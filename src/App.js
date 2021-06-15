@@ -5,8 +5,9 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import ScrollToTop from './components/layout/ScrollToTop';
 import Home from './pages/home';
 import Login from './pages/auth/Login';
+import SignUp from './pages/auth/SignUp';
 
-import { LOGIN } from './routes';
+import { LOGIN, SIGN_UP } from './routes';
 
 const theme = createMuiTheme({
 	overrides: {
@@ -63,6 +64,7 @@ function App() {
 					<ScrollToTop>
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
+						<Route path={SIGN_UP} exact component={SignUp} />
 					</ScrollToTop>
 				</Switch>
 			</Router>

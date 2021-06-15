@@ -6,6 +6,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import Toast from '../../components/common/Toast';
 
+import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
 import { SIGN_UP } from '../../routes';
 
@@ -92,18 +93,18 @@ const Login = () => {
         const { errors, isValid } = validateLogin(data);
 
         if (!isValid) {
+            console.log('form submitted ', errors);
             setErrors({ ...errors, msg: 'Invalid data' });
             return toast.current.handleClick();
         }
 
         setErrors({});
-
     };    
 
     return (
         <>
             <Helmet><title>Login | FXBlooms.com</title></Helmet>
-            {errors && 
+            {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
@@ -123,7 +124,7 @@ const Login = () => {
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
                     </Typography>
-                    <form onClick={handleFormSubmit} className={classes.form}>
+                    <form onSubmit={handleFormSubmit} className={classes.form}>
                         <Grid container direction="column">
                             <Grid item xs={12}>
                                 <TextField 
@@ -153,7 +154,7 @@ const Login = () => {
                                     type="text"
                                     variant="outlined" 
                                     label="Password" 
-                                    placeholder="Username"
+                                    placeholder="Password"
                                     helperText={errors.password}
                                     fullWidth
                                     required
