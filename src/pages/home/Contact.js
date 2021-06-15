@@ -51,7 +51,6 @@ const Contact = () => {
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        
     };
 
     return (
@@ -145,6 +144,7 @@ const Contact = () => {
                                 <Button 
                                     variant="contained" 
                                     color="primary"
+                                    type="submit"
                                 >
                                     Send Message
                                 </Button>

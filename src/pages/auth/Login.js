@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink} from 'react-router-dom';
 import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
@@ -84,6 +84,13 @@ const Login = () => {
 
     const toast = useRef();
 
+    useEffect(() => {
+        setErrors(errors);
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -93,12 +100,11 @@ const Login = () => {
         const { errors, isValid } = validateLogin(data);
 
         if (!isValid) {
-            console.log('form submitted ', errors);
-            setErrors({ ...errors, msg: 'Invalid data' });
-            return toast.current.handleClick();
+            return setErrors({ ...errors, msg: 'Invalid login data' });
         }
 
         setErrors({});
+        alert('Login successful!');
     };    
 
     return (
@@ -114,9 +120,9 @@ const Login = () => {
                 />
             }
             <section className={classes.root}>
-                <Link to="/">
+                <RouterLink to="/">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </Link>
+                </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Welcome back!
@@ -124,7 +130,7 @@ const Login = () => {
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
                     </Typography>
-                    <form onSubmit={handleFormSubmit} className={classes.form}>
+                    <form onSubmit={handleFormSubmit} className={classes.form} noValidate>
                         <Grid container direction="column">
                             <Grid item xs={12}>
                                 <TextField 
@@ -166,6 +172,7 @@ const Login = () => {
                                     className={classes.button}
                                     variant="contained" 
                                     color="primary"
+                                    type="submit"
                                     fullWidth
                                 >
                                     Sign In
