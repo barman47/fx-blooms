@@ -1,0 +1,9 @@
+export const FEATURES = '/features';
+export const STORIES = '/stories';
+export const NUMBERS = '/numbers';
+export const CONTACT_US = '/contactUs';
+export const SIGN_UP = '/user/signUp';
+export const LOGIN = '/user/login';
+export const TERMS = '/termsAndConditions';
+export const PRIVACY_POLICY = '/privacyPolicy';
+export const FAQS = '/frequentlyAskedQuestions';
