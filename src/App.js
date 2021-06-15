@@ -4,13 +4,18 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 import Home from './pages/home';
+import Login from './pages/auth/Login';
+
+import { LOGIN } from './routes';
 
 const theme = createMuiTheme({
 	overrides: {
 		MuiButton: {
 		  	root: {
 				borderRadius: '6px',
-				boxShadow: 'none'
+				boxShadow: 'none',
+				paddingBottom: '14px',
+				paddingTop: '14px',
 		  	},
 		},
 	},
@@ -57,6 +62,7 @@ function App() {
 				<Switch>
 					<ScrollToTop>
 						<Route path="/" exact component={Home} />
+						<Route path={LOGIN} exact component={Login} />
 					</ScrollToTop>
 				</Switch>
 			</Router>

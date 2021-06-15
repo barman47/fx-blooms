@@ -70,8 +70,9 @@ const Contact = () => {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     type="text"
-                                    variant="filled" 
+                                    variant="outlined" 
                                     label="Name" 
+                                    placeholder="Name"
                                     helperText={errors.name || "e.g. John Doe"}
                                     fullWidth
                                     required
@@ -84,8 +85,9 @@ const Contact = () => {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     type="text"
-                                    variant="filled" 
+                                    variant="outlined" 
                                     label="Email Address" 
+                                    placeholder="Email Address"
                                     helperText={errors.email || "e.g. john@gmail.com"}
                                     fullWidth
                                     required
@@ -98,8 +100,9 @@ const Contact = () => {
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                     type="text"
-                                    variant="filled" 
+                                    variant="outlined" 
                                     label="Phone Number" 
+                                    placeholder="Phone Number"
                                     helperText={errors.phone || "e.g. (+234) 801 234 5678"}
                                     fullWidth
                                     required
@@ -112,8 +115,9 @@ const Contact = () => {
                                     value={subject}
                                     onChange={(e) => setSubject(e.target.value.toUpperCase())}
                                     type="text"
-                                    variant="filled" 
+                                    variant="outlined" 
                                     label="Subject" 
+                                    placeholder="Subject"
                                     helperText={errors.subject}
                                     fullWidth
                                     required
@@ -126,8 +130,9 @@ const Contact = () => {
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
                                     type="text"
-                                    variant="filled" 
+                                    variant="outlined" 
                                     label="Message" 
+                                    placeholder="Message"
                                     helperText={errors.message}
                                     rows={5}
                                     fullWidth
