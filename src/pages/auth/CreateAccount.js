@@ -108,6 +108,7 @@ const CreateAccount = (e) => {
     const [postalCode, setPostalCode] = useState('');
     const [photo, setPhoto] = useState('');
     const [idType, setIdType] = useState('');
+    // eslint-disable-next-line
     const [idFront, setIdFront] = useState('');
     const [idBack, setIdBack] = useState('');
     const [errors, setErrors] = useState({});
@@ -116,9 +117,9 @@ const CreateAccount = (e) => {
 
     const toast = useRef();
 
-    useEffect(() => {
-        console.log(emojiFlags.data);
-    }, []);
+    // useEffect(() => {
+    //     console.log(emojiFlags.data);
+    // }, []);
 
     useEffect(() => {
         setErrors(errors);
