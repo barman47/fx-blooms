@@ -114,7 +114,7 @@ const Login = () => {
                 <Toast 
                     ref={toast}
                     title="ERROR"
-                    duration={10000}
+                    duration={5000}
                     msg={errors.msg || ''}
                     type="error"
                 />

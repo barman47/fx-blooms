@@ -65,6 +65,10 @@ const useStyles = makeStyles(theme => ({
             alignSelf: 'center',
             marginBottom: theme.spacing(2),
             textAlign: 'center'
+        },
+
+        '& span': {
+            marginBottom: theme.spacing(5)
         }
     },
 
@@ -77,7 +81,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SignUp = (e) => {
+const CreateProfile = (e) => {
     const classes = useStyles();
 
     const [email, setEmail] = useState('');
@@ -118,12 +122,12 @@ const SignUp = (e) => {
 
     return (
         <>
-            <Helmet><title>Create Accoung | FXBlooms.com</title></Helmet>
+            <Helmet><title>Create Profile | FXBlooms.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
-                    duration={10000}
+                    duration={5000}
                     msg={errors.msg || ''}
                     type="error"
                 />
@@ -143,8 +147,11 @@ const SignUp = (e) => {
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>
                         <div className={classes.header}>
-                            <Typography variant="h4">Create Account</Typography>
-                            <Typography variant="subtitle2" component="span">Complete the form below to create an account.</Typography>
+                            <Typography variant="h4">Create a profile</Typography>
+                            <Typography variant="subtitle2" component="span">Complete the form below to create a profile.</Typography>
+                            <br /><br /><br />
+                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Profile details).</Typography>
+                            <br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={5}>
@@ -232,4 +239,4 @@ const SignUp = (e) => {
     );
 };
 
-export default SignUp;
+export default CreateProfile;
