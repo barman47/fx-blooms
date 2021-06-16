@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@material-ui/core';
@@ -7,7 +8,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Toast from '../../components/common/Toast';
 
 import isEmpty from '../../utils/isEmpty';
-import { LOGIN } from '../../routes';
+import { CREATE_ACCOUNT, LOGIN } from '../../routes';
 import { COLORS } from '../../utils/constants';
 import validateSignUp from '../../utils/validation/auth/signUp';
 
@@ -90,6 +91,8 @@ const CreateProfile = (e) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
 
+    const history = useHistory();
+
     const toast = useRef();
 
     useEffect(() => {
@@ -118,6 +121,7 @@ const CreateProfile = (e) => {
 
         setErrors({});
         alert('Sign up successful!');
+        history.push(CREATE_ACCOUNT);
     };
 
     return (

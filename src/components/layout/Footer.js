@@ -17,11 +17,28 @@ const useStyles = makeStyles(theme => ({
         padding: [[theme.spacing(5), theme.spacing(10)]],
 
         '& img': {
-            marginBottom: theme.spacing(3)
+            marginBottom: theme.spacing(3),
+            [theme.breakpoints.down('sm')]: {
+                margin: '0 auto'
+            }
         },
 
         '& span': {
             fontWeight: 300
+        },
+
+        '& div': {
+            [theme.breakpoints.down('sm')]: {
+                display: 'grid',
+                gridTemplateColumns: 'fr',
+                rowGap: theme.spacing(2)
+            }
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(2),
+            textAlign: 'center'
         }
     },
 
