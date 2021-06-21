@@ -7,3 +7,6 @@ export const COLORS = {
     offWhite: '#f8f8f8',
     lightTeal: '#f6fafa'
 };
+
+export const API = 'https://api.fxblooms.com/api';
+export const NETWORK_ERROR = 'Network Error';

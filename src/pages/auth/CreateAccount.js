@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { Button, 
     FormControl, 
     FormHelperText, 
@@ -15,12 +15,13 @@ import { Button,
 import { makeStyles } from '@material-ui/core/styles';
 import emojiFlags from 'emoji-flags';
 
+import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
 import isEmpty from '../../utils/isEmpty';
 import { LOGIN } from '../../routes';
 import { COLORS } from '../../utils/constants';
-import validateSignUp from '../../utils/validation/auth/signUp';
+import validateSignUp from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -98,28 +99,38 @@ const useStyles = makeStyles(theme => ({
 const CreateAccount = (e) => {
     const classes = useStyles();
 
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    const [FirstName, setFirstName] = useState('');
+    const [LastName, setLastName] = useState('');
     const [countryCode, setCountryCode] = useState('');
-    const [phone, setPhone] = useState('');
-    const [address, setAddress] = useState('');
-    const [country, setCountry] = useState('');
-    const [city, setCity] = useState('');
+    const [PhoneNo, setPhone] = useState('');
+    const [Address, setAddress] = useState('');
+    const [Country, setCountry] = useState('');
+    const [City, setCity] = useState('');
     const [postalCode, setPostalCode] = useState('');
     const [photo, setPhoto] = useState('');
     const [idType, setIdType] = useState('');
     // eslint-disable-next-line
     const [idFront, setIdFront] = useState('');
     const [idBack, setIdBack] = useState('');
+    const [Profile, setProfile] = useState({});
     const [errors, setErrors] = useState({});
 
-    const countries = emojiFlags.data
+    const countries = emojiFlags.data;
+
+    const location = useLocation();
 
     const toast = useRef();
+    const spinner = useRef();
 
     // useEffect(() => {
     //     console.log(emojiFlags.data);
     // }, []);
+
+    useEffect(() => {
+        if (location.state) {
+            setProfile({ ...location.state });
+        }
+    }, [location.state]);
 
     useEffect(() => {
         setErrors(errors);
@@ -143,6 +154,7 @@ const CreateAccount = (e) => {
         }
 
         setErrors({});
+        // spinner.current.handleToggle();
         alert('Sign up successful!');
     };
 
@@ -158,6 +170,7 @@ const CreateAccount = (e) => {
                     type="error"
                 />
             }
+            <Spinner ref={spinner} text="Please wait . . ." />
             <section>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -190,16 +203,16 @@ const CreateAccount = (e) => {
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <TextField 
                                             className={classes.input}
-                                            value={firstName}
+                                            value={FirstName}
                                             onChange={(e) => setFirstName(e.target.value)}
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter First Name"
                                             label="First Name" 
-                                            helperText={errors.firstName}
+                                            helperText={errors.FirstName}
                                             fullWidth
                                             required
-                                            error={errors.firstName ? true : false}
+                                            error={errors.FirstName ? true : false}
                                         />
                                     </Tooltip>
                                 </Grid>
@@ -207,16 +220,16 @@ const CreateAccount = (e) => {
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <TextField 
                                             className={classes.input}
-                                            value={lastName}
+                                            value={LastName}
                                             onChange={(e) => setLastName(e.target.value)}
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Last Name"
                                             label="Last Name" 
-                                            helperText={errors.lastName}
+                                            helperText={errors.LastName}
                                             fullWidth
                                             required
-                                            error={errors.lastName ? true : false}
+                                            error={errors.LastName ? true : false}
                                         />
                                     </Tooltip>
                                 </Grid>
@@ -242,11 +255,11 @@ const CreateAccount = (e) => {
                                         
                                         >
                                             <MenuItem value="">Country Code</MenuItem>
-                                            {countries.map((country) => (
-                                                <MenuItem key={country.code} value={country.dialCode}>
-                                                    {/* <span role="img" aria-label={country.name}>{country.emoji}</span> */}
-                                                    {/* {String.fromCodePoint('0x' + country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + country?.unicode.split(' '[1].substring(2)))} */}
-                                                    {country.dialCode}
+                                            {countries.map((Country) => (
+                                                <MenuItem key={Country.code} value={Country.dialCode}>
+                                                    {/* <span role="img" aria-label={Country.name}>{Country.emoji}</span> */}
+                                                    {/* {String.fromCodePoint('0x' + Country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + Country?.unicode.split(' '[1].substring(2)))} */}
+                                                    {Country.dialCode}
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -269,77 +282,77 @@ const CreateAccount = (e) => {
                                 <Grid item xs={12} md={9} lg={9} xl={9}>
                                     <TextField 
                                         className={classes.input}
-                                        value={phone}
+                                        value={PhoneNo}
                                         onChange={(e) => setPhone(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         // placeholder="Enter Country Code"
                                         // label="Country Code" 
-                                        helperText={errors.phone}
+                                        helperText={errors.PhoneNo}
                                         fullWidth
                                         required
-                                        error={errors.phone ? true : false}
+                                        error={errors.PhoneNo ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={address}
+                                        value={Address}
                                         onChange={(e) => setAddress(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter your address"
+                                        placeholder="Enter your Address"
                                         label="Address" 
-                                        helperText={errors.address}
+                                        helperText={errors.Address}
                                         multiline
                                         rows={2}
                                         fullWidth
                                         required
-                                        error={errors.address ? true : false}
+                                        error={errors.Address ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4} lg={4} xl={4}>
                                     <FormControl 
                                         variant="outlined" 
-                                        error={errors.country ? true : false } 
+                                        error={errors.Country ? true : false } 
                                         fullWidth 
                                         required
                                     >
                                         <InputLabel 
-                                            id="country" 
+                                            id="Country" 
                                             variant="outlined" 
-                                            error={errors.country ? true : false}
+                                            error={errors.Country ? true : false}
                                         >
                                             Country
                                         </InputLabel>
                                         <Select
-                                            labelId="country"
+                                            labelId="Country"
                                             className={classes.input}
-                                            value={country}
+                                            value={Country}
                                             onChange={(e) => setCountry(e.target.value)}
                                         
                                         >
                                             <MenuItem value="">Select Country</MenuItem>
-                                            {countries.map((country) => (
-                                                <MenuItem key={country.code} value={country.name}>{country.name}</MenuItem>
+                                            {countries.map((Country) => (
+                                                <MenuItem key={Country.code} value={Country.name}>{Country.name}</MenuItem>
                                             ))}
                                         </Select>
-                                        <FormHelperText>{errors.country}</FormHelperText>
+                                        <FormHelperText>{errors.Country}</FormHelperText>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} md={4} lg={4} xl={4}>
                                     <TextField 
                                         className={classes.input}
-                                        value={city}
+                                        value={City}
                                         onChange={(e) => setCity(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter your address"
+                                        placeholder="Enter your Address"
                                         label="City/State" 
-                                        helperText={errors.city}
+                                        helperText={errors.City}
                                         fullWidth
                                         required
-                                        error={errors.city ? true : false}
+                                        error={errors.City ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={4} lg={4} xl={4}>

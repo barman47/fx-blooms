@@ -10,7 +10,7 @@ import Toast from '../../components/common/Toast';
 import isEmpty from '../../utils/isEmpty';
 import { CREATE_ACCOUNT, LOGIN } from '../../routes';
 import { COLORS } from '../../utils/constants';
-import validateSignUp from '../../utils/validation/auth/signUp';
+import validateSignUp from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
 import img from '../../assets/img/sign-up.svg';
@@ -19,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     aside: {
         backgroundColor: COLORS.lightTeal,
         height: '100vh',
-        padding: [[theme.spacing(4), theme.spacing(8)]],
+        padding: [[theme.spacing(), theme.spacing(8)]],
 
         '& div': {
             display: 'flex',
@@ -68,6 +68,10 @@ const useStyles = makeStyles(theme => ({
             textAlign: 'center'
         },
 
+        '& h4': {
+            marginTop: theme.spacing(5)
+        },
+
         '& span': {
             marginBottom: theme.spacing(5)
         }
@@ -85,10 +89,10 @@ const useStyles = makeStyles(theme => ({
 const CreateProfile = (e) => {
     const classes = useStyles();
 
-    const [email, setEmail] = useState('');
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
+    const [Email, setEmail] = useState('');
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
+    const [ConfirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
 
     const history = useHistory();
@@ -107,10 +111,10 @@ const CreateProfile = (e) => {
         setErrors({});
 
         const data = {
-            email: email.toLowerCase(),
-            username,
-            password,
-            confirmPassword            
+            Email: Email.toLowerCase(),
+            Username,
+            Password,
+            ConfirmPassword            
         };
 
         const { errors, isValid } = validateSignUp(data);
@@ -120,8 +124,7 @@ const CreateProfile = (e) => {
         }
 
         setErrors({});
-        alert('Sign up successful!');
-        history.push(CREATE_ACCOUNT);
+        history.push(CREATE_ACCOUNT, { Email: Email.toLowerCase(), Username, Password });
     };
 
     return (
@@ -162,61 +165,60 @@ const CreateProfile = (e) => {
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={email}
+                                        value={Email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Email Address"
                                         label="Email Address" 
-                                        helperText={errors.email}
+                                        helperText={errors.Email}
                                         fullWidth
                                         required
-                                        error={errors.email ? true : false}
+                                        error={errors.Email ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={username}
+                                        value={Username}
                                         onChange={(e) => setUsername(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Username"
                                         label="Username" 
-                                        helperText={errors.username}
+                                        helperText={errors.Username || 'Username cannot be changed once set.'}
                                         fullWidth
-                                        required
-                                        error={errors.username ? true : false}
+                                        error={errors.Username ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={password}
+                                        value={Password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Password"
                                         label="Password" 
-                                        helperText={errors.password}
+                                        helperText={errors.Password}
                                         fullWidth
                                         required
-                                        error={errors.password ? true : false}
+                                        error={errors.Password ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={confirmPassword}
+                                        value={ConfirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Confirm Password"
                                         label="Confirm Password" 
-                                        helperText={errors.confirmPassword}
+                                        helperText={errors.ConfirmPassword}
                                         fullWidth
                                         required
-                                        error={errors.confirmPassword ? true : false}
+                                        error={errors.ConfirmPassword ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>

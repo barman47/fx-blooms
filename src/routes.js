@@ -8,3 +8,8 @@ export const LOGIN = '/user/login';
 export const TERMS = '/termsAndConditions';
 export const PRIVACY_POLICY = '/privacyPolicy';
 export const FAQS = '/frequentlyAskedQuestions';
+
+export const DASHBOARD = '/dashboard';
+export const DASHBOARD_HOME = '/listings';
+export const CREATE_LISTING = '/createListing';
+export const MESSAGES = '/messages';

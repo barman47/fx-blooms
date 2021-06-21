@@ -10,7 +10,7 @@ import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
 import { SIGN_UP } from '../../routes';
 
-import validateLogin from '../../utils/validation/auth/login';
+import validateLogin from '../../utils/validation/customer/login';
 
 import logo from '../../assets/img/logo.svg';
 
