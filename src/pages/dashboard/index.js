@@ -1,29 +1,25 @@
 import { useState } from 'react';
-import { useHistory, Link as RouterLink, Switch, Route } from 'react-router-dom';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useHistory, Link as RouterLink } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 import logo from '../../assets/img/logo.svg';
 
 import {
     Box,
-    AppBar,
-    Toolbar,
     IconButton,
-    Typography,
-    Button,
     Drawer,
     Divider,
-    Link,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
     BottomNavigation,
-    BottomNavigationAction
+    BottomNavigationAction,
+    Tooltip
 } from '@material-ui/core';
 
-import { ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout, Menu } from 'mdi-material-ui';
+import { ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { CREATE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
 
 const drawerWidth = 240;
@@ -71,7 +67,7 @@ const useStyles = makeStyles((theme) => ({
         width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             display: 'none'
         }
     },
@@ -110,9 +106,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     content: {
-        flexGrow: 1,
-        paddingLeft: theme.spacing(3),
-        paddingRight: theme.spacing(3)
+        flexGrow: 1
     },
 
     link: {
@@ -137,7 +131,6 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = ({children}) => {
     const classes = useStyles();
-    const theme = useTheme();
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
 
@@ -149,6 +142,7 @@ const Dashboard = ({children}) => {
         { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> }
     ];
 
+    // eslint-disable-next-line
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -157,12 +151,13 @@ const Dashboard = ({children}) => {
         setOpen(!open);
     };
     
+    // eslint-disable-next-line
     const handleDrawerClose = () => {
         setOpen(false);
     };
 
     const handleLinkClick = (link) => {
-        history.push(`/dashboard/${link}`);
+        history.push(`/dashboard${link}`);
     };
 
     return (
@@ -207,11 +202,21 @@ const Dashboard = ({children}) => {
                 }}
             >
                 <div className={classes.toolbar}>
-                    <RouterLink to="/">
-                        <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
-                    </RouterLink>
+                    {open && 
+                        <RouterLink to="/">
+                            <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
+                        </RouterLink>
+                    }
                     <IconButton onClick={toggleDrawer}>
-                        {!open && theme.direction === 'rtl' ? <ChevronRight /> : <ChevronLeft />}
+                        {!open ?
+                            <Tooltip title="Expand Navigation" placement="top" arrow>
+                                <ChevronRight />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Collapse Navigation" placement="top" arrow>
+                                <ChevronLeft />
+                            </Tooltip>
+                        }
                     </IconButton>
                 </div> 
                 <Divider />
@@ -238,7 +243,7 @@ const Dashboard = ({children}) => {
             <div className={classes.content}>
                 {children}
             </div>
-            {/* <Box
+            <Box
                 boxShadow={5}
                 // bgcolor="background.paper"
                 // m={1}
@@ -252,11 +257,11 @@ const Dashboard = ({children}) => {
                     }}
                     showLabels
                 >
-                    {links.map(item => (
-                        <BottomNavigationAction label={item.text} icon={item.icon} />
+                    {links.map((item, index) => (
+                        <BottomNavigationAction key={index} label={item.text} icon={item.icon} />
                     ))}
                 </BottomNavigation>
-            </Box> */}
+            </Box>
         </section>
     );
 }

@@ -8,5 +8,7 @@ export const COLORS = {
     lightTeal: '#f6fafa'
 };
 
+export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
+
 export const API = 'https://api.fxblooms.com/api';
 export const NETWORK_ERROR = 'Network Error';

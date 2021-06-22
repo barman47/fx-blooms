@@ -33,10 +33,11 @@ const theme = createMuiTheme({
 	overrides: {
 		MuiButton: {
 		  	root: {
-				borderRadius: '6px',
+				borderRadius: '5px',
 				boxShadow: 'none',
 				paddingBottom: '14px',
 				paddingTop: '14px',
+				textTransform: 'capitalize'
 		  	},
 		},
 	},
@@ -91,9 +92,9 @@ function App() {
 									<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
 									<Route path={DASHBOARD}>
 										<Dashboard>
-											<Route path={`${DASHBOARD}/${DASHBOARD_HOME}`} exact component={AllListings} />
-											<Route path={`${DASHBOARD}/${CREATE_LISTING}`} exact component={CreateListing} />
-											<Route path={`${DASHBOARD}/${MESSAGES}`} exact component={Messages} />
+											<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
+											<Route path={`${DASHBOARD}${CREATE_LISTING}`} exact component={CreateListing} />
+											<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
 										</Dashboard>
 									</Route>
 								</ScrollToTop>
