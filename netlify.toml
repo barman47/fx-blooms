@@ -1,0 +1,5 @@
+[[redirects]]
+from = "/dashboard"
+to = "/dashboard"
+force = true
+headers = {X-From = "Netlify"}
