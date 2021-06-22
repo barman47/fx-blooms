@@ -157,6 +157,7 @@ const Dashboard = ({children}) => {
     };
 
     const handleLinkClick = (link) => {
+        // console.log(`/dashboard${link}`);
         history.push(`/dashboard${link}`);
     };
 
