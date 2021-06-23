@@ -11,5 +11,5 @@ export const FAQS = '/frequentlyAskedQuestions';
 
 export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = '/listings';
-export const CREATE_LISTING = '/createListing';
+export const MAKE_LISTING = '/createListing';
 export const MESSAGES = '/messages';

@@ -14,14 +14,14 @@ import CreateAccount from './pages/auth/CreateAccount';
 import Dashboard from './pages/dashboard';
 
 import AllListings from './pages/dashboard/listings/AllListings';
-import CreateListing from './pages/dashboard/listings/Create';
+import MakeListing from './pages/dashboard/listings/MakeListing';
 import Messages from './pages/dashboard/messages/Messages';
 
 import { 
 	LOGIN, 
 	SIGN_UP, 
 	CREATE_ACCOUNT, 
-	CREATE_LISTING,
+	MAKE_LISTING,
 	MESSAGES,
 	DASHBOARD,
 	DASHBOARD_HOME 
@@ -93,7 +93,7 @@ function App() {
 									<Route path={DASHBOARD}>
 										<Dashboard>
 											<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
-											<Route path={`${DASHBOARD}${CREATE_LISTING}`} exact component={CreateListing} />
+											<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
 											<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
 										</Dashboard>
 									</Route>

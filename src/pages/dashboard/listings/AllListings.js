@@ -77,10 +77,7 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		position: 'relative',
 		left: 0,
-		display: 'grid',
-		marginTop: theme.spacing(5),
-		gridTemplateColumns: '1fr',
-		rowGap: theme.spacing(2)
+		marginTop: theme.spacing(5)
 	},
 
 	filterContainer: {
@@ -131,7 +128,7 @@ const AllListings = () => {
 		setOpen(true);
 	};
 
-	const handleModalClose = () => {
+	const handleCloseModal = () => {
 		setOpen(false);
 	};
 
@@ -147,7 +144,7 @@ const AllListings = () => {
 					<FilterOutline />
 				</Fab>
 			</Tooltip>
-			<FilterListingModal open={open} handleModalClose={handleModalClose} />
+			<FilterListingModal open={open} handleCloseModal={handleCloseModal} />
 			<Grid container direction="row">
 				<Grid item xs={12} lg={9} className={classes.listings}>
 					<header className={classes.listingHeader}>
@@ -159,23 +156,14 @@ const AllListings = () => {
 					</header>
 					<section className={classes.listingContainer}>
 						<Listing />
+						<Listing negotiation by />
+						<Listing buttonText="Edit" />
 						<Listing />
+						<Listing negotiation by />
+						<Listing buttonText="Edit" />
 						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
-						<Listing />
+						<Listing negotiation by />
+						<Listing buttonText="Edit" />
 					</section>
 				</Grid>
 				<Filter />
@@ -282,7 +270,7 @@ const Filter = () => {
 									variant="outlined" 
 									error={errors.availableCurrency ? true : false}
 								>
-									&#8364;(GBP)
+									&#163;(GBP)
 								</InputLabel>
 								<Select
 									labelId="availableCurrency"
@@ -290,7 +278,7 @@ const Filter = () => {
 									onChange={(e) => setAvailableCurrency(e.target.value)}
 								
 								>
-									<MenuItem value="">&#8364;(GBP)</MenuItem>
+									<MenuItem value="">&#163;(GBP)</MenuItem>
 								</Select>
 								<FormHelperText>{errors.availableCurrency}</FormHelperText>
 							</FormControl>
@@ -298,12 +286,7 @@ const Filter = () => {
 					<Grid item xs={12}>
 						<TextField
 							value={ExchangeAmount}
-							onChange={(e) => {
-								if(!isNaN(Number(e.target.value))) {
-									console.log('not a number');
-									setAvailableCurrency(e.target.value);
-								}
-							}}
+							onChange={(e) => setAvailableCurrency(e.target.value)}
 							type="text"
 							variant="outlined" 
 							placeholder="Enter Amount"

@@ -1,9 +1,11 @@
-import { useState } from 'react';
-import { useHistory, Link as RouterLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
+import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 import logo from '../../assets/img/logo.svg';
+import avatar from '../../assets/img/avatar.jpg';
 
 import {
     Box,
@@ -20,7 +22,9 @@ import {
 } from '@material-ui/core';
 
 import { ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
-import { CREATE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
+import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
+
+import { COLORS } from '../../utils/constants';
 
 const drawerWidth = 240;
 
@@ -110,12 +114,45 @@ const useStyles = makeStyles((theme) => ({
     },
 
     link: {
-        color: 'inherit'
+        backgroundColor: `${COLORS.lightTeal} !important`,
+        border: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        color: theme.palette.primary.main
+    },
+
+    linkItem: {
+        backgroundColor: COLORS.offWhite,
+        marginBottom: theme.spacing(2)
+    },
+
+    icon: {
+        color: theme.palette.primary.main
     },
 
     logoutContainer: {
         position: 'absolute',
-        bottom: 0
+        bottom: 0,
+        width: drawerWidth
+    },
+
+    avatar: {
+        borderRadius: '30px',
+        maxWidth: theme.spacing(8),
+        width: '50%'
+    },
+
+    avatarContainer: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-evenly',
+        width: '100%',
+    },
+
+    email: {
+        color: COLORS.grey,
+        fontWeight: 300
     },
 
     bottomBar: {
@@ -131,16 +168,23 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = ({children}) => {
     const classes = useStyles();
+    const history = useHistory();
+    const location = useLocation();
+
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
+    const [path, setPath] = useState('');
 
-    const history = useHistory();
 
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
-        { url : CREATE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
+        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> }
     ];
+
+    useEffect(() => {
+        setPath(location.pathname);
+    }, [location]);
 
     // eslint-disable-next-line
     const handleDrawerOpen = () => {
@@ -221,25 +265,41 @@ const Dashboard = ({children}) => {
                     </IconButton>
                 </div> 
                 <Divider />
-                    <List>
-                        {links.map((link, index) => (
-                            <ListItem key={index} button onClick={() => handleLinkClick(link.url)}>
-                                <ListItemIcon>
-                                    {link.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={link.text} />
-                            </ListItem>
-                        ))}
-                    </List>
+                <List className={classes.links}>
+                    {links.map((link, index) => (
+                        <ListItem 
+                            className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
+                            key={index} 
+                            button 
+                            disableRipple
+                            onClick={() => handleLinkClick(link.url)}
+                        >
+                            <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
+                                {link.icon}
+                            </ListItemIcon>
+                            <ListItemText primary={link.text} />
+                        </ListItem>
+                    ))}
+                </List>
                 <Divider />
-                <List className={classes.logoutContainer}>
-                    <ListItem button>
+                <section className={classes.logoutContainer}>
+                    <div className={classes.avatarContainer}>
+                        <div>
+                            <img className={classes.avatar} src={avatar} alt="Avatar" />
+                        </div>
+                        <div>
+                            <Typography variant="h6">Hello User</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.email}>hello@fxblooms.com</Typography>
+                        </div>
+                    </div>
+                    <Divider />
+                    <ListItem button className={classes.logout}>
                         <ListItemIcon>
                             <Logout />
                         </ListItemIcon>
                         <ListItemText primary="Logout" />
                     </ListItem>
-                </List>
+                </section>
             </Drawer>
             <div className={classes.content}>
                 {children}

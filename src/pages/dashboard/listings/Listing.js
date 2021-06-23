@@ -1,6 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 
@@ -10,6 +11,7 @@ const useStyles = makeStyles(theme => ({
         boxShadow: SHADOW,
         display: 'grid',
         gridTemplateColumns: '1fr',
+        marginBottom: theme.spacing(3),
 
         '& header': {
             backgroundColor: COLORS.lightTeal,
@@ -38,7 +40,7 @@ const useStyles = makeStyles(theme => ({
             padding: [[theme.spacing(4), theme.spacing(3)]],
 
             [theme.breakpoints.down('sm')]: {
-                padding: [[theme.spacing(1), theme.spacing(2)]]
+                padding: theme.spacing(1)
             },
 
             '& span': {
@@ -64,19 +66,20 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = () => {
+const Listing = ({ by, negotiation, buttonText }) => {
     const classes = useStyles();
+    const theme = useTheme();
 
     return (
         <section className={classes.root}>
             <header>
-                <Typography variant="body2" component="p">Listed by: walecalfos</Typography>
+                <Typography variant="body2" component="p">Listed by: <span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></Typography>
                 <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
             </header>
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#8364;25,000.00
+                    &#163;25,000.00
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
@@ -84,30 +87,55 @@ const Listing = () => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#8364;5,000.00
+                    &#163;5,000.00
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    &#8358;650 to &#8364;1
+                    &#8358;650 to &#163;1
                 </Typography>
-                <Button 
-                    to="#!"
-                    component={RouterLink} 
-                    variant="contained" 
-                    size="small" 
-                    color="primary"
-                    disableElevation
-                    classes={{ 
-                        contained: classes.button,
-                        root: classes.button
-                        // roo: classes.buttonLabel 
-                    }}
-                >
-                    Contact
-                </Button>
+                {negotiation ? 
+                    <Button 
+                        disabled
+                        to="#!"
+                        component={RouterLink} 
+                        variant="contained" 
+                        size="small" 
+                        color="primary"
+                        disableElevation
+                        classes={{ 
+                            contained: classes.button,
+                            root: classes.button
+                            // roo: classes.buttonLabel 
+                        }}
+                    >
+                        In Negotiation
+                    </Button>
+                    :
+                    <Button 
+                        to="#!"
+                        component={RouterLink} 
+                        variant="contained" 
+                        size="small" 
+                        color="primary"
+                        disableElevation
+                        classes={{ 
+                            contained: classes.button,
+                            root: classes.button
+                            // roo: classes.buttonLabel 
+                        }}
+                    >
+                        { buttonText ? buttonText : 'Contact'}
+                    </Button>
+                }
             </div>
         </section>
     );
 };
 
+Listing.propTypes = {
+    negotiation: PropTypes.bool,
+    by: PropTypes.bool,
+    buttonText: PropTypes.string
+
+};
 export default Listing;

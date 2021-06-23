@@ -63,7 +63,7 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const MobileFilterModal = ({ open, handleModalClose }) => {
+const MobileFilterModal = ({ open, handleCloseModal }) => {
 	const classes = useStyles();
 
 	const [ExchangeAmount, setExchangeAmount] = useState('');
@@ -85,7 +85,7 @@ const MobileFilterModal = ({ open, handleModalClose }) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            onClose={handleModalClose}
+            onClose={handleCloseModal}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
@@ -174,7 +174,7 @@ const MobileFilterModal = ({ open, handleModalClose }) => {
                                             variant="outlined" 
                                             error={errors.availableCurrency ? true : false}
                                         >
-                                            &#8364;(GBP)
+                                            &#163;(GBP)
                                         </InputLabel>
                                         <Select
                                             labelId="availableCurrency"
@@ -182,7 +182,7 @@ const MobileFilterModal = ({ open, handleModalClose }) => {
                                             onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
-                                            <MenuItem value="">&#8364;(GBP)</MenuItem>
+                                            <MenuItem value="">&#163;(GBP)</MenuItem>
                                         </Select>
                                         <FormHelperText>{errors.availableCurrency}</FormHelperText>
                                     </FormControl>
@@ -233,7 +233,7 @@ const MobileFilterModal = ({ open, handleModalClose }) => {
 
 MobileFilterModal.propTypes = {
     open: PropTypes.bool.isRequired,
-    handleModalClose: PropTypes.func.isRequired
+    handleCloseModal: PropTypes.func.isRequired
 };
 
 export default MobileFilterModal;
