@@ -14,6 +14,7 @@ import CreateAccount from './pages/auth/CreateAccount';
 import Dashboard from './pages/dashboard';
 
 import AllListings from './pages/dashboard/listings/AllListings';
+import EditListing from './pages/dashboard/listings/EditListing';
 import MakeListing from './pages/dashboard/listings/MakeListing';
 import Messages from './pages/dashboard/messages/Messages';
 
@@ -24,7 +25,8 @@ import {
 	MAKE_LISTING,
 	MESSAGES,
 	DASHBOARD,
-	DASHBOARD_HOME 
+	DASHBOARD_HOME, 
+	EDIT_LISTING
 } from './routes';
 
 import { store } from './store';
@@ -94,6 +96,7 @@ function App() {
 										<Dashboard>
 											<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
 											<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
+											<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={EditListing} />
 											<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
 										</Dashboard>
 									</Route>

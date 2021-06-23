@@ -1,69 +1,110 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+
 import { 
-    Backdrop,
-	Button,
-    Fade,
-	FormControl,
-	FormHelperText,
-	Grid,
-	InputLabel, 
-	MenuItem,
-    Modal,
-	Select,
-	TextField,
+    Button,
+    Fab,
+    Divider,
+    FormControl, 
+    FormHelperText,
+    Grid, 
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
     Tooltip,
-	Typography 
+    Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Plus } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
+import AddListingModal from './AddListingModal';
+import EditListingItem from './EditListingItem';
+
+import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
+    root: {
+        height: '100%',
+        padding: theme.spacing(2),
+        
+        '& header': {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginBottom: theme.spacing(3),
 
-    paper: {
-        backgroundColor: theme.palette.background.paper,
-        boxShadow: SHADOW
+            [theme.breakpoints.down('sm')]: {
+                flexDirection: 'column'
+            },
+
+            '& h6': {
+                fontWeight: 600
+            }
+        }
     },
 
     container: {
-		backgroundColor: COLORS.lightTeal,
-        borderRadius: '5px',
-		padding: theme.spacing(4, 2),
-        width: '80%',
+        position: 'relative',
+        top: 0,
 
-        [theme.breakpoints.down('sm')]: {
-            height: '80vh',
-            overflowY: 'auto'
-        },
-
-        '& header': {
-            marginBottom: theme.spacing(4),
-            textAlign: 'center',
-            
-            '& h6': {
-                fontWeight: 600,
-            },
-
-            '& span': {
-                [theme.breakpoints.down('sm')]: {
-                    display: 'inline-block',
-                    textAlign: 'left',
-                }
-            }
+        [theme.breakpoints.down('md')]: {
+            height: '100%'
         }
-	}
+    },
+
+    listingFormContainer: {
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
+    },
+
+    helperText: {
+        fontSize: '10px'
+    },
+
+    listings: {
+        backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius
+    },
+
+    noListing: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+
+        '& h6': {
+            padding: [[theme.spacing(1), theme.spacing(2)]]
+        }
+    },
+
+    noListingContent: {
+        alignSelf: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%'
+    },
+
+    noListingIcon: {
+        color: theme.palette.primary.main
+    },
+
+    noListingText: {
+        color: COLORS.grey,
+        fontWeight: 300,
+        marginTop: theme.spacing(2)
+    }
 }));
 
-const AddListingModal = ({ edit, open, handleCloseModal }) => {
-	const classes = useStyles();
+const EditListing = () => {
+    const classes = useStyles();
 
-	const [AvailableCurrency, setAvailableCurrency] = useState('');
+    const [open, setOpen] = useState(false);
+    const [openAccountModal, setOpenAccountModal] = useState(false);
+
+    const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     const [ExchangeCurrency, setExchangeCurrency] = useState('');
@@ -74,43 +115,31 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
 
-	const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState({});
 
-	return (
-        <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={handleCloseModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={open}>
-                <Grid item lg={3} className={classes.container}>
-                    <header>
-                        <div>
-                            {edit ? 
-                                <>
-                                    <Typography variant="h6">Edit Listing</Typography>
-                                    <Typography variant="subtitle1" component="span">Modify your current listing.</Typography>
-                                </>
+    const handleOpenModal = () => {
+        setOpen(true);
+    };
 
-                             : 
-                                <>
-                                    <Typography variant="h6">Make a Listing</Typography>
-                                    <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
-                                </>
-                            }
-                        </div>
-                    </header>
+    const handleCloseModal = () => {
+        setOpen(false);
+    };
+
+    return (
+        <section className={classes.root}>
+			<AddListingModal edit={true} open={open} handleCloseModal={handleCloseModal} />
+            <header>
+                <div>
+                    <Typography variant="h6">Edit Listing</Typography>
+                    <Typography variant="subtitle1" component="span">Modify your current listing</Typography>
+                </div>
+            </header>
+            <Grid container direction="row" spacing={4} className={classes.container}>
+                <Grid item md={4} className={classes.listingFormContainer}>
                     <form>
-                        <Grid container direction="row" spacing={1} className={classes.formContainer}>
+                        <Grid container direction="row" spacing={2}>
                             <Grid item xs={12} md={5}>
-                                <Typography variant="subtitle2" component="span">I Have</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
                                 <FormControl 
                                     variant="outlined" 
                                     error={errors.AvailableCurrency ? true : false } 
@@ -136,7 +165,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={7}>
-                            <Typography variant="subtitle2" component="span"AvailableCurrency>&nbsp;</Typography>
+                                <br />
                                 <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
                                         value={ExchangeAmount}
@@ -153,7 +182,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12} md={5}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>Exchange Rate</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                 <FormControl 
                                     variant="outlined" 
                                     error={errors.ExchangeCurrency ? true : false } 
@@ -196,7 +225,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12} md={5}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>Min. Exchange Amount</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
                                 <FormControl 
                                     variant="outlined" 
                                     error={errors.AvailableCurrency ? true : false } 
@@ -239,7 +268,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>I Will Receive</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>I Will Receive</Typography>
                                 <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                     <TextField
                                         value={ReceiptAmount}
@@ -256,7 +285,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span"AvailableCurrency>Listing Fee</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
                                 <TextField
                                     value={ListingFee}
                                     // onChange={(e) => setExchangeAmount(e.target.value)}
@@ -278,15 +307,26 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                         </Grid>
                     </form>
                 </Grid>
-            </Fade>
-        </Modal>
-	);
+                <Grid item xs={12} md={12} lg={8} className={classes.listings}>
+                    {/* <section className={classes.noListing}>
+                        <Typography variant="h6">Previous Listings</Typography>
+                        <Divider />
+                        <div className={classes.noListingContent}>
+                            <FormatListText className={classes.noListingIcon} />
+                            <Typography className={classes.noListingText} variant="subtitle2" component="span">Your previous listings would appear here</Typography>
+                        </div>
+                    </section> */}
+                    <Typography variant="h6">Previous Listings</Typography>
+                    <br />
+                    <Divider />
+                    <br />
+                    <div>
+                        <EditListingItem handleOpenModal={handleOpenModal} />
+                    </div>
+                </Grid>
+            </Grid>
+        </section>
+    );
 };
 
-AddListingModal.propTypes = {
-    edit: PropTypes.bool.isRequired,
-    open: PropTypes.bool.isRequired,
-    handleCloseModal: PropTypes.func.isRequired
-};
-
-export default AddListingModal;
+export default EditListing;
