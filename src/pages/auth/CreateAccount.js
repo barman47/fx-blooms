@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Button, 
     FormControl, 
     FormHelperText, 
@@ -18,10 +20,14 @@ import emojiFlags from 'emoji-flags';
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
+import { getCountries } from '../../actions/countries';
+import { getDocuments } from '../../actions/documents';
+import { createCustomer } from '../../actions/customer';
+
 import isEmpty from '../../utils/isEmpty';
 import { LOGIN } from '../../routes';
 import { COLORS } from '../../utils/constants';
-import validateSignUp from '../../utils/validation/customer/createProfile';
+import validateCreateProfile from '../../utils/validation/customer/createAccount';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -96,42 +102,104 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const CreateAccount = (e) => {
+const CreateAccount = (props) => {
     const classes = useStyles();
+    const { countries } = useSelector(state => state);
+    const { documents } = useSelector(state => state);
+    const errorsState = useSelector(state => state.errors);
+    
 
     const [FirstName, setFirstName] = useState('');
     const [LastName, setLastName] = useState('');
-    const [countryCode, setCountryCode] = useState('');
+    const [CountryCode, setCountryCode] = useState('');
     const [PhoneNo, setPhone] = useState('');
     const [Address, setAddress] = useState('');
     const [Country, setCountry] = useState('');
+    const [CountryId, setCountryId] = useState('');
     const [City, setCity] = useState('');
-    const [postalCode, setPostalCode] = useState('');
-    const [photo, setPhoto] = useState('');
-    const [idType, setIdType] = useState('');
+    const [StateId, setStateId] = useState('');
+    const [states, setStates] = useState([]);
+    const [PostalCode, setPostalCode] = useState('');
     // eslint-disable-next-line
-    const [idFront, setIdFront] = useState('');
-    const [idBack, setIdBack] = useState('');
+    const [Photo, setPhoto] = useState('');
+    const [PhotoFile, setPhotoFile] = useState(null);
+    const [DocumentType, setDocumentType] = useState('');
+    const [IdNumber, setIdNumber] = useState('');
+    // eslint-disable-next-line
+    const [IdFront, setIdFront] = useState('');
+    const [IdFrontPhoto, setIdFrontPhoto] = useState(null);
+    // eslint-disable-next-line
+    const [IdBackPhoto, setIdBackPhoto] = useState(null);
+    // eslint-disable-next-line
+    const [IdBack, setIdBack] = useState('');
     // eslint-disable-next-line
     const [Profile, setProfile] = useState({});
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState('');
 
-    const countries = emojiFlags.data;
+    const countryCodes = emojiFlags.data;
 
     const location = useLocation();
 
     const toast = useRef();
     const spinner = useRef();
 
+    useEffect(() => {
+        if (countries.length === 0) {
+            props.getCountries();
+        }
+        if (documents.length === 0) {
+            props.getDocuments();
+        }
+        // eslint-disable-next-line
+    }, []);
+
     // useEffect(() => {
     //     console.log(emojiFlags.data);
     // }, []);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errors, msg: errorsState.msg });
+        }
+        setLoading(false);
+        setLoadingText('');
+    }, [errorsState, errors]);
 
     useEffect(() => {
         if (location.state) {
             setProfile({ ...location.state });
         }
     }, [location.state]);
+
+    // Setting states when a country is selected
+    useEffect(() => {
+        if (!isEmpty(Country)) {
+            const country = countries.find(country => country.name === Country);
+            const CountryId = country.id;
+            setCountryId(CountryId);
+
+            // eslint-disable-next-line array-callback-return
+            const states = [];
+
+            countries.forEach(item => {
+                if (item.id === CountryId) {
+                    states.push(item.states[0]);
+                }
+            });
+            setStates(states);
+        }
+    }, [Country, countries]);
+
+    // Setting StateId when user selects a state
+    useEffect(() => {
+        if (!isEmpty(City)) {
+            const state = states.find(state => state?.name === City);
+            setStateId(state?.id);
+        }
+    }, [City, states]);
+
 
     useEffect(() => {
         setErrors(errors);
@@ -140,23 +208,76 @@ const CreateAccount = (e) => {
         }
     }, [errors]);
 
+    const handleSetPhoto = (e) => {
+        setPhoto(e.target.files[0]);
+        const reader = new FileReader();
+
+        reader.onload = (() => {
+            const image = reader.result; //Array Buffer
+            console.log(image)
+            setPhotoFile(image);
+        });
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    const handleSetIdFront = (e) => {
+        setIdFront(e.target.files[0]);
+        const reader = new FileReader();
+
+        reader.onload = (() => {
+            const image = reader.result; //Array Buffer
+            setIdFrontPhoto(image);
+        });
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
+    const handleSetIdBack = (e) => {
+        setIdBack(e.target.files[0]);
+        const reader = new FileReader();
+
+        reader.onload = (() => {
+            const image = reader.result; //Array Buffer
+            setIdBackPhoto(image);
+        });
+        reader.readAsDataURL(e.target.files[0]);
+    };
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
 
         const data = {
-            
+            ...Profile,
+            FirstName,
+            LastName,
+            CountryCode,
+            PhoneNo,
+            Address,
+            CountryId,
+            StateId,
+            PostalCode,
+            Img: PhotoFile,
+            Document: {
+                IdNumber,
+                DocumentType,
+                Img: IdFrontPhoto
+            }
         };
 
-        const { errors, isValid } = validateSignUp(data);
+        const { ConfirmPassword, ...rest } = data;
+
+        const { errors, isValid } = validateCreateProfile({ ...rest });
 
         if (!isValid) {
+            console.log(errors);
+            console.log({...rest});
             return setErrors({ ...errors, msg: 'Invalid sign up data' });
         }
 
-        setErrors({});
-        // spinner.current.handleToggle();
-        alert('Sign up successful!');
+        // spinner.current.toggle();
+        setLoading(false);
+        setLoadingText('One Moment . . .');
+        props.createCustomer({ ...rest });
     };
 
     return (
@@ -171,7 +292,7 @@ const CreateAccount = (e) => {
                     type="error"
                 />
             }
-            <Spinner ref={spinner} text="Please wait . . ." />
+            {loading && <Spinner text={loadingText} />}
             <section>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -237,64 +358,54 @@ const CreateAccount = (e) => {
                                 <Grid item xs={12} md={3} lg={3} xl={3}>
                                     <FormControl 
                                         variant="outlined" 
-                                        error={errors.countryCode ? true : false } 
+                                        error={errors.CountryCode ? true : false } 
                                         fullWidth 
                                         required
                                     >
                                         <InputLabel 
-                                            id="countryCode" 
+                                            id="CountryCode" 
                                             variant="outlined" 
-                                            error={errors.countryCode ? true : false}
+                                            error={errors.CountryCode ? true : false}
                                         >
                                             Country Code
                                         </InputLabel>
                                         <Select
-                                            labelId="countryCode"
+                                            labelId="CountryCode"
                                             className={classes.input}
-                                            value={countryCode}
+                                            value={CountryCode}
                                             onChange={(e) => setCountryCode(e.target.value)}
                                         
                                         >
                                             <MenuItem value="">Country Code</MenuItem>
-                                            {countries.map((Country) => (
-                                                <MenuItem key={Country.code} value={Country.dialCode}>
-                                                    {/* <span role="img" aria-label={Country.name}>{Country.emoji}</span> */}
-                                                    {/* {String.fromCodePoint('0x' + Country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + Country?.unicode.split(' '[1].substring(2)))} */}
-                                                    {Country.dialCode}
+                                            {countryCodes.map((country, index) => (
+                                                <MenuItem key={index} value={country.dialCode}>
+                                                    {/* <span role="img" aria-label={country.name}>{country.emoji}</span> */}
+                                                    {/* {String.fromCodePoint('0x' + country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + country?.unicode.split(' '[1].substring(2)))} */}
+                                                    {country.dialCode}
                                                 </MenuItem>
                                             ))}
                                         </Select>
-                                        <FormHelperText>{errors.countryCode}</FormHelperText>
+                                        <FormHelperText>{errors.CountryCode}</FormHelperText>
                                     </FormControl>
-                                    {/* <TextField 
-                                        className={classes.input}
-                                        value={countryCode}
-                                        onChange={(e) => setCountryCode(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="Enter Country Code"
-                                        label="Country Code" 
-                                        helperText={errors.countryCode}
-                                        fullWidth
-                                        required
-                                        error={errors.countryCode ? true : false}
-                                    /> */}
                                 </Grid>
-                                <Grid item xs={12} md={9} lg={9} xl={9}>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={PhoneNo}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        // placeholder="Enter Country Code"
-                                        // label="Country Code" 
-                                        helperText={errors.PhoneNo}
-                                        fullWidth
-                                        required
-                                        error={errors.PhoneNo ? true : false}
-                                    />
-                                </Grid>
+                                {
+                                    CountryCode && 
+                                    <Grid item xs={12} md={9} lg={9} xl={9}>
+                                        <TextField 
+                                            className={classes.input}
+                                            value={PhoneNo}
+                                            onChange={(e) => setPhone(e.target.value)}
+                                            type="text"
+                                            variant="outlined" 
+                                            placeholder="Enter Phone Number"
+                                            label="Phone Number" 
+                                            helperText={errors.PhoneNo}
+                                            fullWidth
+                                            required
+                                            error={errors.PhoneNo ? true : false}
+                                        />
+                                    </Grid>
+                                }
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
                                     <TextField 
                                         className={classes.input}
@@ -335,40 +446,56 @@ const CreateAccount = (e) => {
                                         >
                                             <MenuItem value="">Select Country</MenuItem>
                                             {countries.map((Country) => (
-                                                <MenuItem key={Country.code} value={Country.name}>{Country.name}</MenuItem>
+                                                <MenuItem key={Country.id} value={Country.name}>{Country.name}</MenuItem>
                                             ))}
                                         </Select>
                                         <FormHelperText>{errors.Country}</FormHelperText>
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} md={4} lg={4} xl={4}>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={City}
-                                        onChange={(e) => setCity(e.target.value)}
-                                        type="text"
+                                    <FormControl 
                                         variant="outlined" 
-                                        placeholder="Enter your Address"
-                                        label="City/State" 
-                                        helperText={errors.City}
-                                        fullWidth
+                                        error={errors.City ? true : false } 
+                                        fullWidth 
                                         required
-                                        error={errors.City ? true : false}
-                                    />
+                                    >
+                                        <InputLabel 
+                                            id="City" 
+                                            variant="outlined" 
+                                            error={errors.City ? true : false}
+                                        >
+                                            City/State
+                                        </InputLabel>
+                                        <Select
+                                            labelId="City"
+                                            className={classes.input}
+                                            value={City}
+                                            onChange={(e) => setCity(e.target.value)}
+                                        
+                                        >
+                                            <MenuItem value="">Select City</MenuItem>
+                                            {states.length > 0 &&
+                                                states.map((state, index) => (
+                                                    <MenuItem key={index} value={state?.name}>{state?.name}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                        <FormHelperText>{errors.City}</FormHelperText>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12} md={4} lg={4} xl={4}>
                                     <TextField 
                                         className={classes.input}
-                                        value={postalCode}
+                                        value={PostalCode}
                                         onChange={(e) => setPostalCode(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter post code"
                                         label="Post Code" 
-                                        helperText={errors.postalCode}
+                                        helperText={errors.PostalCode}
                                         fullWidth
                                         required
-                                        error={errors.postalCode ? true : false}
+                                        error={errors.PostalCode ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={2}>
@@ -382,57 +509,80 @@ const CreateAccount = (e) => {
                                 <Grid item xs={12}>
                                     <TextField 
                                         className={classes.input}
-                                        value={photo}
-                                        onChange={(e) => setPhoto(e.target.value)}
+                                        onChange={handleSetPhoto}
                                         type="file"
                                         variant="outlined" 
-                                        // placeholder="Enter post code"
-                                        // label="Post Code" 
-                                        helperText={errors.photo || 'Upload a clear photo of your face'}
+                                        accept="image/*"
+                                        helperText={errors.Photo || 'Upload a clear Photo of your face'}
                                         fullWidth
                                         required
-                                        error={errors.photo ? true : false}
+                                        error={errors.Photo ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={6}>
+                                    <FormControl 
+                                        variant="outlined" 
+                                        error={errors.DocumentType ? true : false}
+                                        fullWidth 
+                                        required
+                                    >
+                                        <InputLabel 
+                                            id="idCardType" 
+                                            variant="outlined" 
+                                            error={errors.DocumentType ? true : false}
+                                        >
+                                            Identity Card Type
+                                        </InputLabel>
+                                        <Select
+                                            labelId="idCardType"
+                                            className={classes.input}
+                                            value={DocumentType}
+                                            onChange={(e) => setDocumentType(e.target.value)}
+                                        
+                                        >
+                                            <MenuItem value="">Select ID type</MenuItem>
+                                            {documents.length > 0 &&
+                                                documents.map((document, index) => (
+                                                    <MenuItem key={index} value={document?.text}>{document?.text}</MenuItem>
+                                                ))
+                                            }
+                                        </Select>
+                                        <FormHelperText>{errors.DocumentType}</FormHelperText>
+                                    </FormControl>
+                                </Grid>
+                                <Grid item xs={12} md={6}>
                                     <TextField 
                                         className={classes.input}
-                                        value={idType}
-                                        onChange={(e) => setIdType(e.target.value)}
+                                        value={IdNumber}
+                                        onChange={(e) => setIdNumber(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Select ID type"
-                                        label="Identity Card Type" 
-                                        helperText={errors.idType}
+                                        placeholder="Enter Document Number"
+                                        label="Document Number" 
+                                        helperText={errors.IdNumber}
                                         fullWidth
                                         required
-                                        error={errors.idType ? true : false}
+                                        error={errors.IdNumber ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField 
                                         className={classes.input}
-                                        value={idType}
-                                        onChange={(e) => setIdFront(e.target.value)}
+                                        onChange={handleSetIdFront}
                                         type="file"
                                         variant="outlined" 
-                                        // placeholder="Select ID Card Front"
-                                        // label="ID Card Front" 
-                                        helperText={errors.idFront || 'ID Card Front'}
+                                        helperText={errors.IdFront || 'ID Card Front'}
                                         fullWidth
                                         required
-                                        error={errors.idFront ? true : false}
+                                        error={errors.IdFront ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={6}>
                                     <TextField 
                                         className={classes.input}
-                                        value={idBack}
-                                        onChange={(e) => setIdBack(e.target.value)}
+                                        onChange={handleSetIdBack}
                                         type="file"
                                         variant="outlined" 
-                                        // placeholder="Select ID Back"
-                                        // label="ID Card Back" 
                                         helperText={errors.idBack || 'ID Card Back'}
                                         fullWidth
                                         error={errors.idBack ? true : false}
@@ -461,5 +611,10 @@ const CreateAccount = (e) => {
         </>
     );
 };
+CreateAccount.propTypes = {
+    createCustomer: PropTypes.func.isRequired,
+    getCountries: PropTypes.func.isRequired,
+    getDocuments: PropTypes.func.isRequired
+};
 
-export default CreateAccount;
+export default connect(undefined, { createCustomer, getCountries, getDocuments })(CreateAccount);

@@ -1,3 +1,4 @@
-export const CLEAR_ERRORS = 'CLEAR_ERRORS';
 export const GET_ERRORS = 'GET_ERRORS';
 export const SET_CURRENT_CUSTOMER = 'SET_CURRENT_CUSTOMER';
+export const SET_COUNTRIES = 'SET_COUNTRIES';
+export const SET_DOCUMENTS = 'SET_DOCUMENTS';

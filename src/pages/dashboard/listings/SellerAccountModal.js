@@ -107,9 +107,9 @@ const SellerAccountModal = ({ open, handleCloseModal }) => {
                                     onChange={(e) => setAccountNumber(e.target.value)}
                                     type="text"
                                     variant="outlined" 
-                                    placeholder="Enter Account Number"
-                                    label="Account Number" 
-                                    helperText={errors.AccountNumber}
+                                    placeholder="Enter IBAN"
+                                    label="IBAN" 
+                                    helperText={errors.AccountNumber || 'Your account number'}
                                     fullWidth
                                     required
                                     error={errors.AccountNumber ? true : false}

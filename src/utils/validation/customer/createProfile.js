@@ -4,7 +4,7 @@ import isEmpty from '../../isEmpty';
 const createProfile = (data) => {
     let errors = {};
     data.Email = !isEmpty(data.Email) ?  data.Email : '';
-    // data.username = !isEmpty(data.username) ?  data.username : '';
+    data.Username = !isEmpty(data.Username) ?  data.Username : '';
     data.Password = !isEmpty(data.Password) ?  data.Password : '';
     data.ConfirmPassword = !isEmpty(data.ConfirmPassword) ?  data.ConfirmPassword : '';
 
@@ -15,9 +15,9 @@ const createProfile = (data) => {
         errors.Email = 'Email address is required!';
     }
 
-    // if (Validator.isEmpty(data.username)) {
-    //     errors.username = 'Username is required!';
-    // }
+    if (Validator.isEmpty(data.Username)) {
+        errors.Username = 'Username is required!';
+    }
 
     if (Validator.isEmpty(data.Password)) {
         errors.Password = 'Password is required!';

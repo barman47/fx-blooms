@@ -1,11 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
+import { connect, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
 import Toast from '../../components/common/Toast';
+
+import { getCountries } from '../../actions/countries';
 
 import isEmpty from '../../utils/isEmpty';
 import { CREATE_ACCOUNT, LOGIN } from '../../routes';
@@ -86,8 +90,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const CreateProfile = (e) => {
+const CreateProfile = (props) => {
     const classes = useStyles();
+    const { countries } = useSelector(state => state);
 
     const [Email, setEmail] = useState('');
     const [Username, setUsername] = useState('');
@@ -98,6 +103,13 @@ const CreateProfile = (e) => {
     const history = useHistory();
 
     const toast = useRef();
+
+    useEffect(() => {
+        if (countries.length === 0) {
+            props.getCountries();
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         setErrors(errors);
@@ -188,6 +200,7 @@ const CreateProfile = (e) => {
                                         label="Username" 
                                         helperText={errors.Username || 'Username cannot be changed once set.'}
                                         fullWidth
+                                        required
                                         error={errors.Username ? true : false}
                                     />
                                 </Grid>
@@ -245,4 +258,8 @@ const CreateProfile = (e) => {
     );
 };
 
-export default CreateProfile;
+CreateProfile.propTypes = {
+    getCountries: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getCountries })(CreateProfile);
