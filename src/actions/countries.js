@@ -15,6 +15,6 @@ export const getCountries = () => async dispatch => {
         });
 
     } catch (err) {
-        return handleError(err, dispatch)
+        return handleError(err, dispatch);
     }
 };

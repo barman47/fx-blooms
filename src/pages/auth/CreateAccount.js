@@ -17,6 +17,7 @@ import { Button,
 import { makeStyles } from '@material-ui/core/styles';
 import emojiFlags from 'emoji-flags';
 
+import SignUpSuccessModal from './SignUpSuccessModal';
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
@@ -106,13 +107,13 @@ const CreateAccount = (props) => {
     const classes = useStyles();
     const { countries } = useSelector(state => state);
     const { documents } = useSelector(state => state);
+    const { successMessage } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-
     const [FirstName, setFirstName] = useState('');
     const [LastName, setLastName] = useState('');
     const [CountryCode, setCountryCode] = useState('');
-    const [PhoneNo, setPhone] = useState('');
+    const [PhoneNo, setPhoneNo] = useState('');
     const [Address, setAddress] = useState('');
     const [Country, setCountry] = useState('');
     const [CountryId, setCountryId] = useState('');
@@ -124,6 +125,7 @@ const CreateAccount = (props) => {
     const [Photo, setPhoto] = useState('');
     const [PhotoFile, setPhotoFile] = useState(null);
     const [DocumentType, setDocumentType] = useState('');
+    const [Document, setDocument] = useState('');
     const [IdNumber, setIdNumber] = useState('');
     // eslint-disable-next-line
     const [IdFront, setIdFront] = useState('');
@@ -136,6 +138,7 @@ const CreateAccount = (props) => {
     const [Profile, setProfile] = useState({});
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);
     const [loadingText, setLoadingText] = useState('');
 
     const countryCodes = emojiFlags.data;
@@ -155,6 +158,13 @@ const CreateAccount = (props) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (successMessage) {
+            setLoading(false);
+            setOpen(true);
+        }
+    }, [successMessage]);
+
     // useEffect(() => {
     //     console.log(emojiFlags.data);
     // }, []);
@@ -162,9 +172,9 @@ const CreateAccount = (props) => {
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errors, msg: errorsState.msg });
+            setLoading(false);
+            setLoadingText('');
         }
-        setLoading(false);
-        setLoadingText('');
     }, [errorsState, errors]);
 
     useEffect(() => {
@@ -199,6 +209,14 @@ const CreateAccount = (props) => {
             setStateId(state?.id);
         }
     }, [City, states]);
+
+    // Setting documentId when user selects a document type
+    useEffect(() => {
+        if (!isEmpty(DocumentType)) {
+            const document = documents.find(document => document.text === DocumentType);
+            setDocument(document.value);
+        }
+    }, [DocumentType, documents]);
 
 
     useEffect(() => {
@@ -242,6 +260,10 @@ const CreateAccount = (props) => {
         reader.readAsDataURL(e.target.files[0]);
     };
 
+    const handleCloseModal = () => {
+        setOpen(false);
+    };
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -259,7 +281,7 @@ const CreateAccount = (props) => {
             Img: PhotoFile,
             Document: {
                 IdNumber,
-                DocumentType,
+                DocumentType: Document,
                 Img: IdFrontPhoto
             }
         };
@@ -268,14 +290,15 @@ const CreateAccount = (props) => {
 
         const { errors, isValid } = validateCreateProfile({ ...rest });
 
-        if (!isValid) {
-            console.log(errors);
-            console.log({...rest});
-            return setErrors({ ...errors, msg: 'Invalid sign up data' });
-        }
+        // if (!isValid) {
+        //     console.log(errors);
+        //     console.log({...rest});
+        //     return setErrors({ ...errors, msg: 'Invalid sign up data' });
+        // }
 
         // spinner.current.toggle();
-        setLoading(false);
+        console.log({ ...rest });
+        setLoading(true);
         setLoadingText('One Moment . . .');
         props.createCustomer({ ...rest });
     };
@@ -293,6 +316,7 @@ const CreateAccount = (props) => {
                 />
             }
             {loading && <Spinner text={loadingText} />}
+            <SignUpSuccessModal handleCloseModal={handleCloseModal} open={open} text={successMessage} />
             <section>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -394,7 +418,7 @@ const CreateAccount = (props) => {
                                         <TextField 
                                             className={classes.input}
                                             value={PhoneNo}
-                                            onChange={(e) => setPhone(e.target.value)}
+                                            onChange={(e) => setPhoneNo(e.target.value)}
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Phone Number"

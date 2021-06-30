@@ -3,15 +3,15 @@ import isEmpty from '../../isEmpty';
 
 const login = (data) => {
     let errors = {};
-    data.username = !isEmpty(data.username) ?  data.username : '';
-    data.password = !isEmpty(data.password) ?  data.password : '';
+    data.Username = !isEmpty(data.Username) ?  data.Username : '';
+    data.Password = !isEmpty(data.Password) ?  data.Password : '';
 
-    if (Validator.isEmpty(data.username)) {
-        errors.username = 'Username is required!';
+    if (Validator.isEmpty(data.Username)) {
+        errors.Username = 'Username is required!';
     }
 
-    if (Validator.isEmpty(data.password)) {
-        errors.password = 'Password is required';
+    if (Validator.isEmpty(data.Password)) {
+        errors.Password = 'Password is required';
     }
    
     return {

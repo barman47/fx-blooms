@@ -1,7 +1,8 @@
-import React from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { Provider } from 'react-redux';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 
@@ -16,7 +17,14 @@ import Dashboard from './pages/dashboard';
 import AllListings from './pages/dashboard/listings/AllListings';
 import EditListing from './pages/dashboard/listings/EditListing';
 import MakeListing from './pages/dashboard/listings/MakeListing';
+import UserDetails from './pages/dashboard/listings/UserDetails';
+
 import Messages from './pages/dashboard/messages/Messages';
+
+import setAuthToken from './utils/setAuthToken';
+import isTokenExpired from './utils/tokenExpired';
+
+import { getMe } from './actions/customer';
 
 import { 
 	LOGIN, 
@@ -26,17 +34,18 @@ import {
 	MESSAGES,
 	DASHBOARD,
 	DASHBOARD_HOME, 
-	EDIT_LISTING
+	EDIT_LISTING,
+	USER_DETAILS
 } from './routes';
 
-import { store } from './store';
+import reIssueToken from './utils/reIssueToken';
 
 const theme = createMuiTheme({
 	overrides: {
 		MuiButton: {
 		  	root: {
 				borderRadius: '5px',
-				boxShadow: 'none',
+				boxShadow: 'none !important',
 				paddingBottom: '14px',
 				paddingTop: '14px',
 				textTransform: 'capitalize'
@@ -79,11 +88,22 @@ const theme = createMuiTheme({
 	}
 });
 
-function App() {
+function App(props) {
+// 	const history = useHistory();
+
+	useEffect(() => {
+		// isTokenExpired();
+		if (localStorage.FXBloomsAuthToken) {
+			// const token = isTokenExpired(localStorage.FXBloomsAuthToken);
+			// // Set auth token header auth
+			// setAuthToken(localStorage.FXBloomsAuthToken);
+			// props.getMe(history);
+			reIssueToken();
+		}
+		// eslint-disable-next-line
+	}, []);
+
 	return (
-		<Provider store={store}>
-			{/* <PersistGate loading={null} persistor={persistor}> */}
-				{/* <Beforeunload onBeforeunload={clearPersistedState}> */}
 					<ThemeProvider theme={theme}>
 						<Router>
 							<Switch>
@@ -98,16 +118,18 @@ function App() {
 											<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
 											<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={EditListing} />
 											<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
+											<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={UserDetails} />
 										</Dashboard>
 									</Route>
 								</ScrollToTop>
 							</Switch>
 						</Router>
 					</ThemeProvider>
-					{/* </Beforeunload> */}
-			{/* </PersistGate> */}
-		</Provider>
 	);
 }
 
-export default App;
+App.propTypes = {
+	getMe: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getMe })(App);

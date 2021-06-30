@@ -1,9 +1,13 @@
 import { Link as RouterLink } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
 import { Button, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
+import { SET_LISTING } from '../../../actions/types';
+
 import { COLORS, SHADOW } from '../../../utils/constants';
+import { DASHBOARD, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -29,6 +33,9 @@ const useStyles = makeStyles(theme => ({
                 [theme.breakpoints.down('sm')]: {
                     fontSize: theme.spacing(1)
                 },
+                '& a': {
+                    textDecoration: 'none'
+                }
             }
         },
 
@@ -66,14 +73,24 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ by, negotiation, buttonText }) => {
+const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const theme = useTheme();
+
+    const setListing = (listing) => {
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
+    };
 
     return (
         <section className={classes.root}>
             <header>
-                <Typography variant="body2" component="p">Listed by: <span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></Typography>
+                <Typography variant="body2" component="p">
+                    Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></RouterLink>
+                </Typography>
                 <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
             </header>
             <div>
@@ -123,6 +140,7 @@ const Listing = ({ by, negotiation, buttonText }) => {
                             root: classes.button
                             // roo: classes.buttonLabel 
                         }}
+                        onClick={editListing ? () => { setListing(listing)} : () => {}}
                     >
                         { buttonText ? buttonText : 'Contact'}
                     </Button>

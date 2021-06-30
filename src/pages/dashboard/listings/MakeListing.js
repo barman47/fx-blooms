@@ -1,7 +1,10 @@
-import { useState } from 'react';
-
+import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
     Button,
+    CircularProgress,
+    Divider,
     Fab,
     FormControl, 
     FormHelperText,
@@ -14,13 +17,16 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Plus } from 'mdi-material-ui';
+import {FormatListText,  Plus } from 'mdi-material-ui';
 
 import AddListingModal from './AddListingModal';
 import SellerAccountModal from './SellerAccountModal';
 import Listing from './Listing';
 
+import { getCurrencies } from '../../../actions/currencies';
+import { addListing } from '../../../actions/listings';
 import { COLORS } from '../../../utils/constants';
+import validateAddListing from '../../../utils/validation/listing/add';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -119,8 +125,26 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const MakeListing = () => {
+const MakeListing = (props) => {
     const classes = useStyles();
+    const { currencies } = useSelector(state => state);
+    const { listings} = useSelector(state => state.listings);
+
+    const { getCurrencies } = props;
+
+    useEffect(() => {
+        console.log(listings.length);
+    }, []);
+
+    useEffect(() => {
+        if (currencies.length === 0) {
+            getCurrencies();
+        }
+    }, [currencies, getCurrencies]);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [listings]);
 
     const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
@@ -128,14 +152,15 @@ const MakeListing = () => {
     const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
-    const [ExchangeCurrency, setExchangeCurrency] = useState('');
+    const [RequiredCurrency, setRequiredCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinimumExchangeAmount, setMinimumExchangeAmount] = useState('');
+    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
 
+    const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
     const handleOpenModal = () => {
@@ -154,6 +179,44 @@ const MakeListing = () => {
         setOpenAccountModal(false);
     };
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+        setErrors({});
+
+        const data = {
+            AvailableCurrency,
+            ExchangeAmount,
+            RequiredCurrency,
+            ExchangeRate,
+            MinExchangeAmount,
+            ReceiptAmount,
+            ListingFee
+        };
+
+        const { errors, isValid } = validateAddListing(data);
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid login data' });
+        }
+
+        setErrors({});
+        setLoading(true);
+        const listing = {
+            currencyNeeded: RequiredCurrency,
+            ExchangeRate: parseFloat(ExchangeRate),
+            AmountAvailable: {
+                CurrencyType: AvailableCurrency,
+                Amount: parseFloat(ExchangeAmount)
+            },
+            MinExchangeAmount: {
+                CurrencyType: RequiredCurrency,
+                Amount: parseFloat(MinExchangeAmount)
+            }
+        };
+
+        setLoading(true);
+        props.addListing(listing);
+    };
+
     return (
         <section className={classes.root}>
             <Tooltip title="Create Listing" arrow>
@@ -166,7 +229,7 @@ const MakeListing = () => {
 					<Plus />
 				</Fab>
 			</Tooltip>
-			<AddListingModal open={open} handleCloseModal={handleCloseModal} />
+			<AddListingModal open={open} edit={false} handleCloseModal={handleCloseModal} />
 			<SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
             <header>
                 <div>
@@ -177,7 +240,7 @@ const MakeListing = () => {
             </header>
             <Grid container direction="row" spacing={4} className={classes.container}>
                 <Grid item md={4} className={classes.listingFormContainer}>
-                    <form>
+                    <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={2}>
                             <Grid item xs={12} md={5}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
@@ -186,6 +249,7 @@ const MakeListing = () => {
                                     error={errors.AvailableCurrency ? true : false } 
                                     fullWidth 
                                     required
+                                    disabled={loading ? true : false}
                                 >
                                     <InputLabel 
                                         id="AvailableCurrency" 
@@ -201,6 +265,9 @@ const MakeListing = () => {
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
@@ -218,6 +285,7 @@ const MakeListing = () => {
                                         helperText={errors.ExchangeAmount}
                                         fullWidth
                                         required
+                                        disabled={loading ? true : false}
                                         error={errors.ExchangeAmount ? true : false}
                                     />
                                 </Tooltip>
@@ -226,26 +294,30 @@ const MakeListing = () => {
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                 <FormControl 
                                     variant="outlined" 
-                                    error={errors.ExchangeCurrency ? true : false } 
+                                    error={errors.RequiredCurrency ? true : false } 
                                     fullWidth 
                                     required
+                                    disabled={loading ? true : false}
                                 >
                                     <InputLabel 
-                                        id="ExchangeCurrency" 
+                                        id="RequiredCurrency" 
                                         variant="outlined" 
-                                        error={errors.ExchangeCurrency ? true : false}
+                                        error={errors.RequiredCurrency ? true : false}
                                     >
                                         &#8358;(NGN)
                                     </InputLabel>
                                     <Select
-                                        labelId="ExchangeCurrency"
-                                        value={ExchangeCurrency}
-                                        onChange={(e) => setAvailableCurrency(e.target.value)}
+                                        labelId="RequiredCurrency"
+                                        value={RequiredCurrency}
+                                        onChange={(e) => setRequiredCurrency(e.target.value)}
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
-                                    <FormHelperText>{errors.ExchangeCurrency}</FormHelperText>
+                                    <FormHelperText>{errors.RequiredCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={7}>
@@ -261,6 +333,7 @@ const MakeListing = () => {
                                         helperText={errors.ExchangeRate}
                                         fullWidth
                                         required
+                                        disabled={loading ? true : false}
                                         error={errors.ExchangeRate ? true : false}
                                     />
                                 </Tooltip>
@@ -272,6 +345,7 @@ const MakeListing = () => {
                                     error={errors.AvailableCurrency ? true : false } 
                                     fullWidth 
                                     required
+                                    disabled={loading ? true : false}
                                 >
                                     <InputLabel 
                                         id="AvailableCurrency" 
@@ -287,6 +361,9 @@ const MakeListing = () => {
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
@@ -295,16 +372,16 @@ const MakeListing = () => {
                                 <br />
                                 <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
-                                        value={MinimumExchangeAmount}
-                                        onChange={(e) => setMinimumExchangeAmount(e.target.value)}
+                                        value={MinExchangeAmount}
+                                        onChange={(e) => setMinExchangeAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
-                                        helperText={errors.MinimumExchangeAmount}
+                                        helperText={errors.MinExchangeAmount}
                                         fullWidth
-                                        required
-                                        error={errors.MinimumExchangeAmount ? true : false}
+                                        disabled={loading ? true : false}
+                                        error={errors.MinExchangeAmount ? true : false}
                                     />
                                 </Tooltip>
                             </Grid>
@@ -313,7 +390,7 @@ const MakeListing = () => {
                                 <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                     <TextField
                                         value={ReceiptAmount}
-                                        // onChange={(e) => setExchangeAmount(e.target.value)}
+                                        onChange={(e) => setReceiptAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
@@ -321,6 +398,7 @@ const MakeListing = () => {
                                         helperText={errors.ReceiptAmount}
                                         fullWidth
                                         required
+                                        disabled={loading ? true : false}
                                         error={errors.ReceiptAmount ? true : false}
                                     />
                                 </Tooltip>
@@ -329,7 +407,7 @@ const MakeListing = () => {
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
                                 <TextField
                                     value={ListingFee}
-                                    // onChange={(e) => setExchangeAmount(e.target.value)}
+                                    onChange={(e) => setListingFee(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Amount"
@@ -337,40 +415,61 @@ const MakeListing = () => {
                                     helperText={errors.ListingFee}
                                     fullWidth
                                     required
+                                    disabled={loading ? true : false}
                                     error={errors.ListingFee ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Button type="submit" variant="contained" color="primary" fullWidth>
+                                <Button 
+                                    type="submit" 
+                                    variant="contained" 
+                                    color="primary" 
+                                    disabled={loading ? true : false}
+                                    fullWidth
+                                >
                                     Submit
+                                    {loading && <>
+                                        &nbsp;&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress 
+                                            color="#ffffff"
+                                        />
+                                    </>}
                                 </Button>
                             </Grid>
                         </Grid>
                     </form>
                 </Grid>
                 <Grid item xs={12} md={12} lg={8} className={classes.listings}>
-                    {/* <section className={classes.noListing}>
-                        <Typography variant="h6">Previous Listings</Typography>
-                        <Divider />
-                        <div className={classes.noListingContent}>
-                            <FormatListText className={classes.noListingIcon} />
-                            <Typography className={classes.noListingText} variant="subtitle2" component="span">Your previous listings would appear here</Typography>
-                        </div>
-                    </section> */}
-                    <div>
-                        <Listing negotiation by />
-                        <Listing buttonText="Edit" />
-                        <Listing />
-                        <Listing negotiation by />
-                        <Listing buttonText="Edit" />
-                        <Listing />
-                        <Listing negotiation by />
-                        <Listing buttonText="Edit" />
+                    {listings.length === 0 ?
+                        <section className={classes.noListing}>
+                            <Typography variant="h6">Previous Listings</Typography>
+                            <Divider />
+                            <div className={classes.noListingContent}>
+                                <FormatListText className={classes.noListingIcon} />
+                                <Typography className={classes.noListingText} variant="subtitle2" component="span">Your previous listings would appear here</Typography>
+                            </div>
+                        </section>
+                        : 
+                        <div>
+                            <Listing negotiation by />
+                            <Listing buttonText="Edit" />
+                            <Listing />
+                            <Listing negotiation by />
+                            <Listing buttonText="Edit" />
+                            <Listing />
+                            <Listing negotiation by />
+                            <Listing buttonText="Edit" />
                     </div>
+                    }
                 </Grid>
             </Grid>
         </section>
     );
 };
 
-export default MakeListing;
+MakeListing.propTypes = {
+    addListing: PropTypes.func.isRequired,
+    getCurrencies: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { addListing, getCurrencies })(MakeListing);

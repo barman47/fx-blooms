@@ -69,7 +69,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
     const [ExchangeCurrency, setExchangeCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinimumExchangeAmount, setMinimumExchangeAmount] = useState('');
+    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
@@ -225,16 +225,16 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 <br />
                                 <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
-                                        value={MinimumExchangeAmount}
-                                        onChange={(e) => setMinimumExchangeAmount(e.target.value)}
+                                        value={MinExchangeAmount}
+                                        onChange={(e) => setMinExchangeAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
-                                        helperText={errors.MinimumExchangeAmount}
+                                        helperText={errors.MinExchangeAmount}
                                         fullWidth
                                         required
-                                        error={errors.MinimumExchangeAmount ? true : false}
+                                        error={errors.MinExchangeAmount ? true : false}
                                     />
                                 </Tooltip>
                             </Grid>

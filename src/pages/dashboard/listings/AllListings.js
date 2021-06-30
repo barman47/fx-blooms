@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
 	Button,
 	Fab,
@@ -18,6 +20,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { FilterOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
+import { getListings } from '../../../actions/listings';
 
 import FilterListingModal from './FilterListingModal';
 import Listing from './Listing';
@@ -119,10 +122,21 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const AllListings = () => {
+const AllListings = (props) => {
 	const classes = useStyles();
 
+	const { isAuthenticated } = useSelector(state => state.customer);
+	const { listings } = useSelector(state => state.listings);
 	const [open, setOpen] = useState(false);
+
+	const { getListings } = props;
+
+	useEffect(() => {
+		if (isAuthenticated && listings?.length === 0) {
+			getListings();
+		}
+		// eslint-disable-next-line
+	}, []);
 
 	const handleOpenModal = () => {
 		setOpen(true);
@@ -320,4 +334,8 @@ const Filter = () => {
 	);
 };
 
-export default AllListings;
+AllListings.propTypes = {
+	getListings: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getListings })(AllListings);

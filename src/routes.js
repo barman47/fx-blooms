@@ -10,8 +10,10 @@ export const PRIVACY_POLICY = '/privacyPolicy';
 export const FAQS = '/frequentlyAskedQuestions';
 
 export const DASHBOARD = '/dashboard';
-export const DASHBOARD_HOME = '/listings';
+export const DASHBOARD_HOME = '/home';
 export const MAKE_LISTING = '/listings/create';
 export const EDIT_LISTING = '/listings/edit';
+export const USER_DETAILS = '/listings/userDetails';
 export const MESSAGES = '/messages';
 export const PROFILE = '/profile';
+export const LOGOUT = '/logout';

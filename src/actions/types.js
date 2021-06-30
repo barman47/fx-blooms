@@ -1,4 +1,7 @@
 export const GET_ERRORS = 'GET_ERRORS';
 export const SET_CURRENT_CUSTOMER = 'SET_CURRENT_CUSTOMER';
 export const SET_COUNTRIES = 'SET_COUNTRIES';
+export const SET_CURRENCIES = 'SET_CURRENCIES';
 export const SET_DOCUMENTS = 'SET_DOCUMENTS';
+export const SET_LISTING = 'SET_LISTING';
+export const SET_LISTINGS = 'SET_LISTINGS';

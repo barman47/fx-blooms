@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink} from 'react-router-dom';
+import { Link as RouterLink, useHistory} from 'react-router-dom';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
+import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
+
+import { login } from '../../actions/customer';
+import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
@@ -74,28 +80,43 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = () => {
+const Login = (props) => {
     const classes = useStyles();
     const theme = useTheme();
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const errorsState = useSelector(state => state.errors);
+
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
 
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const toast = useRef();
 
     useEffect(() => {
-        setErrors(errors);
         if (!isEmpty(errors)) {
             toast.current.handleClick();
         }
     }, [errors]);
 
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
     
-        const data = { username, password };
+        const data = { Username, Password };
     
         const { errors, isValid } = validateLogin(data);
 
@@ -104,7 +125,8 @@ const Login = () => {
         }
 
         setErrors({});
-        alert('Login successful!');
+        setLoading(true);
+        props.login(data, history);
     };    
 
     return (
@@ -119,6 +141,7 @@ const Login = () => {
                     type="error"
                 />
             }
+            {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
@@ -135,16 +158,16 @@ const Login = () => {
                             <Grid item xs={12}>
                                 <TextField 
                                     className={classes.input}
-                                    value={username}
+                                    value={Username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Username"
                                     label="Username" 
-                                    helperText={errors.username}
+                                    helperText={errors.Username || errors.message}
                                     fullWidth
                                     required
-                                    error={errors.username ? true : false}
+                                    error={errors.Username || errors.message ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12} style={{ alignSelf: 'flex-end' }}>
@@ -155,16 +178,16 @@ const Login = () => {
                             <Grid item xs={12}>
                                 <TextField 
                                     className={classes.input}
-                                    value={password}
+                                    value={Password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    type="text"
+                                    type="password"
                                     variant="outlined" 
                                     label="Password" 
                                     placeholder="Password"
-                                    helperText={errors.password}
+                                    helperText={errors.Password || errors.message}
                                     fullWidth
                                     required
-                                    error={errors.password ? true : false}
+                                    error={errors.Password  || errors.message ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -191,4 +214,8 @@ const Login = () => {
     );
 };
 
-export default Login;
+Login.propTypes = {
+    login: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { login })(Login);

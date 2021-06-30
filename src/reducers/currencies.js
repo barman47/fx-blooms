@@ -1,11 +1,11 @@
-import { SET_CURRENT_CUSTOMER } from '../actions/types';
+import { SET_CURRENCIES } from '../actions/types';
 
-const initialState = {};
+const initialState = [];
 
 const customerReducer =  (state = initialState, action) => {
     switch (action.type) {
-        case SET_CURRENT_CUSTOMER:
-            return { ...action.payload };
+        case SET_CURRENCIES:
+            return  [...action.payload];
             
             default:
                 return state;

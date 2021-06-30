@@ -1,8 +1,10 @@
 import { Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FileDocumentEdit } from 'mdi-material-ui';
 
+import { SET_LISTING } from '../../../actions/types';
 import { COLORS, SHADOW } from '../../../utils/constants';
 import { useMediaQuery } from '@material-ui/core';
 
@@ -40,14 +42,21 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ handleOpenModal }) => {
+const Listing = ({ listing, handleOpenModal }) => {
+    const dispatch = useDispatch();
     const classes = useStyles();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
 
+    const setListing = (listing) => {
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
+    };
 
-
-    const editListing = () => {
+    const showEditListingModal = (listing) => {
+        setListing(listing);
         handleOpenModal();
     };
     
@@ -72,9 +81,9 @@ const Listing = ({ handleOpenModal }) => {
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     {matches ? 
-                        <FileDocumentEdit className={classes.editIcon} onClick={() => editListing()} />
+                        <FileDocumentEdit className={classes.editIcon} onClick={() => showEditListingModal(listing)} />
                         :
-                        <FileDocumentEdit className={classes.editIcon} />
+                        <FileDocumentEdit className={classes.editIcon} onClick={() => setListing(listing)} />
                     }
                 </Tooltip>
             </div>

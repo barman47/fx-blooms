@@ -21,8 +21,8 @@ import {
     Tooltip
 } from '@material-ui/core';
 
-import { ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
+import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
+import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
 
 import { COLORS } from '../../utils/constants';
 
@@ -33,6 +33,14 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         flexGrow: 1,
+
+        [theme.breakpoints.down('md')]: {
+            marginBottom: theme.spacing(8)
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            marginBottom: theme.spacing(5)
+        }
     },
 
     appBar: {
@@ -157,16 +165,16 @@ const useStyles = makeStyles((theme) => ({
 
     bottomBar: {
         display: 'none',
-        position: 'absolute',
+        position: 'fixed',
         bottom: 0,
         width: '100vw',
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             display: 'block'
         }
     }
 }));
 
-const Dashboard = ({children}) => {
+const Dashboard = ({ children }) => {
     const classes = useStyles();
     const history = useHistory();
     const location = useLocation();
@@ -180,6 +188,13 @@ const Dashboard = ({children}) => {
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> }
+    ];
+
+    const mobileLinks = [
+        { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
+        { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
+        { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> },
+        { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
 
     useEffect(() => {
@@ -206,124 +221,126 @@ const Dashboard = ({children}) => {
     };
 
     return (
-        <section className={classes.root}>
-            {/* <AppBar 
-                position="fixed"
-                color="transparent"
-                elevation={1}
-                className={clsx(classes.appBar, {
-                    [classes.appBarShift]: open
-                })}
-            >
-                <Toolbar>
-                    <IconButton 
-                        edge="start" 
-                        className={clsx(classes.menuButton, {
-                            [classes.hide]: open,
-                        })}
-                        color="inherit" 
-                        aria-label="open drawer"
-                        onClick={handleDrawerOpen}
-                    >
-                        <Menu />
-                    </IconButton>
-                    <Typography variant="h6" className={classes.title}>
-                        News
-                    </Typography>
-                    <Button color="inherit">Login</Button>
-                </Toolbar>
-            </AppBar> */}
-            <Drawer 
-                variant="permanent"
-                className={clsx(classes.drawer, {
-                    [classes.drawerOpen]: open,
-                    [classes.drawerClose]: !open
-                })}
-                classes={{
-                    paper: clsx({
-                      [classes.drawerOpen]: open,
-                      [classes.drawerClose]: !open,
-                    }),
-                }}
-            >
-                <div className={classes.toolbar}>
-                    {open && 
-                        <RouterLink to="/">
-                            <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
-                        </RouterLink>
-                    }
-                    <IconButton onClick={toggleDrawer}>
-                        {!open ?
-                            <Tooltip title="Expand Navigation" placement="top" arrow>
-                                <ChevronRight />
-                            </Tooltip>
-                            :
-                            <Tooltip title="Collapse Navigation" placement="top" arrow>
-                                <ChevronLeft />
-                            </Tooltip>
-                        }
-                    </IconButton>
-                </div> 
-                <Divider />
-                <List className={classes.links}>
-                    {links.map((link, index) => (
-                        <ListItem 
-                            className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
-                            key={index} 
-                            button 
-                            disableRipple
-                            onClick={() => handleLinkClick(link.url)}
-                        >
-                            <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
-                                {link.icon}
-                            </ListItemIcon>
-                            <ListItemText primary={link.text} />
-                        </ListItem>
-                    ))}
-                </List>
-                <Divider />
-                <section className={classes.logoutContainer}>
-                    <div className={classes.avatarContainer}>
-                        <div>
-                            <img className={classes.avatar} src={avatar} alt="Avatar" />
-                        </div>
-                        <div>
-                            <Typography variant="h6">Hello User</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.email}>hello@fxblooms.com</Typography>
-                        </div>
-                    </div>
-                    <Divider />
-                    <ListItem button className={classes.logout}>
-                        <ListItemIcon>
-                            <Logout />
-                        </ListItemIcon>
-                        <ListItemText primary="Logout" />
-                    </ListItem>
-                </section>
-            </Drawer>
-            <div className={classes.content}>
-                {children}
-            </div>
-            <Box
-                boxShadow={5}
-                // bgcolor="background.paper"
-                // m={1}
-                // p={1}
-                className={classes.bottomBar}
-            >
-                <BottomNavigation
-                    value={value}
-                    onChange={(event, newValue) => {
-                        setValue(newValue)
-                    }}
-                    showLabels
+        <>
+            <section className={classes.root}>
+                {/* <AppBar 
+                    position="fixed"
+                    color="transparent"
+                    elevation={1}
+                    className={clsx(classes.appBar, {
+                        [classes.appBarShift]: open
+                    })}
                 >
-                    {links.map((item, index) => (
-                        <BottomNavigationAction key={index} label={item.text} icon={item.icon} />
-                    ))}
-                </BottomNavigation>
-            </Box>
-        </section>
+                    <Toolbar>
+                        <IconButton 
+                            edge="start" 
+                            className={clsx(classes.menuButton, {
+                                [classes.hide]: open,
+                            })}
+                            color="inherit" 
+                            aria-label="open drawer"
+                            onClick={handleDrawerOpen}
+                        >
+                            <Menu />
+                        </IconButton>
+                        <Typography variant="h6" className={classes.title}>
+                            News
+                        </Typography>
+                        <Button color="inherit">Login</Button>
+                    </Toolbar>
+                </AppBar> */}
+                <Drawer 
+                    variant="permanent"
+                    className={clsx(classes.drawer, {
+                        [classes.drawerOpen]: open,
+                        [classes.drawerClose]: !open
+                    })}
+                    classes={{
+                        paper: clsx({
+                        [classes.drawerOpen]: open,
+                        [classes.drawerClose]: !open,
+                        }),
+                    }}
+                >
+                    <div className={classes.toolbar}>
+                        {open && 
+                            <RouterLink to="/">
+                                <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
+                            </RouterLink>
+                        }
+                        <IconButton onClick={toggleDrawer}>
+                            {!open ?
+                                <Tooltip title="Expand Navigation" placement="top" arrow>
+                                    <ChevronRight />
+                                </Tooltip>
+                                :
+                                <Tooltip title="Collapse Navigation" placement="top" arrow>
+                                    <ChevronLeft />
+                                </Tooltip>
+                            }
+                        </IconButton>
+                    </div> 
+                    <Divider />
+                    <List className={classes.links}>
+                        {links.map((link, index) => (
+                            <ListItem 
+                                className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
+                                key={index} 
+                                button 
+                                disableRipple
+                                onClick={() => handleLinkClick(link.url)}
+                            >
+                                <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
+                                    {link.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={link.text} />
+                            </ListItem>
+                        ))}
+                    </List>
+                    <Divider />
+                    <section className={classes.logoutContainer}>
+                        <div className={classes.avatarContainer}>
+                            <div>
+                                <img className={classes.avatar} src={avatar} alt="Avatar" />
+                            </div>
+                            <div>
+                                <Typography variant="h6">Hello User</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.email}>hello@fxblooms.com</Typography>
+                            </div>
+                        </div>
+                        <Divider />
+                        <ListItem button className={classes.logout}>
+                            <ListItemIcon>
+                                <Logout />
+                            </ListItemIcon>
+                            <ListItemText primary="Logout" />
+                        </ListItem>
+                    </section>
+                </Drawer>
+                <div className={classes.content}>
+                    {children}
+                </div>
+                <Box
+                    boxShadow={5}
+                    // bgcolor="background.paper"
+                    // m={1}
+                    // p={1}
+                    className={classes.bottomBar}
+                >
+                    <BottomNavigation
+                        value={value}
+                        onChange={(event, newValue) => {
+                            setValue(newValue)
+                        }}
+                        showLabels
+                    >
+                        {mobileLinks.map((item, index) => (
+                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                        ))}
+                    </BottomNavigation>
+                </Box>
+            </section>
+        </>
     );
 }
 

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { 
     Button,
@@ -20,6 +21,7 @@ import { Plus } from 'mdi-material-ui';
 import AddListingModal from './AddListingModal';
 import EditListingItem from './EditListingItem';
 
+import { SET_LISTING } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
@@ -100,6 +102,8 @@ const useStyles = makeStyles(theme => ({
 
 const EditListing = () => {
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const { listing } = useSelector(state => state.listings);
 
     const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
@@ -110,12 +114,22 @@ const EditListing = () => {
     const [ExchangeCurrency, setExchangeCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinimumExchangeAmount, setMinimumExchangeAmount] = useState('');
+    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
 
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: SET_LISTING,
+                payload: {}
+            });
+        };
+        // eslint-disable-next-line
+    }, []);
 
     const handleOpenModal = () => {
         setOpen(true);
@@ -254,16 +268,16 @@ const EditListing = () => {
                                 <br />
                                 <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
-                                        value={MinimumExchangeAmount}
-                                        onChange={(e) => setMinimumExchangeAmount(e.target.value)}
+                                        value={MinExchangeAmount}
+                                        onChange={(e) => setMinExchangeAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
-                                        helperText={errors.MinimumExchangeAmount}
+                                        helperText={errors.MinExchangeAmount}
                                         fullWidth
                                         required
-                                        error={errors.MinimumExchangeAmount ? true : false}
+                                        error={errors.MinExchangeAmount ? true : false}
                                     />
                                 </Tooltip>
                             </Grid>
@@ -321,7 +335,7 @@ const EditListing = () => {
                     <Divider />
                     <br />
                     <div>
-                        <EditListingItem handleOpenModal={handleOpenModal} />
+                        <EditListingItem listing={listing} handleOpenModal={handleOpenModal} />
                     </div>
                 </Grid>
             </Grid>

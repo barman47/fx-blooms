@@ -2,6 +2,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography } from '@material-ui/core';
+import PropTypes from 'prop-types';
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
@@ -62,4 +63,11 @@ const Spinner = ({ text }) => {
 //     );
 // });
 
+Spinner.propTypes = {
+    text: PropTypes.string
+};
+
+Spinner.defaultProps = {
+    text: 'One Moment . . .'
+};
 export default Spinner;
