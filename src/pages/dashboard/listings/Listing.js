@@ -25,14 +25,14 @@ const useStyles = makeStyles(theme => ({
             padding: [[theme.spacing(2), theme.spacing(3)]],
 
             [theme.breakpoints.down('sm')]: {
-                padding: [[theme.spacing(1), theme.spacing(2)]]
+                display: 'grid',
+                gridTemplateColumns: '1fr',
+                rowGap: theme.spacing(2),
+                padding: theme.spacing(1, 2)
             },
 
             '& p': {
                 fontWeight: 300,
-                [theme.breakpoints.down('sm')]: {
-                    fontSize: theme.spacing(1)
-                },
                 '& a': {
                     textDecoration: 'none'
                 }
@@ -47,28 +47,22 @@ const useStyles = makeStyles(theme => ({
             padding: [[theme.spacing(4), theme.spacing(3)]],
 
             [theme.breakpoints.down('sm')]: {
-                padding: theme.spacing(1)
-            },
-
-            '& span': {
-                [theme.breakpoints.down('sm')]: {
-                    fontSize: theme.spacing(1)
-                },  
+                padding: theme.spacing(1),
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                rowGap: theme.spacing(2)
             }
+        },
+
+        [theme.breakpoints.down('sm')]: {
+
         }
 	},
 
     button: {
         padding: [[theme.spacing(0.5), theme.spacing(5)]],
         [theme.breakpoints.down('sm')]: {
-            padding: [[theme.spacing(0.1), theme.spacing(0.5)]],
-            minWidth: 'initial'
-        }
-    },
-
-    buttonLabel: {
-        [theme.breakpoints.down('sm')]: {
-            padding: [[theme.spacing(0.5), theme.spacing(0.2)]],
+            gridColumn: '1 / span 2'
         }
     }
 }));
@@ -132,7 +126,6 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
                         classes={{ 
                             contained: classes.button,
                             root: classes.button
-                            // roo: classes.buttonLabel 
                         }}
                     >
                         In Negotiation
@@ -148,7 +141,6 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
                         classes={{ 
                             contained: classes.button,
                             root: classes.button
-                            // roo: classes.buttonLabel 
                         }}
                         onClick={editListing ? () => { setListing(listing)} : () => {}}
                     >
