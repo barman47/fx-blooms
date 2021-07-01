@@ -1,12 +1,19 @@
-import { SET_LISTINGS, SET_LISTING } from '../actions/types';
+import { ADDED_LISTING, SET_LISTINGS, SET_LISTING } from '../actions/types';
 
 const initialState = {
+    addedListing: false,
     listing: {},
     listings: []
 };
 
 const errorsReducer = (state = initialState, action) => {
     switch (action.type) {   
+        case ADDED_LISTING:
+            return {
+                ...state,
+                addedListing: !state.addedListing,
+                msg: action.payload
+            };
         
         case SET_LISTING:
             return {

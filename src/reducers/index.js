@@ -1,5 +1,6 @@
 import { combineReducers } from 'redux';
 
+import accountReducer from './account';
 import countriesReducer from './countries';
 import currencyReducer from './currencies';
 import customerReducer from './customer';
@@ -9,6 +10,7 @@ import errorsReducer from './errors';
 import subscriptionReducer from './subscription';
 
 const rootReducer = combineReducers({
+    account: accountReducer,
     countries: countriesReducer,
     customer: customerReducer,
     currencies: currencyReducer,

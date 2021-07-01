@@ -146,7 +146,6 @@ const CreateAccount = (props) => {
     const location = useLocation();
 
     const toast = useRef();
-    const spinner = useRef();
 
     useEffect(() => {
         if (countries.length === 0) {
@@ -290,14 +289,13 @@ const CreateAccount = (props) => {
 
         const { errors, isValid } = validateCreateProfile({ ...rest });
 
-        // if (!isValid) {
-        //     console.log(errors);
-        //     console.log({...rest});
-        //     return setErrors({ ...errors, msg: 'Invalid sign up data' });
-        // }
-
-        // spinner.current.toggle();
-        console.log({ ...rest });
+        if (!isValid) {
+            console.log(errors);
+            console.log({...rest});
+            return setErrors({ ...errors, msg: 'Invalid sign up data' });
+        }
+        
+        // console.log({ ...rest });
         setLoading(true);
         setLoadingText('One Moment . . .');
         props.createCustomer({ ...rest });

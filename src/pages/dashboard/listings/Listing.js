@@ -78,6 +78,11 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
     const dispatch = useDispatch();
     const theme = useTheme();
 
+    // const userId = useSelector(state => state.customer.id);
+
+    // eslint-disable-next-line
+    const { amountAvailable, amountNeeded, bids, status, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+
     const setListing = (listing) => {
         dispatch({
             type: SET_LISTING,
@@ -85,30 +90,35 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
         });
     };
 
+    // const isMyListing = (customerId) => {
+    //     if (customerId === )
+    // };
+
     return (
         <section className={classes.root}>
             <header>
                 <Typography variant="body2" component="p">
-                    Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></RouterLink>
+                    Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{listedBy}</span></RouterLink>
+                    {/* Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></RouterLink> */}
                 </Typography>
                 <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
             </header>
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#163;25,000.00
+                    &#163;{amountAvailable.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
-                    &#8358;(NGN)
+                    &#8358;{amountNeeded.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#163;5,000.00
+                    &#163;{minExchangeAmount.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    &#8358;650 to &#163;1
+                    &#8358;{exchangeRate} to &#163;1
                 </Typography>
                 {negotiation ? 
                     <Button 

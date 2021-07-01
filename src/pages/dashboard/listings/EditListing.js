@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { 
     Button,
-    Fab,
+    // Fab,
     Divider,
     FormControl, 
     FormHelperText,
@@ -16,7 +16,7 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Plus } from 'mdi-material-ui';
+// import { Plus } from 'mdi-material-ui';
 
 import AddListingModal from './AddListingModal';
 import EditListingItem from './EditListingItem';
@@ -106,19 +106,24 @@ const EditListing = () => {
     const { listing } = useSelector(state => state.listings);
 
     const [open, setOpen] = useState(false);
+    // eslint-disable-next-line
     const [openAccountModal, setOpenAccountModal] = useState(false);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
+    // eslint-disable-next-line
     const [ExchangeCurrency, setExchangeCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
+    // eslint-disable-next-line
     const [ReceiptAmount, setReceiptAmount] = useState('');
+    // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('');
 
+    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     useEffect(() => {

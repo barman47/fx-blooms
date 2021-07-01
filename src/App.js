@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Route, Switch, useHistory } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 
-// import Home from './pages/home';
-import Landing from './pages/landing/Landing';
+import Home from './pages/home';
+// import Landing from './pages/landing/Landing';
 
 import Login from './pages/auth/Login';
 import CreateProfile from './pages/auth/CreateProfile';
@@ -22,8 +22,8 @@ import UserDetails from './pages/dashboard/listings/UserDetails';
 
 import Messages from './pages/dashboard/messages/Messages';
 
-import setAuthToken from './utils/setAuthToken';
-import isTokenExpired from './utils/tokenExpired';
+// import setAuthToken from './utils/setAuthToken';
+// import isTokenExpired from './utils/tokenExpired';
 
 import { getMe } from './actions/customer';
 
@@ -105,7 +105,7 @@ function App(props) {
 						<Router>
 							<Switch>
 								<ScrollToTop>
-									<Route path="/" exact component={Landing} />
+									<Route path="/" exact component={Home} />
 									<Route path={LOGIN} exact component={Login} />
 									<Route path={SIGN_UP} exact component={CreateProfile} />
 									<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />

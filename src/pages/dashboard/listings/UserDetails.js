@@ -63,6 +63,7 @@ const UserDetails = () => {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     const [Message, setMessage] = useState('');
+    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     return (

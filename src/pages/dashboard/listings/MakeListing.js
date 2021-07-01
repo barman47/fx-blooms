@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Button,
@@ -14,17 +14,20 @@ import {
     Select,
     TextField,
     Tooltip,
-    Typography 
+    Typography,
+    useMediaQuery 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import {FormatListText,  Plus } from 'mdi-material-ui';
 
 import AddListingModal from './AddListingModal';
 import SellerAccountModal from './SellerAccountModal';
+import SuccessModal from '../../../components/common/SuccessModal';
 import Listing from './Listing';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing } from '../../../actions/listings';
+import { ADDED_LISTING } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import validateAddListing from '../../../utils/validation/listing/add';
 
@@ -127,24 +130,17 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const dispatch = useDispatch();
     const { currencies } = useSelector(state => state);
-    const { listings} = useSelector(state => state.listings);
+    const { addedListing, listings, msg } = useSelector(state => state.listings);
 
     const { getCurrencies } = props;
 
     // useEffect(() => {
     //     console.log(listings.length);
     // }, []);
-
-    useEffect(() => {
-        if (currencies.length === 0) {
-            getCurrencies();
-        }
-    }, [currencies, getCurrencies]);
-
-    useEffect(() => {
-        setLoading(false);
-    }, [listings]);
 
     const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
@@ -163,6 +159,29 @@ const MakeListing = (props) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const successModal = useRef();
+
+    useEffect(() => {
+        if (currencies.length === 0) {
+            getCurrencies();
+        }
+    }, [currencies, getCurrencies]);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [listings]);
+
+    useEffect(() => {
+        if (addedListing && !matches) {
+            resetForm();
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+            return dispatch({
+                type: ADDED_LISTING
+            });
+        }
+    }, [addedListing, dispatch, matches, msg]);
+
     const handleOpenModal = () => {
         setOpen(true);
     };
@@ -177,6 +196,17 @@ const MakeListing = (props) => {
 
     const handleCloseAccountModalModal = () => {
         setOpenAccountModal(false);
+    };
+
+    const resetForm = () => {
+        setAvailableCurrency('');
+        setExchangeAmount('');
+        setRequiredCurrency('');
+        setExchangeRate('');
+        setMinExchangeAmount('');
+        setReceiptAmount('');
+        setListingFee('');
+        setLoading(false);
     };
 
     const onSubmit = (e) => {
@@ -229,7 +259,8 @@ const MakeListing = (props) => {
 					<Plus />
 				</Fab>
 			</Tooltip>
-			<AddListingModal open={open} edit={false} handleCloseModal={handleCloseModal} />
+			<SuccessModal ref={successModal} />
+			<AddListingModal open={open} edit={false} handleCloseModal={handleCloseModal} currencies={currencies} />
 			<SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
             <header>
                 <div>
@@ -427,13 +458,7 @@ const MakeListing = (props) => {
                                     disabled={loading ? true : false}
                                     fullWidth
                                 >
-                                    Submit
-                                    {loading && <>
-                                        &nbsp;&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress 
-                                            color="#ffffff"
-                                        />
-                                    </>}
+                                    {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                 </Button>
                             </Grid>
                         </Grid>
@@ -451,14 +476,17 @@ const MakeListing = (props) => {
                         </section>
                         : 
                         <div>
-                            <Listing negotiation by />
+                            {listings.map(listing => (
+                                <Listing key={listing.id} listing={listing} />
+                            ))}
+                            {/* <Listing negotiation by />
                             <Listing buttonText="Edit" />
                             <Listing />
                             <Listing negotiation by />
                             <Listing buttonText="Edit" />
                             <Listing />
                             <Listing negotiation by />
-                            <Listing buttonText="Edit" />
+                            <Listing buttonText="Edit" /> */}
                     </div>
                     }
                 </Grid>

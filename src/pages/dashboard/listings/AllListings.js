@@ -169,15 +169,17 @@ const AllListings = (props) => {
 						</div>
 					</header>
 					<section className={classes.listingContainer}>
-						<Listing />
-						<Listing negotiation by />
+						{listings.map(listing => (
+							<Listing key={listing.id} listing={listing} />
+						))}
+						{/* <Listing negotiation by />
 						<Listing buttonText="Edit" />
 						<Listing />
 						<Listing negotiation by />
 						<Listing buttonText="Edit" />
 						<Listing />
 						<Listing negotiation by />
-						<Listing buttonText="Edit" />
+						<Listing buttonText="Edit" /> */}
 					</section>
 				</Grid>
 				<Filter />

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
 	Button,
+    CircularProgress,
     Fade,
 	FormControl,
 	FormHelperText,
@@ -13,11 +15,19 @@ import {
 	Select,
 	TextField,
     Tooltip,
-	Typography 
+	Typography,
+    useMediaQuery 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+
+import SuccessModal from '../../../components/common/SuccessModal';
+
+import { getCurrencies } from '../../../actions/currencies';
+import { addListing } from '../../../actions/listings';
+import { ADDED_LISTING } from '../../../actions/types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
+import validateAddListing from '../../../utils/validation/listing/add';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -60,13 +70,18 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const AddListingModal = ({ edit, open, handleCloseModal }) => {
+const AddListingModal = ({ currencies, addListing, edit, open, handleCloseModal }) => {
 	const classes = useStyles();
+    const dispatch = useDispatch();
 
-	const [AvailableCurrency, setAvailableCurrency] = useState('');
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const { addedListing, listings, msg } = useSelector(state => state.listings);
+
+    const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
-    const [ExchangeCurrency, setExchangeCurrency] = useState('');
+    const [RequiredCurrency, setRequiredCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
@@ -74,13 +89,82 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
 
-	const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const successModal = useRef();
+
+    useEffect(() => {
+        setLoading(false);
+    }, [listings]);
+
+    useEffect(() => {
+        if (addedListing && matches) {
+            resetForm();
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+            return dispatch({
+                type: ADDED_LISTING
+            });
+        }
+    }, [addedListing, dispatch, matches, msg]);
+
+    const resetForm = () => {
+        setAvailableCurrency('');
+        setExchangeAmount('');
+        setRequiredCurrency('');
+        setExchangeRate('');
+        setMinExchangeAmount('');
+        setReceiptAmount('');
+        setListingFee('');
+        setLoading(false);
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+        setErrors({});
+
+        const data = {
+            AvailableCurrency,
+            ExchangeAmount,
+            RequiredCurrency,
+            ExchangeRate,
+            MinExchangeAmount,
+            ReceiptAmount,
+            ListingFee
+        };
+
+        const { errors, isValid } = validateAddListing(data);
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid login data' });
+        }
+
+        setErrors({});
+        setLoading(true);
+        const listing = {
+            currencyNeeded: RequiredCurrency,
+            ExchangeRate: parseFloat(ExchangeRate),
+            AmountAvailable: {
+                CurrencyType: AvailableCurrency,
+                Amount: parseFloat(ExchangeAmount)
+            },
+            MinExchangeAmount: {
+                CurrencyType: RequiredCurrency,
+                Amount: parseFloat(MinExchangeAmount)
+            }
+        };
+
+        setLoading(true);
+        addListing(listing);
+    };
 
 	return (
         <Modal
             aria-labelledby="transition-modal-title"
             aria-describedby="transition-modal-description"
             className={classes.modal}
+            disableBackdropClick={loading ? true : false}
+            disableEscapeKeyDown={loading ? true : false}
             open={open}
             onClose={handleCloseModal}
             closeAfterTransition
@@ -91,6 +175,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
         >
             <Fade in={open}>
                 <Grid item lg={3} className={classes.container}>
+                    <SuccessModal ref={successModal} />
                     <header>
                         <div>
                             {edit ? 
@@ -98,7 +183,6 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                     <Typography variant="h6">Edit Listing</Typography>
                                     <Typography variant="subtitle1" component="span">Modify your current listing.</Typography>
                                 </>
-
                              : 
                                 <>
                                     <Typography variant="h6">Make a Listing</Typography>
@@ -107,13 +191,14 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                             }
                         </div>
                     </header>
-                    <form>
+                    <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={1} className={classes.formContainer}>
                             <Grid item xs={12} md={5}>
                                 <Typography variant="subtitle2" component="span">I Have</Typography>
                                 <FormControl 
                                     variant="outlined" 
                                     error={errors.AvailableCurrency ? true : false } 
+                                    disabled={loading ? true : false}
                                     fullWidth 
                                     required
                                 >
@@ -131,12 +216,15 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={7}>
-                            <Typography variant="subtitle2" component="span"AvailableCurrency>&nbsp;</Typography>
+                            <Typography variant="subtitle2" component="span">&nbsp;</Typography>
                                 <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
                                         value={ExchangeAmount}
@@ -146,6 +234,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
                                         helperText={errors.ExchangeAmount}
+                                        disabled={loading ? true : false}
                                         fullWidth
                                         required
                                         error={errors.ExchangeAmount ? true : false}
@@ -153,29 +242,33 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12} md={5}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>Exchange Rate</Typography>
+                                <Typography variant="subtitle2" component="span">Exchange Rate</Typography>
                                 <FormControl 
                                     variant="outlined" 
-                                    error={errors.ExchangeCurrency ? true : false } 
+                                    error={errors.RequiredCurrency ? true : false } 
+                                    disabled={loading ? true : false}
                                     fullWidth 
                                     required
                                 >
                                     <InputLabel 
-                                        id="ExchangeCurrency" 
+                                        id="RequiredCurrency" 
                                         variant="outlined" 
-                                        error={errors.ExchangeCurrency ? true : false}
+                                        error={errors.RequiredCurrency ? true : false}
                                     >
                                         &#8358;(NGN)
                                     </InputLabel>
                                     <Select
-                                        labelId="ExchangeCurrency"
-                                        value={ExchangeCurrency}
-                                        onChange={(e) => setAvailableCurrency(e.target.value)}
+                                        labelId="RequiredCurrency"
+                                        value={RequiredCurrency}
+                                        onChange={(e) => setRequiredCurrency(e.target.value)}
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
-                                    <FormHelperText>{errors.ExchangeCurrency}</FormHelperText>
+                                    <FormHelperText>{errors.RequiredCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={7}>
@@ -189,6 +282,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
                                         helperText={errors.ExchangeRate}
+                                        disabled={loading ? true : false}
                                         fullWidth
                                         required
                                         error={errors.ExchangeRate ? true : false}
@@ -196,10 +290,11 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12} md={5}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>Min. Exchange Amount</Typography>
+                                <Typography variant="subtitle2" component="span">Min. Exchange Amount</Typography>
                                 <FormControl 
                                     variant="outlined" 
                                     error={errors.AvailableCurrency ? true : false } 
+                                    disabled={loading ? true : false}
                                     fullWidth 
                                     required
                                 >
@@ -214,9 +309,11 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                         labelId="AvailableCurrency"
                                         value={AvailableCurrency}
                                         onChange={(e) => setAvailableCurrency(e.target.value)}
-                                    
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
@@ -232,6 +329,7 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                         placeholder="Enter Amount"
                                         label="Enter Amount" 
                                         helperText={errors.MinExchangeAmount}
+                                        disabled={loading ? true : false}
                                         fullWidth
                                         required
                                         error={errors.MinExchangeAmount ? true : false}
@@ -239,16 +337,17 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span"AvailableCurrency>I Will Receive</Typography>
+                                <Typography variant="subtitle2" component="span">I Will Receive</Typography>
                                 <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                     <TextField
                                         value={ReceiptAmount}
-                                        // onChange={(e) => setExchangeAmount(e.target.value)}
+                                        onChange={(e) => setReceiptAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
                                         // label="Enter Amount" 
                                         helperText={errors.ReceiptAmount}
+                                        disabled={loading ? true : false}
                                         fullWidth
                                         required
                                         error={errors.ReceiptAmount ? true : false}
@@ -256,23 +355,30 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
                                 </Tooltip>
                             </Grid>
                             <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span"AvailableCurrency>Listing Fee</Typography>
+                            <Typography variant="subtitle2" component="span">Listing Fee</Typography>
                                 <TextField
                                     value={ListingFee}
-                                    // onChange={(e) => setExchangeAmount(e.target.value)}
+                                    onChange={(e) => setListingFee(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Amount"
                                     // label="Enter Amount" 
                                     helperText={errors.ListingFee}
+                                    disabled={loading ? true : false}
                                     fullWidth
                                     required
                                     error={errors.ListingFee ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Button type="submit" variant="contained" color="primary" fullWidth>
-                                    Submit
+                                <Button 
+                                    type="submit" 
+                                    variant="contained" 
+                                    color="primary" 
+                                    fullWidth
+                                    disabled={loading ? true : false}
+                                >
+                                    {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                 </Button>
                             </Grid>
                         </Grid>
@@ -284,9 +390,11 @@ const AddListingModal = ({ edit, open, handleCloseModal }) => {
 };
 
 AddListingModal.propTypes = {
+    addListing: PropTypes.func.isRequired,
+    getCurrencies: PropTypes.func.isRequired,
     edit: PropTypes.bool.isRequired,
     open: PropTypes.bool.isRequired,
     handleCloseModal: PropTypes.func.isRequired
 };
 
-export default AddListingModal;
+export default connect(undefined, { addListing, getCurrencies })(AddListingModal);

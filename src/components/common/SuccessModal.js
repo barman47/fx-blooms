@@ -1,6 +1,4 @@
-import { useHistory } from 'react-router-dom';
-import { useDispatch} from 'react-redux';
-import PropTypes from 'prop-types';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import { 
     Backdrop,
 	Button,
@@ -13,7 +11,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { CheckboxMarkedCircle } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../utils/constants';
-import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -58,19 +55,25 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
+const SuccessModal = forwardRef((props, ref) => {
 	const classes = useStyles();
-	const dispatch = useDispatch();
-	const history = useHistory();
 
-    const handleButtonClick = () => {
-        handleCloseModal();
-        dispatch({
-            type: SET_CURRENT_CUSTOMER,
-            payload: {}
-        });
-        history.push('/');
+    const [open, setOpen] = useState(false);
+    const [text, setText] = useState('');
+
+    const closeModal = () => {
+        setOpen(false);
     };
+
+    useImperativeHandle(ref, () => ({
+        openModal: () => {
+            setOpen(true);
+        },
+
+        setModalText: (text) => {
+            setText(text);
+        }
+    }));
 
 	return (
         <Modal
@@ -78,9 +81,9 @@ const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            onClose={handleCloseModal}
-            disableBackdropClick={true}
-            disableEscapeKeyDown={true}
+            disableBackdropClick
+            disableEscapeKeyDown
+            onClose={() => setOpen(false)}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
@@ -94,18 +97,12 @@ const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
                         <Typography variant="subtitle1">
                             {text}
                         </Typography>
-                        <Button onClick={handleButtonClick} color="primary">Okay</Button>
+                        <Button onClick={closeModal} color="primary">Okay</Button>
                     </Grid>
                 </Grid>
             </Fade>
         </Modal>
 	);
-};
+});
 
-SignUpSuccessModal.propTypes = {
-    open: PropTypes.bool.isRequired,
-    handleCloseModal: PropTypes.func.isRequired,
-    text: PropTypes.string.isRequired
-};
-
-export default SignUpSuccessModal;
+export default SuccessModal;
