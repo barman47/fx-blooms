@@ -132,9 +132,9 @@ const MakeListing = (props) => {
 
     const { getCurrencies } = props;
 
-    useEffect(() => {
-        console.log(listings.length);
-    }, []);
+    // useEffect(() => {
+    //     console.log(listings.length);
+    // }, []);
 
     useEffect(() => {
         if (currencies.length === 0) {

@@ -6,6 +6,7 @@ import customerReducer from './customer';
 import documentsReducer from './documents';
 import listingsReducer from './listings';
 import errorsReducer from './errors';
+import subscriptionReducer from './subscription';
 
 const rootReducer = combineReducers({
     countries: countriesReducer,
@@ -13,7 +14,8 @@ const rootReducer = combineReducers({
     currencies: currencyReducer,
     documents: documentsReducer,
     listings: listingsReducer,
-    errors: errorsReducer
+    errors: errorsReducer,
+    subscription: subscriptionReducer
 });
 
 export default rootReducer;

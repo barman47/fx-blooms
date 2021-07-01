@@ -1,4 +1,4 @@
-import { Tooltip, Typography } from '@material-ui/core';
+import { Tooltip, Typography, useMediaQuery } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -6,7 +6,6 @@ import { FileDocumentEdit } from 'mdi-material-ui';
 
 import { SET_LISTING } from '../../../actions/types';
 import { COLORS, SHADOW } from '../../../utils/constants';
-import { useMediaQuery } from '@material-ui/core';
 
 const useStyles = makeStyles(theme => ({
 	root: {

@@ -6,7 +6,8 @@ import PropTypes from 'prop-types';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 
-import Home from './pages/home';
+// import Home from './pages/home';
+import Landing from './pages/landing/Landing';
 
 import Login from './pages/auth/Login';
 import CreateProfile from './pages/auth/CreateProfile';
@@ -80,11 +81,7 @@ const theme = createMuiTheme({
 		fontWeightLight: 300,
 		fontWeightRegular: 400,
 		fontWeightMedium: 500,
-		fontWeightBold: 600,
-
-		button: {
-			borderRadius: '25px'
-		}
+		fontWeightBold: 600
 	}
 });
 
@@ -108,7 +105,7 @@ function App(props) {
 						<Router>
 							<Switch>
 								<ScrollToTop>
-									<Route path="/" exact component={Home} />
+									<Route path="/" exact component={Landing} />
 									<Route path={LOGIN} exact component={Login} />
 									<Route path={SIGN_UP} exact component={CreateProfile} />
 									<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
