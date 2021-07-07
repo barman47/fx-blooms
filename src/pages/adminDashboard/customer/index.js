@@ -4,10 +4,13 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation } from '../../../actions/customer'; 
-import { getDocuments } from '../../../actions/documents'; 
+import { getDocuments } from '../../../actions/documents';
+
+import { COLORS } from '../../../utils/constants';
 
 import PersonalDetails from './PersonalDetails';
 import IdentityDetails from './IdentityDetails';
@@ -27,7 +30,36 @@ const useStyles = makeStyles(theme =>({
 
     container: {
         marginTop: theme.spacing(1)
-    }
+    },
+
+    buttonContainer: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        columnGap: theme.spacing(1),
+        marginTop: theme.spacing(2)
+    },
+
+    button: {
+        padding: [[theme.spacing(2), theme.spacing(3)]]
+    },
+
+    deactivateButton: {
+        borderColor: COLORS.red,
+        color: COLORS.red,
+
+        '&:hover': {
+            backgroundColor: 'initial'
+        }
+    },
+
+    removeButton: {
+        color: COLORS.white,
+        backgroundColor: COLORS.red,
+
+        '&:hover': {
+            backgroundColor: COLORS.red
+        }
+    },
 }));
 
 const Customer = (props) => {
@@ -51,13 +83,16 @@ const Customer = (props) => {
     return (
         <section className={classes.root}>
             <Grid container direction="row" justify="space-between" className={classes.header}>
-                <Grid item>
+                <Grid item xs={12} lg={6}>
                     <Typography variant="h6">User Details (VERIFIED)</Typography>
                 </Grid>
-                <Grid item alignSelf="center">
+                <Grid item alignSelf="center" xs={12} lg={6}>
                     <div className={classes.buttonContainer}>
-                        <Button variant="outlined" color="red">Deactivate</Button>
-                        <Button variant="contained" color="red">Remove</Button>
+                        <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Deactivate</Button>
+                        <Button variant="contained" size="large" className={clsx(classes.button, classes.removeButton)}>Remove</Button>
+                        
+                        {/* <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Decline</Button>
+                        <Button variant="contained" size="large" color="primary" className={classes.button}>Approve</Button> */}
                     </div>
                 </Grid>
             </Grid>

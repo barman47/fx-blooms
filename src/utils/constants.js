@@ -5,7 +5,8 @@ export const COLORS = {
     grey: '#969bab',
     white: '#ffffff',
     offWhite: '#f8f8f8',
-    lightTeal: '#f6fafa'
+    lightTeal: '#f6fafa',
+    red: '#ff0000'
 };
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';

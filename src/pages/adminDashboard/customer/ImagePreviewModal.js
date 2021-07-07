@@ -1,0 +1,54 @@
+import PropTypes from 'prop-types';
+import { 
+    Backdrop,
+    Fade,
+    Modal
+} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+
+const useStyles = makeStyles(theme => ({
+    modal: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        border: '1px solid red'
+    },
+
+    img: {
+        borderRadius: theme.shape.borderRadius,
+
+        [theme.breakpoints.down('sm')]: {
+            width: '90%'
+        }
+    }
+}));
+
+const ImagePreviewModal = ({ open, handleCloseModal, img, alt }) => {
+	const classes = useStyles();
+
+	return (
+        <Modal
+            aria-labelledby="transition-modal-title"
+            aria-describedby="transition-modal-description"
+            className={classes.modal}
+            open={open}
+            onClose={handleCloseModal}
+            closeAfterTransition
+            BackdropComponent={Backdrop}
+            BackdropProps={{
+                timeout: 500,
+            }}
+        >
+            <Fade in={open}>
+                <img src={img} alt={alt} className={classes.img} />
+            </Fade>
+        </Modal>
+	);
+};
+
+ImagePreviewModal.propTypes = {
+    open: PropTypes.bool.isRequired,
+    handleCloseModal: PropTypes.func.isRequired
+};
+
+export default ImagePreviewModal;

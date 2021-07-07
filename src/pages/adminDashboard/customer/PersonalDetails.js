@@ -2,14 +2,8 @@ import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux'; 
 import { 
     Box, 
-    Button, 
     Divider,
-    FormControl,
-    FormHelperText,
     Grid,
-    MenuItem,
-    Select,
-    TextField, 
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -66,9 +60,6 @@ const PersonalDetails = () => {
     const [PostalCode, setPostalCode] = useState('');
     const [Listings, setListings] = useState(0);
     const [Transactions, setTransactions] = useState(0);
-    
-    const [errors, setErrors] = useState({});
-    const [editable, setEditable] = useState(false);
 
     useEffect(() => {
         if (profile) {
@@ -109,8 +100,7 @@ const PersonalDetails = () => {
             setCountry(country?.name);
         }
     }, [countries, countryId]);
-    // useEffect(() => {}, [stateId]);
-    
+
     const onSubmit = (e) => {
         e.preventDefault();
     };
@@ -127,23 +117,23 @@ const PersonalDetails = () => {
             <Grid item>
                 <form onSubmit={onSubmit} noValidate>
                     <Grid container direction="row" spacing={3}>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{FirstName}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{LastName}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Email Address</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{Email}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{Username}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{PhoneNo}</Typography>
                         </Grid>
@@ -151,15 +141,15 @@ const PersonalDetails = () => {
                             <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{Address}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={4}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{country}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={4}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>City/State</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{city}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{PostalCode}</Typography>
                         </Grid>

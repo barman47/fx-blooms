@@ -27,7 +27,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     content: {
-        marginTop: theme.spacing(8),
+        marginTop: theme.spacing(10),
         paddingLeft: theme.spacing(15),
         paddingRight: theme.spacing(15),
 
@@ -66,7 +66,7 @@ const AdminDashboard = ({ children }) => {
             <AppBar 
                 position="fixed"
                 color="white"
-                elevation={1}
+                elevation={0}
                 classes={{ root: classes.root}}
                 // className={clsx(classes.appBar, {
                 //     [classes.appBarShift]: open
