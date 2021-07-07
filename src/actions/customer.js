@@ -4,7 +4,7 @@ import { API } from '../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 import handleError from '../utils/handleError';
 import setAuthToken from '../utils/setAuthToken';
-import { SET_CURRENT_CUSTOMER } from './types';
+import { SET_CURRENT_CUSTOMER, SET_CUSTOMER_PROFILE } from './types';
 
 const api = `${API}/Customer`;
 
@@ -27,6 +27,18 @@ export const createCustomer = (customer) => async (dispatch) => {
         dispatch({
             type: SET_CURRENT_CUSTOMER,
             payload: { successMessage }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomerInformation = () => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/CustomerInformation`);
+        dispatch({
+            type: SET_CUSTOMER_PROFILE,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

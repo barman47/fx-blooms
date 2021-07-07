@@ -9,6 +9,11 @@ export const TERMS = '/termsAndConditions';
 export const PRIVACY_POLICY = '/privacyPolicy';
 export const FAQS = '/frequentlyAskedQuestions';
 
+export const ADMIN_LOGIN = '/login/admin';
+export const ADMIN_DASHBOARD = '/admin';
+export const ADMIN_HOME = '/home';
+export const CUSTOMERS = '/customers';
+
 export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = '/home';
 export const MAKE_LISTING = '/listings/create';

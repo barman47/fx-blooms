@@ -9,12 +9,11 @@ import PropTypes from 'prop-types';
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
-import { login } from '../../actions/customer';
+import { login } from '../../actions/admin';
 import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
-import { SIGN_UP } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -81,7 +80,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = (props) => {
+const AdminLogin = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -132,7 +131,7 @@ const Login = (props) => {
 
     return (
         <>
-            <Helmet><title>Login | FXBlooms.com</title></Helmet>
+            <Helmet><title>AdminLogin | FXBlooms.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -149,7 +148,7 @@ const Login = (props) => {
                 </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
-                        Welcome back!
+                        FXBlooms Admin
                     </Typography>
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
@@ -206,11 +205,6 @@ const Login = (props) => {
                                     Sign In
                                 </Button>
                             </Grid>
-                            <Grid item xs={12}>
-                                <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300 }}>
-                                    Don't have an account? <RouterLink to={SIGN_UP} className={classes.link}>Sign Up</RouterLink>
-                                </Typography>
-                            </Grid>
                         </Grid>
                     </form>
                 </div>
@@ -219,8 +213,8 @@ const Login = (props) => {
     );
 };
 
-Login.propTypes = {
+AdminLogin.propTypes = {
     login: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login })(Login);
+export default connect(undefined, { login })(AdminLogin);

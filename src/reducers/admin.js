@@ -1,4 +1,4 @@
-import { SET_CURRENT_CUSTOMER, SET_CUSTOMER_PROFILE } from '../actions/types';
+import { SET_CURRENT_ADMIN } from '../actions/types';
 
 const initialState = {
     profile: {}
@@ -6,14 +6,8 @@ const initialState = {
 
 const customerReducer =  (state = initialState, action) => {
     switch (action.type) {
-        case SET_CURRENT_CUSTOMER:
+        case SET_CURRENT_ADMIN:
             return { ...state, ...action.payload };
-        
-        case SET_CUSTOMER_PROFILE:
-            return {
-                ...state,
-                profile: { ...action.payload }
-            };
             
             default:
                 return state;

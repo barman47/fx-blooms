@@ -76,22 +76,22 @@ const UserDetails = () => {
                         <Typography variant="h6">Personal Details</Typography>
                         <br /><Divider /><br />
                         <div className={classes.detail}>
-                            <Typography variant="span" className={classes.title}>Username</Typography>
-                            <Typography variant="span" className={classes.title}>Phone Number</Typography>
-                            <Typography variant="span" className={classes.text}>barman47</Typography>
-                            <Typography variant="span" className={classes.text}>+2348147233059</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Username</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Phone Number</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>barman47</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>+2348147233059</Typography>
                         </div>
                         <div className={classes.detail}>
-                            <Typography variant="span" className={classes.title}>City</Typography>
-                            <Typography variant="span" className={classes.title}>Country</Typography>
-                            <Typography variant="span" className={classes.text}>Lagos</Typography>
-                            <Typography variant="span" className={classes.text}>Nigeria</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>City</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Country</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Lagos</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Nigeria</Typography>
                         </div>
                         <div className={classes.detail}>
-                            <Typography variant="span" className={classes.title}>Successful Transactions</Typography>
-                            <Typography variant="span" className={classes.title}>Listings</Typography>
-                            <Typography variant="span" className={classes.text}>100</Typography>
-                            <Typography variant="span" className={classes.text}>200</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Successful Transactions</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Listings</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>100</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>200</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={12} lg={7} className={classes.reportContainer}>

@@ -20,14 +20,26 @@ import EditListing from './pages/dashboard/listings/EditListing';
 import MakeListing from './pages/dashboard/listings/MakeListing';
 import UserDetails from './pages/dashboard/listings/UserDetails';
 
+import Profile from './pages/dashboard/profile';
+
 import Messages from './pages/dashboard/messages/Messages';
 
 // import setAuthToken from './utils/setAuthToken';
 // import isTokenExpired from './utils/tokenExpired';
 
+import AdminLogin from './pages/auth/AdminLogin';
+import AdminDashboard from './pages/adminDashboard';
+import AdminHome from './pages/adminDashboard/home/Home';
+import Customers from './pages/adminDashboard/customers/';
+import Customer from './pages/adminDashboard/customer/';
+
 import { getMe } from './actions/customer';
 
 import { 
+	ADMIN_DASHBOARD,
+	ADMIN_HOME,
+	ADMIN_LOGIN,
+	CUSTOMERS,
 	LOGIN, 
 	SIGN_UP, 
 	CREATE_ACCOUNT, 
@@ -36,7 +48,8 @@ import {
 	DASHBOARD,
 	DASHBOARD_HOME, 
 	EDIT_LISTING,
-	USER_DETAILS
+	USER_DETAILS,
+	PROFILE
 } from './routes';
 
 import reIssueToken from './utils/reIssueToken';
@@ -101,27 +114,36 @@ function App(props) {
 	}, []);
 
 	return (
-					<ThemeProvider theme={theme}>
-						<Router>
-							<Switch>
-								<ScrollToTop>
-									<Route path="/" exact component={Home} />
-									<Route path={LOGIN} exact component={Login} />
-									<Route path={SIGN_UP} exact component={CreateProfile} />
-									<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
-									<Route path={DASHBOARD}>
-										<Dashboard>
-											<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
-											<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
-											<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={EditListing} />
-											<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
-											<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={UserDetails} />
-										</Dashboard>
-									</Route>
-								</ScrollToTop>
-							</Switch>
-						</Router>
-					</ThemeProvider>
+		<ThemeProvider theme={theme}>
+			<Router>
+				<Switch>
+					<ScrollToTop>
+						<Route path="/" exact component={Home} />
+						<Route path={LOGIN} exact component={Login} />
+						<Route path={SIGN_UP} exact component={CreateProfile} />
+						<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
+						<Route path={DASHBOARD}>
+							<Dashboard>
+								<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
+								<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
+								<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={EditListing} />
+								<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
+								<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={UserDetails} />
+								<Route path={`${DASHBOARD}${PROFILE}`} exact component={Profile} />
+							</Dashboard>
+						</Route>
+						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
+						<Route path={ADMIN_DASHBOARD}>
+							<AdminDashboard>
+								<Route path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={AdminHome} />
+								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={Customers} />
+								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={Customer} />
+							</AdminDashboard>
+						</Route>
+					</ScrollToTop>
+				</Switch>
+			</Router>
+		</ThemeProvider>
 	);
 }
 

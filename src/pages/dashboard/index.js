@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
-import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
@@ -12,17 +12,19 @@ import {
     IconButton,
     Drawer,
     Divider,
+    Link,
     List,
     ListItem,
     ListItemIcon,
     ListItemText,
     BottomNavigation,
     BottomNavigationAction,
-    Tooltip
+    Tooltip,
+    Typography
 } from '@material-ui/core';
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
+import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
 
 import { COLORS } from '../../utils/constants';
 
@@ -179,6 +181,8 @@ const Dashboard = ({ children }) => {
     const history = useHistory();
     const location = useLocation();
 
+    const { username, email } = useSelector(state => state.customer); 
+
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
@@ -299,15 +303,15 @@ const Dashboard = ({ children }) => {
                     </List>
                     <Divider />
                     <section className={classes.logoutContainer}>
-                        <div className={classes.avatarContainer}>
+                        <Link underline="none" to={`${DASHBOARD}${PROFILE}`} component={RouterLink} className={classes.avatarContainer}>
                             <div>
                                 <img className={classes.avatar} src={avatar} alt="Avatar" />
                             </div>
                             <div>
-                                <Typography variant="h6">Hello User</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.email}>hello@fxblooms.com</Typography>
+                                <Typography variant="h6">Hello {username}</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.email}>{email}</Typography>
                             </div>
-                        </div>
+                        </Link>
                         <Divider />
                         <ListItem button className={classes.logout}>
                             <ListItemIcon>

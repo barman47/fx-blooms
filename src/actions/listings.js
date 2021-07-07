@@ -10,15 +10,16 @@ const URL = `${API}/Listing`;
 export const getListings = () => async (dispatch) => {
     try {
         await reIssueToken();
-        const res = await axios.post(`${URL}/GetListings`, {
-            PageNumber: 1,
-            PageSize: 1,
-            CurrencyNeeded: 'NGN',
-            CurrencyAvailable: 'NGN',
-            MinExchangeAmount: 0
+        const res = await axios.post(`${URL}/GetAllListings`, {
+            pageNumber: 0,
+            pageSize: 10,
+            currencyNeeded: 'NGN',
+            currencyAvailable: 'NGN',
+            minimumExchangeAmount: 0,
+            useCurrencyFilter: false
         });
-
         const { items, ...rest } = res.data.data;
+        console.log(res);
 
         dispatch({
             type: SET_LISTINGS,

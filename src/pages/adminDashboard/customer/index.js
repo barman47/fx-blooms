@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Grid, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { getCountries } from '../../../actions/countries'; 
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const Profile = (props) => {
+const Customer = (props) => {
     const classes = useStyles();
     const { countries, documents } = useSelector(state => state);
     const { profile } = useSelector(state => state.customer);
@@ -50,7 +50,17 @@ const Profile = (props) => {
 
     return (
         <section className={classes.root}>
-            <Typography variant="h6">My Profile</Typography>
+            <Grid container direction="row" justify="space-between" className={classes.header}>
+                <Grid item>
+                    <Typography variant="h6">User Details (VERIFIED)</Typography>
+                </Grid>
+                <Grid item alignSelf="center">
+                    <div className={classes.buttonContainer}>
+                        <Button variant="outlined" color="red">Deactivate</Button>
+                        <Button variant="contained" color="red">Remove</Button>
+                    </div>
+                </Grid>
+            </Grid>
             <Grid container direction="row" spacing={3} className={classes.container}>
                 <Grid item xs={12} lg={6}>
                     <PersonalDetails />
@@ -63,10 +73,10 @@ const Profile = (props) => {
     );
 }
 
-Profile.propTypes = {
+Customer.propTypes = {
     getCountries: PropTypes.func.isRequired,
     getCustomerInformation: PropTypes.func.isRequired,
     getDocuments: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCountries, getCustomerInformation, getDocuments })(Profile);
+export default connect(undefined, { getCountries, getCustomerInformation, getDocuments })(Customer);
