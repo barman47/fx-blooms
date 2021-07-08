@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { API } from '../utils/constants';
+import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 import handleError from '../utils/handleError';
 import setAuthToken from '../utils/setAuthToken';
-import { SET_CURRENT_CUSTOMER, SET_CUSTOMER_PROFILE } from './types';
+import { SET_CURRENT_CUSTOMER, SET_CUSTOMER_PROFILE, SET_CUSTOMERS } from './types';
 
 const api = `${API}/Customer`;
 
@@ -55,6 +55,45 @@ export const login = (data, history) => async (dispatch) => {
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
         history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomers = () => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/GetAll`);
+        const { result } = res.data.data;
+        const confirmed = [];
+        const pending = [];
+        const rejected = [];
+        result.forEach(customer => {
+            switch (customer.customerStatus) {
+                case CONFIRMED:
+                    confirmed.push(customer);
+                    break;
+
+                case PENDING:
+                    pending.push(customer);
+                    break;
+
+                case REJECTED:
+                    rejected.push(customer);
+                    break;
+
+                default:
+                    break;
+            }
+        });
+        dispatch({
+            type: SET_CUSTOMERS,
+            payload: {
+                confirmed,
+                pending,
+                rejected,
+                count: result.length
+            }
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

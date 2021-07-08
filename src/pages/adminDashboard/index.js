@@ -1,6 +1,9 @@
-// import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 // import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
 import {
     AppBar,
@@ -13,10 +16,12 @@ import {
 import avatar from '../../assets/img/avatar.jpg';
 import logo from '../../assets/img/logo.svg';
 
+import { getCustomers } from '../../actions/customer';
 import { COLORS } from '../../utils/constants';
 
 const useStyles = makeStyles((theme) => ({
     root: {
+        backgroundColor: COLORS.white,
         paddingLeft: theme.spacing(15),
         paddingRight: theme.spacing(15),
 
@@ -43,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     name: {
+        color: COLORS.offBlack,
         fontSize: theme.spacing(2),
         textAlign: 'right'
     },
@@ -56,16 +62,25 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children }) => {
+const AdminDashboard = ({ children, title, getCustomers }) => {
     const classes = useStyles();
+    const { admin } = useSelector(state => state);
+    const { count } = useSelector(state => state.customers);
     // const history = useHistory();
     // const location = useLocation();
 
+    useEffect(() => {
+        if (count === 0) {
+            getCustomers();
+        }
+        // eslint-disable-next-line
+    }, []);
+
     return (
         <>
+            <Helmet><title>{`${title} | FXBlooms.com`}</title></Helmet>
             <AppBar 
                 position="fixed"
-                color="white"
                 elevation={0}
                 classes={{ root: classes.root}}
                 // className={clsx(classes.appBar, {
@@ -80,8 +95,8 @@ const AdminDashboard = ({ children }) => {
                         <Grid item>
                             <Grid container direction="row" alignItems="center" spacing={2}>
                                 <Grid item>
-                                    <Typography variant="h6" className={classes.name}>Wale Calfos</Typography>
-                                    <Typography variant="subtitle2" className={classes.email}>nomsouzoanya@yahoo.co.uk</Typography>
+                                    <Typography variant="h6" className={classes.name}>{`${admin.firstName} ${admin.lastName}`}</Typography>
+                                    <Typography variant="subtitle2" className={classes.email}>{admin.email}</Typography>
                                 </Grid>
                                 <Grid item>
                                     <Avatar src={avatar} />
@@ -96,6 +111,11 @@ const AdminDashboard = ({ children }) => {
             </section>
         </>
     );
-}
+};
 
-export default AdminDashboard;
+AdminDashboard.propTypes = {
+    title: PropTypes.string.isRequired,
+    getCustomers: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getCustomers })(AdminDashboard);

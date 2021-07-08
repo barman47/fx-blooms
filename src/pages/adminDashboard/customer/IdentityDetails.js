@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'; 
+import { useState } from 'react'; 
 import { useSelector } from 'react-redux'; 
 import { 
     Box, 
@@ -8,7 +8,6 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import image from '../../../assets/img/avatar.jpg';
 import { COLORS } from '../../../utils/constants';
 
 import ImagePreviewModal from './ImagePreviewModal';
@@ -56,27 +55,11 @@ const useStyles = makeStyles(theme =>({
 
 const IdentityDetails = () => {
     const classes = useStyles();
-    const { profile } = useSelector(state => state.customer); 
-
-    const [img, setImg] = useState('');
-    const [documentType, setDocumentType] = useState('');
-    const [idNumber, setIdNumber] = useState('');
-    const [idFront, setIdFront] = useState('');
-    const [idBack, setIdBack] = useState('');
+    const { customer } = useSelector(state => state.customers);
     
     const [open, setOpen] = useState(false);
     const [modalImage, setModalImage] = useState('');
     const [alt, setAlt] = useState('');
-
-    useEffect(() => {
-        if (profile) {
-            const { img, document } = profile;
-            setImg(img);
-            setIdFront(document?.img);
-            setDocumentType(document?.documentType);
-            setIdNumber(document?.idNumber);
-        }
-    }, [profile]);
 
     const handleCloseModal = () => {
         setModalImage('');
@@ -110,28 +93,25 @@ const IdentityDetails = () => {
                         <Grid container direction="row" spacing={3}>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Type</Typography>
-                                <Typography variant="subtitle2" className={classes.info}>{documentType}</Typography>
+                                <Typography variant="subtitle2" className={classes.info}>{customer?.documentation?.documentType}</Typography>
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Document Number</Typography>
-                                <Typography variant="subtitle2" className={classes.info}>{idNumber}</Typography>
+                                <Typography variant="subtitle2" className={classes.info}>{customer?.documentation?.idNumber}</Typography>
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Front</Typography>
                                 <br />
-                                {/* {idFront && <img src={idFront} alt="" className={classes.photograph} onMouseEnter={handleModalOpen} />} */}
-                                <img src={image} alt="" className={classes.idCard} onMouseEnter={() => handleModalOpen(image, 'ID Card Front')} />
+                                <img src={customer?.documentation?.img} alt="" className={classes.idCard} onMouseEnter={() => handleModalOpen(customer?.documentation?.img, 'ID Card Front')} />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Back</Typography>
                                 <br />
-                                {/* {idBack && <img src={idBack} alt=""  className={classes.idCard} onMouseEnter={handleModalOpen} />} */}
-                                <img src={image} alt=""  className={classes.idCard} onMouseEnter={() => handleModalOpen(image, 'ID Card Back')} />
+                                <img src={customer?.documentation?.img} alt=""  className={classes.idCard} onMouseEnter={() => handleModalOpen(customer?.documentation?.img, 'ID Card Back')} />
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Photograph</Typography>
-                                {/* {img && <img src={img} alt="" className={classes.idCard} onMouseEnter={handleModalOpen} />} */}
-                                <img src={image} alt="" className={classes.photograph} onMouseEnter={() => handleModalOpen(image, 'Photograph')} />
+                                <img src={customer.img} alt="" className={classes.photograph} onMouseEnter={() => handleModalOpen(customer.img, 'Photograph')} />
                             </Grid>
                         </Grid>
                     </form>

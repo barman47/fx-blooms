@@ -1,6 +1,7 @@
-// import { useEffect, useState } from 'react';
-// import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+// import { connect } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Grid,
@@ -58,8 +59,15 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Home = () => {
+const Home = (props) => {
     const classes = useStyles();
+
+    const { handleSetTitle } = props;
+
+    useEffect(() => {
+        handleSetTitle('Admin Home');
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <>
@@ -86,5 +94,9 @@ const Home = () => {
         </>
     );
 }
+
+Home.propTypes = {
+    handleSetTitle:PropTypes.func.isRequired
+};
 
 export default Home;

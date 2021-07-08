@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core';
@@ -100,6 +100,8 @@ const theme = createMuiTheme({
 
 function App(props) {
 // 	const history = useHistory();
+const [title, setTitle] = useState('');
+
 
 	useEffect(() => {
 		// isTokenExpired();
@@ -113,6 +115,8 @@ function App(props) {
 		// eslint-disable-next-line
 	}, []);
 
+	const handleSetTitle = (title) => setTitle(title);
+
 	return (
 		<ThemeProvider theme={theme}>
 			<Router>
@@ -123,21 +127,21 @@ function App(props) {
 						<Route path={SIGN_UP} exact component={CreateProfile} />
 						<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
 						<Route path={DASHBOARD}>
-							<Dashboard>
-								<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={AllListings} />
-								<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={MakeListing} />
-								<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={EditListing} />
-								<Route path={`${DASHBOARD}${MESSAGES}`} exact component={Messages} />
-								<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={UserDetails} />
-								<Route path={`${DASHBOARD}${PROFILE}`} exact component={Profile} />
+							<Dashboard title={title}>
+								<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
 						</Route>
 						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
 						<Route path={ADMIN_DASHBOARD}>
-							<AdminDashboard>
-								<Route path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={AdminHome} />
-								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={Customers} />
-								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={Customer} />
+							<AdminDashboard title={title}>
+								<Route path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
+								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
+								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 							</AdminDashboard>
 						</Route>
 					</ScrollToTop>

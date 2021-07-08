@@ -176,7 +176,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Dashboard = ({ children }) => {
+const Profile = ({ children, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const location = useLocation();
@@ -186,7 +186,6 @@ const Dashboard = ({ children }) => {
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
-
 
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
@@ -200,6 +199,11 @@ const Dashboard = ({ children }) => {
         { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> },
         { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
+
+    // useEffect(() => {
+    //     handleSetTitle('My Profile');
+    //     // eslint-disable-next-line
+    // }, []);
 
     useEffect(() => {
         setPath(location.pathname);
@@ -225,127 +229,125 @@ const Dashboard = ({ children }) => {
     };
 
     return (
-        <>
-            <section className={classes.root}>
-                {/* <AppBar 
-                    position="fixed"
-                    color="transparent"
-                    elevation={1}
-                    className={clsx(classes.appBar, {
-                        [classes.appBarShift]: open
-                    })}
-                >
-                    <Toolbar>
-                        <IconButton 
-                            edge="start" 
-                            className={clsx(classes.menuButton, {
-                                [classes.hide]: open,
-                            })}
-                            color="inherit" 
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                        >
-                            <Menu />
-                        </IconButton>
-                        <Typography variant="h6" className={classes.title}>
-                            News
-                        </Typography>
-                        <Button color="inherit">Login</Button>
-                    </Toolbar>
-                </AppBar> */}
-                <Drawer 
-                    variant="permanent"
-                    className={clsx(classes.drawer, {
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open
-                    })}
-                    classes={{
-                        paper: clsx({
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open,
-                        }),
-                    }}
-                >
-                    <div className={classes.toolbar}>
-                        {open && 
-                            <RouterLink to="/">
-                                <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
-                            </RouterLink>
-                        }
-                        <IconButton onClick={toggleDrawer}>
-                            {!open ?
-                                <Tooltip title="Expand Navigation" placement="top" arrow>
-                                    <ChevronRight />
-                                </Tooltip>
-                                :
-                                <Tooltip title="Collapse Navigation" placement="top" arrow>
-                                    <ChevronLeft />
-                                </Tooltip>
-                            }
-                        </IconButton>
-                    </div> 
-                    <Divider />
-                    <List className={classes.links}>
-                        {links.map((link, index) => (
-                            <ListItem 
-                                className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
-                                key={index} 
-                                button 
-                                disableRipple
-                                onClick={() => handleLinkClick(link.url)}
-                            >
-                                <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
-                                    {link.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={link.text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                    <Divider />
-                    <section className={classes.logoutContainer}>
-                        <Link underline="none" to={`${DASHBOARD}${PROFILE}`} component={RouterLink} className={classes.avatarContainer}>
-                            <div>
-                                <img className={classes.avatar} src={avatar} alt="Avatar" />
-                            </div>
-                            <div>
-                                <Typography variant="h6">Hello {username}</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.email}>{email}</Typography>
-                            </div>
-                        </Link>
-                        <Divider />
-                        <ListItem button className={classes.logout}>
-                            <ListItemIcon>
-                                <Logout />
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
-                        </ListItem>
-                    </section>
-                </Drawer>
-                <div className={classes.content}>
-                    {children}
-                </div>
-                <Box
-                    boxShadow={5}
-                    // bgcolor="background.paper"
-                    // m={1}
-                    // p={1}
-                    className={classes.bottomBar}
-                >
-                    <BottomNavigation
-                        value={value}
-                        onChange={(event, newValue) => {
-                            setValue(newValue)
-                        }}
-                        showLabels
+        <section className={classes.root}>
+            {/* <AppBar 
+                position="fixed"
+                color="transparent"
+                elevation={1}
+                className={clsx(classes.appBar, {
+                    [classes.appBarShift]: open
+                })}
+            >
+                <Toolbar>
+                    <IconButton 
+                        edge="start" 
+                        className={clsx(classes.menuButton, {
+                            [classes.hide]: open,
+                        })}
+                        color="inherit" 
+                        aria-label="open drawer"
+                        onClick={handleDrawerOpen}
                     >
-                        {mobileLinks.map((item, index) => (
-                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
-                        ))}
-                    </BottomNavigation>
-                </Box>
-            </section>
-        </>
+                        <Menu />
+                    </IconButton>
+                    <Typography variant="h6" className={classes.title}>
+                        News
+                    </Typography>
+                    <Button color="inherit">Login</Button>
+                </Toolbar>
+            </AppBar> */}
+            <Drawer 
+                variant="permanent"
+                className={clsx(classes.drawer, {
+                    [classes.drawerOpen]: open,
+                    [classes.drawerClose]: !open
+                })}
+                classes={{
+                    paper: clsx({
+                    [classes.drawerOpen]: open,
+                    [classes.drawerClose]: !open,
+                    }),
+                }}
+            >
+                <div className={classes.toolbar}>
+                    {open && 
+                        <RouterLink to="/">
+                            <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
+                        </RouterLink>
+                    }
+                    <IconButton onClick={toggleDrawer}>
+                        {!open ?
+                            <Tooltip title="Expand Navigation" placement="top" arrow>
+                                <ChevronRight />
+                            </Tooltip>
+                            :
+                            <Tooltip title="Collapse Navigation" placement="top" arrow>
+                                <ChevronLeft />
+                            </Tooltip>
+                        }
+                    </IconButton>
+                </div> 
+                <Divider />
+                <List className={classes.links}>
+                    {links.map((link, index) => (
+                        <ListItem 
+                            className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
+                            key={index} 
+                            button 
+                            disableRipple
+                            onClick={() => handleLinkClick(link.url)}
+                        >
+                            <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
+                                {link.icon}
+                            </ListItemIcon>
+                            <ListItemText primary={link.text} />
+                        </ListItem>
+                    ))}
+                </List>
+                <Divider />
+                <section className={classes.logoutContainer}>
+                    <Link underline="none" to={`${DASHBOARD}${PROFILE}`} component={RouterLink} className={classes.avatarContainer}>
+                        <div>
+                            <img className={classes.avatar} src={avatar} alt="Avatar" />
+                        </div>
+                        <div>
+                            <Typography variant="h6">Hello {username}</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.email}>{email}</Typography>
+                        </div>
+                    </Link>
+                    <Divider />
+                    <ListItem button className={classes.logout}>
+                        <ListItemIcon>
+                            <Logout />
+                        </ListItemIcon>
+                        <ListItemText primary="Logout" />
+                    </ListItem>
+                </section>
+            </Drawer>
+            <div className={classes.content}>
+                {children}
+            </div>
+            <Box
+                boxShadow={5}
+                // bgcolor="background.paper"
+                // m={1}
+                // p={1}
+                className={classes.bottomBar}
+            >
+                <BottomNavigation
+                    value={value}
+                    onChange={(event, newValue) => {
+                        setValue(newValue)
+                    }}
+                    showLabels
+                >
+                    {mobileLinks.map((item, index) => (
+                        <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                    ))}
+                </BottomNavigation>
+            </Box>
+        </section>
     );
-}
+};
 
-export default Dashboard;
+export default Profile;

@@ -11,7 +11,6 @@ const api = `${API}/Admin`;
 export const login = (data, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Login`, data);
-        console.log(res);
         const { token } = res.data.data;
         setAuthToken(token);
         dispatch({

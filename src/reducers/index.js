@@ -5,6 +5,7 @@ import adminReducer from './admin';
 import countriesReducer from './countries';
 import currencyReducer from './currencies';
 import customerReducer from './customer';
+import customersReducer from './customers';
 import documentsReducer from './documents';
 import listingsReducer from './listings';
 import errorsReducer from './errors';
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     admin: adminReducer,
     countries: countriesReducer,
     customer: customerReducer,
+    customers: customersReducer,
     currencies: currencyReducer,
     documents: documentsReducer,
     listings: listingsReducer,

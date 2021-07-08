@@ -129,12 +129,13 @@ const AllListings = (props) => {
 	const { listings } = useSelector(state => state.listings);
 	const [open, setOpen] = useState(false);
 
-	const { getListings } = props;
+	const { getListings, handleSetTitle } = props;
 
 	useEffect(() => {
 		if (isAuthenticated && listings?.length === 0) {
 			getListings();
 		}
+		handleSetTitle('All Listings');
 		// eslint-disable-next-line
 	}, []);
 

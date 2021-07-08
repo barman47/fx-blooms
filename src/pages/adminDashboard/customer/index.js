@@ -1,16 +1,12 @@
 import { useEffect } from 'react';
-import { connect, useSelector } from 'react-redux';
-import _ from 'lodash';
-import PropTypes from 'prop-types';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
+import PropTypes from 'prop-types';
 
-import { getCountries } from '../../../actions/countries'; 
-import { getCustomerInformation } from '../../../actions/customer'; 
-import { getDocuments } from '../../../actions/documents';
-
-import { COLORS } from '../../../utils/constants';
+import { SET_CUSTOMER} from '../../../actions/types';
+import { COLORS, CONFIRMED, PENDING } from '../../../utils/constants';
 
 import PersonalDetails from './PersonalDetails';
 import IdentityDetails from './IdentityDetails';
@@ -62,21 +58,16 @@ const useStyles = makeStyles(theme =>({
     },
 }));
 
-const Customer = (props) => {
+const Customer = () => {
     const classes = useStyles();
-    const { countries, documents } = useSelector(state => state);
-    const { profile } = useSelector(state => state.customer);
+    const dispatch = useDispatch();
+    const { customer } = useSelector(state => state.customers);
     
     useEffect(() => {
-        if (_.isEmpty(profile)) {
-            props.getCustomerInformation();
-        }
-        if (countries.length === 0) {
-            props.getCountries();
-        }
-        if (documents.length === 0) {
-            props.getDocuments();
-        }
+        return () => dispatch({ 
+            type: SET_CUSTOMER,
+            payload: {}
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -84,15 +75,24 @@ const Customer = (props) => {
         <section className={classes.root}>
             <Grid container direction="row" justify="space-between" className={classes.header}>
                 <Grid item xs={12} lg={6}>
-                    <Typography variant="h6">User Details (VERIFIED)</Typography>
+                    {customer.customerStatus === PENDING && <Typography variant="h6">User Details (NEW)</Typography>}
+                    {customer.customerStatus === CONFIRMED && <Typography variant="h6">User Details (VERIFIED)</Typography>}
+                    
                 </Grid>
-                <Grid item alignSelf="center" xs={12} lg={6}>
+                <Grid item xs={12} lg={6}>
                     <div className={classes.buttonContainer}>
-                        <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Deactivate</Button>
-                        <Button variant="contained" size="large" className={clsx(classes.button, classes.removeButton)}>Remove</Button>
-                        
-                        {/* <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Decline</Button>
-                        <Button variant="contained" size="large" color="primary" className={classes.button}>Approve</Button> */}
+                    {customer.customerStatus === PENDING && 
+                        <>
+                            <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Decline</Button>
+                            <Button variant="contained" size="large" color="primary" className={classes.button}>Approve</Button>
+                        </>
+                    }
+                    {customer.customerStatus === CONFIRMED && 
+                        <>
+                            <Button variant="outlined" size="large" className={clsx(classes.button, classes.deactivateButton)}>Deactivate</Button>
+                            <Button variant="contained" size="large" className={clsx(classes.button, classes.removeButton)}>Remove</Button>
+                        </>
+                    }
                     </div>
                 </Grid>
             </Grid>
@@ -109,9 +109,7 @@ const Customer = (props) => {
 }
 
 Customer.propTypes = {
-    getCountries: PropTypes.func.isRequired,
-    getCustomerInformation: PropTypes.func.isRequired,
-    getDocuments: PropTypes.func.isRequired
+    handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCountries, getCustomerInformation, getDocuments })(Customer);
+export default Customer;

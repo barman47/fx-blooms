@@ -136,11 +136,13 @@ const MakeListing = (props) => {
     const { currencies } = useSelector(state => state);
     const { addedListing, listings, msg } = useSelector(state => state.listings);
 
-    const { getCurrencies } = props;
+    const { getCurrencies, handleSetTitle } = props;
 
-    // useEffect(() => {
-    //     console.log(listings.length);
-    // }, []);
+    useEffect(() => {
+        // console.log(listings.length);
+        handleSetTitle('Add Listing');
+        // eslint-disable-next-line
+    }, []);
 
     const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
