@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-// import { connect } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -61,6 +61,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
     const classes = useStyles();
+    const { count } = useSelector(state => state.customers);
 
     const { handleSetTitle } = props;
 
@@ -84,7 +85,7 @@ const Home = (props) => {
                             </Link>
                         {/* </Typography> */}
                         <section>
-                            <Typography variant="h2" component="span">27,829</Typography>
+                            <Typography variant="h2" component="span">{count}</Typography>
                             <br />
                             <Typography variant="subtitle2" component="span">Total</Typography>
                         </section>

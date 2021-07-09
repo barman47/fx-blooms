@@ -4,7 +4,12 @@ import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 import handleError from '../utils/handleError';
 import setAuthToken from '../utils/setAuthToken';
-import { SET_CURRENT_CUSTOMER, SET_CUSTOMER_PROFILE, SET_CUSTOMERS } from './types';
+import { 
+    SET_CURRENT_CUSTOMER, 
+    SET_CUSTOMER_PROFILE,
+    SET_CUSTOMERS,
+    SET_CUSTOMER_STATUS
+ } from './types';
 
 const api = `${API}/Customer`;
 
@@ -93,6 +98,19 @@ export const getCustomers = () => async (dispatch) => {
                 rejected,
                 count: result.length
             }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const setCustomerStatus = ({ customerID, status, currentStatus }) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
+        const msg = res.data.data;
+        return dispatch({
+            type: SET_CUSTOMER_STATUS,
+            payload: { customerID, status, currentStatus, msg }
         });
     } catch (err) {
         return handleError(err, dispatch);

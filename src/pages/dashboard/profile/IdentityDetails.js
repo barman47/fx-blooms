@@ -70,7 +70,9 @@ const IdentityDetails = () => {
     const [documentType, setDocumentType] = useState('');
     const [idNumber, setIdNumber] = useState('');
     const [idFront, setIdFront] = useState('');
+    // eslint-disable-next-line
     const [idBack, setIdBack] = useState('');
+    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
 

@@ -16,6 +16,7 @@ const useStyles = makeStyles(theme => ({
 
     img: {
         borderRadius: theme.shape.borderRadius,
+        width: '80%',
 
         [theme.breakpoints.down('sm')]: {
             width: '90%'

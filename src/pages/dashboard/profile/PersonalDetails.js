@@ -65,12 +65,16 @@ const PersonalDetails = () => {
     const [country, setCountry] = useState('');
     const [countryId, setCountryId] = useState('');
     const [city, setCity] = useState('');
+    // eslint-disable-next-line
     const [stateId, setStateId] = useState('');
     const [states, setStates] = useState([]);
     const [PostalCode, setPostalCode] = useState('');
+    // eslint-disable-next-line
     const [Listings, setListings] = useState(0);
+    // eslint-disable-next-line
     const [Transactions, setTransactions] = useState(0);
     
+    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
 
@@ -114,7 +118,7 @@ const PersonalDetails = () => {
         }
     }, [countries, countryId]);
     // useEffect(() => {}, [stateId]);
-    
+
     const onSubmit = (e) => {
         e.preventDefault();
     };
