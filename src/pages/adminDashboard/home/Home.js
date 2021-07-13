@@ -45,8 +45,6 @@ const useStyles = makeStyles((theme) => ({
     },
 
     content: {
-        
-
         '& div': {
             backgroundColor: COLORS.lightTeal,
             borderRadius: theme.shape.borderRadius,

@@ -1,11 +1,34 @@
-import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+
+import Message from './Message';
+
+const useStyles = makeStyles(theme => ({
+	root: {
+		height: '100%',
+		// overflowY: 'scroll'
+	}
+}));
 
 const Messages = () => {
-  return (
-    <div>
-      <h1>Messages</h1>
-    </div>
-  );
-}
+	const classes = useStyles();
+
+    return (
+		<section className={classes.root}>
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+			<Message />
+		</section>
+    );
+};
 
 export default Messages;

@@ -12,6 +12,8 @@ import Home from './pages/home';
 import Login from './pages/auth/Login';
 import CreateProfile from './pages/auth/CreateProfile';
 import CreateAccount from './pages/auth/CreateAccount';
+import ForgotPassword from './pages/auth/ForgotPassword';
+import ResetPassword from './pages/auth/ResetPassword';
 
 import Dashboard from './pages/dashboard';
 
@@ -22,7 +24,7 @@ import UserDetails from './pages/dashboard/listings/UserDetails';
 
 import Profile from './pages/dashboard/profile';
 
-import Messages from './pages/dashboard/messages/Messages';
+import Messages from './pages/dashboard/messages';
 
 // import setAuthToken from './utils/setAuthToken';
 // import isTokenExpired from './utils/tokenExpired';
@@ -49,7 +51,9 @@ import {
 	DASHBOARD_HOME, 
 	EDIT_LISTING,
 	USER_DETAILS,
-	PROFILE
+	PROFILE,
+	FORGOT_PASSWORD,
+	RESET_PASSWORD
 } from './routes';
 
 import reIssueToken from './utils/reIssueToken';
@@ -126,6 +130,8 @@ const [title, setTitle] = useState('');
 						<Route path={LOGIN} exact component={Login} />
 						<Route path={SIGN_UP} exact component={CreateProfile} />
 						<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
+						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
+						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
 						<Route path={DASHBOARD}>
 							<Dashboard title={title}>
 								<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />

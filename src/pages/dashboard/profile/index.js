@@ -34,16 +34,23 @@ const Profile = (props) => {
     const classes = useStyles();
     const { countries, documents } = useSelector(state => state);
     const { profile } = useSelector(state => state.customer);
+
+    const { getDocuments, getCountries, getCustomerInformation, handleSetTitle } = props;
+
+    useEffect(() => {
+        handleSetTitle('My Profile');
+        // eslint-disable-next-line
+    }, []);
     
     useEffect(() => {
         if (_.isEmpty(profile)) {
-            props.getCustomerInformation();
+            getCustomerInformation();
         }
         if (countries.length === 0) {
-            props.getCountries();
+            getCountries();
         }
         if (documents.length === 0) {
-            props.getDocuments();
+            getDocuments();
         }
         // eslint-disable-next-line
     }, []);
@@ -66,7 +73,8 @@ const Profile = (props) => {
 Profile.propTypes = {
     getCountries: PropTypes.func.isRequired,
     getCustomerInformation: PropTypes.func.isRequired,
-    getDocuments: PropTypes.func.isRequired
+    getDocuments: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getCountries, getCustomerInformation, getDocuments })(Profile);

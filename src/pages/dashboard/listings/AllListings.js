@@ -338,7 +338,8 @@ const Filter = () => {
 };
 
 AllListings.propTypes = {
-	getListings: PropTypes.func.isRequired
+	getListings: PropTypes.func,
+	handleSetTitle:PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getListings })(AllListings);

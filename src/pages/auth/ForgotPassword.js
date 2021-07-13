@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory} from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import Validator from 'validator';
 
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
@@ -14,9 +15,7 @@ import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
-import { FORGOT_PASSWORD, SIGN_UP } from '../../routes';
-
-import validateLogin from '../../utils/validation/customer/login';
+import { LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -81,15 +80,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = (props) => {
+const ForgotPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    // const history = useHistory();
     const errorsState = useSelector(state => state.errors);
 
-    const [Username, setUsername] = useState('');
-    const [Password, setPassword] = useState('');
+    const [Email, setUsername] = useState('');
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -116,23 +114,22 @@ const Login = (props) => {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
-    
-        const data = { Username, Password };
-    
-        const { errors, isValid } = validateLogin(data);
 
-        if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid login data' });
+        if (!Validator.isEmail(Email)) {
+            return setErrors({ Email: 'Invalid email address' });
+        }
+
+        if (Validator.isEmpty(Email)) {
+            return setErrors({ Email: 'Email address is required' });
         }
 
         setErrors({});
         setLoading(true);
-        props.login(data, history);
     };    
 
     return (
         <>
-            <Helmet><title>Login | FXBlooms.com</title></Helmet>
+            <Helmet><title>Forgot Password | FXBlooms.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -149,50 +146,26 @@ const Login = (props) => {
                 </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
-                        Welcome back!
+                        Forgot Password
                     </Typography>
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
-                        Complete the form below to sign in
+                        Enter your email address below
                     </Typography>
                     <form onSubmit={handleFormSubmit} className={classes.form} noValidate>
                         <Grid container direction="column">
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">Username</Typography>
+                                <Typography variant="subtitle2" component="span">Email Address</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={Username}
+                                    value={Email}
                                     onChange={(e) => setUsername(e.target.value)}
                                     type="text"
                                     variant="outlined" 
-                                    placeholder="Enter Username"
-                                    helperText={errors.Username || errors.message}
+                                    placeholder="Enter Email"
+                                    helperText={errors.Email}
                                     fullWidth
                                     required
-                                    error={errors.Username || errors.message ? true : false}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Grid container direction="row" justify="space-between">
-                                    <Grid item>
-                                        <Typography variant="subtitle2" component="span">Password</Typography>
-                                    </Grid>
-                                    <Grid item>
-                                        <Link to={FORGOT_PASSWORD} component={RouterLink} className={classes.link} style={{ fontWeight: 300 }}>
-                                            Forgot Password?
-                                        </Link>
-                                    </Grid>
-                                </Grid>
-                                <TextField 
-                                    className={classes.input}
-                                    value={Password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
-                                    variant="outlined" 
-                                    placeholder="Enter Password"
-                                    helperText={errors.Password || errors.message}
-                                    fullWidth
-                                    required
-                                    error={errors.Password  || errors.message ? true : false}
+                                    error={errors.Email ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -203,12 +176,12 @@ const Login = (props) => {
                                     type="submit"
                                     fullWidth
                                 >
-                                    Sign In
+                                    Send Reset Link
                                 </Button>
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300 }}>
-                                    Don't have an account? <RouterLink to={SIGN_UP} className={classes.link}>Sign Up</RouterLink>
+                                    Remember now? <RouterLink to={LOGIN} className={classes.link}>Sign In</RouterLink>
                                 </Typography>
                             </Grid>
                         </Grid>
@@ -219,8 +192,8 @@ const Login = (props) => {
     );
 };
 
-Login.propTypes = {
+ForgotPassword.propTypes = {
     login: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login })(Login);
+export default connect(undefined, { login })(ForgotPassword);

@@ -1,8 +1,10 @@
 export const COLORS = {
     primary: '#1e6262',
     black: '#000000',
+    borderColor: 'rgb(224, 224, 224)',
     offBlack: '#333333',
     grey: '#969bab',
+    lightGrey: '#e2e2e2',
     white: '#ffffff',
     offWhite: '#f8f8f8',
     lightTeal: '#f6fafa',

@@ -3,8 +3,9 @@ import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
-import { Button, Grid, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Toast from '../../components/common/Toast';
@@ -23,7 +24,7 @@ const useStyles = makeStyles(theme => ({
     aside: {
         backgroundColor: COLORS.lightTeal,
         height: '100vh',
-        padding: [[theme.spacing(), theme.spacing(8)]],
+        padding: [[0, theme.spacing(8)]],
 
         '& div': {
             display: 'flex',
@@ -56,6 +57,7 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         height: '100vh',
+        paddingTop: theme.spacing(5),
         paddingLeft: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
@@ -100,6 +102,9 @@ const CreateProfile = (props) => {
     const [ConfirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
 
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const history = useHistory();
 
     const toast = useRef();
@@ -117,6 +122,14 @@ const CreateProfile = (props) => {
             toast.current.handleClick();
         }
     }, [errors]);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -175,14 +188,14 @@ const CreateProfile = (props) => {
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={5}>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
+                                    <Typography variant="subtitle2" component="span">Email Address</Typography>
                                     <TextField 
                                         className={classes.input}
                                         value={Email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Email Address"
-                                        label="Email Address" 
+                                        placeholder="Enter Email Address"
                                         helperText={errors.Email}
                                         fullWidth
                                         required
@@ -190,14 +203,14 @@ const CreateProfile = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
+                                    <Typography variant="subtitle2" component="span">Username</Typography>
                                     <TextField 
                                         className={classes.input}
                                         value={Username}
                                         onChange={(e) => setUsername(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Username"
-                                        label="Username" 
+                                        placeholder="Enter Username"
                                         helperText={errors.Username || 'Username cannot be changed once set.'}
                                         fullWidth
                                         required
@@ -205,33 +218,73 @@ const CreateProfile = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
+                                    <Typography variant="subtitle2" component="span">Password</Typography>
                                     <TextField 
                                         className={classes.input}
                                         value={Password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        type="text"
+                                        type={showPassword ? 'text': 'password'}
                                         variant="outlined" 
-                                        placeholder="Password"
-                                        label="Password" 
+                                        placeholder="Enter Password"
                                         helperText={errors.Password}
                                         fullWidth
                                         required
                                         error={errors.Password ? true : false}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={toggleShowPassword}
+                                                    >
+                                                        {showPassword ? 
+                                                            <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                                <EyeOffOutline />
+                                                            </Tooltip>
+                                                                : 
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                <EyeOutline />
+                                                            </Tooltip>
+                                                         }
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
+                                    <Typography variant="subtitle2" component="span">Confirm Password</Typography>
                                     <TextField 
                                         className={classes.input}
                                         value={ConfirmPassword}
                                         onChange={(e) => setConfirmPassword(e.target.value)}
-                                        type="text"
+                                        type={showConfirmPassword ? 'text': 'password'}
                                         variant="outlined" 
-                                        placeholder="Confirm Password"
-                                        label="Confirm Password" 
+                                        placeholder="Confirm Your Password"
                                         helperText={errors.ConfirmPassword}
                                         fullWidth
                                         required
                                         error={errors.ConfirmPassword ? true : false}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={toggleShowConfirmPassword}
+                                                    >
+                                                        {showConfirmPassword ? 
+                                                            <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                                <EyeOffOutline />
+                                                            </Tooltip>
+                                                                : 
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                <EyeOutline />
+                                                            </Tooltip>
+                                                         }
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Grid>
                                 <Grid item xs={12} md={12} lg={12} xl={12}>
