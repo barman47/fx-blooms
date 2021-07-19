@@ -2,17 +2,27 @@ import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useHistory} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
+import { 
+    Button, 
+    Collapse,
+    Grid, 
+    IconButton,
+    InputAdornment,
+    Link, 
+    TextField, 
+    Tooltip,
+    Typography 
+} from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
-import Toast from '../../components/common/Toast';
 
 import { login } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
-import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
 import { FORGOT_PASSWORD, SIGN_UP } from '../../routes';
 
@@ -92,26 +102,25 @@ const Login = (props) => {
     const [Password, setPassword] = useState('');
 
     const [errors, setErrors] = useState({});
+    const [open, setOpen] = useState(true);
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const toast = useRef();
-
-    useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-        }
-    }, [errors]);
 
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
             setLoading(false);
+            setOpen(true);
             dispatch({
                 type: GET_ERRORS,
                 payload: {}
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -122,10 +131,11 @@ const Login = (props) => {
         const { errors, isValid } = validateLogin(data);
 
         if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid login data' });
+            return setErrors({ ...errors });
         }
 
         setErrors({});
+        setOpen(false);
         setLoading(true);
         props.login(data, history);
     };    
@@ -133,15 +143,6 @@ const Login = (props) => {
     return (
         <>
             <Helmet><title>Login | FXBlooms.com</title></Helmet>
-            {!isEmpty(errors) && 
-                <Toast 
-                    ref={toast}
-                    title="ERROR"
-                    duration={5000}
-                    msg={errors.msg || ''}
-                    type="error"
-                />
-            }
             {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">
@@ -154,6 +155,28 @@ const Login = (props) => {
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
                     </Typography>
+                    {(errors.msg || errors.message) && 
+                        <Collapse in={open}>
+                            <Alert 
+                                severity="error"
+                                action={
+                                    <IconButton 
+                                        color="inherit" 
+                                        size="small"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            dispatch({ type: GET_ERRORS, payload: {} })}
+                                        }
+                                    >
+                                        <Close />
+                                    </IconButton>
+                                }
+                            >
+                                {/* <AlertTitle>Error</AlertTitle> */}
+                                {errors.msg || errors.message}
+                            </Alert>
+                        </Collapse>
+                    }
                     <form onSubmit={handleFormSubmit} className={classes.form} noValidate>
                         <Grid container direction="column">
                             <Grid item xs={12}>
@@ -165,10 +188,10 @@ const Login = (props) => {
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Username"
-                                    helperText={errors.Username || errors.message}
+                                    helperText={errors.Username}
                                     fullWidth
                                     required
-                                    error={errors.Username || errors.message ? true : false}
+                                    error={errors.Username ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -186,13 +209,33 @@ const Login = (props) => {
                                     className={classes.input}
                                     value={Password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
+                                    type={showPassword ? 'text': 'password'}
                                     variant="outlined" 
                                     placeholder="Enter Password"
-                                    helperText={errors.Password || errors.message}
+                                    helperText={errors.Password}
                                     fullWidth
                                     required
-                                    error={errors.Password  || errors.message ? true : false}
+                                    error={errors.Password  ? true : false}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={toggleShowPassword}
+                                                >
+                                                    {showPassword ? 
+                                                        <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip>
+                                                            : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
+                                                            <EyeOutline />
+                                                        </Tooltip>
+                                                     }
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>

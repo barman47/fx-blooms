@@ -1,13 +1,14 @@
-import { Link as RouterLink } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
 import { SET_LISTING } from '../../../actions/types';
+import { getCustomer } from '../../../actions/customer';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, USER_DETAILS } from '../../../routes';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { DASHBOARD, EDIT_LISTING, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -67,33 +68,36 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
+const Listing = ({ listing, editListing, getCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
+    const history = useHistory();
 
-    // const userId = useSelector(state => state.customer.id);
+    const userId = useSelector(state => state.customer.customerId);
 
-    // eslint-disable-next-line
-    const { amountAvailable, amountNeeded, bids, status, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+    const { amountAvailable, amountNeeded, bids, status, minExchangeAmount, exchangeRate, listedBy, customerId, id } = listing;
 
-    const setListing = (listing) => {
+    const setListing = (e, listing) => {
+        e.preventDefault();
         dispatch({
             type: SET_LISTING,
             payload: listing
         });
+        return history.push(`${DASHBOARD}${EDIT_LISTING}`);
     };
 
-    // const isMyListing = (customerId) => {
-    //     if (customerId === )
-    // };
+    const handleSetCustomer = (e, customerId) => {
+        e.preventDefault();
+        getCustomer(customerId);
+        return history.push(`${DASHBOARD}${USER_DETAILS}`, { customerId });
+    };
 
     return (
         <section className={classes.root}>
             <header>
                 <Typography variant="body2" component="p">
-                    Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{listedBy}</span></RouterLink>
-                    {/* Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`}><span style={{ color: theme.palette.primary.main }}>{by ? 'Me' : 'walecalfos'}</span></RouterLink> */}
+                    Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`} onClick={(e) =>handleSetCustomer(e, customerId)}><span style={{ color: theme.palette.primary.main }}>{listedBy}</span></RouterLink>
                 </Typography>
                 <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
             </header>
@@ -114,7 +118,7 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                     &#8358;{exchangeRate} to &#163;1
                 </Typography>
-                {negotiation ? 
+                {listing.status === LISTING_STATUS.negotiation ?
                     <Button 
                         disabled
                         to="#!"
@@ -131,6 +135,23 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
                         In Negotiation
                     </Button>
                     :
+                    listing.customerId === userId ? 
+                    <Button 
+                        to={`${DASHBOARD}${EDIT_LISTING}`}
+                        component={RouterLink} 
+                        variant="contained" 
+                        size="small" 
+                        color="primary"
+                        disableElevation
+                        classes={{ 
+                            contained: classes.button,
+                            root: classes.button
+                        }}
+                        onClick={(e) => setListing(e, listing)}
+                    >
+                        Edit
+                    </Button>
+                    :
                     <Button 
                         to="#!"
                         component={RouterLink} 
@@ -144,7 +165,7 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
                         }}
                         onClick={editListing ? () => { setListing(listing)} : () => {}}
                     >
-                        { buttonText ? buttonText : 'Contact'}
+                        Contact
                     </Button>
                 }
             </div>
@@ -153,9 +174,8 @@ const Listing = ({ listing, by, negotiation, buttonText, editListing }) => {
 };
 
 Listing.propTypes = {
-    negotiation: PropTypes.bool,
-    by: PropTypes.bool,
-    buttonText: PropTypes.string
-
+    getCustomer: PropTypes.func.isRequired,
+    listing: PropTypes.object.isRequired
 };
-export default Listing;
+
+export default connect(undefined, { getCustomer })(Listing);

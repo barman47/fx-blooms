@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
+import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
-import { login } from '../../actions/customer';
-import { GET_ERRORS } from '../../actions/types';
+import { resetPassword } from '../../actions/customer';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
+import validateResetPassword from '../../utils/validation/customer/resetPassword';
 import { LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
@@ -79,26 +82,31 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ForgotPassword = (props) => {
+const ResetPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    // const history = useHistory();
+    const history = useHistory();
+    const { msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Password, setPassword] = useState('');
     const [ConfirmPassword, setConfirmPassword] = useState('');
+    const [token, setToken] = useState('');
+
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-        }
-    }, [errors]);
+        setToken(history.location.search.split('=')[1]);
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -111,12 +119,53 @@ const ForgotPassword = (props) => {
         }
     }, [dispatch, errorsState, errors]);
 
+    useEffect(() => {
+        if (errors.msg) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: null
+            });
+            return history.push('/');
+        }
+    }, [dispatch, history, msg]);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
+
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
+    };
+
+    const redirectToLogin = () => history.push(LOGIN);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
 
+        const data = { Password, ConfirmPassword };
+        const { errors, isValid } = validateResetPassword(data);
+
+        if (!isValid) {
+            return setErrors({ ...errors });
+        }
+
         setErrors({});
         setLoading(true);
+        props.resetPassword({
+            token,
+            password: Password,
+            confirmedPassword: ConfirmPassword
+        });
     };    
 
     return (
@@ -131,6 +180,7 @@ const ForgotPassword = (props) => {
                     type="error"
                 />
             }
+            <SuccessModal ref={successModal} dismissAction={redirectToLogin} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">
@@ -151,13 +201,33 @@ const ForgotPassword = (props) => {
                                     className={classes.input}
                                     value={Password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     variant="outlined" 
                                     placeholder="Enter New Password"
                                     helperText={errors.Password}
                                     fullWidth
                                     required
                                     error={errors.Password ? true : false}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={toggleShowPassword}
+                                                >
+                                                    {showPassword ? 
+                                                        <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip>
+                                                            : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
+                                                            <EyeOutline />
+                                                        </Tooltip>
+                                                     }
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -166,13 +236,33 @@ const ForgotPassword = (props) => {
                                     className={classes.input}
                                     value={ConfirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    type="password"
+                                    type={showConfirmPassword ? 'text' : 'password'}
                                     variant="outlined" 
                                     placeholder="Please Confirm Your Password"
                                     helperText={errors.ConfirmPassword}
                                     fullWidth
                                     required
                                     error={errors.ConfirmPassword ? true : false}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={toggleShowConfirmPassword}
+                                                >
+                                                    {showConfirmPassword ? 
+                                                        <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip>
+                                                            : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
+                                                            <EyeOutline />
+                                                        </Tooltip>
+                                                     }
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -199,8 +289,8 @@ const ForgotPassword = (props) => {
     );
 };
 
-ForgotPassword.propTypes = {
-    login: PropTypes.func.isRequired
+ResetPassword.propTypes = {
+    resetPassword: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login })(ForgotPassword);
+export default connect(undefined, { resetPassword })(ResetPassword);

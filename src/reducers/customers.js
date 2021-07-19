@@ -12,7 +12,12 @@ const initialState = {
     pending: [],
     rejected: [],
     msg: null,
-    count: 0
+    currentPageNumber: 0,
+    currentPageSize: 0,
+    hasNext: false,
+    hasPrevious: false,
+    count: 0,
+    totalPageCount: 0
 };
 
 const customersReducer = (state = initialState, action) => {
@@ -30,12 +35,15 @@ const customersReducer = (state = initialState, action) => {
             };
 
         case SET_CUSTOMERS:
+            const { confirmed, pending, rejected, totalItemCount, ...rest } = action.payload;
+
             return {
                 ...state,
-                confirmed: [...action.payload.confirmed],
-                pending: [...action.payload.pending],
-                rejected: [...action.payload.rejected],
-                count: action.payload.count
+                confirmed: [...confirmed],
+                pending: [...pending],
+                rejected: [...rejected],
+                count: totalItemCount,
+                ...rest
             };
 
         case SET_CUSTOMER_STATUS:

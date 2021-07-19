@@ -70,12 +70,13 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const AddListingModal = ({ currencies, addListing, edit, open, handleCloseModal }) => {
+const AddListingModal = ({ addListing, edit, open, getCurrencies, handleCloseModal }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
+    
+    const { currencies } = useSelector(state => state);
     const { addedListing, listings, msg } = useSelector(state => state.listings);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('');
@@ -97,6 +98,12 @@ const AddListingModal = ({ currencies, addListing, edit, open, handleCloseModal 
     useEffect(() => {
         setLoading(false);
     }, [listings]);
+
+    useEffect(() => {
+        if (currencies.length === 0) {
+            getCurrencies();
+        }
+    }, [currencies, getCurrencies]);
 
     useEffect(() => {
         if (addedListing && matches) {
@@ -216,7 +223,7 @@ const AddListingModal = ({ currencies, addListing, edit, open, handleCloseModal 
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
-                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                        {currencies?.length > 0 && currencies.map((currency, index) => (
                                             <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
                                         ))}
                                     </Select>

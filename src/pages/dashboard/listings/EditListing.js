@@ -1,28 +1,32 @@
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-
+import { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
     Button,
-    // Fab,
+    CircularProgress,
     Divider,
     FormControl, 
     FormHelperText,
     Grid, 
-    InputLabel,
     MenuItem,
     Select,
     TextField,
     Tooltip,
-    Typography 
+    Typography,
+    useMediaQuery 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-// import { Plus } from 'mdi-material-ui';
+
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import AddListingModal from './AddListingModal';
 import EditListingItem from './EditListingItem';
+import SuccessModal from '../../../components/common/SuccessModal';
 
-import { SET_LISTING } from '../../../actions/types';
+import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
+import { updateListing } from '../../../actions/listings';
 import { COLORS } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
+import validateAddListing from '../../../utils/validation/listing/add';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -100,12 +104,18 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditListing = () => {
+const EditListing = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { listing } = useSelector(state => state.listings);
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const { currencies } = useSelector(state => state);
+    const { customerId } = useSelector(state => state.customer);
+    const { listing, listings, updatedListing, msg } = useSelector(state => state.listings);
+    const errorsState = useSelector(state => state.errors);
 
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [openAccountModal, setOpenAccountModal] = useState(false);
 
@@ -113,7 +123,7 @@ const EditListing = () => {
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     // eslint-disable-next-line
-    const [ExchangeCurrency, setExchangeCurrency] = useState('');
+    const [RequiredCurrency, setRequiredCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
 
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
@@ -123,8 +133,13 @@ const EditListing = () => {
     // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('');
 
+    const [previousListings, setPreviousListings] = useState([]);
+
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+
+    const successModal = useRef();
+    const toast = useRef();
 
     useEffect(() => {
         return () => {
@@ -136,6 +151,62 @@ const EditListing = () => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
+
+    useEffect(() => {
+        if (updatedListing && msg && !matches) {
+            resetForm();
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [updatedListing, dispatch, matches, msg]);
+
+    useEffect(() => {
+        if (!isEmpty(listing)) {
+            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate } = listing;
+
+            setAvailableCurrency(amountAvailable.currencyType);
+            setExchangeAmount(amountAvailable.amount);
+            setRequiredCurrency(amountNeeded.currencyType);
+            setExchangeRate(exchangeRate);
+            setMinExchangeAmount(minExchangeAmount.amount);
+        }
+    }, [listing]);
+
+    useEffect(() => {
+        if (listings.length > 0) {
+            // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
+            // debugger
+            setPreviousListings(listings.filter(item => item.customerId === customerId && item.id !== listing.id)); // Fix this
+        }
+    }, [customerId, listing.id, listings]);
+
+    const resetForm = () => {
+        setAvailableCurrency('');
+        setExchangeAmount('');
+        setRequiredCurrency('');
+        setExchangeRate('');
+        setMinExchangeAmount('');
+        setReceiptAmount('');
+        setListingFee('');
+        setLoading(false);
+    };
+
     const handleOpenModal = () => {
         setOpen(true);
     };
@@ -144,8 +215,48 @@ const EditListing = () => {
         setOpen(false);
     };
 
+    const onSubmit = (e) => {
+        e.preventDefault();
+        setErrors({});
+
+        const data = {
+            AvailableCurrency,
+            ExchangeAmount,
+            RequiredCurrency,
+            ExchangeRate,
+            MinExchangeAmount,
+            ReceiptAmount,
+            ListingFee
+        };
+
+        const { errors, isValid } = validateAddListing(data);
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid login data' });
+        }
+
+        setErrors({});
+        setLoading(true);
+        const listingItem = {
+            listingId: listing.id,
+            currencyNeeded: RequiredCurrency,
+            ExchangeRate: parseFloat(ExchangeRate),
+            AmountAvailable: {
+                CurrencyType: AvailableCurrency,
+                Amount: parseFloat(ExchangeAmount)
+            },
+            MinExchangeAmount: {
+                CurrencyType: RequiredCurrency,
+                Amount: parseFloat(MinExchangeAmount)
+            }
+        };
+
+        setLoading(true);
+        props.updateListing(listingItem);
+    };
+
     return (
         <section className={classes.root}>
+            <SuccessModal ref={successModal} />
 			<AddListingModal edit={true} open={open} handleCloseModal={handleCloseModal} />
             <header>
                 <div>
@@ -155,7 +266,7 @@ const EditListing = () => {
             </header>
             <Grid container direction="row" spacing={4} className={classes.container}>
                 <Grid item md={4} className={classes.listingFormContainer}>
-                    <form>
+                    <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={2}>
                             <Grid item xs={12} md={5}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
@@ -165,20 +276,15 @@ const EditListing = () => {
                                     fullWidth 
                                     required
                                 >
-                                    <InputLabel 
-                                        id="AvailableCurrency" 
-                                        variant="outlined" 
-                                        error={errors.AvailableCurrency ? true : false}
-                                    >
-                                        &#163;(GBP)
-                                    </InputLabel>
                                     <Select
                                         labelId="AvailableCurrency"
                                         value={AvailableCurrency}
                                         onChange={(e) => setAvailableCurrency(e.target.value)}
-                                    
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
@@ -192,7 +298,6 @@ const EditListing = () => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
-                                        label="Enter Amount" 
                                         helperText={errors.ExchangeAmount}
                                         fullWidth
                                         required
@@ -204,26 +309,22 @@ const EditListing = () => {
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                 <FormControl 
                                     variant="outlined" 
-                                    error={errors.ExchangeCurrency ? true : false } 
+                                    error={errors.RequiredCurrency ? true : false } 
                                     fullWidth 
                                     required
                                 >
-                                    <InputLabel 
-                                        id="ExchangeCurrency" 
-                                        variant="outlined" 
-                                        error={errors.ExchangeCurrency ? true : false}
-                                    >
-                                        &#8358;(NGN)
-                                    </InputLabel>
                                     <Select
-                                        labelId="ExchangeCurrency"
-                                        value={ExchangeCurrency}
-                                        onChange={(e) => setAvailableCurrency(e.target.value)}
+                                        labelId="RequiredCurrency"
+                                        value={RequiredCurrency}
+                                        onChange={(e) => setRequiredCurrency(e.target.value)}
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
-                                    <FormHelperText>{errors.ExchangeCurrency}</FormHelperText>
+                                    <FormHelperText>{errors.RequiredCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
                             <Grid item xs={12} md={7}>
@@ -235,7 +336,6 @@ const EditListing = () => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
-                                        label="Enter Amount" 
                                         helperText={errors.ExchangeRate}
                                         fullWidth
                                         required
@@ -251,13 +351,6 @@ const EditListing = () => {
                                     fullWidth 
                                     required
                                 >
-                                    <InputLabel 
-                                        id="AvailableCurrency" 
-                                        variant="outlined" 
-                                        error={errors.AvailableCurrency ? true : false}
-                                    >
-                                        &#163;(GBP)
-                                    </InputLabel>
                                     <Select
                                         labelId="AvailableCurrency"
                                         value={AvailableCurrency}
@@ -265,6 +358,9 @@ const EditListing = () => {
                                     
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
+                                        {currencies.length > 0 && currencies.map((currency, index) => (
+                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                        ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
@@ -278,7 +374,6 @@ const EditListing = () => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
-                                        label="Enter Amount" 
                                         helperText={errors.MinExchangeAmount}
                                         fullWidth
                                         required
@@ -291,11 +386,10 @@ const EditListing = () => {
                                 <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                     <TextField
                                         value={ReceiptAmount}
-                                        // onChange={(e) => setExchangeAmount(e.target.value)}
+                                        onChange={(e) => setReceiptAmount(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Amount"
-                                        // label="Enter Amount" 
                                         helperText={errors.ReceiptAmount}
                                         fullWidth
                                         required
@@ -307,11 +401,10 @@ const EditListing = () => {
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
                                 <TextField
                                     value={ListingFee}
-                                    // onChange={(e) => setExchangeAmount(e.target.value)}
+                                    onChange={(e) => setListingFee(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Amount"
-                                    // label="Enter Amount" 
                                     helperText={errors.ListingFee}
                                     fullWidth
                                     required
@@ -319,8 +412,14 @@ const EditListing = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Button type="submit" variant="contained" color="primary" fullWidth>
-                                    Submit
+                                <Button 
+                                    type="submit" 
+                                    variant="contained" 
+                                    color="primary" 
+                                    disabled={loading ? true : false}
+                                    fullWidth
+                                >
+                                    {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                 </Button>
                             </Grid>
                         </Grid>
@@ -340,7 +439,16 @@ const EditListing = () => {
                     <Divider />
                     <br />
                     <div>
-                        <EditListingItem listing={listing} handleOpenModal={handleOpenModal} />
+                        {
+                            previousListings.map(item => {
+                                // if (item.customerId === customerId && item.id !== listing.id) {
+                                    return (
+                                        <EditListingItem key={listing.id} listing={listing} handleOpenModal={handleOpenModal} />
+                                    )
+                                // }
+                                // return null
+                            })
+                        }
                     </div>
                 </Grid>
             </Grid>
@@ -348,4 +456,8 @@ const EditListing = () => {
     );
 };
 
-export default EditListing;
+EditListing.propTypes = {
+    updateListing: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { updateListing })(EditListing);

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -8,13 +8,14 @@ import PropTypes from 'prop-types';
 import Validator from 'validator';
 
 import Spinner from '../../components/common/Spinner';
+import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
-import { login } from '../../actions/customer';
-import { GET_ERRORS } from '../../actions/types';
+import { forgotPassword } from '../../actions/customer';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
-import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
+import isEmpty from '../../utils/isEmpty';
 import { LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
@@ -54,6 +55,7 @@ const useStyles = makeStyles(theme => ({
     
     form: {
         backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
         marginTop: theme.spacing(5),
         padding: [[theme.spacing(8), theme.spacing(5)]],
 
@@ -84,7 +86,8 @@ const ForgotPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    // const history = useHistory();
+    const history = useHistory();
+    const { msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setUsername] = useState('');
@@ -92,13 +95,8 @@ const ForgotPassword = (props) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    const successModal = useRef();
     const toast = useRef();
-
-    useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-        }
-    }, [errors]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -110,6 +108,26 @@ const ForgotPassword = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    useEffect(() => {
+        if (errors.msg) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: null
+            });
+        }
+    }, [dispatch, history, msg]);
+
+    const goHome = () => history.push('/');
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -125,6 +143,7 @@ const ForgotPassword = (props) => {
 
         setErrors({});
         setLoading(true);
+        props.forgotPassword(Email);
     };    
 
     return (
@@ -135,14 +154,15 @@ const ForgotPassword = (props) => {
                     ref={toast}
                     title="ERROR"
                     duration={5000}
-                    msg={errors.msg || ''}
+                    msg={errors.message || ''}
                     type="error"
                 />
             }
+            <SuccessModal ref={successModal} dismissAction={goHome} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">
-                    <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
+                    <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
                 </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
@@ -162,10 +182,10 @@ const ForgotPassword = (props) => {
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Email"
-                                    helperText={errors.Email}
+                                    helperText={errors.Email || errors.message}
                                     fullWidth
                                     required
-                                    error={errors.Email ? true : false}
+                                    error={errors.Email || errors.message ? true : false}
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -193,7 +213,7 @@ const ForgotPassword = (props) => {
 };
 
 ForgotPassword.propTypes = {
-    login: PropTypes.func.isRequired
+    forgotPassword: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login })(ForgotPassword);
+export default connect(undefined, { forgotPassword })(ForgotPassword);

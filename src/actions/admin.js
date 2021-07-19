@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API } from '../utils/constants';
 import { ADMIN_DASHBOARD, ADMIN_HOME } from '../routes';
 import handleError from '../utils/handleError';
+import reIssueToken from '../utils/reIssueToken';
 import setAuthToken from '../utils/setAuthToken';
 import { SET_CURRENT_ADMIN } from './types';
 

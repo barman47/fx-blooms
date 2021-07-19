@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Tooltip, Typography, useMediaQuery } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { useDispatch } from 'react-redux';
@@ -47,6 +48,10 @@ const Listing = ({ listing, handleOpenModal }) => {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
 
+    useEffect(() => {
+        console.log(listing);
+    }, []);
+
     const setListing = (listing) => {
         dispatch({
             type: SET_LISTING,
@@ -64,7 +69,7 @@ const Listing = ({ listing, handleOpenModal }) => {
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#163;25,000.00
+                    &#163;{listing.amountAvailable.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
@@ -72,11 +77,11 @@ const Listing = ({ listing, handleOpenModal }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#163;5,000.00
+                    &#163;{listing.minExchangeAmount.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    &#8358;650 to &#163;1
+                    &#8358;{listing.exchangeRate} to &#163;1
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     {matches ? 

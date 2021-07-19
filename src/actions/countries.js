@@ -8,7 +8,6 @@ import { API } from '../utils/constants';
 export const getCountries = () => async dispatch => {
     try {
         const res = await axios.get(`${API}/Customer/GetCountries`);
-
         dispatch({
             type: SET_COUNTRIES,
             payload: res.data.data

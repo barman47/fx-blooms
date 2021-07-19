@@ -1,23 +1,10 @@
 import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
-const createAccount = (data) => {
+const resetPassword = (data) => {
     let errors = {};
-    data.Email = !isEmpty(data.Email) ?  data.Email : '';
-    data.Username = !isEmpty(data.Username) ?  data.Username : '';
     data.Password = !isEmpty(data.Password) ?  data.Password : '';
     data.ConfirmPassword = !isEmpty(data.ConfirmPassword) ?  data.ConfirmPassword : '';
-
-    if (!Validator.isEmail(data.Email)) {
-        errors.Email = 'Invalid Email address!';
-    }
-    if (Validator.isEmpty(data.Email)) {
-        errors.Email = 'Email address is required!';
-    }
-
-    if (Validator.isEmpty(data.Username)) {
-        errors.Username = 'Username is required!';
-    }
 
     if (Validator.isEmpty(data.Password)) {
         errors.Password = 'Password is required!';
@@ -41,4 +28,4 @@ const createAccount = (data) => {
     };
 };
 
-export default createAccount;
+export default resetPassword;

@@ -3,23 +3,20 @@ import axios from 'axios';
 import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 import handleError from '../utils/handleError';
+import reIssueToken from '../utils/reIssueToken';
 import setAuthToken from '../utils/setAuthToken';
 import { 
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
     SET_CUSTOMERS,
-    SET_CUSTOMER_STATUS
+    SET_CUSTOMER_STATUS,
+    SET_CUSTOMER,
+    SET_CUSTOMER_MSG
  } from './types';
 
 const api = `${API}/Customer`;
 
 export const getMe = (history) => async (dispatch) => {
-    try {} catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const reIssueToken = (history) => async (dispatch) => {
     try {} catch (err) {
         return handleError(err, dispatch);
     }
@@ -40,6 +37,7 @@ export const createCustomer = (customer) => async (dispatch) => {
 
 export const getCustomerInformation = () => async (dispatch) => {
     try {
+        // await reIssueToken();
         const res = await axios.get(`${api}/CustomerInformation`);
         dispatch({
             type: SET_CUSTOMER_PROFILE,
@@ -67,12 +65,13 @@ export const login = (data, history) => async (dispatch) => {
 
 export const getCustomers = () => async (dispatch) => {
     try {
-        const res = await axios.get(`${api}/GetAll`);
-        const { result } = res.data.data;
+        // await reIssueToken();
+        const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 0, pageNumber: 0 });
+        const { items, ...rest } = res.data.data;
         const confirmed = [];
         const pending = [];
         const rejected = [];
-        result.forEach(customer => {
+        items.forEach(customer => {
             switch (customer.customerStatus) {
                 case CONFIRMED:
                     confirmed.push(customer);
@@ -96,8 +95,22 @@ export const getCustomers = () => async (dispatch) => {
                 confirmed,
                 pending,
                 rejected,
-                count: result.length
+                count: items.length,
+                ...rest
             }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomer = (customerId) => async(dispatch) => {
+    try {
+        const res = await axios.get(`${api}/GetCustomer/${customerId}`);
+        console.log(res);
+        return dispatch({
+            type: SET_CUSTOMER,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -106,11 +119,37 @@ export const getCustomers = () => async (dispatch) => {
 
 export const setCustomerStatus = ({ customerID, status, currentStatus }) => async (dispatch) => {
     try {
+        // await reIssueToken();
         const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
         const msg = res.data.data;
         return dispatch({
             type: SET_CUSTOMER_STATUS,
             payload: { customerID, status, currentStatus, msg }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const forgotPassword = (email) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/GenerateResetToken?email=${email}`);
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const resetPassword = (data) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/ResetPassword`, data);
+        console.log(res);
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

@@ -5,13 +5,15 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core';
 import PropTypes from 'prop-types';
 
 import ScrollToTop from './components/layout/ScrollToTop';
+import AdminRoute from './components/common/AdminRoute';
+import PrivateRoute from './components/common/PrivateRoute';
 
 import Home from './pages/home';
 // import Landing from './pages/landing/Landing';
 
 import Login from './pages/auth/Login';
-import CreateProfile from './pages/auth/CreateProfile';
 import CreateAccount from './pages/auth/CreateAccount';
+import CreateProfile from './pages/auth/CreateProfile';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 
@@ -44,7 +46,7 @@ import {
 	CUSTOMERS,
 	LOGIN, 
 	SIGN_UP, 
-	CREATE_ACCOUNT, 
+	CREATE_PROFILE, 
 	MAKE_LISTING,
 	MESSAGES,
 	DASHBOARD,
@@ -56,7 +58,7 @@ import {
 	RESET_PASSWORD
 } from './routes';
 
-import reIssueToken from './utils/reIssueToken';
+// import reIssueToken from './utils/reIssueToken';
 
 const theme = createMuiTheme({
 	overrides: {
@@ -114,7 +116,6 @@ const [title, setTitle] = useState('');
 			// // Set auth token header auth
 			// setAuthToken(localStorage.FXBloomsAuthToken);
 			// props.getMe(history);
-			reIssueToken();
 		}
 		// eslint-disable-next-line
 	}, []);
@@ -128,28 +129,28 @@ const [title, setTitle] = useState('');
 					<ScrollToTop>
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
-						<Route path={SIGN_UP} exact component={CreateProfile} />
-						<Route path={CREATE_ACCOUNT} exact component={CreateAccount} />
+						<Route path={SIGN_UP} exact component={CreateAccount} />
+						<Route path={CREATE_PROFILE} exact component={CreateProfile} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
-						<Route path={DASHBOARD}>
+						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
-								<Route path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DASHBOARD}${USER_DETAILS}`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
-						</Route>
+						</PrivateRoute>
 						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
-						<Route path={ADMIN_DASHBOARD}>
+						<AdminRoute path={ADMIN_DASHBOARD}>
 							<AdminDashboard title={title}>
-								<Route path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
-								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
-								<Route path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
+								<AdminRoute path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
+								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
+								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 							</AdminDashboard>
-						</Route>
+						</AdminRoute>
 					</ScrollToTop>
 				</Switch>
 			</Router>

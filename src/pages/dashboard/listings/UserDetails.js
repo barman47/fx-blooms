@@ -1,8 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
-import { Button, Divider, Grid, TextField, Typography, useMediaQuery} from '@material-ui/core';
+import { Button, Divider, Grid, TextField, Typography, useMediaQuery } from '@material-ui/core';
+import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { COLORS } from '../../../utils/constants';
+import { SET_CUSTOMER } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -55,16 +59,37 @@ const useStyles = makeStyles(theme => ({
         '& h5': {
             marginBottom: theme.spacing(2)
         }
+    },
+
+    rating: {
+        color: theme.palette.primary.main
     }
 }));
 
 const UserDetails = () => {
     const classes = useStyles();
+    const location = useLocation();
     const theme = useTheme();
+    const dispatch = useDispatch();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const { customer } = useSelector(state => state);
+
     const [Message, setMessage] = useState('');
+    const [customerId, setCustomerId] = useState('');
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+
+    useEffect(() => {
+        console.log(location);
+        setCustomerId(location.state.customerId);
+        return () => {
+            dispatch({
+                type: SET_CUSTOMER,
+                payload: {}
+            });
+        };
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <>
@@ -93,42 +118,50 @@ const UserDetails = () => {
                             <Typography variant="subtitle2" component="span" className={classes.text}>100</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>200</Typography>
                         </div>
+                        <div className={classes.detail}>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Last Login</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.title}>Rating</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>33 Days ago</Typography>
+                            <Rating name=""customer-rating  value={2} precision={0.5} readOnly className={classes.rating} />
+                        </div>
                     </Grid>
-                    <Grid item xs={12} lg={7} className={classes.reportContainer}>
-                        <Typography variant="h5">Report this User</Typography>
-                        <form noValidate>
-                            <Grid container direction="row" spacing={2}>
-                                <Grid item xs={12} xl={9}>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={Message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        label="Message" 
-                                        placeholder="Enter Message"
-                                        helperText={errors.Message || errors.message}
-                                        fullWidth
-                                        multiline
-                                        rows={matches ? 4 : 1}
-                                        required
-                                        error={errors.Message || errors.message ? true : false}
-                                    />
+                    {!customer.customerId === customerId &&
+                        <Grid item xs={12} lg={7} className={classes.reportContainer}>
+                            <Typography variant="h5">Report this User</Typography>
+                            <form noValidate>
+                                <Grid container direction="row" spacing={2}>
+                                    <Grid item xs={12} xl={9}>
+                                        <TextField 
+                                            className={classes.input}
+                                            value={Message}
+                                            onChange={(e) => setMessage(e.target.value)}
+                                            type="text"
+                                            variant="outlined" 
+                                            label="Message" 
+                                            placeholder="Enter Message"
+                                            helperText={errors.Message || errors.message}
+                                            fullWidth
+                                            multiline
+                                            rows={matches ? 4 : 1}
+                                            required
+                                            error={errors.Message || errors.message ? true : false}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} xl={3}>
+                                        <Button 
+                                            className={classes.button}
+                                            variant="contained" 
+                                            color="primary"
+                                            type="submit"
+                                            fullWidth
+                                        >
+                                            Report
+                                        </Button>
+                                    </Grid>
                                 </Grid>
-                                <Grid item xs={12} xl={3}>
-                                    <Button 
-                                        className={classes.button}
-                                        variant="contained" 
-                                        color="primary"
-                                        type="submit"
-                                        fullWidth
-                                    >
-                                        Report
-                                    </Button>
-                                </Grid>
-                            </Grid>
-                        </form>
-                    </Grid>
+                            </form>
+                        </Grid>
+                    }
                 </Grid>
             </section>
         </>

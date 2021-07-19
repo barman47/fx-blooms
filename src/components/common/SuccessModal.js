@@ -1,4 +1,6 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useDispatch } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
     Backdrop,
 	Button,
@@ -11,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { CheckboxMarkedCircle } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../utils/constants';
+import { UPDATED_LISTING } from '../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -57,12 +60,22 @@ const useStyles = makeStyles(theme => ({
 
 const SuccessModal = forwardRef((props, ref) => {
 	const classes = useStyles();
+	const dispatch = useDispatch();
 
     const [open, setOpen] = useState(false);
     const [text, setText] = useState('');
 
+    const { dismissAction } = props;
+
     const closeModal = () => {
         setOpen(false);
+        dispatch({
+            type: UPDATED_LISTING,
+            payload: { msg: null } 
+        });
+        if (dismissAction) {
+            dismissAction();
+        }
     };
 
     useImperativeHandle(ref, () => ({
@@ -104,5 +117,9 @@ const SuccessModal = forwardRef((props, ref) => {
         </Modal>
 	);
 });
+
+SuccessModal.propTypes = {
+    dismissAction: PropTypes.func
+};
 
 export default SuccessModal;

@@ -3,10 +3,10 @@ import { connect } from 'react-redux';
 import { Route, Redirect } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const AdminRoute = ({ component: Component, auth, ...rest }) => (
+const AdminRoute = ({ component: Component, isAuthenticated, ...rest }) => (
     <Route 
         {...rest}
-        render={props => auth.authenticated === true ? (
+        render={props => isAuthenticated ? (
             <Component {...props} />
         ) : (
             <Redirect to="/" />
@@ -15,11 +15,11 @@ const AdminRoute = ({ component: Component, auth, ...rest }) => (
 );
 
 AdminRoute.propTypes = {
-    auth: PropTypes.object.isRequired
+    isAuthenticated: PropTypes.bool.isRequired
 };
 
 const mapStateToProps = (state) => ({
-    auth: state.auth
+    isAuthenticated: state.admin.isAuthenticated
 });
 
 export default connect(mapStateToProps)(AdminRoute);

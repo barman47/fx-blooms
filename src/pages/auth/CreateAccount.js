@@ -1,47 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
-import { Button, 
-    FormControl, 
-    FormHelperText, 
+import { Link as RouterLink } from 'react-router-dom';
+import { 
+    Button, 
     Grid, 
-    InputLabel, 
-    MenuItem, 
-    Select, 
+    IconButton, 
+    Link,
+    InputAdornment, 
     TextField, 
     Tooltip, 
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import emojiFlags from 'emoji-flags';
+import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
+import PropTypes from 'prop-types';
 
-import SignUpSuccessModal from './SignUpSuccessModal';
-import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
-import { getDocuments } from '../../actions/documents';
-import { createCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { LOGIN } from '../../routes';
+import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
 import { COLORS } from '../../utils/constants';
-import validateCreateProfile from '../../utils/validation/customer/createAccount';
+import validateSignUp from '../../utils/validation/customer/createAccount';
 
 import logo from '../../assets/img/logo.svg';
+import img from '../../assets/img/sign-up.svg';
 
 const useStyles = makeStyles(theme => ({
     aside: {
         backgroundColor: COLORS.lightTeal,
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        // height: '100vh',
-        padding: [[theme.spacing(4), theme.spacing(8)]],
+        height: '100vh',
+        padding: [[0, theme.spacing(8)]],
 
-        '& div:first-child': {
+        '& div': {
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
@@ -50,15 +44,12 @@ const useStyles = makeStyles(theme => ({
 
             '& span': {
                 width: '60%'
-            },
-            
-            '& div': {
-                width: '60%'
             }
+            
         },
 
         [theme.breakpoints.down('md')]: {
-            height: '50vh'
+            height: '70vh'
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -66,13 +57,17 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    image: {
+        width: '100%'
+    },
+
     formContainer: {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        // height: '100vh',
-        paddingLeft: theme.spacing(5),
+        height: '100vh',
         paddingTop: theme.spacing(5),
+        paddingLeft: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
             height: '100%',
@@ -86,12 +81,15 @@ const useStyles = makeStyles(theme => ({
             alignSelf: 'center',
             marginBottom: theme.spacing(2),
             textAlign: 'center'
-        }
-    },
+        },
 
-    '& span': {
-        color: 'red',
-        marginBottom: theme.spacing(5)
+        '& h4': {
+            marginTop: theme.spacing(5)
+        },
+
+        '& span': {
+            marginBottom: theme.spacing(5)
+        }
     },
 
     link: {
@@ -106,44 +104,17 @@ const useStyles = makeStyles(theme => ({
 const CreateAccount = (props) => {
     const classes = useStyles();
     const { countries } = useSelector(state => state);
-    const { documents } = useSelector(state => state);
-    const { successMessage } = useSelector(state => state.customer);
-    const errorsState = useSelector(state => state.errors);
-    
-    const [FirstName, setFirstName] = useState('');
-    const [LastName, setLastName] = useState('');
-    const [CountryCode, setCountryCode] = useState('');
-    const [PhoneNo, setPhoneNo] = useState('');
-    const [Address, setAddress] = useState('');
-    const [Country, setCountry] = useState('');
-    const [CountryId, setCountryId] = useState('');
-    const [City, setCity] = useState('');
-    const [StateId, setStateId] = useState('');
-    const [states, setStates] = useState([]);
-    const [PostalCode, setPostalCode] = useState('');
-    // eslint-disable-next-line
-    const [Photo, setPhoto] = useState('');
-    const [PhotoFile, setPhotoFile] = useState(null);
-    const [DocumentType, setDocumentType] = useState('');
-    const [Document, setDocument] = useState('');
-    const [IdNumber, setIdNumber] = useState('');
-    // eslint-disable-next-line
-    const [IdFront, setIdFront] = useState('');
-    const [IdFrontPhoto, setIdFrontPhoto] = useState(null);
-    // eslint-disable-next-line
-    const [IdBackPhoto, setIdBackPhoto] = useState(null);
-    // eslint-disable-next-line
-    const [IdBack, setIdBack] = useState('');
-    // eslint-disable-next-line
-    const [Profile, setProfile] = useState({});
+
+    const [Email, setEmail] = useState('');
+    const [Username, setUsername] = useState('');
+    const [Password, setPassword] = useState('');
+    const [ConfirmPassword, setConfirmPassword] = useState('');
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [loadingText, setLoadingText] = useState('');
 
-    const countryCodes = emojiFlags.data;
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const location = useLocation();
+    const history = useHistory();
 
     const toast = useRef();
 
@@ -151,72 +122,8 @@ const CreateAccount = (props) => {
         if (countries.length === 0) {
             props.getCountries();
         }
-        if (documents.length === 0) {
-            props.getDocuments();
-        }
         // eslint-disable-next-line
     }, []);
-
-    useEffect(() => {
-        if (successMessage) {
-            setLoading(false);
-            setOpen(true);
-        }
-    }, [successMessage]);
-
-    // useEffect(() => {
-    //     console.log(emojiFlags.data);
-    // }, []);
-
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setErrors({ ...errors, msg: errorsState.msg });
-            setLoading(false);
-            setLoadingText('');
-        }
-    }, [errorsState, errors]);
-
-    useEffect(() => {
-        if (location.state) {
-            setProfile({ ...location.state });
-        }
-    }, [location.state]);
-
-    // Setting states when a country is selected
-    useEffect(() => {
-        if (!isEmpty(Country)) {
-            const country = countries.find(country => country.name === Country);
-            const CountryId = country.id;
-            setCountryId(CountryId);
-
-            // eslint-disable-next-line array-callback-return
-            const states = [];
-
-            countries.forEach(item => {
-                if (item.id === CountryId) {
-                    states.push(item.states[0]);
-                }
-            });
-            setStates(states);
-        }
-    }, [Country, countries]);
-
-    // Setting StateId when user selects a state
-    useEffect(() => {
-        if (!isEmpty(City)) {
-            const state = states.find(state => state?.name === City);
-            setStateId(state?.id);
-        }
-    }, [City, states]);
-
-    // Setting documentId when user selects a document type
-    useEffect(() => {
-        if (!isEmpty(DocumentType)) {
-            const document = documents.find(document => document.text === DocumentType);
-            setDocument(document.value);
-        }
-    }, [DocumentType, documents]);
-
 
     useEffect(() => {
         setErrors(errors);
@@ -225,42 +132,12 @@ const CreateAccount = (props) => {
         }
     }, [errors]);
 
-    const handleSetPhoto = (e) => {
-        setPhoto(e.target.files[0]);
-        const reader = new FileReader();
-
-        reader.onload = (() => {
-            const image = reader.result; //Array Buffer
-            console.log(image)
-            setPhotoFile(image);
-        });
-        reader.readAsDataURL(e.target.files[0]);
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
     };
 
-    const handleSetIdFront = (e) => {
-        setIdFront(e.target.files[0]);
-        const reader = new FileReader();
-
-        reader.onload = (() => {
-            const image = reader.result; //Array Buffer
-            setIdFrontPhoto(image);
-        });
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    const handleSetIdBack = (e) => {
-        setIdBack(e.target.files[0]);
-        const reader = new FileReader();
-
-        reader.onload = (() => {
-            const image = reader.result; //Array Buffer
-            setIdBackPhoto(image);
-        });
-        reader.readAsDataURL(e.target.files[0]);
-    };
-
-    const handleCloseModal = () => {
-        setOpen(false);
+    const toggleShowConfirmPassword = () => {
+        setShowConfirmPassword(!showConfirmPassword);
     };
 
     const handleFormSubmit = (e) => {
@@ -268,42 +145,25 @@ const CreateAccount = (props) => {
         setErrors({});
 
         const data = {
-            ...Profile,
-            FirstName,
-            LastName,
-            CountryCode,
-            PhoneNo,
-            Address,
-            CountryId,
-            StateId,
-            PostalCode,
-            Img: PhotoFile,
-            Document: {
-                IdNumber,
-                DocumentType: Document,
-                Img: IdFrontPhoto
-            }
+            Email: Email.toLowerCase(),
+            Username,
+            Password,
+            ConfirmPassword            
         };
 
-        const { ConfirmPassword, ...rest } = data;
-
-        const { errors, isValid } = validateCreateProfile({ ...rest });
+        const { errors, isValid } = validateSignUp(data);
 
         if (!isValid) {
-            console.log(errors);
-            console.log({...rest});
             return setErrors({ ...errors, msg: 'Invalid sign up data' });
         }
-        
-        // console.log({ ...rest });
-        setLoading(true);
-        setLoadingText('One Moment . . .');
-        props.createCustomer({ ...rest });
+
+        setErrors({});
+        history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
     };
 
     return (
         <>
-            <Helmet><title>Create Profile | FXBlooms.com</title></Helmet>
+            <Helmet><title>Create Account | FXBlooms.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -313,8 +173,6 @@ const CreateAccount = (props) => {
                     type="error"
                 />
             }
-            {loading && <Spinner text={loadingText} />}
-            <SignUpSuccessModal handleCloseModal={handleCloseModal} open={open} text={successMessage} />
             <section>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -322,305 +180,136 @@ const CreateAccount = (props) => {
                             <RouterLink to="/">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </RouterLink>
-                            <Typography variant="subtitle2" component="span">Hello [name]!</Typography>
-                            <Typography variant="subtitle2" component="span">Thanks for joining FXBlooms!</Typography>
+                            <img src={img} className={classes.image} alt="FX Blooms logo" />
+                            <Typography variant="subtitle2" component="span">Thanks for visiting FXBlooms!</Typography>
                             <Typography variant="subtitle2" component="span">Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
-                            <Typography variant="subtitle2" component="span">We are committed to keeping this platform safe, secoure and trustworthy.</Typography>
-                            <Typography variant="subtitle2" component="span">Kindly tell us about yourself.</Typography>
-                            <div>
-                                <Typography variant="subtitle2" component="span">Please not that all information provided on this page must be true and accurate.</Typography>
-                                <Typography variant="subtitle2" component="span">If any misinformation is spotted, you will not be allowed to use the platform.</Typography>
-                            </div>
+                            <Typography variant="subtitle2" component="span">Create an account today to see a list of available offerings.</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>
                         <div className={classes.header}>
-                            <Typography variant="h4">Create account</Typography>
-                            <Typography variant="subtitle2" component="span">Complete the form below to create an acount.</Typography>
+                            <Typography variant="h4">Create Account</Typography>
+                            <Typography variant="subtitle2" component="span">Complete the form below to create a profile.</Typography>
                             <br /><br /><br />
-                            <Typography variant="subtitle2" component="span" color="primary">2 of 2 (Personal details).</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Profile details).</Typography>
                             <br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
-                            <Grid container direction="row" spacing={3}>
-                                <Grid item xs={12} md={6} lg={6} xl={6}>
-                                    <Tooltip title="This should be your official government name" placement="top" arrow>
-                                        <TextField 
-                                            className={classes.input}
-                                            value={FirstName}
-                                            onChange={(e) => setFirstName(e.target.value)}
-                                            type="text"
-                                            variant="outlined" 
-                                            placeholder="Enter First Name"
-                                            label="First Name" 
-                                            helperText={errors.FirstName}
-                                            fullWidth
-                                            required
-                                            error={errors.FirstName ? true : false}
-                                        />
-                                    </Tooltip>
-                                </Grid>
-                                <Grid item xs={12} md={6} lg={6} xl={6}>
-                                    <Tooltip title="This should be your official government name" placement="top" arrow>
-                                        <TextField 
-                                            className={classes.input}
-                                            value={LastName}
-                                            onChange={(e) => setLastName(e.target.value)}
-                                            type="text"
-                                            variant="outlined" 
-                                            placeholder="Enter Last Name"
-                                            label="Last Name" 
-                                            helperText={errors.LastName}
-                                            fullWidth
-                                            required
-                                            error={errors.LastName ? true : false}
-                                        />
-                                    </Tooltip>
-                                </Grid>
-                                <Grid item xs={12} md={3} lg={3} xl={3}>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.CountryCode ? true : false } 
-                                        fullWidth 
-                                        required
-                                    >
-                                        <InputLabel 
-                                            id="CountryCode" 
-                                            variant="outlined" 
-                                            error={errors.CountryCode ? true : false}
-                                        >
-                                            Country Code
-                                        </InputLabel>
-                                        <Select
-                                            labelId="CountryCode"
-                                            className={classes.input}
-                                            value={CountryCode}
-                                            onChange={(e) => setCountryCode(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Country Code</MenuItem>
-                                            {countryCodes.map((country, index) => (
-                                                <MenuItem key={index} value={country.dialCode}>
-                                                    {/* <span role="img" aria-label={country.name}>{country.emoji}</span> */}
-                                                    {/* {String.fromCodePoint('0x' + country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + country?.unicode.split(' '[1].substring(2)))} */}
-                                                    {country.dialCode}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.CountryCode}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
-                                {
-                                    CountryCode && 
-                                    <Grid item xs={12} md={9} lg={9} xl={9}>
-                                        <TextField 
-                                            className={classes.input}
-                                            value={PhoneNo}
-                                            onChange={(e) => setPhoneNo(e.target.value)}
-                                            type="text"
-                                            variant="outlined" 
-                                            placeholder="Enter Phone Number"
-                                            label="Phone Number" 
-                                            helperText={errors.PhoneNo}
-                                            fullWidth
-                                            required
-                                            error={errors.PhoneNo ? true : false}
-                                        />
-                                    </Grid>
-                                }
-                                <Grid item xs={12} md={12} lg={12} xl={12}>
+                            <Grid container direction="row" spacing={2}>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Email Address</Typography>
                                     <TextField 
                                         className={classes.input}
-                                        value={Address}
-                                        onChange={(e) => setAddress(e.target.value)}
+                                        value={Email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter your Address"
-                                        label="Address" 
-                                        helperText={errors.Address}
-                                        multiline
-                                        rows={2}
+                                        placeholder="Enter Email Address"
+                                        helperText={errors.Email}
                                         fullWidth
                                         required
-                                        error={errors.Address ? true : false}
+                                        error={errors.Email ? true : false}
                                     />
-                                </Grid>
-                                <Grid item xs={12} md={4} lg={4} xl={4}>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.Country ? true : false } 
-                                        fullWidth 
-                                        required
-                                    >
-                                        <InputLabel 
-                                            id="Country" 
-                                            variant="outlined" 
-                                            error={errors.Country ? true : false}
-                                        >
-                                            Country
-                                        </InputLabel>
-                                        <Select
-                                            labelId="Country"
-                                            className={classes.input}
-                                            value={Country}
-                                            onChange={(e) => setCountry(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Select Country</MenuItem>
-                                            {countries.map((Country) => (
-                                                <MenuItem key={Country.id} value={Country.name}>{Country.name}</MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.Country}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={4} lg={4} xl={4}>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.City ? true : false } 
-                                        fullWidth 
-                                        required
-                                    >
-                                        <InputLabel 
-                                            id="City" 
-                                            variant="outlined" 
-                                            error={errors.City ? true : false}
-                                        >
-                                            City/State
-                                        </InputLabel>
-                                        <Select
-                                            labelId="City"
-                                            className={classes.input}
-                                            value={City}
-                                            onChange={(e) => setCity(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Select City</MenuItem>
-                                            {states.length > 0 &&
-                                                states.map((state, index) => (
-                                                    <MenuItem key={index} value={state?.name}>{state?.name}</MenuItem>
-                                                ))
-                                            }
-                                        </Select>
-                                        <FormHelperText>{errors.City}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={4} lg={4} xl={4}>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={PostalCode}
-                                        onChange={(e) => setPostalCode(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="Enter post code"
-                                        label="Post Code" 
-                                        helperText={errors.PostalCode}
-                                        fullWidth
-                                        required
-                                        error={errors.PostalCode ? true : false}
-                                    />
-                                </Grid>
-                                <Grid item xs={2}>
-                                    <Typography variant="subtitle1" component="span" style={{ color: COLORS.primary, fontWeight: 300 }}>
-                                        Identity
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={10} style={{ alignSelf: 'center' }}>
-                                    <hr />
                                 </Grid>
                                 <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Username</Typography>
                                     <TextField 
                                         className={classes.input}
-                                        onChange={handleSetPhoto}
-                                        type="file"
-                                        variant="outlined" 
-                                        accept="image/*"
-                                        helperText={errors.Photo || 'Upload a clear Photo of your face'}
-                                        fullWidth
-                                        required
-                                        error={errors.Photo ? true : false}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.DocumentType ? true : false}
-                                        fullWidth 
-                                        required
-                                    >
-                                        <InputLabel 
-                                            id="idCardType" 
-                                            variant="outlined" 
-                                            error={errors.DocumentType ? true : false}
-                                        >
-                                            Identity Card Type
-                                        </InputLabel>
-                                        <Select
-                                            labelId="idCardType"
-                                            className={classes.input}
-                                            value={DocumentType}
-                                            onChange={(e) => setDocumentType(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Select ID type</MenuItem>
-                                            {documents.length > 0 &&
-                                                documents.map((document, index) => (
-                                                    <MenuItem key={index} value={document?.text}>{document?.text}</MenuItem>
-                                                ))
-                                            }
-                                        </Select>
-                                        <FormHelperText>{errors.DocumentType}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={IdNumber}
-                                        onChange={(e) => setIdNumber(e.target.value)}
+                                        value={Username}
+                                        onChange={(e) => setUsername(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter Document Number"
-                                        label="Document Number" 
-                                        helperText={errors.IdNumber}
+                                        placeholder="Enter Username"
+                                        helperText={errors.Username || 'Username cannot be changed once set.'}
                                         fullWidth
                                         required
-                                        error={errors.IdNumber ? true : false}
+                                        error={errors.Username ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Password</Typography>
                                     <TextField 
                                         className={classes.input}
-                                        onChange={handleSetIdFront}
-                                        type="file"
+                                        value={Password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        type={showPassword ? 'text': 'password'}
                                         variant="outlined" 
-                                        helperText={errors.IdFront || 'ID Card Front'}
+                                        placeholder="Enter Password"
+                                        helperText={errors.Password}
                                         fullWidth
                                         required
-                                        error={errors.IdFront ? true : false}
+                                        error={errors.Password ? true : false}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={toggleShowPassword}
+                                                    >
+                                                        {showPassword ? 
+                                                            <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                                <EyeOffOutline />
+                                                            </Tooltip>
+                                                                : 
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                <EyeOutline />
+                                                            </Tooltip>
+                                                         }
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Grid>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Confirm Password</Typography>
                                     <TextField 
                                         className={classes.input}
-                                        onChange={handleSetIdBack}
-                                        type="file"
+                                        value={ConfirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        type={showConfirmPassword ? 'text': 'password'}
                                         variant="outlined" 
-                                        helperText={errors.idBack || 'ID Card Back'}
+                                        placeholder="Confirm Your Password"
+                                        helperText={errors.ConfirmPassword}
                                         fullWidth
-                                        error={errors.idBack ? true : false}
+                                        required
+                                        error={errors.ConfirmPassword ? true : false}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        aria-label="toggle password visibility"
+                                                        onClick={toggleShowConfirmPassword}
+                                                    >
+                                                        {showConfirmPassword ? 
+                                                            <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                                <EyeOffOutline />
+                                                            </Tooltip>
+                                                                : 
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                <EyeOutline />
+                                                            </Tooltip>
+                                                         }
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={12} lg={12} xl={12}>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">By clicking proceed, you agree to our <Link component={RouterLink} to={TERMS}>terms and conditions</Link></Typography>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <Button 
                                         variant="contained" 
                                         color="primary"
                                         type="submit"
                                         fullWidth
                                     >
-                                        Create Account
+                                        Proceed
                                     </Button>
                                 </Grid>
-                                <Grid item xs={12} md={12} lg={12} xl={12}>
+                                <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 300 }}>
                                         Already have an account? <RouterLink to={LOGIN} className={classes.link}>Sign In</RouterLink>
                                     </Typography>
@@ -633,10 +322,9 @@ const CreateAccount = (props) => {
         </>
     );
 };
+
 CreateAccount.propTypes = {
-    createCustomer: PropTypes.func.isRequired,
-    getCountries: PropTypes.func.isRequired,
-    getDocuments: PropTypes.func.isRequired
+    getCountries: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { createCustomer, getCountries, getDocuments })(CreateAccount);
+export default connect(undefined, { getCountries })(CreateAccount);

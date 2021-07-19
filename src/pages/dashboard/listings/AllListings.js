@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -21,6 +21,7 @@ import { FilterOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
 import { getListings } from '../../../actions/listings';
+import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 
 import FilterListingModal from './FilterListingModal';
 import Listing from './Listing';
@@ -124,9 +125,10 @@ const useStyles = makeStyles(theme => ({
 
 const AllListings = (props) => {
 	const classes = useStyles();
-
+	const dispatch = useDispatch();
 	const { isAuthenticated } = useSelector(state => state.customer);
 	const { listings } = useSelector(state => state.listings);
+	
 	const [open, setOpen] = useState(false);
 
 	const { getListings, handleSetTitle } = props;
@@ -145,6 +147,10 @@ const AllListings = (props) => {
 
 	const handleCloseModal = () => {
 		setOpen(false);
+	};
+
+	const hideListingsInNegotiation = () => {
+		dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 	};
 
 	return (
@@ -166,7 +172,7 @@ const AllListings = (props) => {
 						<Typography variant="h5">All Listings</Typography>
 						<div className={classes.headerContent}>
 							<Typography variant="subtitle1" component="span">Here are all the listings available right now</Typography>
-							<Link to="#!" component={RouterLink}>Hide listings in negotiation</Link>
+							<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
 						</div>
 					</header>
 					<section className={classes.listingContainer}>
