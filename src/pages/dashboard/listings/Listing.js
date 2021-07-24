@@ -5,10 +5,10 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
 import { SET_LISTING } from '../../../actions/types';
-import { getCustomer } from '../../../actions/customer';
+import { getCustomer, getSeller } from '../../../actions/customer';
 
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, EDIT_LISTING, USER_DETAILS } from '../../../routes';
+import { DASHBOARD, EDIT_LISTING, MESSAGES, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ listing, editListing, getCustomer }) => {
+const Listing = ({ listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -87,10 +87,10 @@ const Listing = ({ listing, editListing, getCustomer }) => {
         return history.push(`${DASHBOARD}${EDIT_LISTING}`);
     };
 
-    const handleSetCustomer = (e, customerId) => {
+    const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
-        getCustomer(customerId);
-        return history.push(`${DASHBOARD}${USER_DETAILS}`, { customerId });
+        getSeller(sellerId);
+        return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
     };
 
     return (
@@ -153,7 +153,7 @@ const Listing = ({ listing, editListing, getCustomer }) => {
                     </Button>
                     :
                     <Button 
-                        to="#!"
+                        to={MESSAGES}
                         component={RouterLink} 
                         variant="contained" 
                         size="small" 
@@ -163,7 +163,7 @@ const Listing = ({ listing, editListing, getCustomer }) => {
                             contained: classes.button,
                             root: classes.button
                         }}
-                        onClick={editListing ? () => { setListing(listing)} : () => {}}
+                        // onClick={editListing ? () => { setListing(listing)} : () => {}}
                     >
                         Contact
                     </Button>
@@ -175,7 +175,8 @@ const Listing = ({ listing, editListing, getCustomer }) => {
 
 Listing.propTypes = {
     getCustomer: PropTypes.func.isRequired,
+    getSeller: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { getCustomer })(Listing);
+export default connect(undefined, { getCustomer, getSeller })(Listing);

@@ -52,12 +52,18 @@ export const login = (data, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/login`, data);
         const { token } = res.data.data;
+        const { twoFactorEnabled } = res.data.data;
+        console.log(res);
         setAuthToken(token);
         dispatch({
             type: SET_CURRENT_CUSTOMER,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
-        history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+
+        // if (!twoFactorEnabled) {
+        //     history.push();
+        // }
+        // history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -110,6 +116,30 @@ export const getCustomer = (customerId) => async(dispatch) => {
         console.log(res);
         return dispatch({
             type: SET_CUSTOMER,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getSeller = (sellerId) => async(dispatch) => {
+    try {
+        const res = await axios.get(`${api}/Seller/${sellerId}`);
+        return dispatch({
+            type: SET_CUSTOMER,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const reportSeller = (message) => async(dispatch) => {
+    try {
+        const res = await axios.post(`${api}/ReportSeller`, message);
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
             payload: res.data.data
         });
     } catch (err) {

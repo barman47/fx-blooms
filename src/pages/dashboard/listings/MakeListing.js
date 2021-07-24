@@ -9,7 +9,6 @@ import {
     FormControl, 
     FormHelperText,
     Grid, 
-    InputLabel,
     MenuItem,
     Select,
     TextField,
@@ -33,6 +32,7 @@ import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import validateAddListing from '../../../utils/validation/listing/add';
+import ResidencePermitModal from './ResidencePermitModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -132,7 +132,7 @@ const MakeListing = (props) => {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
-    const { currencies } = useSelector(state => state);
+    const { customer, currencies } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const { addedListing, listings, msg } = useSelector(state => state.listings);
@@ -147,6 +147,7 @@ const MakeListing = (props) => {
 
     const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
+    const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
@@ -245,6 +246,10 @@ const MakeListing = (props) => {
         setOpenAccountModal(false);
     };
 
+    const handleCloseResidencePermitModal = () => {
+        setShowResidencePermitModal(false);
+    };
+
     const resetForm = () => {
         setAvailableCurrency('');
         setExchangeAmount('');
@@ -270,9 +275,13 @@ const MakeListing = (props) => {
             ListingFee
         };
 
-        const { errors, isValid } = validateAddListing(data);
-        if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid login data' });
+        // const { errors, isValid } = validateAddListing(data);
+        // if (!isValid) {
+        //     return setErrors({ ...errors, msg: 'Invalid login data' });
+        // }
+
+        if (customer.hasProvidedResidencePermit) {
+            return setShowResidencePermitModal(true);
         }
 
         setErrors({});
@@ -318,6 +327,7 @@ const MakeListing = (props) => {
                 </Tooltip>
                 <SuccessModal ref={successModal} />
                 <AddListingModal open={open} edit={false} handleCloseModal={handleCloseModal} />
+                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} />
                 <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
                     <div>
@@ -339,13 +349,6 @@ const MakeListing = (props) => {
                                         required
                                         disabled={loading ? true : false}
                                     >
-                                        <InputLabel 
-                                            id="AvailableCurrency" 
-                                            variant="outlined" 
-                                            error={errors.AvailableCurrency ? true : false}
-                                        >
-                                            &#163;(GBP)
-                                        </InputLabel>
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
@@ -370,7 +373,6 @@ const MakeListing = (props) => {
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Amount"
-                                            label="Enter Amount" 
                                             helperText={errors.ExchangeAmount}
                                             fullWidth
                                             required
@@ -388,13 +390,6 @@ const MakeListing = (props) => {
                                         required
                                         disabled={loading ? true : false}
                                     >
-                                        <InputLabel 
-                                            id="RequiredCurrency" 
-                                            variant="outlined" 
-                                            error={errors.RequiredCurrency ? true : false}
-                                        >
-                                            &#8358;(NGN)
-                                        </InputLabel>
                                         <Select
                                             labelId="RequiredCurrency"
                                             value={RequiredCurrency}
@@ -418,7 +413,6 @@ const MakeListing = (props) => {
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Amount"
-                                            label="Enter Amount" 
                                             helperText={errors.ExchangeRate}
                                             fullWidth
                                             required
@@ -436,13 +430,6 @@ const MakeListing = (props) => {
                                         required
                                         disabled={loading ? true : false}
                                     >
-                                        <InputLabel 
-                                            id="AvailableCurrency" 
-                                            variant="outlined" 
-                                            error={errors.AvailableCurrency ? true : false}
-                                        >
-                                            &#163;(GBP)
-                                        </InputLabel>
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
@@ -466,7 +453,6 @@ const MakeListing = (props) => {
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Amount"
-                                            label="Enter Amount" 
                                             helperText={errors.MinExchangeAmount}
                                             fullWidth
                                             disabled={loading ? true : false}

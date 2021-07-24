@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 import { 
 	Button,
 	Fab,
 	FormControl,
 	FormHelperText,
 	Grid,
-	InputLabel, 
 	Link, 
 	MenuItem,
 	Select,
@@ -17,11 +17,14 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { FilterOutline } from 'mdi-material-ui';
+import { FilterOutline, FormatListText } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
-import { getListings } from '../../../actions/listings';
+import isEmpty from '../../../utils/isEmpty';
+import { getCurrencies } from '../../../actions/currencies';
+import { getListingsOpenForBid } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
+import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
 import Listing from './Listing';
@@ -84,6 +87,27 @@ const useStyles = makeStyles(theme => ({
 		marginTop: theme.spacing(5)
 	},
 
+	noListingContent: {
+		backgroundColor: COLORS.lightTeal,
+        alignSelf: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+		padding: [[theme.spacing(4), 0]]
+    },
+
+    noListingIcon: {
+        color: theme.palette.primary.main
+    },
+
+    noListingText: {
+        color: COLORS.grey,
+        fontWeight: 300,
+        marginTop: theme.spacing(2)
+    },
+
 	filterContainer: {
 		backgroundColor: COLORS.lightTeal,
 		padding: theme.spacing(2),
@@ -99,20 +123,32 @@ const useStyles = makeStyles(theme => ({
 
 		'& form': {
 			'& header': {
-				display: 'flex',
-				flexDirection: 'row',
-				justifyContent: 'space-between',
+				display: 'grid',
+				gridTemplateColumns: '1fr 1fr',
+				columnGap: theme.spacing(10),
 				marginBottom: theme.spacing(4),
-				alignItems: 'center',
-
-				'& span': {
-					cursor: 'pointer',
-					'&:hover': {
-						textDecoration: 'underline'
-					}
-				}
+				alignItems: 'center'
 			}
 		}
+	},
+
+	clear: {
+		cursor: 'pointer',
+		'&:hover': {
+			textDecoration: 'underline'
+		}
+	},
+
+	filterButton: {
+		borderRadius: '25px',
+		'&:hover': {
+			textDecoration: 'none !important'
+		}
+	},
+
+	disabledButton: {
+		backgroundColor: '#d8dcdc',
+		color: '#aoa3a3'
 	},
 
 	buyerPopup: {
@@ -131,11 +167,18 @@ const AllListings = (props) => {
 	
 	const [open, setOpen] = useState(false);
 
-	const { getListings, handleSetTitle } = props;
+	const { getListingsOpenForBid, handleSetTitle } = props;
 
 	useEffect(() => {
 		if (isAuthenticated && listings?.length === 0) {
-			getListings();
+			getListingsOpenForBid({
+				pageNumber: 0,
+				pageSize: 15,
+				currencyNeeded: 'NGN',
+				currencyAvailable: 'NGN',
+				minimumExchangeAmount: 0,
+				useCurrencyFilter: false
+			});
 		}
 		handleSetTitle('All Listings');
 		// eslint-disable-next-line
@@ -176,17 +219,16 @@ const AllListings = (props) => {
 						</div>
 					</header>
 					<section className={classes.listingContainer}>
-						{listings.map(listing => (
-							<Listing key={listing.id} listing={listing} />
-						))}
-						{/* <Listing negotiation by />
-						<Listing buttonText="Edit" />
-						<Listing />
-						<Listing negotiation by />
-						<Listing buttonText="Edit" />
-						<Listing />
-						<Listing negotiation by />
-						<Listing buttonText="Edit" /> */}
+						{listings.length > 0 ? 
+							listings.map(listing => (
+								<Listing key={listing.id} listing={listing} />
+							))
+							:
+							<div className={classes.noListingContent}>
+								<FormatListText className={classes.noListingIcon} />
+								<Typography className={classes.noListingText} variant="subtitle2" component="span">No listings found</Typography>
+							</div>
+						}
 					</section>
 				</Grid>
 				<Filter />
@@ -195,28 +237,103 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = () => {
+const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies, getListingsOpenForBid })((props) => {
+	const PRICE = 'PRICE';
+	const RATING = 'RATING';
 	const classes = useStyles();
+	const { currencies } = useSelector(state => state);
 
-	const [ExchangeAmount, setExchangeAmount] = useState('');
-	const [availableCurrency, setAvailableCurrency] = useState('');
-	// eslint-disable-next-line
-	const [requiredCurrency, setRequiredCurrency] = useState('');
+	const [AvailableCurrency, setAvailableCurrency] = useState('');
+	const [RequiredCurrency, setRequiredCurrency] = useState('');
+	const [Amount, setAmount] = useState('');
+
+	const [SellerRating, setSellerRating] = useState('');
 	// eslint-disable-next-line
 	const [errors, setErrors] = useState({});
+	const [loading, setLoading] = useState(false);
+	const [filter, setFilter] = useState(PRICE);
+
+	useEffect(() => {
+		if (currencies.length === 0) {
+			props.getCurrencies();
+		}
+		// eslint-disable-next-line
+	}, []);
 
 	const handleClearFilter = () => {
-		setExchangeAmount('');
+		setFilter(PRICE);
 		setAvailableCurrency('');
 		setRequiredCurrency('');
+		setAmount('');
+		setSellerRating('');
+		setErrors({});
+
+		props.getListingsOpenForBid({
+			pageNumber: 0,
+			pageSize: 15,
+			currencyNeeded: 'NGN',
+			currencyAvailable: 'NGN',
+			minimumExchangeAmount: 0,
+			useCurrencyFilter: false
+		});
+	};
+
+	const onSubmit = (e) => {
+		e.preventDefault();
+		setErrors({});
+
+		if (filter === RATING) {
+			if (isEmpty(SellerRating)) {
+				return setErrors({ msg: 'Invalid Filter', SellerRating: 'Seller rating is required!' });
+			}
+
+			setErrors({});
+			setLoading(true);
+			props.getListingsOpenForBid({
+				pageNumber: 0,
+				pageSize: 15,
+				currencyAvailable: 'NGN',
+				currencyNeeded: 'NGN',
+				minimumExchangeAmount: 0,
+				useCurrencyFilter: false,
+				useRatingFilter: true,
+				sellerRating: parseInt(SellerRating)
+			});
+			// Get rating by star
+		} else {
+			const priceFilter = {
+				AvailableCurrency,
+				RequiredCurrency,
+				Amount
+			};
+			const { errors, isValid } = validatePriceFilter(priceFilter);
+
+			if (!isValid) {
+				return setErrors({ msg: 'Invalid Filter', ...errors });
+			}
+
+			setErrors({});
+			setLoading(true);
+			props.getListingsOpenForBid({
+				pageNumber: 0,
+				pageSize: 15,
+				currencyAvailable: AvailableCurrency,
+				currencyNeeded: RequiredCurrency,
+				minimumExchangeAmount: Number(Amount),
+				useCurrencyFilter: true,
+				useRatingFilter: false,
+				sellerRating: 0
+			});
+		}
 	};
 
 	return (
 		<Grid item lg={3} className={classes.filterContainer}>
-			<form>
+			<form onSubmit={onSubmit} noValidate>
 				<header>
 					<Typography variant="h6">Filter</Typography>
 					<Typography 
+						className={classes.clear}
 						variant="subtitle2" 
 						component="span" 
 						color="primary"
@@ -224,113 +341,159 @@ const Filter = () => {
 						>
 							Clear
 					</Typography>
+					<Button 
+						className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
+						variant="contained" 
+						color="primary" 
+						size="small"
+						onClick={() => setFilter(PRICE)}
+					>
+						Price
+					</Button>
+					<Button 
+						className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
+						variant="contained" 
+						color="primary" 
+						size="small"
+						onClick={() => setFilter(RATING)}
+					>
+						Rating
+					</Button>
 				</header>
-				<Grid container direction="row" spacing={2}>
-					<Grid item xs={12}>
-						<Typography variant="subtitle2">I Have</Typography>
+				{
+					filter === PRICE
+					?
+					<Grid container direction="row" spacing={1}>
+						<Grid item xs={12}>
+							<Typography variant="subtitle2">I Have</Typography>
 							<FormControl 
 								variant="outlined" 
-								error={errors.availableCurrency ? true : false } 
+								error={errors.AvailableCurrency ? true : false } 
 								fullWidth 
 								required
+								disabled={loading ? true : false}
 							>
-								<InputLabel 
-									id="availableCurrency" 
-									variant="outlined" 
-									error={errors.availableCurrency ? true : false}
-								>
-									Select Currency
-								</InputLabel>
 								<Select
-									labelId="availableCurrency"
-									value={availableCurrency}
+									labelId="AvailableCurrency"
+									value={AvailableCurrency}
 									onChange={(e) => setAvailableCurrency(e.target.value)}
 								
 								>
 									<MenuItem value="">Select Currency</MenuItem>
+									{currencies.length > 0 && currencies.map((currency, index) => (
+										<MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+									))}
 								</Select>
-								<FormHelperText>{errors.availableCurrency}</FormHelperText>
+								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
-					</Grid>
-					<Grid item xs={12}>
-						<Typography variant="subtitle2">I Want</Typography>
+						</Grid>
+						<Grid item xs={12}>
+							<Typography variant="subtitle2">I Want</Typography>
 							<FormControl 
 								variant="outlined" 
-								error={errors.availableCurrency ? true : false } 
+								error={errors.RequiredCurrency ? true : false } 
 								fullWidth 
 								required
+								disabled={loading ? true : false}
 							>
-								<InputLabel 
-									id="availableCurrency" 
-									variant="outlined" 
-									error={errors.availableCurrency ? true : false}
-								>
-									Select Currency
-								</InputLabel>
 								<Select
-									labelId="availableCurrency"
-									value={availableCurrency}
-									onChange={(e) => setAvailableCurrency(e.target.value)}
+									labelId="RequiredCurrency"
+									value={RequiredCurrency}
+									onChange={(e) => setRequiredCurrency(e.target.value)}
 								
 								>
 									<MenuItem value="">Select Currency</MenuItem>
+									{currencies.length > 0 && currencies.map((currency, index) => (
+										<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+									))}
 								</Select>
-								<FormHelperText>{errors.availableCurrency}</FormHelperText>
+								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
-					</Grid>
-					<Grid item xs={12}>
-						<Typography variant="subtitle2">Min. Exchange Amount</Typography>
-					</Grid>
-					<Grid item xs={12}>
+						</Grid>
+						<Grid item xs={12}>
+							<Typography variant="subtitle2">Min. Exchange Amount</Typography>
+						</Grid>
+						<Grid item xs={5}>
 							<FormControl 
 								variant="outlined" 
-								error={errors.availableCurrency ? true : false } 
+								error={errors.AvailableCurrency ? true : false } 
 								fullWidth 
 								required
+								disabled={true}
 							>
-								<InputLabel 
-									id="availableCurrency" 
-									variant="outlined" 
-									error={errors.availableCurrency ? true : false}
-								>
-									&#163;(GBP)
-								</InputLabel>
 								<Select
-									labelId="availableCurrency"
-									value={availableCurrency}
-									onChange={(e) => setAvailableCurrency(e.target.value)}
+									labelId="AvailableCurrency"
+									value={AvailableCurrency}
 								
 								>
-									<MenuItem value="">&#163;(GBP)</MenuItem>
+									<MenuItem value={AvailableCurrency}>{AvailableCurrency}</MenuItem>
 								</Select>
-								<FormHelperText>{errors.availableCurrency}</FormHelperText>
+								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
+						</Grid>
+						<Grid item xs={7}>
+							<TextField 
+								value={Amount}
+								onChange={(e) => setAmount(e.target.value)}
+								type="text"
+								variant="outlined" 
+								placeholder="Enter Amount"
+								helperText={errors.Amount}
+								fullWidth
+								required
+								error={errors.Amount ? true : false}
+							/>
+						</Grid>
+						<Grid item xs={12}>
+							<Button 
+								type="submit" 
+								variant="contained" 
+								color="primary"
+								fullWidth
+								>
+									Filter Result
+							</Button>
+						</Grid>
 					</Grid>
-					<Grid item xs={12}>
-						<TextField
-							value={ExchangeAmount}
-							onChange={(e) => setAvailableCurrency(e.target.value)}
-							type="text"
-							variant="outlined" 
-							placeholder="Enter Amount"
-							label="Amount" 
-							helperText={errors.ExchangeAmount}
-							fullWidth
-							required
-							error={errors.ExchangeAmount ? true : false}
-						/>
+					:
+					<Grid container direction="row" spacing={2}>
+						<Grid item xs={12}>
+							<Typography variant="subtitle2">Number of Stars</Typography>
+								<FormControl 
+									variant="outlined" 
+									error={errors.SellerRating ? true : false } 
+									fullWidth 
+									required
+								>
+									<Select
+										labelId="SellerRating"
+										value={SellerRating}
+										onChange={(e) => setSellerRating(e.target.value)}
+									
+									>
+										<MenuItem value="">Select Number of Stars</MenuItem>
+										<MenuItem value="1">1</MenuItem>
+										<MenuItem value="2">2</MenuItem>
+										<MenuItem value="3">3</MenuItem>
+										<MenuItem value="4">4</MenuItem>
+										<MenuItem value="5">5</MenuItem>
+									</Select>
+									<FormHelperText>{errors.SellerRating}</FormHelperText>
+								</FormControl>
+						</Grid>
+						<Grid item xs={12}>
+							<Button 
+								type="submit" 
+								variant="contained" 
+								color="primary"
+								fullWidth
+								>
+									Filter Result
+							</Button>
+						</Grid>
 					</Grid>
-					<Grid item xs={12}>
-						<Button 
-							type="submit" 
-							variant="contained" 
-							color="primary"
-							fullWidth
-							>
-								Filter Result
-						</Button>
-					</Grid>
-				</Grid>
+				}
+				
 			</form>
 			<Link 
 				to="#!" 
@@ -341,11 +504,16 @@ const Filter = () => {
 			</Link>
 		</Grid>
 	);
+});
+
+Filter.propTypes = {
+	getCurrencies: PropTypes.func,
+	getListingsOpenForBid: PropTypes.func
 };
 
 AllListings.propTypes = {
-	getListings: PropTypes.func,
+	getListingsOpenForBid: PropTypes.func,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getListings })(AllListings);
+export default connect(undefined, { getListingsOpenForBid })(AllListings);

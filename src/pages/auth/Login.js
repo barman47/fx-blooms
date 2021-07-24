@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useHistory} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -19,6 +19,7 @@ import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
+import TwoFactorModal from './TwoFactorModal';
 
 import { login } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
@@ -97,6 +98,7 @@ const Login = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
     const errorsState = useSelector(state => state.errors);
+    const { customer } = useSelector(state => state);
 
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
@@ -104,6 +106,7 @@ const Login = (props) => {
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
+    const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -117,6 +120,15 @@ const Login = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+    useEffect(() => {
+        // if (customer.twoFactorEnabled === true) {
+            
+        // }
+        if (customer.twoFactorEnabled === false) {
+            setLoading(false);
+            setShowModal(true);
+        }
+    }, [customer]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -143,6 +155,7 @@ const Login = (props) => {
     return (
         <>
             <Helmet><title>Login | FXBlooms.com</title></Helmet>
+            <TwoFactorModal open={showModal} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">
@@ -172,7 +185,6 @@ const Login = (props) => {
                                     </IconButton>
                                 }
                             >
-                                {/* <AlertTitle>Error</AlertTitle> */}
                                 {errors.msg || errors.message}
                             </Alert>
                         </Collapse>

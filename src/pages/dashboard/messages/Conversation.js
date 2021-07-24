@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, Send } from 'mdi-material-ui';
+import axios from 'axios';
+import { HubConnection, HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -89,6 +91,34 @@ const Conversation = () => {
     const classes = useStyles();
 
     const [message, setMessage] = useState('');
+    const [connection, setConnection] = useState(null);
+
+    useEffect(() => {
+        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+            skipNegotiation: true,
+            transport: HttpTransportType.WebSockets
+        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+        console.log(connect);
+        setConnection(connect);
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (connection) {
+            connection.start()
+                .then(() => {
+                    console.log('connected');
+                    connection.on('ReceiveNotification', message => {
+                        Notification.open({
+                            message: 'New Notification',
+                            description: message
+                        });
+                    });
+                })
+                .catch(err => {
+                });
+        }
+    }, [connection]);
 
     const onSubmit = (e) => {
         e.preventDefault();

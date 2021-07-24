@@ -19,7 +19,9 @@ export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 
 export const API = 'https://api.fxblooms.com/api';
 export const NETWORK_ERROR = 'Network Error';
-export const AUTH_TOKEN = 'FXBloomsAuthToken';
+export const AUTH_TOKEN = 'FXBloomsAuthToken'
+
+export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
 
 export const LISTING_STATUS = {
     open: 'OPEN',

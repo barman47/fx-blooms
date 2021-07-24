@@ -10,6 +10,8 @@ export const RESET_PASSWORD = '/user/resetPassword';
 export const TERMS = '/termsAndConditions';
 export const PRIVACY_POLICY = '/privacyPolicy';
 export const FAQS = '/frequentlyAskedQuestions';
+export const SETUP_2FA = '/user/twoFactor';
+export const VERIFY_2FA = '/user/twoFactor/verify';
 
 export const ADMIN_LOGIN = '/login/admin';
 export const ADMIN_DASHBOARD = '/admin';
@@ -20,7 +22,7 @@ export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = '/home';
 export const MAKE_LISTING = '/listings/create';
 export const EDIT_LISTING = '/listings/edit';
-export const USER_DETAILS = '/listings/userDetails';
+export const USER_DETAILS = '/listings/sellerDetails';
 export const MESSAGES = '/messages';
 export const PROFILE = '/profile';
 export const LOGOUT = '/logout';

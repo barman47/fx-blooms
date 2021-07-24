@@ -16,6 +16,8 @@ import CreateAccount from './pages/auth/CreateAccount';
 import CreateProfile from './pages/auth/CreateProfile';
 import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
+import QrCode from './pages/auth/QrCode';
+import VerifyQrCode from './pages/auth/VerifyQrCode';
 
 import Dashboard from './pages/dashboard';
 
@@ -46,6 +48,8 @@ import {
 	CUSTOMERS,
 	LOGIN, 
 	SIGN_UP, 
+	SETUP_2FA,
+	VERIFY_2FA,
 	CREATE_PROFILE, 
 	MAKE_LISTING,
 	MESSAGES,
@@ -130,6 +134,8 @@ const [title, setTitle] = useState('');
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
 						<Route path={SIGN_UP} exact component={CreateAccount} />
+						<Route path={SETUP_2FA} exact component={QrCode} />
+						<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
 						<Route path={CREATE_PROFILE} exact component={CreateProfile} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
@@ -139,7 +145,7 @@ const [title, setTitle] = useState('');
 								<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
 						</PrivateRoute>

@@ -28,7 +28,7 @@ import { createCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
 import { LOGIN } from '../../routes';
-import { COLORS, NETWORK_ERROR } from '../../utils/constants';
+import { COLORS, NETWORK_ERROR, UPLOAD_LIMIT } from '../../utils/constants';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
@@ -186,6 +186,7 @@ const CreateProfile = (props) => {
 
     const [Photo, setPhoto] = useState('');
     const [PhotoFile, setPhotoFile] = useState(null);
+    // eslint-disable-next-line
     const [PhotoUrl, setPhotoUrl] = useState('');
     const [uploadedPhoto, setUploadedPhoto] = useState(false);
 
@@ -208,8 +209,6 @@ const CreateProfile = (props) => {
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [loadingText, setLoadingText] = useState('');
-
-    const oneMegaByte = 1000000;
 
     const countryCodes = emojiFlags.data;
 
@@ -286,7 +285,6 @@ const CreateProfile = (props) => {
             setDocument(document.value);
         }
     }, [DocumentType, documents]);
-
 
     useEffect(() => {
         setErrors(errors);
@@ -384,7 +382,7 @@ const CreateProfile = (props) => {
                 return setErrors({ msg: 'Photo is required!', photo: 'Photo is required!' });
             }
 
-            if (file.size / oneMegaByte > 1) {
+            if (file.size / UPLOAD_LIMIT > 1) {
                 return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
             }
 
@@ -407,12 +405,11 @@ const CreateProfile = (props) => {
         setErrors({});
         try {
             const file = IdFront;
-            console.log(file);
             if (!file) {
                 return setErrors({ msg: 'Photo is required!', idFront: 'Photo is required!' });
             }
 
-            if (file.size / oneMegaByte > 1) {
+            if (file.size / UPLOAD_LIMIT > 1) {
                 return setErrors({ msg: 'File too large', idFront: 'Photo must not be greater than 3MB' });
             }
 
@@ -440,7 +437,7 @@ const CreateProfile = (props) => {
                 return setErrors({ msg: 'Photo is required!', idBack: 'Photo is required!' });
             }
 
-            if (file.size / oneMegaByte > 1) {
+            if (file.size / UPLOAD_LIMIT > 1) {
                 return setErrors({ msg: 'File too large', idBack: 'Photo must not be greater than 3MB' });
             }
 
