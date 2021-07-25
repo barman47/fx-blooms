@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import { AppBar, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
+import { AppBar, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
 import { Menu as MenuIcon } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 
 import MobileNav from './MobileNav';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
-import { FEATURES, STORIES, NUMBERS, CONTACT_US, SIGN_UP, LOGIN } from '../../routes';
+import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY } from '../../routes';
 
 function HideOnScroll (props) {
     const { children } = props;
@@ -34,10 +33,11 @@ const useStyles = makeStyles(theme => ({
     },
 
     nav: {
-        padding: [[0, theme.spacing(10)]],
+        paddingLeft: theme.spacing(10),
+        paddingRight: theme.spacing(10),
 
         [theme.breakpoints.down('lg')]: { 
-            padding: [[0, theme.spacing(5)]],
+            // padding: [[0, theme.spacing(5)]],
         },
         [theme.breakpoints.down('md')]: { 
             display: 'none'
@@ -45,9 +45,13 @@ const useStyles = makeStyles(theme => ({
     },
 
     link: {
-        color: COLORS.black,
-        fontWeight: 600,
-        lineHeight: '20px'
+        color: COLORS.darkGrey,
+        fontWeight: 300,
+        transition: '0.3s linear all',
+
+        '&:hover': {
+            color: theme.palette.primary.main
+        }
     },
 
     signUp: {
@@ -84,7 +88,7 @@ const Header = (props) => {
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <Grid container direction="row" alignItems="center" className={classes.nav}>
-                        <Grid item xs={10}>
+                        <Grid item xs={9}>
                             <Grid container direction="row" alignItems="center" spacing={5} justify="flex-start">
                                 <Grid item>
                                     <Link to="/" component={RouterLink}>
@@ -92,26 +96,40 @@ const Header = (props) => {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={FEATURES} className={classes.link} component={RouterLink} variant="body1">Features</Link>
+                                    <Link to={WHY} className={classes.link} component={RouterLink} underline="none">Why FXBLOOMS</Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={STORIES} className={classes.link} component={RouterLink} variant="body1">Stories</Link>
+                                    <Link to={ABOUT_US} className={classes.link} component={RouterLink} underline="none">About Us</Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={NUMBERS} className={classes.link} component={RouterLink} variant="body1">Numbers</Link>
-                                </Grid>
-                                <Grid item>
-                                    <Link to={CONTACT_US} className={classes.link} component={RouterLink} variant="body1">Contact Us</Link>
+                                    <Link to={CONTACT_US} className={classes.link} component={RouterLink} underline="none">Contact</Link>
                                 </Grid>
                             </Grid>
                         </Grid>
-                        <Grid item xs={2}>
-                            <Grid container direction="row" spacing={5} justify="flex-end">
+                        <Grid item xs={3}>
+                            <Grid container direction="row" justify="flex-end" alignItems="center" spacing={2}>
                                 <Grid item>
-                                    <Link to={SIGN_UP} className={clsx(classes.link, classes.signUp)} component={RouterLink} variant="body1">Sign Up</Link>
+                                    <Button 
+                                        variant="outlined" 
+                                        color="primary" 
+                                        to={LOGIN} 
+                                        // className={classes.link} 
+                                        component={RouterLink}
+                                        size="large"
+                                        >
+                                        Log In
+                                    </Button>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={LOGIN} className={classes.link} component={RouterLink} variant="body1">Log In</Link>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        to={SIGN_UP} 
+                                        component={RouterLink}
+                                        size="large"
+                                    >
+                                        Get Started
+                                    </Button>
                                 </Grid>
                             </Grid>
                         </Grid>

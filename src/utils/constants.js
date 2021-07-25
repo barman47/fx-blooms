@@ -4,6 +4,7 @@ export const COLORS = {
     borderColor: 'rgb(224, 224, 224)',
     offBlack: '#333333',
     grey: '#969bab',
+    darkGrey: '#a9a9a9',
     lightGrey: '#e2e2e2',
     white: '#ffffff',
     offWhite: '#f8f8f8',

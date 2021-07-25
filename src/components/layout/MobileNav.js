@@ -5,14 +5,14 @@ import List from '@material-ui/core/List';
 import ListItemText from '@material-ui/core/ListItemText';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Typography from '@material-ui/core/Typography';
-import { AccountOutline, FormatListNumbered, Home, InformationOutline, NewspaperVariantOutline, Phone, Login } from 'mdi-material-ui';
+import { AccountOutline, Home, Phone, Login } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
 
 import ListItemLink from './ListItemLink';
 
-import { FEATURES, STORIES, NUMBERS, CONTACT_US, SIGN_UP, LOGIN } from '../../routes';
+import { CONTACT_US, SIGN_UP, LOGIN } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -61,24 +61,6 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             <Home />
                         </ListItemIcon>
                         <ListItemText primary="Home" />
-                    </ListItemLink>
-                    <ListItemLink button divider to={FEATURES} onClick={toggleDrawer}>
-                        <ListItemIcon>
-                            <InformationOutline />
-                        </ListItemIcon>
-                        <ListItemText primary="Features" />
-                    </ListItemLink>
-                    <ListItemLink button divider to={STORIES} onClick={toggleDrawer}>
-                        <ListItemIcon>
-                            <NewspaperVariantOutline />
-                        </ListItemIcon>
-                        <ListItemText primary="Stories" />
-                    </ListItemLink>
-                    <ListItemLink button divider to={NUMBERS} onClick={toggleDrawer}>
-                        <ListItemIcon>
-                            <FormatListNumbered />
-                        </ListItemIcon>
-                        <ListItemText primary="Numbers" />
                     </ListItemLink>
                     <ListItemLink button divider to={CONTACT_US} onClick={toggleDrawer}>
                         <ListItemIcon>

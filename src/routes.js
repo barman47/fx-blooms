@@ -1,6 +1,5 @@
-export const FEATURES = '/features';
-export const STORIES = '/stories';
-export const NUMBERS = '/numbers';
+export const ABOUT_US = '/aboutUs';
+export const WHY = '/whyFXBLOOMS';
 export const CONTACT_US = '/contactUs';
 export const SIGN_UP = '/user/signUp';
 export const CREATE_PROFILE = '/user/profile';

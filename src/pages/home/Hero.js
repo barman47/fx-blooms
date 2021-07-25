@@ -1,19 +1,16 @@
 import { Link } from 'react-router-dom';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { PlayCircle } from 'mdi-material-ui';
 
 import { SIGN_UP } from '../../routes';
-
-import { COLORS } from '../../utils/constants';
-
-import listing1 from '../../assets/img/listing1.png';
-import listing2 from '../../assets/img/listing2.png';
+import banner from '../../assets/img/banner.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        backgroundColor: COLORS.lightTeal,
         marginTop: theme.spacing(8.1),
         paddingLeft: theme.spacing(15),
+
         [theme.breakpoints.down('lg')]: {
             paddingLeft: theme.spacing(10),
         },
@@ -21,6 +18,7 @@ const useStyles = makeStyles(theme => ({
             
         },
         [theme.breakpoints.down('lg')]: {
+            paddingBottom: theme.spacing(5),
             paddingLeft: theme.spacing(10),
         },
         [theme.breakpoints.down('sm')]: {
@@ -30,11 +28,22 @@ const useStyles = makeStyles(theme => ({
     },
 
     hero: {
-        height: '100%'
+        height: '100%',
+        paddingLeft: theme.spacing(5),
+        
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: 0
+        }
+    },
+
+    banner: {
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
     },
 
     text: {
-        '& h2': {
+        '& h1': {
             fontStyle: 'italic',
             fontWeight: 700,
             margin: [[theme.spacing(35), 0, theme.spacing(5), 0]],
@@ -55,50 +64,9 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    listings: {
-        display: 'flex',
-        flexDirection: 'column',
-        maxHeight: theme.spacing(132),
-        position: 'relative',
-        top: 0,
-        left: 0,
-
-        [theme.breakpoints.down('lg')]: {
-            maxHeight: theme.spacing(96)
-        },
-        
-        [theme.breakpoints.down('sm')]: {
-            display: 'none'
-        },
-    },
-
-    listing1: {
-        position: 'relative',
-        top: 0,
-        right: 0,
-        zIndex: 1,
-        width: '100%',
-        [theme.breakpoints.down('md')]: {
-            width: '80%'
-        }
-    },
-
-    listing2: {
-        backgroundColor: COLORS.lightTeal,
-        position: 'relative',
-        top: -theme.spacing(45),
-        right: theme.spacing(20),
-        width: '50%',
-
-        [theme.breakpoints.down('lg')]: {
-            right: theme.spacing(12),
-            top: -theme.spacing(30)
-        },
-        [theme.breakpoints.down('md')]: {
-            top: -theme.spacing(35),
-            width: '50%'
-        }
-    },
+    highlight: {
+        color: theme.palette.primary.main
+    }
 }));
 
 const Hero = () => {
@@ -106,17 +74,49 @@ const Hero = () => {
 
     return (
         <section className={classes.root}>
-            <Grid container direction="row" className={classes.hero}>
+            <Grid container direction="row" spacing={10} className={classes.hero}>
                 <Grid item sm={12} lg={6} xl={6} className={classes.text}>
-                    <Typography variant="h2">
-                        Organise projects.<br />
-                        Get more done.
-                    </Typography>
-                    <Button variant="contained" component={Link} color="primary" to={SIGN_UP}>Get Started</Button>
+                    <Grid container direction="row" spacing={3} alignItems="center">
+                        <Grid item xs={12}>
+                            <Typography variant="h1">
+                                Decentralized Money Exchange
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="h6">
+                                FXBLOOMS is a <span className={classes.highlight}>peer-to-peer</span> 
+                                currency exchange platform that gives you the freedom to exchange money 
+                                <span className={classes.highlight}>seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Button 
+                                variant="contained" 
+                                component={Link} 
+                                color="primary" 
+                                to={SIGN_UP}
+                                size="large"
+                                fullWidth
+                                >
+                                    Get Started
+                            </Button>                            
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Button 
+                                component={Link} 
+                                color="primary" 
+                                to={SIGN_UP}
+                                size="large"
+                                fullWidth
+                            >
+                                <PlayCircle />
+                                See how it works
+                            </Button>                            
+                        </Grid>
+                    </Grid>
                 </Grid>
-                <Grid item sm={12} lg={6} xl={6} className={classes.listings}>
-                    <img src={listing1} className={classes.listing1} alt="FX Blooms Listing" />
-                    <img src={listing2} className={classes.listing2} alt="FX Blooms Listing" />
+                <Grid item sm={12} lg={6} xl={6} className={classes.banner}>
+                    <img src={banner} alt="FXBLOOMS" />
                 </Grid>
             </Grid>
         </section>

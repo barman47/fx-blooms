@@ -1,8 +1,7 @@
 import Layout from '../../components/layout';
 import Hero from './Hero';
 import Features from './Features';
-import Testimonials from './Testimonials';
-import Stats from './Stats';
+import AboutUs from './AboutUs';
 import Contact from './Contact';
 
 const index = () => {
@@ -12,8 +11,7 @@ const index = () => {
         >
             <Hero />
             <Features />
-            <Testimonials />
-            <Stats />
+            <AboutUs />
             <Contact />
         </Layout>
     );

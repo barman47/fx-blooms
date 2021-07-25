@@ -1,15 +1,15 @@
-import { Grid, Typography } from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
+import { Grid, Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Eye, LightningBolt } from 'mdi-material-ui';
 
-import robust from '../../assets/img/downloads.svg';
-import flexibility from '../../assets/img/flexibility.svg';
-import user from '../../assets/img/user-friendly.svg';
-import layouts from '../../assets/img/users.svg';
-import components from '../../assets/img/clients.svg';
-import organized from '../../assets/img/organized.svg';
+import listing from '../../assets/img/listing1.png';
+
+import { COLORS, SHADOW } from '../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
+        backgroundColor: COLORS.lightTeal,
         padding: [[theme.spacing(7), theme.spacing(5)]],
         [theme.breakpoints.down('sm')]: {
             paddingLeft: theme.spacing(2),
@@ -17,108 +17,103 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    header: {
-        margin: '0 auto',
-        textAlign: 'center',
-        width: '40%',
+    item: {
+        backgroundColor: COLORS.white,
+        borderRadius: theme.shape.borderRadius,
+        boxShadow: SHADOW,
+        maxHeight: 'inherit',
+        padding: theme.spacing(2),
 
-        '& h4': {
+        '& p:first-child': {
+            borderRadius: '25px',
+            color: theme.palette.primary.main,
+            fontSize: theme.spacing(1.7),
             fontWeight: 600,
-            fontStyle: 'italic',
-            marginBottom: theme.spacing(2)
+            marginBottom: theme.spacing(2),
+            padding: [[theme.spacing(0.5), theme.spacing(2), theme.spacing(1), theme.spacing(2)]],
+            backgroundColor: COLORS.lightTeal,
         },
-        [theme.breakpoints.down('md')]: {
-            width: '60%',
-        },
-        [theme.breakpoints.down('sm')]: {
-            width: '100%',
+
+        '& p:nth-child(2)': {
+            fontWeight: 300,
+            marginBottom: theme.spacing(2),
         }
     },
 
-    features: {
-        marginTop: theme.spacing(3),
+    icon: {
+        position: 'relative',
+        top: '8px'
+    },
 
-        '& h5': {
-            fontWeight: 600,
-            fontStyle: 'italic',
-            margin: [[theme.spacing(2), '0']]
-        },
+    link: {
+        fontWeight: 600
+    },
 
-        '& span': {
-            color: '#333333'
-        }
+    imgContainer: {
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        } 
     }
 }));
 
 const Features = () => {
     const classes = useStyles();
     return (
-        <section className={classes.root}>
-            <div className={classes.header}>
-                <Typography variant="h4">
-                    Tailor-made features
-                </Typography>
-                <Typography variant="subtitle1">
-                    Lorem ipsum dolor, sit amet consectetur adipisicing elit. Repellendus ipsam nisi rem ratione alias tenetur, fuga veniam dolorem?
-                </Typography>
-            </div>
-            <Grid container className={classes.features} spacing={5}>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={robust} alt="Robust workflow" />
-                    <Typography variant="h5">
-                        Robust workflow
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={flexibility} alt="Flexiblity" />
-                    <Typography variant="h5">
-                        Flexibility
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={user} alt="User friendly" />
-                    <Typography variant="h5">
-                        User friendly
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={layouts} alt="Multiple Layouts" />
-                    <Typography variant="h5">
-                        Multiple layouts
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={components} alt="Better Components" />
-                    <Typography variant="h5">
-                        Better components
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
-                </Grid>
-                <Grid item xs={12} md={6} lg={4} align="center">
-                    <img src={organized} alt="Well organised" />
-                    <Typography variant="h5">
-                        Well organised
-                    </Typography>
-                    <Typography variant="body1" component="span">
-                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatibus veritatis saepe soluta?
-                    </Typography>
+        <Grid container direction="row" className={classes.root}>
+            <Grid item xs={12} lg={6}>
+                {/* <section className={classes.root}> */}
+                <Grid container direction="row" spacing={3}>
+                    <Grid item xs={12} md={6}>
+                        <div className={classes.item}>
+                            <Typography variant="subtitle1" component="P">
+                                <Eye className={classes.icon} />
+                                &nbsp;&nbsp;
+                                No hidden charges
+                            </Typography>
+                            <Typography variant="subtitle1" component="p">We are built upon honesty and openness - we provide the maximum transparency to our customers</Typography>
+                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                        </div>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <div className={classes.item}>
+                            <Typography variant="subtitle1" component="p">
+                                <LightningBolt className={classes.icon} />
+                                &nbsp;&nbsp;
+                                Quick and timely transactions
+                            </Typography>
+                            <Typography variant="subtitle1" component="p">We understand that each transaction is important. Thus, we make it happen as soon as possible.</Typography>
+                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                        </div>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <div className={classes.item}>
+                            <Typography variant="subtitle1" component="p">
+                                <Eye className={classes.icon} />
+                                &nbsp;&nbsp;
+                                No middlemen
+                            </Typography>
+                            <Typography variant="subtitle1" component="P">We guarantee better rates by cutting out middlemen and hidden charges</Typography>
+                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                        </div>
+                    </Grid>
+                    <Grid item xs={12} md={6}>
+                        <div className={classes.item}>
+                            <Typography variant="subtitle1" component="P">
+                                <Eye className={classes.icon} />
+                                &nbsp;&nbsp;
+                                Take control of YOUR money
+                            </Typography>
+                            <Typography variant="subtitle1" component="P">Freedom to exchange at your desired rate</Typography>
+                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                        </div>
+                    </Grid>
+                {/* </section> */}
                 </Grid>
             </Grid>
-        </section>
+            <Grid item xs={12} lg={6} className={classes.imgContainer}>
+                <img src={listing} alt="Sample Listing" />
+            </Grid>
+        </Grid>
     );
 };
 
