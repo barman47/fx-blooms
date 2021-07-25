@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -18,6 +18,7 @@ import Toast from '../../components/common/Toast';
 
 import { getBarcode } from '../../actions/twoFactor';
 import { COLORS } from '../../utils/constants';
+import cancelLogin from '../../utils/cancelLogin';
 import { VERIFY_2FA } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
@@ -87,6 +88,8 @@ const useStyles = makeStyles(theme => ({
 const QrCode = (props) => {
     const classes = useStyles();
     
+    const history = useHistory();
+
     const twoFactor = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);
     const [msg, setMsg] = useState('');
@@ -165,7 +168,7 @@ const QrCode = (props) => {
                     />
                     <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                     <Button variant="contained" color="primary" component={RouterLink} to={VERIFY_2FA} className={classes.button}>Proceed</Button>
-                    <Button className={clsx(classes.button, classes.cancelButton)}>Cancel</Button>
+                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => cancelLogin(history)}>Cancel</Button>
                 </div>
             </Container>
         </>

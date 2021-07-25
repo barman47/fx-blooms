@@ -1,10 +1,9 @@
 import axios from 'axios';
 
 import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
-import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 import handleError from '../utils/handleError';
-import reIssueToken from '../utils/reIssueToken';
-import setAuthToken from '../utils/setAuthToken';
+// import reIssueToken from '../utils/reIssueToken';
+
 import { 
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
@@ -48,22 +47,26 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-export const login = (data, history) => async (dispatch) => {
+export const login = (data) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/login`, data);
-        const { token } = res.data.data;
-        const { twoFactorEnabled } = res.data.data;
-        console.log(res);
-        setAuthToken(token);
-        dispatch({
+        return dispatch({
             type: SET_CURRENT_CUSTOMER,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
-        // if (!twoFactorEnabled) {
-        //     history.push();
-        // }
-        // history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+export const addResidentPermit = (data) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/AddResidencePermit`, data);
+        console.log(res);
+        // dispatch({
+        //     type: SET_CURRENT_CUSTOMER,
+        //     payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

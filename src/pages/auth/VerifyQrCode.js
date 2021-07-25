@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { Link as RouterLink, useLocation, useHistory } from 'react-router-dom';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -15,14 +15,18 @@ import {
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import Spinner from '../../components/common/Spinner';
+import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
-import { enableTwoFactor } from '../../actions/twoFactor';
-import { COLORS } from '../../utils/constants';
+import { authorizeTwoFactor, enableTwoFactor } from '../../actions/twoFactor';
+import { DASHBOARD, DASHBOARD_HOME } from '../../routes';
 import isEmpty from '../../utils/isEmpty';
+import { COLORS } from '../../utils/constants';
+import cancelLogin from '../../utils/cancelLogin';
 import validateAuthenticatorCode from '../../utils/validation/customer/authenticator';
 
 import logo from '../../assets/img/logo.svg';
+import { SET_2FA_MSG, SET_BARCODE } from '../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -56,6 +60,15 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    input: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        // border: '1px solid red',
+        textAlign: 'center'
+    },
+
     buttonContainer: {
         marginTop: theme.spacing(2),
     },
@@ -84,11 +97,16 @@ const useStyles = makeStyles(theme => ({
 
 const VerifyQrCode = (props) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const history = useHistory();
+    const location = useLocation();
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
+    const { msg } = useSelector(state => state.twoFactor);
     
     const [first, setFirst] = useState('');
     const [second, setSecond] = useState('');
@@ -99,7 +117,10 @@ const VerifyQrCode = (props) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+
     const toast = useRef();
+    const successModal = useRef();
     
     const firstField = useRef();
     const secondField = useRef();
@@ -107,6 +128,12 @@ const VerifyQrCode = (props) => {
     const fourthField = useRef();
     const fifthField = useRef();
     const sixthField = useRef();
+
+    useEffect(() => {
+        if (location.state.twoFactorEnabled) {
+            setTwoFactorEnabled(location.state.twoFactorEnabled);
+        }
+    }, [location.state]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -122,6 +149,14 @@ const VerifyQrCode = (props) => {
         }
     }, [errors]);
 
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
+
     const moveToNextField = (current, nextField, previousField) => {
         if (nextField === null) {
             return onSubmit();
@@ -136,6 +171,20 @@ const VerifyQrCode = (props) => {
         if (previousField && current.value.length === 0) {
             previousField.getElementsByTagName('input')[0].focus();
         }
+    };
+
+    const dismissAction = () => {
+        batch(() => {
+            dispatch({
+                type: SET_BARCODE,
+                payload: {}
+            });
+            dispatch({
+                type: SET_2FA_MSG,
+                payload: null
+            });
+        });
+        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     };
 
     const onSubmit = (e) => {
@@ -158,13 +207,14 @@ const VerifyQrCode = (props) => {
             return setErrors({ msg: 'Invalid Code' });
         }
         
-        // if (!first || !second || !third || !fourth || !fifth || !sixth) {
-        //     return setErrors({ msg: 'Invalid code!' });
-        // }
         const code = `${first}${second}${third}${fourth}${fifth}${sixth}`;
         setErrors({});
         setLoading(true);
-        props.enableTwoFactor({ inputCode: code });
+
+        if (twoFactorEnabled) {
+            return props.authorizeTwoFactor({ code, profileId: customerId }, history);
+        }
+        return props.enableTwoFactor(code);
     };
 
 
@@ -181,9 +231,10 @@ const VerifyQrCode = (props) => {
                 />
             }
             {loading && <Spinner />}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
                 <RouterLink to="/" className={classes.logo}>
-                    <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
+                    <img src={logo} className={classes.logo} alt="FXBlooms Logo" />
                 </RouterLink>
                 <div className={classes.content}>
                     <Typography variant="h5">Verify Google Authenticator</Typography>
@@ -192,7 +243,7 @@ const VerifyQrCode = (props) => {
                         <Grid container direction="row" spacing={matches ? 1 : 3}>
                             <Grid item xs={2}>
                                 <TextField
-                                    style={{ display: 'inline-block', textAlign: 'center' }}
+                                    className={classes.input}
                                     value={first}
                                     onChange={(e) => setFirst(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
@@ -208,6 +259,7 @@ const VerifyQrCode = (props) => {
                             </Grid>
                             <Grid item xs={2}>
                                 <TextField
+                                    className={classes.input}
                                     value={second}
                                     onChange={(e) => setSecond(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
@@ -224,6 +276,7 @@ const VerifyQrCode = (props) => {
                             </Grid>
                             <Grid item xs={2}>
                                 <TextField
+                                    className={classes.input}
                                     value={third}
                                     onChange={(e) => setThird(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
@@ -240,6 +293,7 @@ const VerifyQrCode = (props) => {
                             </Grid>
                             <Grid item xs={2}>
                                 <TextField
+                                    className={classes.input}
                                     value={fourth}
                                     onChange={(e) => setFourth(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, fifthField.current, thirdField.current)}
@@ -256,6 +310,7 @@ const VerifyQrCode = (props) => {
                             </Grid>
                             <Grid item xs={2}>
                                 <TextField
+                                    className={classes.input}
                                     value={fifth}
                                     onChange={(e) => setFifth(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, sixthField.current, fourthField.current)}
@@ -272,6 +327,7 @@ const VerifyQrCode = (props) => {
                             </Grid>
                             <Grid item xs={2}>
                                 <TextField
+                                    className={classes.input}
                                     value={sixth}
                                     onChange={(e) => setSixth(e.target.value)}
                                     onKeyUp={(e) => moveToNextField(e.target, null, fifthField.current)}
@@ -289,7 +345,7 @@ const VerifyQrCode = (props) => {
                         </Grid>
                         <div className={classes.buttonContainer}>
                             <Button variant="contained" color="primary" className={classes.button} type="submit">Proceed</Button>
-                            <Button className={clsx(classes.button, classes.cancelButton)}>Cancel</Button>
+                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>cancelLogin(history)}>Cancel</Button>
                         </div>
                     </form>
                 </div>
@@ -299,7 +355,8 @@ const VerifyQrCode = (props) => {
 };
 
 VerifyQrCode.propTypes = {
+    authorizeTwoFactor: PropTypes.func.isRequired,
     enableTwoFactor: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { enableTwoFactor })(VerifyQrCode);
+export default connect(undefined, { authorizeTwoFactor, enableTwoFactor })(VerifyQrCode);

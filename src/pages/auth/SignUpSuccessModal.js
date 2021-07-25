@@ -14,6 +14,7 @@ import { CheckboxMarkedCircle } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../utils/constants';
 import { SET_CURRENT_CUSTOMER } from '../../actions/types';
+import { LOGIN } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -69,7 +70,7 @@ const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
             type: SET_CURRENT_CUSTOMER,
             payload: {}
         });
-        history.push('/');
+        history.push(LOGIN);
     };
 
 	return (

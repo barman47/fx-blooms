@@ -18,10 +18,12 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { FilterOutline, FormatListText } from 'mdi-material-ui';
+import _ from 'lodash';
 
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
+import { getCustomerInformation } from '../../../actions/customer';
 import { getListingsOpenForBid } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -162,12 +164,19 @@ const useStyles = makeStyles(theme => ({
 const AllListings = (props) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const { isAuthenticated } = useSelector(state => state.customer);
+	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings } = useSelector(state => state.listings);
 	
 	const [open, setOpen] = useState(false);
 
-	const { getListingsOpenForBid, handleSetTitle } = props;
+	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
+
+	useEffect(() => {
+		if (_.isEmpty(profile)) {
+			getCustomerInformation();
+		}
+		// eslint-disable-next-line
+	}, []);
 
 	useEffect(() => {
 		if (isAuthenticated && listings?.length === 0) {
@@ -237,7 +246,7 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies, getListingsOpenForBid })((props) => {
+const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((props) => {
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
@@ -512,8 +521,9 @@ Filter.propTypes = {
 };
 
 AllListings.propTypes = {
+	getCustomerInformation: PropTypes.func,
 	getListingsOpenForBid: PropTypes.func,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getListingsOpenForBid })(AllListings);
+export default connect(undefined, { getCustomerInformation, getListingsOpenForBid })(AllListings);

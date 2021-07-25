@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ADDED_ACCOUNT } from './types';
 
 import { API } from '../utils/constants';
-import reIssueToken from '../utils/reIssueToken';
+// import reIssueToken from '../utils/reIssueToken';
 import handleError from '../utils/handleError';
 
 const URL = `${API}/Account`;

@@ -1,17 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 import axios from 'axios';
 import { 
     Backdrop,
 	Button,
+    CircularProgress,
     Fade,
 	FormControl,
 	FormHelperText,
 	Grid,
-	Link, 
 	MenuItem,
     Modal,
 	Select,
@@ -21,11 +19,14 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { CloudUpload } from 'mdi-material-ui';
 import { getListingsOpenForBid } from '../../../actions/listings';
-import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
+import { addResidentPermit } from '../../../actions/customer';
+import validateResidencePermit from '../../../utils/validation/customer/residencePermit';
+
+import Spinner from '../../../components/common/Spinner';
 
 import { COLORS, UPLOAD_LIMIT } from '../../../utils/constants';
 import handleError from '../../../utils/handleError';
-import isEmpty from '../../../utils/isEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -37,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     modalContent: {
         backgroundColor: COLORS.white,
         borderRadius: theme.shape.borderRadius,
-        padding: theme.spacing(5),
+        padding: theme.spacing(3),
         width: '35vw',
 
         '& span': {
@@ -87,6 +88,11 @@ const useStyles = makeStyles(theme => ({
         width: '100%'
     },
 
+    error: {
+        color: COLORS.red,
+        fontSize: theme.spacing(1.5)
+    },
+
     clearButton: {
         color: 'red',
         transition: '0.3s linear all',
@@ -94,14 +100,28 @@ const useStyles = makeStyles(theme => ({
         '&:hover': {
             backgroundColor: 'rgba(255, 0, 0, 0.1)'
         }
+    },
+
+    progress: {
+        // backgroundColor: COLORS.lightTeal,
+        backgroundColor: theme.palette.primary.main,
+        borderRadius: theme.shape.borderRadius,
+        color: COLORS.offWhite,
+        display: 'inline-block',
+        marginTop: '10px',
+        textAlign: 'center',
+        width: '100%'
     }
 }));
 
-const MobileFilterModal = ({ open, handleCloseModal }) => {
+const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) => {
     const classes = useStyles();
 
+    const { documents } = useSelector(state => state);
+    const errorsState = useSelector(state => state.errors);
+
     const [PermitFront, setPermitFront] = useState('');
-    const [PermitFrontUrl, setPermitFrontUrl] = useState('');
+    const [permitFrontUrl, setPermitFrontUrl] = useState('');
     const [permitFrontPhoto, setPermitFrontPhoto] = useState(null);
     const [uploadedPermitFront, setUploadedIdFront] = useState(false);
     
@@ -109,20 +129,28 @@ const MobileFilterModal = ({ open, handleCloseModal }) => {
     const [permitBackUrl, setPermitBackUrl] = useState('');
     const [permitBackPhoto, setPermitBackPhoto] = useState(null);
     const [uploadedPermitBack, setUploadedPermitBack] = useState(false);
-	// eslint-disable-next-line
+
+	const [idNumber, setIdNumber] = useState('');
+	const [documentType, setDocumentType] = useState('');
+
 	const [errors, setErrors] = useState({});
+	const [loadingText, setLoadingText] = useState('');
 	const [loading, setLoading] = useState(false);
 
-    const onSubmit = (e) => {
-		e.preventDefault();
-		setErrors({});
-	};
+    const [backUploadProgress, setBackUploadProgress] = useState('');
+    const [frontUploadProgress, setFrontUploadProgress] = useState('');
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+        }
+    }, [errorsState, errors]);
 
     const uploadPermitFront = async () => {
         setErrors({});
         try {
             const file = PermitFront;
-            console.log(file);
             if (!file) {
                 return setErrors({ msg: 'Photo is required!', idFront: 'Photo is required!' });
             }
@@ -132,15 +160,24 @@ const MobileFilterModal = ({ open, handleCloseModal }) => {
             }
 
             setLoading(true);
+            setLoadingText('Uploading Front . . .');
+            
             const data = new FormData();
             data.append(`${file.name}`, file);
             const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/Upload`, data, {
-                'Content-Type': 'multipart/form-data'
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: (progressEvent) => {
+                    setFrontUploadProgress(Math.floor(progressEvent.loaded / progressEvent.total * 100));
+                }
             });
             setPermitFrontUrl(res.data.fileName);
             setUploadedIdFront(true);
             setLoading(false);
+            setFrontUploadProgress('');
         } catch (err) {
+            setFrontUploadProgress('');
             return handleError(err, 'idFront', 'ID upload failed');
         }
     };
@@ -149,7 +186,6 @@ const MobileFilterModal = ({ open, handleCloseModal }) => {
         setErrors({});
         try {
             const file = PermitBack;
-            console.log(file);
             if (!file) {
                 return setErrors({ msg: 'Photo is required!', permitBack: 'Photo is required!' });
             }
@@ -158,16 +194,24 @@ const MobileFilterModal = ({ open, handleCloseModal }) => {
                 return setErrors({ msg: 'File too large', permitBack: 'Photo must not be greater than 3MB' });
             }
 
+            setLoadingText('Uploading Back . . .');
             setLoading(true);
             const data = new FormData();
             data.append(`${file.name}`, file);
             const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/Upload`, data, {
-                'Content-Type': 'multipart/form-data'
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                onUploadProgress: (progressEvent) => {
+                    setBackUploadProgress(Math.floor(progressEvent.loaded / progressEvent.total * 100));
+                }
             });
             setPermitBackUrl(res.data.fileName);
             setUploadedPermitBack(true);
             setLoading(false);
+            setBackUploadProgress('');
         } catch (err) {
+            setBackUploadProgress('');
             return handleError(err, 'permitBack', 'ID upload failed');
         }
     };
@@ -212,137 +256,212 @@ const MobileFilterModal = ({ open, handleCloseModal }) => {
 	    setErrors({});
     };
 
+    const onSubmit = (e) => {
+		e.preventDefault();
+		setErrors({});
+
+        const data = {
+            idNumber,
+            documentType,
+            img: permitFrontUrl,
+            backImg: permitBackUrl
+        };
+
+        const { errors, isValid } = validateResidencePermit(data);
+
+        if (!isValid) {
+            console.log(errors);
+            return setErrors(errors);
+        }
+
+        console.log(data);
+        setErrors({});
+        setLoading(true);
+        addResidentPermit(data);
+	};
+
 	return (
-        <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={(reason) => {
-                console.log(reason);
-                handleCloseModal();
-            }}
-            closeAfterTransition
-            disableEscapeKeyDown={true}
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={open}>
-                <Grid container direction="column" spacing={1} className={classes.modalContent}>
-                    <Grid item>
-                        <Typography variant="h6">Resident Permit</Typography>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" component="span">You are required to provide your resident permit before making a listing.</Typography>
-                    </Grid>
-                    <Grid item>
-                        <form onSubmit={onSubmit} noValidate>
-                            <Grid container direction="row" spacing={3}>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Resident Permit (Front)</Typography>
-                                    <TextField 
-                                        className={classes.input}
-                                        onChange={handleSetPermitFront}
-                                        id="permitFront"
-                                        type="file"
-                                        variant="outlined"
-                                        style={{ display: 'none' }}
-                                        inputProps={{
-                                            accept: 'image/*'
-                                        }}
-                                        fullWidth
-                                        error={errors.permitFront ? true : false}
-                                    />
-                                    {
-                                        PermitFront ? 
-                                        <>
-                                            <div style={{backgroundImage: `url(${permitFrontPhoto})`,}} className={classes.permitPhoto}></div>
-                                            {errors.permitFront && <span className={classes.error}>{errors.permitFront}</span>}
-                                            <br />
-                                            {
-                                                uploadedPermitFront
-                                                ?
-                                                <span className={classes.uploadSuccess}>ID Back Uploaded</span>
-                                                :
-                                                <>
-                                                    <Button onClick={selectPermitFront} color="primary">Change Photo</Button>
-                                                    <Button onClick={uploadPermitFront} variant="contained" color="primary" size="small">Upload</Button>
-                                                </>
-                                            }
-                                        </>
-                                        :
-                                        <div className={classes.fileUpload} onClick={selectPermitFront}>
-                                            <Typography variant="subtitle2" component="span">Upload a clear photograph of your resident permit</Typography>
-                                            <CloudUpload className={classes.uploadIcon} />
-                                        </div>
+        <>
+            {loading && <Spinner text={loadingText} />}
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                onClose={handleCloseModal}
+                closeAfterTransition
+                disableEscapeKeyDown={loading ? true : false}
+                disableBackdropClick={loading ? true : false}
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+            >
+                <Fade in={open}>
+                    <Grid container direction="column" spacing={1} className={classes.modalContent}>
+                        <Grid item>
+                            <Typography variant="h6">Resident Permit</Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="subtitle2" component="span">You are required to provide your resident permit before making a listing.</Typography>
+                        </Grid>
+                        <Grid item>
+                            <form onSubmit={onSubmit} noValidate>
+                                <Grid container direction="row" spacing={3}>
+                                    <Grid item xs={12} md={6}>
+                                        <Typography variant="subtitle2" component="span">Resident Permit (Front)</Typography>
+                                        <TextField 
+                                            className={classes.input}
+                                            onChange={handleSetPermitFront}
+                                            id="permitFront"
+                                            type="file"
+                                            variant="outlined"
+                                            style={{ display: 'none' }}
+                                            inputProps={{
+                                                accept: 'image/*'
+                                            }}
+                                            fullWidth
+                                            error={errors.img ? true : false}
+                                        />
+                                        {
+                                            PermitFront ? 
+                                            <>
+                                                <div style={{backgroundImage: `url(${permitFrontPhoto})`,}} className={classes.permitPhoto}></div>
+                                                <br />
+                                                {
+                                                    uploadedPermitFront
+                                                    ?
+                                                    <span className={classes.uploadSuccess}>ID Back Uploaded</span>
+                                                    :
+                                                    <>
+                                                        <Button onClick={selectPermitFront} color="primary" disabled={loading ? true : false}>Change Photo</Button>
+                                                        <Button onClick={uploadPermitFront} variant="contained" color="primary" size="small" disabled={loading ? true : false}>Upload</Button>
+                                                    </>
+                                                }
+                                            </>
+                                            :
+                                            <>
+                                                <div className={classes.fileUpload} onClick={selectPermitFront}>
+                                                    <Typography variant="subtitle2" component="span">Upload a clear photograph of your resident permit</Typography>
+                                                    <CloudUpload className={classes.uploadIcon} />
+                                                </div>
+                                                <span className={classes.progress}>{`${frontUploadProgress}${Number(backUploadProgress) > 0 ? '%' : ''}`}</span>
+                                            </>
+                                        }
+                                        {errors.img && <span className={classes.error}>{errors.img}</span>}
+                                    </Grid>			
+                                    <Grid item xs={12} md={6}>
+                                        <Typography variant="subtitle2" component="span">Resident Permit (Back)</Typography>
+                                        <TextField 
+                                            onChange={handleSetPermitBack}
+                                            id="permitBack"
+                                            type="file"
+                                            variant="outlined"
+                                            style={{ display: 'none' }}
+                                            inputProps={{
+                                                accept: 'image/*'
+                                            }}
+                                            helperText={errors.backImg || 'ID Card Back'}
+                                            fullWidth
+                                            error={errors.backImg ? true : false}
+                                        />
+                                        {
+                                            PermitBack ? 
+                                            <>
+                                                <div style={{backgroundImage: `url(${permitBackPhoto})`,}} className={classes.permitPhoto}></div>
+                                                <br />
+                                                {
+                                                    uploadedPermitBack
+                                                    ?
+                                                    <span className={classes.uploadSuccess}>ID Back Uploaded</span>
+                                                    :
+                                                    <>
+                                                        <Button onClick={selectPermitBack} color="primary" disabled={loading ? true : false}>Change Photo</Button>
+                                                        <Button onClick={uploadPermitBack} variant="contained" color="primary" size="small" disabled={loading ? true : false}>Upload</Button>
+                                                    </>
+                                                }
+                                            </>
+                                            :
+                                            <>
+                                                <div className={classes.fileUpload} onClick={selectPermitBack}>
+                                                    <Typography variant="subtitle2" component="span">Upload a clear photograph of your resident permit</Typography>
+                                                    <CloudUpload className={classes.uploadIcon} />
+                                                </div>
+                                                <span className={classes.progress}>{`${backUploadProgress}${Number(backUploadProgress) > 0 ? '%' : ''}`}</span>
+                                            </>
+                                        }
+                                        {errors.backImg && <span className={classes.error}>{errors.backImg}</span>}
+                                    </Grid>
+                                    {(!permitFrontUrl && !permitBackUrl) && 
+                                        <Grid item xs={12}>
+                                            <Button className={classes.clearButton} onClick={removeFiles} disabled={loading ? true : false}>Clear</Button>
+                                        </Grid>	
                                     }
-                                </Grid>			
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Resident Permit (Back)</Typography>
-                                    <TextField 
-                                        onChange={handleSetPermitBack}
-                                        id="permitBack"
-                                        type="file"
-                                        variant="outlined"
-                                        style={{ display: 'none' }}
-                                        inputProps={{
-                                            accept: 'image/*'
-                                        }}
-                                        helperText={errors.permitBack || 'ID Card Back'}
-                                        fullWidth
-                                        error={errors.permitBack ? true : false}
-                                    />
-                                    {
-                                        PermitBack ? 
-                                        <>
-                                            <div style={{backgroundImage: `url(${permitBackPhoto})`,}} className={classes.permitPhoto}></div>
-                                            {errors.permitBack && <span className={classes.error}>{errors.permitBack}</span>}
-                                            <br />
-                                            {
-                                                uploadedPermitBack
-                                                ?
-                                                <span className={classes.uploadSuccess}>ID Back Uploaded</span>
-                                                :
-                                                <>
-                                                    <Button onClick={selectPermitBack} color="primary">Change Photo</Button>
-                                                    <Button onClick={uploadPermitBack} variant="contained" color="primary" size="small">Upload</Button>
-                                                </>
-                                            }
-                                        </>
-                                        :
-                                        <div className={classes.fileUpload} onClick={selectPermitBack}>
-                                            <Typography variant="subtitle2" component="span">Upload a clear photograph of your resident permit</Typography>
-                                            <CloudUpload className={classes.uploadIcon} />
-                                        </div>
-                                    }
-                                </Grid>	
-                                <Grid item xs={12}>
-                                    <Button className={classes.clearButton} onClick={removeFiles}>Clear</Button>
-                                </Grid>		
-                                <Grid item xs={12}>
-                                    <Button 
-                                        type="submit" 
-                                        variant="contained" 
-                                        color="primary"
-                                        fullWidth
+                                    <Grid item xs={6}>
+                                        <Typography variant="subtitle2" component="span">Identity Card Type</Typography>
+                                        <FormControl 
+                                            variant="outlined" 
+                                            error={errors.documentType ? true : false}
+                                            fullWidth 
+                                            required
                                         >
-                                            Submit
-                                    </Button>
-                                </Grid>			
-                            </Grid>
-                        </form>
+                                            <Select
+                                                labelId="idCardType"
+                                                className={classes.input}
+                                                value={documentType}
+                                                onChange={(e) => setDocumentType(e.target.value)}
+                                            
+                                            >
+                                                <MenuItem value="">Select ID type</MenuItem>
+                                                {documents.length > 0 &&
+                                                    documents.map((document, index) => (
+                                                        <MenuItem key={index} value={document?.text}>{document?.text}</MenuItem>
+                                                    ))
+                                                }
+                                            </Select>
+                                            <FormHelperText>{errors.documentType}</FormHelperText>
+                                        </FormControl>
+                                    </Grid>		
+                                    <Grid item xs={6}>
+                                        <Typography variant="subtitle2" component="span">ID Number</Typography>
+                                        <TextField 
+                                            className={classes.input}
+                                            value={idNumber}
+                                            onChange={(e) => setIdNumber(e.target.value)}
+                                            type="text"
+                                            variant="outlined" 
+                                            placeholder="Enter Document Number"
+                                            helperText={errors.idNumber}
+                                            fullWidth
+                                            required
+                                            error={errors.idNumber ? true : false}
+                                        />
+                                    </Grid>			
+                                    <Grid item xs={12}>
+                                        <Button 
+                                            type="submit" 
+                                            variant="contained" 
+                                            color="primary"
+                                            fullWidth
+                                            disabled={loading ? true : false}
+                                        >
+                                            {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                        </Button>
+                                    </Grid>			
+                                </Grid>
+                            </form>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Fade>
-        </Modal>
+                </Fade>
+            </Modal>
+        </>
 	);
 };
 
-MobileFilterModal.propTypes = {
+ResidencePermitModal.propTypes = {
     open: PropTypes.bool.isRequired,
-    handleCloseModal: PropTypes.func.isRequired
+    handleCloseModal: PropTypes.func.isRequired,
+    addResidentPermit: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getListingsOpenForBid })(MobileFilterModal);
+export default connect(undefined, { addResidentPermit, getListingsOpenForBid })(ResidencePermitModal);

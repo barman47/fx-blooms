@@ -50,6 +50,8 @@ const Listing = ({ listing, handleOpenModal }) => {
 
     useEffect(() => {
         console.log(listing);
+
+        // eslint-disable-next-line
     }, []);
 
     const setListing = (listing) => {

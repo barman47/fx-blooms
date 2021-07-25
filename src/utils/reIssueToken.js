@@ -33,6 +33,7 @@ import { SET_AUTH_TOKEN } from '../actions/types';
 
 const reIssueToken = new Promise(async(resolve, reject) => {
     try {
+        const { token } = store.getState().customer;
         if (!tokenExpired()) {
             console.log('token not expired');
             return token;
@@ -42,7 +43,6 @@ const reIssueToken = new Promise(async(resolve, reject) => {
             return token;
         }
         
-        const { token } = store.getState().customer;
         const res = await axios.get(`${API}/Customer/ReIssueToken`, {
             headers: {
                 'Authorization': 'Bearer',

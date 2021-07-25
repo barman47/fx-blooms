@@ -76,7 +76,8 @@ const Listing = ({ listing, getSeller }) => {
 
     const userId = useSelector(state => state.customer.customerId);
 
-    const { amountAvailable, amountNeeded, bids, status, minExchangeAmount, exchangeRate, listedBy, customerId, id } = listing;
+    const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+    // const { bids, status, id } = listing;
 
     const setListing = (e, listing) => {
         e.preventDefault();

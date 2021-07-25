@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Button, 
@@ -25,6 +25,7 @@ import Toast from '../../components/common/Toast';
 import { getCountries } from '../../actions/countries';
 import { getDocuments } from '../../actions/documents';
 import { createCustomer } from '../../actions/customer';
+import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { LOGIN } from '../../routes';
@@ -167,8 +168,9 @@ const useStyles = makeStyles(theme => ({
 
 const CreateProfile = (props) => {
     const classes = useStyles();
-    const { countries } = useSelector(state => state);
-    const { documents } = useSelector(state => state);
+    const dispatch = useDispatch();
+
+    const { countries, documents } = useSelector(state => state);
     const { successMessage } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
@@ -223,6 +225,13 @@ const CreateProfile = (props) => {
         if (documents.length === 0) {
             props.getDocuments();
         }
+
+        return () => {
+            dispatch({
+                type: SET_CURRENT_CUSTOMER,
+                payload: { }
+            });
+        };
         // eslint-disable-next-line
     }, []);
 

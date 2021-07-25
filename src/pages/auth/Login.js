@@ -25,7 +25,7 @@ import { login } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { FORGOT_PASSWORD, SIGN_UP } from '../../routes';
+import { FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -66,6 +66,7 @@ const useStyles = makeStyles(theme => ({
     
     form: {
         backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
         marginTop: theme.spacing(5),
         padding: [[theme.spacing(8), theme.spacing(5)]],
 
@@ -120,15 +121,18 @@ const Login = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+
     useEffect(() => {
-        // if (customer.twoFactorEnabled === true) {
-            
-        // }
-        if (customer.twoFactorEnabled === false) {
+        if (customer.twoFactorEnabled === true && loading) {
+            setLoading(false);
+            history.push(VERIFY_2FA, { twoFactorEnabled: true });
+        }
+
+        if (customer.twoFactorEnabled === false && loading) {
             setLoading(false);
             setShowModal(true);
         }
-    }, [customer]);
+    }, [customer, history, loading]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -149,7 +153,7 @@ const Login = (props) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        props.login(data, history);
+        props.login(data);
     };    
 
     return (

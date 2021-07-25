@@ -27,6 +27,7 @@ import Listing from './Listing';
 
 
 import { getCurrencies } from '../../../actions/currencies';
+import { getDocuments } from '../../../actions/documents';
 import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
@@ -132,7 +133,7 @@ const MakeListing = (props) => {
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     const dispatch = useDispatch();
-    const { customer, currencies } = useSelector(state => state);
+    const { customer, currencies, documents } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const { addedListing, listings, msg } = useSelector(state => state.listings);
@@ -166,6 +167,13 @@ const MakeListing = (props) => {
     const successModal = useRef();
 
     const toast = useRef();
+
+    useEffect(() => {
+        if (!customer.hasProvidedResidencePermit && documents.length === 0) {
+            props.getDocuments();
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -275,13 +283,17 @@ const MakeListing = (props) => {
             ListingFee
         };
 
-        // const { errors, isValid } = validateAddListing(data);
-        // if (!isValid) {
-        //     return setErrors({ ...errors, msg: 'Invalid login data' });
+        const { errors, isValid } = validateAddListing(data);
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid listing data' });
+        }
+
+        // if (!customer.hasProvidedResidencePermit) {
+        //     return setShowResidencePermitModal(true);
         // }
 
-        if (customer.hasProvidedResidencePermit) {
-            return setShowResidencePermitModal(true);
+        if (customer.profile.listings >= 2) { // and there is no account number
+            return setOpenAccountModal(true);
         }
 
         setErrors({});
@@ -533,7 +545,8 @@ const MakeListing = (props) => {
 
 MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
+    getDocuments: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getCurrencies })(MakeListing);
+export default connect(undefined, { addListing, getCurrencies, getDocuments })(MakeListing);

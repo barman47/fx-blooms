@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, Send } from 'mdi-material-ui';
-import axios from 'axios';
-import { HubConnection, HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+// import axios from 'axios';
+import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+// import { HubConnection } from '@microsoft/signalr';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -89,6 +91,7 @@ const useStyles = makeStyles(theme => ({
 }));
 const Conversation = () => {
     const classes = useStyles();
+    const { customerId } = useSelector(state => state.customer);
 
     const [message, setMessage] = useState('');
     const [connection, setConnection] = useState(null);
@@ -116,12 +119,26 @@ const Conversation = () => {
                     });
                 })
                 .catch(err => {
+                    console.error(err);
                 });
         }
     }, [connection]);
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
+
+        const chatMessage = {
+            user: customerId,
+            message
+        };
+
+        if (connection.connectionStarted) {
+            try {
+                await connection.send('ReceiveNotification', chatMessage);
+            } catch (err) {
+                console.error(err);
+            }
+        }
     };
 
     return (
