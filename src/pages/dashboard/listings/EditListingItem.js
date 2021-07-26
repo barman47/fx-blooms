@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
-import { Tooltip, Typography, useMediaQuery } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { Tooltip, Typography } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { FileDocumentEdit } from 'mdi-material-ui';
 
@@ -39,20 +39,18 @@ const useStyles = makeStyles(theme => ({
     editIcon: {
         color: theme.palette.primary.main,
         cursor: 'pointer'
+    },
+
+    disabled: {
+        color: COLORS.grey,
+        pointerEvents: 'disabled'
     }
 }));
 
-const Listing = ({ listing, handleOpenModal }) => {
+const EditListingItem = ({ listing }) => {
     const dispatch = useDispatch();
     const classes = useStyles();
-    const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('md'));
-
-    useEffect(() => {
-        console.log(listing);
-
-        // eslint-disable-next-line
-    }, []);
+    const listingId = useSelector(state => state.listings.listing.id);
 
     const setListing = (listing) => {
         dispatch({
@@ -60,18 +58,13 @@ const Listing = ({ listing, handleOpenModal }) => {
             payload: listing
         });
     };
-
-    const showEditListingModal = (listing) => {
-        setListing(listing);
-        handleOpenModal();
-    };
     
     return (
         <section className={classes.root}>
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#163;{listing.amountAvailable.amount}
+                    &#163;{listing?.amountAvailable.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
@@ -79,28 +72,25 @@ const Listing = ({ listing, handleOpenModal }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#163;{listing.minExchangeAmount.amount}
+                    &#163;{listing?.minExchangeAmount.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    &#8358;{listing.exchangeRate} to &#163;1
+                    &#8358;{listing?.exchangeRate} to &#163;1
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
-                    {matches ? 
-                        <FileDocumentEdit className={classes.editIcon} onClick={() => showEditListingModal(listing)} />
-                        :
-                        <FileDocumentEdit className={classes.editIcon} onClick={() => setListing(listing)} />
-                    }
+                    <FileDocumentEdit 
+                        className={clsx(classes.editIcon, { [`${classes.disabled}`]: listing.id === listingId })} 
+                        onClick={listing.id === listingId ? () => {} : () => setListing(listing)} 
+                    />
                 </Tooltip>
             </div>
         </section>
     );
 };
 
-Listing.propTypes = {
-    negotiation: PropTypes.bool,
-    by: PropTypes.bool,
-    buttonText: PropTypes.string
-
+EditListingItem.propTypes = {
+    listing: PropTypes.object.isRequired
 };
-export default Listing;
+
+export default EditListingItem;

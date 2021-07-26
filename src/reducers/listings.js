@@ -15,17 +15,26 @@ const initialState = {
 };
 
 const listingsReducer = (state = initialState, action) => {
+    let listingId;
+    let listingIndex;
+    let listingsList = [];
+    let listing = {};
+    let updatedListing = {};
+
     switch (action.type) {   
         case ADDED_LISTING:
-            return {
+            return action.payload ? {
                 ...state,
-                listings: [...state.listings, action.payload],
+                listings: [action.payload.listing, ...state.listings],
                 addedListing: !state.addedListing,
-                msg: action.payload
+                msg: action.payload.msg ? action.payload.msg : null
+            } : {
+                ...state,
+                addedListing: !state.addedListing,
+                msg: null
             };
         
         case SET_LISTING:
-            console.log(action.payload);
             return {
                 ...state,
                 listing: action.payload
@@ -39,8 +48,18 @@ const listingsReducer = (state = initialState, action) => {
             };
 
         case UPDATED_LISTING: 
+        // listing update logic here
+            listingsList = [...state.listings];
+            listing = {...action.payload.listing};
+            listingId = listing.id;
+            listingIndex = listings.findIndex(listing => listing.id === listingId);
+            updatedListing = { ...listing };
+            listingsList.splice(listingIndex, 1, updatedListing);
+
             return {
                 ...state,
+                listing: { ...updatedListing },
+                listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
             }; 

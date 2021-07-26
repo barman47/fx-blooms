@@ -18,7 +18,6 @@ import {
 
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
-import AddListingModal from './AddListingModal';
 import EditListingItem from './EditListingItem';
 import SuccessModal from '../../../components/common/SuccessModal';
 
@@ -58,19 +57,17 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    listingFormContainer: {
-        [theme.breakpoints.down('md')]: {
-            display: 'none'
-        }
-    },
-
     helperText: {
         fontSize: '10px'
     },
 
     listings: {
         backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius
+        borderRadius: theme.shape.borderRadius,
+
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
     },
 
     noListing: {
@@ -114,7 +111,6 @@ const EditListing = (props) => {
     const { listing, listings, updatedListing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
-    const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [openAccountModal, setOpenAccountModal] = useState(false);
@@ -192,7 +188,7 @@ const EditListing = (props) => {
         if (listings.length > 0) {
             // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
             // debugger
-            setPreviousListings(listings.filter(item => item.customerId === customerId && item.id !== listing.id)); // Fix this
+            setPreviousListings(listings.filter(item => item.customerId === customerId)); 
         }
     }, [customerId, listing.id, listings]);
 
@@ -205,14 +201,6 @@ const EditListing = (props) => {
         setReceiptAmount('');
         setListingFee('');
         setLoading(false);
-    };
-
-    const handleOpenModal = () => {
-        setOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setOpen(false);
     };
 
     const onSubmit = (e) => {
@@ -257,7 +245,6 @@ const EditListing = (props) => {
     return (
         <section className={classes.root}>
             <SuccessModal ref={successModal} />
-			<AddListingModal edit={true} open={open} handleCloseModal={handleCloseModal} />
             <header>
                 <div>
                     <Typography variant="h6">Edit Listing</Typography>
@@ -265,7 +252,7 @@ const EditListing = (props) => {
                 </div>
             </header>
             <Grid container direction="row" spacing={4} className={classes.container}>
-                <Grid item md={4} className={classes.listingFormContainer}>
+                <Grid item xs={12} lg={4} className={classes.listingFormContainer}>
                     <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={2}>
                             <Grid item xs={12} md={5}>
@@ -425,7 +412,7 @@ const EditListing = (props) => {
                         </Grid>
                     </form>
                 </Grid>
-                <Grid item xs={12} md={12} lg={8} className={classes.listings}>
+                <Grid item xs={12} lg={8} className={classes.listings}>
                     {/* <section className={classes.noListing}>
                         <Typography variant="h6">Previous Listings</Typography>
                         <Divider />
@@ -440,14 +427,7 @@ const EditListing = (props) => {
                     <br />
                     <div>
                         {
-                            previousListings.map(item => {
-                                // if (item.customerId === customerId && item.id !== listing.id) {
-                                    return (
-                                        <EditListingItem key={listing.id} listing={listing} handleOpenModal={handleOpenModal} />
-                                    )
-                                // }
-                                // return null
-                            })
+                            previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))
                         }
                     </div>
                 </Grid>

@@ -39,7 +39,7 @@ export const addListing = (listing) => async (dispatch) => {
         console.log(res);
         return dispatch({
             type: ADDED_LISTING,
-            payload: res.data.data
+            payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -51,15 +51,12 @@ export const updateListing = (listing) => async (dispatch) => {
         // await reIssueToken();
         // console.log(listing);
         const res = await axios.patch(`${URL}/UpdateList`, listing);
-        const msg = res.data.data;
-        console.log(msg);
         return dispatch({
             type: UPDATED_LISTING,
-            payload: { msg }
+            payload: { listing: res.data.data, msg: 'Your listing has been updated successfully' }
         });
     } catch (err) {
-        console.error(err);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 

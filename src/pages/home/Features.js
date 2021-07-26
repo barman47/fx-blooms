@@ -6,6 +6,7 @@ import { Eye, LightningBolt } from 'mdi-material-ui';
 import listing from '../../assets/img/listing1.png';
 
 import { COLORS, SHADOW } from '../../utils/constants';
+import { SIGN_UP } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -65,13 +66,13 @@ const Features = () => {
                 <Grid container direction="row" spacing={3}>
                     <Grid item xs={12} md={6}>
                         <div className={classes.item}>
-                            <Typography variant="subtitle1" component="P">
+                            <Typography variant="subtitle1" component="p">
                                 <Eye className={classes.icon} />
                                 &nbsp;&nbsp;
                                 No hidden charges
                             </Typography>
                             <Typography variant="subtitle1" component="p">We are built upon honesty and openness - we provide the maximum transparency to our customers</Typography>
-                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                            <Link to={SIGN_UP} component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -82,7 +83,7 @@ const Features = () => {
                                 Quick and timely transactions
                             </Typography>
                             <Typography variant="subtitle1" component="p">We understand that each transaction is important. Thus, we make it happen as soon as possible.</Typography>
-                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                            <Link to={SIGN_UP} component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={6}>
@@ -92,19 +93,19 @@ const Features = () => {
                                 &nbsp;&nbsp;
                                 No middlemen
                             </Typography>
-                            <Typography variant="subtitle1" component="P">We guarantee better rates by cutting out middlemen and hidden charges</Typography>
-                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                            <Typography variant="subtitle1" component="p">We guarantee better rates by cutting out middlemen and hidden charges</Typography>
+                            <Link to={SIGN_UP} component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={6}>
                         <div className={classes.item}>
-                            <Typography variant="subtitle1" component="P">
+                            <Typography variant="subtitle1" component="p">
                                 <Eye className={classes.icon} />
                                 &nbsp;&nbsp;
                                 Take control of YOUR money
                             </Typography>
-                            <Typography variant="subtitle1" component="P">Freedom to exchange at your desired rate</Typography>
-                            <Link component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
+                            <Typography variant="subtitle1" component="p">Freedom to exchange at your desired rate</Typography>
+                            <Link to={SIGN_UP} component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
                         </div>
                     </Grid>
                 {/* </section> */}

@@ -5,7 +5,6 @@ import {
     Button,
     CircularProgress,
     Divider,
-    Fab,
     FormControl, 
     FormHelperText,
     Grid, 
@@ -17,9 +16,8 @@ import {
     useMediaQuery 
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import {FormatListText,  Plus } from 'mdi-material-ui';
+import {FormatListText } from 'mdi-material-ui';
 
-import AddListingModal from './AddListingModal';
 import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
@@ -85,7 +83,7 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    listingFormContainer: {
+    listings: {
         [theme.breakpoints.down('md')]: {
             display: 'none'
         }
@@ -146,7 +144,6 @@ const MakeListing = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const [open, setOpen] = useState(false);
     const [openAccountModal, setOpenAccountModal] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
 
@@ -238,14 +235,6 @@ const MakeListing = (props) => {
     //     }
     // };
 
-    const handleOpenModal = () => {
-        setOpen(true);
-    };
-
-    const handleCloseModal = () => {
-        setOpen(false);
-    };
-
     const handleOpenAccountModalModal = () => {
         setOpenAccountModal(true);
     };
@@ -327,18 +316,7 @@ const MakeListing = (props) => {
                 />
             }
             <section className={classes.root}>
-                <Tooltip title="Create Listing" arrow>
-                    <Fab 
-                        className={classes.fab} 
-                        color="primary" 
-                        aria-label="filter listings"
-                        onClick={handleOpenModal}
-                    >
-                        <Plus />
-                    </Fab>
-                </Tooltip>
                 <SuccessModal ref={successModal} />
-                <AddListingModal open={open} edit={false} handleCloseModal={handleCloseModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} />
                 <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
@@ -349,7 +327,7 @@ const MakeListing = (props) => {
                     <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography>
                 </header>
                 <Grid container direction="row" spacing={4} className={classes.container}>
-                    <Grid item md={4} className={classes.listingFormContainer}>
+                    <Grid item xs={12} lg={4} className={classes.listingFormContainer}>
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
                                 <Grid item xs={12} md={5}>
