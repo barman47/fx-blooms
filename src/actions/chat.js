@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SET_CHATS, SENT_MESSAGE } from './types';
+import { SET_CHATS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 
@@ -21,12 +21,7 @@ export const getChats = () => async (dispatch) => {
 
 export const sendMessage = (message) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/SendMessage`, message);
-        console.log(res);
-        // return dispatch({
-        //     type: SENT_MESSAGE,
-        //     payload: message
-        // });
+        await axios.post(`${api}/SendMessage`, message);
     } catch (err) {
         return handleError(err, dispatch);
     }

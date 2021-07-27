@@ -12,7 +12,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS } from '../../../utils/constants';
-import { SENT_MESSAGE } from '../../../actions/types';
+// import { SENT_MESSAGE } from '../../../actions/types';
 
 // import avatar from '../../../assets/img/avatar.jpg';
 
@@ -107,6 +107,7 @@ const Conversation = (props) => {
     const { chat, sessionId } = useSelector(state => state.chat);
 
     const [message, setMessage] = useState('');
+    const [messageList, setMessageList] = useState([]);
     const [connection, setConnection] = useState(null);
 
     useEffect(() => {
@@ -120,18 +121,34 @@ const Conversation = (props) => {
     }, []);
 
     useEffect(() => {
+        if (chat?.messages?.length > 0) {
+            setMessageList(chat?.messages);
+        }
+    }, [chat?.messages]);
+
+    useEffect(() => {
         if (connection) {
             connection.start()
                 .then(() => {
                     console.log('connected');
                     connection.on('ReceiveNotification', message => {
-                        console.log('message received ', message);
+                        console.log('message received ', JSON.parse(message));
+                        let response = JSON.parse(message);
+                        const newMessage = {
+                            chatId: response.chatId,
+                            dateSent: response.dateSent,
+                            id: response.Id,
+                            sender: response.sender,
+                            text: response.text,
+                            uploadedFileName: response.UploadedFileName
+                        };
 
-                        const { chatSessionId, ...rest } = message;
-                        dispatch({
-                            type: SENT_MESSAGE,
-                            payload: { ...rest }
-                        });
+                        // const { chatSessionId, ...rest } = message;
+                        // dispatch({
+                        //     type: SENT_MESSAGE,
+                        //     payload: message
+                        // });
+                        setMessageList([...messageList, newMessage]);
                         setMessage('');
                         // Notification.open({
                         //     message: 'New Notification',
@@ -143,7 +160,7 @@ const Conversation = (props) => {
                     console.error(err);
                 });
         }
-    }, [connection, dispatch]);
+    }, [connection, dispatch, messageList]);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -187,7 +204,7 @@ const Conversation = (props) => {
                             Ensure to read our <Link color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
                         </Typography>
                         <div className={classes.messages}>
-                            {chat?.messages && chat.messages.map((message, index) => (
+                            {messageList && messageList.map((message, index) => (
                                 <Typography 
                                     key={index} 
                                     variant="subtitle2" 

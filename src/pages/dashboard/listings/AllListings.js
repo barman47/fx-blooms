@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
@@ -165,20 +166,14 @@ const AllListings = (props) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings } = useSelector(state => state.listings);
+	const { listings, totalItemCount, currentPageNumber, hasNext } = useSelector(state => state.listings);
 	
 	const [open, setOpen] = useState(false);
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
 
 	useEffect(() => {
-		if (_.isEmpty(profile)) {
-			getCustomerInformation();
-		}
-		// eslint-disable-next-line
-	}, []);
-
-	useEffect(() => {
+		handleSetTitle('All Listings');
 		if (isAuthenticated && listings?.length === 0) {
 			getListingsOpenForBid({
 				pageNumber: 0,
@@ -189,9 +184,23 @@ const AllListings = (props) => {
 				useCurrencyFilter: false
 			});
 		}
-		handleSetTitle('All Listings');
+
+		if (_.isEmpty(profile)) {
+			getCustomerInformation();
+		}
 		// eslint-disable-next-line
 	}, []);
+
+	const getMoreListings = () => {
+		getListingsOpenForBid({
+			pageNumber: currentPageNumber + 1,
+			pageSize: 15,
+			currencyNeeded: 'NGN',
+			currencyAvailable: 'NGN',
+			minimumExchangeAmount: 0,
+			useCurrencyFilter: false
+		});	
+	};
 
 	const handleOpenModal = () => {
 		setOpen(true);
@@ -228,16 +237,23 @@ const AllListings = (props) => {
 						</div>
 					</header>
 					<section className={classes.listingContainer}>
-						{listings.length > 0 ? 
-							listings.map(listing => (
-								<Listing key={listing.id} listing={listing} />
-							))
-							:
-							<div className={classes.noListingContent}>
-								<FormatListText className={classes.noListingIcon} />
-								<Typography className={classes.noListingText} variant="subtitle2" component="span">No listings found</Typography>
-							</div>
-						}
+						<InfiniteScroll 
+							dataLength={totalItemCount ? totalItemCount : 0}
+							next={getMoreListings}
+							hasMore={hasNext}
+							loader={<h4>/</h4>}
+						>
+							{listings.length > 0 ? 
+								listings.map(listing => (
+									<Listing key={listing.id} listing={listing} />
+								))
+								:
+								<div className={classes.noListingContent}>
+									<FormatListText className={classes.noListingIcon} />
+									<Typography className={classes.noListingText} variant="subtitle2" component="span">No listings found</Typography>
+								</div>
+							}
+						</InfiniteScroll>
 					</section>
 				</Grid>
 				<Filter />
