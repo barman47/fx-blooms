@@ -154,11 +154,14 @@ const Login = (props) => {
         setOpen(false);
         setLoading(true);
         props.login(data);
-    };    
+    };   
 
     return (
         <>
-            <Helmet><title>Login | FXBlooms.com</title></Helmet>
+            <Helmet>
+                <title>Login | FXBlooms.com</title>
+                <meta name="description" content="Thanks for joining FXBLOOMS. Trust and security are our cornerstones. Log in to enjoy unbeatable rates and service." />
+            </Helmet>
             <TwoFactorModal open={showModal} />
             {loading && <Spinner />}
             <section className={classes.root}>

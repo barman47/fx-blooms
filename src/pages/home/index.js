@@ -7,7 +7,8 @@ import Contact from './Contact';
 const index = () => {
     return (
         <Layout
-            title="Home"
+            title="Peer-to-peercurrency exchange platform."
+            description="Your trusted P2P currency exchange platform. FXBLOOMS is committed to making currency exchange more accessible, secure and seamless."
         >
             <Hero />
             <Features />

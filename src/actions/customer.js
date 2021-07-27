@@ -3,6 +3,7 @@ import axios from 'axios';
 import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 import handleError from '../utils/handleError';
 // import reIssueToken from '../utils/reIssueToken';
+import setAuthToken from '../utils/setAuthToken';
 
 import { 
     SET_CURRENT_CUSTOMER, 
@@ -50,6 +51,7 @@ export const getCustomerInformation = () => async (dispatch) => {
 export const login = (data) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/login`, data);
+        setAuthToken(res.data.data.token);
         return dispatch({
             type: SET_CURRENT_CUSTOMER,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
@@ -187,4 +189,9 @@ export const resetPassword = (data) => async (dispatch) => {
     } catch (err) {
         return handleError(err, dispatch);
     }
+};
+
+export const logout = (history) => dispatch => {
+    dispatch({});
+    history.push('/');
 };

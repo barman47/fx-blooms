@@ -29,16 +29,10 @@ HideOnScroll.propTypes = {
 const useStyles = makeStyles(theme => ({
     root: {
         background: COLORS.white,
-        boxShadow: `0px 1px 0px #e5e9f2`
+        boxShadow: `0px 1px 0px #e5e9f2`,
     },
-
+    
     nav: {
-        paddingLeft: theme.spacing(10),
-        paddingRight: theme.spacing(10),
-
-        [theme.breakpoints.down('lg')]: { 
-            // padding: [[0, theme.spacing(5)]],
-        },
         [theme.breakpoints.down('md')]: { 
             display: 'none'
         }

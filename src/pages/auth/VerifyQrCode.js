@@ -130,8 +130,10 @@ const VerifyQrCode = (props) => {
     const sixthField = useRef();
 
     useEffect(() => {
-        if (location.state.twoFactorEnabled) {
-            setTwoFactorEnabled(location.state.twoFactorEnabled);
+        if (location.state) {
+            if (location.state.twoFactorEnabled) {
+                setTwoFactorEnabled(location.state.twoFactorEnabled);
+            }
         }
     }, [location.state]);
 

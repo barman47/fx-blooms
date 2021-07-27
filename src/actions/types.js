@@ -23,3 +23,6 @@ export const SET_CHATS = 'SET_CHATS';
 export const ENABLED_2FA = 'ENABLED_2FA';
 export const SET_2FA_MSG = 'SET_2FA_MSG';
 export const SET_BARCODE = 'SET_BARCODE';
+export const SET_CHAT = 'SET_CHAT';
+export const SENT_MESSAGE = 'SENT_MESSAGE';
+export const CANCELED_NEGOTIATION = 'CANCELED_NEGOTIATION';

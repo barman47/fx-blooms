@@ -19,6 +19,7 @@ export const authorizeTwoFactor = ({ code, profileId }, history) => async (dispa
     try {
         const res = await axios.post(`${api}/Authorize?inputCode=${code}&profileId=${profileId}`);
         const token = res.data.data;
+        console.log(res);
         setAuthToken(token);
         dispatch({
             type: SET_AUTH_TOKEN,
@@ -45,10 +46,12 @@ export const getBarcode = () => async (dispatch) => {
 export const enableTwoFactor = (code) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Enable?inputCode=${code}`);
+        const { token, message } = res.data.data;
+        setAuthToken(token);
         return batch(() => {
             dispatch({
                 type: SET_2FA_MSG,
-                payload: res.data.data
+                payload: message
             });
             dispatch({
                 type: ENABLED_2FA,

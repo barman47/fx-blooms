@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, SET_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_CHAT, SET_LISTINGS, UPDATED_LISTING } from './types';
 // import reIssueToken from '../utils/reIssueToken';
 
 const URL = `${API}/Listing`;
@@ -68,6 +69,49 @@ export const getListingsOpenForBid = (filter) => async (dispatch) => {
             type: SET_LISTINGS,
             payload: { listings: items, ...rest }
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const addBid = (bid, history) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${URL}/AddBid`, bid);
+        console.log(res);
+        dispatch({
+            type: SET_CHAT,
+            payload: {
+                sessionId: res.data.data
+            }
+        });
+        history.push(`${DASHBOARD}${MESSAGES}`)
+        // const { items, ...rest } = res.data.data;
+        // return dispatch({
+        //     type: SET_LISTINGS,
+        //     payload: { listings: items, ...rest }
+        // });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${URL}/CancelNegotiation?chatSessionId=${chatSessionId}`);
+        dispatch({
+            type: CANCELED_NEGOTIATION,
+            payload: res.data.data
+        });
+        history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const completeTransaction = (data, history) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${URL}/CompleteTransaction`, data);
+        history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     } catch (err) {
         return handleError(err, dispatch);
     }

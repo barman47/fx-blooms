@@ -39,6 +39,10 @@ const useStyles = makeStyles(theme => ({
     banner: {
         [theme.breakpoints.down('md')]: {
             display: 'none'
+        },
+
+        '& img': {
+            width: '100%'
         }
     },
 

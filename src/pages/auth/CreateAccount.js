@@ -163,7 +163,10 @@ const CreateAccount = (props) => {
 
     return (
         <>
-            <Helmet><title>Create Account | FXBlooms.com</title></Helmet>
+            <Helmet>
+                <title>Create Account | FXBlooms.com</title>
+                <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
+            </Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}

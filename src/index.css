@@ -1,5 +1,10 @@
 @import url('http://fonts.cdnfonts.com/css/br-firma');
 
+html {
+  width: 100vw;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -7,6 +12,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 code {

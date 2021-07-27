@@ -3,7 +3,8 @@ import {
     HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_LISTING,
-    UPDATED_LISTING 
+    UPDATED_LISTING, 
+    CANCELED_NEGOTIATION
 } from '../actions/types';
 import { LISTING_STATUS } from '../utils/constants';
 
@@ -52,7 +53,7 @@ const listingsReducer = (state = initialState, action) => {
             listingsList = [...state.listings];
             listing = {...action.payload.listing};
             listingId = listing.id;
-            listingIndex = listings.findIndex(listing => listing.id === listingId);
+            listingIndex = listingsList.findIndex(item => item.id === listingId);
             updatedListing = { ...listing };
             listingsList.splice(listingIndex, 1, updatedListing);
 
@@ -67,6 +68,22 @@ const listingsReducer = (state = initialState, action) => {
         case HIDE_NEGOTIATION_LISTINGS: 
             return {
                 listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
+            };
+
+        case CANCELED_NEGOTIATION:
+            listingsList = [...state.listings];
+            listing = {...action.payload.listing};
+            listingId = listing.id;
+            listingIndex = listingsList.findIndex(item => item.id === listingId);
+            updatedListing = { ...listing };
+            listingsList.splice(listingIndex, 1, updatedListing);
+
+            return {
+                ...state,
+                listing: {},
+                listings: [...listingsList],
+                updatedListing: !state.addedListing,
+                msg: action.payload.msg
             };
 
         default:

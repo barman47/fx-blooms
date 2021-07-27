@@ -12,6 +12,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.lightTeal,
         padding: [[theme.spacing(7), theme.spacing(5)]],
+
         [theme.breakpoints.down('sm')]: {
             paddingLeft: theme.spacing(2),
             paddingRight: theme.spacing(2)
@@ -60,9 +61,9 @@ const useStyles = makeStyles(theme => ({
 const Features = () => {
     const classes = useStyles();
     return (
-        <Grid container direction="row" className={classes.root}>
+        <section className={classes.root}>
+        <Grid container direction="row">
             <Grid item xs={12} lg={6}>
-                {/* <section className={classes.root}> */}
                 <Grid container direction="row" spacing={3}>
                     <Grid item xs={12} md={6}>
                         <div className={classes.item}>
@@ -108,13 +109,13 @@ const Features = () => {
                             <Link to={SIGN_UP} component={RouterLink} underline="none" className={classes.link}>Get Started</Link>
                         </div>
                     </Grid>
-                {/* </section> */}
                 </Grid>
             </Grid>
             <Grid item xs={12} lg={6} className={classes.imgContainer}>
                 <img src={listing} alt="Sample Listing" />
             </Grid>
         </Grid>
+        </section>
     );
 };
 
