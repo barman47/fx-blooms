@@ -3,6 +3,7 @@ import { Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
 import { COLORS } from '../../utils/constants';
+import { CONTACT_US } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -88,25 +89,25 @@ const Contact = () => {
     const [subject, setSubject] = useState('');
     const [message, setMessage] = useState('');
 
-    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        setErrors({});
     };
 
     return (
-        <section className={classes.root}>
+        <section className={classes.root} id={CONTACT_US}>
             <Grid container direction="row">
                 <Grid item xs={12} md={12} lg={6}>
                     <Typography variant="subtitle1" component="p" className={classes.title}>Connect with us on social media</Typography>
                     <br />
                     <div className={classes.social}>
-                        <a href="https://google.com" target="_blank" rel="noreferrer">
+                        <a href="https://www.instagram/fxblooms" target="_blank" rel="noreferrer">
                             <Instagram className={classes.icon} />
                         </a>
                     
-                        <a href="https://google.com" target="_blank" rel="noreferrer">
+                        <a href="https://www.linkedin.com/company/fxblooms/" target="_blank" rel="noreferrer">
                             <Linkedin className={classes.icon} />
                         </a>
                         <a href="https://google.com" target="_blank" rel="noreferrer">
@@ -183,7 +184,7 @@ const Contact = () => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">Subject</Typography>
+                                <Typography variant="subtitle2" component="span">Message</Typography>
                                 <TextField 
                                     className={classes.input}
                                     value={message}

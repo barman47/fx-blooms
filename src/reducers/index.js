@@ -1,5 +1,7 @@
 import { combineReducers } from 'redux';
 
+import { RESET_STORE } from '../actions/types';
+
 import accountReducer from './account';
 import adminReducer from './admin';
 import chatsReducer from './chat';
@@ -13,7 +15,7 @@ import errorsReducer from './errors';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
 
-const rootReducer = combineReducers({
+const appReducer = combineReducers({
     account: accountReducer,
     admin: adminReducer,
     countries: countriesReducer,
@@ -27,5 +29,12 @@ const rootReducer = combineReducers({
     subscription: subscriptionReducer,
     twoFactor: twoFactorReducer
 });
+
+const rootReducer = (state, action) => {
+    if (action.type === RESET_STORE) {
+        state = undefined;
+    }
+    return appReducer(state, action);
+};
 
 export default rootReducer;

@@ -16,9 +16,9 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import Toast from '../../components/common/Toast';
 
+import { logout } from '../../actions/customer';
 import { getBarcode } from '../../actions/twoFactor';
 import { COLORS } from '../../utils/constants';
-import cancelLogin from '../../utils/cancelLogin';
 import { VERIFY_2FA } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
@@ -168,7 +168,7 @@ const QrCode = (props) => {
                     />
                     <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                     <Button variant="contained" color="primary" component={RouterLink} to={VERIFY_2FA} className={classes.button}>Proceed</Button>
-                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => cancelLogin(history)}>Cancel</Button>
+                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button>
                 </div>
             </Container>
         </>
@@ -176,7 +176,8 @@ const QrCode = (props) => {
 }
 
 QrCode.propTypes = {
-    getBarcode: PropTypes.func.isRequired
+    getBarcode: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getBarcode })(QrCode);
+export default connect(undefined, { getBarcode, logout })(QrCode);

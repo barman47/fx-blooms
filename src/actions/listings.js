@@ -4,14 +4,14 @@ import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../routes';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_CHAT, SET_LISTINGS, UPDATED_LISTING } from './types';
-// import reIssueToken from '../utils/reIssueToken';
+import reIssueToken from '../utils/reIssueToken';
 
 const URL = `${API}/Listing`;
 
 export const getAllListings = () => async (dispatch) => {
     try {
         // console.log('reIssuing token');
-        // await reIssueToken();
+        await reIssueToken();
         // console.log('reIssued token');
         const res = await axios.post(`${URL}/GetAllListings`, {
             pageNumber: 0,
@@ -35,7 +35,7 @@ export const getAllListings = () => async (dispatch) => {
 
 export const addListing = (listing) => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
         console.log(res);
         return dispatch({
@@ -49,8 +49,8 @@ export const addListing = (listing) => async (dispatch) => {
 
 export const updateListing = (listing) => async (dispatch) => {
     try {
-        // await reIssueToken();
-        // console.log(listing);
+        await reIssueToken();
+        console.log('Editing listing ', listing);
         const res = await axios.patch(`${URL}/UpdateList`, listing);
         return dispatch({
             type: UPDATED_LISTING,
@@ -63,7 +63,9 @@ export const updateListing = (listing) => async (dispatch) => {
 
 export const getListingsOpenForBid = (filter) => async (dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, filter);
+        console.log(res);
         const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_LISTINGS,
@@ -76,6 +78,7 @@ export const getListingsOpenForBid = (filter) => async (dispatch) => {
 
 export const addBid = (bid, history) => async (dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.post(`${URL}/AddBid`, bid);
         console.log(res);
         dispatch({
@@ -97,6 +100,7 @@ export const addBid = (bid, history) => async (dispatch) => {
 
 export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.post(`${URL}/CancelNegotiation?chatSessionId=${chatSessionId}`);
         dispatch({
             type: CANCELED_NEGOTIATION,
@@ -110,7 +114,9 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
 
 export const completeTransaction = (data, history) => async (dispatch) => {
     try {
-        await axios.post(`${URL}/CompleteTransaction`, data);
+        await reIssueToken();
+        const res = await axios.post(`${URL}/CompleteTransaction`, data);
+        console.log(res);
         history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     } catch (err) {
         return handleError(err, dispatch);

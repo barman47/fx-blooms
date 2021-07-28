@@ -1,7 +1,7 @@
-export const ABOUT_US = '/aboutUs';
+export const ABOUT_US = 'aboutUs';
 export const BLOG = '/blog.fxblooms.com';
-export const WHY = '/whyFXBLOOMS';
-export const CONTACT_US = '/contactUs';
+export const WHY = 'whyFXBLOOMS';
+export const CONTACT_US = 'contactUs';
 export const SIGN_UP = '/user/signUp';
 export const CREATE_PROFILE = '/user/profile';
 export const LOGIN = '/user/login';

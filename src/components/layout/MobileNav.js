@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import ListItemText from '@material-ui/core/ListItemText';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import Typography from '@material-ui/core/Typography';
+import { Link as AnimatedLink } from 'react-scroll';
+import {
+    Drawer,
+    List,
+    ListItemText,
+    ListItemIcon,
+    Typography
+} from '@material-ui/core';
 import { AccountOutline, Home, Phone, Login } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
@@ -12,7 +15,7 @@ import { COLORS } from '../../utils/constants';
 
 import ListItemLink from './ListItemLink';
 
-import { CONTACT_US, SIGN_UP, LOGIN } from '../../routes';
+import { CONTACT_US, SIGN_UP, LOGIN, ABOUT_US, WHY } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -24,7 +27,15 @@ const useStyles = makeStyles(theme => ({
     },
 
     link: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+        color: 'inherit',
+        cursor: 'pointer',
+        textDecoration: 'none'
+    },
+
+    activeLink: {
+        color: theme.palette.primary.main,
+        fontWeight: 600
     },
 
     drawerLogo: {
@@ -62,12 +73,55 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItemLink>
-                    <ListItemLink button divider to={CONTACT_US} onClick={toggleDrawer}>
+                    <ListItemLink button divider onClick={toggleDrawer}>
                         <ListItemIcon>
                             <Phone />
                         </ListItemIcon>
-                        <ListItemText primary="Contact Us" />
+                        <AnimatedLink 
+                            to={WHY} 
+                            activeClass={classes.activeLink} 
+                            spy={true}
+                            smooth={true}
+                            offSet={-70}
+                            duration={500}
+                            className={classes.link}
+                            >
+                                Why FXBLOOMS
+                        </AnimatedLink>
                     </ListItemLink>
+                    <ListItemLink button divider onClick={toggleDrawer}>
+                        <ListItemIcon>
+                            <Phone />
+                        </ListItemIcon>
+                        <AnimatedLink 
+                            to={ABOUT_US} 
+                            activeClass={classes.activeLink} 
+                            spy={true}
+                            smooth={true}
+                            offSet={-70}
+                            duration={500}
+                            className={classes.link}
+                            >
+                                About Us
+                        </AnimatedLink>
+                    </ListItemLink>
+                    <ListItemLink button divider onClick={toggleDrawer}>
+                        <ListItemIcon>
+                            <Phone />
+                        </ListItemIcon>
+                        <AnimatedLink 
+                            to={CONTACT_US} 
+                            activeClass={classes.activeLink} 
+                            spy={true}
+                            smooth={true}
+                            offSet={-70}
+                            duration={500}
+                            className={classes.link}
+                            >
+                                Contact
+                        </AnimatedLink>
+                    </ListItemLink>
+                    
                     <ListItemLink button divider to={SIGN_UP} onClick={toggleDrawer}>
                         <ListItemIcon>
                             <AccountOutline />

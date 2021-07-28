@@ -15,10 +15,11 @@ import {
 	Select,
 	TextField,
 	Tooltip,
-	Typography 
+	Typography,
+	useMediaQuery 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
-import { FilterOutline, FormatListText } from 'mdi-material-ui';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { COLORS } from '../../../utils/constants';
@@ -30,7 +31,7 @@ import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
-import Listing from './Listing';
+import Listings from './Listings';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -87,29 +88,9 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		position: 'relative',
 		left: 0,
+		border: '1px solid red',
 		marginTop: theme.spacing(5)
 	},
-
-	noListingContent: {
-		backgroundColor: COLORS.lightTeal,
-        alignSelf: 'center',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100%',
-		padding: [[theme.spacing(4), 0]]
-    },
-
-    noListingIcon: {
-        color: theme.palette.primary.main
-    },
-
-    noListingText: {
-        color: COLORS.grey,
-        fontWeight: 300,
-        marginTop: theme.spacing(2)
-    },
 
 	filterContainer: {
 		backgroundColor: COLORS.lightTeal,
@@ -164,9 +145,12 @@ const useStyles = makeStyles(theme => ({
 
 const AllListings = (props) => {
 	const classes = useStyles();
+	const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
+
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, totalItemCount, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 	
 	const [open, setOpen] = useState(false);
 
@@ -174,15 +158,8 @@ const AllListings = (props) => {
 
 	useEffect(() => {
 		handleSetTitle('All Listings');
-		if (isAuthenticated && listings?.length === 0) {
-			getListingsOpenForBid({
-				pageNumber: 0,
-				pageSize: 15,
-				currencyNeeded: 'NGN',
-				currencyAvailable: 'NGN',
-				minimumExchangeAmount: 0,
-				useCurrencyFilter: false
-			});
+		if (isAuthenticated && _.isEmpty(listings)) {
+			getListings();
 		}
 
 		if (_.isEmpty(profile)) {
@@ -191,11 +168,24 @@ const AllListings = (props) => {
 		// eslint-disable-next-line
 	}, []);
 
+	const getListings = () => {
+		console.log('getting listings');
+		getListingsOpenForBid({
+			pageNumber: 0,
+			pageSize: 5,
+			currencyNeeded: 'EUR',
+			currencyAvailable: 'NGN',
+			minimumExchangeAmount: 0,
+			useCurrencyFilter: false
+		});
+	};
+
 	const getMoreListings = () => {
+		console.log('getting listings');
 		getListingsOpenForBid({
 			pageNumber: currentPageNumber + 1,
 			pageSize: 15,
-			currencyNeeded: 'NGN',
+			currencyNeeded: 'EUR',
 			currencyAvailable: 'NGN',
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
@@ -215,7 +205,7 @@ const AllListings = (props) => {
 	};
 
 	return (
-		<section className={classes.root}>
+		<section className={classes.root} id="parent">
 			<Tooltip title="Filter Listings" arrow>
 				<Fab 
 					className={classes.fab} 
@@ -236,25 +226,28 @@ const AllListings = (props) => {
 							<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
 						</div>
 					</header>
-					<section className={classes.listingContainer}>
-						<InfiniteScroll 
-							dataLength={totalItemCount ? totalItemCount : 0}
-							next={getMoreListings}
-							hasMore={hasNext}
-							loader={<h4>/</h4>}
-						>
-							{listings.length > 0 ? 
-								listings.map(listing => (
-									<Listing key={listing.id} listing={listing} />
-								))
-								:
-								<div className={classes.noListingContent}>
-									<FormatListText className={classes.noListingIcon} />
-									<Typography className={classes.noListingText} variant="subtitle2" component="span">No listings found</Typography>
-								</div>
-							}
-						</InfiniteScroll>
-					</section>
+					<InfiniteScroll 
+						className={classes.listingContainer}
+						dataLength={listings.length || 5}
+						next={getMoreListings}
+						hasMore={hasNext}
+						scrollThreshold={1}
+						loader={<h4>Fetching Listings . . .</h4>}
+						refreshFunction={getListings}
+						pullDownToRefresh
+						pullDownToRefreshThreshold={80}
+						releaseToRefreshContent={
+							matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+						}
+						pullDownToRefreshContent={
+							matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+						}
+						// endMessage={}
+						scrollableTarget="parent"
+						height="100%"
+					>
+						<Listings />
+					</InfiniteScroll>
 				</Grid>
 				<Filter />
 			</Grid>
@@ -266,11 +259,11 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
-	const { currencies } = useSelector(state => state);
+	const { currencies, listings } = useSelector(state => state);
 
 	const [AvailableCurrency, setAvailableCurrency] = useState('');
 	const [RequiredCurrency, setRequiredCurrency] = useState('');
-	const [Amount, setAmount] = useState('');
+	const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
 	const [SellerRating, setSellerRating] = useState('');
 	// eslint-disable-next-line
@@ -285,18 +278,23 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 		// eslint-disable-next-line
 	}, []);
 
+	useEffect(() => {
+		setLoading(false);
+	}, [listings]);
+
 	const handleClearFilter = () => {
 		setFilter(PRICE);
 		setAvailableCurrency('');
 		setRequiredCurrency('');
-		setAmount('');
+		setMinExchangeAmount('');
 		setSellerRating('');
 		setErrors({});
+		setLoading(false);
 
 		props.getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
-			currencyNeeded: 'NGN',
+			currencyNeeded: 'EUR',
 			currencyAvailable: 'NGN',
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
@@ -318,7 +316,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 				pageNumber: 0,
 				pageSize: 15,
 				currencyAvailable: 'NGN',
-				currencyNeeded: 'NGN',
+				currencyNeeded: 'EUR',
 				minimumExchangeAmount: 0,
 				useCurrencyFilter: false,
 				useRatingFilter: true,
@@ -329,7 +327,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 			const priceFilter = {
 				AvailableCurrency,
 				RequiredCurrency,
-				Amount
+				MinExchangeAmount
 			};
 			const { errors, isValid } = validatePriceFilter(priceFilter);
 
@@ -344,8 +342,8 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
 				currencyNeeded: RequiredCurrency,
-				minimumExchangeAmount: Number(Amount),
-				useCurrencyFilter: true,
+				minimumExchangeAmount: Number(MinExchangeAmount),
+				useCurrencyFilter: false,
 				useRatingFilter: false,
 				sellerRating: 0
 			});
@@ -458,15 +456,15 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 						</Grid>
 						<Grid item xs={7}>
 							<TextField 
-								value={Amount}
-								onChange={(e) => setAmount(e.target.value)}
+								value={MinExchangeAmount}
+								onChange={(e) => setMinExchangeAmount(e.target.value)}
 								type="text"
 								variant="outlined" 
 								placeholder="Enter Amount"
-								helperText={errors.Amount}
+								helperText={errors.MinExchangeAmount}
 								fullWidth
 								required
-								error={errors.Amount ? true : false}
+								error={errors.MinExchangeAmount ? true : false}
 							/>
 						</Grid>
 						<Grid item xs={12}>

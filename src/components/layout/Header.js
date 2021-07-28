@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { AppBar, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
+import { Link as AnimatedLink } from 'react-scroll';
 import { Menu as MenuIcon } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -40,12 +41,19 @@ const useStyles = makeStyles(theme => ({
 
     link: {
         color: COLORS.darkGrey,
+        cursor: 'pointer',
         fontWeight: 300,
+        textDecoration: 'none',
         transition: '0.3s linear all',
 
         '&:hover': {
             color: theme.palette.primary.main
         }
+    },
+
+    activeLink: {
+        color: theme.palette.primary.main,
+        fontWeight: 600
     },
 
     signUp: {
@@ -90,13 +98,43 @@ const Header = (props) => {
                                     </Link>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={WHY} className={classes.link} component={RouterLink} underline="none">Why FXBLOOMS</Link>
+                                    <AnimatedLink 
+                                        to={WHY} 
+                                        activeClass={classes.activeLink} 
+                                        spy={true}
+                                        smooth={true}
+                                        offSet={-70}
+                                        duration={500}
+                                        className={classes.link}
+                                        >
+                                            Why FXBLOOMS
+                                    </AnimatedLink>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={ABOUT_US} className={classes.link} component={RouterLink} underline="none">About Us</Link>
+                                    <AnimatedLink 
+                                        to={ABOUT_US} 
+                                        activeClass={classes.activeLink} 
+                                        spy={true}
+                                        smooth={true}
+                                        offSet={-70}
+                                        duration={500}
+                                        className={classes.link}
+                                        >
+                                            About Us
+                                    </AnimatedLink>
                                 </Grid>
                                 <Grid item>
-                                    <Link to={CONTACT_US} className={classes.link} component={RouterLink} underline="none">Contact</Link>
+                                    <AnimatedLink 
+                                        to={CONTACT_US} 
+                                        activeClass={classes.activeLink} 
+                                        spy={true}
+                                        smooth={true}
+                                        offSet={-70}
+                                        duration={500}
+                                        className={classes.link}
+                                        >
+                                            Contact
+                                    </AnimatedLink>
                                 </Grid>
                             </Grid>
                         </Grid>

@@ -3,12 +3,13 @@ import axios from 'axios';
 import { SET_CHATS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
+import reIssueToken from '../utils/reIssueToken';
 
 const api = `${API}/Chat`;
 
 export const getChats = () => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.get(`${api}/Chats`);
         return dispatch({
             type: SET_CHATS,
@@ -21,6 +22,7 @@ export const getChats = () => async (dispatch) => {
 
 export const sendMessage = (message) => async (dispatch) => {
     try {
+        await reIssueToken();
         await axios.post(`${api}/SendMessage`, message);
     } catch (err) {
         return handleError(err, dispatch);

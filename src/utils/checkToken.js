@@ -1,4 +1,5 @@
 import { store } from '../store';
+import { LOGIN } from '../routes';
 
 export const tokenExpired = () => {
     const generated = new Date(store.getState().customer.timeGenerated).getTime();
@@ -23,15 +24,17 @@ export const tokenExpiring = () => {
     const time = now - generated;
     const minutes = (time) / (60) / 1000;
 
-    if (time >= 240000) {
+    if (time >= 240000 && time < 300000) {
         console.log('expiring soon ', Math.floor(minutes) + ' minutes');
         // Token expired, Logout
         return true;
-    } else {
-        console.log('not expired ', Math.floor(minutes) + ' minutes');
-        // Token not expired
-        return false;
-    }
+    } 
+    if (time >= 300000) {
+        console.log('experd  ', Math.floor(minutes) + ' minutes');
+        window.location.href = LOGIN;
+        // Token expired, Logout
+        return true;
+    } 
 };
 
 export default tokenExpired;

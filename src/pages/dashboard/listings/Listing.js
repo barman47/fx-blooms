@@ -116,8 +116,12 @@ const Listing = ({ addBid, listing, getSeller }) => {
         return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
     };
 
-    const handleAddBid = (e) => {
+    const handleAddBid = (e, listing) => {
         e.preventDefault();
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
         addBid({
             listingId: id,
             amount: {
@@ -207,7 +211,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            onClick={handleAddBid}
+                            onClick={(e) => handleAddBid(e, listing)}
                         >
                             Contact
                         </Button>

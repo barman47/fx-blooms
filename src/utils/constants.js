@@ -23,6 +23,7 @@ export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'
 
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
+export const ATTACHMENT_LIMIT = 15000000; // 15 Megabytes
 
 export const LISTING_STATUS = {
     open: 'OPEN',

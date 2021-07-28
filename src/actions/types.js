@@ -27,3 +27,4 @@ export const SET_CHAT = 'SET_CHAT';
 export const EXIT_CHAT = 'EXIT_CHAT';
 export const SENT_MESSAGE = 'SENT_MESSAGE';
 export const CANCELED_NEGOTIATION = 'CANCELED_NEGOTIATION';
+export const RESET_STORE = 'RESET_STORE';

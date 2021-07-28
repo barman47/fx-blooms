@@ -9,6 +9,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
+import { Link as AnimatedLink, animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';
 
 import { BLOG, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
@@ -42,6 +43,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     logo: {
+        cursor: 'pointer',
         [theme.breakpoints.down('md')]: {
             margin: '0 auto 20px auto',
             width: 'initial'
@@ -84,6 +86,7 @@ const useStyles = makeStyles(theme => ({
 
     link: {
         color: COLORS.offWhite,
+        cursor: 'pointer',
         fontWeight: 200,
         textDecoration: 'none',
 
@@ -119,14 +122,23 @@ const Footer = () => {
         <footer className={classes.root}>
             <section className={classes.content}>
                 <div>
-                    <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
+                    <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
                         FXBLOOMS gives YOU the autonomy to exchange on your own terms - after all, it's YOUR money, YOU should have total control over it.
                     </Typography>
                 </div>
                 <div>
                     <Typography variant="h6">Company</Typography>
-                    <Link className={classes.link} underline="hover" to={ABOUT_US} component={RouterLink}>About Us</Link>
+                    <AnimatedLink 
+                        to={ABOUT_US} 
+                        spy={true}
+                        smooth={true}
+                        offSet={-70}
+                        duration={500}
+                        className={classes.link}
+                        >
+                            About us
+                    </AnimatedLink>
                     <Link className={classes.link} underline="hover" to={PRIVACY_POLICY} target="_blank" component={RouterLink}>Privacy Policy</Link>
                     <Link className={classes.link} underline="hover" to={TERMS} component={RouterLink}>Terms &amp; Conditions</Link>
                 </div>
@@ -139,7 +151,16 @@ const Footer = () => {
                 <div>
                     <Typography variant="h6">Help</Typography>
                     <Link className={classes.link} underline="hover" to={FAQS} component={RouterLink}>FAQs</Link>
-                    <Link className={classes.link} underline="hover" to={`#${CONTACT_US}`} component={RouterLink}>Contact Us</Link>
+                    <AnimatedLink 
+                        to={CONTACT_US} 
+                        spy={true}
+                        smooth={true}
+                        offSet={-70}
+                        duration={500}
+                        className={classes.link}
+                        >
+                            Contact Us
+                    </AnimatedLink>
                 </div>
                 <div>
                     <Typography variant="h6">Connect</Typography>

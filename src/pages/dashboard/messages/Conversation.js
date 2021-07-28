@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
@@ -6,13 +6,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, Send } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
-// import axios from 'axios';
+import axios from 'axios';
+import _ from 'lodash';
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
 
 import { sendMessage } from '../../../actions/chat';
-import { COLORS } from '../../../utils/constants';
-import { SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
+import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+import isEmpty from '../../../utils/isEmpty';
 
 // import avatar from '../../../assets/img/avatar.jpg';
 
@@ -113,11 +115,23 @@ const Conversation = (props) => {
 
     const { customerId } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
+    const listings = useSelector(state => state.listings.listings);
+
+    const { sendMessage } = props;
 
     const [message, setMessage] = useState('');
+    const [attachment, setAttachment] = useState(null);
+    // eslint-disable-next-line
+    const [attachmentUrl, setAttachmentUrl] = useState('');
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
     const [newMessage, setNewMessage] = useState(false);
+    // eslint-disable-next-line
+    const [loading, setLoading] = useState(false);
+    // eslint-disable-next-line
+    const [loadingText, setLoadingText] = useState('');
+    // eslint-disable-next-line
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
@@ -132,6 +146,16 @@ const Conversation = (props) => {
         };
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
+            const listing = listings.find(item => item.id === chat.listing);
+            dispatch({
+                type: SET_LISTING,
+                payload: listing
+            });
+        }
+    }, [chat, dispatch, listings]);
 
     // useEffect(() => {
     //     console.log('setting messages');
@@ -182,30 +206,77 @@ const Conversation = (props) => {
         }
     }, [connection, dispatch, connected, newMessage]);
 
+    const uploadAttachment = useCallback(async () => {
+        try {
+            if (attachment.size / ATTACHMENT_LIMIT > 1) {
+                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
+            }
+
+            setLoadingText('Sending File . . ');
+            setLoading(true);
+            const data = new FormData();
+            data.append(`${attachment.name}`, attachment);
+            const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/Upload`, data, {
+                'Content-Type': 'multipart/form-data'
+            });
+            setAttachmentUrl(res.data.fileName);
+            setLoading(false);
+            console.log(res);
+            
+            const chatMessage = {
+                chatSessionId: sessionId,
+                message: '',
+                documentName: res.data.fileName
+            };
+
+            sendMessage(chatMessage);
+        } catch (err) {
+            return handleError(err, 'attachment', 'File not sent');
+        }
+    }, [attachment, sessionId, sendMessage]);
+
+    useEffect(() => {
+        if (attachment) {
+            uploadAttachment();
+        }
+    }, [attachment, uploadAttachment]);
+
+    const handleError = (err, key, msg) => {
+        console.log(err.response);
+        console.error(err);
+        setLoading(false);
+        if (err?.message === NETWORK_ERROR) {
+            return setErrors({ msg:  NETWORK_ERROR });    
+        }
+
+        return setErrors({ [`${key}`]: msg || 'Upload Failed' });
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
-
-        // const chatMessage = {
-        //     user: customerId,
-        //     message
-        // };
-
-        const chatMessage = {
-            chatSessionId: sessionId,
-            message,
-            documentName: 'document'
-        };
-
-        props.sendMessage(chatMessage);
-
-        // if (connection.connectionStarted) {
-        //     try {
-        //         await connection.send('ReceiveNotification', chatMessage);
-        //     } catch (err) {
-        //         console.error(err);
-        //     }
-        // }
+        if (!isEmpty(message)) {
+            const chatMessage = {
+                chatSessionId: sessionId,
+                message,
+                documentName: ''
+            };
+    
+            sendMessage(chatMessage);
+        }
     };
+
+    const handleSelectAttachment = () => document.getElementById('attachment').click();
+
+    // const handleSetAttachment = (e) => {
+    //     // setAttachment(e.target.files[0]);
+    //     const reader = new FileReader();
+
+    //     reader.onload = (() => {
+    //         const file = reader.result; //Array Buffer
+    //         setAttachment(file);
+    //     });
+    //     reader.readAsDataURL(e.target.files[0]);
+    // };
 
     return (
         <>
@@ -224,49 +295,68 @@ const Conversation = (props) => {
                             Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
                         </Typography>
                         <div className={classes.messages}>
-                            {chat?.messages && chat.messages.map((message, index) => (
-                                <Typography 
-                                    key={index} 
-                                    variant="subtitle2" 
-                                    component="span" 
-                                    className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
-                                >
-                                    {message.text}
-                                </Typography>
+                            {chat?.messages && chat.messages.map((message) => (
+                                <>
+                                {!isEmpty(message.uploadedFileName) ? 
+                                    <a key={message.id} href={message.uploadedFileName}>attachment</a>
+                                    :
+                                    <Typography 
+                                        key={message.id} 
+                                        variant="subtitle2" 
+                                        component="span" 
+                                        className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                    >
+                                        {message.text}
+                                    </Typography>
+                                }
+                                </>
                             ))}
                         </div>
                         <form onSubmit={onSubmit} noValidate className={classes.form}>
                             <Grid container direction="row">
                                 <TextField 
-                                    className={classes.input}
-                                    type="text"
-                                    variant="outlined"
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Enter message"
-                                    multiline
-                                    rows={1}
-                                    fullWidth
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    color="primary"
-                                                    aria-label="attach-file"
-                                                >
-                                                    <Attachment />
-                                                </IconButton>
-                                                <IconButton
-                                                    color="primary"
-                                                    aria-label="send-message"
-                                                    onClick={onSubmit}
-                                                >
-                                                    <Send />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
+                                        onChange={(e) =>setAttachment(e.target.files[0])}
+                                        id="attachment"
+                                        style={{ display: 'none' }}
+                                        type="file"
+                                        variant="outlined" 
+                                        accept=".png,.jpg,.pdf.,doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                                        fullWidth
+                                        required
+                                    />
+                                <Grid item>
+                                    <TextField 
+                                        className={classes.input}
+                                        type="text"
+                                        variant="outlined"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        placeholder="Enter message"
+                                        multiline
+                                        rows={1}
+                                        fullWidth
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        color="primary"
+                                                        aria-label="attach-file"
+                                                        onClick={handleSelectAttachment}
+                                                    >
+                                                        <Attachment />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        color="primary"
+                                                        aria-label="send-message"
+                                                        onClick={onSubmit}
+                                                    >
+                                                        <Send />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </Grid>
                             </Grid>
                         </form>
                 </section>

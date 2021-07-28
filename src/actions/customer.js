@@ -1,11 +1,13 @@
 import axios from 'axios';
 
+import { LOGIN } from '../routes';
 import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 import handleError from '../utils/handleError';
-// import reIssueToken from '../utils/reIssueToken';
+import reIssueToken from '../utils/reIssueToken';
 import setAuthToken from '../utils/setAuthToken';
 
 import { 
+    RESET_STORE,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
     SET_CUSTOMERS,
@@ -37,7 +39,7 @@ export const createCustomer = (customer) => async (dispatch) => {
 
 export const getCustomerInformation = () => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.get(`${api}/CustomerInformation`);
         dispatch({
             type: SET_CUSTOMER_PROFILE,
@@ -63,6 +65,7 @@ export const login = (data) => async (dispatch) => {
 
 export const addResidentPermit = (data) => async (dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.post(`${api}/AddResidencePermit`, data);
         console.log(res);
         // dispatch({
@@ -117,6 +120,7 @@ export const getCustomers = () => async (dispatch) => {
 
 export const getCustomer = (customerId) => async(dispatch) => {
     try {
+        // Issue admin token
         const res = await axios.get(`${api}/GetCustomer/${customerId}`);
         console.log(res);
         return dispatch({
@@ -130,6 +134,7 @@ export const getCustomer = (customerId) => async(dispatch) => {
 
 export const getSeller = (sellerId) => async(dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.get(`${api}/Seller/${sellerId}`);
         return dispatch({
             type: SET_CUSTOMER,
@@ -142,6 +147,7 @@ export const getSeller = (sellerId) => async(dispatch) => {
 
 export const reportSeller = (message) => async(dispatch) => {
     try {
+        await reIssueToken();
         const res = await axios.post(`${api}/ReportSeller`, message);
         return dispatch({
             type: SET_CUSTOMER_MSG,
@@ -154,7 +160,7 @@ export const reportSeller = (message) => async(dispatch) => {
 
 export const setCustomerStatus = ({ customerID, status, currentStatus }) => async (dispatch) => {
     try {
-        // await reIssueToken();
+        // Issue admin token
         const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
         const msg = res.data.data;
         return dispatch({
@@ -192,6 +198,7 @@ export const resetPassword = (data) => async (dispatch) => {
 };
 
 export const logout = (history) => dispatch => {
-    dispatch({});
-    history.push('/');
+    setAuthToken(null);
+    dispatch({ type: RESET_STORE });
+    history.push(LOGIN);
 };

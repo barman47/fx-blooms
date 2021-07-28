@@ -5,7 +5,7 @@ const priceFilter = (data) => {
     let errors = {};
     data.AvailableCurrency = !isEmpty(data.AvailableCurrency) ?  data.AvailableCurrency.toString() : '';
     data.RequiredCurrency = !isEmpty(data.RequiredCurrency) ?  data.RequiredCurrency.toString() : '';
-    data.Amount = !isEmpty(data.Amount) ?  data.Amount.toString() : '';
+    data.MinExchangeAmount = !isEmpty(data.MinExchangeAmount) ?  data.MinExchangeAmount.toString() : '';
 
     if (Validator.isEmpty(data.AvailableCurrency)) {
         errors.AvailableCurrency = 'Please select a currency!';
@@ -15,11 +15,11 @@ const priceFilter = (data) => {
         errors.RequiredCurrency = 'Please select a currency!';
     }
 
-    if (!Validator.isNumeric(data.Amount) || data.Amount <= 0) {
-        errors.Amount = 'Invalid amount!';
+    if (!Validator.isNumeric(data.MinExchangeAmount) || data.MinExchangeAmount <= 0) {
+        errors.MinExchangeAmount = 'Invalid amount!';
     }
-    if (Validator.isEmpty(data.Amount)) {
-        errors.Amount = 'Amount is required!';
+    if (Validator.isEmpty(data.MinExchangeAmount)) {
+        errors.MinExchangeAmount = 'Amount is required!';
     }
     return {
         errors,

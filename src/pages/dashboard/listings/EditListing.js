@@ -12,14 +12,14 @@ import {
     Select,
     TextField,
     Tooltip,
-    Typography,
-    useMediaQuery 
+    Typography
 } from '@material-ui/core';
 
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 import EditListingItem from './EditListingItem';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 import { updateListing } from '../../../actions/listings';
@@ -104,8 +104,6 @@ const useStyles = makeStyles(theme => ({
 const EditListing = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('md'));
     const { currencies } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
     const { listing, listings, updatedListing, msg } = useSelector(state => state.listings);
@@ -165,12 +163,12 @@ const EditListing = (props) => {
     }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
-        if (updatedListing && msg && !matches) {
+        if (updatedListing && msg) {
             resetForm();
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
-    }, [updatedListing, dispatch, matches, msg]);
+    }, [updatedListing, dispatch, msg]);
 
     useEffect(() => {
         if (!isEmpty(listing)) {
@@ -219,7 +217,7 @@ const EditListing = (props) => {
 
         const { errors, isValid } = validateAddListing(data);
         if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid login data' });
+            return setErrors({ ...errors, msg: 'Invalid data' });
         }
 
         setErrors({});
@@ -244,6 +242,15 @@ const EditListing = (props) => {
 
     return (
         <section className={classes.root}>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} />
             <header>
                 <div>

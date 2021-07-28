@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -12,10 +13,9 @@ import {
     Select,
     TextField,
     Tooltip,
-    Typography,
-    useMediaQuery 
+    Typography
 } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import {FormatListText } from 'mdi-material-ui';
 
 import SellerAccountModal from './SellerAccountModal';
@@ -30,6 +30,7 @@ import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
+import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import ResidencePermitModal from './ResidencePermitModal';
 
@@ -128,8 +129,7 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('md'));
+    const history = useHistory();
     const dispatch = useDispatch();
     const { customer, currencies, documents } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
@@ -200,7 +200,7 @@ const MakeListing = (props) => {
     }, [listings]);
 
     useEffect(() => {
-        if (addedListing && !matches) {
+        if (addedListing) {
             resetForm();
             successModal.current.openModal();
             successModal.current.setModalText(msg);
@@ -208,7 +208,7 @@ const MakeListing = (props) => {
                 type: ADDED_LISTING
             });
         }
-    }, [addedListing, dispatch, matches, msg]);
+    }, [addedListing, dispatch, msg]);
 
     // const handleSetReceiptAmount = (e) => {
     //     if (isEmpty(e.target.value)) {
@@ -257,6 +257,8 @@ const MakeListing = (props) => {
         setListingFee('');
         setLoading(false);
     };
+
+    const dismissSuccessModal = () => history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -316,7 +318,7 @@ const MakeListing = (props) => {
                 />
             }
             <section className={classes.root}>
-                <SuccessModal ref={successModal} />
+                <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} />
                 <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
@@ -327,7 +329,7 @@ const MakeListing = (props) => {
                     <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography>
                 </header>
                 <Grid container direction="row" spacing={4} className={classes.container}>
-                    <Grid item xs={12} lg={4} className={classes.listingFormContainer}>
+                    <Grid item xs={12} lg={4}>
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
                                 <Grid item xs={12} md={5}>

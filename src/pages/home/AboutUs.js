@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { SIGN_UP } from '../../routes';
+import { ABOUT_US, SIGN_UP } from '../../routes';
 
 import img from '../../assets/img/about.png';
 
@@ -32,7 +32,7 @@ const AboutUs = () => {
     const classes = useStyles();
 
     return (
-        <Grid container direction="row" spacing={5} className={classes.root}>
+        <Grid container direction="row" spacing={5} className={classes.root} id={ABOUT_US}>
             <Grid item xs={12} lg={5}>
                 <Grid container direction="column" spacing={5}>
                     <Grid item>

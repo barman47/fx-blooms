@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
+
+import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
 import avatar from '../../assets/img/avatar.jpg';
@@ -178,7 +180,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Dashboard = ({ children, title }) => {
+const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const history = useHistory();
     const location = useLocation();
@@ -225,36 +227,12 @@ const Dashboard = ({ children, title }) => {
         history.push(`/dashboard${link}`);
     };
 
+    const handleLogout = () => logout(history);
+
     return (
         <>
             <Helmet><title>{`${title} | FXBlooms.com`}</title></Helmet>
             <section className={classes.root}>
-                {/* <AppBar 
-                    position="fixed"
-                    color="transparent"
-                    elevation={1}
-                    className={clsx(classes.appBar, {
-                        [classes.appBarShift]: open
-                    })}
-                >
-                    <Toolbar>
-                        <IconButton 
-                            edge="start" 
-                            className={clsx(classes.menuButton, {
-                                [classes.hide]: open,
-                            })}
-                            color="inherit" 
-                            aria-label="open drawer"
-                            onClick={handleDrawerOpen}
-                        >
-                            <Menu />
-                        </IconButton>
-                        <Typography variant="h6" className={classes.title}>
-                            News
-                        </Typography>
-                        <Button color="inherit">Login</Button>
-                    </Toolbar>
-                </AppBar> */}
                 <Drawer 
                     variant="permanent"
                     className={clsx(classes.drawer, {
@@ -286,7 +264,6 @@ const Dashboard = ({ children, title }) => {
                             }
                         </IconButton>
                     </div> 
-                    {/* <Divider /> */}
                     <List className={classes.links}>
                         {links.map((link, index) => (
                             <ListItem 
@@ -315,7 +292,7 @@ const Dashboard = ({ children, title }) => {
                             </div>
                         </Link>
                         <Divider />
-                        <ListItem button className={classes.logout}>
+                        <ListItem button className={classes.logout} onClick={handleLogout}>
                             <ListItemIcon>
                                 <Logout />
                             </ListItemIcon>
@@ -328,9 +305,6 @@ const Dashboard = ({ children, title }) => {
                 </div>
                 <Box
                     boxShadow={5}
-                    // bgcolor="background.paper"
-                    // m={1}
-                    // p={1}
                     className={classes.bottomBar}
                 >
                     <BottomNavigation
@@ -351,7 +325,8 @@ const Dashboard = ({ children, title }) => {
 };
 
 Dashboard.propTypes = {
+    logout: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
 };
 
-export default Dashboard;
+export default connect(undefined, { logout })(Dashboard);

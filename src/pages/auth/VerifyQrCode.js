@@ -18,11 +18,11 @@ import Spinner from '../../components/common/Spinner';
 import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
+import { logout } from '../../actions/customer';
 import { authorizeTwoFactor, enableTwoFactor } from '../../actions/twoFactor';
 import { DASHBOARD, DASHBOARD_HOME } from '../../routes';
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
-import cancelLogin from '../../utils/cancelLogin';
 import validateAuthenticatorCode from '../../utils/validation/customer/authenticator';
 
 import logo from '../../assets/img/logo.svg';
@@ -347,7 +347,7 @@ const VerifyQrCode = (props) => {
                         </Grid>
                         <div className={classes.buttonContainer}>
                             <Button variant="contained" color="primary" className={classes.button} type="submit">Proceed</Button>
-                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>cancelLogin(history)}>Cancel</Button>
+                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>props.logout(history)}>Cancel</Button>
                         </div>
                     </form>
                 </div>
@@ -358,7 +358,8 @@ const VerifyQrCode = (props) => {
 
 VerifyQrCode.propTypes = {
     authorizeTwoFactor: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired,
     enableTwoFactor: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { authorizeTwoFactor, enableTwoFactor })(VerifyQrCode);
+export default connect(undefined, { authorizeTwoFactor, enableTwoFactor, logout })(VerifyQrCode);
