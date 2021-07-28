@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Divider, Grid, Radio, TextField, Typography } from '@material-ui/core';
+import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -21,6 +22,7 @@ const Actions = () => {
 
     const [successfulTransaction, setSuccessfulTransaction] = useState(false);
     const [ratingComment, setRatingComment] = useState('');
+    const [sellerRating, setSellerRating] = useState(0);
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -80,7 +82,7 @@ const Actions = () => {
                                 <Typography variant="subtitle1" component="p">Rate this user</Typography>
                             </Grid>
                             <Grid item>
-                                <Typography variant="subtitle1" component="p">Star Rating Here . . .</Typography>
+                                <Rating name=""seller-rating  value={sellerRating} onChange={(e) => setSellerRating(e.target.value)} className={classes.rating} />
                             </Grid>
                             <Grid item>
                                 <TextField 

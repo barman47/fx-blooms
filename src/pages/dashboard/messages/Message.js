@@ -46,17 +46,17 @@ const Message = ({ handleSetChat, conversation }) => {
                             {conversation && userName === conversation.buyerUsername ? conversation.sellerUsername : conversation.buyerUsername
                             }
                         </Typography>
-                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{conversation?.messages[conversation?.messages.length - 1]?.text}</Typography>
+                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{conversation?.messages?.length > 0 && conversation.messages[conversation.messages.length - 1].text}</Typography>
                     </Grid>
                 </Grid>
             </Grid>
             <Grid item>
                 <Grid container direction="column">
                     <Grid item>
-                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{moment(conversation?.messages[conversation?.messages.length - 1]?.dateSent).format('h:mma')}</Typography>
+                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{moment(conversation?.messages?.length > 0 && conversation.messages[conversation.messages.length - 1].dateSent).format('h:mma')}</Typography>
                     </Grid>
                     <Grid item>
-                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{moment(conversation?.messages[conversation?.messages.length - 1]?.dateSent).fromNow()}</Typography>
+                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{moment(conversation?.messages?.length > 0 && conversation.messages[conversation.messages.length - 1].dateSent).fromNow()}</Typography>
                     </Grid>
                 </Grid>
             </Grid>
@@ -65,7 +65,7 @@ const Message = ({ handleSetChat, conversation }) => {
 };
 
 Message.propTypes = {
-    conversation: PropTypes.func.isRequired,
+    conversation: PropTypes.object.isRequired,
     handleSetChat: PropTypes.func.isRequired
 };
 

@@ -32,7 +32,7 @@ const Messages = (props) => {
 	const handleSetChat = (chat) => {
 		dispatch({
 			type: SET_CHAT,
-			payload: { chat }
+			payload: chat
 		});
 	};
 

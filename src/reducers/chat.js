@@ -1,4 +1,4 @@
-import { SET_CHAT, SET_CHATS, SENT_MESSAGE } from '../actions/types';
+import { EXIT_CHAT, SET_CHAT, SET_CHATS, SENT_MESSAGE } from '../actions/types';
 
 const initialState = {
     chat: null,
@@ -9,27 +9,41 @@ const initialState = {
 const chatsReducer = (state = initialState, action) => {
     let messageList = [];
     let chat = {};
+    let chats = [];
+    let chatIndex;
+
     switch (action.type) {    
         case SET_CHATS:
             return {
                 ...state,
                 chats: [...action.payload]
-            };  
+            }; 
+            
+        case EXIT_CHAT:
+            chats = [...state.chats];
+            chat = {...state.chat};
+            chatIndex = chats.findIndex(item => item.id === chat.id);
+            chats.splice(chatIndex, 1, chat);
+            return {
+                ...state,
+                chat: null,
+                chats,
+            };
 
         case SET_CHAT:
             return {
                 ...state,
-                chat: { ...action.payload.chat },
-                sessionId: action.payload.sessionId || action.payload.chat.id
+                chat: action.payload,
+                sessionId: action.payload.sessionId || action.payload.id
             };
 
         case SENT_MESSAGE: 
-            messageList = [...state.chat.messages, action.payload];
-            const { messages, ...rest } = chat;
+            const { messages, ...rest } = state.chat;
+            messageList = [...messages, action.payload];
+            
             return {
                 ...state,
-                // chat: { ...state.chat, messages: state.chat.messages ? [...state.chat.messages, action.payload] : [action.payload] }
-                chat: { ...rest, messages: [...messageList] }
+                chat: { ...rest, messages: messageList }
             }
 
         default:

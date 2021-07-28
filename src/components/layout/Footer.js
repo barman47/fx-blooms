@@ -137,6 +137,11 @@ const Footer = () => {
                     <Link className={classes.link} underline="hover" to={BLOG} target="_blank" component={RouterLink}>Blog</Link>
                 </div>
                 <div>
+                    <Typography variant="h6">Help</Typography>
+                    <Link className={classes.link} underline="hover" to={FAQS} component={RouterLink}>FAQs</Link>
+                    <Link className={classes.link} underline="hover" to={`#${CONTACT_US}`} component={RouterLink}>Contact Us</Link>
+                </div>
+                <div>
                     <Typography variant="h6">Connect</Typography>
                     <a className={classes.link} href="mailto:hello@fxblooms.com">hello@fxblooms.com</a>
                     <a className={classes.link} href="tel:+234 812 345 6789">(+234) 812 345 6789</a>
@@ -145,7 +150,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('https://www.linkedin.com/company/cyberkach/', '_blank', 'noopener,noreferrer')
+                                    window.open('https://www.instagram/fxblooms', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Instagram />
@@ -155,7 +160,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('https://www.linkedin.com/company/cyberkach/', '_blank', 'noopener,noreferrer')
+                                    window.open('https://www.linkedin.com/company/fxblooms/', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Linkedin />
@@ -165,7 +170,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('https://www.linkedin.com/company/cyberkach/', '_blank', 'noopener,noreferrer')
+                                    window.open('', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Twitter />
@@ -175,7 +180,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('https://www.linkedin.com/company/cyberkach/', '_blank', 'noopener,noreferrer')
+                                    window.open('', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Telegram />
@@ -183,15 +188,10 @@ const Footer = () => {
                         </Tooltip>
                     </section>
                 </div>
-                <div>
-                    <Typography variant="h6">Help</Typography>
-                    <Link className={classes.link} underline="hover" to={FAQS} component={RouterLink}>FAQs</Link>
-                    <Link className={classes.link} underline="hover" to={`#${CONTACT_US}`} component={RouterLink}>Contact Us</Link>
-                </div>
             </section>
             <Divider className={classes.divider} />
             <Typography variant="subtitle2" component="span" className={classes.copyright}>
-                FXBLOOMS &copy; {new Date().getFullYear()} All rights reserved.
+                FXBLOOMS O&#220;, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
             </Typography>  
         </footer>
     );

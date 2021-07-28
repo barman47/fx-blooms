@@ -12,7 +12,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS } from '../../../utils/constants';
-// import { SENT_MESSAGE } from '../../../actions/types';
+import { SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
 
 // import avatar from '../../../assets/img/avatar.jpg';
 
@@ -60,8 +60,10 @@ const useStyles = makeStyles(theme => ({
     },
     
     messages: {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
+        display: 'flex',
+        flexDirection: 'column',
+        // display: 'grid',
+        // gridTemplateColumns: '1fr',
         // gridAutoFlow: 'row',
         gap: theme.spacing(1),
         overflowY: 'scroll',
@@ -80,12 +82,18 @@ const useStyles = makeStyles(theme => ({
 
     me: {
         backgroundColor: '#069595',
+        flexBasis: 'initial',
+        flexGrow: 1,
+        flexShrink: 0,
+        border: '1px solid red',
         color: COLORS.offWhite,
-        justifySelf: 'flex-end'
+        alignSelf: 'flex-end'
     },
 
     recipient: {
         backgroundColor: `${COLORS.lightGrey} !important`,
+        flexBasis: 'initial',
+        border: '1px solid red',
         // color: COLORS.grey,
     },
 
@@ -107,8 +115,9 @@ const Conversation = (props) => {
     const { chat, sessionId } = useSelector(state => state.chat);
 
     const [message, setMessage] = useState('');
-    const [messageList, setMessageList] = useState([]);
     const [connection, setConnection] = useState(null);
+    const [connected, setConnected] = useState(false);
+    const [newMessage, setNewMessage] = useState(false);
 
     useEffect(() => {
         const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
@@ -117,50 +126,61 @@ const Conversation = (props) => {
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
         console.log(connect);
         setConnection(connect);
+
+        return () => {
+            dispatch({ type: EXIT_CHAT });
+        };
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (chat?.messages?.length > 0) {
-            setMessageList(chat?.messages);
-        }
-    }, [chat?.messages]);
+    // useEffect(() => {
+    //     console.log('setting messages');
+    //     if (chat?.messages?.length > 0) {
+    //         setMessageList(chat?.messages);
+    //     }
+    // }, [chat?.messages]);
 
     useEffect(() => {
-        if (connection) {
+        setNewMessage(false);
+    }, [chat]);
+
+    useEffect(() => {
+        if (connection && !connected) {
             connection.start()
                 .then(() => {
                     console.log('connected');
+                    setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        console.log('message received ', JSON.parse(message));
-                        let response = JSON.parse(message);
-                        const newMessage = {
-                            chatId: response.chatId,
-                            dateSent: response.dateSent,
-                            id: response.Id,
-                            sender: response.sender,
-                            text: response.text,
-                            uploadedFileName: response.UploadedFileName
-                        };
+                        if (!newMessage) {
+                            setNewMessage(true);
+                            let response = JSON.parse(message);
+                            const newMessage = {
+                                chatId: response.ChatId,
+                                dateSent: response.DateSent,
+                                id: response.Id,
+                                sender: response.Sender,
+                                text: response.Text,
+                                uploadedFileName: response.UploadedFileName
+                            };
 
-                        // const { chatSessionId, ...rest } = message;
-                        // dispatch({
-                        //     type: SENT_MESSAGE,
-                        //     payload: message
-                        // });
-                        setMessageList([...messageList, newMessage]);
-                        setMessage('');
-                        // Notification.open({
-                        //     message: 'New Notification',
-                        //     description: message
-                        // });
+                            dispatch({
+                                type: SENT_MESSAGE,
+                                payload: newMessage
+                            });
+                            setMessage('');
+                            // Notification.open({
+                            //     message: 'New Notification',
+                            //     description: message
+                            // });
+                        }
                     });
                 })
                 .catch(err => {
+                    setConnected(false);
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, messageList]);
+    }, [connection, dispatch, connected, newMessage]);
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -201,10 +221,10 @@ const Conversation = (props) => {
                     </Grid>
                     <section className={classes.messageContainer}>
                         <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
-                            Ensure to read our <Link color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
+                            Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
                         </Typography>
                         <div className={classes.messages}>
-                            {messageList && messageList.map((message, index) => (
+                            {chat?.messages && chat.messages.map((message, index) => (
                                 <Typography 
                                     key={index} 
                                     variant="subtitle2" 
