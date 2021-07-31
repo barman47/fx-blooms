@@ -133,13 +133,13 @@ const Footer = () => {
                         to={ABOUT_US} 
                         spy={true}
                         smooth={true}
-                        offSet={-70}
+                        offset={-70}
                         duration={500}
                         className={classes.link}
                         >
                             About us
                     </AnimatedLink>
-                    <Link className={classes.link} underline="hover" to={PRIVACY_POLICY} target="_blank" component={RouterLink}>Privacy Policy</Link>
+                    <Link className={classes.link} underline="hover" to={PRIVACY_POLICY} component={RouterLink}>Privacy Policy</Link>
                     <Link className={classes.link} underline="hover" to={TERMS} component={RouterLink}>Terms &amp; Conditions</Link>
                 </div>
                 <div>
@@ -155,7 +155,7 @@ const Footer = () => {
                         to={CONTACT_US} 
                         spy={true}
                         smooth={true}
-                        offSet={-70}
+                        offset={-70}
                         duration={500}
                         className={classes.link}
                         >

@@ -172,7 +172,7 @@ const AllListings = (props) => {
 		console.log('getting listings');
 		getListingsOpenForBid({
 			pageNumber: 0,
-			pageSize: 5,
+			pageSize: 15,
 			currencyNeeded: 'EUR',
 			currencyAvailable: 'NGN',
 			minimumExchangeAmount: 0,

@@ -10,7 +10,8 @@ import { SET_CHAT } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
 	root: {
-		height: '100%',
+		// height: '100%',
+		position: 'sticky'
 		// overflowY: 'scroll'
 	}
 }));
@@ -38,8 +39,8 @@ const Messages = (props) => {
 
     return (
 		<section className={classes.root}>
-			{chats.map(chat => (
-				<Message key={chat.id} conversation={chat} handleSetChat={() => handleSetChat(chat)} />
+			{chats.map((chat, index) => (
+				<Message key={index} conversation={chat} handleSetChat={() => handleSetChat(chat)} />
 			))}
 		</section>
     );

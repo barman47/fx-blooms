@@ -103,7 +103,7 @@ const Header = (props) => {
                                         activeClass={classes.activeLink} 
                                         spy={true}
                                         smooth={true}
-                                        offSet={-70}
+                                        offset={-70}
                                         duration={500}
                                         className={classes.link}
                                         >
@@ -116,7 +116,7 @@ const Header = (props) => {
                                         activeClass={classes.activeLink} 
                                         spy={true}
                                         smooth={true}
-                                        offSet={-70}
+                                        offset={-70}
                                         duration={500}
                                         className={classes.link}
                                         >
@@ -129,7 +129,7 @@ const Header = (props) => {
                                         activeClass={classes.activeLink} 
                                         spy={true}
                                         smooth={true}
-                                        offSet={-70}
+                                        offset={-70}
                                         duration={500}
                                         className={classes.link}
                                         >

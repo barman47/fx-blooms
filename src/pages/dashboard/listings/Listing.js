@@ -112,8 +112,10 @@ const Listing = ({ addBid, listing, getSeller }) => {
 
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
-        getSeller(sellerId);
-        return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
+        if (userId !== customerId) {
+            getSeller(sellerId);
+            return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
+        }
     };
 
     const handleAddBid = (e, listing) => {
@@ -145,7 +147,13 @@ const Listing = ({ addBid, listing, getSeller }) => {
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
-                        Listed by: <RouterLink to={`${DASHBOARD}${USER_DETAILS}`} onClick={(e) =>handleSetCustomer(e, customerId)}><span style={{ color: theme.palette.primary.main }}>{listedBy}</span></RouterLink>
+                        Listed by: 
+                        <RouterLink 
+                            to={`${DASHBOARD}${USER_DETAILS}`} 
+                            onClick={(e) =>handleSetCustomer(e, customerId)}
+                            >
+                                <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
+                        </RouterLink>
                     </Typography>
                     <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
                 </header>

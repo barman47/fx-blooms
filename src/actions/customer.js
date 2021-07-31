@@ -13,7 +13,8 @@ import {
     SET_CUSTOMERS,
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER,
-    SET_CUSTOMER_MSG
+    SET_CUSTOMER_MSG,
+    GET_ERRORS
  } from './types';
 
 const api = `${API}/Customer`;
@@ -45,6 +46,35 @@ export const getCustomerInformation = () => async (dispatch) => {
             type: SET_CUSTOMER_PROFILE,
             payload: res.data.data
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const checkUserName = (username) => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/Available/username/${username}`);
+        const { data, message, status } = res.data.data;
+
+        if (status === false) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {
+                    msg: message,
+                    usernames: data,
+                    usernameAvailable: status,
+                    Username: message
+                }
+            });
+        } else {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {
+                    usernameAvailable: status
+                }
+            });
+        }
+        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }

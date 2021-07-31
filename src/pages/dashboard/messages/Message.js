@@ -35,6 +35,31 @@ const Message = ({ handleSetChat, conversation }) => {
     const { userName } = useSelector(state => state.customer);
 
     return (
+        // <Grid onClick={handleSetChat} container direction="row" justify="space-between" alignItems="center" className={classes.message}>
+        //     <Grid item>
+        //         <Grid container direction="row" alignItems="center" spacing={1}>
+        //             <Grid item>
+        //                 <Avatar src={avatar} alt="Avatar Alt" />
+        //             </Grid>
+        //             <Grid item>
+        //                 <Typography variant="subtitle1" component="p">
+        //                     barman
+        //                 </Typography>
+        //                 <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>8:14pm</Typography>
+        //             </Grid>
+        //         </Grid>
+        //     </Grid>
+        //     <Grid item>
+        //         <Grid container direction="column">
+        //             <Grid item>
+        //                 <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>2 days ago</Typography>
+        //             </Grid>
+        //             <Grid item>
+        //                 <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{moment(conversation?.messages?.length > 0 && conversation.messages[conversation.messages.length - 1].dateSent).fromNow()}</Typography>
+        //             </Grid>
+        //         </Grid>
+        //     </Grid>
+        // </Grid>
         <Grid onClick={handleSetChat} container direction="row" justify="space-between" alignItems="center" className={classes.message}>
             <Grid item>
                 <Grid container direction="row" alignItems="center" spacing={1}>

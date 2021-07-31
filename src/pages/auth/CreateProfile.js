@@ -392,7 +392,7 @@ const CreateProfile = (props) => {
             }
 
             if (file.size / UPLOAD_LIMIT > 1) {
-                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
+                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 1MB' });
             }
 
             setLoadingText('Uploading Photo . . .');
@@ -419,7 +419,7 @@ const CreateProfile = (props) => {
             }
 
             if (file.size / UPLOAD_LIMIT > 1) {
-                return setErrors({ msg: 'File too large', idFront: 'Photo must not be greater than 3MB' });
+                return setErrors({ msg: 'File too large', idFront: 'Photo must not be greater than 1MB' });
             }
 
             setLoadingText('Uploading ID Front . . .');
@@ -721,7 +721,9 @@ const CreateProfile = (props) => {
                                         style={{ display: 'none' }}
                                         type="file"
                                         variant="outlined" 
-                                        accept="image/*"
+                                        inputProps={{
+                                            accept: 'image/*'
+                                        }}
                                         helperText={errors.Photo || 'Upload a clear Photo of your face'}
                                         fullWidth
                                         required

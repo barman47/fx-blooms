@@ -20,35 +20,38 @@ import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        // border: '1px solid red'
         height: '100%',
-        borderBottom: `1px solid ${COLORS.borderColor}`,
-        borderRight: `1px solid ${COLORS.borderColor}`,
-        borderTop: `1px solid ${COLORS.borderColor}`,
-        position: 'relative',
-        top: 0,
+        border: `1px solid ${COLORS.borderColor}`,
+        // borderBottom: `1px solid ${COLORS.borderColor}`,
+        // borderRight: `1px solid ${COLORS.borderColor}`,
+        // borderTop: `1px solid ${COLORS.borderColor}`,
+        position: 'sticky',
+        bottom: theme.spacing(1),
         left: 0,
-        overflowY: 'scroll',
+        overflowY: 'hidden'
     },
     
     header: {
         backgroundColor: COLORS.lightTeal,
         padding: theme.spacing(3),
-        // position: 'fixed',
+        position: 'sticky',
         top: 0,
-        left: 0,
-        width: '100%'
+        left: 0
     },
     
     messageContainer: {
-        border: '1px solid red',
-        height: '100%',
-        // overflowY: 'scroll',
-        padding: [[0, theme.spacing(3)]],
+        // height: '55%',
+        height: theme.spacing(95),
         position: 'relative',
         top: 0,
-        left: 0,
-        // paddingBottom: theme.spacing(10),
+        overflowY: 'scroll',
+        paddingLeft: theme.spacing(2),
+        paddingRight: theme.spacing(2),
+        zIndex: -1,
+
+        [theme.breakpoints.down('lg')]: {
+            height: theme.spacing(55),
+        }
     },
     
     disclaimer: {
@@ -64,49 +67,57 @@ const useStyles = makeStyles(theme => ({
     messages: {
         display: 'flex',
         flexDirection: 'column',
-        // display: 'grid',
-        // gridTemplateColumns: '1fr',
-        // gridAutoFlow: 'row',
+        flexGrow: 0,
         gap: theme.spacing(1),
-        overflowY: 'scroll',
+        height: '68vh',
+        // overflowY: 'scroll',
+        paddingBottom: theme.spacing(1),
         position: 'relative',
         zIndex: 2,
+
+        overflowY: ["hidden", "-moz-scrollbars-none"],
+        scrollbarWidth: "none",
+        msOverflowStyle: "none",
+
+        '&::-webkit-scrollbar': {
+            display: 'none'
+        },
+
+        [theme.breakpoints.down('lg')]: {
+            height: '55vh',
+        },
 
         '& span': {
             borderRadius: theme.shape.borderRadius,
             display: 'inline-block',
             fontSize: theme.spacing(1.5),
             fontWeight: 300,
-            padding: theme.spacing(1),
-            width: '75%'
+            padding: theme.spacing(1)
         }
     },
 
     me: {
         backgroundColor: '#069595',
-        flexBasis: 'initial',
-        flexGrow: 1,
-        flexShrink: 0,
-        border: '1px solid red',
         color: COLORS.offWhite,
         alignSelf: 'flex-end'
     },
 
     recipient: {
+        alignSelf: 'flex-start',
         backgroundColor: `${COLORS.lightGrey} !important`,
-        flexBasis: 'initial',
-        border: '1px solid red',
-        // color: COLORS.grey,
     },
 
     input: {
         backgroundColor: COLORS.lightTeal,
-        border: 'none !important'
+        border: 'none !important',
+        width: '100%'
     },
 
     form: {
-        position: 'fixed',
-        bottom: 0
+        position: 'sticky',
+        bottom: 0,
+        width: '100%',
+        zIndex: 2
     }
 }));
 const Conversation = (props) => {
@@ -312,54 +323,57 @@ const Conversation = (props) => {
                                 </>
                             ))}
                         </div>
-                        <form onSubmit={onSubmit} noValidate className={classes.form}>
-                            <Grid container direction="row">
-                                <TextField 
-                                        onChange={(e) =>setAttachment(e.target.files[0])}
-                                        id="attachment"
-                                        style={{ display: 'none' }}
-                                        type="file"
-                                        variant="outlined" 
-                                        accept=".png,.jpg,.pdf.,doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                                        fullWidth
-                                        required
-                                    />
-                                <Grid item>
-                                    <TextField 
-                                        className={classes.input}
-                                        type="text"
-                                        variant="outlined"
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="Enter message"
-                                        multiline
-                                        rows={1}
-                                        fullWidth
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        aria-label="attach-file"
-                                                        onClick={handleSelectAttachment}
-                                                    >
-                                                        <Attachment />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="primary"
-                                                        aria-label="send-message"
-                                                        onClick={onSubmit}
-                                                    >
-                                                        <Send />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </Grid>
-                            </Grid>
-                        </form>
+                        
                 </section>
+                <form onSubmit={onSubmit} noValidate className={classes.form}>
+                    <Grid container direction="row">
+                        <TextField 
+                                onChange={(e) =>setAttachment(e.target.files[0])}
+                                id="attachment"
+                                style={{ display: 'none' }}
+                                type="file"
+                                variant="outlined" 
+                                fullWidth
+                                required
+                                inputProps={{
+                                    accept: ".png,.jpg,.pdf"
+                                }}
+                            />
+                        <Grid item xs={12}>
+                            <TextField 
+                                className={classes.input}
+                                type="text"
+                                variant="outlined"
+                                value={message}
+                                onChange={(e) => setMessage(e.target.value)}
+                                placeholder="Enter message"
+                                multiline
+                                rows={1}
+                                fullWidth
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton
+                                                color="primary"
+                                                aria-label="attach-file"
+                                                onClick={handleSelectAttachment}
+                                            >
+                                                <Attachment />
+                                            </IconButton>
+                                            <IconButton
+                                                color="primary"
+                                                aria-label="send-message"
+                                                onClick={onSubmit}
+                                            >
+                                                <Send />
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                            />
+                        </Grid>
+                    </Grid>
+                </form>
             </section>
             :
                 <div></div>

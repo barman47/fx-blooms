@@ -8,7 +8,7 @@ import {
     ListItemIcon,
     Typography
 } from '@material-ui/core';
-import { AccountOutline, Home, Phone, Login } from 'mdi-material-ui';
+import { AccountOutline, Home, InformationVariant, Phone, Login, Help } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
@@ -75,7 +75,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                     </ListItemLink>
                     <ListItemLink button divider onClick={toggleDrawer}>
                         <ListItemIcon>
-                            <Phone />
+                            <Help />
                         </ListItemIcon>
                         <AnimatedLink 
                             to={WHY} 
@@ -91,7 +91,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                     </ListItemLink>
                     <ListItemLink button divider onClick={toggleDrawer}>
                         <ListItemIcon>
-                            <Phone />
+                            <InformationVariant />
                         </ListItemIcon>
                         <AnimatedLink 
                             to={ABOUT_US} 

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { 
     Button, 
@@ -11,18 +11,22 @@ import {
     InputAdornment, 
     TextField, 
     Tooltip, 
-    Typography 
+    Typography,
+    Zoom 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
+import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
+import { checkUserName } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
 import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
+import { GET_ERRORS } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import validateSignUp from '../../utils/validation/customer/createAccount';
 
@@ -98,12 +102,29 @@ const useStyles = makeStyles(theme => ({
         '&:hover': {
             textDecoration: 'none'
         }
+    },
+
+    usernames: {
+        display: 'flex',
+        flexDirection: 'row',
+        flexWrap: 'wrap'
+    },
+
+    suggestedUsername: {
+        borderRadius: '5px',
+        cursor: 'pointer',
+        backgroundColor: COLORS.offWhite,
+        padding: theme.spacing(1),
+        marginLeft: theme.spacing(1),
+        marginTop: theme.spacing(1),
     }
 }));
 
 const CreateAccount = (props) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const { countries } = useSelector(state => state);
+    const errorsState = useSelector(state => state.errors);
 
     const [Email, setEmail] = useState('');
     const [Username, setUsername] = useState('');
@@ -114,23 +135,55 @@ const CreateAccount = (props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
     const history = useHistory();
 
     const toast = useRef();
+    const usernameRef = useRef();
 
     useEffect(() => {
         if (countries.length === 0) {
             props.getCountries();
         }
+
+        return () => {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        };
         // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
-        setErrors(errors);
         if (!isEmpty(errors)) {
             toast.current.handleClick();
         }
     }, [errors]);
+
+    useEffect(() => {
+        if (errorsState.usernameAvailable === true) {
+            history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+        }
+    }, [Email, Password, Username, history, errorsState.usernameAvailable]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors(errorsState);
+            setLoading(false);
+        }
+    }, [errorsState]);
+    
+    useEffect(() => {
+        if (errors.usernameAvailable === false) {
+            usernameRef.current.focus();
+        }
+    }, [errors.usernameAvailable]);
+
+    const copyUsername = (username) => {
+        setUsername(username);
+    };
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -157,8 +210,10 @@ const CreateAccount = (props) => {
             return setErrors({ ...errors, msg: 'Invalid sign up data' });
         }
 
+        setLoading(true);
         setErrors({});
-        history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+        dispatch({ type: GET_ERRORS, payload: {} });
+        props.checkUserName(Username);
     };
 
     return (
@@ -167,6 +222,7 @@ const CreateAccount = (props) => {
                 <title>Create Account | FXBlooms.com</title>
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
+            {loading && <Spinner text="One moment . . ." />}
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -212,6 +268,7 @@ const CreateAccount = (props) => {
                                         fullWidth
                                         required
                                         error={errors.Email ? true : false}
+                                        disabled={loading ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -224,10 +281,29 @@ const CreateAccount = (props) => {
                                         variant="outlined" 
                                         placeholder="Enter Username"
                                         helperText={errors.Username || 'Username cannot be changed once set.'}
+                                        ref={usernameRef}
                                         fullWidth
                                         required
                                         error={errors.Username ? true : false}
+                                        disabled={loading ? true : false}
                                     />
+                                    {errors.usernames &&
+                                        <div className={classes.usernames}>
+                                            {errors.usernames.map((username, index) => (
+                                                <Tooltip title={`Select ${username}`} TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
+                                                    <Typography 
+                                                        key={index} 
+                                                        variant="subtitle2" 
+                                                        component="span" 
+                                                        className={classes.suggestedUsername}
+                                                        onClick={() => copyUsername(username)}
+                                                        >
+                                                            {username}
+                                                    </Typography>
+                                                </Tooltip>
+                                            ))}
+                                        </div>
+                                    }
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span">Password</Typography>
@@ -262,6 +338,7 @@ const CreateAccount = (props) => {
                                                 </InputAdornment>
                                             )
                                         }}
+                                        disabled={loading ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -297,6 +374,7 @@ const CreateAccount = (props) => {
                                                 </InputAdornment>
                                             )
                                         }}
+                                        disabled={loading ? true : false}
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
@@ -327,7 +405,8 @@ const CreateAccount = (props) => {
 };
 
 CreateAccount.propTypes = {
+    checkUserName: PropTypes.func.isRequired,
     getCountries: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCountries })(CreateAccount);
+export default connect(undefined, { checkUserName, getCountries })(CreateAccount);

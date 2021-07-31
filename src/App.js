@@ -19,6 +19,10 @@ import ResetPassword from './pages/auth/ResetPassword';
 import QrCode from './pages/auth/QrCode';
 import VerifyQrCode from './pages/auth/VerifyQrCode';
 
+import Faqs from './pages/faqs';
+import PrivacyPolicy from './pages/privacyPolicy';
+import TermsAndConditions from './pages/termsAndConditions';
+
 import Dashboard from './pages/dashboard';
 
 import AllListings from './pages/dashboard/listings/AllListings';
@@ -59,7 +63,10 @@ import {
 	USER_DETAILS,
 	PROFILE,
 	FORGOT_PASSWORD,
-	RESET_PASSWORD
+	RESET_PASSWORD,
+	TERMS,
+	FAQS,
+	PRIVACY_POLICY
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -139,6 +146,9 @@ const [title, setTitle] = useState('');
 						<Route path={CREATE_PROFILE} exact component={CreateProfile} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
+						<Route path={TERMS} exact component={TermsAndConditions} />
+						<Route path={FAQS} exact component={Faqs} />
+						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
 						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />

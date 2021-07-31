@@ -42,7 +42,6 @@ const useStyles = makeStyles(theme => ({
     },
 
     detail: {
-        // border: '1px solid green',
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         rowGap: theme.spacing(2),
@@ -83,7 +82,7 @@ const UserDetails = (props) => {
     const [Message, setMessage] = useState('');
     const [sellerId, setSellerId] = useState('');
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
+
     const [errors, setErrors] = useState({});
 
     const successModal = useRef();
@@ -146,12 +145,6 @@ const UserDetails = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.title}>Phone Number</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>{seller?.userName}</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>{seller?.phoneNumber}</Typography>
-                        </div>
-                        <div className={classes.detail}>
-                            <Typography variant="subtitle2" component="span" className={classes.title}>City</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.title}>Country</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.text}>{seller?.city}</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.text}>{seller?.country}</Typography>
                         </div>
                         <div className={classes.detail}>
                             <Typography variant="subtitle2" component="span" className={classes.title}>Successful Transactions</Typography>
