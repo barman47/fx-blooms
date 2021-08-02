@@ -19,12 +19,12 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
-import Toast from '../../components/common/Toast';
+// import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
 import { registerCustomer } from '../../actions/customer';
 
-import isEmpty from '../../utils/isEmpty';
+// import isEmpty from '../../utils/isEmpty';
 import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
 import { GET_ERRORS } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
@@ -144,8 +144,9 @@ const CreateAccount = (props) => {
 
     const history = useHistory();
 
-    const toast = useRef();
+    // const toast = useRef();
     const usernameRef = useRef();
+    const emailRef = useRef();
 
     useEffect(() => {
         if (countries.length === 0) {
@@ -161,11 +162,11 @@ const CreateAccount = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-        }
-    }, [errors]);
+    // useEffect(() => {
+    //     if (!isEmpty(errors)) {
+    //         toast.current.handleClick();
+    //     }
+    // }, [errors]);
 
     useEffect(() => {
         if (errorsState.usernameAvailable === true) {
@@ -185,6 +186,24 @@ const CreateAccount = (props) => {
             usernameRef.current.focus();
         }
     }, [errors.usernameAvailable]);
+
+    useEffect(() => {
+        if (errors.emailAvailable === false) {
+            emailRef.current.focus();
+        }
+    }, [errors.emailAvailable]);
+
+    useEffect(() => {
+        if (typeof errors.Username === 'object') {
+            const { Username, ...rest } = errors;
+            setErrors({
+                ...rest,
+                Username: Username[0],
+                Email: Username[1],
+
+            });
+        }
+    }, [errors]);
 
     const copyUsername = (username) => {
         setUsername(username);
@@ -233,7 +252,7 @@ const CreateAccount = (props) => {
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
             {loading && <Spinner text="One moment . . ." />}
-            {!isEmpty(errors) && 
+            {/* {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
@@ -241,7 +260,7 @@ const CreateAccount = (props) => {
                     msg={errors.msg || ''}
                     type="error"
                 />
-            }
+            } */}
             <section className={classes.root}>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -274,10 +293,11 @@ const CreateAccount = (props) => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Email Address"
-                                        helperText={errors.Email || errors.EmailAddress || errors.Username[1]}
+                                        helperText={errors.Email || errors.EmailAddress}
+                                        ref={emailRef}
                                         fullWidth
                                         required
-                                        error={errors.Email || errors.EmailAddress || errors.Username[1] ? true : false}
+                                        error={errors.Email || errors.EmailAddress ? true : false}
                                         disabled={loading ? true : false}
                                     />
                                 </Grid>
@@ -290,7 +310,7 @@ const CreateAccount = (props) => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Username"
-                                        helperText={errors.Username[0] || errors.Username || 'Username cannot be changed once set.'}
+                                        helperText={errors.Username || 'Username cannot be changed once set.'}
                                         ref={usernameRef}
                                         fullWidth
                                         required

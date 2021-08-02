@@ -12,6 +12,8 @@ export const PRIVACY_POLICY = '/privacyPolicy';
 export const FAQS = '/frequentlyAskedQuestions';
 export const SETUP_2FA = '/user/twoFactor';
 export const VERIFY_2FA = '/user/twoFactor/verify';
+export const ID_VERIFICATION_SUCCESS = '/user/verificationSuccess';
+export const ID_VERIFICATION_FAILURE = '/user/verificationFailure';
 
 export const ADMIN_LOGIN = '/login/admin';
 export const ADMIN_DASHBOARD = '/admin';
