@@ -22,7 +22,7 @@ import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
-import { checkUserName } from '../../actions/customer';
+import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
 import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
@@ -218,7 +218,12 @@ const CreateAccount = (props) => {
         setLoading(true);
         setErrors({});
         dispatch({ type: GET_ERRORS, payload: {} });
-        props.checkUserName(Username);
+        props.registerCustomer(Username, Email);
+        // props.registerCustomer({
+        //     EmailAddress: data.Email,
+        //     Username,
+        //     Password
+        // });
     };
 
     return (
@@ -269,10 +274,10 @@ const CreateAccount = (props) => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Email Address"
-                                        helperText={errors.Email}
+                                        helperText={errors.Email || errors.EmailAddress || errors.Username[1]}
                                         fullWidth
                                         required
-                                        error={errors.Email ? true : false}
+                                        error={errors.Email || errors.EmailAddress || errors.Username[1] ? true : false}
                                         disabled={loading ? true : false}
                                     />
                                 </Grid>
@@ -285,7 +290,7 @@ const CreateAccount = (props) => {
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Username"
-                                        helperText={errors.Username || 'Username cannot be changed once set.'}
+                                        helperText={errors.Username[0] || errors.Username || 'Username cannot be changed once set.'}
                                         ref={usernameRef}
                                         fullWidth
                                         required
@@ -410,8 +415,8 @@ const CreateAccount = (props) => {
 };
 
 CreateAccount.propTypes = {
-    checkUserName: PropTypes.func.isRequired,
+    registerCustomer: PropTypes.func.isRequired,
     getCountries: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { checkUserName, getCountries })(CreateAccount);
+export default connect(undefined, { registerCustomer, getCountries })(CreateAccount);

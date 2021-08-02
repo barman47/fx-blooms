@@ -51,30 +51,39 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-export const checkUserName = (username) => async (dispatch) => {
-    try {
-        const res = await axios.get(`${api}/Available/username/${username}`);
-        const { data, message, status } = res.data.data;
+// export const registerCustomer = (customer) => async (dispatch) => {
+//     try {
+//         const res = await axios.post(`${api}/CreateCustomerV2`, customer);
+//         window.location.href = res.data.data;
+//     } catch (err) {
+//         return handleError(err, dispatch);
+//     }
+// };
 
-        if (status === false) {
+export const registerCustomer = (username, email) => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/Available/username/${username}/email/${email}`);
+        const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
+
+        if (isEmailAvailable && isUsernameAvailable) {
             dispatch({
                 type: GET_ERRORS,
                 payload: {
-                    msg: message,
-                    usernames: data,
-                    usernameAvailable: status,
-                    Username: message
+                    usernameAvailable: true
                 }
             });
         } else {
             dispatch({
                 type: GET_ERRORS,
                 payload: {
-                    usernameAvailable: status
+                    msg: message,
+                    usernames: generatedUsernames,
+                    usernameAvailable: isUsernameAvailable,
+                    emailAvailable: isEmailAvailable,
+                    Username: message
                 }
             });
         }
-        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }
