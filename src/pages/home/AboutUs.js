@@ -36,7 +36,7 @@ const AboutUs = () => {
             <Grid item xs={12} lg={5}>
                 <Grid container direction="column" spacing={5}>
                     <Grid item>
-                        <Typography variant="h2">About Us</Typography>
+                        <Typography variant="h3">About Us</Typography>
                     </Grid>
                 <Grid item>
                     <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>

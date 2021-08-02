@@ -12,15 +12,14 @@ const useStyles = makeStyles(theme => ({
         paddingLeft: theme.spacing(15),
 
         [theme.breakpoints.down('lg')]: {
-            paddingLeft: theme.spacing(10),
-        },
-        [theme.breakpoints.down('md')]: {
-            
-        },
-        [theme.breakpoints.down('lg')]: {
             paddingBottom: theme.spacing(5),
             paddingLeft: theme.spacing(10),
         },
+
+        [theme.breakpoints.down('md')]: {
+            paddingLeft: 0
+        },
+        
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(4),
             marginTop: theme.spacing(7),
@@ -48,8 +47,7 @@ const useStyles = makeStyles(theme => ({
 
     text: {
         '& h1': {
-            fontStyle: 'italic',
-            fontWeight: 700,
+            fontWeight: 300,
             margin: [[theme.spacing(35), 0, theme.spacing(5), 0]],
 
             [theme.breakpoints.down('lg')]: {
@@ -65,6 +63,10 @@ const useStyles = makeStyles(theme => ({
                 fontSize: theme.spacing(4),
                 marginTop: 0
             }
+        },
+
+        '& h6': {
+            width: '95%'
         }
     },
 
@@ -89,8 +91,8 @@ const Hero = () => {
                         <Grid item xs={12}>
                             <Typography variant="h6">
                                 FXBLOOMS is a <span className={classes.highlight}>peer-to-peer</span> 
-                                currency exchange platform that gives you the freedom to exchange money 
-                                <span className={classes.highlight}>seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
+                                currency exchange platform that gives you the freedom to exchange money
+                                <span className={classes.highlight}> seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
                             </Typography>
                         </Grid>
                         <Grid item xs={12} md={6}>

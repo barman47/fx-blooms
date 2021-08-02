@@ -21,7 +21,7 @@ import {FormatListText } from 'mdi-material-ui';
 import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
-import Listing from './Listing';
+import EditListingItem from './EditListingItem';
 
 
 import { getCurrencies } from '../../../actions/currencies';
@@ -37,20 +37,20 @@ import ResidencePermitModal from './ResidencePermitModal';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
-        padding: theme.spacing(2),
+        padding: theme.spacing(4, 2, 2, 2),
         
         '& header': {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginBottom: theme.spacing(3),
-
+            
             [theme.breakpoints.down('sm')]: {
                 flexDirection: 'column'
             },
-
+            
             '& h6': {
-                fontWeight: 600
+                fontWeight: 600,
+                // marginTop: theme.spacing(2),
             },
 
             '& p': {
@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
 
     container: {
         position: 'relative',
-        top: 0,
+        top: theme.spacing(3),
 
         [theme.breakpoints.down('md')]: {
             height: '100%'
@@ -85,13 +85,19 @@ const useStyles = makeStyles(theme => ({
     },
 
     listings: {
+        backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
+        marginTop: theme.spacing(4),
+        // marginRight: theme.spacing(2),
+
         [theme.breakpoints.down('md')]: {
             display: 'none'
         }
     },
 
     helperText: {
-        fontSize: '10px'
+        color: COLORS.offBlack,
+        fontSize: theme.spacing(1.4)
     },
 
     noListing: {
@@ -328,7 +334,7 @@ const MakeListing = (props) => {
                     </div>
                     <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography>
                 </header>
-                <Grid container direction="row" spacing={4} className={classes.container}>
+                <Grid container direction="row" spacing={6} className={classes.container}>
                     <Grid item xs={12} lg={4}>
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
@@ -511,8 +517,11 @@ const MakeListing = (props) => {
                             </section>
                             : 
                             <div>
+                                <Typography variant="h6">Previous Listings</Typography>
+                                <Divider />
+                                <br />
                                 {listings.map(listing => (
-                                    <Listing key={listing.id} listing={listing} />
+                                    <EditListingItem key={listing.id} listing={listing} />
                                 ))}
                             </div>
                         }

@@ -34,6 +34,11 @@ const useStyles = makeStyles(theme => ({
     },
     
     nav: {
+        padding: [[0, theme.spacing(10)]],
+
+        [theme.breakpoints.down('lg')]: { 
+            padding: 0
+        },
         [theme.breakpoints.down('md')]: { 
             display: 'none'
         }

@@ -118,7 +118,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        padding: theme.spacing(0, 1),
+        // padding: theme.spacing(2, 1),
+        padding: [[theme.spacing(2), theme.spacing(2), 0, theme.spacing(2)]],
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
@@ -134,6 +135,10 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main
     },
 
+    links: {
+        marginTop: theme.spacing(4.5)
+    },
+
     linkItem: {
         backgroundColor: COLORS.offWhite,
         marginBottom: theme.spacing(2)
@@ -146,7 +151,12 @@ const useStyles = makeStyles((theme) => ({
     logoutContainer: {
         position: 'absolute',
         bottom: 0,
-        width: drawerWidth
+        width: drawerWidth,
+
+        '& p': {
+            color: COLORS.offBlack,
+            fontWeight: 600   
+        }
     },
 
     avatar: {
@@ -185,7 +195,7 @@ const Dashboard = ({ children, title, logout }) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { username, email } = useSelector(state => state.customer); 
+    const { firstName, lastName, email } = useSelector(state => state.customer); 
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
@@ -287,7 +297,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 <img className={classes.avatar} src={avatar} alt="Avatar" />
                             </div>
                             <div>
-                                <Typography variant="h6">Hello {username}</Typography>
+                                <Typography variant="subtitle1" component="p">{`${firstName} ${lastName}`}</Typography>
                                 <Typography variant="subtitle2" component="span" className={classes.email}>{email}</Typography>
                             </div>
                         </Link>

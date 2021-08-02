@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Grid, Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Eye, LightningBolt } from 'mdi-material-ui';
+import { Cancel, CarTurbocharger, Eye, LightningBolt } from 'mdi-material-ui';
 
 import listing from '../../assets/img/listing1.png';
 
@@ -90,7 +90,7 @@ const Features = () => {
                         <Grid item xs={12} md={6}>
                             <div className={classes.item}>
                                 <Typography variant="subtitle1" component="p">
-                                    <Eye className={classes.icon} />
+                                <Cancel className={classes.icon} />
                                     &nbsp;&nbsp;
                                     No middlemen
                                 </Typography>
@@ -101,7 +101,7 @@ const Features = () => {
                         <Grid item xs={12} md={6}>
                             <div className={classes.item}>
                                 <Typography variant="subtitle1" component="p">
-                                    <Eye className={classes.icon} />
+                                    <CarTurbocharger className={classes.icon} />
                                     &nbsp;&nbsp;
                                     Take control of YOUR money
                                 </Typography>

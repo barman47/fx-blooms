@@ -35,9 +35,9 @@ import Listings from './Listings';
 
 const useStyles = makeStyles(theme => ({
 	root: {
-		position: 'relative'
+		position: 'relative',
 	},
-
+	
 	fab: {
 		display: 'none',
 		[theme.breakpoints.down('md')]: {
@@ -48,10 +48,11 @@ const useStyles = makeStyles(theme => ({
 			zIndex: 1
 		}
 	},
-
+	
 	listings: {
-		paddingLeft: theme.spacing(3),
-		paddingRight: theme.spacing(3),
+		paddingLeft: theme.spacing(2),
+		paddingRight: theme.spacing(4),
+		maxWidth: '100%',
 
 		[theme.breakpoints.down('sm')]: {
 			paddingLeft: theme.spacing(1),
@@ -60,6 +61,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingHeader: {
+		marginTop: theme.spacing(4),
 		[theme.breakpoints.down('md')]: {
 			marginTop: theme.spacing(2)
 		},
@@ -88,7 +90,7 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		position: 'relative',
 		left: 0,
-		border: '1px solid red',
+		// border: '1px solid red',
 		marginTop: theme.spacing(5)
 	},
 
@@ -109,7 +111,8 @@ const useStyles = makeStyles(theme => ({
 			'& header': {
 				display: 'grid',
 				gridTemplateColumns: '1fr 1fr',
-				columnGap: theme.spacing(10),
+				columnGap: theme.spacing(1),
+				rowGap: theme.spacing(2),
 				marginBottom: theme.spacing(4),
 				alignItems: 'center'
 			}
@@ -354,7 +357,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 		<Grid item lg={3} className={classes.filterContainer}>
 			<form onSubmit={onSubmit} noValidate>
 				<header>
-					<Typography variant="h6">Filter</Typography>
+					<Typography variant="subtitle2" component="span">Filter</Typography>
 					<Typography 
 						className={classes.clear}
 						variant="subtitle2" 

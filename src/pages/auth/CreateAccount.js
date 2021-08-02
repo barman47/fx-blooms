@@ -34,24 +34,15 @@ import logo from '../../assets/img/logo.svg';
 import img from '../../assets/img/sign-up.svg';
 
 const useStyles = makeStyles(theme => ({
+    root: {
+        paddingBottom: theme.spacing(10),
+    },
+
     aside: {
         backgroundColor: COLORS.lightTeal,
         height: '100vh',
-        padding: [[0, theme.spacing(8)]],
-
-        '& div': {
-            display: 'flex',
-            flexDirection: 'column',
-            height: '100%',
-            alignItems: 'center',
-            justifyContent: 'space-evenly',
-
-            '& span': {
-                width: '60%'
-            }
+        padding: [[theme.spacing(4), theme.spacing(8)]],
             
-        },
-
         [theme.breakpoints.down('md')]: {
             height: '70vh'
         },
@@ -60,8 +51,22 @@ const useStyles = makeStyles(theme => ({
             display: 'none'
         }
     },
+    
+    logo: {
+        display: 'block',
+        margin: '10px auto',
+        width: '50%'
+    },
+
+    text: {
+        display: 'block',
+        fontWeight: 300,
+        margin: '10px auto',
+        width: '70%',
+    },
 
     image: {
+        margin: [[theme.spacing(4), 0]],
         width: '100%'
     },
 
@@ -232,7 +237,7 @@ const CreateAccount = (props) => {
                     type="error"
                 />
             }
-            <section>
+            <section className={classes.root}>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
@@ -240,9 +245,9 @@ const CreateAccount = (props) => {
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </RouterLink>
                             <img src={img} className={classes.image} alt="FX Blooms logo" />
-                            <Typography variant="subtitle2" component="span">Thanks for visiting FXBlooms!</Typography>
-                            <Typography variant="subtitle2" component="span">Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
-                            <Typography variant="subtitle2" component="span">Create an account today to see a list of available offerings.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Thank you for visiting FXBLOOMS!</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to see a list of available offerings.</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>

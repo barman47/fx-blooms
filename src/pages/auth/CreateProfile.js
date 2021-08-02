@@ -35,11 +35,14 @@ import validateCreateProfile from '../../utils/validation/customer/createProfile
 import logo from '../../assets/img/logo.svg';
 
 const useStyles = makeStyles(theme => ({
+    root: {
+        paddingBottom: theme.spacing(5)
+    },
+
     aside: {
         backgroundColor: COLORS.lightTeal,
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
         padding: [[theme.spacing(4), theme.spacing(8)]],
 
         '& div:first-child': {
@@ -51,35 +54,40 @@ const useStyles = makeStyles(theme => ({
 
             '& img': {
                 marginBottom: theme.spacing(5),
-            },
-
-            '& span': {
-                fontWeight: 300,
-                marginBottom: theme.spacing(5),
-                width: '100%'
-            },
-            
-            '& div': {
-                border: '1px solid #eb5757',
-                borderRadius: '10px',
-                marginBottom: theme.spacing(5),
-                padding: theme.spacing(3),
-                
-                '& span': {
-                    display: 'inline-block',
-                    fontWeight: 300,
-                    marginBottom: theme.spacing(2),
-                    width: '100%'
-                }
             }
         },
-
+        
         [theme.breakpoints.down('md')]: {
             height: '50vh'
         },
-
+        
         [theme.breakpoints.down('sm')]: {
             display: 'none'
+        }
+    },
+
+    logo: {
+        marginLeft: theme.spacing(-15)
+    },
+    
+    text: {
+        display: 'inline-block',
+        fontWeight: 300,
+        marginBottom: theme.spacing(2),
+        width: '70%'
+    },
+
+    info: {
+        border: '1px solid #eb5757',
+        borderRadius: '10px',
+        margin: '0 auto',
+        padding: theme.spacing(2),
+        width: '65%',
+        
+        '& span': {
+            display: 'inline-block',
+            fontWeight: 300,
+            width: '100%'
         }
     },
 
@@ -517,17 +525,18 @@ const CreateProfile = (props) => {
             }
             {loading && <Spinner text={loadingText} />}
             <SignUpSuccessModal handleCloseModal={handleCloseModal} open={open} text={successMessage || ''} />
-            <section>
+            <section className={classes.root}>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
                             <RouterLink to="/">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </RouterLink>
-                            <Typography variant="subtitle2" component="span" style={{ fontWeight: 500 }}>Hello <span style={{ color: COLORS.primary }}>{Profile.Username},</span></Typography>
-                            <Typography variant="subtitle2" component="span">Trust and Security are cornerstones of FXBLOOMS.</Typography>
-                            <Typography variant="subtitle2" component="span">To ensure this platform remain safe and secure, kindly tell us about yourself.</Typography>
-                            <div>
+                            <Typography variant="subtitle2" component="span" className={classes.text} style={{ fontWeight: 500 }}>Hello <span style={{ color: COLORS.primary }}>{Profile.Username},</span></Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Thanks for joining!.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Trust and Security are cornerstones of FXBLOOMS.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>To ensure this platform remain safe and secure, kindly tell us about yourself.</Typography>
+                            <div className={classes.info}>
                                 <Typography variant="subtitle2" component="span">Please not that all information provided on this page must be true and accurate.</Typography>
                                 <Typography variant="subtitle2" component="span">If any misinformation is spotted, you will not be allowed to use the platform.</Typography>
                             </div>
@@ -543,7 +552,7 @@ const CreateProfile = (props) => {
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={3}>
-                                <Grid item xs={12} md={6} lg={6} xl={6}>
+                                <Grid item xs={12} md={5}>
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <>
                                             <Typography variant="subtitle2" component="span">First Name</Typography>
@@ -562,7 +571,7 @@ const CreateProfile = (props) => {
                                         </>
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12} md={6} lg={6} xl={6}>
+                                <Grid item xs={12} md={5}>
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <>
                                             <Typography variant="subtitle2" component="span">Last Name</Typography>
@@ -571,7 +580,8 @@ const CreateProfile = (props) => {
                                                 value={LastName}
                                                 onChange={(e) => setLastName(e.target.value)}
                                                 type="text"
-                                                variant="outlined" 
+                                                variant="outlined"
+                                                placeholder="Enter Last Name"
                                                 helperText={errors.LastName}
                                                 fullWidth
                                                 required
@@ -580,8 +590,8 @@ const CreateProfile = (props) => {
                                         </>
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
-                                    <Typography variant="subtitle2" component="span">Country Code</Typography>
+                                <Grid item xs={12} md={3}>
+                                    <Typography variant="subtitle2" component="span">Phone Number</Typography>
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.CountryCode ? true : false } 
@@ -609,7 +619,7 @@ const CreateProfile = (props) => {
                                 </Grid>
                                 {
                                     CountryCode && 
-                                    <Grid item xs={12} md={8}>
+                                    <Grid item xs={12} md={7}>
                                         <Typography variant="subtitle2" component="span">Phone Number</Typography>
                                         <TextField 
                                             className={classes.input}
@@ -625,7 +635,7 @@ const CreateProfile = (props) => {
                                         />
                                     </Grid>
                                 }
-                                <Grid item xs={12} md={12}>
+                                <Grid item xs={12} md={10}>
                                 <Typography variant="subtitle2" component="span">Address</Typography>
                                     <TextField 
                                         className={classes.input}
@@ -642,6 +652,7 @@ const CreateProfile = (props) => {
                                         error={errors.Address ? true : false}
                                     />
                                 </Grid>
+                            
                                 <Grid item xs={12} md={4}>
                                     <Typography variant="subtitle2" component="span">Country</Typography>
                                     <FormControl 
@@ -665,7 +676,7 @@ const CreateProfile = (props) => {
                                         <FormHelperText>{errors.Country}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                <Grid item xs={12} md={3}>
                                     <Typography variant="subtitle2" component="span">City/State</Typography>
                                     <FormControl 
                                         variant="outlined" 
@@ -690,7 +701,7 @@ const CreateProfile = (props) => {
                                         <FormHelperText>{errors.City}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={4}>
+                                <Grid item xs={12} md={3}>
                                     <Typography variant="subtitle2" component="span">Postal Code</Typography>
                                     <TextField 
                                         className={classes.input}
@@ -705,15 +716,15 @@ const CreateProfile = (props) => {
                                         error={errors.PostalCode ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={2}>
+                                <Grid item xs={3}>
                                     <Typography variant="subtitle1" component="span" style={{ color: COLORS.primary, fontWeight: 300 }}>
                                         Identity
                                     </Typography>
                                 </Grid>
-                                <Grid item xs={10} style={{ alignSelf: 'center' }}>
+                                <Grid item xs={7} style={{ alignSelf: 'center' }}>
                                     <hr />
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={10}>
                                     <TextField 
                                         className={classes.input}
                                         onChange={handleSetPhoto}
@@ -752,7 +763,7 @@ const CreateProfile = (props) => {
                                         </div>
                                     }
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={5}>
                                     <Typography variant="subtitle2" component="span">Identity Card Type</Typography>
                                     <FormControl 
                                         variant="outlined" 
@@ -777,7 +788,7 @@ const CreateProfile = (props) => {
                                         <FormHelperText>{errors.DocumentType}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={5}>
                                     <Typography variant="subtitle2" component="span">Document Number</Typography>
                                     <TextField 
                                         className={classes.input}
@@ -792,7 +803,7 @@ const CreateProfile = (props) => {
                                         error={errors.IdNumber ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={5}>
                                     <TextField 
                                         className={classes.input}
                                         onChange={handleSetIdFront}
@@ -832,7 +843,7 @@ const CreateProfile = (props) => {
                                         </div>
                                     }
                                 </Grid>
-                                <Grid item xs={12} md={6}>
+                                <Grid item xs={12} md={5}>
                                     <TextField 
                                         className={classes.input}
                                         onChange={handleSetIdBack}
@@ -871,7 +882,7 @@ const CreateProfile = (props) => {
                                         </div>
                                     }
                                 </Grid>
-                                <Grid item xs={12} md={12} lg={12} xl={12}>
+                                <Grid item xs={12} md={10}>
                                     <Button 
                                         variant="contained" 
                                         color="primary"

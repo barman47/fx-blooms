@@ -1,3 +1,4 @@
+import { useHistory, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,6 +8,7 @@ import { FileDocumentEdit } from 'mdi-material-ui';
 
 import { SET_LISTING } from '../../../actions/types';
 import { COLORS, SHADOW } from '../../../utils/constants';
+import { DASHBOARD, EDIT_LISTING, MAKE_LISTING } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -47,13 +49,23 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditListingItem = ({ listing }) => {
+const EditListingItem = ({ edit, listing }) => {
     const dispatch = useDispatch();
     const classes = useStyles();
+    const history = useHistory();
+    const location = useLocation();
+
     const listingId = useSelector(state => state.listings.listing.id);
 
     const setListing = (listing) => {
-        dispatch({
+        if (location.pathname.includes(MAKE_LISTING)) {
+            dispatch({
+                type: SET_LISTING,
+                payload: listing
+            });
+            return history.push(`${DASHBOARD}${EDIT_LISTING}`);
+        }
+        return dispatch({
             type: SET_LISTING,
             payload: listing
         });
@@ -80,8 +92,9 @@ const EditListingItem = ({ listing }) => {
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     <FileDocumentEdit 
-                        className={clsx(classes.editIcon, { [`${classes.disabled}`]: listing.id === listingId })} 
-                        onClick={listing.id === listingId ? () => {} : () => setListing(listing)} 
+                        className={clsx(classes.editIcon, { [`${classes.disabled}`]: edit === true && listing.id === listingId })} 
+                        // onClick={edit === true && listing.id === listingId ? () => {} : () => setListing(listing)} 
+                        onClick={() => setListing(listing)} 
                     />
                 </Tooltip>
             </div>
@@ -90,6 +103,7 @@ const EditListingItem = ({ listing }) => {
 };
 
 EditListingItem.propTypes = {
+    edit: PropTypes.bool,
     listing: PropTypes.object.isRequired
 };
 

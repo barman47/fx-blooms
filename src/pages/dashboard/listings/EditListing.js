@@ -434,7 +434,7 @@ const EditListing = (props) => {
                     <br />
                     <div>
                         {
-                            previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))
+                            previousListings.map(item => (<EditListingItem key={item.id} listing={item} edit={true} />))
                         }
                     </div>
                 </Grid>

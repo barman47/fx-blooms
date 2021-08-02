@@ -17,11 +17,13 @@ import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
 	root: {
-        borderRadius: '5px',
+        backgroundColor: COLORS.white,
+        borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
         display: 'grid',
         gridTemplateColumns: '1fr',
         marginBottom: theme.spacing(3),
+        overflow: 'hidden',
 
         '& header': {
             backgroundColor: COLORS.lightTeal,
@@ -46,11 +48,17 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& div': {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
+            display: 'grid',
+            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 1fr',
             alignItems: 'center',
+            gap: theme.spacing(2),
             padding: [[theme.spacing(4), theme.spacing(3)]],
+
+            [theme.breakpoints.down('lg')]: {
+                gridTemplateColumns: '0.5fr 0.5fr 1fr 0.8fr 1fr',
+                gap: theme.spacing(1),
+                padding: theme.spacing(1),
+            },
 
             [theme.breakpoints.down('sm')]: {
                 padding: theme.spacing(1),
@@ -58,15 +66,30 @@ const useStyles = makeStyles(theme => ({
                 gridTemplateColumns: '1fr 1fr',
                 rowGap: theme.spacing(2)
             }
-        },
-
-        [theme.breakpoints.down('sm')]: {
-
         }
+        // '& div': {
+        //     display: 'flex',
+        //     flexDirection: 'row',
+        //     justifyContent: 'space-between',
+        //     alignItems: 'center',
+        //     padding: [[theme.spacing(4), theme.spacing(3)]],
+
+        //     [theme.breakpoints.down('sm')]: {
+        //         padding: theme.spacing(1),
+        //         display: 'grid',
+        //         gridTemplateColumns: '1fr 1fr',
+        //         rowGap: theme.spacing(2)
+        //     }
+        // }
 	},
 
     button: {
         padding: [[theme.spacing(0.5), theme.spacing(5)]],
+
+        [theme.breakpoints.down('lg')]: {
+            padding: [[theme.spacing(0.5), theme.spacing(2)]],
+        },
+
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
         }
@@ -147,7 +170,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
-                        Listed by: 
+                        Listed by:&nbsp;
                         <RouterLink 
                             to={`${DASHBOARD}${USER_DETAILS}`} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
@@ -208,7 +231,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
                             Edit
                         </Button>
                         :
-                        <Button 
+                        <Button
                             to={MESSAGES}
                             component={RouterLink} 
                             variant="contained" 

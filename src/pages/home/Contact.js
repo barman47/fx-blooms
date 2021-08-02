@@ -99,7 +99,7 @@ const Contact = () => {
     return (
         <section className={classes.root} id={CONTACT_US}>
             <Grid container direction="row">
-                <Grid item xs={12} md={12} lg={6}>
+                <Grid item xs={12} md={12} lg={4}>
                     <Typography variant="subtitle1" component="p" className={classes.title}>Connect with us on social media</Typography>
                     <br />
                     <div className={classes.social}>
