@@ -32,6 +32,7 @@ import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
 import Listings from './Listings';
+import SellerNoticeModal from './SellerNoticeModal';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -208,53 +209,56 @@ const AllListings = (props) => {
 	};
 
 	return (
-		<section className={classes.root} id="parent">
-			<Tooltip title="Filter Listings" arrow>
-				<Fab 
-					className={classes.fab} 
-					color="primary" 
-					aria-label="filter listings"
-					onClick={handleOpenModal}
-				>
-					<FilterOutline />
-				</Fab>
-			</Tooltip>
-			<FilterListingModal open={open} handleCloseModal={handleCloseModal} />
-			<Grid container direction="row">
-				<Grid item xs={12} lg={9} className={classes.listings}>
-					<header className={classes.listingHeader}>
-						<Typography variant="h5">All Listings</Typography>
-						<div className={classes.headerContent}>
-							<Typography variant="subtitle1" component="span">Here are all the listings available right now</Typography>
-							<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
-						</div>
-					</header>
-					<InfiniteScroll 
-						className={classes.listingContainer}
-						dataLength={listings.length || 5}
-						next={getMoreListings}
-						hasMore={hasNext}
-						scrollThreshold={1}
-						loader={<h4>Fetching Listings . . .</h4>}
-						refreshFunction={getListings}
-						pullDownToRefresh
-						pullDownToRefreshThreshold={80}
-						releaseToRefreshContent={
-							matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-						}
-						pullDownToRefreshContent={
-							matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-						}
-						// endMessage={}
-						scrollableTarget="parent"
-						height="100%"
+		<>
+			<SellerNoticeModal />
+			<section className={classes.root} id="parent">
+				<Tooltip title="Filter Listings" arrow>
+					<Fab 
+						className={classes.fab} 
+						color="primary" 
+						aria-label="filter listings"
+						onClick={handleOpenModal}
 					>
-						<Listings />
-					</InfiniteScroll>
+						<FilterOutline />
+					</Fab>
+				</Tooltip>
+				<FilterListingModal open={open} handleCloseModal={handleCloseModal} />
+				<Grid container direction="row">
+					<Grid item xs={12} lg={9} className={classes.listings}>
+						<header className={classes.listingHeader}>
+							<Typography variant="h5">All Listings</Typography>
+							<div className={classes.headerContent}>
+								<Typography variant="subtitle1" component="span">Here are all the listings available right now</Typography>
+								<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
+							</div>
+						</header>
+						<InfiniteScroll 
+							className={classes.listingContainer}
+							dataLength={listings.length || 5}
+							next={getMoreListings}
+							hasMore={hasNext}
+							scrollThreshold={1}
+							loader={<h4>Fetching Listings . . .</h4>}
+							refreshFunction={getListings}
+							pullDownToRefresh
+							pullDownToRefreshThreshold={80}
+							releaseToRefreshContent={
+								matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+							}
+							pullDownToRefreshContent={
+								matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+							}
+							// endMessage={}
+							scrollableTarget="parent"
+							height="100%"
+						>
+							<Listings />
+						</InfiniteScroll>
+					</Grid>
+					<Filter />
 				</Grid>
-				<Filter />
-			</Grid>
-		</section>
+			</section>
+		</>
 	);
 }
 

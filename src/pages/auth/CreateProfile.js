@@ -12,9 +12,10 @@ import { Button,
     Select, 
     TextField, 
     Tooltip, 
-    Typography 
+    Typography,
+    Zoom 
 } from '@material-ui/core';
-import { CloudUpload } from 'mdi-material-ui';
+import { CloudUpload, Information } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import emojiFlags from 'emoji-flags';
 
@@ -285,6 +286,11 @@ const CreateProfile = (props) => {
             });
             setStates(states);
         }
+
+        if (isEmpty(Country)) {
+            setCountryId('');
+            setStates([]);
+        }
     }, [Country, countries]);
 
     // Setting StateId when user selects a state
@@ -292,6 +298,9 @@ const CreateProfile = (props) => {
         if (!isEmpty(City)) {
             const state = states.find(state => state?.name === City);
             setStateId(state?.id);
+        }
+        if (isEmpty(City)) {
+            setStateId('');
         }
     }, [City, states]);
 
@@ -373,6 +382,12 @@ const CreateProfile = (props) => {
     //         console.error(err);
     //     }
     // };
+
+    const handleSetPhoneNumber = (e) => {
+        if (!isNaN(Number(e.target.value))) {
+            setPhoneNo(e.target.value);
+        }
+    };
 
     const handleError = (err, key, msg) => {
         console.log(err.response);
@@ -481,6 +496,7 @@ const CreateProfile = (props) => {
             ...Profile,
             FirstName,
             LastName,
+            Country,
             CountryCode,
             PhoneNo,
             Address,
@@ -501,8 +517,6 @@ const CreateProfile = (props) => {
         const { errors, isValid } = validateCreateProfile({ ...rest });
 
         if (!isValid) {
-            console.log(errors);
-            console.log({...rest});
             return setErrors({ ...errors, msg: 'Invalid sign up data' });
         }
     
@@ -575,6 +589,9 @@ const CreateProfile = (props) => {
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <>
                                             <Typography variant="subtitle2" component="span">Last Name</Typography>
+                                            <Tooltip title="This should be your official government name" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
+                                                <Information style={{ float: 'right' }} />
+                                            </Tooltip>
                                             <TextField 
                                                 className={classes.input}
                                                 value={LastName}
@@ -624,7 +641,7 @@ const CreateProfile = (props) => {
                                         <TextField 
                                             className={classes.input}
                                             value={PhoneNo}
-                                            onChange={(e) => setPhoneNo(e.target.value)}
+                                            onChange={handleSetPhoneNumber}
                                             type="text"
                                             variant="outlined" 
                                             placeholder="Enter Phone Number"
@@ -702,19 +719,23 @@ const CreateProfile = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={12} md={3}>
-                                    <Typography variant="subtitle2" component="span">Postal Code</Typography>
-                                    <TextField 
-                                        className={classes.input}
-                                        value={PostalCode}
-                                        onChange={(e) => setPostalCode(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="Enter postal code"
-                                        helperText={errors.PostalCode}
-                                        fullWidth
-                                        required
-                                        error={errors.PostalCode ? true : false}
-                                    />
+                                    {Country.toLowerCase() !== 'nigeria' && 
+                                        <>
+                                            <Typography variant="subtitle2" component="span">Postal Code</Typography>
+                                            <TextField 
+                                                className={classes.input}
+                                                value={PostalCode}
+                                                onChange={(e) => setPostalCode(e.target.value)}
+                                                type="text"
+                                                variant="outlined" 
+                                                placeholder="Enter postal code"
+                                                helperText={errors.PostalCode}
+                                                fullWidth
+                                                required
+                                                error={errors.PostalCode ? true : false}
+                                            />
+                                        </>
+                                    }
                                 </Grid>
                                 <Grid item xs={3}>
                                     <Typography variant="subtitle1" component="span" style={{ color: COLORS.primary, fontWeight: 300 }}>

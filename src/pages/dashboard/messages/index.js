@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Actions from './Actions';
 import Conversation from './Conversation';
 import Messages from './Messages';
+import RiskNoticeModal from './RiskNoticeModal';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -97,24 +98,27 @@ const Index = (props) => {
         // eslint-disable-next-line
     }, []);
     return (
-        <section className={classes.root}>
-            <Typography variant="h5">Messages</Typography>
-            {/* <Grid container direction="row" className={classes.gridContainer}> */}
-            <div className={classes.gridContainer}>
-                <div className={classes.messages}>
-                    <Messages />
+        <>
+            <RiskNoticeModal />
+            <section className={classes.root}>
+                <Typography variant="h5">Messages</Typography>
+                {/* <Grid container direction="row" className={classes.gridContainer}> */}
+                <div className={classes.gridContainer}>
+                    <div className={classes.messages}>
+                        <Messages />
+                    </div>
+                    <div className={classes.conversation}>
+                        <Conversation />
+                    </div>
+                    <div className={classes.actions}>
+                        {chat && 
+                            <Actions />
+                        }
+                    </div>
                 </div>
-                <div className={classes.conversation}>
-                    <Conversation />
-                </div>
-                <div className={classes.actions}>
-                    {chat && 
-                        <Actions />
-                    }
-                </div>
-            </div>
-            {/* </Grid> */}
-        </section>
+                {/* </Grid> */}
+            </section>
+        </>
     );
 };
 

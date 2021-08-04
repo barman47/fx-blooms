@@ -3,15 +3,15 @@ import { Grid, Link, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Cancel, CarTurbocharger, Eye, LightningBolt } from 'mdi-material-ui';
 
-import listing from '../../assets/img/listing1.png';
+import listing from '../../assets/img/listing.png';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS } from '../../utils/constants';
 import { SIGN_UP, WHY } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.lightTeal,
-        padding: [[theme.spacing(7), theme.spacing(5)]],
+        padding: [[theme.spacing(7), 0, theme.spacing(7), theme.spacing(5)]],
 
         [theme.breakpoints.down('sm')]: {
             paddingLeft: theme.spacing(2),
@@ -21,8 +21,8 @@ const useStyles = makeStyles(theme => ({
 
     item: {
         backgroundColor: COLORS.white,
-        borderRadius: theme.shape.borderRadius,
-        boxShadow: SHADOW,
+        borderRadius: '10px',
+        boxShadow: '0px 4px 24px rgba(30, 98, 98, 0.24)',
         maxHeight: 'inherit',
         padding: theme.spacing(2),
 
@@ -52,9 +52,20 @@ const useStyles = makeStyles(theme => ({
     },
 
     imgContainer: {
-        [theme.breakpoints.down('sm')]: {
+        border: '1px solid red',
+        position: 'relative',
+        right: theme.spacing(-5),
+
+        [theme.breakpoints.down('md')]: {
             display: 'none'
-        } 
+        },
+        [theme.breakpoints.down('sm')]: {
+            right: 0
+        },
+
+        '& img': {
+            width: '100%'
+        }
     }
 }));
 

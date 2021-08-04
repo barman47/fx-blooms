@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -122,10 +122,69 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(1),
         marginLeft: theme.spacing(1),
         marginTop: theme.spacing(1),
+    },
+
+    passwordStrength: {
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        marginTop: theme.spacing(1),
+
+        '& div:nth-child(2)': {
+            border: `1px solid ${COLORS.offBlack}`,
+            borderRadius: '20px',
+            height: '10px',
+            // marginTop: theme.spacing(1),
+            position: 'relative',
+            // overflow: 'hidden',
+            width: '100%'
+        },
+
+        '& p:last-child': {
+            fontWeight: 500
+        }
+    },
+
+    title: {
+        // border: '1px solid red',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%'
+    },
+
+    weak: {
+        backgroundColor: 'red',
+        borderRadius: '20px',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        width: '10%'
+    },
+
+    average: {
+        backgroundColor: 'orange',
+        borderRadius: '20px',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        width: '60%'
+    },
+
+    strong: {
+        backgroundColor: 'green',
+        borderRadius: '20px',
+        height: '100%',
+        position: 'absolute',
+        top: 0,
+        width: '90%'
     }
 }));
 
 const CreateAccount = (props) => {
+    const POOR = 'poor';
+    const AVERAGE = 'average';
+    const STRONG = 'strong';
+
     const classes = useStyles();
     const dispatch = useDispatch();
     const { countries } = useSelector(state => state);
@@ -142,11 +201,15 @@ const CreateAccount = (props) => {
 
     const [loading, setLoading] = useState(false);
 
+    const [showStrengthBadge, setShowStrengthBadge] = useState(false);
+    const [passwordStrength, setPasswordStrength] = useState(POOR);
+
     const history = useHistory();
 
     // const toast = useRef();
     const usernameRef = useRef();
     const emailRef = useRef();
+    let timeout = useRef();
 
     useEffect(() => {
         if (countries.length === 0) {
@@ -204,6 +267,32 @@ const CreateAccount = (props) => {
             });
         }
     }, [errors]);
+
+    const strengthChecker = useCallback((password) => {
+        const strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})');
+        const mediumPassword = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))');
+
+        if (strongPassword.test(password)) {
+            setPasswordStrength(STRONG);
+        } else if (mediumPassword.test(password)) {
+            setPasswordStrength(AVERAGE);
+        } else {
+            setPasswordStrength(POOR);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (Password) {
+            clearTimeout(timeout.current);
+            setShowStrengthBadge(true);
+
+            timeout.current = setTimeout(() => strengthChecker(Password), 500);
+
+        } else {
+            clearTimeout(timeout.current);
+            setShowStrengthBadge(false);
+        }
+    }, [Password, strengthChecker, timeout]);
 
     const copyUsername = (username) => {
         setUsername(username);
@@ -370,6 +459,42 @@ const CreateAccount = (props) => {
                                         }}
                                         disabled={loading ? true : false}
                                     />
+                                    {showStrengthBadge && passwordStrength === POOR && 
+                                        <div className={classes.passwordStrength}>
+                                            <div className={classes.title}>
+                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
+                                                <Typography variant="subtitle2" component="span">Poor&nbsp;<span>&#128555;</span></Typography>
+                                            </div>
+                                            <div>
+                                                <div className={classes.weak}></div>
+                                            </div>
+                                            <Typography variant="subtitle1" component="p">Your password is easily guessable. You can do better.</Typography>
+                                        </div>
+                                    }
+                                    {showStrengthBadge && passwordStrength === AVERAGE && 
+                                        <div className={classes.passwordStrength}>
+                                            <div className={classes.title}>
+                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
+                                                <Typography variant="subtitle2" component="span">Average&nbsp;<span>&#128528;</span></Typography>
+                                            </div>
+                                            <div>
+                                                <div className={classes.average}></div>
+                                            </div>
+                                            <Typography variant="subtitle1" component="p">Your password is easily guessable. You can do better.</Typography>
+                                        </div>
+                                    }
+                                    {showStrengthBadge && passwordStrength === STRONG && 
+                                        <div className={classes.passwordStrength}>
+                                            <div className={classes.title}>
+                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
+                                                <Typography variant="subtitle2" component="span">Strong&nbsp;<span>&#128526;</span></Typography>
+                                            </div>
+                                            <div>
+                                                <div className={classes.strong}></div>
+                                            </div>
+                                            <Typography variant="subtitle1" component="p">Your password is great. Nice work!</Typography>
+                                        </div>
+                                    }
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span">Confirm Password</Typography>
@@ -408,7 +533,7 @@ const CreateAccount = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">By clicking proceed, you agree to our <Link component={RouterLink} to={TERMS}>terms and conditions</Link></Typography>
+                                    <Typography variant="subtitle2" component="span">By clicking proceed, you agree to our <Link component={RouterLink} to={TERMS} target="_blank">terms and conditions</Link></Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Button 

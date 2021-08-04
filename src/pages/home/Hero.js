@@ -72,6 +72,11 @@ const useStyles = makeStyles(theme => ({
 
     highlight: {
         color: theme.palette.primary.main
+    },
+
+    getStarted: {
+        paddingBottom: theme.spacing(2),
+        paddingTop: theme.spacing(2)
     }
 }));
 
@@ -95,19 +100,20 @@ const Hero = () => {
                                 <span className={classes.highlight}> seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             <Button 
+                                classes={{ root: classes.getStarted }}
                                 variant="contained" 
                                 component={Link} 
                                 color="primary" 
                                 to={SIGN_UP}
                                 size="large"
                                 fullWidth
-                                >
-                                    Get Started
+                            >
+                                Get Started
                             </Button>                            
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12} md={4}>
                             <Button 
                                 component={Link} 
                                 color="primary" 
@@ -116,7 +122,7 @@ const Hero = () => {
                                 fullWidth
                             >
                                 <PlayCircle />
-                                See how it works
+                                <strong>See how it works</strong>
                             </Button>                            
                         </Grid>
                     </Grid>

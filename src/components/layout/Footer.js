@@ -67,6 +67,7 @@ const useStyles = makeStyles(theme => ({
         '& div': {
             display: 'grid',
             gridTemplateColumns: '1fr',
+            gap: theme.spacing(2),
 
             '& h6': {
                 marginBottom: theme.spacing(2)
@@ -165,7 +166,7 @@ const Footer = () => {
                 <div>
                     <Typography variant="h6">Connect</Typography>
                     <a className={classes.link} href="mailto:hello@fxblooms.com">hello@fxblooms.com</a>
-                    <a className={classes.link} href="tel:+234 812 345 6789">(+234) 812 345 6789</a>
+                    <a className={classes.link} href="tel:+4917647003124">+4917647003124</a>
                     <section className={classes.socialContainer}>
                         <Tooltip title="Follow FXBLOOMS on Instagram" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
                             <IconButton 

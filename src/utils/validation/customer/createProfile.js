@@ -2,13 +2,13 @@ import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
 const createProfile = (data) => {
-    console.log(data);
     let errors = {};
     data.FirstName = !isEmpty(data.FirstName) ?  data.FirstName : '';
     data.LastName = !isEmpty(data.LastName) ?  data.LastName : '';
     data.CountryCode = !isEmpty(data.CountryCode) ?  data.CountryCode : '';
     data.PhoneNo = !isEmpty(data.PhoneNo) ?  data.PhoneNo : '';
     data.Address = !isEmpty(data.Address) ?  data.Address : '';
+    data.Country = !isEmpty(data.Country) ?  data.Country : '';
     data.CountryId = !isEmpty(data.CountryId) ?  data.CountryId : '';
     data.StateId = !isEmpty(data.StateId) ?  data.StateId : '';
     data.PostalCode = !isEmpty(data.PostalCode) ?  data.PostalCode : '';
@@ -73,11 +73,13 @@ const createProfile = (data) => {
         errors.City = 'Your City or State is required!';
     }
 
-    if (!Validator.isPostalCode(data.PostalCode, 'any')) {
-        errors.PostalCode = 'Invalid Postal Code!';
-    }
-    if (Validator.isEmpty(data.PostalCode)) {
-        errors.PostalCode = 'Your Postal Code is required!';
+    if (data.Country.toLowerCase() !== 'nigeria') {
+        if (!Validator.isPostalCode(data.PostalCode, 'any')) {
+            errors.PostalCode = 'Invalid Postal Code!';
+        }
+        if (Validator.isEmpty(data.PostalCode)) {
+            errors.PostalCode = 'Your Postal Code is required!';
+        }   
     }
 
     if (Validator.isEmpty(data.Img)) {
