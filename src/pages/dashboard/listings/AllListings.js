@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
 	Button,
+	CircularProgress,
 	Fab,
 	FormControl,
 	FormHelperText,
@@ -270,7 +271,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 
 	const [AvailableCurrency, setAvailableCurrency] = useState('');
 	const [RequiredCurrency, setRequiredCurrency] = useState('');
-	const [MinExchangeAmount, setMinExchangeAmount] = useState('');
+	const [Amount, setAmount] = useState('');
 
 	const [SellerRating, setSellerRating] = useState('');
 	// eslint-disable-next-line
@@ -293,7 +294,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 		setFilter(PRICE);
 		setAvailableCurrency('');
 		setRequiredCurrency('');
-		setMinExchangeAmount('');
+		setAmount('');
 		setSellerRating('');
 		setErrors({});
 		setLoading(false);
@@ -329,12 +330,12 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 				useRatingFilter: true,
 				sellerRating: parseInt(SellerRating)
 			});
-			// Get rating by star
 		} else {
+			// Get rating by star
 			const priceFilter = {
 				AvailableCurrency,
 				RequiredCurrency,
-				MinExchangeAmount
+				Amount
 			};
 			const { errors, isValid } = validatePriceFilter(priceFilter);
 
@@ -349,8 +350,8 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
 				currencyNeeded: RequiredCurrency,
-				minimumExchangeAmount: Number(MinExchangeAmount),
-				useCurrencyFilter: false,
+				minimumExchangeAmount: Number(Amount),
+				useCurrencyFilter: true,
 				useRatingFilter: false,
 				sellerRating: 0
 			});
@@ -417,7 +418,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
 						</Grid>
-						<Grid item xs={12}>
+						{/* <Grid item xs={12}>
 							<Typography variant="subtitle2">I Want</Typography>
 							<FormControl 
 								variant="outlined" 
@@ -439,39 +440,43 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								</Select>
 								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
-						</Grid>
+						</Grid> */}
 						<Grid item xs={12}>
-							<Typography variant="subtitle2">Min. Exchange Amount</Typography>
+							<Typography variant="subtitle2">Amount</Typography>
 						</Grid>
 						<Grid item xs={5}>
 							<FormControl 
 								variant="outlined" 
-								error={errors.AvailableCurrency ? true : false } 
+								error={errors.RequiredCurrency ? true : false } 
 								fullWidth 
 								required
-								disabled={true}
+								disabled={loading ? true : false}
 							>
 								<Select
-									labelId="AvailableCurrency"
-									value={AvailableCurrency}
-								
+									labelId="RequiredCurrency"
+									value={RequiredCurrency}
+									onChange={(e) => setRequiredCurrency(e.target.value)}
 								>
-									<MenuItem value={AvailableCurrency}>{AvailableCurrency}</MenuItem>
+									<MenuItem value="" disabled>Select</MenuItem>
+									{currencies.length > 0 && currencies.map((currency, index) => (
+										<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+									))}
 								</Select>
-								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
+								<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
 							</FormControl>
 						</Grid>
 						<Grid item xs={7}>
 							<TextField 
-								value={MinExchangeAmount}
-								onChange={(e) => setMinExchangeAmount(e.target.value)}
+								value={Amount}
+								onChange={(e) => setAmount(e.target.value)}
 								type="text"
 								variant="outlined" 
 								placeholder="Enter Amount"
-								helperText={errors.MinExchangeAmount}
+								helperText={errors.Amount}
 								fullWidth
 								required
-								error={errors.MinExchangeAmount ? true : false}
+								error={errors.Amount ? true : false}
+								disabled={loading ? true : false}
 							/>
 						</Grid>
 						<Grid item xs={12}>
@@ -480,8 +485,9 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								variant="contained" 
 								color="primary"
 								fullWidth
-								>
-									Filter Result
+								disabled={loading ? true : false}
+							>
+								{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 							</Button>
 						</Grid>
 					</Grid>
@@ -494,6 +500,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 									error={errors.SellerRating ? true : false } 
 									fullWidth 
 									required
+									disabled={loading ? true : false}
 								>
 									<Select
 										labelId="SellerRating"
@@ -517,8 +524,9 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								variant="contained" 
 								color="primary"
 								fullWidth
-								>
-									Filter Result
+								disabled={loading ? true : false}
+							>
+								{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 							</Button>
 						</Grid>
 					</Grid>

@@ -63,6 +63,7 @@ export const updateListing = (listing) => async (dispatch) => {
 
 export const getListingsOpenForBid = (filter) => async (dispatch) => {
     try {
+        console.log(filter);
         await reIssueToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, filter);
         console.log(res);
@@ -101,7 +102,7 @@ export const addBid = (bid, history) => async (dispatch) => {
 export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
     try {
         await reIssueToken();
-        const res = await axios.post(`${URL}/CancelNegotiation?chatSessionId=${chatSessionId}`);
+        const res = await axios.post(`${URL}/CancelNegotiation?chatSessioId=${chatSessionId}`);
         dispatch({
             type: CANCELED_NEGOTIATION,
             payload: res.data.data

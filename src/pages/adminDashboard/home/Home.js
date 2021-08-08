@@ -72,7 +72,7 @@ const Home = (props) => {
         <>
             <Grid container direction="column" spacing={10} className={classes.root}>
                 <Grid item xs={12} md={6} lg={5} className={classes.header}>
-                    <Typography variant="h5">Welcome to FXBlooms Admin</Typography>
+                    <Typography variant="h5">Welcome to FXBLOOMS Admin</Typography>
                     <Typography variant="subtitle2" component="span">What would you like to do today?</Typography>
                 </Grid>
                 <Grid item xs={12} md={6} lg={5} className={classes.content}>

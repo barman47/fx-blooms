@@ -132,7 +132,7 @@ const UserDetails = (props) => {
 
     return (
         <>
-            <Helmet><title>User Details | FXBlooms.com</title></Helmet>
+            <Helmet><title>User Details | FXBLOOMS.com</title></Helmet>
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <Typography variant="h5">User Details</Typography>

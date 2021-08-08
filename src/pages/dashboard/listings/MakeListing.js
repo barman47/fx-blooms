@@ -138,17 +138,12 @@ const MakeListing = (props) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const { customer, currencies, documents } = useSelector(state => state);
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const { addedListing, listings, msg } = useSelector(state => state.listings);
 
     const { getCurrencies, handleSetTitle } = props;
-
-    useEffect(() => {
-        // console.log(listings.length);
-        handleSetTitle('Add Listing');
-        // eslint-disable-next-line
-    }, []);
 
     const [openAccountModal, setOpenAccountModal] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
@@ -164,6 +159,8 @@ const MakeListing = (props) => {
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee, setListingFee] = useState('');
 
+    const [previousListings, setPreviousListings] = useState([]);
+
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -172,6 +169,7 @@ const MakeListing = (props) => {
     const toast = useRef();
 
     useEffect(() => {
+        handleSetTitle('Add Listing');
         if (!customer.hasProvidedResidencePermit && documents.length === 0) {
             props.getDocuments();
         }
@@ -200,10 +198,13 @@ const MakeListing = (props) => {
             getCurrencies();
         }
     }, [currencies, getCurrencies]);
-
+    
     useEffect(() => {
         setLoading(false);
-    }, [listings]);
+        if (listings.length > 0) {
+            setPreviousListings(listings.filter(item => item.customerId === customerId)); 
+        }
+    }, [customerId, listings]);
 
     useEffect(() => {
         if (addedListing) {
@@ -215,6 +216,14 @@ const MakeListing = (props) => {
             });
         }
     }, [addedListing, dispatch, msg]);
+
+    useEffect(() => {
+        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+        } else {
+            setErrors({});
+        }
+    }, [ExchangeAmount, MinExchangeAmount]);
 
     // const handleSetReceiptAmount = (e) => {
     //     if (isEmpty(e.target.value)) {
@@ -520,9 +529,10 @@ const MakeListing = (props) => {
                                 <Typography variant="h6">Previous Listings</Typography>
                                 <Divider />
                                 <br />
-                                {listings.map(listing => (
+                                {previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))}
+                                {/* {listings.map(listing => (
                                     <EditListingItem key={listing.id} listing={listing} />
-                                ))}
+                                ))} */}
                             </div>
                         }
                     </Grid>

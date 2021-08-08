@@ -4,30 +4,29 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button,
     CircularProgress, 
-    Divider, 
-    FormControl,
-    FormControlLabel,
-    FormLabel,
-    Grid, 
-    Radio, 
-    RadioGroup,
+    Grid,
     TextField, 
     Typography 
 } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
+import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import PropTypes from 'prop-types';
 
-import { SET_LISTING } from '../../../actions/types';
+// eslint-disable-next-line
+import { SET_CUSTOMER_MSG, SET_LISTING } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
-import { completeTransaction } from '../../../actions/listings';
+import { sendTransactionNotification } from '../../../actions/chat';
+import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
+// eslint-disable-next-line
 import { DASHBOARD, EDIT_LISTING } from '../../../routes';
 
+import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
 
-import validateRateCustomer from '../../../utils/validation/customer/rateCustomer';
+import validateCompleteTransaction from '../../../utils/validation/customer/completeTransaction';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -36,9 +35,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
-        marginBottom: theme.spacing(2),
-        paddingBottom: theme.spacing(1.5),
-        paddingTop: theme.spacing(1.5),
+        paddingBottom: theme.spacing(2),
+        paddingTop: theme.spacing(2),
     },
 
     radio: {
@@ -56,18 +54,56 @@ const Actions = (props) => {
     const history = useHistory();
     const dispatch = useDispatch();
     const { listing } = useSelector(state => state.listings);
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { sessionId } = useSelector(state => state.chat);
 
-    const [successfulTransaction, setSuccessfulTransaction] = useState('');
-    const [ratingComment, setRatingComment] = useState('');
-    const [sellerRating, setSellerRating] = useState(0);
+    const [Message, setMessage] = useState('');
+    const [sellerRating, setSellerRating] = useState(null);
+    // eslint-disable-next-line
+    const [completingTransaction, setCompletingTransaction] = useState(false);
+    // eslint-disable-next-line
+    const [paymentMade, setPaymentMade] = useState(false);
+    // eslint-disable-next-line
+    const [paymentReceived, setPaymentReceived] = useState(false);
     const [loading, setLoading] = useState(false);
     
+    const [connection, setConnection] = useState(null);
+    const [connected, setConnected] = useState(false);
+
     const [errors, setErrors] = useState({});
 
     const toast = useRef();
+    const successModal = useRef();
+
+    useEffect(() => {
+        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+            skipNegotiation: true,
+            transport: HttpTransportType.WebSockets
+        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+        console.log(connect);
+        setConnection(connect);
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (connection && !connected) {
+            connection.start()
+                .then(() => {
+                    console.log('connected');
+                    setConnected(true);
+                    connection.on('TransferNotification', notification => {
+                        console.log('notification ', notification);
+                        setPaymentMade(true);
+                        
+                    });
+                })
+                .catch(err => {
+                    setConnected(false);
+                    console.error(err);
+                });
+        }
+    }, [connection, dispatch, connected]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -82,147 +118,211 @@ const Actions = (props) => {
         }
     }, [errorsState]);
 
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [dispatch, msg]);
 
-    const handleEditListing = () => {
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        return history.push(`${DASHBOARD}${EDIT_LISTING}`);
-    };
 
-    const handleChange = (e) => {
-        setSuccessfulTransaction(e.target.value);
-    };
+    // const handleEditListing = () => {
+    //     dispatch({
+    //         type: SET_LISTING,
+    //         payload: listing
+    //     });
+    //     return history.push(`${DASHBOARD}${EDIT_LISTING}`);
+    // };
 
     const handleSetRating = (e, value) => {
         setSellerRating(value);
     }
 
-    const onSubmit = (e) => {
-        e.preventDefault();
+    const cancelNegotiation = () => {
+        props.cancelNegotiation(sessionId, history);
+    };
+
+    const completeTransaction = () => {
         setErrors({});
         const data = {
-            successfulTransaction,
-            ratingComment,
-            sellerRating
+            Message,
+            Rating: sellerRating
         };
 
-        const { errors, isValid } = validateRateCustomer(data);
+        const { errors, isValid } = validateCompleteTransaction(data);
 
         if (!isValid) {
+            console.log(errors, isValid);
             return setErrors(errors);
         }
 
         setErrors({});
         setLoading(true);
-        props.completeTransaction({
+        console.log({
             chatSessionId: sessionId,
-            rating: Number(sellerRating),
-            message: ratingComment,
-            receivedExpectedFunds: successfulTransaction === 'yes' ? true : false
+            rating: parseInt(sellerRating),
+            Message,
+            ReceivedExpectedFunds: true
+        });
+
+        props.completeTransaction({
+            ChatSessionId: sessionId,
+            Rating: parseInt(sellerRating),
+            Message,
+            ReceivedExpectedFunds: true
         });
     };
 
+    const dismissSuccessModal = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+    };    
+
+    const handlePayment = () => {
+        props.sendTransactionNotification(sessionId);
+    };
+
+    const onSubmit = (e) => {
+        e.preventDefault();
+    };
+
     return (
-		<section className={classes.root}>
-            {loading && <Spinner text="One moment . . ." />}
-            {!isEmpty(errors) && 
-                <Toast 
-                    ref={toast}
-                    title="ERROR"
-                    duration={5000}
-                    msg={errors.msg || ''}
-                    type="error"
-                />
-            }
-			<Typography variant="subtitle1" component="p">Actions</Typography>
-            <Grid container direction="column" spacing={2}>
-                <Grid item>
-                    {listing && listing.customerId === customerId &&
+        <>
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+            <section className={classes.root}>
+                {loading && <Spinner text="One moment . . ." />}
+                {!isEmpty(errors) && 
+                    <Toast 
+                        ref={toast}
+                        title="ERROR"
+                        duration={5000}
+                        msg={errors.msg || ''}
+                        type="error"
+                    />
+                }
+                <Typography variant="subtitle1" component="p">Actions</Typography>
+                <Grid container direction="column" spacing={2}>
+                    {/* <Grid item>
+                        {listing && listing.customerId === customerId &&
+                            <Button 
+                                variant="outlined" 
+                                color="primary"
+                                fullWidth
+                                className={classes.button}
+                                onClick={handleEditListing}
+                            >
+                                Edit Listing
+                            </Button>
+                        }
                         <Button 
-                            variant="outlined" 
+                            variant="contained" 
                             color="primary"
                             fullWidth
-                            className={classes.button}
-                            onClick={handleEditListing}
                         >
-                            Edit Listing
+                            Cancel Negotiation
                         </Button>
-                    }
-                    <Button 
-                        variant="contained" 
-                        color="primary"
-                        fullWidth
-                    >
-                        Cancel Negotiation
-                    </Button>
+                    </Grid> */}
+                    <Grid item>
+                        <form onSubmit={onSubmit}>
+                            <Grid container direction="column" spacing={3}>
+                                    {customerId === listing?.customerId ? 
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                disabled={loading ? true : false}
+                                            >
+                                                Payment Received
+                                            </Button>
+                                        </Grid>
+                                        :
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                disabled={loading ? true : false}
+                                                onClick={handlePayment}
+                                            >
+                                                I've Made Payment
+                                            </Button>
+                                        </Grid>
+                                    }
+                                    {!completingTransaction && 
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                onClick={cancelNegotiation}
+                                                disabled={loading ? true : false}
+                                            >
+                                                Cancel Negotiation
+                                            </Button>
+                                        </Grid>
+                                    }
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle1" component="p">Rate this user</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Rating 
+                                        color="primary" 
+                                        name="seller-rating"  
+                                        value={sellerRating} 
+                                        onChange={handleSetRating}
+                                        className={classes.rating}
+                                        disabled={loading ? true : false}
+                                    />
+                                    {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <TextField 
+                                        type="text"
+                                        variant="outlined"
+                                        value={Message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        placeholder="Enter message"
+                                        multiline
+                                        rows={5}
+                                        fullWidth
+                                        helperText={errors.Message}
+                                        error={errors.Message ? true : false}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button 
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        fullWidth
+                                        onClick={completeTransaction}
+                                        disabled={loading ? true : false}
+                                    >
+                                        {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <Divider />
-                </Grid>
-                <Grid item>
-                    <form onSubmit={onSubmit}>
-                        <Grid container direction="column" spacing={3}>
-                            <Grid item>
-                            <FormControl component="fieldset">
-                                <FormLabel component="legend">Is this a successful transaction?</FormLabel>
-                                <RadioGroup 
-                                    aria-label="successful-transaction" 
-                                    name="transaction" 
-                                    value={successfulTransaction} 
-                                    onChange={handleChange}
-                                    className={classes.radio}
-                                >
-                                    <FormControlLabel value="yes" control={<Radio color="primary" />} label="Yes" />
-                                    <FormControlLabel value="no" control={<Radio color="primary" />} label="No" />
-                                </RadioGroup>
-                                </FormControl>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1" component="p" align="center">Rate this user</Typography>
-                            </Grid>
-                            <Grid item align="center">
-                                <Rating 
-                                    color="primary" 
-                                    name="seller-rating"  
-                                    value={sellerRating} 
-                                    onChange={handleSetRating} 
-                                    className={classes.rating}
-                                />
-                            </Grid>
-                            <Grid item>
-                                <TextField 
-                                    type="text"
-                                    variant="outlined"
-                                    value={ratingComment}
-                                    onChange={(e) => setRatingComment(e.target.value)}
-                                    placeholder="Enter message"
-                                    multiline
-                                    rows={5}
-                                    fullWidth
-                                />
-                            </Grid>
-                            <Grid item>
-                                <Button 
-                                    type="submit"
-                                    variant="contained"
-                                    color="primary"
-                                    fullWidth
-                                >
-                                    {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </form>
-                </Grid>
-            </Grid>
-		</section>
+            </section>
+        </>
     );
 };
 
 Actions.propTypes = {
-    completeTransaction: PropTypes.func.isRequired
+    cancelNegotiation: PropTypes.func.isRequired,
+    completeTransaction: PropTypes.func.isRequired,
+    sendTransactionNotification: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction })(Actions);
+export default connect(undefined, { cancelNegotiation, completeTransaction, sendTransactionNotification })(Actions);

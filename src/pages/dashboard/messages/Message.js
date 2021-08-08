@@ -2,6 +2,7 @@ import { Avatar, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import { decode } from 'html-entities';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -71,7 +72,7 @@ const Message = ({ handleSetChat, conversation }) => {
                             {conversation && userName === conversation.buyerUsername ? conversation.sellerUsername : conversation.buyerUsername
                             }
                         </Typography>
-                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{conversation?.messages?.length > 0 && conversation.messages[conversation.messages.length - 1].text}</Typography>
+                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>{conversation?.messages?.length > 0 && decode(conversation.messages[conversation.messages.length - 1].text)}</Typography>
                     </Grid>
                 </Grid>
             </Grid>

@@ -14,6 +14,7 @@ import {
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER,
     SET_CUSTOMER_MSG,
+    // eslint-disable-next-line
     GET_ERRORS
  } from './types';
 
@@ -51,43 +52,43 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-// export const registerCustomer = (customer) => async (dispatch) => {
-//     try {
-//         const res = await axios.post(`${api}/CreateCustomerV2`, customer);
-//         window.location.href = res.data.data;
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
-
-export const registerCustomer = (username, email) => async (dispatch) => {
+export const registerCustomer = (customer) => async (dispatch) => {
     try {
-        const res = await axios.get(`${api}/Available/username/${username}/email/${email}`);
-        const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
-
-        if (isEmailAvailable && isUsernameAvailable) {
-            dispatch({
-                type: GET_ERRORS,
-                payload: {
-                    usernameAvailable: true
-                }
-            });
-        } else {
-            dispatch({
-                type: GET_ERRORS,
-                payload: {
-                    msg: message,
-                    usernames: generatedUsernames,
-                    usernameAvailable: isUsernameAvailable,
-                    emailAvailable: isEmailAvailable,
-                    Username: message
-                }
-            });
-        }
+        const res = await axios.post(`${api}/CreateCustomerV2`, customer);
+        window.location.href = res.data.data;
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
+
+// export const registerCustomer = (username, email) => async (dispatch) => {
+//     try {
+//         const res = await axios.get(`${api}/Available/username/${username}/email/${email}`);
+//         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
+
+//         if (isEmailAvailable && isUsernameAvailable) {
+//             dispatch({
+//                 type: GET_ERRORS,
+//                 payload: {
+//                     usernameAvailable: true
+//                 }
+//             });
+//         } else {
+//             dispatch({
+//                 type: GET_ERRORS,
+//                 payload: {
+//                     msg: message,
+//                     usernames: generatedUsernames,
+//                     usernameAvailable: isUsernameAvailable,
+//                     emailAvailable: isEmailAvailable,
+//                     Username: message
+//                 }
+//             });
+//         }
+//     } catch (err) {
+//         return handleError(err, dispatch);
+//     }
+// };
 
 export const login = (data) => async (dispatch) => {
     try {
@@ -227,6 +228,18 @@ export const resetPassword = (data) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/ResetPassword`, data);
         console.log(res);
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const sendMail = (data) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/SendMail`, data);
         return dispatch({
             type: SET_CUSTOMER_MSG,
             payload: res.data.data

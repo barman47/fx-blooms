@@ -55,7 +55,7 @@ const EditListingItem = ({ edit, listing }) => {
     const history = useHistory();
     const location = useLocation();
 
-    const listingId = useSelector(state => state.listings.listing.id);
+    const listingId = useSelector(state => state.listings?.listing?.id);
 
     const setListing = (listing) => {
         if (location.pathname.includes(MAKE_LISTING)) {
@@ -76,7 +76,7 @@ const EditListingItem = ({ edit, listing }) => {
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#163;{listing?.amountAvailable.amount}
+                    &#163;{listing?.amountAvailable?.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
@@ -84,7 +84,7 @@ const EditListingItem = ({ edit, listing }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#163;{listing?.minExchangeAmount.amount}
+                    &#163;{listing?.minExchangeAmount?.amount}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>

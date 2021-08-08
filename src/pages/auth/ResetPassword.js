@@ -170,7 +170,7 @@ const ResetPassword = (props) => {
 
     return (
         <>
-            <Helmet><title>Reset Password | FXBlooms.com</title></Helmet>
+            <Helmet><title>Reset Password | FXBLOOMS.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}

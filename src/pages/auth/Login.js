@@ -159,7 +159,7 @@ const Login = (props) => {
     return (
         <>
             <Helmet>
-                <title>Login | FXBlooms.com</title>
+                <title>Login | FXBLOOMS.com</title>
                 <meta name="description" content="Thanks for joining FXBLOOMS. Trust and security are our cornerstones. Log in to enjoy unbeatable rates and service." />
             </Helmet>
             <TwoFactorModal open={showModal} />
@@ -244,11 +244,11 @@ const Login = (props) => {
                                                 >
                                                     {showPassword ? 
                                                         <Tooltip title="Hide Password" placement="bottom" arrow>
-                                                            <EyeOffOutline />
+                                                            <EyeOutline />
                                                         </Tooltip>
                                                             : 
-                                                        <Tooltip title="Show Password" placement="bottom" arrow>
-                                                            <EyeOutline />
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
                                                         </Tooltip>
                                                      }
                                                 </IconButton>

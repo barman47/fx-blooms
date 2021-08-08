@@ -106,7 +106,7 @@ const TwoFactorModal = ({ open, getBarcode }) => {
                             2 Factor Authentication
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            FXBlooms requires that you set up your 2 factor authentication for extra security
+                            FXBLOOMS requires that you set up your 2 factor authentication for extra security
                         </Typography>
                         <Button onClick={closeModal} color="primary">Set It Up</Button>
                     </Grid>

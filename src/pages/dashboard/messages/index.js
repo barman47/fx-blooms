@@ -16,32 +16,36 @@ const useStyles = makeStyles(theme => ({
         height: '100vh',
         position: 'sticky',
         // overflowY: 'hidden',
-        overflowY: ["hidden", "-moz-scrollbars-none"],
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
+        overflowY: ['hidden', '-moz-scrollbars-none'],
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        top: 0,
+        left: 0,
 
         '&::-webkit-scrollbar': {
             display: 'none'
-        },
-
-        top: 0,
-        left: 0,
-        
-        '& h5': {
-            // border: '1px solid red',
-            backgroundColor: COLORS.white,
-            marginBottom: theme.spacing(2),
-            padding: [[theme.spacing(2), 0, 0, theme.spacing(2)]],
-            margin: 0,
-            position: 'sticky',
-            top: 0,
-            zIndex: 1
         }
     },
+
+    header: {
+        backgroundColor: COLORS.white,
+        marginBottom: theme.spacing(2),
+        padding: [[theme.spacing(2), 0, 0, theme.spacing(2)]],
+        margin: 0,
+        position: 'sticky',
+        top: 0,
+        zIndex: 1
+    },
+
     gridContainer: {
         display: 'flex',
         flexDirection: 'row',
-        height: '100%'
+        height: '100%',
+
+        [theme.breakpoints.down('md')]: {
+            display: 'grid',
+            gridTemplateColumns: '2fr 1fr'
+        }
     },
     // gridContainer: {
     //     marginTop: theme.spacing(1)
@@ -57,7 +61,10 @@ const useStyles = makeStyles(theme => ({
         '&::-webkit-scrollbar': {
             display: 'none'
         },
-        width: '25%'
+        width: '25%',
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
     },
 
     conversation: {
@@ -66,6 +73,10 @@ const useStyles = makeStyles(theme => ({
         overflowY: ["hidden", "-moz-scrollbars-none"],
         scrollbarWidth: "none",
         msOverflowStyle: "none",
+
+        [theme.breakpoints.down('md')]: {
+            width: '100%'
+        },
 
         '&::-webkit-scrollbar': {
             display: 'none'
@@ -79,6 +90,10 @@ const useStyles = makeStyles(theme => ({
         overflowY: ["hidden", "-moz-scrollbars-none"],
         scrollbarWidth: "none",
         msOverflowStyle: "none",
+
+        [theme.breakpoints.down('md')]: {
+            width: '100%'
+        },
 
         '&::-webkit-scrollbar': {
             display: 'none'
@@ -101,7 +116,7 @@ const Index = (props) => {
         <>
             <RiskNoticeModal />
             <section className={classes.root}>
-                <Typography variant="h5">Messages</Typography>
+                <Typography variant="h5" className={classes.header}>Messages</Typography>
                 {/* <Grid container direction="row" className={classes.gridContainer}> */}
                 <div className={classes.gridContainer}>
                     <div className={classes.messages}>
@@ -110,6 +125,9 @@ const Index = (props) => {
                     <div className={classes.conversation}>
                         <Conversation />
                     </div>
+                    {/* <div className={classes.actions}>
+                        <Actions />
+                    </div> */}
                     <div className={classes.actions}>
                         {chat && 
                             <Actions />

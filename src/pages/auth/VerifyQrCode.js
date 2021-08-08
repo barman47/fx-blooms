@@ -222,7 +222,7 @@ const VerifyQrCode = (props) => {
 
     return (
         <>
-            <Helmet><title>Verify Code | FXBlooms.com</title></Helmet>
+            <Helmet><title>Verify Code | FXBLOOMS.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -236,7 +236,7 @@ const VerifyQrCode = (props) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
                 <RouterLink to="/" className={classes.logo}>
-                    <img src={logo} className={classes.logo} alt="FXBlooms Logo" />
+                    <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
                 </RouterLink>
                 <div className={classes.content}>
                     <Typography variant="h5">Verify Google Authenticator</Typography>

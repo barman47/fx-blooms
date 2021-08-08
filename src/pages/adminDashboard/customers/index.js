@@ -212,14 +212,14 @@ const Customers = (props) => {
         const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] }; 
     
         const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array', Props: {
-            Owner: 'FXBlooms.com',
+            Owner: 'FXBLOOMS.com',
             Date: new Date().toISOString(),
             Category: filter,
             Admin: `${admin.firstName} ${admin.lastName}`
         }});
     
         const usersData = new Blob([excelBuffer], { type: fileType });
-        FileSaver.saveAs(usersData, `FXBlooms Customers - ${new Date().toISOString()}${fileExtension}`);
+        FileSaver.saveAs(usersData, `FXBLOOMS Customers - ${new Date().toISOString()}${fileExtension}`);
     };
 
     return (

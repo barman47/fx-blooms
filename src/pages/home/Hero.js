@@ -95,7 +95,7 @@ const Hero = () => {
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="h6">
-                                FXBLOOMS is a <span className={classes.highlight}>peer-to-peer</span> 
+                                FXBLOOMS is a <span className={classes.highlight}>peer-to-peer </span> 
                                 currency exchange platform that gives you the freedom to exchange money
                                 <span className={classes.highlight}> seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
                             </Typography>

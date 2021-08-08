@@ -1,19 +1,24 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, Send } from 'mdi-material-ui';
+import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import _ from 'lodash';
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
+import { Document } from 'react-pdf';
+// import { Page } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+
+import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
 
 // import avatar from '../../../assets/img/avatar.jpg';
@@ -28,7 +33,13 @@ const useStyles = makeStyles(theme => ({
         position: 'sticky',
         bottom: theme.spacing(1),
         left: 0,
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+
+        // [theme.breakpoints.down('md')]: {
+        //     border: '1px solid red',
+        //     height: '100vh'
+        // }
+        
     },
     
     header: {
@@ -51,6 +62,11 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('lg')]: {
             height: theme.spacing(55),
+        },
+
+        [theme.breakpoints.down('md')]: {
+            border: '1px solid red',
+            height: theme.spacing(95)
         }
     },
     
@@ -118,6 +134,44 @@ const useStyles = makeStyles(theme => ({
         bottom: 0,
         width: '100%',
         zIndex: 2
+    },
+
+    attachment: {
+        borderRadius: theme.shape.borderRadius,
+        width: '40%'
+    },
+
+    otherAttachment: {
+        alignSelf: 'flex-end',
+    },
+
+    paymentNotification: {
+        backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
+        marginBottom: theme.spacing(2),
+        padding: theme.spacing(2),
+
+        '& p': {
+            color: theme.palette.primary.main,
+            fontWeight: 300
+        },
+
+        '& ul li': {
+            color: theme.palette.primary.main,
+            fontWeight: 300
+        }
+    },
+
+    username: {
+        fontSize: '1rem !important',
+        fontWeight: '500 !important'
+    },
+
+    paymentTips: {
+        cursor: 'pointer',
+        fontSize: '1rem !important',
+        fontWeight: '500 !important',
+        textDecoration: 'underline'
     }
 }));
 const Conversation = (props) => {
@@ -137,12 +191,18 @@ const Conversation = (props) => {
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
     const [newMessage, setNewMessage] = useState(false);
+    const [paymentMade, setPaymentMade] = useState(false);
+    // eslint-disable-next-line
+    const [buyerName, setBuyerName] = useState();
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
+    
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+
+    const paymentModal = useRef();
 
     useEffect(() => {
         const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
@@ -167,13 +227,6 @@ const Conversation = (props) => {
             });
         }
     }, [chat, dispatch, listings]);
-
-    // useEffect(() => {
-    //     console.log('setting messages');
-    //     if (chat?.messages?.length > 0) {
-    //         setMessageList(chat?.messages);
-    //     }
-    // }, [chat?.messages]);
 
     useEffect(() => {
         setNewMessage(false);
@@ -203,11 +256,13 @@ const Conversation = (props) => {
                                 payload: newMessage
                             });
                             setMessage('');
-                            // Notification.open({
-                            //     message: 'New Notification',
-                            //     description: message
-                            // });
                         }
+                    });
+
+                    connection.on('TransferNotification', notification => {
+                        console.log('notification ', notification);
+                        setPaymentMade(true);
+                        
                     });
                 })
                 .catch(err => {
@@ -216,6 +271,10 @@ const Conversation = (props) => {
                 });
         }
     }, [connection, dispatch, connected, newMessage]);
+
+    const openModal = () => {
+        paymentModal.current.openModal();
+    };
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -227,17 +286,17 @@ const Conversation = (props) => {
             setLoading(true);
             const data = new FormData();
             data.append(`${attachment.name}`, attachment);
-            const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/Upload`, data, {
+            const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/UploadV2`, data, {
                 'Content-Type': 'multipart/form-data'
             });
-            setAttachmentUrl(res.data.fileName);
-            setLoading(false);
             console.log(res);
+            setAttachmentUrl(res.data);
+            setLoading(false);
             
             const chatMessage = {
                 chatSessionId: sessionId,
                 message: '',
-                documentName: res.data.fileName
+                documentName: res.data
             };
 
             sendMessage(chatMessage);
@@ -291,6 +350,7 @@ const Conversation = (props) => {
 
     return (
         <>
+            <PaymentConfirmationTipsModal ref={paymentModal} />
             {chat ? 
 		        <section className={classes.root}>
                     <Grid container direction="row" justify="space-between" className={classes.header}>
@@ -306,76 +366,105 @@ const Conversation = (props) => {
                             Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
                         </Typography>
                         <div className={classes.messages}>
-                            {chat?.messages && chat.messages.map((message) => (
+                            {chat?.messages && chat?.messages.map((message) => (
                                 <>
-                                {!isEmpty(message.uploadedFileName) ? 
-                                    <a key={message.id} href={message.uploadedFileName}>attachment</a>
-                                    :
-                                    <Typography 
-                                        key={message.id} 
-                                        variant="subtitle2" 
-                                        component="span" 
-                                        className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
-                                    >
-                                        {message.text}
-                                    </Typography>
-                                }
+                                    {!isEmpty(message.uploadedFileName) ? 
+                                        (
+                                            message.uploadedFileName.includes('.pdf') ? 
+                                                <div 
+                                                    key={message.id} 
+                                                    className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
+                                                >
+                                                    <Document 
+                                                        file={message.uploadedFileName}
+                                                    >
+                                                    </Document>
+                                                </div>
+                                            :
+                                            <img 
+                                                key={message.id}
+                                                src={message.uploadedFileName} 
+                                                className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
+                                                alt="Attachment" 
+                                            />
+                                        )
+                                        :
+                                        <Typography 
+                                            key={message.id} 
+                                            variant="subtitle2" 
+                                            component="span" 
+                                            className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                        >
+                                            {/* {message.text} */}
+                                            {decode(message.text)}
+                                        </Typography>
+                                    }
                                 </>
                             ))}
+                            {paymentMade && 
+                                <div className={classes.paymentNotification}>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerName}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p">What's next?</Typography>
+                                    <ul>
+                                        <li>Proceed to your banking app to confirm payment.</li>
+                                        <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openModal}>here.</span></li>
+                                        <li>Send your money to the buyer.</li>
+                                    </ul>
+                                </div>
+                            }
                         </div>
-                        
-                </section>
-                <form onSubmit={onSubmit} noValidate className={classes.form}>
-                    <Grid container direction="row">
-                        <TextField 
-                                onChange={(e) =>setAttachment(e.target.files[0])}
-                                id="attachment"
-                                style={{ display: 'none' }}
-                                type="file"
-                                variant="outlined" 
-                                fullWidth
-                                required
-                                inputProps={{
-                                    accept: ".png,.jpg,.pdf"
-                                }}
-                            />
-                        <Grid item xs={12}>
+                    </section>
+                    <form onSubmit={onSubmit} noValidate className={classes.form}>
+                        <Grid container direction="row">
                             <TextField 
-                                className={classes.input}
-                                type="text"
-                                variant="outlined"
-                                value={message}
-                                onChange={(e) => setMessage(e.target.value)}
-                                placeholder="Enter message"
-                                multiline
-                                rows={1}
-                                fullWidth
-                                InputProps={{
-                                    endAdornment: (
-                                        <InputAdornment position="end">
-                                            <IconButton
-                                                color="primary"
-                                                aria-label="attach-file"
-                                                onClick={handleSelectAttachment}
-                                            >
-                                                <Attachment />
-                                            </IconButton>
-                                            <IconButton
-                                                color="primary"
-                                                aria-label="send-message"
-                                                onClick={onSubmit}
-                                            >
-                                                <Send />
-                                            </IconButton>
-                                        </InputAdornment>
-                                    )
-                                }}
-                            />
+                                    onChange={(e) =>setAttachment(e.target.files[0])}
+                                    id="attachment"
+                                    style={{ display: 'none' }}
+                                    type="file"
+                                    variant="outlined" 
+                                    fullWidth
+                                    required
+                                    inputProps={{
+                                        accept: ".png,.jpg,.pdf"
+                                    }}
+                                />
+                            <Grid item xs={12}>
+                                <TextField 
+                                    className={classes.input}
+                                    type="text"
+                                    variant="outlined"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Enter message"
+                                    multiline
+                                    rows={1}
+                                    fullWidth
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    color="primary"
+                                                    aria-label="attach-file"
+                                                    onClick={handleSelectAttachment}
+                                                >
+                                                    <Attachment />
+                                                </IconButton>
+                                                <IconButton
+                                                    color="primary"
+                                                    aria-label="send-message"
+                                                    onClick={onSubmit}
+                                                >
+                                                    <Send />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                            </Grid>
                         </Grid>
-                    </Grid>
-                </form>
-            </section>
-            :
+                    </form>
+                </section>
+                :
                 <div></div>
             }
         </>

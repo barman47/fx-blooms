@@ -1,4 +1,4 @@
-import { EXIT_CHAT, SET_CHAT, SET_CHATS, SENT_MESSAGE } from '../actions/types';
+import { EXIT_CHAT, PAYMENT_MADE, PAYMENT_RECEIVED, SET_CHAT, SET_CHATS, SENT_MESSAGE } from '../actions/types';
 
 const initialState = {
     chat: null,
@@ -40,11 +40,22 @@ const chatsReducer = (state = initialState, action) => {
         case SENT_MESSAGE: 
             const { messages, ...rest } = state.chat;
             messageList = [...messages, action.payload];
-            
             return {
                 ...state,
                 chat: { ...rest, messages: messageList }
             }
+
+        case PAYMENT_MADE:
+            return {
+                ...state,
+                chat: { ...state.chat, paymentMade: action.payload}
+            };
+
+        case PAYMENT_RECEIVED:
+            return {
+                ...state,
+                chat: { ...state.chat, paymentReceived: action.payload}
+            };
 
         default:
             return state;

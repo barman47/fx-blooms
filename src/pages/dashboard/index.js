@@ -129,7 +129,6 @@ const useStyles = makeStyles((theme) => ({
     },
 
     link: {
-        backgroundColor: `${COLORS.lightTeal} !important`,
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
         color: theme.palette.primary.main
@@ -140,7 +139,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     linkItem: {
-        backgroundColor: COLORS.offWhite,
+        backgroundColor: `${COLORS.lightTeal} !important`,
         marginBottom: theme.spacing(2)
     },
 
@@ -241,7 +240,7 @@ const Dashboard = ({ children, title, logout }) => {
 
     return (
         <>
-            <Helmet><title>{`${title} | FXBlooms.com`}</title></Helmet>
+            <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <section className={classes.root}>
                 <Drawer 
                     variant="permanent"
@@ -259,7 +258,7 @@ const Dashboard = ({ children, title, logout }) => {
                     <div className={classes.toolbar}>
                         {open && 
                             <RouterLink to="/">
-                                <img className={classes.logo} src={logo} alt="FXBlooms Logo" />
+                                <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
                             </RouterLink>
                         }
                         <IconButton onClick={toggleDrawer}>

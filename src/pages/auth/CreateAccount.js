@@ -337,7 +337,7 @@ const CreateAccount = (props) => {
     return (
         <>
             <Helmet>
-                <title>Create Account | FXBlooms.com</title>
+                <title>Create Account | FXBLOOMS.com</title>
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
             {loading && <Spinner text="One moment . . ." />}
@@ -366,9 +366,9 @@ const CreateAccount = (props) => {
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>
                         <div className={classes.header}>
                             <Typography variant="h4">Create Account</Typography>
-                            <Typography variant="subtitle2" component="span">Complete the form below to create a profile.</Typography>
+                            <Typography variant="subtitle2" component="span">Complete the form below to create an account.</Typography>
                             <br /><br /><br />
-                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Profile details).</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Account details).</Typography>
                             <br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
@@ -446,11 +446,11 @@ const CreateAccount = (props) => {
                                                     >
                                                         {showPassword ? 
                                                             <Tooltip title="Hide Password" placement="bottom" arrow>
-                                                                <EyeOffOutline />
+                                                                <EyeOutline />
                                                             </Tooltip>
                                                                 : 
-                                                            <Tooltip title="Show Password" placement="bottom" arrow>
-                                                                <EyeOutline />
+                                                                <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                    <EyeOffOutline />
                                                             </Tooltip>
                                                          }
                                                     </IconButton>
@@ -518,11 +518,11 @@ const CreateAccount = (props) => {
                                                     >
                                                         {showConfirmPassword ? 
                                                             <Tooltip title="Hide Password" placement="bottom" arrow>
-                                                                <EyeOffOutline />
+                                                                <EyeOutline />
                                                             </Tooltip>
                                                                 : 
-                                                            <Tooltip title="Show Password" placement="bottom" arrow>
-                                                                <EyeOutline />
+                                                                <Tooltip title="Show Password" placement="bottom" arrow>
+                                                                <EyeOffOutline />
                                                             </Tooltip>
                                                          }
                                                     </IconButton>

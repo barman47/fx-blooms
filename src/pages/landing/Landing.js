@@ -242,7 +242,7 @@ const Landing = (props) => {
             <section className={classes.root}>
                 <div className={classes.content}>
                     <Typography variant="subtitle2" component="p">LAUNCHING 29-07-2021</Typography>
-                    <img src={logo} alt="FXBlooms Logo" />
+                    <img src={logo} alt="FXBLOOMS Logo" />
                     <Typography variant="h6">FX Blooms is a marketplace for peer-to-peer currency exchange.</Typography>
                     <form onSubmit={onSubmit} noValidate>
                         <Typography variant="subtitle2" component="span">Subscribe to receive our most recent updates.</Typography>
@@ -274,7 +274,7 @@ const Landing = (props) => {
                     </form>
                 </div>
                 <div className={classes.timerSection}>
-                    <img src={img} alt="FXBlooms.com" />
+                    <img src={img} alt="FXBLOOMS.com" />
                     <Typography variant="h6" align="center">LAUNCHING IN</Typography>
                     <div className={classes.timerContainer}>
                         <CountdownCircleTimer

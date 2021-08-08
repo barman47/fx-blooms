@@ -83,6 +83,7 @@ const theme = createMuiTheme({
 		  	},
 		},
 	},
+	
 	palette: {
 		primary: {
 			// light: '#df3c3a',

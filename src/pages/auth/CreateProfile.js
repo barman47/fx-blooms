@@ -527,7 +527,7 @@ const CreateProfile = (props) => {
 
     return (
         <>
-            <Helmet><title>Create Profile | FXBlooms.com</title></Helmet>
+            <Helmet><title>Create Profile | FXBLOOMS.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -558,10 +558,10 @@ const CreateProfile = (props) => {
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>
                         <div className={classes.header}>
-                            <Typography variant="h4">Create Profile</Typography>
-                            <Typography variant="subtitle2" component="span">Complete the form below to create an acount.</Typography>
+                            <Typography variant="h4">Create a profile</Typography>
+                            <Typography variant="subtitle2" component="span">Complete the form below to create a profile.</Typography>
                             <br /><br /><br />
-                            <Typography variant="subtitle2" component="span" color="primary">2 of 2 (Personal details).</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">2 of 2 (Profile details).</Typography>
                             <br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>

@@ -129,7 +129,7 @@ const QrCode = (props) => {
 
     return (
         <>
-            <Helmet><title>Setup Two Factor Authentication | FXBlooms.com</title></Helmet>
+            <Helmet><title>Setup Two Factor Authentication | FXBLOOMS.com</title></Helmet>
             {msg && 
                 <Toast 
                     ref={toast}

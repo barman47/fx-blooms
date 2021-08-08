@@ -1,6 +1,7 @@
+import { batch } from 'react-redux';
 import axios from 'axios';
 
-import { SET_CHATS } from './types';
+import { PAYMENT_MADE, SET_CHATS, SET_CUSTOMER_MSG } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
@@ -24,6 +25,25 @@ export const sendMessage = (message) => async (dispatch) => {
     try {
         await reIssueToken();
         await axios.post(`${api}/SendMessage`, message);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const sendTransactionNotification = (chatId) => async (dispatch) => {
+    try {
+        await reIssueToken();
+        const res = await axios.post(`${api}/TransactionNotification?chatId=${chatId}`);
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: res.data.data
+            });
+            dispatch({
+                type: PAYMENT_MADE,
+                payload: true
+            });
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

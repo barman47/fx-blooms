@@ -42,6 +42,9 @@ const login = (data) => {
         if (!Validator.isNumeric(data.MinExchangeAmount) || data.MinExchangeAmount <= 0) {
             errors.MinExchangeAmount = 'Invalid amount!';
         }
+        if (data.MinExchangeAmount && data.ExchangeAmount && Number(data.MinExchangeAmount) > Number(data.ExchangeAmount)) {
+            errors.MinExchangeAmount = 'Minimum exchange amount cannot be greater than available amount!';
+        }
         if (Validator.isEmpty(data.MinExchangeAmount)) {
             errors.MinExchangeAmount = 'Amount is required!';
         }

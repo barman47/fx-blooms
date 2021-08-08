@@ -148,7 +148,7 @@ const ForgotPassword = (props) => {
 
     return (
         <>
-            <Helmet><title>Forgot Password | FXBlooms.com</title></Helmet>
+            <Helmet><title>Forgot Password | FXBLOOMS.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}

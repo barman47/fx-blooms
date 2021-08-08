@@ -7,7 +7,7 @@ import Footer from './Footer';
 const index = ({ children, title, description }) => (
     <>
         <Helmet>
-            <title>{`${title} | FXBlooms.com`}</title>
+            <title>{`${title} | FXBLOOMS.com`}</title>
             {description && <meta name="description" content={description} />}
         </Helmet>
         <Header />

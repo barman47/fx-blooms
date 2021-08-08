@@ -8,6 +8,7 @@ const handleError =  (err, dispatch) => {
     });
 
     console.log(err.response);
+    console.log(err.message);
     
     if (err?.message === NETWORK_ERROR) {
         console.log('network error');

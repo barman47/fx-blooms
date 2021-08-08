@@ -78,7 +78,7 @@ const AdminDashboard = ({ children, title, getCustomers }) => {
 
     return (
         <>
-            <Helmet><title>{`${title} | FXBlooms.com`}</title></Helmet>
+            <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AppBar 
                 position="fixed"
                 elevation={0}
@@ -90,7 +90,7 @@ const AdminDashboard = ({ children, title, getCustomers }) => {
                 <Toolbar style={{ padding: 0 }}>
                     <Grid container direction="row" justify="space-between" alignItems="center">
                         <Grid item>
-                            <img src={logo} alt="FXBlooms Logo" />
+                            <img src={logo} alt="FXBLOOMS Logo" />
                         </Grid>
                         <Grid item>
                             <Grid container direction="row" alignItems="center" spacing={2}>

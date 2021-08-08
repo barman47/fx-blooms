@@ -131,7 +131,7 @@ const AdminLogin = (props) => {
 
     return (
         <>
-            <Helmet><title>AdminLogin | FXBlooms.com</title></Helmet>
+            <Helmet><title>AdminLogin | FXBLOOMS.com</title></Helmet>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
@@ -148,7 +148,7 @@ const AdminLogin = (props) => {
                 </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
-                        FXBlooms Admin
+                        FXBLOOMS Admin
                     </Typography>
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
