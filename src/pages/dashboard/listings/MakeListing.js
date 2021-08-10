@@ -294,9 +294,9 @@ const MakeListing = (props) => {
             return setErrors({ ...errors, msg: 'Invalid listing data' });
         }
 
-        // if (!customer.hasProvidedResidencePermit) {
-        //     return setShowResidencePermitModal(true);
-        // }
+        if (!customer.hasProvidedResidencePermit) {
+            return setShowResidencePermitModal(true);
+        }
 
         if (customer.profile.listings >= 2) { // and there is no account number
             return setOpenAccountModal(true);

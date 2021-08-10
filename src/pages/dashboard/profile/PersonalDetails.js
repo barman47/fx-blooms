@@ -69,9 +69,7 @@ const PersonalDetails = () => {
     const [stateId, setStateId] = useState('');
     const [states, setStates] = useState([]);
     const [PostalCode, setPostalCode] = useState('');
-    // eslint-disable-next-line
     const [Listings, setListings] = useState(0);
-    // eslint-disable-next-line
     const [Transactions, setTransactions] = useState(0);
     
     // eslint-disable-next-line
@@ -80,15 +78,17 @@ const PersonalDetails = () => {
 
     useEffect(() => {
         if (profile) {
-            const { firstName, lastName, email, username, phoneNo, countryId, stateId, postalCode } = profile;
+            const { firstName, lastName, email, userName, phoneNo, countryId, stateId, postalCode, numberOfListings, numberOfSuccessfulTransactions } = profile;
             setFirstName(firstName);
             setLastName(lastName);
             setEmail(email);
-            setUsername(username);
+            setUsername(userName);
             setPhoneNo(phoneNo);
             setCountryId(countryId);
             setStateId(stateId);
             setPostalCode(postalCode);
+            setListings(numberOfListings);
+            setTransactions(numberOfSuccessfulTransactions);
         }
     }, [profile]);
 
@@ -148,7 +148,7 @@ const PersonalDetails = () => {
                                 helperText={errors.FirstName}
                                 fullWidth
                                 required
-                                disabled={editable ? false : true}
+                                disabled
                                 error={errors.FirstName ? true : false}
                             />
                         </Grid>
@@ -164,7 +164,8 @@ const PersonalDetails = () => {
                                 helperText={errors.LastName}
                                 fullWidth
                                 required
-                                disabled={editable ? false : true}
+                                // disabled={editable ? false : true}
+                                disabled
                                 error={errors.LastName ? true : false}
                             />
                         </Grid>
@@ -227,7 +228,7 @@ const PersonalDetails = () => {
                                 multiline
                                 rows={1}
                                 required
-                                disabled={editable ? false : true}
+                                disabled
                                 error={errors.Address ? true : false}
                             />
                         </Grid>
@@ -261,7 +262,7 @@ const PersonalDetails = () => {
                             <FormControl 
                                     variant="outlined" 
                                     error={errors.city ? true : false}
-                                    disabled={editable ? false : true}
+                                    disabled
                                     fullWidth 
                                     required
                                 >
@@ -292,7 +293,7 @@ const PersonalDetails = () => {
                                 helperText={errors.PostalCode}
                                 fullWidth
                                 required
-                                disabled={editable ? false : true}
+                                disabled
                                 error={errors.PostalCode ? true : false}
                             />
                         </Grid>

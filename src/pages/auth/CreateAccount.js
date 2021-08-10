@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import { 
     Button, 
+    Checkbox,
     Grid, 
     IconButton, 
     Link,
@@ -199,6 +200,7 @@ const CreateAccount = (props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const [checked, setChecked] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const [showStrengthBadge, setShowStrengthBadge] = useState(false);
@@ -326,12 +328,12 @@ const CreateAccount = (props) => {
         setLoading(true);
         setErrors({});
         dispatch({ type: GET_ERRORS, payload: {} });
-        props.registerCustomer(Username, Email);
-        // props.registerCustomer({
-        //     EmailAddress: data.Email,
-        //     Username,
-        //     Password
-        // });
+        // props.registerCustomer(Username, Email);
+        props.registerCustomer({
+            EmailAddress: data.Email,
+            Username,
+            Password
+        });
     };
 
     return (
@@ -359,8 +361,10 @@ const CreateAccount = (props) => {
                             </RouterLink>
                             <img src={img} className={classes.image} alt="FX Blooms logo" />
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thank you for visiting FXBLOOMS!</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.text}>Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to see a list of available offerings.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to enjoy our superb service.</Typography>
+                            {/* <Typography variant="subtitle2" component="span" className={classes.text}>Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to see a list of available offerings.</Typography> */}
                         </div>
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>
@@ -533,7 +537,14 @@ const CreateAccount = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">By clicking proceed, you agree to our <Link component={RouterLink} to={TERMS} target="_blank">terms and conditions</Link></Typography>
+                                <Checkbox
+                                    color="primary"
+                                    checked={checked}
+                                    onChange={() => setChecked(!checked)}
+                                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                                />
+                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <Link component={RouterLink} to={TERMS} target="_blank">terms and conditions</Link></Typography>
+
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Button 
@@ -541,6 +552,7 @@ const CreateAccount = (props) => {
                                         color="primary"
                                         type="submit"
                                         fullWidth
+                                        disabled={checked ? false : true}
                                     >
                                         Proceed
                                     </Button>

@@ -66,7 +66,11 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& h6': {
-            width: '95%'
+            width: '95%',
+
+            [theme.breakpoints.down('sm')]: {
+                fontSize: theme.spacing(2)
+            }
         }
     },
 

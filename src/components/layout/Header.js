@@ -48,7 +48,7 @@ const useStyles = makeStyles(theme => ({
     link: {
         color: COLORS.darkGrey,
         cursor: 'pointer',
-        fontWeight: 300,
+        fontWeight: 500,
         textDecoration: 'none',
         transition: '0.3s linear all',
 
@@ -151,7 +151,7 @@ const Header = (props) => {
                                 {
                                     isAuthenticated ?
                                     <Grid item>
-                                        <Link to={`${DASHBOARD}${DASHBOARD_HOME}`} component={RouterLink}>Listings</Link>
+                                        <Link to={`${DASHBOARD}${DASHBOARD_HOME}`} component={RouterLink}>All Listings</Link>
                                     </Grid>
                                     :
                                     <>

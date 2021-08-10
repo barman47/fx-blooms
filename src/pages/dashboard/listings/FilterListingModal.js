@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState, useImperativeHandle } from 'react';
 import { connect, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
     Backdrop,
 	Button,
+	CircularProgress,
     Fade,
 	FormControl,
 	FormHelperText,
@@ -15,7 +15,8 @@ import {
 	TextField,
 	Typography 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import Rating from '@material-ui/lab/Rating';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { getListingsOpenForBid } from '../../../actions/listings';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -81,28 +82,44 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) => {
+const MobileFilterModal = forwardRef((props, ref) => {
+
+    const [open, setOpen] = useState(false);
+
+    const { getListingsOpenForBid } = props;
+
+    const closeModal = useCallback(() => {
+        setOpen(false);
+    }, []);
+
+    useImperativeHandle(ref, () => ({
+        openModal: () => {
+            setOpen(true);
+        }
+    }));
     const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	
     const classes = useStyles();
-	const { currencies } = useSelector(state => state);
+	const theme = useTheme();
+	
 	const { listings } = useSelector(state => state.listings);
+	const { currencies } = useSelector(state => state);
 
 	const [AvailableCurrency, setAvailableCurrency] = useState('');
 	const [RequiredCurrency, setRequiredCurrency] = useState('');
 	const [Amount, setAmount] = useState('');
 
-	const [SellerRating, setSellerRating] = useState('');
-	// eslint-disable-next-line
+	const [SellerRating, setSellerRating] = useState(0);
+
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
 
     useEffect(() => {
         setLoading(false);
-        handleCloseModal();
-    }, [handleCloseModal, listings])
+        closeModal();
+    }, [closeModal, listings])
 
 	const handleClearFilter = () => {
 		setFilter(PRICE);
@@ -130,14 +147,14 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 				pageNumber: 0,
 				pageSize: 15,
 				currencyAvailable: 'NGN',
-				currencyNeeded: 'NGN',
+				currencyNeeded: 'EUR',
 				minimumExchangeAmount: 0,
 				useCurrencyFilter: false,
 				useRatingFilter: true,
 				sellerRating: parseInt(SellerRating)
 			});
-			// Get rating by star
 		} else {
+			// Get rating by star
 			const priceFilter = {
 				AvailableCurrency,
 				RequiredCurrency,
@@ -166,16 +183,16 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 
 	return (
         <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={handleCloseModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
+			aria-labelledby="transition-modal-title"
+			aria-describedby="transition-modal-description"
+			className={classes.modal}
+			open={open}
+			onClose={() => setOpen(false)}
+			closeAfterTransition
+			BackdropComponent={Backdrop}
+			BackdropProps={{
+				timeout: 500,
+			}}
         >
             <Fade in={open}>
                 <Grid item lg={3} className={classes.filterContainer}>
@@ -211,7 +228,7 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 							</Button>
 						</header>
 						{
-							filter === PRICE
+						filter === PRICE
 							?
 							<Grid container direction="row" spacing={1}>
 								<Grid item xs={12}>
@@ -238,7 +255,9 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 									</FormControl>
 								</Grid>
 								<Grid item xs={12}>
-									<Typography variant="subtitle2">I Want</Typography>
+									<Typography variant="subtitle2">Amount</Typography>
+								</Grid>
+								<Grid item xs={5}>
 									<FormControl 
 										variant="outlined" 
 										error={errors.RequiredCurrency ? true : false } 
@@ -250,35 +269,13 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 											labelId="RequiredCurrency"
 											value={RequiredCurrency}
 											onChange={(e) => setRequiredCurrency(e.target.value)}
-										
 										>
-											<MenuItem value="">Select Currency</MenuItem>
+											<MenuItem value="" disabled>Select</MenuItem>
 											{currencies.length > 0 && currencies.map((currency, index) => (
 												<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
 											))}
 										</Select>
-										<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-									</FormControl>
-								</Grid>
-								<Grid item xs={12}>
-									<Typography variant="subtitle2">Min. Exchange Amount</Typography>
-								</Grid>
-								<Grid item xs={5}>
-									<FormControl 
-										variant="outlined" 
-										error={errors.AvailableCurrency ? true : false } 
-										fullWidth 
-										required
-										disabled={true}
-									>
-										<Select
-											labelId="AvailableCurrency"
-											value={AvailableCurrency}
-										
-										>
-											<MenuItem value={AvailableCurrency}>{AvailableCurrency}</MenuItem>
-										</Select>
-										<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
+										<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
 									</FormControl>
 								</Grid>
 								<Grid item xs={7}>
@@ -292,6 +289,7 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 										fullWidth
 										required
 										error={errors.Amount ? true : false}
+										disabled={loading ? true : false}
 									/>
 								</Grid>
 								<Grid item xs={12}>
@@ -300,36 +298,23 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 										variant="contained" 
 										color="primary"
 										fullWidth
-										>
-											Filter Result
+										disabled={loading ? true : false}
+									>
+										{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 									</Button>
 								</Grid>
 							</Grid>
 							:
 							<Grid container direction="row" spacing={2}>
 								<Grid item xs={12}>
-									<Typography variant="subtitle2">Number of Stars</Typography>
-										<FormControl 
-											variant="outlined" 
-											error={errors.SellerRating ? true : false } 
-											fullWidth 
-											required
-										>
-											<Select
-												labelId="SellerRating"
-												value={SellerRating}
-												onChange={(e) => setSellerRating(e.target.value)}
-											
-											>
-												<MenuItem value="">Select Number of Stars</MenuItem>
-												<MenuItem value="1">1</MenuItem>
-												<MenuItem value="2">2</MenuItem>
-												<MenuItem value="3">3</MenuItem>
-												<MenuItem value="4">4</MenuItem>
-												<MenuItem value="5">5</MenuItem>
-											</Select>
-											<FormHelperText>{errors.SellerRating}</FormHelperText>
-										</FormControl>
+									<Rating 
+										color="primary" 
+										name="seller-rating"  
+										style={{ color: theme.palette.primary.main }}
+										value={SellerRating}
+										onChange={(e) => setSellerRating(e.target.value)}
+										disabled={loading ? true : false}
+									/>
 								</Grid>
 								<Grid item xs={12}>
 									<Button 
@@ -337,8 +322,9 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
 										variant="contained" 
 										color="primary"
 										fullWidth
-										>
-											Filter Result
+										disabled={loading ? true : false}
+									>
+										{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 									</Button>
 								</Grid>
 							</Grid>
@@ -348,11 +334,6 @@ const MobileFilterModal = ({ getListingsOpenForBid, open, handleCloseModal }) =>
             </Fade>
         </Modal>
 	);
-};
-
-MobileFilterModal.propTypes = {
-    open: PropTypes.bool.isRequired,
-    handleCloseModal: PropTypes.func.isRequired
-};
+});
 
 export default connect(undefined, { getListingsOpenForBid })(MobileFilterModal);

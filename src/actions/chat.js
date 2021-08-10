@@ -34,6 +34,7 @@ export const sendTransactionNotification = (chatId) => async (dispatch) => {
     try {
         await reIssueToken();
         const res = await axios.post(`${api}/TransactionNotification?chatId=${chatId}`);
+        console.log(res);
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,

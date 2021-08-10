@@ -14,7 +14,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 import PropTypes from 'prop-types';
 
 // eslint-disable-next-line
-import { SET_CUSTOMER_MSG, SET_LISTING } from '../../../actions/types';
+import { PAYMENT_MADE, SET_CUSTOMER_MSG, SET_LISTING } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
@@ -56,16 +56,11 @@ const Actions = (props) => {
     const { listing } = useSelector(state => state.listings);
     const { customerId, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { sessionId } = useSelector(state => state.chat);
+    // eslint-disable-next-line
+    const { paymentMade, paymentReceived, sessionId } = useSelector(state => state.chat);
 
     const [Message, setMessage] = useState('');
     const [sellerRating, setSellerRating] = useState(null);
-    // eslint-disable-next-line
-    const [completingTransaction, setCompletingTransaction] = useState(false);
-    // eslint-disable-next-line
-    const [paymentMade, setPaymentMade] = useState(false);
-    // eslint-disable-next-line
-    const [paymentReceived, setPaymentReceived] = useState(false);
     const [loading, setLoading] = useState(false);
     
     const [connection, setConnection] = useState(null);
@@ -94,8 +89,10 @@ const Actions = (props) => {
                     setConnected(true);
                     connection.on('TransferNotification', notification => {
                         console.log('notification ', notification);
-                        setPaymentMade(true);
-                        
+                        dispatch({
+                            type: PAYMENT_MADE,
+                            payload: { ...JSON.parse(notification) }
+                        }); 
                     });
                 })
                 .catch(err => {
@@ -235,7 +232,8 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading ? true : false}
+                                                disabled={loading || !paymentMade ? true : false}
+                                                onClick={handlePayment}
                                             >
                                                 Payment Received
                                             </Button>
@@ -248,14 +246,14 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading ? true : false}
+                                                disabled={loading || paymentMade ? true : false}
                                                 onClick={handlePayment}
                                             >
                                                 I've Made Payment
                                             </Button>
                                         </Grid>
                                     }
-                                    {!completingTransaction && 
+                                    {!paymentMade && 
                                         <Grid item xs={12}>
                                             <Button 
                                                 className={classes.button}

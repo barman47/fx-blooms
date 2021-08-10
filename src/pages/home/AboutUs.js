@@ -15,8 +15,11 @@ const useStyles = makeStyles(theme => ({
     },
 
     left: {
-        display: 'grid',
-        gridTemplateColumns: '1fr'
+        width: '80%',
+
+        '& h3': {
+            fontWeight: 300
+        }
     },
 
     text: {
@@ -32,22 +35,22 @@ const AboutUs = () => {
     const classes = useStyles();
 
     return (
-        <Grid container direction="row" spacing={5} className={classes.root} id={ABOUT_US}>
-            <Grid item xs={12} lg={5}>
-                <Grid container direction="column" spacing={5}>
+        <Grid container direction="row" spacing={10} className={classes.root} id={ABOUT_US}>
+            <Grid item xs={12} lg={4} className={classes.left}>
+                <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h3">About Us</Typography>
                     </Grid>
-                <Grid item>
-                    <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>
+                    <Grid item>
+                        <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
+                    </Grid>
+                    <Grid item>
+                        <Button to={SIGN_UP} component={RouterLink} color="primary" size="large">Get Started</Button>
+                    </Grid>
                 </Grid>
-                <Grid item>
-                    <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
-                </Grid>
-                <Grid item>
-                    <Button to={SIGN_UP} component={RouterLink} color="primary" size="large">Get Started</Button>
-                </Grid>
-            </Grid>
             </Grid>
             <Grid item xs={12} lg={7}>
                 <img src={img} className={classes.img} alt="About FXBLOOMS" />

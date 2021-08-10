@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -19,6 +19,7 @@ import {
 	Typography,
 	useMediaQuery 
 } from '@material-ui/core';
+import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
@@ -156,10 +157,10 @@ const AllListings = (props) => {
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
-	
-	const [open, setOpen] = useState(false);
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
+
+	const filterModal = useRef();
 
 	useEffect(() => {
 		handleSetTitle('All Listings');
@@ -174,7 +175,6 @@ const AllListings = (props) => {
 	}, []);
 
 	const getListings = () => {
-		console.log('getting listings');
 		getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
@@ -186,7 +186,6 @@ const AllListings = (props) => {
 	};
 
 	const getMoreListings = () => {
-		console.log('getting listings');
 		getListingsOpenForBid({
 			pageNumber: currentPageNumber + 1,
 			pageSize: 15,
@@ -198,11 +197,7 @@ const AllListings = (props) => {
 	};
 
 	const handleOpenModal = () => {
-		setOpen(true);
-	};
-
-	const handleCloseModal = () => {
-		setOpen(false);
+		filterModal.current.openModal();
 	};
 
 	const hideListingsInNegotiation = () => {
@@ -212,6 +207,7 @@ const AllListings = (props) => {
 	return (
 		<>
 			<SellerNoticeModal />
+			<FilterListingModal ref={filterModal} />
 			<section className={classes.root} id="parent">
 				<Tooltip title="Filter Listings" arrow>
 					<Fab 
@@ -223,7 +219,6 @@ const AllListings = (props) => {
 						<FilterOutline />
 					</Fab>
 				</Tooltip>
-				<FilterListingModal open={open} handleCloseModal={handleCloseModal} />
 				<Grid container direction="row">
 					<Grid item xs={12} lg={9} className={classes.listings}>
 						<header className={classes.listingHeader}>
@@ -267,14 +262,14 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
+	const theme = useTheme();
 	const { currencies, listings } = useSelector(state => state);
 
 	const [AvailableCurrency, setAvailableCurrency] = useState('');
 	const [RequiredCurrency, setRequiredCurrency] = useState('');
 	const [Amount, setAmount] = useState('');
 
-	const [SellerRating, setSellerRating] = useState('');
-	// eslint-disable-next-line
+	const [SellerRating, setSellerRating] = useState(0);
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
@@ -320,6 +315,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 
 			setErrors({});
 			setLoading(true);
+			console.log(SellerRating);
 			props.getListingsOpenForBid({
 				pageNumber: 0,
 				pageSize: 15,
@@ -418,29 +414,6 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 							</FormControl>
 						</Grid>
-						{/* <Grid item xs={12}>
-							<Typography variant="subtitle2">I Want</Typography>
-							<FormControl 
-								variant="outlined" 
-								error={errors.RequiredCurrency ? true : false } 
-								fullWidth 
-								required
-								disabled={loading ? true : false}
-							>
-								<Select
-									labelId="RequiredCurrency"
-									value={RequiredCurrency}
-									onChange={(e) => setRequiredCurrency(e.target.value)}
-								
-								>
-									<MenuItem value="">Select Currency</MenuItem>
-									{currencies.length > 0 && currencies.map((currency, index) => (
-										<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
-									))}
-								</Select>
-								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-							</FormControl>
-						</Grid> */}
 						<Grid item xs={12}>
 							<Typography variant="subtitle2">Amount</Typography>
 						</Grid>
@@ -494,8 +467,16 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 					:
 					<Grid container direction="row" spacing={2}>
 						<Grid item xs={12}>
-							<Typography variant="subtitle2">Number of Stars</Typography>
-								<FormControl 
+							<Rating 
+								color="primary" 
+								name="seller-rating"  
+								style={{ color: theme.palette.primary.main }}
+								value={SellerRating}
+								onChange={(e) => setSellerRating(e.target.value)}
+								disabled={loading ? true : false}
+							/>
+							{/* <Typography variant="subtitle2">Number of Stars</Typography> */}
+								{/* <FormControl 
 									variant="outlined" 
 									error={errors.SellerRating ? true : false } 
 									fullWidth 
@@ -516,7 +497,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 										<MenuItem value="5">5</MenuItem>
 									</Select>
 									<FormHelperText>{errors.SellerRating}</FormHelperText>
-								</FormControl>
+								</FormControl> */}
 						</Grid>
 						<Grid item xs={12}>
 							<Button 
@@ -531,7 +512,6 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 						</Grid>
 					</Grid>
 				}
-				
 			</form>
 			<Link 
 				to="#!" 

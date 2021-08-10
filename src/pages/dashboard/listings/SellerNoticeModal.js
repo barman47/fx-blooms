@@ -66,7 +66,6 @@ const SellerNoticeModal = () => {
     const HAS_SEEN_SELLER_WARNING = 'hasSeenSellerWarning';
 
     useEffect(() => {
-        console.log(localStorage.HAS_SEEN_SELLER_WARNING);
         if (!localStorage.getItem(HAS_SEEN_SELLER_WARNING)) {
             setOpen(true);
         }

@@ -3,7 +3,9 @@ import { EXIT_CHAT, PAYMENT_MADE, PAYMENT_RECEIVED, SET_CHAT, SET_CHATS, SENT_ME
 const initialState = {
     chat: null,
     chats: [],
-    sessionId: null
+    sessionId: null,
+    paymentMade: null,
+    paymentReceived: null
 };
 
 const chatsReducer = (state = initialState, action) => {
@@ -48,13 +50,13 @@ const chatsReducer = (state = initialState, action) => {
         case PAYMENT_MADE:
             return {
                 ...state,
-                chat: { ...state.chat, paymentMade: action.payload}
+                paymentMade: action.payload
             };
 
         case PAYMENT_RECEIVED:
             return {
                 ...state,
-                chat: { ...state.chat, paymentReceived: action.payload}
+                paymentReceived: action.payload
             };
 
         default:

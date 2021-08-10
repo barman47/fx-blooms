@@ -84,6 +84,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
     button: {
+        color: `${COLORS.offWhite} !important`,
         padding: [[theme.spacing(0.5), theme.spacing(5)]],
 
         [theme.breakpoints.down('lg')]: {

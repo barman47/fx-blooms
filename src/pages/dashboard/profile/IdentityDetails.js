@@ -74,6 +74,7 @@ const IdentityDetails = () => {
     const [idBack, setIdBack] = useState('');
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line
     const [editable, setEditable] = useState(false);
 
     useEffect(() => {
@@ -95,7 +96,7 @@ const IdentityDetails = () => {
             <Grid item>
                 <Box className={classes.header}>
                     <Typography variant="subtitle2">Identity Details</Typography>
-                    <Button color="primary" classes={{ root: classes.button }} onClick={() => setEditable(true)}>Edit</Button>
+                    {/* <Button color="primary" classes={{ root: classes.button }} onClick={() => setEditable(true)}>Edit</Button> */}
                 </Box>
             </Grid>
             <Divider />

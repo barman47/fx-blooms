@@ -38,8 +38,8 @@ const Listings = () => {
     return (
         <>
             {listings.length > 0 ? 
-                listings.map(listing => (
-                    <Listing key={listing.id} listing={listing} />
+                listings.map((listing, index) => (
+                    <Listing key={index} listing={listing} />
                 ))
                 :
                 <div className={classes.noListingContent}>
