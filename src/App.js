@@ -33,6 +33,7 @@ import UserDetails from './pages/dashboard/listings/UserDetails';
 import Profile from './pages/dashboard/profile';
 
 import Messages from './pages/dashboard/messages';
+import MobileConversation from './pages/dashboard/messages/MobileConversation';
 
 // import setAuthToken from './utils/setAuthToken';
 // import isTokenExpired from './utils/tokenExpired';
@@ -66,7 +67,8 @@ import {
 	RESET_PASSWORD,
 	TERMS,
 	FAQS,
-	PRIVACY_POLICY
+	PRIVACY_POLICY,
+	MOBILE_CONVERSATION
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -158,6 +160,7 @@ const [title, setTitle] = useState('');
 								<PrivateRoute path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${MOBILE_CONVERSATION}`} exact component={() => <MobileConversation handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
 						</PrivateRoute>
 						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />

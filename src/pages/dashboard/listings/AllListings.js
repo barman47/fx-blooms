@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import InfiniteScroll from 'react-infinite-scroll-component';
+// import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
@@ -17,7 +17,7 @@ import {
 	TextField,
 	Tooltip,
 	Typography,
-	useMediaQuery 
+	// useMediaQuery 
 } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -151,12 +151,13 @@ const useStyles = makeStyles(theme => ({
 
 const AllListings = (props) => {
 	const classes = useStyles();
-	const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('md'));
+	// const theme = useTheme();
+    // const matches = useMediaQuery(theme.breakpoints.down('md'));
 
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings } = useSelector(state => state.listings);
+	// const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
 
@@ -185,16 +186,16 @@ const AllListings = (props) => {
 		});
 	};
 
-	const getMoreListings = () => {
-		getListingsOpenForBid({
-			pageNumber: currentPageNumber + 1,
-			pageSize: 15,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
-			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
-		});	
-	};
+	// const getMoreListings = () => {
+	// 	getListingsOpenForBid({
+	// 		pageNumber: currentPageNumber + 1,
+	// 		pageSize: 15,
+	// 		currencyNeeded: 'EUR',
+	// 		currencyAvailable: 'NGN',
+	// 		minimumExchangeAmount: 0,
+	// 		useCurrencyFilter: false
+	// 	});	
+	// };
 
 	const handleOpenModal = () => {
 		filterModal.current.openModal();
@@ -228,7 +229,7 @@ const AllListings = (props) => {
 								<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
 							</div>
 						</header>
-						<InfiniteScroll 
+						{/* <InfiniteScroll 
 							className={classes.listingContainer}
 							dataLength={listings.length || 5}
 							next={getMoreListings}
@@ -247,9 +248,9 @@ const AllListings = (props) => {
 							// endMessage={}
 							scrollableTarget="parent"
 							height="100%"
-						>
+						> */}
 							<Listings />
-						</InfiniteScroll>
+						{/* </InfiniteScroll> */}
 					</Grid>
 					<Filter />
 				</Grid>

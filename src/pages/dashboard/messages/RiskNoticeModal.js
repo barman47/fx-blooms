@@ -66,7 +66,6 @@ const RiskNoticeModal = () => {
     const HAS_SEEN_RISK_NOTICE = 'hasSeenRiskNotice';
 
     useEffect(() => {
-        console.log(localStorage.HAS_SEEN_RISK_NOTICE);
         if (!localStorage.getItem(HAS_SEEN_RISK_NOTICE)) {
             setOpen(true);
         }

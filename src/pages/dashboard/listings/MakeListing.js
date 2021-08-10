@@ -225,6 +225,24 @@ const MakeListing = (props) => {
         }
     }, [ExchangeAmount, MinExchangeAmount]);
 
+    // useEffect(() => {
+    //     if (ExchangeAmount && ReceiptAmount) {
+    //         setExchangeRate(Math.round(Number(ReceiptAmount) / Number(ExchangeAmount)))
+    //     }
+    // }, [ExchangeAmount, ReceiptAmount]);
+
+    useEffect(() => {
+        if (ExchangeAmount && ExchangeRate) {
+            setReceiptAmount(Number(ExchangeAmount) * Number(ExchangeRate))
+        }
+    }, [ExchangeAmount, ExchangeRate]);
+
+    // useEffect(() => {
+    //     if (ReceiptAmount && ExchangeRate) {
+    //         setExchangeAmount(Number(ReceiptAmount) / Number(ExchangeRate))
+    //     }
+    // }, [ReceiptAmount, ExchangeRate]);
+
     // const handleSetReceiptAmount = (e) => {
     //     if (isEmpty(e.target.value)) {
     //         return setReceiptAmount('');
@@ -364,7 +382,7 @@ const MakeListing = (props) => {
                                         >
                                             <MenuItem value="">Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
-                                                <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                                <MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
                                             ))}
                                         </Select>
                                         <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
@@ -489,10 +507,9 @@ const MakeListing = (props) => {
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
                                     <TextField
                                         value={ListingFee}
-                                        onChange={(e) => setListingFee(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter Amount"
+                                        placeholder="0% x 200"
                                         helperText={errors.ListingFee}
                                         fullWidth
                                         required

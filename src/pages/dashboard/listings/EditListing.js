@@ -190,6 +190,26 @@ const EditListing = (props) => {
         }
     }, [customerId, listing.id, listings]);
 
+    useEffect(() => {
+        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+        } else {
+            setErrors({});
+        }
+    }, [ExchangeAmount, MinExchangeAmount]);
+
+    // useEffect(() => {
+    //     if (ExchangeAmount && ReceiptAmount) {
+    //         setExchangeRate(Math.round(Number(ReceiptAmount) / Number(ExchangeAmount)))
+    //     }
+    // }, [ExchangeAmount, ReceiptAmount]);
+
+    useEffect(() => {
+        if (ExchangeAmount && ExchangeRate) {
+            setReceiptAmount(Number(ExchangeAmount) * Number(ExchangeRate))
+        }
+    }, [ExchangeAmount, ExchangeRate]);
+
     const resetForm = () => {
         setAvailableCurrency('');
         setExchangeAmount('');
@@ -277,7 +297,7 @@ const EditListing = (props) => {
                                     >
                                         <MenuItem value="">Select Currency</MenuItem>
                                         {currencies.length > 0 && currencies.map((currency, index) => (
-                                            <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+                                            <MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
                                         ))}
                                     </Select>
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
@@ -390,20 +410,6 @@ const EditListing = (props) => {
                                         error={errors.ReceiptAmount ? true : false}
                                     />
                                 </Tooltip>
-                            </Grid>
-                            <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
-                                <TextField
-                                    value={ListingFee}
-                                    onChange={(e) => setListingFee(e.target.value)}
-                                    type="text"
-                                    variant="outlined" 
-                                    placeholder="Enter Amount"
-                                    helperText={errors.ListingFee}
-                                    fullWidth
-                                    required
-                                    error={errors.ListingFee ? true : false}
-                                />
                             </Grid>
                             <Grid item xs={12}>
                                 <Button 

@@ -158,6 +158,9 @@ const SellerAccountModal = ({ addAccount, open, handleCloseModal }) => {
                     </header>
                     <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={2} className={classes.formContainer}>
+                            <Grid item>
+                                <Typography variant="subtitle2" component="span">Account Name</Typography>
+                            </Grid>
                             <Grid item xs={12}>
                                 <TextField
                                     value={AccountName}
@@ -165,7 +168,6 @@ const SellerAccountModal = ({ addAccount, open, handleCloseModal }) => {
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Account Name"
-                                    label="Account Name" 
                                     helperText={errors.AccountName}
                                     fullWidth
                                     required
@@ -174,13 +176,15 @@ const SellerAccountModal = ({ addAccount, open, handleCloseModal }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <Grid item>
+                                    <Typography variant="subtitle2" component="span">IBAN</Typography>
+                                </Grid>
                                 <TextField
                                     value={AccountNumber}
                                     onChange={(e) => setAccountNumber(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter IBAN"
-                                    label="IBAN" 
                                     helperText={errors.AccountNumber || 'Your account number'}
                                     fullWidth
                                     required
@@ -189,13 +193,15 @@ const SellerAccountModal = ({ addAccount, open, handleCloseModal }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <Grid item>
+                                    <Typography variant="subtitle2" component="span">Bank Name</Typography>
+                                </Grid>
                                 <TextField
                                     value={BankName}
                                     onChange={(e) => setBankName(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Bank Name"
-                                    label="Bank Name" 
                                     helperText={errors.BankName}
                                     fullWidth
                                     required

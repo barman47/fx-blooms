@@ -34,7 +34,11 @@ const useStyles = makeStyles(theme => ({
         margin: 0,
         position: 'sticky',
         top: 0,
-        zIndex: 1
+        zIndex: 1,
+
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
+        }
     },
 
     gridContainer: {
@@ -44,12 +48,13 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('md')]: {
             display: 'grid',
-            gridTemplateColumns: '2fr 1fr'
-        }
+            gridTemplateColumns: '1.5fr 2fr'
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            gridTemplateColumns: '1fr'
+        },
     },
-    // gridContainer: {
-    //     marginTop: theme.spacing(1)
-    // },
 
     messages: {
         maxHeight: '100%',
@@ -63,7 +68,8 @@ const useStyles = makeStyles(theme => ({
         },
         width: '25%',
         [theme.breakpoints.down('md')]: {
-            display: 'none'
+            // display: 'none'
+            width: '100%'
         }
     },
 
@@ -73,15 +79,15 @@ const useStyles = makeStyles(theme => ({
         overflowY: ["hidden", "-moz-scrollbars-none"],
         scrollbarWidth: "none",
         msOverflowStyle: "none",
-
-        [theme.breakpoints.down('md')]: {
-            width: '100%'
-        },
+        width: '50%',
 
         '&::-webkit-scrollbar': {
             display: 'none'
         },
-        width: '50%'
+
+        [theme.breakpoints.down('md')]: {
+            width: '100%'
+        }
     },
 
     actions: {
@@ -90,15 +96,15 @@ const useStyles = makeStyles(theme => ({
         overflowY: ["hidden", "-moz-scrollbars-none"],
         scrollbarWidth: "none",
         msOverflowStyle: "none",
+        width: '25%',
 
         [theme.breakpoints.down('md')]: {
-            width: '100%'
+            display: 'none'
         },
 
         '&::-webkit-scrollbar': {
             display: 'none'
-        },
-        width: '25%'
+        }
     }
 }));
 
@@ -112,6 +118,7 @@ const Index = (props) => {
         handleSetTitle('Messages');
         // eslint-disable-next-line
     }, []);
+
     return (
         <>
             <RiskNoticeModal />

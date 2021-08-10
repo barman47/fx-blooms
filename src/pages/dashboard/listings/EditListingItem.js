@@ -80,7 +80,8 @@ const EditListingItem = ({ edit, listing }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
-                    &#8358;(NGN)
+                    &#8358;{listing?.amountNeeded?.amount}
+                    {/* &#8358;(NGN) */}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>

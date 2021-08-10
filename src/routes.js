@@ -26,5 +26,6 @@ export const MAKE_LISTING = '/listings/create';
 export const EDIT_LISTING = '/listings/edit';
 export const USER_DETAILS = '/listings/sellerDetails';
 export const MESSAGES = '/messages';
+export const MOBILE_CONVERSATION = '/messages/mobile';
 export const PROFILE = '/profile';
 export const LOGOUT = '/logout';

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Attachment, Send } from 'mdi-material-ui';
+import { ArrowLeft, Attachment, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -17,20 +17,32 @@ import { Document } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SET_LISTING, SENT_MESSAGE } from '../../../actions/types';
-// import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
+import CompleteTransactionModal from './CompleteTransactionModal';
+
+// import avatar from '../../../assets/img/avatar.jpg';
 
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
         border: `1px solid ${COLORS.borderColor}`,
+        // borderBottom: `1px solid ${COLORS.borderColor}`,
+        // borderRight: `1px solid ${COLORS.borderColor}`,
+        // borderTop: `1px solid ${COLORS.borderColor}`,
         position: 'sticky',
         bottom: theme.spacing(1),
         left: 0,
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+
+        // [theme.breakpoints.down('md')]: {
+        //     border: '1px solid red',
+        //     height: '100vh'
+        // }
+        
     },
     
     header: {
@@ -167,11 +179,27 @@ const useStyles = makeStyles(theme => ({
         fontSize: '1rem !important',
         fontWeight: '500 !important',
         textDecoration: 'underline'
+    },
+
+    backButton: {
+        backgroundColor: COLORS.white,
+        marginBottom: theme.spacing(2),
+        padding: [[theme.spacing(2), 0, 0, theme.spacing(2)]],
+        margin: 0,
+        position: 'sticky',
+        top: 0,
+        zIndex: 1,
+        display: 'none',
+
+        [theme.breakpoints.down('sm')]: {
+            display: 'block'
+        }
     }
 }));
-const Conversation = (props) => {
+const MobileConversation = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const history = useHistory();
 
     const { customerId } = useSelector(state => state.customer);
     const { chat, paymentMade, sessionId } = useSelector(state => state.chat);
@@ -186,6 +214,8 @@ const Conversation = (props) => {
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
     const [newMessage, setNewMessage] = useState(false);
+
+    const [completeTransactionOpen, setCompleteTransactionOpen] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -205,9 +235,9 @@ const Conversation = (props) => {
         console.log(connect);
         setConnection(connect);
 
-        // return () => {
-        //     dispatch({ type: EXIT_CHAT });
-        // };
+        return () => {
+            dispatch({ type: EXIT_CHAT });
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -328,12 +358,39 @@ const Conversation = (props) => {
 
     const handleSelectAttachment = () => document.getElementById('attachment').click();
 
+    // const handleSetAttachment = (e) => {
+    //     // setAttachment(e.target.files[0]);
+    //     const reader = new FileReader();
+
+    //     reader.onload = (() => {
+    //         const file = reader.result; //Array Buffer
+    //         setAttachment(file);
+    //     });
+    //     reader.readAsDataURL(e.target.files[0]);
+    // };
+
+    const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
+
+    const showCompleteTransactionModal = () => {
+        setCompleteTransactionOpen(true);
+    };
+
     return (
         <>
-            <PaymentConfirmationTipsModal ref={paymentModal} />
             {chat ? 
 		        <section className={classes.root}>
                     <Grid container direction="row" justify="space-between" className={classes.header}>
+                    <PaymentConfirmationTipsModal ref={paymentModal} />
+                    <CompleteTransactionModal open={completeTransactionOpen} />
+                        <Grid item xs={12}>
+                            <Button component={RouterLink} color="primary" onClick={goBack} className={classes.backButton}>
+                                <ArrowLeft />
+                                &nbsp;&nbsp;Back
+                            </Button>
+                            <Button color="primary" onClick={showCompleteTransactionModal}>
+                                Complete Transaction
+                            </Button>
+                        </Grid>
                         <Grid item>
                             <Typography variant="subtitle1" component="p">Conversation</Typography>
                         </Grid>
@@ -453,8 +510,8 @@ const Conversation = (props) => {
     );
 };
 
-Conversation.propTypes = {
+MobileConversation.propTypes = {
     sendMessage: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { sendMessage })(Conversation);
+export default connect(undefined, { sendMessage })(MobileConversation);
