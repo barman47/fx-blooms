@@ -87,7 +87,7 @@ const ForgotPassword = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
-    const { msg } = useSelector(state => state.customer);
+    const { isAuthenticated, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setUsername] = useState('');
@@ -97,6 +97,13 @@ const ForgotPassword = (props) => {
 
     const successModal = useRef();
     const toast = useRef();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         if (errorsState?.msg) {

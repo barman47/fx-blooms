@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { PlayCircle } from 'mdi-material-ui';
@@ -86,6 +87,7 @@ const useStyles = makeStyles(theme => ({
 
 const Hero = () => {
     const classes = useStyles();
+    const { isAuthenticated } = useSelector(state => state.customer);
 
     return (
         <section className={classes.root}>
@@ -104,19 +106,21 @@ const Hero = () => {
                                 <span className={classes.highlight}> seemlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
                             </Typography>
                         </Grid>
-                        <Grid item xs={12} md={4}>
-                            <Button 
-                                classes={{ root: classes.getStarted }}
-                                variant="contained" 
-                                component={Link} 
-                                color="primary" 
-                                to={SIGN_UP}
-                                size="large"
-                                fullWidth
-                            >
-                                Get Started
-                            </Button>                            
-                        </Grid>
+                        {!isAuthenticated && 
+                            <Grid item xs={12} md={4}>
+                                <Button 
+                                    classes={{ root: classes.getStarted }}
+                                    variant="contained" 
+                                    component={Link} 
+                                    color="primary" 
+                                    to={SIGN_UP}
+                                    size="large"
+                                    fullWidth
+                                >
+                                    Get Started
+                                </Button>                            
+                            </Grid>
+                        }
                         <Grid item xs={12} md={4}>
                             <Button 
                                 component={Link} 

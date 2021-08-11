@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -179,6 +179,9 @@ const CreateProfile = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
+    const history = useHistory();
+
+    const { isAuthenticated } = useSelector(state => state.customer);
     const { countries, documents } = useSelector(state => state);
     const { successMessage } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
@@ -228,6 +231,9 @@ const CreateProfile = (props) => {
     const toast = useRef();
 
     useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
         if (countries.length === 0) {
             props.getCountries();
         }

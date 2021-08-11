@@ -85,6 +85,8 @@ const AdminLogin = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
+
+    const { isAuthenticated } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Username, setUsername] = useState('');
@@ -94,6 +96,13 @@ const AdminLogin = (props) => {
     const [loading, setLoading] = useState(false);
 
     const toast = useRef();
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         if (!isEmpty(errors)) {

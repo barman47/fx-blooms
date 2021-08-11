@@ -282,9 +282,9 @@ const MakeListing = (props) => {
     //     }
     // };
 
-    const handleOpenAccountModalModal = () => {
-        setOpenAccountModal(true);
-    };
+    // const handleOpenAccountModalModal = () => {
+    //     setOpenAccountModal(true);
+    // };
 
     const handleCloseAccountModalModal = () => {
         setOpenAccountModal(false);
@@ -373,7 +373,7 @@ const MakeListing = (props) => {
                         <Typography variant="h6">Make a Listing</Typography>
                         <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
                     </div>
-                    <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography>
+                    {/* <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography> */}
                 </header>
                 <Grid container direction="row" spacing={6} className={classes.container}>
                     <Grid item xs={12} lg={4}>

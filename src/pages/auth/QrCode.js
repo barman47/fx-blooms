@@ -90,6 +90,7 @@ const QrCode = (props) => {
     
     const history = useHistory();
 
+    const { isAuthenticated } = useSelector(state => state.customer);
     const twoFactor = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);
     const [msg, setMsg] = useState('');
@@ -97,6 +98,9 @@ const QrCode = (props) => {
     const toast = useRef();
 
     useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
         props.getBarcode();
         // eslint-disable-next-line
     }, []);

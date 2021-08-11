@@ -87,7 +87,7 @@ const ResetPassword = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
-    const { msg } = useSelector(state => state.customer);
+    const { isAuthenticated, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Password, setPassword] = useState('');
@@ -104,6 +104,9 @@ const ResetPassword = (props) => {
     const toast = useRef();
 
     useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
         setToken(history.location.search.split('=')[1]);
         // eslint-disable-next-line
     }, []);

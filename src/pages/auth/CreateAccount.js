@@ -188,6 +188,8 @@ const CreateAccount = (props) => {
 
     const classes = useStyles();
     const dispatch = useDispatch();
+
+    const { isAuthenticated } = useSelector(state => state.customer);
     const { countries } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
@@ -214,6 +216,9 @@ const CreateAccount = (props) => {
     let timeout = useRef();
 
     useEffect(() => {
+        if (isAuthenticated) {
+            return history.push('/');
+        }
         if (countries.length === 0) {
             props.getCountries();
         }

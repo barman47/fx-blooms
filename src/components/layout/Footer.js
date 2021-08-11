@@ -12,7 +12,7 @@ import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
 import { Link as AnimatedLink, animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';
 
-import { BLOG, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
+import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
 import { COLORS } from '../../utils/constants';
 
 import logo from '../../assets/img/logo-white.svg';
@@ -142,6 +142,7 @@ const Footer = () => {
                     </AnimatedLink>
                     <Link className={classes.link} underline="hover" to={PRIVACY_POLICY} component={RouterLink}>Privacy Policy</Link>
                     <Link className={classes.link} underline="hover" to={TERMS} component={RouterLink}>Terms &amp; Conditions</Link>
+                    <Link className={classes.link} underline="hover" to={DISCLAIMER} component={RouterLink}>Disclaimer</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>
@@ -202,7 +203,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('', '_blank', 'noopener,noreferrer')
+                                    window.open('https://t.me/joinchat/4zNq4cJg-fA1NjFi', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Telegram />

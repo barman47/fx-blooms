@@ -111,6 +111,13 @@ const Login = (props) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        if (customer.isAuthenticated) {
+            return history.push('/');
+        }
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
             setLoading(false);

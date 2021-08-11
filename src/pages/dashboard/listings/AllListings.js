@@ -521,13 +521,13 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 					</Grid>
 				}
 			</form>
-			<Link 
+			{/* <Link 
 				to="#!" 
 				component={RouterLink}
 				className={classes.buyerPopup}
 			>
 				Buyer Account Details Popup
-			</Link>
+			</Link> */}
 		</Grid>
 	);
 });

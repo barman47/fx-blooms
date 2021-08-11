@@ -172,7 +172,7 @@ const Contact = (props) => {
                             <a href="https://google.com" target="_blank" rel="noreferrer">
                                 <Twitter className={classes.icon} />
                             </a>
-                            <a href="https://google.com" target="_blank" rel="noreferrer">
+                            <a href="https://t.me/joinchat/4zNq4cJg-fA1NjFi" target="_blank" rel="noreferrer">
                                 <Telegram className={classes.icon} />
                             </a>
                         </div>

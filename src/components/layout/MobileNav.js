@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link as AnimatedLink } from 'react-scroll';
 import {
@@ -8,14 +9,14 @@ import {
     ListItemIcon,
     Typography
 } from '@material-ui/core';
-import { AccountOutline, Home, InformationVariant, Phone, Login, Help } from 'mdi-material-ui';
+import { AccountOutline, Home, FormatListText, InformationVariant, Phone, Login, Help } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
 
 import ListItemLink from './ListItemLink';
 
-import { CONTACT_US, SIGN_UP, LOGIN, ABOUT_US, WHY } from '../../routes';
+import { CONTACT_US, SIGN_UP, LOGIN, ABOUT_US, WHY, DASHBOARD, DASHBOARD_HOME } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -47,6 +48,10 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.primary.main
     },
 
+    listings: {
+        color: theme.palette.primary.main
+    },
+
     copyright: {
         color: COLORS.lightGray,
         display: 'inline-block',
@@ -59,6 +64,7 @@ const useStyles = makeStyles(theme => ({
 
 const MobileNav = ({ toggleDrawer, drawerOpen }) => {
     const classes = useStyles();
+    const { isAuthenticated } = useSelector(state => state.customer);
 
     return (
         <section>
@@ -73,6 +79,29 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItemLink>
+                    {isAuthenticated === true ? 
+                        <ListItemLink button divider to={`${DASHBOARD}${DASHBOARD_HOME}`} onClick={toggleDrawer}>
+                            <ListItemIcon>
+                                <FormatListText className={classes.listings} />
+                            </ListItemIcon>
+                            <ListItemText primary="All Listings" />
+                        </ListItemLink>
+                        :
+                        <>
+                            <ListItemLink button divider to={SIGN_UP} onClick={toggleDrawer}>
+                                <ListItemIcon>
+                                    <AccountOutline />
+                                </ListItemIcon>
+                                <ListItemText primary="Get Started" />
+                            </ListItemLink>
+                            <ListItemLink button divider to={LOGIN} onClick={toggleDrawer}>
+                                <ListItemIcon>
+                                    <Login />
+                                </ListItemIcon>
+                                <ListItemText primary="Log In" />
+                            </ListItemLink>
+                        </>
+                    }
                     <ListItemLink button divider onClick={toggleDrawer}>
                         <ListItemIcon>
                             <Help />
@@ -120,19 +149,6 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             >
                                 Contact
                         </AnimatedLink>
-                    </ListItemLink>
-                    
-                    <ListItemLink button divider to={SIGN_UP} onClick={toggleDrawer}>
-                        <ListItemIcon>
-                            <AccountOutline />
-                        </ListItemIcon>
-                        <ListItemText primary="Sign Up" />
-                    </ListItemLink>
-                    <ListItemLink button divider to={LOGIN} onClick={toggleDrawer}>
-                        <ListItemIcon>
-                            <Login />
-                        </ListItemIcon>
-                        <ListItemText primary="Log In" />
                     </ListItemLink>
                 </List>
                 <Typography variant="subtitle2" className={classes.copyright} >&copy; Copyright FX Blooms {new Date().getFullYear()}</Typography>
