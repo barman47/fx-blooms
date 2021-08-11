@@ -106,7 +106,6 @@ const CompleteTransactionModal = (props) => {
     const successModal = useRef();
 
     useEffect(() => {
-        console.log(props.open);
         setOpen(props.open);
     }, [props.open]);
 

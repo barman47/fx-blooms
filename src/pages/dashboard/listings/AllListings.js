@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 // import InfiniteScroll from 'react-infinite-scroll-component';
@@ -157,18 +157,16 @@ const AllListings = (props) => {
 
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings } = useSelector(state => state.listings);
 	// const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
 
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
-
-	const filterModal = useRef();
+	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
 		handleSetTitle('All Listings');
-		if (isAuthenticated && _.isEmpty(listings)) {
+		if (isAuthenticated) {
 			getListings();
 		}
 
@@ -202,7 +200,7 @@ const AllListings = (props) => {
 	// };
 
 	const handleOpenModal = () => {
-		filterModal.current.openModal();
+		setOpen(true);
 	};
 
 	const hideListingsInNegotiation = () => {
@@ -213,7 +211,7 @@ const AllListings = (props) => {
 	return (
 		<>
 			<SellerNoticeModal />
-			<FilterListingModal ref={filterModal} />
+			<FilterListingModal open={open} />
 			<section className={classes.root} id="parent">
 				<Tooltip title="Filter Listings" arrow>
 					<Fab 

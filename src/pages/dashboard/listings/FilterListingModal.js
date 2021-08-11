@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useState, useImperativeHandle } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { connect, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { 
@@ -34,7 +34,16 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: COLORS.lightTeal,
         borderRadius: '5px',
 		padding: theme.spacing(4, 3),
-        width: '80%',
+        width: '80vw',
+
+		[theme.breakpoints.down('md')]: {
+			width: '40vw'
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			width: '85vw'
+		},
+
 		'& form': {
 			'& header': {
 				display: 'grid',
@@ -82,7 +91,7 @@ const useStyles = makeStyles(theme => ({
 	}
 }));
 
-const MobileFilterModal = forwardRef((props, ref) => {
+const MobileFilterModal = (props) => {
 
     const [open, setOpen] = useState(false);
 
@@ -92,11 +101,6 @@ const MobileFilterModal = forwardRef((props, ref) => {
         setOpen(false);
     }, []);
 
-    useImperativeHandle(ref, () => ({
-        openModal: () => {
-            setOpen(true);
-        }
-    }));
     const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	
@@ -120,6 +124,10 @@ const MobileFilterModal = forwardRef((props, ref) => {
         setLoading(false);
         closeModal();
     }, [closeModal, listings])
+
+	useEffect(() => {
+        setOpen(props.open);
+    }, [props.open]);
 
 	const handleClearFilter = () => {
 		setFilter(PRICE);
@@ -334,6 +342,6 @@ const MobileFilterModal = forwardRef((props, ref) => {
             </Fade>
         </Modal>
 	);
-});
+};
 
 export default connect(undefined, { getListingsOpenForBid })(MobileFilterModal);

@@ -43,17 +43,10 @@ const useStyles = makeStyles(theme => ({
         '& ul li': {
             color: COLORS.offBlack,
             listStyleType: 'disc',
-            fontWeight: 300,
-            // border: '1px solid red',
-            // marginBottom: theme.spacing(4),
-
-            // '&::first-line': {
-            //     color: 'red'
-            // }
+            fontWeight: 300
         },
 
         '& ol li': {
-            // border: '1px solid red',
             color: COLORS.offBlack,
             fontWeight: 300,
             marginBottom: theme.spacing(4),

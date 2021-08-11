@@ -17,6 +17,7 @@ import { Document } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
+import { DISCLAIMER } from '../../../routes';
 import { SET_LISTING, SENT_MESSAGE } from '../../../actions/types';
 // import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
 
@@ -343,7 +344,7 @@ const Conversation = (props) => {
                     </Grid>
                     <section className={classes.messageContainer}>
                         <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
-                            Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
+                            Ensure to read our <Link to={DISCLAIMER} target="_blank" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
                         </Typography>
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}

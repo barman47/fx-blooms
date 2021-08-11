@@ -22,6 +22,7 @@ import VerifyQrCode from './pages/auth/VerifyQrCode';
 import Faqs from './pages/faqs';
 import PrivacyPolicy from './pages/privacyPolicy';
 import TermsAndConditions from './pages/termsAndConditions';
+import Disclaimer from './pages/disclaimer';
 
 import Dashboard from './pages/dashboard';
 
@@ -60,6 +61,7 @@ import {
 	MESSAGES,
 	DASHBOARD,
 	DASHBOARD_HOME, 
+	DISCLAIMER,
 	EDIT_LISTING,
 	USER_DETAILS,
 	PROFILE,
@@ -152,6 +154,7 @@ const [title, setTitle] = useState('');
 						<Route path={TERMS} exact component={TermsAndConditions} />
 						<Route path={FAQS} exact component={Faqs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
+						<Route path={DISCLAIMER} exact component={Disclaimer} />
 						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
