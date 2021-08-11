@@ -6,6 +6,8 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { FileDocumentEdit } from 'mdi-material-ui';
 
+import formatNumber from '../../../utils/formatNumber';
+import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import { SET_LISTING } from '../../../actions/types';
 import { COLORS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MAKE_LISTING } from '../../../routes';
@@ -76,20 +78,19 @@ const EditListingItem = ({ edit, listing }) => {
             <div>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                    &#163;{listing?.amountAvailable?.amount}
+                    {`${getCurrencySymbol(listing?.amountAvailable?.currencyType)}${formatNumber(listing?.amountAvailable?.amount)}`}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
-                    &#8358;{listing?.amountNeeded?.amount}
-                    {/* &#8358;(NGN) */}
+                    {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.amountNeeded?.amount)}`}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    &#163;{listing?.minExchangeAmount?.amount}
+                    {`${getCurrencySymbol(listing?.minExchangeAmount?.currencyType)}${formatNumber(listing?.minExchangeAmount?.amount)}`}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    &#8358;{listing?.exchangeRate} to &#163;1
+                    {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountNeeded?.currencyType)} 1`}
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     <FileDocumentEdit 

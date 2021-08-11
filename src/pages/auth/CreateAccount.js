@@ -20,12 +20,12 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
-// import Toast from '../../components/common/Toast';
+import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
 import { registerCustomer } from '../../actions/customer';
 
-// import isEmpty from '../../utils/isEmpty';
+import isEmpty from '../../utils/isEmpty';
 import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
 import { GET_ERRORS } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
@@ -208,7 +208,7 @@ const CreateAccount = (props) => {
 
     const history = useHistory();
 
-    // const toast = useRef();
+    const toast = useRef();
     const usernameRef = useRef();
     const emailRef = useRef();
     let timeout = useRef();
@@ -227,11 +227,11 @@ const CreateAccount = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    // useEffect(() => {
-    //     if (!isEmpty(errors)) {
-    //         toast.current.handleClick();
-    //     }
-    // }, [errors]);
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
 
     useEffect(() => {
         if (errorsState.usernameAvailable === true) {
@@ -343,7 +343,7 @@ const CreateAccount = (props) => {
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
             {loading && <Spinner text="One moment . . ." />}
-            {/* {!isEmpty(errors) && 
+            {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
@@ -351,7 +351,7 @@ const CreateAccount = (props) => {
                     msg={errors.msg || ''}
                     type="error"
                 />
-            } */}
+            }
             <section className={classes.root}>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>

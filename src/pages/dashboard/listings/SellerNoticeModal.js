@@ -3,7 +3,6 @@ import {
     Backdrop,
 	Button,
     Fade,
-	Grid,
     Modal,
 	Typography 
 } from '@material-ui/core';
@@ -22,35 +21,36 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '50vw',
-        height: '30vh',
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: theme.spacing(1),
+        alignItems: 'center',
+        width: '25vw',
+        height: 'auto',
         boxShadow: SHADOW,
-        padding: theme.spacing(5, 10),
+        padding: theme.spacing(5),
 
-        [theme.breakpoints.down('lg')]: {
-            height: '50vh',
-        },
         [theme.breakpoints.down('md')]: {
-            height: '40vh',
-            width: '70vw',
+            width: '45vw',
         },
+        
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(5, 2),
-            height: '40vh',
-            width: '90vw',
+            height: 'auto',
+            width: '80vw',
         },
 
         '& p': {
-            fontWeight: 300
-        }
-    },
+            fontWeight: 300,
+            textAlign: 'justify'
+        },
 
-    item: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        textAlign: 'center'
+        '& div': {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
     },
 
     icon: {
@@ -94,16 +94,16 @@ const SellerNoticeModal = () => {
             }}
         >
             <Fade in={open}>
-                <Grid container className={classes.container}>
-                    <Grid item xs={12} className={classes.item}>
-                        <Information className={classes.icon} />
-                        <Typography variant="h5">Seller's Notice</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            To avoid being a victim of malicious users, NEVER transfer EUR before actually receiving the NGN equivalent! Once the SELLER  confirms the payment and transfers the EUR to the BUYER, the transaction is considered done and can not be disputed.
-                        </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
-                    </Grid>
-                </Grid>
+                <section className={classes.container}>
+                    <div>
+                        <Information className={classes.icon} />                        
+                    </div>
+                    <Typography variant="h5" align="center">Seller's Notice</Typography>
+                    <Typography variant="subtitle1" component="p">
+                        To avoid being a victim of malicious users, NEVER transfer EUR before actually receiving the NGN equivalent! Once the SELLER  confirms the payment and transfers the EUR to the BUYER, the transaction is considered done and can not be disputed.
+                    </Typography>
+                    <Button onClick={closeModal} color="primary">Okay</Button>
+                </section>
             </Fade>
         </Modal>
 	);

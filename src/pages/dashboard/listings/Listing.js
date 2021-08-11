@@ -9,6 +9,8 @@ import { SET_LISTING } from '../../../actions/types';
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { addBid } from '../../../actions/listings';
 
+import formatNumber from '../../../utils/formatNumber';
+import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MESSAGES, USER_DETAILS } from '../../../routes';
@@ -179,24 +181,24 @@ const Listing = ({ addBid, listing, getSeller }) => {
                                 <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
                         </RouterLink>
                     </Typography>
-                    <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography>
+                    {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
                 </header>
                 <div>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                        &#163;{amountAvailable?.amount}
+                        {`${getCurrencySymbol(amountAvailable?.currencyType)}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
-                        &#8358;{amountNeeded?.amount}
+                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(amountNeeded?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                        &#163;{minExchangeAmount?.amount}
+                        {`${getCurrencySymbol(minExchangeAmount?.currencyType)}${formatNumber(minExchangeAmount?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                        &#8358;{exchangeRate} to &#163;1
+                        {`${getCurrencySymbol(amountAvailable?.currencyType)}${formatNumber(exchangeRate)} to ${getCurrencySymbol(amountNeeded?.currencyType)}1`}
                     </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 

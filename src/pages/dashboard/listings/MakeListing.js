@@ -9,6 +9,7 @@ import {
     FormControl, 
     FormHelperText,
     Grid, 
+    InputAdornment,
     MenuItem,
     Select,
     TextField,
@@ -16,13 +17,12 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import {FormatListText } from 'mdi-material-ui';
+import {CurrencyNgn, FormatListText } from 'mdi-material-ui';
 
 import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import EditListingItem from './EditListingItem';
-
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getDocuments } from '../../../actions/documents';
@@ -237,6 +237,20 @@ const MakeListing = (props) => {
         }
     }, [ExchangeAmount, ExchangeRate]);
 
+
+    useEffect(() => {
+        if (ExchangeAmount) {
+            // const listingFee = Math.round((1 / 100) * Number(ExchangeAmount.replace(',', '')));
+            const listingFee = Math.round((1 / 100) * Number(ExchangeAmount));
+            if (isNaN(listingFee)) {
+                setListingFee(0);
+            } else {
+                setListingFee(listingFee);
+            }
+            setListingFee(listingFee);
+        }
+    }, [ExchangeAmount]);
+
     // useEffect(() => {
     //     if (ReceiptAmount && ExchangeRate) {
     //         setExchangeAmount(Number(ReceiptAmount) / Number(ExchangeRate))
@@ -365,7 +379,7 @@ const MakeListing = (props) => {
                     <Grid item xs={12} lg={4}>
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
-                                <Grid item xs={12} md={5}>
+                                <Grid item xs={5} md={5}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
                                     <FormControl 
                                         variant="outlined" 
@@ -388,7 +402,7 @@ const MakeListing = (props) => {
                                         <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={7}>
+                                <Grid item xs={7} md={7}>
                                     <br />
                                     <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                         <TextField
@@ -406,7 +420,7 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12} md={5}>
+                                <Grid item xs={5} md={5}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                     <FormControl 
                                         variant="outlined" 
@@ -429,7 +443,7 @@ const MakeListing = (props) => {
                                         <FormHelperText>{errors.RequiredCurrency}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={7}>
+                                <Grid item xs={7} md={7}>
                                     <br />
                                     <Tooltip title="This is the exchange rate you want." aria-label="Exchange Rate" arrow>
                                         <TextField
@@ -446,7 +460,7 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12} md={5}>
+                                <Grid item xs={5} md={5}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
                                     <FormControl 
                                         variant="outlined" 
@@ -469,7 +483,7 @@ const MakeListing = (props) => {
                                         <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                     </FormControl>
                                 </Grid>
-                                <Grid item xs={12} md={7}>
+                                <Grid item xs={7} md={7}>
                                     <br />
                                     <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                         <TextField
@@ -485,7 +499,7 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={5} lg={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I Will Receive</Typography>
                                     <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                         <TextField
@@ -500,16 +514,22 @@ const MakeListing = (props) => {
                                             required
                                             disabled={loading ? true : false}
                                             error={errors.ReceiptAmount ? true : false}
+                                            InputProps={{
+                                                startAdornment: (
+                                                    <InputAdornment position="start">
+                                                        <CurrencyNgn />
+                                                    </InputAdornment>
+                                                )
+                                            }}
                                         />
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} md={7} lg={12}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
                                     <TextField
                                         value={ListingFee}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="0% x 200"
                                         helperText={errors.ListingFee}
                                         fullWidth
                                         required

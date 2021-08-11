@@ -82,6 +82,7 @@ const useStyles = makeStyles(theme => ({
 
 		[theme.breakpoints.down('sm')]: {
 			flexDirection: 'column',
+			marginBottom: theme.spacing(2),
 			marginTop: theme.spacing(2)
 		},
 
@@ -161,6 +162,8 @@ const AllListings = (props) => {
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
 
+	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
+
 	const filterModal = useRef();
 
 	useEffect(() => {
@@ -176,6 +179,7 @@ const AllListings = (props) => {
 	}, []);
 
 	const getListings = () => {
+		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
@@ -203,6 +207,7 @@ const AllListings = (props) => {
 
 	const hideListingsInNegotiation = () => {
 		dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
+		setHideNegotiationListings(true);
 	};
 
 	return (
@@ -226,7 +231,11 @@ const AllListings = (props) => {
 							<Typography variant="h5">All Listings</Typography>
 							<div className={classes.headerContent}>
 								<Typography variant="subtitle1" component="span">Here are all the listings available right now</Typography>
-								<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
+								{hideNegotiationListings ? 
+									<Link to="#!" component={RouterLink} onClick={() => getListings()}>Show all listings</Link>
+									:
+									<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
+								}
 							</div>
 						</header>
 						{/* <InfiniteScroll 

@@ -8,14 +8,15 @@ import {
     FormControl, 
     FormHelperText,
     Grid, 
+    InputAdornment,
     MenuItem,
     Select,
     TextField,
     Tooltip,
     Typography
 } from '@material-ui/core';
-
 import { makeStyles } from '@material-ui/core/styles';
+import { CurrencyNgn } from 'mdi-material-ui';
 
 import EditListingItem from './EditListingItem';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -408,6 +409,13 @@ const EditListing = (props) => {
                                         fullWidth
                                         required
                                         error={errors.ReceiptAmount ? true : false}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <CurrencyNgn />
+                                                </InputAdornment>
+                                            )
+                                        }}
                                     />
                                 </Tooltip>
                             </Grid>
