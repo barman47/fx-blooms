@@ -1,14 +1,27 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
+import { 
+    AppBar,
+    Button, 
+    Grid, 
+    IconButton, 
+    InputAdornment, 
+    Link, 
+    TextField, 
+    Toolbar,
+    Typography 
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ArrowLeft, Attachment, Send } from 'mdi-material-ui';
+import { ArrowLeft, Attachment, InformationOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import _ from 'lodash';
+import toast, { Toaster } from 'react-hot-toast';
+import copy from 'copy-to-clipboard';
+
 // import ScrollableFeed from 'react-scrollable-feed'
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
@@ -30,35 +43,20 @@ const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
         border: `1px solid ${COLORS.borderColor}`,
-        // borderBottom: `1px solid ${COLORS.borderColor}`,
-        // borderRight: `1px solid ${COLORS.borderColor}`,
-        // borderTop: `1px solid ${COLORS.borderColor}`,
         position: 'sticky',
         bottom: theme.spacing(1),
         left: 0,
-        overflowY: 'hidden',
-
-        // [theme.breakpoints.down('md')]: {
-        //     border: '1px solid red',
-        //     height: '100vh'
-        // }
-        
+        overflowY: 'hidden'
     },
-    
-    header: {
-        backgroundColor: COLORS.lightTeal,
-        padding: theme.spacing(3),
-        position: 'sticky',
-        top: 0,
-        left: 0,
 
-        [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(1)
-        }
+    headerContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%'
     },
     
     messageContainer: {
-        // height: '55%',
         height: theme.spacing(95),
         position: 'relative',
         top: 0,
@@ -72,8 +70,11 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.down('md')]: {
-            border: '1px solid red',
             height: theme.spacing(95)
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            height: '79vh'
         }
     },
     
@@ -375,29 +376,36 @@ const MobileConversation = (props) => {
         setCompleteTransactionOpen(true);
     };
 
+    const copyChatSessionId = () => {
+        copy(sessionId);
+        toast.success('Chat Session ID Copied!');
+    };
+
     return (
         <>
+            <Toaster />
+            <PaymentConfirmationTipsModal ref={paymentModal} />
+            <CompleteTransactionModal open={completeTransactionOpen} />
             {chat ? 
 		        <section className={classes.root}>
-                    <Grid container direction="row" justify="space-between" className={classes.header}>
-                    <PaymentConfirmationTipsModal ref={paymentModal} />
-                    <CompleteTransactionModal open={completeTransactionOpen} />
-                        <Grid item xs={12}>
-                            <Button component={RouterLink} color="primary" onClick={goBack} className={classes.backButton}>
-                                <ArrowLeft />
-                                &nbsp;&nbsp;Back
-                            </Button>
-                            <Button color="primary" onClick={showCompleteTransactionModal}>
-                                Complete Transaction
-                            </Button>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="subtitle1" component="p">Conversation</Typography>
-                        </Grid>
-                        <Grid item>
-                            <Typography variant="subtitle1" component="p" color="primary">ID: {sessionId}</Typography>
-                        </Grid>
-                    </Grid>
+                    <AppBar position="static" color="transparent" elevation={1}>
+                        <Toolbar>
+                            <section className={classes.headerContainer}>
+                                <IconButton edge="start" color="primary" aria-label="back" onClick={goBack}>
+                                    <ArrowLeft />
+                                </IconButton>
+                                <div>
+                                    <Button color="primary" variant="outlined" size="small" onClick={showCompleteTransactionModal}>
+                                        Complete Transaction
+                                    </Button>
+                                    <IconButton 
+                                        edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
+                                        <InformationOutline />
+                                    </IconButton>
+                                </div>
+                            </section>
+                        </Toolbar>
+                    </AppBar>
                     <section className={classes.messageContainer}>
                         <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
                             Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.

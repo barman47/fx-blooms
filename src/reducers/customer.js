@@ -4,7 +4,9 @@ import {
     SET_AUTH_TOKEN,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
-    SET_CUSTOMER_MSG 
+    SET_CUSTOMER_MSG ,
+    HIDE_PHONE_NUMBER,
+    SHOW_PHONE_NUMBER
 } from '../actions/types';
 
 const initialState = {
@@ -13,6 +15,7 @@ const initialState = {
 };
 
 const customerReducer =  (state = initialState, action) => {
+    let profile = {};
     switch (action.type) {
         case SET_CURRENT_CUSTOMER:
             return { ...state, ...action.payload };
@@ -46,6 +49,24 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 msg: action.payload
+            };
+
+        case HIDE_PHONE_NUMBER:
+            profile = state.profile;
+            profile.showPhoneNumber = false;
+            
+            return {
+                ...state,
+                profile
+            };
+            
+        case SHOW_PHONE_NUMBER:
+            profile = state.profile;
+            profile.showPhoneNumber = true;
+
+            return {
+                ...state,
+                profile
             };
             
             default:

@@ -14,6 +14,8 @@ import {
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER,
     SET_CUSTOMER_MSG,
+    HIDE_PHONE_NUMBER,
+    SHOW_PHONE_NUMBER,
     // eslint-disable-next-line
     GET_ERRORS
  } from './types';
@@ -207,6 +209,26 @@ export const setCustomerStatus = ({ customerID, status, currentStatus }) => asyn
             type: SET_CUSTOMER_STATUS,
             payload: { customerID, status, currentStatus, msg }
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const setHidePhoneNumber = () => async (dispatch) => {
+    try {
+        await reIssueToken();
+        await axios.post(`${api}/ShowPhoneNumber/status/false`);
+        dispatch({ type: HIDE_PHONE_NUMBER });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const setShowPhoneNumber = () => async (dispatch) => {
+    try {
+        await reIssueToken();
+        await axios.post(`${api}/ShowPhoneNumber/status/true`);
+        dispatch({ type: SHOW_PHONE_NUMBER });
     } catch (err) {
         return handleError(err, dispatch);
     }

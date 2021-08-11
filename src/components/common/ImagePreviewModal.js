@@ -10,13 +10,12 @@ const useStyles = makeStyles(theme => ({
     modal: {
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        border: '1px solid red'
+        justifyContent: 'center'
     },
 
     img: {
         borderRadius: theme.shape.borderRadius,
-        width: '80%',
+        width: '50%',
 
         [theme.breakpoints.down('sm')]: {
             width: '90%'

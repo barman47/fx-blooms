@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS } from '../../../utils/constants';
 
-import ImagePreviewModal from './ImagePreviewModal';
+import ImagePreviewModal from '../../../components/common/ImagePreviewModal';
 
 const useStyles = makeStyles(theme =>({
     root: {

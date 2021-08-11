@@ -9,10 +9,11 @@ import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import _ from 'lodash';
+import { v4 as uuidv4 } from 'uuid';
 // import ScrollableFeed from 'react-scrollable-feed'
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
-import { Document } from 'react-pdf';
+// import { Document } from 'react-pdf';
 // import { Page } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
@@ -23,6 +24,11 @@ import { SET_LISTING, SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
+
+import { Document, Page, pdfjs } from 'react-pdf';
+pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+// import { Document, Page, pdfjs } from 'react-pdf';
+// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -61,8 +67,12 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.down('md')]: {
-            border: '1px solid red',
+            // border: '1px solid red',
             height: theme.spacing(95)
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            height: theme.spacing(10)
         }
     },
     
@@ -354,17 +364,19 @@ const Conversation = (props) => {
                                             (
                                                 message.uploadedFileName.includes('.pdf') ? 
                                                     <div 
-                                                        key={message.id} 
+                                                        key={uuidv4()} 
                                                         className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
                                                     >
                                                         <Document 
                                                             file={message.uploadedFileName}
+                                                            options={{workerSrc: "pdf.worker.js"}}
                                                         >
+                                                            <Page pageNumber={1} />
                                                         </Document>
                                                     </div>
                                                 :
                                                 <img 
-                                                    key={message.id}
+                                                    key={uuidv4()}
                                                     src={message.uploadedFileName} 
                                                     className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
                                                     alt="Attachment" 
@@ -372,7 +384,7 @@ const Conversation = (props) => {
                                             )
                                             :
                                             <Typography 
-                                                key={message.id} 
+                                                key={uuidv4()} 
                                                 variant="subtitle2" 
                                                 component="span" 
                                                 className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}

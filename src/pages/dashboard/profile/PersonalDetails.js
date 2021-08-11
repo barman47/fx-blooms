@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react'; 
-import { useSelector } from 'react-redux'; 
+import { connect, useSelector } from 'react-redux'; 
 import { 
     Box, 
     Button, 
     Divider,
-    FormControl,
-    FormHelperText,
     Grid,
-    MenuItem,
-    Select,
     TextField, 
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
-import isEmpty from '../../../utils/isEmpty'; 
+import { setHidePhoneNumber, setShowPhoneNumber } from '../../../actions/customer'; 
+
+// import isEmpty from '../../../utils/isEmpty'; 
 import { COLORS } from '../../../utils/constants'; 
 
 const useStyles = makeStyles(theme =>({
@@ -51,7 +50,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const PersonalDetails = () => {
+const PersonalDetails = (props) => {
     const classes = useStyles();
     const { countries } = useSelector(state => state); 
     const { profile } = useSelector(state => state.customer); 
@@ -65,25 +64,34 @@ const PersonalDetails = () => {
     const [country, setCountry] = useState('');
     const [countryId, setCountryId] = useState('');
     const [city, setCity] = useState('');
-    // eslint-disable-next-line
     const [stateId, setStateId] = useState('');
+    // eslint-disable-next-line
     const [states, setStates] = useState([]);
     const [PostalCode, setPostalCode] = useState('');
     const [Listings, setListings] = useState(0);
     const [Transactions, setTransactions] = useState(0);
+
+    const [showNumber, setShowNumber] = useState(false);
     
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
 
+    const { setHidePhoneNumber, setShowPhoneNumber } = props;
+
+    useEffect(() => {
+        setShowNumber(profile.showPhoneNumber);
+    }, [profile.showPhoneNumber]);
+
     useEffect(() => {
         if (profile) {
-            const { firstName, lastName, email, userName, phoneNo, countryId, stateId, postalCode, numberOfListings, numberOfSuccessfulTransactions } = profile;
+            const { address, firstName, lastName, email, userName, phoneNo, countryId, stateId, postalCode, numberOfListings, numberOfSuccessfulTransactions } = profile;
             setFirstName(firstName);
             setLastName(lastName);
             setEmail(email);
             setUsername(userName);
             setPhoneNo(phoneNo);
+            setAddress(address);
             setCountryId(countryId);
             setStateId(stateId);
             setPostalCode(postalCode);
@@ -93,34 +101,43 @@ const PersonalDetails = () => {
     }, [profile]);
 
     // Setting states when a country is selected
+    // useEffect(() => {
+    //     if (!isEmpty(country)) {
+    //         const country = countries.find(country => country.name === country);
+    //         const CountryId = country?.id;
+    //         setCountryId(CountryId);
+
+    //         // eslint-disable-next-line array-callback-return
+    //         const states = [];
+
+    //         countries.forEach(item => {
+    //             if (item.id === CountryId) {
+    //                 states.push(item.states[0]);
+    //             }
+    //         });
+    //         setStates(states);
+    //     }
+    // }, [country, countries]);
+
     useEffect(() => {
-        if (!isEmpty(country)) {
-            const country = countries.find(country => country.name === country);
-            const CountryId = country?.id;
-            setCountryId(CountryId);
-
-            // eslint-disable-next-line array-callback-return
-            const states = [];
-
-            countries.forEach(item => {
-                if (item.id === CountryId) {
-                    states.push(item.states[0]);
-                }
-            });
-            setStates(states);
-        }
-    }, [country, countries]);
-
-    useEffect(() => {
-        if (countryId) {
-            const country = countries.find(country => country.id === countryId);
+        if (countryId && stateId) {
+            const country = countries.find(country => country.id.toLowerCase() === countryId.toLowerCase());
+            const state = country?.states.find(state => state.id.toLowerCase() === stateId.toLowerCase());
+            setCity(state.name);
             setCountry(country?.name);
         }
-    }, [countries, countryId]);
-    // useEffect(() => {}, [stateId]);
-
+    }, [countries, countryId, stateId]);
+    
     const onSubmit = (e) => {
         e.preventDefault();
+    };
+
+    const handleShowPhoneNumber = () => {
+        setShowPhoneNumber();
+    };
+
+    const handleHidePhoneNumber = () => {
+        setHidePhoneNumber();
     };
 
     return (
@@ -138,23 +155,12 @@ const PersonalDetails = () => {
                     <Grid container direction="row" spacing={3}>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                            <TextField 
-                                className={classes.info}
-                                value={FirstName}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter First Name"
-                                helperText={errors.FirstName}
-                                fullWidth
-                                required
-                                disabled
-                                error={errors.FirstName ? true : false}
-                            />
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{FirstName}</Typography>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                            <TextField 
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{LastName}</Typography>
+                            {/* <TextField 
                                 className={classes.info}
                                 value={LastName}
                                 onChange={(e) => setLastName(e.target.value)}
@@ -167,7 +173,7 @@ const PersonalDetails = () => {
                                 // disabled={editable ? false : true}
                                 disabled
                                 error={errors.LastName ? true : false}
-                            />
+                            /> */}
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Email Address</Typography>
@@ -187,19 +193,15 @@ const PersonalDetails = () => {
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                            <TextField 
-                                className={classes.info}
-                                value={Username}
-                                type="text"
-                                variant="outlined" 
-                                helperText={errors.Username}
-                                fullWidth
-                                required
-                                disabled
-                            />
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{Username}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
+                            {showNumber ?
+                                <Button color="primary" onClick={handleHidePhoneNumber}>Hide</Button>
+                                :
+                                <Button color="primary" onClick={handleShowPhoneNumber}>Show</Button>
+                            }
                             <TextField 
                                 className={classes.info}
                                 value={PhoneNo}
@@ -214,9 +216,10 @@ const PersonalDetails = () => {
                                 error={errors.PhoneNo ? true : false}
                             />
                         </Grid>
-                        <Grid item xs={12} md={6}>
+                        <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
-                            <TextField 
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{Address}</Typography>
+                            {/* <TextField 
                                 className={classes.info}
                                 value={Address}
                                 onChange={(e) => setAddress(e.target.value)}
@@ -230,11 +233,12 @@ const PersonalDetails = () => {
                                 required
                                 disabled
                                 error={errors.Address ? true : false}
-                            />
+                            /> */}
                         </Grid>
                         <Grid item xs={12} md={4}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                                <FormControl 
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{country}</Typography>
+                                {/* <FormControl 
                                     variant="outlined" 
                                     helperText={errors.country}
                                     error={errors.country ? true : false}
@@ -255,11 +259,12 @@ const PersonalDetails = () => {
                                         ))}
                                     </Select>
                                 <FormHelperText>{errors.country}</FormHelperText>
-                            </FormControl>
+                            </FormControl> */}
                         </Grid>
                         <Grid item xs={12} md={4}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>City/State</Typography>
-                            <FormControl 
+                            <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{city}</Typography>
+                            {/* <FormControl 
                                     variant="outlined" 
                                     error={errors.city ? true : false}
                                     disabled
@@ -279,11 +284,16 @@ const PersonalDetails = () => {
                                         ))}
                                     </Select>
                                     <FormHelperText>{errors.city}</FormHelperText>
-                            </FormControl>
+                            </FormControl> */}
                         </Grid>
                         <Grid item xs={12} md={4}>
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
-                            <TextField 
+                            {PostalCode && 
+                                <>
+                                    <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
+                                    <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{PostalCode}</Typography>
+                                </>
+                            }
+                            {/* <TextField 
                                 className={classes.info}
                                 value={PostalCode}
                                 onChange={(e) => setPostalCode(e.target.value)}
@@ -295,7 +305,7 @@ const PersonalDetails = () => {
                                 required
                                 disabled
                                 error={errors.PostalCode ? true : false}
-                            />
+                            /> */}
                         </Grid>
                         <Grid item xs={12}>
                             <Button
@@ -323,4 +333,9 @@ const PersonalDetails = () => {
     );
 };
 
-export default PersonalDetails;
+PersonalDetails.propTypes = {
+    setHidePhoneNumber: PropTypes.func.isRequired,
+    setShowPhoneNumber: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { setHidePhoneNumber, setShowPhoneNumber })(PersonalDetails);

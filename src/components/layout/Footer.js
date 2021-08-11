@@ -213,7 +213,7 @@ const Footer = () => {
             </section>
             <Divider className={classes.divider} />
             <Typography variant="subtitle2" component="span" className={classes.copyright}>
-                FXBLOOMS O&#220;, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
+                FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
             </Typography>  
         </footer>
     );
