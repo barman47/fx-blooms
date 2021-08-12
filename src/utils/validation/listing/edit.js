@@ -1,7 +1,7 @@
 import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
-const addListing = (data) => {
+const editListing = (data) => {
     let errors = {};
     data.AvailableCurrency = !isEmpty(data.AvailableCurrency) ?  data.AvailableCurrency.toString() : '';
     data.ExchangeAmount = !isEmpty(data.ExchangeAmount) ?  data.ExchangeAmount.toString() : '';
@@ -9,7 +9,6 @@ const addListing = (data) => {
     data.ExchangeRate = !isEmpty(data.ExchangeRate) ?  data.ExchangeRate.toString() : '';
     data.MinExchangeAmount = !isEmpty(data.MinExchangeAmount) ?  data.MinExchangeAmount.toString() : '';
     data.ReceiptAmount = !isEmpty(data.ReceiptAmount) ?  data.ReceiptAmount.toString() : '';
-    data.ListingFee = !isEmpty(data.ListingFee) ?  data.ListingFee.toString() : '';
 
     if (Validator.isEmpty(data.AvailableCurrency)) {
         errors.AvailableCurrency = 'Please select a currency!';
@@ -56,13 +55,6 @@ const addListing = (data) => {
     if (Validator.isEmpty(data.ReceiptAmount)) {
         errors.ReceiptAmount = 'Amount is required!';
     }
-
-    if (!Validator.isNumeric(data.ListingFee) || data.ListingFee <= 0) {
-        errors.ListingFee = 'Invalid listing fee!';
-    }
-    if (Validator.isEmpty(data.ListingFee)) {
-        errors.ListingFee = 'Listing fee is required!';
-    }
    
     return {
         errors,
@@ -70,4 +62,4 @@ const addListing = (data) => {
     };
 };
 
-export default addListing;
+export default editListing;

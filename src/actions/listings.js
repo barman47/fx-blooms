@@ -61,11 +61,10 @@ export const updateListing = (listing) => async (dispatch) => {
     }
 };
 
-export const getListingsOpenForBid = (filter) => async (dispatch) => {
+export const getListingsOpenForBid = (query) => async (dispatch) => {
     try {
-        console.log(filter);
         await reIssueToken();
-        const res = await axios.post(`${URL}/GetListingsOpenForBid`, filter);
+        const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
         console.log(res);
         const { items, ...rest } = res.data.data;
         return dispatch({

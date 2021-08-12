@@ -13,7 +13,7 @@ import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, EDIT_LISTING, MESSAGES, USER_DETAILS } from '../../../routes';
+import { DASHBOARD, EDIT_LISTING, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
 
 import Toast from '../../../components/common/Toast';
 
@@ -142,6 +142,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
             getSeller(sellerId);
             return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
         }
+        return history.push(`${DASHBOARD}${PROFILE}`);
     };
 
     const handleAddBid = (e, listing) => {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -28,13 +27,13 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.grey,
         fontWeight: 300,
         marginTop: theme.spacing(2)
-    },
+    }
 }));
 
 const Listings = () => {
     const classes = useStyles();
-
     const { listings } = useSelector(state => state.listings);
+
     return (
         <>
             {listings.length > 0 ? 
@@ -50,5 +49,6 @@ const Listings = () => {
         </>
     );
 }
+
 
 export default Listings;

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-// import InfiniteScroll from 'react-infinite-scroll-component';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
@@ -53,6 +53,8 @@ const useStyles = makeStyles(theme => ({
 	},
 	
 	listings: {
+		height: '100vh',
+		overflow: 'auto',
 		paddingLeft: theme.spacing(2),
 		paddingRight: theme.spacing(4),
 		maxWidth: '100%',
@@ -92,6 +94,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingContainer: {
+		height: '1vh',
 		position: 'relative',
 		left: 0,
 		// border: '1px solid red',
@@ -157,9 +160,11 @@ const AllListings = (props) => {
 
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	// const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 
 	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
+
+	// useGetListings(query, pageNumber, getListingsOpenForBid);
 
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
@@ -179,25 +184,26 @@ const AllListings = (props) => {
 	const getListings = () => {
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
-			pageNumber: 0,
-			pageSize: 15,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
+			pageNumber: 1,
+			pageSize: 10,
+			currencyNeeded: 'NGN',
+			currencyAvailable: 'EUR',
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
 		});
 	};
 
-	// const getMoreListings = () => {
-	// 	getListingsOpenForBid({
-	// 		pageNumber: currentPageNumber + 1,
-	// 		pageSize: 15,
-	// 		currencyNeeded: 'EUR',
-	// 		currencyAvailable: 'NGN',
-	// 		minimumExchangeAmount: 0,
-	// 		useCurrencyFilter: false
-	// 	});	
-	// };
+	const getMoreListings = () => {
+		console.log('getting more listings');
+		getListingsOpenForBid({
+			pageNumber: currentPageNumber + 1,
+			pageSize: 15,
+			currencyNeeded: 'EUR',
+			currencyAvailable: 'NGN',
+			minimumExchangeAmount: 0,
+			useCurrencyFilter: false
+		});	
+	};
 
 	const handleOpenModal = () => {
 		setOpen(true);
@@ -208,11 +214,15 @@ const AllListings = (props) => {
 		setHideNegotiationListings(true);
 	};
 
+	const handleScroll = () => {
+		// console.log('scrolling');
+	};
+
 	return (
 		<>
 			<SellerNoticeModal />
 			<FilterListingModal open={open} />
-			<section className={classes.root} id="parent">
+			<section className={classes.root} onScroll={handleScroll}>
 				<Tooltip title="Filter Listings" arrow>
 					<Fab 
 						className={classes.fab} 
@@ -224,7 +234,7 @@ const AllListings = (props) => {
 					</Fab>
 				</Tooltip>
 				<Grid container direction="row">
-					<Grid item xs={12} lg={9} className={classes.listings}>
+					<Grid item xs={12} lg={9} className={classes.listings} id="scrollableParent">
 						<header className={classes.listingHeader}>
 							<Typography variant="h5">All Listings</Typography>
 							<div className={classes.headerContent}>
@@ -236,9 +246,9 @@ const AllListings = (props) => {
 								}
 							</div>
 						</header>
-						{/* <InfiniteScroll 
+						<InfiniteScroll 
 							className={classes.listingContainer}
-							dataLength={listings.length || 5}
+							dataLength={listings.length}
 							next={getMoreListings}
 							hasMore={hasNext}
 							scrollThreshold={1}
@@ -246,18 +256,18 @@ const AllListings = (props) => {
 							refreshFunction={getListings}
 							pullDownToRefresh
 							pullDownToRefreshThreshold={80}
-							releaseToRefreshContent={
-								matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-							}
-							pullDownToRefreshContent={
-								matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-							}
+							// releaseToRefreshContent={
+							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+							// }
+							// pullDownToRefreshContent={
+							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+							// }
 							// endMessage={}
-							scrollableTarget="parent"
-							height="100%"
-						> */}
-							<Listings />
-						{/* </InfiniteScroll> */}
+							scrollableTarget="scrollableParent"
+							// height={1000}
+						>
+							<Listings setHideNegotiationListings={setHideNegotiationListings} />
+						</InfiniteScroll>
 					</Grid>
 					<Filter />
 				</Grid>

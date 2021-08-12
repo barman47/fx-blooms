@@ -26,7 +26,7 @@ import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 import { updateListing } from '../../../actions/listings';
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import validateAddListing from '../../../utils/validation/listing/add';
+import validateEditListing from '../../../utils/validation/listing/edit';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -173,6 +173,14 @@ const EditListing = (props) => {
 
     useEffect(() => {
         if (!isEmpty(listing)) {
+            
+        }
+    }, [listing]);
+
+    useEffect(() => {
+        if (listings.length > 0 && !isEmpty(listing)) {
+            // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
+            // debugger
             const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate } = listing;
 
             setAvailableCurrency(amountAvailable.currencyType);
@@ -180,16 +188,10 @@ const EditListing = (props) => {
             setRequiredCurrency(amountNeeded.currencyType);
             setExchangeRate(exchangeRate);
             setMinExchangeAmount(minExchangeAmount.amount);
-        }
-    }, [listing]);
 
-    useEffect(() => {
-        if (listings.length > 0) {
-            // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
-            // debugger
             setPreviousListings(listings.filter(item => item.customerId === customerId)); 
         }
-    }, [customerId, listing.id, listings]);
+    }, [customerId, listing.id, listing, listings]);
 
     useEffect(() => {
         if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
@@ -236,7 +238,7 @@ const EditListing = (props) => {
             ListingFee
         };
 
-        const { errors, isValid } = validateAddListing(data);
+        const { errors, isValid } = validateEditListing(data);
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid data' });
         }
