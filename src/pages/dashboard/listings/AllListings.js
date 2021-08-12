@@ -185,7 +185,7 @@ const AllListings = (props) => {
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
-			pageSize: 10,
+			pageSize: 30,
 			currencyNeeded: 'NGN',
 			currencyAvailable: 'EUR',
 			minimumExchangeAmount: 0,

@@ -199,7 +199,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                        {`${getCurrencySymbol(amountAvailable?.currencyType)}${formatNumber(exchangeRate)} to ${getCurrencySymbol(amountNeeded?.currencyType)}1`}
+                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(exchangeRate)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
                     </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 

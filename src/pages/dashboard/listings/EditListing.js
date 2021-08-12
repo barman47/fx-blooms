@@ -254,7 +254,7 @@ const EditListing = (props) => {
                 Amount: parseFloat(ExchangeAmount)
             },
             MinExchangeAmount: {
-                CurrencyType: RequiredCurrency,
+                CurrencyType: AvailableCurrency,
                 Amount: parseFloat(MinExchangeAmount)
             }
         };

@@ -123,7 +123,7 @@ const PersonalDetails = (props) => {
         if (countryId && stateId) {
             const country = countries.find(country => country.id.toLowerCase() === countryId.toLowerCase());
             const state = country?.states.find(state => state.id.toLowerCase() === stateId.toLowerCase());
-            setCity(state.name);
+            setCity(state?.name);
             setCountry(country?.name);
         }
     }, [countries, countryId, stateId]);

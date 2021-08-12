@@ -331,7 +331,7 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
                                                 {
                                                     uploadedPermitFront
                                                     ?
-                                                    <span className={classes.uploadSuccess}>ID Back Uploaded</span>
+                                                    <span className={classes.uploadSuccess}>ID Front Uploaded</span>
                                                     :
                                                     <>
                                                         <Button onClick={selectPermitFront} color="primary" disabled={loading ? true : false}>Change Photo</Button>
