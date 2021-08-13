@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
@@ -196,7 +196,7 @@ const Conversation = (props) => {
     const [attachmentUrl, setAttachmentUrl] = useState('');
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
-    // const [newMessage, setNewMessage] = useState(false);
+    const [newMessage, setNewMessage] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -244,8 +244,8 @@ const Conversation = (props) => {
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
                         console.log('new message ', message);
-                        // if (!newMessage) {
-                            // setNewMessage(true);
+                        if (!newMessage) {
+                            setNewMessage(true);
                             let response = JSON.parse(message);
                             const newMessage = {
                                 chatId: response.ChatId,
@@ -261,7 +261,7 @@ const Conversation = (props) => {
                                 payload: newMessage
                             });
                             setMessage('');
-                        // }
+                        }
                     });
 
                     // connection.on('TransferNotification', notification => {
@@ -273,7 +273,7 @@ const Conversation = (props) => {
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, connected]);
+    }, [connection, dispatch, connected, newMessage]);
 
     const openModal = () => {
         paymentModal.current.openModal();
@@ -360,12 +360,12 @@ const Conversation = (props) => {
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}
                                 {chat?.messages && chat?.messages.map((message) => (
-                                    <>
+                                    <Fragment key={uuidv4()}>
                                         {!isEmpty(message.uploadedFileName) ? 
                                             (
                                                 message.uploadedFileName.includes('.pdf') ? 
                                                     <div 
-                                                        key={uuidv4()} 
+                                                        // key={uuidv4()}
                                                         className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
                                                     >
                                                         <Document 
@@ -377,7 +377,7 @@ const Conversation = (props) => {
                                                     </div>
                                                 :
                                                 <img 
-                                                    key={uuidv4()}
+                                                    // key={uuidv4()}
                                                     src={message.uploadedFileName} 
                                                     className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
                                                     alt="Attachment" 
@@ -385,7 +385,7 @@ const Conversation = (props) => {
                                             )
                                             :
                                             <Typography 
-                                                key={uuidv4()} 
+                                                // key={uuidv4()} 
                                                 variant="subtitle2" 
                                                 component="span" 
                                                 className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
@@ -394,7 +394,7 @@ const Conversation = (props) => {
                                                 {decode(message.text)}
                                             </Typography>
                                         }
-                                    </>
+                                    </Fragment>
                                 ))}
                                 {paymentMade && 
                                     <div className={classes.paymentNotification}>
