@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_CHAT, SET_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_CHAT, SET_LISTINGS, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
 import reIssueToken from '../utils/reIssueToken';
 
 const URL = `${API}/Listing`;
@@ -70,6 +70,28 @@ export const getListingsOpenForBid = (query) => async (dispatch) => {
         return dispatch({
             type: SET_LISTINGS,
             payload: { listings: items, ...rest }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreListings = (query) => async (dispatch) => {
+    try {
+        await reIssueToken();
+        const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
+        console.log(res);
+        const { items, currentPageNumber, currentPageSize, hasNext, totalItemCount, totalPageCount } = res.data.data;
+        return dispatch({
+            type: SET_MORE_LISTINGS,
+            payload: { 
+                listings: items,
+                currentPageNumber,
+                currentPageSize,
+                hasNext,
+                totalItemCount,
+                totalPageCount
+            }
         });
     } catch (err) {
         return handleError(err, dispatch);

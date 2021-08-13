@@ -196,7 +196,7 @@ const Conversation = (props) => {
     const [attachmentUrl, setAttachmentUrl] = useState('');
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
-    const [newMessage, setNewMessage] = useState(false);
+    // const [newMessage, setNewMessage] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -232,9 +232,9 @@ const Conversation = (props) => {
         }
     }, [chat, dispatch, listings]);
 
-    useEffect(() => {
-        setNewMessage(false);
-    }, [chat]);
+    // useEffect(() => {
+    //     setNewMessage(false);
+    // }, [chat]);
 
     useEffect(() => {
         if (connection && !connected) {
@@ -243,8 +243,9 @@ const Conversation = (props) => {
                     console.log('connected');
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        if (!newMessage) {
-                            setNewMessage(true);
+                        console.log('new message ', message);
+                        // if (!newMessage) {
+                            // setNewMessage(true);
                             let response = JSON.parse(message);
                             const newMessage = {
                                 chatId: response.ChatId,
@@ -260,19 +261,19 @@ const Conversation = (props) => {
                                 payload: newMessage
                             });
                             setMessage('');
-                        }
+                        // }
                     });
 
-                    connection.on('TransferNotification', notification => {
-                        console.log('notification ', notification);
-                    });
+                    // connection.on('TransferNotification', notification => {
+                    //     console.log('notification ', notification);
+                    // });
                 })
                 .catch(err => {
                     setConnected(false);
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, connected, newMessage]);
+    }, [connection, dispatch, connected]);
 
     const openModal = () => {
         paymentModal.current.openModal();

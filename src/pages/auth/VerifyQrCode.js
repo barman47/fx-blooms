@@ -26,7 +26,7 @@ import { COLORS } from '../../utils/constants';
 import validateAuthenticatorCode from '../../utils/validation/customer/authenticator';
 
 import logo from '../../assets/img/logo.svg';
-import { SET_2FA_MSG, SET_BARCODE } from '../../actions/types';
+import { GET_ERRORS, SET_2FA_MSG, SET_BARCODE } from '../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -212,6 +212,10 @@ const VerifyQrCode = (props) => {
         const code = `${first}${second}${third}${fourth}${fifth}${sixth}`;
         setErrors({});
         setLoading(true);
+        dispatch({
+            type: GET_ERRORS,
+            payload: {}
+        });
 
         if (twoFactorEnabled) {
             return props.authorizeTwoFactor({ code, profileId: customerId }, history);

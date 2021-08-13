@@ -96,8 +96,7 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
 });
 
 PaymentConfirmationTipsModal.propTypes = {
-    closeModal: PropTypes.func.isRequired,
-    isOpen: PropTypes.bool.isRequired
+    closeModal: PropTypes.func.isRequired
 };
 
 export default PaymentConfirmationTipsModal;

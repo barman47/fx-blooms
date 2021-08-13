@@ -417,6 +417,9 @@ const MakeListing = (props) => {
                                             required
                                             disabled={loading ? true : false}
                                             error={errors.ExchangeAmount ? true : false}
+                                            inputProps={{
+                                                maxLength: 12
+                                            }}
                                         />
                                     </Tooltip>
                                 </Grid>
@@ -457,6 +460,9 @@ const MakeListing = (props) => {
                                             required
                                             disabled={loading ? true : false}
                                             error={errors.ExchangeRate ? true : false}
+                                            inputProps={{
+                                                maxLength: 12
+                                            }}
                                         />
                                     </Tooltip>
                                 </Grid>
@@ -496,6 +502,9 @@ const MakeListing = (props) => {
                                             fullWidth
                                             disabled={loading ? true : false}
                                             error={errors.MinExchangeAmount ? true : false}
+                                            inputProps={{
+                                                maxLength: 12
+                                            }}
                                         />
                                     </Tooltip>
                                 </Grid>
@@ -504,7 +513,7 @@ const MakeListing = (props) => {
                                     <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                         <TextField
                                             value={ReceiptAmount}
-                                            onChange={(e) => setReceiptAmount(e.target.value)}
+                                            // onChange={(e) => setReceiptAmount(e.target.value)}
                                             // onKeyUp={handleSetExchangeAmount}
                                             type="text"
                                             variant="outlined" 

@@ -90,7 +90,7 @@ const EditListingItem = ({ edit, listing }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                    {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountNeeded?.currencyType)} 1`}
+                    {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountAvailable?.currencyType)} 1`}
                 </Typography>
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     <FileDocumentEdit 

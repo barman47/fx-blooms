@@ -2,6 +2,7 @@ import {
     ADDED_LISTING, 
     HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
+    SET_MORE_LISTINGS,
     SET_LISTING,
     UPDATED_LISTING, 
     CANCELED_NEGOTIATION
@@ -44,8 +45,26 @@ const listingsReducer = (state = initialState, action) => {
         case SET_LISTINGS: 
             const { listings, ...rest } = action.payload;
             return {
-                listings: action.payload.listings,
+                listings,
                 ...rest
+            };
+
+        case SET_MORE_LISTINGS: 
+            const {
+                currentPageNumber,
+                currentPageSize,
+                hasNext,
+                totalItemCount,
+                totalPageCount
+            } = action.payload;
+            return {
+                ...state,
+                listings: [...state.listings, ...action.payload.listings],
+                currentPageNumber,
+                currentPageSize,
+                hasNext,
+                totalItemCount,
+                totalPageCount
             };
 
         case UPDATED_LISTING: 

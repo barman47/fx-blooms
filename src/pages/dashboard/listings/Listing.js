@@ -12,6 +12,7 @@ import { addBid } from '../../../actions/listings';
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
+import { GET_ERRORS } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
 
@@ -124,8 +125,12 @@ const Listing = ({ addBid, listing, getSeller }) => {
     useEffect(() => {
         if (!isEmpty(errors)) {
             toast.current.handleClick();
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
         }
-    }, [errors]);
+    }, [dispatch, errors]);
 
     const setListing = (e, listing) => {
         e.preventDefault();

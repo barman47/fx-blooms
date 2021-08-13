@@ -319,6 +319,9 @@ const EditListing = (props) => {
                                         fullWidth
                                         required
                                         error={errors.ExchangeAmount ? true : false}
+                                        inputProps={{
+                                            maxLength: 12
+                                        }}
                                     />
                                 </Tooltip>
                             </Grid>
@@ -357,6 +360,9 @@ const EditListing = (props) => {
                                         fullWidth
                                         required
                                         error={errors.ExchangeRate ? true : false}
+                                        inputProps={{
+                                            maxLength: 12
+                                        }}
                                     />
                                 </Tooltip>
                             </Grid>
@@ -395,6 +401,9 @@ const EditListing = (props) => {
                                         fullWidth
                                         required
                                         error={errors.MinExchangeAmount ? true : false}
+                                        inputProps={{
+                                            maxLength: 12
+                                        }}
                                     />
                                 </Tooltip>
                             </Grid>

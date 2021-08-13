@@ -20,13 +20,14 @@ import { makeStyles } from '@material-ui/core/styles';
 import { CloudUpload } from 'mdi-material-ui';
 import { getListingsOpenForBid } from '../../../actions/listings';
 import { addResidentPermit } from '../../../actions/customer';
+import { getDocuments } from '../../../actions/documents';
 import validateResidencePermit from '../../../utils/validation/customer/residencePermit';
 
 import Spinner from '../../../components/common/Spinner';
 
 import { COLORS, UPLOAD_LIMIT } from '../../../utils/constants';
 import handleError from '../../../utils/handleError';
-// import isEmpty from '../../../utils/isEmpty';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -114,7 +115,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) => {
+const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  getDocuments }) => {
     const classes = useStyles();
 
     const { documents } = useSelector(state => state);
@@ -132,6 +133,7 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
 
 	const [idNumber, setIdNumber] = useState('');
 	const [documentType, setDocumentType] = useState('');
+	const [document, setDocument] = useState('');
 
 	const [errors, setErrors] = useState({});
 	const [loadingText, setLoadingText] = useState('');
@@ -141,11 +143,25 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
     const [frontUploadProgress, setFrontUploadProgress] = useState('');
 
     useEffect(() => {
+        if (isEmpty(documents)) {
+            getDocuments();
+        }
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
             setLoading(false);
         }
     }, [errorsState, errors]);
+
+    useEffect(() => {
+        if (documentType) {
+            const item = documents.find(item => item.text === documentType);
+            setDocument(item.value);
+        }
+    }, [documents,documentType]);
 
     const uploadPermitFront = async () => {
         setErrors({});
@@ -262,11 +278,11 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
 
         const data = {
             idNumber,
-            documentType,
+            documentType: document,
             img: permitFrontUrl,
             backImg: permitBackUrl
         };
-
+        
         const { errors, isValid } = validateResidencePermit(data);
 
         if (!isValid) {
@@ -274,7 +290,6 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
             return setErrors(errors);
         }
 
-        console.log(data);
         setErrors({});
         setLoading(true);
         addResidentPermit(data);
@@ -461,7 +476,8 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  }) =
 ResidencePermitModal.propTypes = {
     open: PropTypes.bool.isRequired,
     handleCloseModal: PropTypes.func.isRequired,
-    addResidentPermit: PropTypes.func.isRequired
+    addResidentPermit: PropTypes.func.isRequired,
+    getDocuments: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addResidentPermit, getListingsOpenForBid })(ResidencePermitModal);
+export default connect(undefined, { addResidentPermit, getListingsOpenForBid, getDocuments })(ResidencePermitModal);

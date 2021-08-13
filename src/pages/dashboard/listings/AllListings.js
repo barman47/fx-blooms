@@ -28,7 +28,7 @@ import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
 import { getCustomerInformation } from '../../../actions/customer';
-import { getListingsOpenForBid } from '../../../actions/listings';
+import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -185,7 +185,7 @@ const AllListings = (props) => {
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
-			pageSize: 30,
+			pageSize: 5,
 			currencyNeeded: 'NGN',
 			currencyAvailable: 'EUR',
 			minimumExchangeAmount: 0,
@@ -193,11 +193,11 @@ const AllListings = (props) => {
 		});
 	};
 
-	const getMoreListings = () => {
+	const getMore = () => {
 		console.log('getting more listings');
-		getListingsOpenForBid({
+		getMoreListings({
 			pageNumber: currentPageNumber + 1,
-			pageSize: 15,
+			pageSize: 5,
 			currencyNeeded: 'EUR',
 			currencyAvailable: 'NGN',
 			minimumExchangeAmount: 0,
@@ -249,7 +249,7 @@ const AllListings = (props) => {
 						<InfiniteScroll 
 							className={classes.listingContainer}
 							dataLength={listings.length}
-							next={getMoreListings}
+							next={getMore}
 							hasMore={hasNext}
 							scrollThreshold={1}
 							loader={<h4>Fetching Listings . . .</h4>}
@@ -543,14 +543,15 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 });
 
 Filter.propTypes = {
-	getCurrencies: PropTypes.func,
-	getListingsOpenForBid: PropTypes.func
+	getCurrencies: PropTypes.func.isRequired,
+	getListingsOpenForBid: PropTypes.func.isRequired
 };
 
 AllListings.propTypes = {
-	getCustomerInformation: PropTypes.func,
-	getListingsOpenForBid: PropTypes.func,
+	getCustomerInformation: PropTypes.func.isRequired,
+	getListingsOpenForBid: PropTypes.func.isRequired,
+	getMoreListings: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomerInformation, getListingsOpenForBid })(AllListings);
+export default connect(undefined, { getCustomerInformation, getListingsOpenForBid, getMoreListings })(AllListings);
