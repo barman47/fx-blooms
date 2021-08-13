@@ -162,10 +162,11 @@ const AllListings = (props) => {
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 
-	const { getCustomerInformation, getListingsOpenForBid, handleSetTitle } = props;
+	const { getCustomerInformation, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
 
 	// useGetListings(query, pageNumber, getListingsOpenForBid);
 
+	const [dataLength, setDataLength] = useState(0);
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
 
@@ -181,11 +182,15 @@ const AllListings = (props) => {
 		// eslint-disable-next-line
 	}, []);
 
+	useEffect(() => {
+		setDataLength(listings.length);
+	}, [listings]);
+
 	const getListings = () => {
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
-			pageSize: 5,
+			pageSize: 10,
 			currencyNeeded: 'NGN',
 			currencyAvailable: 'EUR',
 			minimumExchangeAmount: 0,
@@ -194,10 +199,10 @@ const AllListings = (props) => {
 	};
 
 	const getMore = () => {
-		console.log('getting more listings');
+		console.log('getting more');
 		getMoreListings({
 			pageNumber: currentPageNumber + 1,
-			pageSize: 5,
+			pageSize: 10,
 			currencyNeeded: 'EUR',
 			currencyAvailable: 'NGN',
 			minimumExchangeAmount: 0,
@@ -248,21 +253,21 @@ const AllListings = (props) => {
 						</header>
 						<InfiniteScroll 
 							className={classes.listingContainer}
-							dataLength={listings.length}
+							dataLength={dataLength}
 							next={getMore}
 							hasMore={hasNext}
 							scrollThreshold={1}
-							loader={<h4>Fetching Listings . . .</h4>}
+							loader={<h4 style={{ textAlign: 'center' }}>Fetching Listings . . .</h4>}
 							refreshFunction={getListings}
-							pullDownToRefresh
-							pullDownToRefreshThreshold={80}
+							// pullDownToRefresh
+							// pullDownToRefreshThreshold={80}
 							// releaseToRefreshContent={
 							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
 							// }
 							// pullDownToRefreshContent={
 							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
 							// }
-							// endMessage={}
+							endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
 							scrollableTarget="scrollableParent"
 							// height={1000}
 						>
@@ -433,7 +438,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 							</FormControl>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography variant="subtitle2">Amount</Typography>
+							<Typography variant="subtitle2">I want</Typography>
 						</Grid>
 						<Grid item xs={5}>
 							<FormControl 

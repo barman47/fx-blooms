@@ -263,7 +263,7 @@ const MobileFilterModal = (props) => {
 									</FormControl>
 								</Grid>
 								<Grid item xs={12}>
-									<Typography variant="subtitle2">Amount</Typography>
+									<Typography variant="subtitle2">I want</Typography>
 								</Grid>
 								<Grid item xs={5}>
 									<FormControl 

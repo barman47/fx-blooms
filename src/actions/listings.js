@@ -79,6 +79,7 @@ export const getListingsOpenForBid = (query) => async (dispatch) => {
 export const getMoreListings = (query) => async (dispatch) => {
     try {
         await reIssueToken();
+        console.log('getting more ', query);
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
         console.log(res);
         const { items, currentPageNumber, currentPageSize, hasNext, totalItemCount, totalPageCount } = res.data.data;
