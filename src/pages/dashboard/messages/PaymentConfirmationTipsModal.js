@@ -7,7 +7,6 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 
@@ -94,9 +93,5 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
         </Modal>
 	);
 });
-
-PaymentConfirmationTipsModal.propTypes = {
-    closeModal: PropTypes.func.isRequired
-};
 
 export default PaymentConfirmationTipsModal;

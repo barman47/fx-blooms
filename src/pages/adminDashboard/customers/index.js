@@ -18,6 +18,8 @@ import { SET_CUSTOMER } from '../../../actions/types';
 import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 
+import NewCustomers from './NewCustomers';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         paddingTop: theme.spacing(3),
@@ -112,6 +114,7 @@ const Customers = (props) => {
     const history = useHistory();
     const { admin } = useSelector(state => state);
     const { confirmed, pending, rejected, count } = useSelector(state => state.customers);
+    const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
 
     const [error, setError] = useState('');
     const [filter, setFilter] = useState(PENDING);
@@ -252,25 +255,25 @@ const Customers = (props) => {
                     <Grid item xs={6} md={3}>
                         <div className={clsx(classes.filter, filter === PENDING && classes.active)} onClick={() => setFilter(PENDING)}>
                             <Typography variant="subtitle2" component="span">New</Typography>
-                            <Typography variant="subtitle2" component="span">{pending.length}</Typography>
+                            <Typography variant="subtitle2" component="span">{totalCustomersAwaitingApproval}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
                         <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => setFilter(CONFIRMED)}>
                             <Typography variant="subtitle2" component="span">Verified</Typography>
-                            <Typography variant="subtitle2" component="span">{confirmed.length}</Typography>
+                            <Typography variant="subtitle2" component="span">{totalApprovedCustomers}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
                         <div className={clsx(classes.filter, filter === REJECTED && classes.active)} onClick={() => setFilter(REJECTED)}>
                             <Typography variant="subtitle2" component="span">Rejected</Typography>
-                            <Typography variant="subtitle2" component="span">{rejected.length}</Typography>
+                            <Typography variant="subtitle2" component="span">{totalRejectedCustomers}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
                         <div className={classes.filter}>
                             <Typography variant="subtitle2" component="span">All</Typography>
-                            <Typography variant="subtitle2" component="span">{count}</Typography>
+                            <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
                         </div>
                     </Grid>
                 </Grid>
@@ -285,26 +288,15 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span"></Typography>
                     </header>
                     <main className={classes.content}>
-                        {filter === PENDING && 
-                            pending.map((customer, index) => (
-                                <div key={customer.id} className={classes.customer}>
-                                    <Typography variant="subtitle2" component="span">{index + 1}</Typography>
-                                    <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.username}</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
-                                </div>
-                            ))
-                        }
+                        {filter === PENDING && <NewCustomers />}
+                        
                         {filter === CONFIRMED && 
                             confirmed.map((customer, index) => (
                                 <div key={customer.id} className={classes.customer}>
                                     <Typography variant="subtitle2" component="span">{index + 1}</Typography>
                                     <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
                                     <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography>
+                                    {/* <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography> */}
                                     <Typography variant="subtitle2" component="span">{customer.email}</Typography>
                                     <Typography variant="subtitle2" component="span">{customer.username}</Typography>
                                     <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>

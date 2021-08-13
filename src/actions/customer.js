@@ -16,6 +16,7 @@ import {
     SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
+    SET_NEW_CUSTOMERS,
     // eslint-disable-next-line
     GET_ERRORS
  } from './types';
@@ -122,7 +123,7 @@ export const addResidentPermit = (data) => async (dispatch) => {
 export const getCustomers = () => async (dispatch) => {
     try {
         // await reIssueToken();
-        const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 0, pageNumber: 0 });
+        const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 10, pageNumber: 1 });
         const { items, ...rest } = res.data.data;
         const confirmed = [];
         const pending = [];
@@ -167,6 +168,20 @@ export const getCustomer = (customerId) => async(dispatch) => {
         console.log(res);
         return dispatch({
             type: SET_CUSTOMER,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getNewCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}/GetCustomersAwaitingConfirmation/`, query);
+        console.log(res);
+        return dispatch({
+            type: SET_NEW_CUSTOMERS,
             payload: res.data.data
         });
     } catch (err) {

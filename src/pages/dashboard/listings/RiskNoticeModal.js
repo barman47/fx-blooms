@@ -98,9 +98,9 @@ const RiskNoticeModal = () => {
                     <div>
                         <Information className={classes.icon} />
                     </div>
-                    <Typography variant="h5" align="center">Risk Notice</Typography>
+                    <Typography variant="h5" align="center">Notice</Typography>
                     <Typography variant="subtitle1" component="p">
-                        To avoid being a victim of malicious users, NEVER transfer EUR before actually receiving the NGN equivalent! Once the SELLER  confirms the payment and transfers the EUR to the BUYER, the transaction is considered done and can not be disputed.
+                        To sell EUR on the FXBLOOMS platform, a user may be subjected to more verifications and requirements. This action is to ensure utmost security on our platform.
                     </Typography>
                     <Button onClick={closeModal} color="primary">Okay, I Understand</Button>
                 </section>

@@ -7,9 +7,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Actions from './Actions';
 import Conversation from './Conversation';
 import Messages from './Messages';
-import RiskNoticeModal from './RiskNoticeModal';
 
 import { COLORS } from '../../../utils/constants';
+import SellerNoticeModal from './SellerNoticeModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -124,7 +124,7 @@ const Index = (props) => {
 
     return (
         <>
-            <RiskNoticeModal />
+            <SellerNoticeModal />
             <section className={classes.root}>
                 <Typography variant="h5" className={classes.header}>Messages</Typography>
                 {/* <Grid container direction="row" className={classes.gridContainer}> */}

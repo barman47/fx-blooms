@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import axios from 'axios';
@@ -142,6 +142,9 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  getD
     const [backUploadProgress, setBackUploadProgress] = useState('');
     const [frontUploadProgress, setFrontUploadProgress] = useState('');
 
+    const permitFront = useRef();
+    const permitBack = useRef();
+
     useEffect(() => {
         if (isEmpty(documents)) {
             getDocuments();
@@ -232,9 +235,13 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  getD
         }
     };
 
-    const selectPermitFront = () => document.getElementById('permitFront').click();
+    const selectPermitFront = () => {
+        permitFront.current.click();
+    };
     
-    const selectPermitBack = () => document.getElementById('permitBack').click();
+    const selectPermitBack = () => {
+        permitBack.current.click();
+    };
 
     const handleSetPermitFront = (e) => {
         setPermitFront(e.target.files[0]);
@@ -328,12 +335,13 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  getD
                                         <TextField 
                                             className={classes.input}
                                             onChange={handleSetPermitFront}
-                                            id="permitFront"
+                                            inputRef={permitFront}
                                             type="file"
                                             variant="outlined"
                                             style={{ display: 'none' }}
                                             inputProps={{
-                                                accept: 'image/*'
+                                                accept: 'image/*',
+                                                id: 'permitFront'
                                             }}
                                             fullWidth
                                             error={errors.img ? true : false}
@@ -369,7 +377,7 @@ const ResidencePermitModal = ({ addResidentPermit, open, handleCloseModal,  getD
                                         <Typography variant="subtitle2" component="span">Resident Permit (Back)</Typography>
                                         <TextField 
                                             onChange={handleSetPermitBack}
-                                            id="permitBack"
+                                            inputRef={permitBack}
                                             type="file"
                                             variant="outlined"
                                             style={{ display: 'none' }}

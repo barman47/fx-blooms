@@ -3,32 +3,24 @@ import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Attachment, Send } from 'mdi-material-ui';
+import { Attachment, FilePdfOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import _ from 'lodash';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid';
 // import ScrollableFeed from 'react-scrollable-feed'
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
-// import { Document } from 'react-pdf';
-// import { Page } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import { DISCLAIMER } from '../../../routes';
 import { SET_LISTING, SENT_MESSAGE } from '../../../actions/types';
-// import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
-
-import { Document, Page, pdfjs } from 'react-pdf';
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
-// import { Document, Page, pdfjs } from 'react-pdf';
-// pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -147,6 +139,21 @@ const useStyles = makeStyles(theme => ({
         width: '40%'
     },
 
+    downloadLink: {
+        color: '#db2219',
+        textDecoration: 'none',
+
+        '& div': {
+            display: 'flex',
+            flexDirection: 'column'
+        }
+    },
+
+    downloadIcon: {
+        fontSize: theme.spacing(10),
+        float: 'right'
+    },
+
     otherAttachment: {
         alignSelf: 'flex-end',
     },
@@ -180,6 +187,7 @@ const useStyles = makeStyles(theme => ({
         textDecoration: 'underline'
     }
 }));
+
 const Conversation = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -360,7 +368,7 @@ const Conversation = (props) => {
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}
                                 {chat?.messages && chat?.messages.map((message) => (
-                                    <Fragment key={uuidv4()}>
+                                    <Fragment key={message.id}>
                                         {!isEmpty(message.uploadedFileName) ? 
                                             (
                                                 message.uploadedFileName.includes('.pdf') ? 
@@ -368,12 +376,12 @@ const Conversation = (props) => {
                                                         // key={uuidv4()}
                                                         className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
                                                     >
-                                                        <Document 
-                                                            file={message.uploadedFileName}
-                                                            options={{workerSrc: "pdf.worker.js"}}
-                                                        >
-                                                            <Page pageNumber={1} />
-                                                        </Document>
+                                                        <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                            <div>
+                                                                <FilePdfOutline className={classes.downloadIcon} />
+                                                                <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
+                                                            </div>
+                                                        </a>
                                                     </div>
                                                 :
                                                 <img 
@@ -390,7 +398,6 @@ const Conversation = (props) => {
                                                 component="span" 
                                                 className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
                                             >
-                                                {/* {message.text} */}
                                                 {decode(message.text)}
                                             </Typography>
                                         }

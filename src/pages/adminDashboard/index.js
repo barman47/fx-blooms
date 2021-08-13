@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-// import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
@@ -16,6 +15,7 @@ import {
 import avatar from '../../assets/img/avatar.jpg';
 import logo from '../../assets/img/logo.svg';
 
+import { getStats } from '../../actions/admin';
 import { getCustomers } from '../../actions/customer';
 import { COLORS } from '../../utils/constants';
 
@@ -62,17 +62,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getCustomers }) => {
+const AdminDashboard = ({ children, title, getCustomers, getStats }) => {
     const classes = useStyles();
     const { admin } = useSelector(state => state);
-    const { count } = useSelector(state => state.customers);
-    // const history = useHistory();
-    // const location = useLocation();
 
     useEffect(() => {
-        if (count === 0) {
-            getCustomers();
-        }
+        getStats();
         // eslint-disable-next-line
     }, []);
 
@@ -115,7 +110,8 @@ const AdminDashboard = ({ children, title, getCustomers }) => {
 
 AdminDashboard.propTypes = {
     title: PropTypes.string.isRequired,
-    getCustomers: PropTypes.func.isRequired
+    getCustomers: PropTypes.func.isRequired,
+    getStats: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomers })(AdminDashboard);
+export default connect(undefined, { getCustomers, getStats })(AdminDashboard);

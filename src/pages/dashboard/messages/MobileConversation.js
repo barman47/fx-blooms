@@ -283,9 +283,9 @@ const MobileConversation = (props) => {
                         }
                     });
 
-                    connection.on('TransferNotification', notification => {
-                        console.log('notification ', notification);
-                    });
+                    // connection.on('TransferNotification', notification => {
+                    //     console.log('notification ', notification);
+                    // });
                 })
                 .catch(err => {
                     setConnected(false);

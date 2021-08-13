@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -48,6 +49,7 @@ const useStyles = makeStyles((theme) => ({
         '& div': {
             backgroundColor: COLORS.lightTeal,
             borderRadius: theme.shape.borderRadius,
+            cursor: 'pointer',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
@@ -59,7 +61,9 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
     const classes = useStyles();
-    const { count } = useSelector(state => state.customers);
+    const history = useHistory();
+
+    const { totalCustomers } = useSelector(state => state.stats);
 
     const { handleSetTitle } = props;
 
@@ -67,6 +71,8 @@ const Home = (props) => {
         handleSetTitle('Admin Home');
         // eslint-disable-next-line
     }, []);
+
+    const goToDashboard = () => history.push(`${ADMIN_DASHBOARD}${CUSTOMERS}`);
 
     return (
         <>
@@ -76,14 +82,14 @@ const Home = (props) => {
                     <Typography variant="subtitle2" component="span">What would you like to do today?</Typography>
                 </Grid>
                 <Grid item xs={12} md={6} lg={5} className={classes.content}>
-                    <div>
+                    <div onClick={goToDashboard}>
                         {/* <Typography variant="subtitle2" component="span" color="primary"> */}
                             <Link to={`${ADMIN_DASHBOARD}${CUSTOMERS}`} component={RouterLink} underline="none" color="primary">
                                 Customers
                             </Link>
                         {/* </Typography> */}
                         <section>
-                            <Typography variant="h2" component="span">{count}</Typography>
+                            <Typography variant="h2" component="span">{totalCustomers}</Typography>
                             <br />
                             <Typography variant="subtitle2" component="span">Total</Typography>
                         </section>

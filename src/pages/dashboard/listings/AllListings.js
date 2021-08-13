@@ -34,7 +34,7 @@ import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
 import Listings from './Listings';
-import SellerNoticeModal from './SellerNoticeModal';
+import RiskNoticeModal from './RiskNoticeModal';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -225,7 +225,7 @@ const AllListings = (props) => {
 
 	return (
 		<>
-			<SellerNoticeModal />
+			<RiskNoticeModal />
 			<FilterListingModal open={open} />
 			<section className={classes.root} onScroll={handleScroll}>
 				<Tooltip title="Filter Listings" arrow>
@@ -438,7 +438,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 							</FormControl>
 						</Grid>
 						<Grid item xs={12}>
-							<Typography variant="subtitle2">I want</Typography>
+							<Typography variant="subtitle2">I Want</Typography>
 						</Grid>
 						<Grid item xs={5}>
 							<FormControl 

@@ -12,6 +12,7 @@ import customersReducer from './customers';
 import documentsReducer from './documents';
 import listingsReducer from './listings';
 import errorsReducer from './errors';
+import statsReducer from './stats';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
 
@@ -26,6 +27,7 @@ const appReducer = combineReducers({
     documents: documentsReducer,
     listings: listingsReducer,
     errors: errorsReducer,
+    stats: statsReducer,
     subscription: subscriptionReducer,
     twoFactor: twoFactorReducer
 });
