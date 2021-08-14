@@ -10,9 +10,10 @@ import {
     Link, 
     TextField, 
     Toolbar,
-    Typography 
+    Typography,
+    useMediaQuery 
 } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ArrowLeft, Attachment, InformationOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
@@ -199,6 +200,8 @@ const useStyles = makeStyles(theme => ({
 }));
 const MobileConversation = (props) => {
     const classes = useStyles();
+    const theme = useTheme();
+    const matches = useMediaQuery(theme.breakpoints.down('sm'));
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -243,18 +246,20 @@ const MobileConversation = (props) => {
     }, []);
 
     useEffect(() => {
-        if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
+        if (!_.isEmpty(chat) && _.isEmpty(listings.listing) && matches) {
             const listing = listings.find(item => item.id === chat.listing);
             dispatch({
                 type: SET_LISTING,
                 payload: listing
             });
         }
-    }, [chat, dispatch, listings]);
+    }, [chat, dispatch, listings, matches]);
 
     useEffect(() => {
-        setNewMessage(false);
-    }, [chat]);
+        if (matches) {
+            setNewMessage(false);
+        }
+    }, [chat, matches]);
 
     useEffect(() => {
         if (connection && !connected) {
@@ -263,24 +268,22 @@ const MobileConversation = (props) => {
                     console.log('connected');
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        if (!newMessage) {
-                            setNewMessage(true);
-                            let response = JSON.parse(message);
-                            const newMessage = {
-                                chatId: response.ChatId,
-                                dateSent: response.DateSent,
-                                id: response.Id,
-                                sender: response.Sender,
-                                text: response.Text,
-                                uploadedFileName: response.UploadedFileName
-                            };
+                        setNewMessage(true);
+                        let response = JSON.parse(message);
+                        const newMessage = {
+                            chatId: response.ChatId,
+                            dateSent: response.DateSent,
+                            id: response.Id,
+                            sender: response.Sender,
+                            text: response.Text,
+                            uploadedFileName: response.UploadedFileName
+                        };
 
-                            dispatch({
-                                type: SENT_MESSAGE,
-                                payload: newMessage
-                            });
-                            setMessage('');
-                        }
+                        dispatch({
+                            type: SENT_MESSAGE,
+                            payload: newMessage
+                        });
+                        setMessage('');
                     });
 
                     // connection.on('TransferNotification', notification => {
@@ -292,7 +295,7 @@ const MobileConversation = (props) => {
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, connected, newMessage]);
+    }, [connection, dispatch, connected, matches, newMessage]);
 
     const openModal = () => {
         paymentModal.current.openModal();
@@ -412,7 +415,7 @@ const MobileConversation = (props) => {
                         </Typography>
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}
-                                {chat?.messages && chat?.messages.map((message) => (
+                                {chat?.messages && matches && chat?.messages.map((message) => (
                                     <>
                                         {!isEmpty(message.uploadedFileName) ? 
                                             (
@@ -447,7 +450,7 @@ const MobileConversation = (props) => {
                                         }
                                     </>
                                 ))}
-                                {paymentMade && 
+                                {paymentMade && matches &&
                                     <div className={classes.paymentNotification}>
                                         <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
                                         <Typography variant="subtitle1" component="p">What's next?</Typography>

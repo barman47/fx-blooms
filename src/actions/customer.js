@@ -17,6 +17,8 @@ import {
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
     SET_NEW_CUSTOMERS,
+    SET_RESIDENCE_PERMIT,
+    SET_PERMIT_URL,
     // eslint-disable-next-line
     GET_ERRORS
  } from './types';
@@ -44,7 +46,7 @@ export const createCustomer = (customer) => async (dispatch) => {
 
 export const getCustomerInformation = () => async (dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         const res = await axios.get(`${api}/CustomerInformation`);
         dispatch({
             type: SET_CUSTOMER_PROFILE,
@@ -106,15 +108,31 @@ export const login = (data) => async (dispatch) => {
     }
 };
 
+export const getResidencePermitLink = () => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/GetLinkForResidencePermitUpload`);
+        console.log(res);
+        dispatch({
+            type: SET_PERMIT_URL,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const addResidentPermit = (data) => async (dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         const res = await axios.post(`${api}/AddResidencePermit`, data);
-        console.log(res);
-        // dispatch({
-        //     type: SET_CURRENT_CUSTOMER,
-        //     payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
-        // });
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: res.data.data
+        });
+        dispatch({
+            type: SET_RESIDENCE_PERMIT,
+            payload: true
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

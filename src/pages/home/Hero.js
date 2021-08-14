@@ -107,7 +107,7 @@ const Hero = () => {
                             </Typography>
                         </Grid>
                         {!isAuthenticated && 
-                            <Grid item xs={12} md={4}>
+                            <Grid item xs={12} md={5}>
                                 <Button 
                                     classes={{ root: classes.getStarted }}
                                     variant="contained" 
@@ -121,7 +121,7 @@ const Hero = () => {
                                 </Button>                            
                             </Grid>
                         }
-                        <Grid item xs={12} md={4}>
+                        <Grid item xs={12} md={5}>
                             <Button 
                                 component={Link} 
                                 color="primary" 

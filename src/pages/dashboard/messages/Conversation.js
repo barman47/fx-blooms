@@ -8,7 +8,6 @@ import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
-import _ from 'lodash';
 // import { v4 as uuidv4 } from 'uuid';
 // import ScrollableFeed from 'react-scrollable-feed'
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
@@ -17,7 +16,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import { DISCLAIMER } from '../../../routes';
-import { SET_LISTING, SENT_MESSAGE } from '../../../actions/types';
+import { SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
@@ -194,7 +193,6 @@ const Conversation = (props) => {
 
     const { customerId } = useSelector(state => state.customer);
     const { chat, paymentMade, sessionId } = useSelector(state => state.chat);
-    const listings = useSelector(state => state.listings.listings);
 
     const { sendMessage } = props;
 
@@ -230,15 +228,15 @@ const Conversation = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
-            const listing = listings.find(item => item.id === chat.listing);
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-        }
-    }, [chat, dispatch, listings]);
+    // useEffect(() => {
+    //     if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
+    //         const listing = listings.find(item => item.id === chat.listing);
+    //         dispatch({
+    //             type: SET_LISTING,
+    //             payload: listing
+    //         });
+    //     }
+    // }, [chat, dispatch, listings]);
 
     // useEffect(() => {
     //     setNewMessage(false);
@@ -252,10 +250,10 @@ const Conversation = (props) => {
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
                         console.log('new message ', message);
-                        if (!newMessage) {
+                        // if (!newMessage) {
                             setNewMessage(true);
                             let response = JSON.parse(message);
-                            const newMessage = {
+                            const messageData = {
                                 chatId: response.ChatId,
                                 dateSent: response.DateSent,
                                 id: response.Id,
@@ -266,10 +264,10 @@ const Conversation = (props) => {
 
                             dispatch({
                                 type: SENT_MESSAGE,
-                                payload: newMessage
+                                payload: messageData
                             });
                             setMessage('');
-                        }
+                        // }
                     });
 
                     // connection.on('TransferNotification', notification => {

@@ -25,6 +25,7 @@ import Toast from '../../../components/common/Toast';
 import EditListingItem from './EditListingItem';
 
 import { getCurrencies } from '../../../actions/currencies';
+import { getResidencePermitLink } from '../../../actions/customer';
 import { getDocuments } from '../../../actions/documents';
 import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
@@ -137,8 +138,8 @@ const MakeListing = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customer, currencies, documents } = useSelector(state => state);
-    const { customerId } = useSelector(state => state.customer);
+    const { customer, currencies } = useSelector(state => state);
+    const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const { addedListing, listings, msg } = useSelector(state => state.listings);
@@ -161,6 +162,8 @@ const MakeListing = (props) => {
 
     const [previousListings, setPreviousListings] = useState([]);
 
+    const [permitUrl, setPermitUrl] = useState('');
+
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -170,9 +173,12 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         handleSetTitle('Add Listing');
-        if (!customer.hasProvidedResidencePermit && documents.length === 0) {
-            props.getDocuments();
+        if (!customer.hasProvidedResidencePermit && !residencePermitUrl) {
+            props.getResidencePermitLink();
         }
+        // if (!customer.hasProvidedResidencePermit && documents.length === 0) {
+        //     props.getDocuments();
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -192,6 +198,12 @@ const MakeListing = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    useEffect(() => {
+        if (residencePermitUrl) {
+            setPermitUrl(residencePermitUrl);
+        }
+    }, [residencePermitUrl]);
 
     useEffect(() => {
         if (currencies.length === 0) {
@@ -366,7 +378,7 @@ const MakeListing = (props) => {
             }
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} />
+                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
                 <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
                     <div>
@@ -591,7 +603,8 @@ const MakeListing = (props) => {
 MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getDocuments: PropTypes.func.isRequired,
-    getCurrencies: PropTypes.func.isRequired
+    getCurrencies: PropTypes.func.isRequired,
+    getResidencePermitLink: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getCurrencies, getDocuments })(MakeListing);
+export default connect(undefined, { addListing, getCurrencies, getDocuments, getResidencePermitLink })(MakeListing);

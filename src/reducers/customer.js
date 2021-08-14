@@ -4,9 +4,11 @@ import {
     SET_AUTH_TOKEN,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
-    SET_CUSTOMER_MSG ,
+    SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
-    SHOW_PHONE_NUMBER
+    SHOW_PHONE_NUMBER,
+    SET_RESIDENCE_PERMIT,
+    SET_PERMIT_URL
 } from '../actions/types';
 
 const initialState = {
@@ -67,6 +69,18 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 profile
+            };
+
+        case SET_RESIDENCE_PERMIT:
+            return {
+                ...state,
+                hasProvidedResidencePermit: true
+            };
+
+        case SET_PERMIT_URL:
+            return {
+                ...state,
+                residencePermitUrl: action.payload
             };
             
             default:

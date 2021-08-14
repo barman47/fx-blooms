@@ -155,19 +155,13 @@ const Actions = (props) => {
 
         setErrors({});
         setLoading(true);
-        console.log({
-            chatSessionId: sessionId,
-            rating: parseInt(sellerRating),
-            Message,
-            ReceivedExpectedFunds: true
-        });
 
         props.completeTransaction({
             ChatSessionId: sessionId,
             Rating: parseInt(sellerRating),
             Message,
             ReceivedExpectedFunds: true
-        });
+        }, history);
     };
 
     const dismissSuccessModal = () => {

@@ -83,6 +83,10 @@ const SuccessModal = forwardRef((props, ref) => {
             setOpen(true);
         },
 
+        closeModal: () => {
+            setOpen(false);
+        },
+
         setModalText: (text) => {
             setText(text);
         }
