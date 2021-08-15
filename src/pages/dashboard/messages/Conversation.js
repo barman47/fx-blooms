@@ -401,7 +401,7 @@ const Conversation = (props) => {
                                         }
                                     </Fragment>
                                 ))}
-                                {paymentMade && 
+                                {paymentMade && customerId === chat.seller &&
                                     <div className={classes.paymentNotification}>
                                         <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
                                         <Typography variant="subtitle1" component="p">What's next?</Typography>

@@ -68,7 +68,11 @@ const ResidencePermitModal = ({ url, open, handleCloseModal }) => {
                     <div className={classes.modalContent}>
                         <Information className={classes.icon} />
                         <Typography variamt="h6">
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Necessitatibus sint enim quo sunt quisquam et sapiente nesciunt itaque est consectetur? Necessitatibus aperiam expedita libero quo corporis. Nesciunt sunt doloremque temporibus.
+                            Dear User, 
+                            <br />
+                            As measures to ensure utmost security on our platform, a first time seller of EUR is required to verify his or her EU resident permit. 
+                            <br />
+                            Thanks for your cooperation.
                         </Typography>
                         <Link 
                             underline="none"

@@ -53,7 +53,7 @@ const Actions = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { listing } = useSelector(state => state.listings);
+    const { disableBuyerSubmitButton, disableSellerSubmitButton, seller } = useSelector(state => state.chat.chat);
     const { customerId, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     // eslint-disable-next-line
@@ -139,18 +139,19 @@ const Actions = (props) => {
         props.cancelNegotiation(sessionId, history);
     };
 
-    const completeTransaction = () => {
+    const completeTransaction = (submit) => {
         setErrors({});
         const data = {
             Message,
             Rating: sellerRating
         };
 
-        const { errors, isValid } = validateCompleteTransaction(data);
+        if (submit) {
+            const { errors, isValid } = validateCompleteTransaction(data);
 
-        if (!isValid) {
-            console.log(errors, isValid);
-            return setErrors(errors);
+            if (!isValid) {
+                return setErrors(errors);
+            }
         }
 
         setErrors({});
@@ -158,7 +159,7 @@ const Actions = (props) => {
 
         props.completeTransaction({
             ChatSessionId: sessionId,
-            Rating: parseInt(sellerRating),
+            Rating: !sellerRating ? 0 : parseInt(sellerRating),
             Message,
             ReceivedExpectedFunds: true
         }, history);
@@ -195,30 +196,10 @@ const Actions = (props) => {
                 }
                 <Typography variant="subtitle1" component="p">Actions</Typography>
                 <Grid container direction="column" spacing={2}>
-                    {/* <Grid item>
-                        {listing && listing.customerId === customerId &&
-                            <Button 
-                                variant="outlined" 
-                                color="primary"
-                                fullWidth
-                                className={classes.button}
-                                onClick={handleEditListing}
-                            >
-                                Edit Listing
-                            </Button>
-                        }
-                        <Button 
-                            variant="contained" 
-                            color="primary"
-                            fullWidth
-                        >
-                            Cancel Negotiation
-                        </Button>
-                    </Grid> */}
                     <Grid item>
                         <form onSubmit={onSubmit}>
                             <Grid container direction="column" spacing={3}>
-                                    {customerId === listing?.customerId ? 
+                                    {customerId === seller ? 
                                         <Grid item xs={12}>
                                             <Button 
                                                 className={classes.button}
@@ -227,7 +208,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 disabled={loading || !paymentMade ? true : false}
-                                                onClick={handlePayment}
+                                                onClick={() => completeTransaction()}
                                             >
                                                 Payment Received
                                             </Button>
@@ -296,8 +277,9 @@ const Actions = (props) => {
                                         variant="contained"
                                         color="primary"
                                         fullWidth
-                                        onClick={completeTransaction}
-                                        disabled={loading ? true : false}
+                                        onClick={() => completeTransaction(true)}
+                                        disabled={seller === customerId && disableSellerSubmitButton ? true : seller !== customerId && disableBuyerSubmitButton}
+                                        // disabled={loading ? true : false}
                                     >
                                         {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                     </Button>
