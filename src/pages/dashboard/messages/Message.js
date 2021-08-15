@@ -3,10 +3,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import { decode } from 'html-entities';
+import { Account } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
 
-import avatar from '../../../assets/img/avatar.jpg';
 import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
@@ -65,7 +65,9 @@ const Message = ({ handleSetChat, conversation }) => {
             <Grid item>
                 <Grid container direction="row" alignItems="center" spacing={1}>
                     <Grid item>
-                        <Avatar src={avatar} alt="Avatar Alt" />
+                        <Avatar>
+                            <Account />
+                        </Avatar>
                     </Grid>
                     <Grid item>
                         <Typography variant="subtitle1" component="p">

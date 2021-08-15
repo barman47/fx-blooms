@@ -2,7 +2,8 @@ import {
     CLEAR_CUSTOMER_STATUS_MSG,
     SET_CUSTOMER, 
     SET_CUSTOMERS, 
-    SET_CUSTOMER_STATUS 
+    SET_CUSTOMER_STATUS, 
+    SET_NEW_CUSTOMERS
 } from '../actions/types';
 import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 
@@ -32,6 +33,19 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 customer: {...action.payload}
+            };
+
+        case SET_NEW_CUSTOMERS:
+            return {
+                ...state,
+                pending: action.payload.customers,
+                currentPageNumber: action.payload.currentPageNumber,
+                currentPageSize: action.payload.currentPageSize,
+                hasNext: action.payload.hasNext,
+                hasPrevious: action.payload.hasPrevious,
+                totalItemCount: action.payload.totalItemCount,
+                totalPageCount: action.payload.totalPageCount
+
             };
 
         case SET_CUSTOMERS:

@@ -36,6 +36,7 @@ import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
+import { API } from '../../../utils/constants';
 import CompleteTransactionModal from './CompleteTransactionModal';
 
 // import avatar from '../../../assets/img/avatar.jpg';
@@ -232,7 +233,7 @@ const MobileConversation = (props) => {
     const paymentModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();

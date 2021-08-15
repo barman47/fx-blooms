@@ -8,7 +8,6 @@ import {
     FormControl, 
     FormHelperText,
     Grid, 
-    InputAdornment,
     MenuItem,
     Select,
     TextField,
@@ -16,7 +15,6 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CurrencyNgn } from 'mdi-material-ui';
 
 import EditListingItem from './EditListingItem';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -59,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     helperText: {
-        fontSize: '10px'
+        fontSize: theme.spacing(1)
     },
 
     listings: {
@@ -126,7 +124,7 @@ const EditListing = (props) => {
     // eslint-disable-next-line
     const [ReceiptAmount, setReceiptAmount] = useState('');
     // eslint-disable-next-line
-    const [ListingFee, setListingFee] = useState('');
+    const [ListingFee, setListingFee] = useState('0');
 
     const [previousListings, setPreviousListings] = useState([]);
 
@@ -220,7 +218,7 @@ const EditListing = (props) => {
         setExchangeRate('');
         setMinExchangeAmount('');
         setReceiptAmount('');
-        setListingFee('');
+        // setListingFee('');
         setLoading(false);
     };
 
@@ -284,8 +282,8 @@ const EditListing = (props) => {
             <Grid container direction="row" spacing={4} className={classes.container}>
                 <Grid item xs={12} lg={4} className={classes.listingFormContainer}>
                     <form onSubmit={onSubmit} noValidate>
-                        <Grid container direction="row" spacing={2}>
-                            <Grid item xs={12} md={5}>
+                        <Grid container direction="row" spacing={1}>
+                            <Grid item xs={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
                                 <FormControl 
                                     variant="outlined" 
@@ -306,7 +304,7 @@ const EditListing = (props) => {
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={7}>
+                            <Grid item xs={8}>
                                 <br />
                                 <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
@@ -325,7 +323,7 @@ const EditListing = (props) => {
                                     />
                                 </Tooltip>
                             </Grid>
-                            <Grid item xs={12} md={5}>
+                            <Grid item xs={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                 <FormControl 
                                     variant="outlined" 
@@ -347,7 +345,7 @@ const EditListing = (props) => {
                                     <FormHelperText>{errors.RequiredCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={7}>
+                            <Grid item xs={8}>
                                 <br />
                                 <Tooltip title="This is the exchange rate you want." aria-label="Exchange Rate" arrow>
                                     <TextField
@@ -366,7 +364,7 @@ const EditListing = (props) => {
                                     />
                                 </Tooltip>
                             </Grid>
-                            <Grid item xs={12} md={5}>
+                            <Grid item xs={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
                                 <FormControl 
                                     variant="outlined" 
@@ -388,7 +386,7 @@ const EditListing = (props) => {
                                     <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                                 </FormControl>
                             </Grid>
-                            <Grid item xs={12} md={7}>
+                            <Grid item xs={8}>
                                 <br />
                                 <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                     <TextField
@@ -407,8 +405,24 @@ const EditListing = (props) => {
                                     />
                                 </Tooltip>
                             </Grid>
-                            <Grid item xs={12}>
+                            <Grid item xs={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.helperText}>I Will Receive</Typography>
+                                <FormControl 
+                                    variant="outlined" 
+                                    fullWidth 
+                                    required
+                                    disabled
+                                >
+                                    <Select
+                                        labelId="RequiredCurrency"
+                                        value={RequiredCurrency}                                        
+                                    >
+                                        <MenuItem value={RequiredCurrency}>{RequiredCurrency}</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item xs={8}>
+                                <br />
                                 <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
                                     <TextField
                                         value={ReceiptAmount}
@@ -420,13 +434,6 @@ const EditListing = (props) => {
                                         fullWidth
                                         required
                                         error={errors.ReceiptAmount ? true : false}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <CurrencyNgn />
-                                                </InputAdornment>
-                                            )
-                                        }}
                                     />
                                 </Tooltip>
                             </Grid>

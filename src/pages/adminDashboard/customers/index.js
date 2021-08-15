@@ -13,7 +13,7 @@ import {
     Typography
 } from '@material-ui/core';
 
-import { getCustomers } from '../../../actions/customer';
+import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
@@ -81,21 +81,7 @@ const useStyles = makeStyles((theme) => ({
         rowGap: theme.spacing(1)
     },
 
-    customer: {
-        backgroundColor: COLORS.white,
-        display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1.2fr 1.2fr 1.7fr 1.2fr 0.8fr',
-
-        '& span': {
-            color: COLORS.offBlack,
-            fontWeight: 400,
-            padding: theme.spacing(1),
-
-            [theme.breakpoints.down('md')]: {
-                fontSize: theme.spacing(1.2)
-            }
-        }
-    },
+    
 
     customerLink: {
         color: `${theme.palette.primary.main}`,
@@ -119,12 +105,12 @@ const Customers = (props) => {
     const [error, setError] = useState('');
     const [filter, setFilter] = useState(PENDING);
 
-    const { getCustomers, handleSetTitle } = props;
+    const { getNewCustomers, handleSetTitle } = props;
 
     useEffect(() => {
         handleSetTitle('Customers');
         if (count === 0) {
-            getCustomers();
+            getNewCustomers();
         }
         // handleSetTitle('Customers');
         // eslint-disable-next-line
@@ -288,7 +274,7 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span"></Typography>
                     </header>
                     <main className={classes.content}>
-                        {filter === PENDING && <NewCustomers />}
+                        {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
                         
                         {filter === CONFIRMED && 
                             confirmed.map((customer, index) => (
@@ -325,8 +311,8 @@ const Customers = (props) => {
 }
 
 Customers.propTypes = {
-    getCustomers: PropTypes.func.isRequired,
+    getNewCustomers: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomers })(Customers);
+export default connect(undefined, { getNewCustomers })(Customers);

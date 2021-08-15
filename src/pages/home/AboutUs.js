@@ -1,9 +1,9 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ABOUT_US, SIGN_UP } from '../../routes';
+import YouTube from 'react-youtube';
 
-import img from '../../assets/img/about.png';
+import { ABOUT_US, SIGN_UP } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -26,13 +26,29 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 300
     },
 
-    img: {
+    video: {
         width: '100%'
     }
 }));
 
 const AboutUs = () => {
     const classes = useStyles();
+
+    const opts = {
+        // height: '390',
+        // width: '640',
+        playerVars: {
+          // https://developers.google.com/youtube/player_parameters
+            autoplay: 0,
+            color: 'white',
+            playsinline: 1
+        },
+    };
+
+    const onReady = (e) => {
+        // access to player in all event handlers via e.target
+        e.target.pauseVideo();
+      }
 
     return (
         <Grid container direction="row" spacing={10} className={classes.root} id={ABOUT_US}>
@@ -53,7 +69,7 @@ const AboutUs = () => {
                 </Grid>
             </Grid>
             <Grid item xs={12} lg={7}>
-                <img src={img} className={classes.img} alt="About FXBLOOMS" />
+                <YouTube className={classes.video} videoId="71YM28sN0vE" opts={opts} onReady={onReady} />
             </Grid>
         </Grid>
     );

@@ -9,7 +9,7 @@ const addListing = (data) => {
     data.ExchangeRate = !isEmpty(data.ExchangeRate) ?  data.ExchangeRate.toString() : '';
     data.MinExchangeAmount = !isEmpty(data.MinExchangeAmount) ?  data.MinExchangeAmount.toString() : '';
     data.ReceiptAmount = !isEmpty(data.ReceiptAmount) ?  data.ReceiptAmount.toString() : '';
-    data.ListingFee = !isEmpty(data.ListingFee) ?  data.ListingFee.toString() : '';
+    // data.ListingFee = !isEmpty(data.ListingFee) ?  data.ListingFee.toString() : '';
 
     if (Validator.isEmpty(data.AvailableCurrency)) {
         errors.AvailableCurrency = 'Please select a currency!';
@@ -57,12 +57,12 @@ const addListing = (data) => {
         errors.ReceiptAmount = 'Amount is required!';
     }
 
-    if (!Validator.isNumeric(data.ListingFee) || data.ListingFee <= 0) {
-        errors.ListingFee = 'Invalid listing fee!';
-    }
-    if (Validator.isEmpty(data.ListingFee)) {
-        errors.ListingFee = 'Listing fee is required!';
-    }
+    // if (!Validator.isNumeric(data.ListingFee) || data.ListingFee <= 0) {
+    //     errors.ListingFee = 'Invalid listing fee!';
+    // }
+    // if (Validator.isEmpty(data.ListingFee)) {
+    //     errors.ListingFee = 'Listing fee is required!';
+    // }
    
     return {
         errors,

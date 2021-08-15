@@ -9,9 +9,9 @@ import PropTypes from 'prop-types';
 import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
-import avatar from '../../assets/img/avatar.jpg';
 
 import {
+    Avatar,
     Box,
     IconButton,
     Drawer,
@@ -194,7 +194,7 @@ const Dashboard = ({ children, title, logout }) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { firstName, lastName, email } = useSelector(state => state.customer); 
+    const { firstName, lastName, email, profile, userName } = useSelector(state => state.customer); 
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
@@ -293,7 +293,13 @@ const Dashboard = ({ children, title, logout }) => {
                     <section className={classes.logoutContainer}>
                         <Link underline="none" to={`${DASHBOARD}${PROFILE}`} component={RouterLink} className={classes.avatarContainer}>
                             <div>
-                                <img className={classes.avatar} src={avatar} alt="Avatar" />
+                                <Avatar>
+                                    {profile.img ? 
+                                        <img src={profile.img} alt={userName} />
+                                        :
+                                        <Account />
+                                    }
+                                </Avatar>
                             </div>
                             <div>
                                 <Typography variant="subtitle1" component="p">{`${firstName} ${lastName}`}</Typography>

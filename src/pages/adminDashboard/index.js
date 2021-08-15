@@ -16,7 +16,7 @@ import avatar from '../../assets/img/avatar.jpg';
 import logo from '../../assets/img/logo.svg';
 
 import { getStats } from '../../actions/admin';
-import { getCustomers } from '../../actions/customer';
+import { getNewCustomers } from '../../actions/customer';
 import { COLORS } from '../../utils/constants';
 
 const useStyles = makeStyles((theme) => ({
@@ -62,12 +62,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getCustomers, getStats }) => {
+const AdminDashboard = ({ children, title, getNewCustomers, getStats }) => {
     const classes = useStyles();
     const { admin } = useSelector(state => state);
 
     useEffect(() => {
         getStats();
+        // getNewCustomers({
+        //     pageNumber: 1,
+        //     pageSize: 25
+        // });
         // eslint-disable-next-line
     }, []);
 
@@ -110,8 +114,8 @@ const AdminDashboard = ({ children, title, getCustomers, getStats }) => {
 
 AdminDashboard.propTypes = {
     title: PropTypes.string.isRequired,
-    getCustomers: PropTypes.func.isRequired,
+    getNewCustomers: PropTypes.func.isRequired,
     getStats: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomers, getStats })(AdminDashboard);
+export default connect(undefined, { getNewCustomers, getStats })(AdminDashboard);

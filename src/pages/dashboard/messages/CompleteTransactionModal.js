@@ -26,7 +26,8 @@ import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
+import { API, COLORS, SHADOW } from '../../../utils/constants';
+
 
 import validateCompleteTransaction from '../../../utils/validation/customer/completeTransaction';
 
@@ -86,11 +87,11 @@ const CompleteTransactionModal = (props) => {
 	const dispatch = useDispatch();
     const history = useHistory();
 
-    const { listing } = useSelector(state => state.listings);
     const { customerId, msg } = useSelector(state => state.customer);
-    const errorsState = useSelector(state => state.errors);
     const { paymentMade, sessionId } = useSelector(state => state.chat);
-
+    const { disableBuyerSubmitButton, disableSellerSubmitButton, seller } = useSelector(state => state.chat.chat);
+    
+    const errorsState = useSelector(state => state.errors);
     const [open, setOpen] = useState(false);
 
     const [Message, setMessage] = useState('');
@@ -110,7 +111,7 @@ const CompleteTransactionModal = (props) => {
     }, [props.open]);
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
@@ -169,18 +170,19 @@ const CompleteTransactionModal = (props) => {
         props.cancelNegotiation(sessionId, history);
     };
 
-    const completeTransaction = () => {
+    const completeTransaction = (submit) => {
         setErrors({});
         const data = {
             Message,
             Rating: sellerRating
         };
 
-        const { errors, isValid } = validateCompleteTransaction(data);
+        if (submit) {
+            const { errors, isValid } = validateCompleteTransaction(data);
 
-        if (!isValid) {
-            console.log(errors, isValid);
-            return setErrors(errors);
+            if (!isValid) {
+                return setErrors(errors);
+            }
         }
 
         setErrors({});
@@ -188,7 +190,7 @@ const CompleteTransactionModal = (props) => {
 
         props.completeTransaction({
             ChatSessionId: sessionId,
-            Rating: parseInt(sellerRating),
+            Rating: !sellerRating ? 0 : parseInt(sellerRating),
             Message,
             ReceivedExpectedFunds: true
         }, history);
@@ -240,7 +242,7 @@ const CompleteTransactionModal = (props) => {
                         <Grid item>
                             <form onSubmit={onSubmit}>
                                 <Grid container direction="column" spacing={3}>
-                                        {customerId === listing?.customerId ? 
+                                    {customerId === seller ? 
                                             <Grid item xs={12}>
                                                 <Button 
                                                     className={classes.button}
@@ -249,7 +251,7 @@ const CompleteTransactionModal = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     disabled={loading || !paymentMade ? true : false}
-                                                    onClick={handlePayment}
+                                                    onClick={() => completeTransaction()}
                                                 >
                                                     Payment Received
                                                 </Button>
@@ -296,6 +298,7 @@ const CompleteTransactionModal = (props) => {
                                             className={classes.rating}
                                             disabled={loading ? true : false}
                                         />
+                                        <br />
                                         {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
                                     </Grid>
                                     <Grid item xs={12}>
@@ -318,8 +321,8 @@ const CompleteTransactionModal = (props) => {
                                             variant="contained"
                                             color="primary"
                                             fullWidth
-                                            onClick={completeTransaction}
-                                            disabled={loading ? true : false}
+                                            onClick={() => completeTransaction(true)}
+                                            disabled={seller === customerId && disableSellerSubmitButton ? true : seller !== customerId && disableBuyerSubmitButton}
                                         >
                                             {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                         </Button>

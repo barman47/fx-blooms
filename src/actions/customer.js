@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { LOGIN } from '../routes';
-import { API, CONFIRMED, PENDING, REJECTED } from '../utils/constants';
+import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
 import setAuthToken from '../utils/setAuthToken';
@@ -10,7 +10,8 @@ import {
     RESET_STORE,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
-    SET_CUSTOMERS,
+    SET_CONFIRMED_CUSTOMERS,
+    SET_REJECTED_CUSTOMERS,
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER,
     SET_CUSTOMER_MSG,
@@ -138,46 +139,46 @@ export const addResidentPermit = (data) => async (dispatch) => {
     }
 };
 
-export const getCustomers = () => async (dispatch) => {
-    try {
-        // await reIssueToken();
-        const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 10, pageNumber: 1 });
-        const { items, ...rest } = res.data.data;
-        const confirmed = [];
-        const pending = [];
-        const rejected = [];
-        items.forEach(customer => {
-            switch (customer.customerStatus) {
-                case CONFIRMED:
-                    confirmed.push(customer);
-                    break;
+// export const getCustomers = () => async (dispatch) => {
+//     try {
+//         // await reIssueToken();
+//         const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 10, pageNumber: 1 });
+//         const { items, ...rest } = res.data.data;
+//         const confirmed = [];
+//         const pending = [];
+//         const rejected = [];
+//         items.forEach(customer => {
+//             switch (customer.customerStatus) {
+//                 case CONFIRMED:
+//                     confirmed.push(customer);
+//                     break;
 
-                case PENDING:
-                    pending.push(customer);
-                    break;
+//                 case PENDING:
+//                     pending.push(customer);
+//                     break;
 
-                case REJECTED:
-                    rejected.push(customer);
-                    break;
+//                 case REJECTED:
+//                     rejected.push(customer);
+//                     break;
 
-                default:
-                    break;
-            }
-        });
-        dispatch({
-            type: SET_CUSTOMERS,
-            payload: {
-                confirmed,
-                pending,
-                rejected,
-                count: items.length,
-                ...rest
-            }
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
+//                 default:
+//                     break;
+//             }
+//         });
+//         dispatch({
+//             type: SET_CUSTOMERS,
+//             payload: {
+//                 confirmed,
+//                 pending,
+//                 rejected,
+//                 count: items.length,
+//                 ...rest
+//             }
+//         });
+//     } catch (err) {
+//         return handleError(err, dispatch);
+//     }
+// };
 
 export const getCustomer = (customerId) => async(dispatch) => {
     try {
@@ -196,11 +197,43 @@ export const getCustomer = (customerId) => async(dispatch) => {
 export const getNewCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
+        console.log(query);
         const res = await axios.post(`${api}/GetCustomersAwaitingConfirmation/`, query);
         console.log(res);
+        const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_NEW_CUSTOMERS,
-            payload: res.data.data
+            payload: { customers: items, ...rest }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getRejectedCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}//api/Customer/GetRejectedCustomers/`, query);
+        console.log(res);
+        const { items, ...rest } = res.data.data;
+        return dispatch({
+            type: SET_REJECTED_CUSTOMERS,
+            payload: { customers: items, ...rest }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getVerified = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}//api/Customer/GetConfirmedCustomers/`, query);
+        console.log(res);
+        const { items, ...rest } = res.data.data;
+        return dispatch({
+            type: SET_CONFIRMED_CUSTOMERS,
+            payload: { customers: items, ...rest }
         });
     } catch (err) {
         return handleError(err, dispatch);

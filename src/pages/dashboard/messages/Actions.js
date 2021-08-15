@@ -21,6 +21,7 @@ import { cancelNegotiation, completeTransaction } from '../../../actions/listing
 // eslint-disable-next-line
 import { DASHBOARD, EDIT_LISTING } from '../../../routes';
 
+import { API } from '../../../utils/constants';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
@@ -72,7 +73,7 @@ const Actions = (props) => {
     const successModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
@@ -255,6 +256,7 @@ const Actions = (props) => {
                                         className={classes.rating}
                                         disabled={loading ? true : false}
                                     />
+                                    <br />
                                     {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
                                 </Grid>
                                 <Grid item xs={12}>

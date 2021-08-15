@@ -13,8 +13,8 @@ export const FAQS = '/frequentlyAskedQuestions';
 export const DISCLAIMER = '/disclaimer';
 export const SETUP_2FA = '/user/twoFactor';
 export const VERIFY_2FA = '/user/twoFactor/verify';
-export const ID_VERIFICATION_SUCCESS = '/user/verificationSuccess';
-export const ID_VERIFICATION_FAILURE = '/user/verificationFailure';
+export const SIGNUP_SUCCESS = '/user/verificationSuccess';
+export const SIGNUP_FAILURE = '/user/verificationFailure';
 
 export const ADMIN_LOGIN = '/login/admin';
 export const ADMIN_DASHBOARD = '/admin';

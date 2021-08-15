@@ -8,15 +8,37 @@ import { makeStyles } from '@material-ui/core/styles';
 import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
+import { COLORS } from '../../../utils/constants';
 
-const useStyles = makeStyles();
+const useStyles = makeStyles(theme => ({
+    customer: {
+        backgroundColor: COLORS.white,
+        display: 'grid',
+        gridTemplateColumns: '0.2fr 1fr 1.2fr 1.2fr 1.7fr 1.2fr 0.8fr',
+
+        '& span': {
+            color: COLORS.offBlack,
+            fontWeight: 400,
+            padding: theme.spacing(1),
+
+            [theme.breakpoints.down('md')]: {
+                fontSize: theme.spacing(1.2)
+            }
+        }
+    },
+
+    customerLink: {
+        color: `${theme.palette.primary.main}`,
+        cursor: 'pointer'
+    },
+}));
 
 const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { confirmed } = useSelector(state => state.customers);
+    const { pending } = useSelector(state => state.customers);
 
     useEffect(() => {
         getNewCustomers({
@@ -37,9 +59,9 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     return (
         <>
-            {confirmed && confirmed.map((customer, index) => (
+            {pending && pending.map((customer, index) => (
                 <div key={customer.id} className={classes.customer}>
-                    <Typography variant="subtitle2" component="span">{index + 1}</Typography>
+                    <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                     <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
                     <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
                     {/* <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography> */}

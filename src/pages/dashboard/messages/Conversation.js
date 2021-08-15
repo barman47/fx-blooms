@@ -20,6 +20,7 @@ import { SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
+import { API } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -215,7 +216,7 @@ const Conversation = (props) => {
     const paymentModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl('https://api.fxblooms.com/notificationhub', {
+        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
