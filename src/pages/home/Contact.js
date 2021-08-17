@@ -162,14 +162,14 @@ const Contact = (props) => {
                         <Typography variant="subtitle1" component="p" className={classes.title}>Connect with us on social media</Typography>
                         <br />
                         <div className={classes.social}>
-                            <a href="https://www.instagram/fxblooms" target="_blank" rel="noreferrer">
+                            <a href="https://www.instagram.com/fxblooms/" target="_blank" rel="noreferrer">
                                 <Instagram className={classes.icon} />
                             </a>
                         
                             <a href="https://www.linkedin.com/company/fxblooms/" target="_blank" rel="noreferrer">
                                 <Linkedin className={classes.icon} />
                             </a>
-                            <a href="https://google.com" target="_blank" rel="noreferrer">
+                            <a href="https://twitter.com/FXBLOOM1" target="_blank" rel="noreferrer">
                                 <Twitter className={classes.icon} />
                             </a>
                             <a href="https://t.me/joinchat/4zNq4cJg-fA1NjFi" target="_blank" rel="noreferrer">

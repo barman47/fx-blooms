@@ -20,6 +20,8 @@ import ForgotPassword from './pages/auth/ForgotPassword';
 import ResetPassword from './pages/auth/ResetPassword';
 import QrCode from './pages/auth/QrCode';
 import VerifyQrCode from './pages/auth/VerifyQrCode';
+import VerifyEmail from './pages/auth/VerifyEmail';
+import PendingVerification from './pages/auth/PendingVerification';
 
 import Faqs from './pages/faqs';
 import PrivacyPolicy from './pages/privacyPolicy';
@@ -74,7 +76,9 @@ import {
 	TERMS,
 	FAQS,
 	PRIVACY_POLICY,
-	MOBILE_CONVERSATION
+	MOBILE_CONVERSATION,
+	VERIFY_EMAIL,
+	PENDING_VERIFICATION
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -150,6 +154,8 @@ const [title, setTitle] = useState('');
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
 						<Route path={SIGN_UP} exact component={CreateAccount} />
+						<Route path={PENDING_VERIFICATION} exact component={PendingVerification} />
+						<Route path={VERIFY_EMAIL} exact component={VerifyEmail} />
 						<Route path={SIGNUP_SUCCESS} exact component={SignUpSuccess} />
 						<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
 						<Route path={SETUP_2FA} exact component={QrCode} />

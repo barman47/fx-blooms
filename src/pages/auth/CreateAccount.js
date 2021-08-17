@@ -20,14 +20,15 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
+import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
 import { getCountries } from '../../actions/countries';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { CREATE_PROFILE, LOGIN, TERMS } from '../../routes';
-import { GET_ERRORS } from '../../actions/types';
+import { CREATE_PROFILE, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import validateSignUp from '../../utils/validation/customer/createAccount';
 
@@ -189,7 +190,7 @@ const CreateAccount = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { isAuthenticated } = useSelector(state => state.customer);
+    const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { countries } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
@@ -211,6 +212,7 @@ const CreateAccount = (props) => {
     const history = useHistory();
 
     const toast = useRef();
+    const successModal = useRef();
     const usernameRef = useRef();
     const emailRef = useRef();
     let timeout = useRef();
@@ -231,6 +233,13 @@ const CreateAccount = (props) => {
         };
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [dispatch, msg]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -313,6 +322,14 @@ const CreateAccount = (props) => {
         setShowConfirmPassword(!showConfirmPassword);
     };
 
+    const dismissSuccessModal = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+        return history.push(PENDING_VERIFICATION);
+    };
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -333,7 +350,6 @@ const CreateAccount = (props) => {
         setLoading(true);
         setErrors({});
         dispatch({ type: GET_ERRORS, payload: {} });
-        // props.registerCustomer(Username, Email);
         props.registerCustomer({
             EmailAddress: data.Email,
             Username,
@@ -347,6 +363,7 @@ const CreateAccount = (props) => {
                 <title>Create Account | FXBLOOMS.com</title>
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {loading && <Spinner text="One moment . . ." />}
             {!isEmpty(errors) && 
                 <Toast 
@@ -368,8 +385,6 @@ const CreateAccount = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thank you for visiting FXBLOOMS!</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to enjoy our superb service.</Typography>
-                            {/* <Typography variant="subtitle2" component="span" className={classes.text}>Our aim is to make P2P foreign currency exchange much less stressful, safer and faster.</Typography>
-                            <Typography variant="subtitle2" component="span" className={classes.text}>Create an account today to see a list of available offerings.</Typography> */}
                         </div>
                     </Grid>
                     <Grid item xs={12} md={12} lg={5} className={classes.formContainer}>

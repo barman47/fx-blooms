@@ -8,7 +8,7 @@ const createAccount = (data) => {
     data.Password = !isEmpty(data.Password) ?  data.Password : '';
     data.ConfirmPassword = !isEmpty(data.ConfirmPassword) ?  data.ConfirmPassword : '';
 
-    if (!Validator.isEmail(data.Email)) {
+    if (!Validator.isEmail(data.Email.trim())) {
         errors.Email = 'Invalid Email address!';
     }
     if (Validator.isEmpty(data.Email)) {

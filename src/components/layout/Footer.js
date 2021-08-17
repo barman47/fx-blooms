@@ -173,7 +173,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('https://www.instagram/fxblooms', '_blank', 'noopener,noreferrer')
+                                    window.open('https://www.instagram.com/fxblooms/', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Instagram />
@@ -193,7 +193,7 @@ const Footer = () => {
                             <IconButton 
                                 className={clsx(classes.linkedInIcon, classes.social)}
                                 onClick={() => {
-                                    window.open('', '_blank', 'noopener,noreferrer')
+                                    window.open('https://twitter.com/FXBLOOM1', '_blank', 'noopener,noreferrer')
                                 }}
                             >
                                 <Twitter />

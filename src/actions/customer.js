@@ -58,10 +58,29 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-export const registerCustomer = (customer) => async (dispatch) => {
+export const registerCustomer = ({EmailAddress, Username, Password}) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/CreateCustomerV2`, customer);
-        window.location.href = res.data.data;
+        Promise.all([
+            await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`),
+            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password }),
+            await axios.get(`${api}/VerificationLink/email/${EmailAddress}`)
+        ]);
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
+    try {
+        await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -112,7 +131,6 @@ export const login = (data) => async (dispatch) => {
 export const getResidencePermitLink = () => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/GetLinkForResidencePermitUpload`);
-        console.log(res);
         dispatch({
             type: SET_PERMIT_URL,
             payload: res.data.data
