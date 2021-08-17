@@ -5,16 +5,17 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Button, 
-    FormControl, 
-    FormHelperText, 
+    // FormControl, 
+    // FormHelperText, 
     Grid, 
-    MenuItem, 
-    Select, 
+    // MenuItem, 
+    // Select, 
     TextField, 
     Tooltip, 
     Typography,
     Zoom 
 } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import { Information } from 'mdi-material-ui';
@@ -30,6 +31,7 @@ import { createCustomer } from '../../actions/customer';
 import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
+import { countries as countriesList } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
@@ -128,9 +130,11 @@ const CreateProfile = (props) => {
     
     const [FirstName, setFirstName] = useState('');
     const [LastName, setLastName] = useState('');
+    // eslint-disable-next-line
     const [CountryCode, setCountryCode] = useState('');
     const [PhoneNo, setPhoneNo] = useState('');
     const [Address, setAddress] = useState('');
+    // eslint-disable-next-line
     const [Country, setCountry] = useState('');
     // eslint-disable-next-line
     const [CountryId, setCountryId] = useState('');
@@ -144,6 +148,8 @@ const CreateProfile = (props) => {
     const [verifiedEmail, setVerifiedEmail] = useState(false);
 
     const countryCodes = emojiFlags.data;
+
+    console.log(countryCodes);
 
     const toast = useRef();
 
@@ -207,6 +213,22 @@ const CreateProfile = (props) => {
             setPhoneNo(e.target.value);
         }
     };
+
+    // const countryToFlag = (isoCode) => {
+    //     return typeof String.fromCodePoint !== 'undefined'
+    //       ? isoCode
+    //           .toUpperCase()
+    //           .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397))
+    //       : isoCode;
+    // };
+
+    const countryToFlag = (countryCode) => {
+        const codePoints = countryCode
+          .toUpperCase()
+          .split('')
+          .map(char =>  127397 + char.charCodeAt());
+        return String.fromCodePoint(...codePoints);
+      }
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -322,33 +344,32 @@ const CreateProfile = (props) => {
                                 </Grid>
                                 <Grid item xs={12} md={3}>
                                     <Typography variant="subtitle2" component="span">Phone Number</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.CountryCode ? true : false } 
-                                        fullWidth 
-                                        required
-                                    >
-                                        <Select
-                                            labelId="CountryCode"
-                                            className={classes.input}
-                                            value={CountryCode}
-                                            onChange={(e) => setCountryCode(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Country Code</MenuItem>
-                                            {countryCodes.map((country, index) => (
-                                                <MenuItem key={index} value={country.dialCode}>
-                                                    {/* <span role="img" aria-label={country.name}>{country.emoji}</span> */}
-                                                    {/* {String.fromCodePoint('0x' + country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + country?.unicode.split(' '[1].substring(2)))} */}
-                                                    {country.dialCode}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.CountryCode}</FormHelperText>
-                                    </FormControl>
+                                    <Autocomplete
+                                        id="country-select"
+                                        options={countriesList}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.phone}
+                                        renderOption={(option) => (
+                                            <>
+                                                <span>{countryToFlag(option.code)}</span>
+                                                {`+${option.phone}`}
+                                            </>
+                                        )}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                variant="outlined"
+                                                inputProps={{
+                                                    ...params.inputProps,
+                                                    autoComplete: 'new-password', // disable autocomplete and autofill
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                    
                                 </Grid>
                                 <Grid item xs={12} md={7}>
-                                    <Typography variant="subtitle2" component="span">Phone Number</Typography>
+                                    <br />
                                     <TextField 
                                         className={classes.input}
                                         value={PhoneNo}
@@ -382,7 +403,28 @@ const CreateProfile = (props) => {
                             
                                 <Grid item xs={12} md={5}>
                                     <Typography variant="subtitle2" component="span">Country</Typography>
-                                    <FormControl 
+                                    <Autocomplete
+                                        id="country-select"
+                                        options={countriesList}
+                                        autoHighlight
+                                        getOptionLabel={(option) => option.label}
+                                        renderOption={(option) => (
+                                            <>
+                                                <span>{option.label}</span>
+                                            </>
+                                        )}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                variant="outlined"
+                                                inputProps={{
+                                                    ...params.inputProps,
+                                                    autoComplete: 'new-password', // disable autocomplete and autofill
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                    {/* <FormControl 
                                         variant="outlined" 
                                         error={errors.Country ? true : false } 
                                         fullWidth 
@@ -401,7 +443,7 @@ const CreateProfile = (props) => {
                                             ))}
                                         </Select>
                                         <FormHelperText>{errors.Country}</FormHelperText>
-                                    </FormControl>
+                                    </FormControl> */}
                                 </Grid>
                                 <Grid item xs={12} md={5}>
                                     {Country.toLowerCase() !== 'nigeria' && 
