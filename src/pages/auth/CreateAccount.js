@@ -327,7 +327,7 @@ const CreateAccount = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history.push(PENDING_VERIFICATION);
+        return history.push(PENDING_VERIFICATION, { email: Email });
     };
 
     const handleFormSubmit = (e) => {

@@ -19,7 +19,6 @@ import {
 import Alert from '@material-ui/lab/Alert';
 import { CloudUpload, Information } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
-import emojiFlags from 'emoji-flags';
 
 import SignUpSuccessModal from './SignUpSuccessModal';
 import Spinner from '../../components/common/Spinner';
@@ -228,8 +227,6 @@ const CreateProfile = (props) => {
     const [loadingText, setLoadingText] = useState('');
 
     const [verifiedEmail, setVerifiedEmail] = useState(false);
-
-    const countryCodes = emojiFlags.data;
 
     const toast = useRef();
 

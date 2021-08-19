@@ -111,6 +111,7 @@ const Customers = (props) => {
         handleSetTitle('Customers');
         if (count === 0) {
             getNewCustomers();
+            console.log('getting new customers');
         }
         // handleSetTitle('Customers');
         // eslint-disable-next-line

@@ -82,10 +82,12 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
         >
             <Fade in={open}>
                 <div container className={classes.container} direction="column">
-                    <Typography variant="subtitle2" component="span" className={classes.title}>Payment Confirmation Tips</Typography>
+                    <Typography variant="subtitle2" component="span" className={classes.title}>Tips and Recommendations</Typography>
                     <ul className={classes.list}>
-                        <li>Make sure you have confirmed payment in your banking app before sending funds.</li>
-                        <li>Do not rely on payment receipts or proof of payments(screenshots).</li>
+                        <li>The seller should confirm the NGN(&#8358;) payment in their account before sending the EUR(&#163;) equivalent.</li>
+                        <li>We recommend that the SELLER uses instant EUR(&#163;) payment when possible.</li>
+                        <li>Both the SELLER and the BUYER must verify and confirm account details and payment reference provided.</li>
+                        <li>After a successful transaction, please rate the other party involved. Positive ratings will increase your trust level on FXBLOOMS</li>
                     </ul>
                     <Button className={classes.button} variant="contained" color="primary" onClick={closeModal} fullWidth>Okay</Button>
                 </div>

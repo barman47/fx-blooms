@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { batch } from 'react-redux';
 
-import { LOGIN } from '../routes';
+import { LOGIN, SETUP_2FA } from '../routes';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
@@ -21,7 +22,8 @@ import {
     SET_RESIDENCE_PERMIT,
     SET_PERMIT_URL,
     // eslint-disable-next-line
-    GET_ERRORS
+    GET_ERRORS,
+    SET_EMAIL
  } from './types';
 
 const api = `${API}/Customer`;
@@ -32,14 +34,11 @@ export const getMe = (history) => async (dispatch) => {
     }
 };
 
-export const createCustomer = (customer) => async (dispatch) => {
+export const createCustomer = (customer, history) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/CreateCustomer`, customer);
-        const successMessage = res.data.data;
-        dispatch({
-            type: SET_CURRENT_CUSTOMER,
-            payload: { successMessage }
-        });
+        const res = await axios.post(`${api}/CompleteOnboarding`, customer);
+        setAuthToken(res.data.data.token);
+        history.push(SETUP_2FA);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -62,8 +61,7 @@ export const registerCustomer = ({EmailAddress, Username, Password}) => async (d
     try {
         Promise.all([
             await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`),
-            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password }),
-            await axios.get(`${api}/VerificationLink/email/${EmailAddress}`)
+            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password })
         ]);
         dispatch({
             type: SET_CUSTOMER_MSG,
@@ -76,10 +74,16 @@ export const registerCustomer = ({EmailAddress, Username, Password}) => async (d
 
 export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     try {
-        await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
+        const res = await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
+        batch(() => {
+            dispatch({
+                type: SET_EMAIL,
+                payload: res.data.data.emailAddress
+            });
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

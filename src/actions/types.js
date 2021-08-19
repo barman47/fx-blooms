@@ -38,4 +38,5 @@ export const PAYMENT_RECEIVED = 'PAYMENT_RECEIVED';
 export const SET_STATS = 'SET_STATS';
 export const SET_RESIDENCE_PERMIT = 'SET_RESIDENCE_PERMIT';
 export const SET_PERMIT_URL = 'SET_PERMIT_URL';
+export const SET_EMAIL = 'SET_EMAIL';
 export const RESET_STORE = 'RESET_STORE';

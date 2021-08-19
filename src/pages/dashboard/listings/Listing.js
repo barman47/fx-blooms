@@ -16,6 +16,8 @@ import { GET_ERRORS } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
 
+import IDVerificationModal from '../listings/IDVerificationModal';
+
 import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
@@ -108,6 +110,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
 
     const errorsState = useSelector(state => state.errors);
     const userId = useSelector(state => state.customer.customerId);
+    const { document } = useSelector(state => state.customer.profile);
 
     const [errors, setErrors] = useState({});
 
@@ -115,6 +118,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
     // const { bids, status, id } = listing;
 
     const toast = useRef();
+    const idVerificationModal = useRef();
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -150,8 +154,19 @@ const Listing = ({ addBid, listing, getSeller }) => {
         return history.push(`${DASHBOARD}${PROFILE}`);
     };
 
+    const checkUserId = () => {
+        idVerificationModal.current.openModal();
+    };
+
+    const dismissAction = () => {
+        // Redirect to getID
+    };
+
     const handleAddBid = (e, listing) => {
         e.preventDefault();
+        if (!document) {
+            return checkUserId();
+        }
         dispatch({
             type: SET_LISTING,
             payload: listing
@@ -176,6 +191,7 @@ const Listing = ({ addBid, listing, getSeller }) => {
                     type="error"
                 />
             }
+            <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">

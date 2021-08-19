@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useLocation, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -99,12 +99,12 @@ const VerifyQrCode = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
-    const location = useLocation();
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { customerId } = useSelector(state => state.customer);
+    const twoFactorEnabled = useSelector(state => state.customer.twoFactorEnabled);
+    const customerId = useSelector(state => state.customer.customerId);
     const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.twoFactor);
     
@@ -117,8 +117,6 @@ const VerifyQrCode = (props) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
-    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-
     const toast = useRef();
     const successModal = useRef();
     
@@ -128,14 +126,6 @@ const VerifyQrCode = (props) => {
     const fourthField = useRef();
     const fifthField = useRef();
     const sixthField = useRef();
-
-    useEffect(() => {
-        if (location.state) {
-            if (location.state.twoFactorEnabled) {
-                setTwoFactorEnabled(location.state.twoFactorEnabled);
-            }
-        }
-    }, [location.state]);
 
     useEffect(() => {
         if (errorsState?.msg) {

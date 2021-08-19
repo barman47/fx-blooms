@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Button, 
-    // FormControl, 
-    // FormHelperText, 
+    FormHelperText, 
     Grid, 
-    // MenuItem, 
-    // Select, 
     TextField, 
     Tooltip, 
     Typography,
@@ -19,19 +16,16 @@ import Autocomplete from '@material-ui/lab/Autocomplete';
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles } from '@material-ui/core/styles';
 import { Information } from 'mdi-material-ui';
-import emojiFlags from 'emoji-flags';
 
-import SignUpSuccessModal from './SignUpSuccessModal';
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
-import { getCountries } from '../../actions/countries';
 import { getDocuments } from '../../actions/documents';
 import { createCustomer } from '../../actions/customer';
 import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { countries as countriesList } from '../../utils/countries';
+import { countries } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
@@ -122,48 +116,38 @@ const CreateProfile = (props) => {
     const dispatch = useDispatch();
 
     const history = useHistory();
+    const location = useLocation();
 
-    const { isAuthenticated } = useSelector(state => state.customer);
-    const { countries, documents } = useSelector(state => state);
-    const { successMessage } = useSelector(state => state.customer);
+    const { email, isAuthenticated } = useSelector(state => state.customer);
+    const { documents } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
     
     const [FirstName, setFirstName] = useState('');
     const [LastName, setLastName] = useState('');
-    // eslint-disable-next-line
+    
     const [CountryCode, setCountryCode] = useState('');
     const [PhoneNo, setPhoneNo] = useState('');
     const [Address, setAddress] = useState('');
-    // eslint-disable-next-line
+    
     const [Country, setCountry] = useState('');
-    // eslint-disable-next-line
-    const [CountryId, setCountryId] = useState('');
+
     const [PostalCode, setPostalCode] = useState('');
     
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
     const [loadingText, setLoadingText] = useState('');
-    // eslint-disable-next-line
     const [verifiedEmail, setVerifiedEmail] = useState(false);
-
-    const countryCodes = emojiFlags.data;
-
-    console.log(countryCodes);
 
     const toast = useRef();
 
     useEffect(() => {
-        // if (location.state.verifiedEmail) {
-        //     setVerifiedEmail(true);
-        // } else {
-        //     return history.push('/');
-        // }
-        if (isAuthenticated) {
+        if (location?.state?.verifiedEmail && email) {
+            setVerifiedEmail(true);
+        } else {
             return history.push('/');
         }
-        if (countries.length === 0) {
-            props.getCountries();
+        if (isAuthenticated) {
+            return history.push('/');
         }
         if (documents.length === 0) {
             props.getDocuments();
@@ -177,17 +161,6 @@ const CreateProfile = (props) => {
         };
         // eslint-disable-next-line
     }, []);
-
-    useEffect(() => {
-        if (successMessage) {
-            setLoading(false);
-            setOpen(true);
-        }
-    }, [successMessage]);
-
-    // useEffect(() => {
-    //     console.log(emojiFlags.data);
-    // }, []);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -204,23 +177,11 @@ const CreateProfile = (props) => {
         }
     }, [errors]);
 
-    const handleCloseModal = () => {
-        setOpen(false);
-    };
-
     const handleSetPhoneNumber = (e) => {
         if (!isNaN(Number(e.target.value))) {
             setPhoneNo(e.target.value);
         }
     };
-
-    // const countryToFlag = (isoCode) => {
-    //     return typeof String.fromCodePoint !== 'undefined'
-    //       ? isoCode
-    //           .toUpperCase()
-    //           .replace(/./g, (char) => String.fromCodePoint(char.charCodeAt(0) + 127397))
-    //       : isoCode;
-    // };
 
     const countryToFlag = (countryCode) => {
         const codePoints = countryCode
@@ -241,13 +202,10 @@ const CreateProfile = (props) => {
             CountryCode,
             PhoneNo,
             Address,
-            CountryId,
             PostalCode
         };
 
-        const { ConfirmPassword, ...rest } = data;
-
-        const { errors, isValid } = validateCreateProfile({ ...rest });
+        const { errors, isValid } = validateCreateProfile(data);
 
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid sign up data' });
@@ -255,7 +213,15 @@ const CreateProfile = (props) => {
     
         setLoading(true);
         setLoadingText('One Moment . . .');
-        props.createCustomer({ ...rest });
+        props.createCustomer({
+            Email: email,
+            FirstName,
+            LastName,
+            PhoneNumber: `+${data.CountryCode}${data.PhoneNo}`,
+            CountryId: Country,
+            Address,
+            PostalCode
+        }, history);
     };
 
     return (
@@ -271,7 +237,6 @@ const CreateProfile = (props) => {
                 />
             }
             {loading && <Spinner text={loadingText} />}
-            <SignUpSuccessModal handleCloseModal={handleCloseModal} open={open} text={successMessage || ''} />
             <section className={classes.root}>
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
@@ -298,9 +263,11 @@ const CreateProfile = (props) => {
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
-                                <Grid item xs={10}>
-                                    <Alert severity="success">Email successfuly verified</Alert>
-                                </Grid>
+                                {verifiedEmail && email && 
+                                    <Grid item xs={10}>
+                                        <Alert severity="success">Email successfuly verified</Alert>
+                                    </Grid>
+                                }
                                 <Grid item xs={12} md={5}>
                                     <Tooltip title="This should be your official government name" placement="top" arrow>
                                         <>
@@ -346,9 +313,12 @@ const CreateProfile = (props) => {
                                     <Typography variant="subtitle2" component="span">Phone Number</Typography>
                                     <Autocomplete
                                         id="country-select"
-                                        options={countriesList}
+                                        options={countries}
                                         autoHighlight
-                                        getOptionLabel={(option) => option.phone}
+                                        getOptionLabel={(option) => {
+                                            setCountryCode(option.phone);
+                                            return option.phone;
+                                        }}
                                         renderOption={(option) => (
                                             <>
                                                 <span>{countryToFlag(option.code)}</span>
@@ -363,10 +333,12 @@ const CreateProfile = (props) => {
                                                     ...params.inputProps,
                                                     autoComplete: 'new-password', // disable autocomplete and autofill
                                                 }}
+                                                // onChange={(e) => setCountryCode(e.target.value)}
                                             />
                                         )}
                                     />
-                                    
+                                    <FormHelperText id="my-helper-text">Country code. e.g. +234</FormHelperText>
+                                    {errors.CountryCode && <FormHelperText error>{errors.CountryCode}</FormHelperText>}
                                 </Grid>
                                 <Grid item xs={12} md={7}>
                                     <br />
@@ -405,9 +377,13 @@ const CreateProfile = (props) => {
                                     <Typography variant="subtitle2" component="span">Country</Typography>
                                     <Autocomplete
                                         id="country-select"
-                                        options={countriesList}
+                                        options={countries}
                                         autoHighlight
-                                        getOptionLabel={(option) => option.label}
+                                        disableClearable
+                                        getOptionLabel={(option) => {
+                                            setCountry(option.label);
+                                            return option.label;
+                                        }}
                                         renderOption={(option) => (
                                             <>
                                                 <span>{option.label}</span>
@@ -421,9 +397,11 @@ const CreateProfile = (props) => {
                                                     ...params.inputProps,
                                                     autoComplete: 'new-password', // disable autocomplete and autofill
                                                 }}
+                                                // onChange={(e) => setCountry(e.target.value)}
                                             />
                                         )}
                                     />
+                                    {errors.Country && <FormHelperText error>{errors.Country}</FormHelperText>}
                                     {/* <FormControl 
                                         variant="outlined" 
                                         error={errors.Country ? true : false } 
@@ -485,8 +463,7 @@ const CreateProfile = (props) => {
 
 CreateProfile.propTypes = {
     createCustomer: PropTypes.func.isRequired,
-    getCountries: PropTypes.func.isRequired,
     getDocuments: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { createCustomer, getCountries, getDocuments })(CreateProfile);
+export default connect(undefined, { createCustomer, getDocuments })(CreateProfile);

@@ -8,10 +8,12 @@ import {
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
     SET_RESIDENCE_PERMIT,
-    SET_PERMIT_URL
+    SET_PERMIT_URL,
+    SET_EMAIL
 } from '../actions/types';
 
 const initialState = {
+    isAuthenticated: false,
     msg: null,
     profile: {}
 };
@@ -20,7 +22,7 @@ const customerReducer =  (state = initialState, action) => {
     let profile = {};
     switch (action.type) {
         case SET_CURRENT_CUSTOMER:
-            return { ...state, ...action.payload };
+            return { ...state, ...action.payload, isAuthenticated: true };
 
         case CLEAR_CURRENT_CUSTOMER:
             return {
@@ -41,10 +43,15 @@ const customerReducer =  (state = initialState, action) => {
             };
 
         case ENABLED_2FA:
-            const { twoFactorEnable, ...rest } = state.customer;
             return {
                 ...state,
-                customer: { ...rest, twoFactorEnabled: true }
+                customer: { twoFactorEnabled: true }
+            };
+
+        case SET_EMAIL:
+            return {
+                ...state,
+                email: action.payload
             };
 
         case SET_CUSTOMER_MSG:

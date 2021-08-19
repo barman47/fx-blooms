@@ -1,7 +1,6 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Grid, IconButton, InputAdornment, Link, TextField, Typography } from '@material-ui/core';
+import { Grid, IconButton, InputAdornment, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, FilePdfOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
@@ -15,7 +14,6 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { DISCLAIMER } from '../../../routes';
 import { SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
@@ -66,16 +64,6 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             height: theme.spacing(10)
         }
-    },
-    
-    disclaimer: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius,
-        fontSize: theme.spacing(1.7),
-        marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(2),
-        padding: [[theme.spacing(1), 0]],
-        textAlign: 'center'
     },
     
     messages: {
@@ -361,9 +349,6 @@ const Conversation = (props) => {
                         </Grid>
                     </Grid>
                     <section className={classes.messageContainer}>
-                        <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
-                            Ensure to read our <Link to={DISCLAIMER} target="_blank" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
-                        </Typography>
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}
                                 {chat?.messages && chat?.messages.map((message) => (

@@ -9,6 +9,7 @@ import Conversation from './Conversation';
 import Messages from './Messages';
 
 import { COLORS } from '../../../utils/constants';
+
 import SellerNoticeModal from './SellerNoticeModal';
 
 const useStyles = makeStyles(theme => ({
