@@ -9,6 +9,7 @@ import setAuthToken from '../utils/setAuthToken';
 
 import { 
     RESET_STORE,
+    SET_ID_VERIFICATION_LINK,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
     SET_CONFIRMED_CUSTOMERS,
@@ -84,6 +85,18 @@ export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
                 type: SET_CUSTOMER_MSG,
                 payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
             });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getIdVerificationLink = () => async (dispatch) => {
+    try {
+        const res = await axios.get(`${api}/IDCardVerificationLink`);
+        return dispatch({
+            type: SET_ID_VERIFICATION_LINK,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -206,7 +219,6 @@ export const getCustomer = (customerId) => async(dispatch) => {
     try {
         // Issue admin token
         const res = await axios.get(`${api}/GetCustomer/${customerId}`);
-        console.log(res);
         return dispatch({
             type: SET_CUSTOMER,
             payload: res.data.data
@@ -219,13 +231,11 @@ export const getCustomer = (customerId) => async(dispatch) => {
 export const getNewCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
-        console.log(query);
         const res = await axios.post(`${api}/GetCustomersAwaitingConfirmation/`, query);
-        console.log(res);
         const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_NEW_CUSTOMERS,
-            payload: { customers: items, ...rest }
+            payload: { pending: items, ...rest }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -235,27 +245,25 @@ export const getNewCustomers = (query) => async(dispatch) => {
 export const getRejectedCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
-        const res = await axios.post(`${api}//api/Customer/GetRejectedCustomers/`, query);
-        console.log(res);
+        const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
         const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_REJECTED_CUSTOMERS,
-            payload: { customers: items, ...rest }
+            payload: { rejected: items, ...rest }
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const getVerified = (query) => async(dispatch) => {
+export const getVerifiedCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
-        const res = await axios.post(`${api}//api/Customer/GetConfirmedCustomers/`, query);
-        console.log(res);
+        const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
         const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_CONFIRMED_CUSTOMERS,
-            payload: { customers: items, ...rest }
+            payload: { confirmed: items, ...rest }
         });
     } catch (err) {
         return handleError(err, dispatch);

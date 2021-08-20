@@ -8,6 +8,7 @@ import {
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
     SET_RESIDENCE_PERMIT,
+    SET_ID_VERIFICATION_LINK,
     SET_PERMIT_URL,
     SET_EMAIL
 } from '../actions/types';
@@ -88,6 +89,12 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 residencePermitUrl: action.payload
+            };
+
+        case SET_ID_VERIFICATION_LINK:
+            return {
+                ...state,
+                idVerificationLink: action.payload
             };
             
             default:

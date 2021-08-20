@@ -66,9 +66,10 @@ const SellerNoticeModal = () => {
     const HAS_SEEN_SELLER_WARNING = 'hasSeenSellerWarning';
 
     useEffect(() => {
-        if (!localStorage.getItem(HAS_SEEN_SELLER_WARNING)) {
-            setOpen(true);
-        }
+        setOpen(true);
+        // if (!localStorage.getItem(HAS_SEEN_SELLER_WARNING)) {
+        //     setOpen(true);
+        // }
         // eslint-disable-next-line
     }, []);
 

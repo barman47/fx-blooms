@@ -3,12 +3,18 @@ import {
     SET_CUSTOMER, 
     SET_CUSTOMERS, 
     SET_CUSTOMER_STATUS, 
-    SET_NEW_CUSTOMERS
+    SET_NEW_CUSTOMERS,
+    SET_CONFIRMED_CUSTOMERS,
+    SET_REJECTED_CUSTOMERS,
+    SET_ALL_CUSTOMERS,
+    CLEAR_ALL_CUSTOMERS
 } from '../actions/types';
+
 import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 
 const initialState = {
     customer: {},
+    customers: [],
     confirmed: [],
     pending: [],
     rejected: [],
@@ -38,14 +44,49 @@ const customersReducer = (state = initialState, action) => {
         case SET_NEW_CUSTOMERS:
             return {
                 ...state,
-                pending: action.payload.customers,
                 currentPageNumber: action.payload.currentPageNumber,
                 currentPageSize: action.payload.currentPageSize,
                 hasNext: action.payload.hasNext,
                 hasPrevious: action.payload.hasPrevious,
                 totalItemCount: action.payload.totalItemCount,
-                totalPageCount: action.payload.totalPageCount
+                totalPageCount: action.payload.totalPageCount,
+                pending: action.payload.pending
+            };
 
+        case SET_CONFIRMED_CUSTOMERS:
+            return {
+                ...state,
+                currentPageNumber: action.payload.currentPageNumber,
+                currentPageSize: action.payload.currentPageSize,
+                hasNext: action.payload.hasNext,
+                hasPrevious: action.payload.hasPrevious,
+                totalItemCount: action.payload.totalItemCount,
+                totalPageCount: action.payload.totalPageCount,
+                confirmed: action.payload.confirmed
+            };
+
+        case SET_REJECTED_CUSTOMERS:
+            return {
+                ...state,
+                currentPageNumber: action.payload.currentPageNumber,
+                currentPageSize: action.payload.currentPageSize,
+                hasNext: action.payload.hasNext,
+                hasPrevious: action.payload.hasPrevious,
+                totalItemCount: action.payload.totalItemCount,
+                totalPageCount: action.payload.totalPageCount,
+                rejected: action.payload.rejected
+            };
+
+        case SET_ALL_CUSTOMERS:
+            return {
+                ...state,
+                customers: [...state.pending, ...state.confirmed, ...state.rejected]
+            };
+
+        case CLEAR_ALL_CUSTOMERS:
+            return {
+                ...state,
+                customers: []
             };
 
         case SET_CUSTOMERS:
@@ -110,7 +151,8 @@ const customersReducer = (state = initialState, action) => {
                 default:
                     break;
             }
-            break;
+
+        break;
 
         case CLEAR_CUSTOMER_STATUS_MSG:
             return {

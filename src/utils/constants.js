@@ -15,6 +15,7 @@ export const COLORS = {
 export const CONFIRMED = 'CONFIRMED';
 export const PENDING = 'PENDING';
 export const REJECTED = 'REJECTED';
+export const ALL_CUSTOMERS = 'ALL_CUSTOMERS';
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 

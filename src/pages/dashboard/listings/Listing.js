@@ -7,7 +7,6 @@ import PropTypes from 'prop-types';
 
 import { SET_LISTING } from '../../../actions/types';
 import { getCustomer, getSeller } from '../../../actions/customer';
-import { addBid } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
@@ -15,8 +14,6 @@ import isEmpty from '../../../utils/isEmpty';
 import { GET_ERRORS } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
-
-import IDVerificationModal from '../listings/IDVerificationModal';
 
 import Toast from '../../../components/common/Toast';
 
@@ -102,7 +99,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ addBid, listing, getSeller }) => {
+const Listing = ({ handleAddBid, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -110,15 +107,13 @@ const Listing = ({ addBid, listing, getSeller }) => {
 
     const errorsState = useSelector(state => state.errors);
     const userId = useSelector(state => state.customer.customerId);
-    const { document } = useSelector(state => state.customer.profile);
 
     const [errors, setErrors] = useState({});
 
-    const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId, id } = listing;
+    const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
     // const { bids, status, id } = listing;
 
     const toast = useRef();
-    const idVerificationModal = useRef();
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -154,32 +149,6 @@ const Listing = ({ addBid, listing, getSeller }) => {
         return history.push(`${DASHBOARD}${PROFILE}`);
     };
 
-    const checkUserId = () => {
-        idVerificationModal.current.openModal();
-    };
-
-    const dismissAction = () => {
-        // Redirect to getID
-    };
-
-    const handleAddBid = (e, listing) => {
-        e.preventDefault();
-        if (!document) {
-            return checkUserId();
-        }
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        addBid({
-            listingId: id,
-            amount: {
-                currencyType: minExchangeAmount.currencyType,
-                amount: minExchangeAmount.amount
-            }
-        }, history);
-    };
-
     return (
         <>
             {!isEmpty(errors) && 
@@ -191,7 +160,6 @@ const Listing = ({ addBid, listing, getSeller }) => {
                     type="error"
                 />
             }
-            <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
@@ -279,10 +247,10 @@ const Listing = ({ addBid, listing, getSeller }) => {
 };
 
 Listing.propTypes = {
-    addBid: PropTypes.func.isRequired,
     getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
+    handleAddBid: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { addBid, getCustomer, getSeller })(Listing);
+export default connect(undefined, { getCustomer, getSeller })(Listing);

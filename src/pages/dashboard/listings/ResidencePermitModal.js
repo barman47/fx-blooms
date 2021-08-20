@@ -68,11 +68,7 @@ const ResidencePermitModal = ({ url, open, handleCloseModal }) => {
                     <div className={classes.modalContent}>
                         <Information className={classes.icon} />
                         <Typography variamt="h6">
-                            Dear User, 
-                            <br />
-                            As measures to ensure utmost security on our platform, a first time seller of EUR is required to verify his or her EU resident permit. 
-                            <br />
-                            Thanks for your cooperation.
+                            To ensure utmost security on our platform, all first time SELLERS of EUR are required to verify their EU resident permit.
                         </Typography>
                         <Link 
                             underline="none"
@@ -81,7 +77,7 @@ const ResidencePermitModal = ({ url, open, handleCloseModal }) => {
                                 window.location.href = url;
                             }}
                         >
-                            Okay
+                            Okay, Verify My Permit
                         </Link>
                     </div>
                 </Fade>

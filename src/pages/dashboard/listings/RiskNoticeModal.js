@@ -100,7 +100,7 @@ const RiskNoticeModal = () => {
                     </div>
                     <Typography variant="h5" align="center">Notice</Typography>
                     <Typography variant="subtitle1" component="p">
-                        To sell EUR on the FXBLOOMS platform, a user may be subjected to more verifications and requirements. This action is to ensure utmost security on our platform.
+                        Depending on the type of activitiy a USER wants to carry out, USERS will be subjected to more verifications and requirements as measures put in place to ensure utmost security on the FXBLOOMS platform.
                     </Typography>
                     <Button onClick={closeModal} color="primary">Okay, I Understand</Button>
                 </section>

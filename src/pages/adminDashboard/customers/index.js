@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';
@@ -13,12 +12,14 @@ import {
     Typography
 } from '@material-ui/core';
 
-import { getNewCustomers } from '../../../actions/customer';
-import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
-import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
+import { getNewCustomers, getRejectedCustomers, getVerifiedCustomers } from '../../../actions/customer';
+import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
 
 import NewCustomers from './NewCustomers';
+import RejectedCustomers from './RejectedCustomers';
+import VerifiedCustomers from './VerifiedCustomers';
+import { SET_ALL_CUSTOMERS } from '../../../actions/types';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -97,7 +98,7 @@ const useStyles = makeStyles((theme) => ({
 const Customers = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+
     const { admin } = useSelector(state => state);
     const { confirmed, pending, rejected, count } = useSelector(state => state.customers);
     const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
@@ -105,25 +106,56 @@ const Customers = (props) => {
     const [error, setError] = useState('');
     const [filter, setFilter] = useState(PENDING);
 
-    const { getNewCustomers, handleSetTitle } = props;
+    const { getNewCustomers, getVerifiedCustomers, getRejectedCustomers, handleSetTitle } = props;
 
     useEffect(() => {
         handleSetTitle('Customers');
         if (count === 0) {
             getNewCustomers();
-            console.log('getting new customers');
         }
         // handleSetTitle('Customers');
         // eslint-disable-next-line
     }, []);
 
-    const handleViewCustomer = (customer) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleSetTitle('User Details');
-        history.push(`${ADMIN_DASHBOARD}${CUSTOMERS}/${customer.id}`);
+    const handleSetFilter = (filter) => {
+        setFilter(filter);
+        switch (filter) {
+            case CONFIRMED:
+                if (isEmpty(confirmed)) {
+                    getVerifiedCustomers({
+                        pageNumber: 1,
+                        pageSize: 25
+                    });
+                }
+                break;
+
+            case PENDING:
+                if (isEmpty(pending)) {
+                    getNewCustomers({
+                        pageNumber: 1,
+                        pageSize: 25
+                    });
+                }
+                break;
+
+            case REJECTED:
+                if (isEmpty(rejected)) {
+                    getRejectedCustomers({
+                        pageNumber: 1,
+                        pageSize: 25
+                    });
+                }
+                break;
+
+            case ALL_CUSTOMERS:
+                dispatch({
+                    type: SET_ALL_CUSTOMERS
+                });
+                break;
+
+            default:
+                break;
+        }  
     };
 
     const downloadRecords = () => {
@@ -134,42 +166,19 @@ const Customers = (props) => {
 
         switch (filter) {
             case CONFIRMED:
-                confirmed.forEach((customer, index) => {
-                    data.push({
-                        'S/N': index + 1,
-                        'Full Name': `${customer.firstName} ${customer.lastName}`,
-                        'Phone Number': customer.phoneNo,
-                        'ID Type': customer.documentation.documentType,
-                        'Email': customer.email,
-                        Username: customer.username,
-                    });
-                });
+                data = [...confirmed];
                 break;
 
             case PENDING:
-                pending.forEach((customer, index) => {
-                    data.push({
-                        'S/N': index + 1,
-                        'Full Name': `${customer.firstName} ${customer.lastName}`,
-                        'Phone Number': customer.phoneNo,
-                        'ID Type': customer.documentation.documentType,
-                        'Email': customer.email,
-                        Username: customer.username,
-                    });
-                });
+                data = [...pending];
                 break;
 
             case REJECTED:
-                rejected.forEach((customer, index) => {
-                    data.push({
-                        'S/N': index + 1,
-                        'Full Name': `${customer.firstName} ${customer.lastName}`,
-                        'Phone Number': customer.phoneNo,
-                        'ID Type': customer.documentation.documentType,
-                        'Email': customer.email,
-                        Username: customer.username,
-                    });
-                });
+                data = [...rejected];
+                break;
+            
+            case ALL_CUSTOMERS:
+                data = [...pending, ...confirmed, ...rejected];
                 break;
 
             default:
@@ -240,25 +249,25 @@ const Customers = (props) => {
                 </Grid>
                 <Grid container direction="row" spacing={5} className={classes.filterContainer}>
                     <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === PENDING && classes.active)} onClick={() => setFilter(PENDING)}>
+                        <div className={clsx(classes.filter, filter === PENDING && classes.active)} onClick={() => handleSetFilter(PENDING)}>
                             <Typography variant="subtitle2" component="span">New</Typography>
                             <Typography variant="subtitle2" component="span">{totalCustomersAwaitingApproval}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => setFilter(CONFIRMED)}>
+                        <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => handleSetFilter(CONFIRMED)}>
                             <Typography variant="subtitle2" component="span">Verified</Typography>
                             <Typography variant="subtitle2" component="span">{totalApprovedCustomers}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === REJECTED && classes.active)} onClick={() => setFilter(REJECTED)}>
+                        <div className={clsx(classes.filter, filter === REJECTED && classes.active)} onClick={() => handleSetFilter(REJECTED)}>
                             <Typography variant="subtitle2" component="span">Rejected</Typography>
                             <Typography variant="subtitle2" component="span">{totalRejectedCustomers}</Typography>
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                        <div className={classes.filter}>
+                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
                             <Typography variant="subtitle2" component="span">All</Typography>
                             <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
                         </div>
@@ -276,33 +285,8 @@ const Customers = (props) => {
                     </header>
                     <main className={classes.content}>
                         {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
-                        
-                        {filter === CONFIRMED && 
-                            confirmed.map((customer, index) => (
-                                <div key={customer.id} className={classes.customer}>
-                                    <Typography variant="subtitle2" component="span">{index + 1}</Typography>
-                                    <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                                    {/* <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography> */}
-                                    <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.username}</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
-                                </div>
-                            ))
-                        }
-                        {filter === REJECTED && 
-                            rejected.map((customer, index) => (
-                                <div key={customer.id} className={classes.customer}>
-                                    <Typography variant="subtitle2" component="span">{index + 1}</Typography>
-                                    <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                                    <Typography variant="subtitle2" component="span">{customer.username}</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
-                                </div>
-                            ))
-                        }
+                        {filter === CONFIRMED && <VerifiedCustomers handleSetTitle={handleSetTitle} />}
+                        {filter === REJECTED && <RejectedCustomers handleSetTitle={handleSetTitle} />}
                         <Button color="primary" className={classes.button}>Load More</Button>
                     </main>
                 </section>
@@ -313,7 +297,9 @@ const Customers = (props) => {
 
 Customers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired,
+    getRejectedCustomers: PropTypes.func.isRequired,
+    getVerifiedCustomers: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getNewCustomers })(Customers);
+export default connect(undefined, { getNewCustomers, getRejectedCustomers, getVerifiedCustomers })(Customers);

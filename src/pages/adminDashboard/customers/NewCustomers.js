@@ -9,6 +9,7 @@ import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -41,10 +42,12 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const { pending } = useSelector(state => state.customers);
 
     useEffect(() => {
-        getNewCustomers({
-            pageNumber: 1,
-            pageSize: 25
-        });
+        if (isEmpty(pending)) {
+            getNewCustomers({
+                pageNumber: 1,
+                pageSize: 25
+            });
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -60,13 +63,13 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
     return (
         <>
             {pending && pending.map((customer, index) => (
-                <div key={customer.id} className={classes.customer}>
+                <div key={index} className={classes.customer}>
                     <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                     <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
                     <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                    {/* <Typography variant="subtitle2" component="span">{customer.documentation.documentType}</Typography> */}
+                    <Typography variant="subtitle2" component="span"></Typography>
                     <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer.username}</Typography>
+                    <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
                     <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
                 </div>
             ))
