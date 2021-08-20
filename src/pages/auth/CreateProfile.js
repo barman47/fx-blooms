@@ -315,6 +315,7 @@ const CreateProfile = (props) => {
                                         id="country-select"
                                         options={countries}
                                         autoHighlight
+                                        disableClearable
                                         getOptionLabel={(option) => {
                                             setCountryCode(option.phone);
                                             return option.phone;

@@ -2,7 +2,6 @@ import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
 const createProfile = (data) => {
-    console.log(data);
     let errors = {};
     data.FirstName = !isEmpty(data.FirstName) ?  data.FirstName : '';
     data.LastName = !isEmpty(data.LastName) ?  data.LastName : '';

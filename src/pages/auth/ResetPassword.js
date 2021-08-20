@@ -133,11 +133,6 @@ const ResetPassword = (props) => {
             setLoading(false);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
-            dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: null
-            });
-            return history.push('/');
         }
     }, [dispatch, history, msg]);
 
@@ -149,7 +144,13 @@ const ResetPassword = (props) => {
         setShowConfirmPassword(!showConfirmPassword);
     };
 
-    const redirectToLogin = () => history.push(LOGIN);
+    const redirectToLogin = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+        history.push(LOGIN)
+    };
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
