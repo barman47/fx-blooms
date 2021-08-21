@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -9,8 +9,9 @@ import { FormatListText } from 'mdi-material-ui';
 import { COLORS } from '../../../utils/constants';
 import { addBid } from '../../../actions/listings';
 import { getIdVerificationLink } from '../../../actions/customer';
-import { SET_LISTING } from '../../../actions/types';
+import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
+import Spinner from '../../../components/common/Spinner';
 import IDVerificationModal from '../listings/IDVerificationModal';
 import Listing from './Listing';
 
@@ -37,14 +38,19 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listings = ({ getIdVerificationLink }) => {
+const Listings = ({ addBid, getIdVerificationLink }) => {
     const classes = useStyles();
+
     const dispatch = useDispatch();
     const history = useHistory();
 
     const { document, img } = useSelector(state => state.customer.profile);
+    const errorsState = useSelector(state => state.errors);
     const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
     const { listings } = useSelector(state => state.listings);
+
+    const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const idVerificationModal = useRef();
 
@@ -56,15 +62,27 @@ const Listings = ({ getIdVerificationLink }) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors(errorsState);
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
+
     const checkUserId = () => {
         idVerificationModal.current.openModal();
     };
 
     const handleAddBid = (e, listing) => {
         e.preventDefault();
-        if (!document && !img) {
-            return checkUserId();
-        }
+        // if (!document && !img) {
+        //     return checkUserId();
+        // }
+        setLoading(true);
         dispatch({
             type: SET_LISTING,
             payload: listing
@@ -79,13 +97,13 @@ const Listings = ({ getIdVerificationLink }) => {
     };
 
     const dismissAction = () => {
-        // Redirect to getID
         window.location.href = idVerificationLink;
     };
 
     return (
         <>
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
+            {loading && <Spinner />}
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
                     <Listing key={index} listing={listing} handleAddBid={handleAddBid} />

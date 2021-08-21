@@ -102,6 +102,7 @@ export const getMoreListings = (query) => async (dispatch) => {
 export const addBid = (bid, history) => async (dispatch) => {
     try {
         await reIssueToken();
+        console.log('adding bid');
         const res = await axios.post(`${URL}/AddBid`, bid);
         console.log(res);
         dispatch({

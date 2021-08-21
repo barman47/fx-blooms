@@ -55,7 +55,7 @@ const AllCustomers = ({ handleSetTitle }) => {
     return (
         <>
             {customers && customers.map((customer, index) => (
-                    <div key={index} className={classes.customer}>
+                    <div key={customer.id} className={classes.customer}>
                         <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                         <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
                         <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>

@@ -332,10 +332,10 @@ export const setShowPhoneNumber = () => async (dispatch) => {
 
 export const forgotPassword = (email) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/GenerateResetToken?email=${email}`);
+        await axios.post(`${api}/GenerateResetToken?email=${email}`);
         return dispatch({
             type: SET_CUSTOMER_MSG,
-            payload: res.data.data
+            payload: 'A magic link has been sent to your email'
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -344,11 +344,10 @@ export const forgotPassword = (email) => async (dispatch) => {
 
 export const resetPassword = (data) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/ResetPassword`, data);
-        console.log(res);
+        await axios.post(`${api}/ResetPassword`, data);
         return dispatch({
             type: SET_CUSTOMER_MSG,
-            payload: res.data.data
+            payload: 'A new passwod has been set'
         });
     } catch (err) {
         return handleError(err, dispatch);

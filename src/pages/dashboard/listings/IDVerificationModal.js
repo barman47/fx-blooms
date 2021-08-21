@@ -47,7 +47,11 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        textAlign: 'center'
+        textAlign: 'center',
+
+        '& strong': {
+            color: theme.palette.primary.main
+        }
     },
 
     icon: {
@@ -86,8 +90,6 @@ const IDVerificationModal = forwardRef((props, ref) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            disableBackdropClick
-            disableEscapeKeyDown
             onClose={() => setOpen(false)}
             closeAfterTransition
             BackdropComponent={Backdrop}
@@ -101,6 +103,7 @@ const IDVerificationModal = forwardRef((props, ref) => {
                         <Information className={classes.icon} />
                         <Typography variant="subtitle1">
                             To ensure utmost security on our platform, all first time BUYERS of EUR are required to verify their identity.
+                            <br />
                             <strong>N.B We only accept international passport, drivers licenses.</strong>
                         </Typography>
                         <Button onClick={closeModal} color="primary">Okay</Button>

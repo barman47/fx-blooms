@@ -38,7 +38,7 @@ const customersReducer = (state = initialState, action) => {
         case SET_CUSTOMER:
             return {
                 ...state,
-                customer: {...action.payload}
+                customer: action.payload
             };
 
         case SET_NEW_CUSTOMERS:

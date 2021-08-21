@@ -1,6 +1,4 @@
-import { useEffect, useState } from 'react'; 
-import { connect, useSelector } from 'react-redux'; 
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux'; 
 import { 
     Box, 
     Divider,
@@ -9,7 +7,6 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { getCountries } from '../../../actions/countries'; 
 import { COLORS } from '../../../utils/constants'; 
 
 const useStyles = makeStyles(theme =>({
@@ -42,54 +39,9 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const PersonalDetails = (props) => {
+const PersonalDetails = () => {
     const classes = useStyles();
-    const { countries } = useSelector(state => state);
     const { customer } = useSelector(state => state.customers);
-
-    const [country, setCountry] = useState('');
-    const [countryId, setCountryId] = useState('');
-    const [city, setCity] = useState('');
-    const [stateId, setStateId] = useState('');
-    const [states, setStates] = useState([]);
-
-    const { getCountries } = props;
-
-    useEffect(() => {
-        if (countries.length === 0) {
-            getCountries();
-        }
-    }, [countries, getCountries]);
-
-    useEffect(() => {
-        if (customer) {
-            const { countryId, stateId } = customer;
-            setCountryId(countryId);
-            setStateId(stateId);
-        }
-    }, [customer]);
-
-    useEffect(() => {
-        if (countryId) {
-            const country = countries.find(country => country.id === countryId);
-            setStates(country?.states);
-            setCountry(country?.name);
-        }
-    }, [countryId, countries]);
-
-    useEffect(() => {
-        if (states?.length > 0 && stateId) {
-            const city = states.find(state => state.id === stateId);
-            setCity(city.name)
-        }
-    }, [stateId, states]);
-
-    // useEffect(() => {
-    //     if (states?.length > 0) {
-    //         const state = states.find(state => state.id === stateId);
-    //         setCity(state.name);
-    //     }
-    // }, [states, stateId]);
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -121,7 +73,7 @@ const PersonalDetails = (props) => {
                         </Grid>
                         <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{customer?.username}</Typography>
+                            <Typography variant="subtitle2" className={classes.info}>{customer?.userName}</Typography>
                         </Grid>
                         <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
@@ -131,25 +83,21 @@ const PersonalDetails = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{customer?.address}</Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{country}</Typography>
+                            <Typography variant="subtitle2" className={classes.info}>{customer?.countryId}</Typography>
                         </Grid>
-                        <Grid item xs={4}>
-                            <Typography variant="subtitle2" component="span" className={classes.label}>City/State</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{city}</Typography>
-                        </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{customer?.postalCode}</Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Listings</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{customer?.listings?.length}</Typography>
+                            <Typography variant="subtitle2" className={classes.info}>{customer?.numberOfListings}</Typography>
                         </Grid>
-                        <Grid item xs={8}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Successful Transactions</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>[NA]</Typography>
+                            <Typography variant="subtitle2" className={classes.info}>{customer?.numberOfSuccessfulTransactions}</Typography>
                         </Grid>
                     </Grid>
                 </form>
@@ -158,8 +106,4 @@ const PersonalDetails = (props) => {
     );
 };
 
-PersonalDetails.propTypes = {
-    getCountries: PropTypes.func.isRequired
-};
-
-export default connect(undefined, { getCountries })(PersonalDetails);
+export default PersonalDetails;
