@@ -29,7 +29,14 @@ import { registerCustomer } from '../../actions/customer';
 import isEmpty from '../../utils/isEmpty';
 import { CREATE_PROFILE, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
-import { COLORS } from '../../utils/constants';
+import  {
+    COLORS,
+    ONE_UPPERCASE_LETTER,
+    ONE_LOWERCASE_LETTER,
+    ONE_DIGIT,
+    ONE_SPECIAL_CHARACTER,
+    EIGHT_CHARACTERS
+} from '../../utils/constants';
 import validateSignUp from '../../utils/validation/customer/createAccount';
 
 import logo from '../../assets/img/logo.svg';
@@ -131,36 +138,10 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr',
         marginTop: theme.spacing(1),
 
-        '& div:nth-child(2)': {
-            border: `1px solid ${COLORS.offBlack}`,
-            borderRadius: '20px',
-            height: '10px',
-            // marginTop: theme.spacing(1),
-            position: 'relative',
-            // overflow: 'hidden',
-            width: '100%'
-        },
-
-        '& p:last-child': {
-            fontWeight: 500
+        '& small': {
+            color: '#ff0000',
+            fontWeight: 300
         }
-    },
-
-    title: {
-        // border: '1px solid red',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%'
-    },
-
-    weak: {
-        backgroundColor: 'red',
-        borderRadius: '20px',
-        height: '100%',
-        position: 'absolute',
-        top: 0,
-        width: '10%'
     },
 
     average: {
@@ -183,10 +164,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const CreateAccount = (props) => {
-    const POOR = 'poor';
-    const AVERAGE = 'average';
-    const STRONG = 'strong';
-
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -207,7 +184,13 @@ const CreateAccount = (props) => {
     const [loading, setLoading] = useState(false);
 
     const [showStrengthBadge, setShowStrengthBadge] = useState(false);
-    const [passwordStrength, setPasswordStrength] = useState(POOR);
+    const [isStrongPassword, setIsStrongPassword] = useState(false);
+
+    const [isUppercase, setIsUppercase] = useState(false);
+    const [isLowercase, setIsLowercase] = useState(false);
+    const [isOneDigit, setIsOneDigit] = useState(false);
+    const [isOneSpecialCharacter, setIsOneSpecialCharacter] = useState(false);
+    const [isEightCharacters, setIsEightCharacters] = useState(false);
 
     const history = useHistory();
 
@@ -285,17 +268,38 @@ const CreateAccount = (props) => {
     }, [errors]);
 
     const strengthChecker = useCallback((password) => {
-        const strongPassword = new RegExp('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})');
-        const mediumPassword = new RegExp('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))');
-
-        if (strongPassword.test(password)) {
-            setPasswordStrength(STRONG);
-        } else if (mediumPassword.test(password)) {
-            setPasswordStrength(AVERAGE);
+        if (ONE_UPPERCASE_LETTER.test(password)) {
+            setIsUppercase(true);
         } else {
-            setPasswordStrength(POOR);
+            setIsUppercase(false);
         }
-    }, []);
+        if (ONE_LOWERCASE_LETTER.test(password)) {
+            setIsLowercase(true);
+        } else {
+            setIsLowercase(false);
+        }
+        if (ONE_DIGIT.test(password)) {
+            setIsOneDigit(true);
+        } else {
+            setIsOneDigit(false);
+        }
+        if (ONE_SPECIAL_CHARACTER.test(password)) {
+            setIsOneSpecialCharacter(true);
+        } else {
+            setIsOneSpecialCharacter(false);
+        }
+        if (EIGHT_CHARACTERS.test(password)) {
+            setIsEightCharacters(true);
+        } else {
+            setIsEightCharacters(false);
+        }
+        
+        if (isUppercase && isLowercase && isOneDigit && isOneSpecialCharacter && isEightCharacters) {
+            setIsStrongPassword(true);
+        } else {
+            setIsStrongPassword(false);
+        }
+    }, [isUppercase, isLowercase, isOneDigit, isOneSpecialCharacter, isEightCharacters]);
 
     useEffect(() => {
         if (Password) {
@@ -307,6 +311,12 @@ const CreateAccount = (props) => {
         } else {
             clearTimeout(timeout.current);
             setShowStrengthBadge(false);
+            setIsUppercase(false);
+            setIsLowercase(false);
+            setIsOneDigit(false);
+            setIsOneSpecialCharacter(false);
+            setIsEightCharacters(false);
+            setIsStrongPassword(false);
         }
     }, [Password, strengthChecker, timeout]);
 
@@ -333,6 +343,10 @@ const CreateAccount = (props) => {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+
+        if (!isStrongPassword) {
+            return setErrors({ msg: 'Weak password' });
+        }
 
         const data = {
             Email: Email.toLowerCase(),
@@ -483,40 +497,13 @@ const CreateAccount = (props) => {
                                         }}
                                         disabled={loading ? true : false}
                                     />
-                                    {showStrengthBadge && passwordStrength === POOR && 
+                                    {showStrengthBadge && 
                                         <div className={classes.passwordStrength}>
-                                            <div className={classes.title}>
-                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
-                                                <Typography variant="subtitle2" component="span">Poor&nbsp;<span>&#128555;</span></Typography>
-                                            </div>
-                                            <div>
-                                                <div className={classes.weak}></div>
-                                            </div>
-                                            <Typography variant="subtitle1" component="p">Your password is easily guessable. You can do better.</Typography>
-                                        </div>
-                                    }
-                                    {showStrengthBadge && passwordStrength === AVERAGE && 
-                                        <div className={classes.passwordStrength}>
-                                            <div className={classes.title}>
-                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
-                                                <Typography variant="subtitle2" component="span">Average&nbsp;<span>&#128528;</span></Typography>
-                                            </div>
-                                            <div>
-                                                <div className={classes.average}></div>
-                                            </div>
-                                            <Typography variant="subtitle1" component="p">Your password is easily guessable. You can do better.</Typography>
-                                        </div>
-                                    }
-                                    {showStrengthBadge && passwordStrength === STRONG && 
-                                        <div className={classes.passwordStrength}>
-                                            <div className={classes.title}>
-                                                <Typography variant="subtitle2" component="span">Password Strength</Typography>
-                                                <Typography variant="subtitle2" component="span">Strong&nbsp;<span>&#128526;</span></Typography>
-                                            </div>
-                                            <div>
-                                                <div className={classes.strong}></div>
-                                            </div>
-                                            <Typography variant="subtitle1" component="p">Your password is great. Nice work!</Typography>
+                                            {!isUppercase && <Typography variant="subtitle1" component="small">Your password should containt at least one uppercase letter</Typography>}
+                                            {!isLowercase && <Typography variant="subtitle1" component="small">Your password should containt at least one lowercase letter</Typography>}
+                                            {!isOneDigit && <Typography variant="subtitle1" component="small">Your password should containt at least one digit</Typography>}
+                                            {!isOneSpecialCharacter && <Typography variant="subtitle1" component="small">Your password should contain at least one special character</Typography>}
+                                            {!isEightCharacters && <Typography variant="subtitle1" component="small">Your password be at least 8 characters long</Typography>}
                                         </div>
                                     }
                                 </Grid>

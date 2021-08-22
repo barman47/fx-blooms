@@ -55,7 +55,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const idVerificationModal = useRef();
 
     useEffect(() => {
-        if (!document && !img) {
+        if (!document || !img) {
             getIdVerificationLink();
         }
 
@@ -79,9 +79,9 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
 
     const handleAddBid = (e, listing) => {
         e.preventDefault();
-        // if (!document && !img) {
-        //     return checkUserId();
-        // }
+        if (!document && !img) {
+            return checkUserId();
+        }
         setLoading(true);
         dispatch({
             type: SET_LISTING,

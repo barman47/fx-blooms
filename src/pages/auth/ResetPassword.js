@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,14 @@ import { resetPassword } from '../../actions/customer';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
-import { COLORS } from '../../utils/constants';
+import  {
+    COLORS,
+    ONE_UPPERCASE_LETTER,
+    ONE_LOWERCASE_LETTER,
+    ONE_DIGIT,
+    ONE_SPECIAL_CHARACTER,
+    EIGHT_CHARACTERS
+} from '../../utils/constants';
 import validateResetPassword from '../../utils/validation/customer/resetPassword';
 import { LOGIN } from '../../routes';
 
@@ -73,6 +80,18 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(5)
     },
 
+    passwordStrength: {
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        marginBottom: theme.spacing(1),
+
+        '& small': {
+            color: '#ff0000',
+            fontSize: theme.spacing(1.5),
+            fontWeight: 300
+        }
+    },
+
     link: {
         color: theme.palette.primary.main,
         textDecoration: 'none',
@@ -97,10 +116,20 @@ const ResetPassword = (props) => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+    const [showStrengthBadge, setShowStrengthBadge] = useState(false);
+    const [isStrongPassword, setIsStrongPassword] = useState(false);
+
+    const [isUppercase, setIsUppercase] = useState(false);
+    const [isLowercase, setIsLowercase] = useState(false);
+    const [isOneDigit, setIsOneDigit] = useState(false);
+    const [isOneSpecialCharacter, setIsOneSpecialCharacter] = useState(false);
+    const [isEightCharacters, setIsEightCharacters] = useState(false);
+
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const successModal = useRef();
+    let timeout = useRef();
     const toast = useRef();
 
     useEffect(() => {
@@ -152,9 +181,66 @@ const ResetPassword = (props) => {
         history.push(LOGIN)
     };
 
+    const strengthChecker = useCallback((password) => {
+        if (ONE_UPPERCASE_LETTER.test(password)) {
+            setIsUppercase(true);
+        } else {
+            setIsUppercase(false);
+        }
+        if (ONE_LOWERCASE_LETTER.test(password)) {
+            setIsLowercase(true);
+        } else {
+            setIsLowercase(false);
+        }
+        if (ONE_DIGIT.test(password)) {
+            setIsOneDigit(true);
+        } else {
+            setIsOneDigit(false);
+        }
+        if (ONE_SPECIAL_CHARACTER.test(password)) {
+            setIsOneSpecialCharacter(true);
+        } else {
+            setIsOneSpecialCharacter(false);
+        }
+        if (EIGHT_CHARACTERS.test(password)) {
+            setIsEightCharacters(true);
+        } else {
+            setIsEightCharacters(false);
+        }
+        
+        if (isUppercase && isLowercase && isOneDigit && isOneSpecialCharacter && isEightCharacters) {
+            setIsStrongPassword(true);
+        } else {
+            setIsStrongPassword(false);
+        }
+    }, [isUppercase, isLowercase, isOneDigit, isOneSpecialCharacter, isEightCharacters]);
+
+    useEffect(() => {
+        if (Password) {
+            clearTimeout(timeout.current);
+            setShowStrengthBadge(true);
+
+            timeout.current = setTimeout(() => strengthChecker(Password), 500);
+
+        } else {
+            clearTimeout(timeout.current);
+            setShowStrengthBadge(false);
+            setIsUppercase(false);
+            setIsLowercase(false);
+            setIsOneDigit(false);
+            setIsOneSpecialCharacter(false);
+            setIsEightCharacters(false);
+            setIsStrongPassword(false);
+        }
+    }, [Password, strengthChecker, timeout]);
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+
+        if (!isStrongPassword) {
+            return setErrors({ msg: 'Weak password' });
+        }
 
         const data = { Password, ConfirmPassword };
         const { errors, isValid } = validateResetPassword(data);
@@ -233,6 +319,15 @@ const ResetPassword = (props) => {
                                         )
                                     }}
                                 />
+                                {showStrengthBadge && 
+                                    <div className={classes.passwordStrength}>
+                                        {!isUppercase && <Typography variant="subtitle1" component="small">Your password should containt at least one uppercase letter</Typography>}
+                                        {!isLowercase && <Typography variant="subtitle1" component="small">Your password should containt at least one lowercase letter</Typography>}
+                                        {!isOneDigit && <Typography variant="subtitle1" component="small">Your password should containt at least one digit</Typography>}
+                                        {!isOneSpecialCharacter && <Typography variant="subtitle1" component="small">Your password should contain at least one special character</Typography>}
+                                        {!isEightCharacters && <Typography variant="subtitle1" component="small">Your password be at least 8 characters long</Typography>}
+                                    </div>
+                                }
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Confirm Password</Typography>

@@ -60,7 +60,7 @@ export const getCustomerInformation = () => async (dispatch) => {
 
 export const registerCustomer = ({EmailAddress, Username, Password}) => async (dispatch) => {
     try {
-        Promise.all([
+        await Promise.all([
             await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`),
             await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password })
         ]);
@@ -69,6 +69,12 @@ export const registerCustomer = ({EmailAddress, Username, Password}) => async (d
             payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
         });
     } catch (err) {
+        if (err.response.status === 400) {
+            return dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+            });
+        }
         return handleError(err, dispatch);
     }
 };
@@ -76,6 +82,7 @@ export const registerCustomer = ({EmailAddress, Username, Password}) => async (d
 export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
+        console.log(res);
         batch(() => {
             dispatch({
                 type: SET_EMAIL,

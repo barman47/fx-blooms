@@ -24,6 +24,12 @@ export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'
 
+export const ONE_UPPERCASE_LETTER = /(?=.*?[A-Z])/;
+export const ONE_LOWERCASE_LETTER = /(?=.*?[a-z])/;
+export const ONE_DIGIT = /(?=.*?[0-9])/;
+export const ONE_SPECIAL_CHARACTER = /(?=.*?[#?!@$%^&*-])/;
+export const EIGHT_CHARACTERS = /.{8,}/;
+
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
 export const ATTACHMENT_LIMIT = 15000000; // 15 Megabytes
 
