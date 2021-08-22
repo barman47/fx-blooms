@@ -267,7 +267,7 @@ const AllListings = (props) => {
 							// pullDownToRefreshContent={
 							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
 							// }
-							endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
+							// endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
 							scrollableTarget="scrollableParent"
 							// height={1000}
 						>

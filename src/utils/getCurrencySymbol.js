@@ -8,7 +8,7 @@ const getCurrencySymbol = (currency) => {
             return decode('&#8358;');
 
         case EUR:
-            return decode('&#163;');
+            return decode('&#8364;');
 
         default:
             return '';

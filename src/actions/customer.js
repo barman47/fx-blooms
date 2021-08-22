@@ -2,7 +2,14 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 
 import { LOGIN, SETUP_2FA } from '../routes';
-import { API } from '../utils/constants';
+import { 
+    API,
+    SETUP_2FA as GOTO_2FA,
+    EMAIL_VERIFICATION,
+    PROCEED_TO_LOGIN,
+    FILL_FORM1,
+    // FILL_FORM2,
+} from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
 import setAuthToken from '../utils/setAuthToken';
@@ -38,6 +45,7 @@ export const getMe = (history) => async (dispatch) => {
 export const createCustomer = (customer, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
+        console.log(res);
         setAuthToken(res.data.data.token);
         history.push(SETUP_2FA);
     } catch (err) {
@@ -58,23 +66,37 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-export const registerCustomer = ({EmailAddress, Username, Password}) => async (dispatch) => {
+export const registerCustomer = ({EmailAddress, Username, Password}, history) => async (dispatch) => {
     try {
-        await Promise.all([
-            await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`),
-            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password })
-        ]);
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-        });
-    } catch (err) {
-        if (err.response.status === 400) {
-            return dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-            });
+        const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
+        const { nextStep } = res.data.data;
+
+        switch (nextStep) {
+            case FILL_FORM1:
+                await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+
+            case EMAIL_VERIFICATION:
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+
+            case GOTO_2FA:
+                setAuthToken(res.data.data.token);
+                return history.push(SETUP_2FA);
+
+            case PROCEED_TO_LOGIN:
+                return history.push(LOGIN);
+
+            default:
+                return;
         }
+
+    } catch (err) {
         return handleError(err, dispatch);
     }
 };

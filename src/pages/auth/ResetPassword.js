@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
 
         '& small': {
             color: '#ff0000',
-            fontSize: theme.spacing(1.5),
+            fontSize: theme.spacing(1.3),
             fontWeight: 300
         }
     },

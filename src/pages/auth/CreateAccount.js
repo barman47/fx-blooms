@@ -140,6 +140,7 @@ const useStyles = makeStyles(theme => ({
 
         '& small': {
             color: '#ff0000',
+            fontSize: theme.spacing(1.3),
             fontWeight: 300
         }
     },
@@ -167,6 +168,8 @@ const CreateAccount = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
+    const history = useHistory();
+
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { countries } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
@@ -191,8 +194,6 @@ const CreateAccount = (props) => {
     const [isOneDigit, setIsOneDigit] = useState(false);
     const [isOneSpecialCharacter, setIsOneSpecialCharacter] = useState(false);
     const [isEightCharacters, setIsEightCharacters] = useState(false);
-
-    const history = useHistory();
 
     const toast = useRef();
     const successModal = useRef();
@@ -368,7 +369,7 @@ const CreateAccount = (props) => {
             EmailAddress: data.Email,
             Username,
             Password
-        });
+        }, history);
     };
 
     return (

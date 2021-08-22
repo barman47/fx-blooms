@@ -17,6 +17,12 @@ export const PENDING = 'PENDING';
 export const REJECTED = 'REJECTED';
 export const ALL_CUSTOMERS = 'ALL_CUSTOMERS';
 
+export const SETUP_2FA = 'SETUP_2FA';
+export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
+export const PROCEED_TO_LOGIN = 'PROCEED_TO_LOGIN';
+export const FILL_FORM1 = 'FILL_FORM1';
+export const FILL_FORM2 = 'FILL_FORM2';
+
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
