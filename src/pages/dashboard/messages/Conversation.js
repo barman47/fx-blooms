@@ -18,7 +18,7 @@ import { SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
-import { API } from '../../../utils/constants';
+import { HUB_URL } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -204,18 +204,22 @@ const Conversation = (props) => {
     const paymentModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
-            skipNegotiation: true,
-            transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
-        console.log(connect);
-        setConnection(connect);
+        connectToSocket();
 
         // return () => {
         //     dispatch({ type: EXIT_CHAT });
         // };
         // eslint-disable-next-line
     }, []);
+
+    const connectToSocket = () => {
+        const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
+            skipNegotiation: true,
+            transport: HttpTransportType.WebSockets
+        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+        console.log(connect);
+        setConnection(connect);
+    };
 
     // useEffect(() => {
     //     if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
@@ -239,7 +243,7 @@ const Conversation = (props) => {
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
                         console.log('new message ', message);
-                        // if (!newMessage) {
+                        if (!newMessage) {
                             setNewMessage(true);
                             let response = JSON.parse(message);
                             const messageData = {
@@ -256,7 +260,7 @@ const Conversation = (props) => {
                                 payload: messageData
                             });
                             setMessage('');
-                        // }
+                        }
                     });
 
                     // connection.on('TransferNotification', notification => {

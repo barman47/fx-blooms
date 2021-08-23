@@ -70,6 +70,8 @@ const ResidencePermitModal = ({ url, open, handleCloseModal }) => {
                         <Typography variamt="h6">
                             To ensure utmost security on our platform, all first time SELLERS of EUR are required to verify their EU resident permit.
                         </Typography>
+                        <br />
+                        <strong>N.B We only accept international passport, drivers licenses.</strong>
                         <Link 
                             underline="none"
                             component={Button}

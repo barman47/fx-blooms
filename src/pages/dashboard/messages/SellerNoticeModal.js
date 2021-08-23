@@ -63,7 +63,7 @@ const SellerNoticeModal = () => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
-    const HAS_SEEN_SELLER_WARNING = 'hasSeenSellerWarning';
+    // const HAS_SEEN_SELLER_WARNING = 'hasSeenSellerWarning';
 
     useEffect(() => {
         setOpen(true);
@@ -76,7 +76,7 @@ const SellerNoticeModal = () => {
 
     const closeModal = () => {
         setOpen(false);
-        localStorage.setItem(HAS_SEEN_SELLER_WARNING, true);
+        // localStorage.setItem(HAS_SEEN_SELLER_WARNING, true);
     };
 
 	return (
@@ -101,7 +101,7 @@ const SellerNoticeModal = () => {
                     </div>
                     <Typography variant="h5" align="center">Seller's Notice</Typography>
                     <Typography variant="subtitle1" component="p">
-                        To avoid being a victim of malicious users, NEVER transfer EUR before actually receiving the NGN equivalent! Once the SELLER  confirms the payment and transfers the EUR to the BUYER, the transaction is considered done and can not be disputed.
+                        To avoid being a victim of malicious users, NEVER transfer EUR before actually receiving the NGN equivalent!
                     </Typography>
                     <Button onClick={closeModal} color="primary">Okay</Button>
                 </section>

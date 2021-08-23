@@ -21,7 +21,7 @@ import { cancelNegotiation, completeTransaction } from '../../../actions/listing
 // eslint-disable-next-line
 import { DASHBOARD, EDIT_LISTING } from '../../../routes';
 
-import { API } from '../../../utils/constants';
+import { HUB_URL } from '../../../utils/constants';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
@@ -73,7 +73,7 @@ const Actions = (props) => {
     const successModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
+        const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
@@ -208,7 +208,7 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading || !paymentMade ? true : false}
+                                                disabled={loading || paymentReceived ? true : false}
                                                 onClick={() => completeTransaction()}
                                             >
                                                 Payment Received

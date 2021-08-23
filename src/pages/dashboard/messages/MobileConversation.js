@@ -36,7 +36,7 @@ import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import isEmpty from '../../../utils/isEmpty';
-import { API } from '../../../utils/constants';
+import { HUB_URL } from '../../../utils/constants';
 import CompleteTransactionModal from './CompleteTransactionModal';
 
 // import avatar from '../../../assets/img/avatar.jpg';
@@ -233,7 +233,7 @@ const MobileConversation = (props) => {
     const paymentModal = useRef();
 
     useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
+        const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();

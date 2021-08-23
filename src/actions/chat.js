@@ -24,7 +24,8 @@ export const getChats = () => async (dispatch) => {
 export const sendMessage = (message) => async (dispatch) => {
     try {
         await reIssueToken();
-        await axios.post(`${api}/SendMessage`, message);
+        const res = await axios.post(`${api}/SendMessage`, message);
+        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }

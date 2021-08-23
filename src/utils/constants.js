@@ -26,6 +26,9 @@ export const FILL_FORM2 = 'FILL_FORM2';
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
+export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
+
+// export const HUB_URL = 'https://fifth-mechanism-322509.ey.r.appspot.com/notificationhub'; // Production branch
 // export const API = 'https://fifth-mechanism-322509.ey.r.appspot.com/api'; // Production Branch
 export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'
