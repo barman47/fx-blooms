@@ -106,7 +106,7 @@ const ResetPassword = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
-    const { isAuthenticated, msg } = useSelector(state => state.customer);
+    const { isAuthenticated, twoFactorEnabled, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Password, setPassword] = useState('');
@@ -133,7 +133,7 @@ const ResetPassword = (props) => {
     const toast = useRef();
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && twoFactorEnabled) {
             return history.push('/');
         }
         setToken(history.location.search.split('=')[1]);

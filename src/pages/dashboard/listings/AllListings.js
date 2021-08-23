@@ -340,11 +340,11 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 			setLoading(true);
 			console.log(SellerRating);
 			props.getListingsOpenForBid({
-				pageNumber: 0,
+				pageNumber: 1,
 				pageSize: 15,
 				currencyAvailable: 'NGN',
 				currencyNeeded: 'EUR',
-				minimumExchangeAmount: 0,
+				minimumExchangeAmount: Number(Amount),
 				useCurrencyFilter: false,
 				useRatingFilter: true,
 				sellerRating: parseInt(SellerRating)
@@ -365,7 +365,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 			setErrors({});
 			setLoading(true);
 			props.getListingsOpenForBid({
-				pageNumber: 0,
+				pageNumber: 1,
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
 				currencyNeeded: RequiredCurrency,

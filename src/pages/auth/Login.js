@@ -111,7 +111,7 @@ const Login = (props) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (customer.isAuthenticated) {
+        if (customer.isAuthenticated && customer.twoFactorEnabled) {
             return history.push('/');
         }
         // eslint-disable-next-line

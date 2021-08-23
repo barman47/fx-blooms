@@ -87,7 +87,7 @@ const ForgotPassword = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
-    const { isAuthenticated, msg } = useSelector(state => state.customer);
+    const { isAuthenticated, twoFactorEnabled, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setUsername] = useState('');
@@ -99,7 +99,7 @@ const ForgotPassword = (props) => {
     const toast = useRef();
 
     useEffect(() => {
-        if (isAuthenticated) {
+        if (isAuthenticated && twoFactorEnabled) {
             return history.push('/');
         }
         // eslint-disable-next-line

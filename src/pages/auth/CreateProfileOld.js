@@ -183,7 +183,7 @@ const CreateProfile = (props) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { isAuthenticated } = useSelector(state => state.customer);
+    const { isAuthenticated, twoFactorEnabled } = useSelector(state => state.customer);
     const { countries, documents } = useSelector(state => state);
     const { successMessage } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
@@ -236,7 +236,7 @@ const CreateProfile = (props) => {
         // } else {
         //     return history.push('/');
         // }
-        if (isAuthenticated) {
+        if (isAuthenticated && twoFactorEnabled) {
             return history.push('/');
         }
         if (countries.length === 0) {
@@ -636,13 +636,11 @@ const CreateProfile = (props) => {
                                         
                                         >
                                             <MenuItem value="">Country Code</MenuItem>
-                                            {countryCodes.map((country, index) => (
+                                            {/* {countryCodes.map((country, index) => (
                                                 <MenuItem key={index} value={country.dialCode}>
-                                                    {/* <span role="img" aria-label={country.name}>{country.emoji}</span> */}
-                                                    {/* {String.fromCodePoint('0x' + country?.unicode.split(' '[0].substring(2)))}{String.fromCodePoint('0x' + country?.unicode.split(' '[1].substring(2)))} */}
                                                     {country.dialCode}
                                                 </MenuItem>
-                                            ))}
+                                            ))} */}
                                         </Select>
                                         <FormHelperText>{errors.CountryCode}</FormHelperText>
                                     </FormControl>
