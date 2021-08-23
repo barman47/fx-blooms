@@ -87,7 +87,7 @@ const Header = (props) => {
     const classes = useStyles();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const { isAuthenticated } = useSelector(state => state.customer);
+    const { isAuthenticated, twoFactorEnabled } = useSelector(state => state.customer);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
@@ -149,7 +149,7 @@ const Header = (props) => {
                         <Grid item xs={3}>
                             <Grid container direction="row" justify="flex-end" alignItems="center" spacing={2}>
                                 {
-                                    isAuthenticated ?
+                                    isAuthenticated && twoFactorEnabled ?
                                     <Grid item>
                                         <Link to={`${DASHBOARD}${DASHBOARD_HOME}`} component={RouterLink}>All Listings</Link>
                                     </Grid>
