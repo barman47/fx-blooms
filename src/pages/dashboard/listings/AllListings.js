@@ -27,7 +27,7 @@ import _ from 'lodash';
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
-import { getCustomerInformation } from '../../../actions/customer';
+import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -162,7 +162,7 @@ const AllListings = (props) => {
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 
-	const { getCustomerInformation, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
+	const { getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
 
 	// useGetListings(query, pageNumber, getListingsOpenForBid);
 
@@ -171,6 +171,7 @@ const AllListings = (props) => {
 	const [open, setOpen] = useState(false);
 
 	useEffect(() => {
+		getCustomerStats();
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
 			getListings();
@@ -554,9 +555,10 @@ Filter.propTypes = {
 
 AllListings.propTypes = {
 	getCustomerInformation: PropTypes.func.isRequired,
+	getCustomerStats: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomerInformation, getListingsOpenForBid, getMoreListings })(AllListings);
+export default connect(undefined, { getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings })(AllListings);

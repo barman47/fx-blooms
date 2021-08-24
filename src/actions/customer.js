@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { LOGIN, SETUP_2FA, SIGN_UP } from '../routes';
+import { CREATE_PROFILE, LOGIN, SETUP_2FA, SIGN_UP } from '../routes';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
@@ -9,7 +9,7 @@ import {
     PROCEED_TO_LOGIN,
     PROCEED_TO_DASHBOARD,
     FILL_FORM1,
-    // FILL_FORM2,
+    FILL_FORM2,
 } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
@@ -23,6 +23,7 @@ import {
     SET_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
     SET_CUSTOMER_STATUS,
+    SET_CUSTOMER_STATS,
     SET_CUSTOMER,
     SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
@@ -70,6 +71,7 @@ export const getCustomerInformation = () => async (dispatch) => {
 export const registerCustomer = ({EmailAddress, Username, Password}, history) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
+        console.log(res);
         const { nextStep } = res.data.data;
 
         switch (nextStep) {
@@ -79,6 +81,11 @@ export const registerCustomer = ({EmailAddress, Username, Password}, history) =>
                     type: SET_CUSTOMER_MSG,
                     payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
                 });
+
+            case FILL_FORM2:
+                const email = res.data.data.message[0].split(' ')[0];
+                dispatch({ type: SET_EMAIL, payload: email });
+                return history.push(CREATE_PROFILE, { verifiedEmail: true });
 
             case EMAIL_VERIFICATION:
                 return dispatch({
@@ -185,6 +192,20 @@ export const login = (data, history) => async (dispatch) => {
         }
 
         
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomerStats = () => async (dispatch) => {
+    try {
+        console.log('getting customer stats');
+        const res = await axios.get(`${api}/GetCustomerStats`);
+        console.log(res);
+        dispatch({
+            type: SET_CUSTOMER_STATS,
+            payload: res.data.data
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

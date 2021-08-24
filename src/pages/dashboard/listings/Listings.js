@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-import { COLORS } from '../../../utils/constants';
+import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../utils/constants';
 import { addBid } from '../../../actions/listings';
 import { getIdVerificationLink } from '../../../actions/customer';
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
@@ -44,7 +44,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { document, img } = useSelector(state => state.customer.profile);
+    const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
     const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
     const { listings } = useSelector(state => state.listings);
@@ -55,7 +55,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const idVerificationModal = useRef();
 
     useEffect(() => {
-        if (!document || !img) {
+        if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
             getIdVerificationLink();
         }
 
@@ -73,28 +73,51 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
         }
     }, [dispatch, errorsState, errors]);
 
-    const checkUserId = () => {
+    const checkIdStatus = () => {
+        switch (idStatus) {
+            case APPROVED:
+                break;
+
+            case PENDING:
+                alert('Pending');
+                // Show Modal
+                break;
+
+            case REJECTED:
+                verifyUserId();
+                break;
+
+            case NOT_SUBMITTED:
+                verifyUserId();
+                break;
+
+            default:
+                break;
+        }
+    };
+
+    const verifyUserId = () => {
         idVerificationModal.current.openModal();
     };
 
     const handleAddBid = (e, listing) => {
         e.preventDefault();
-        if (!document && !img) {
-            checkUserId();
-        } else {
-            setLoading(true);
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-            addBid({
-                listingId: listing.id,
-                amount: {
-                    currencyType: listing.minExchangeAmount.currencyType,
-                    amount: listing.minExchangeAmount.amount
-                }
-            }, history);
-        }
+        if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
+            return checkIdStatus();
+        } 
+
+        setLoading(true);
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
+        addBid({
+            listingId: listing.id,
+            amount: {
+                currencyType: listing.minExchangeAmount.currencyType,
+                amount: listing.minExchangeAmount.amount
+            }
+        }, history);
     };
 
     const dismissAction = () => {

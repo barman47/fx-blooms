@@ -25,10 +25,9 @@ import EditListingItem from './EditListingItem';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
-import { getDocuments } from '../../../actions/documents';
 import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
-import { COLORS } from '../../../utils/constants';
+import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
@@ -137,6 +136,8 @@ const MakeListing = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
+
+    const { residencePermitStatus } = useSelector(state => state.customer.stats);
     const { customer, currencies } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
@@ -173,12 +174,10 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         handleSetTitle('Add Listing');
-        if (!customer.hasProvidedResidencePermit && !residencePermitUrl) {
+        if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             props.getResidencePermitLink();
         }
-        // if (!customer.hasProvidedResidencePermit && documents.length === 0) {
-        //     props.getDocuments();
-        // }
+        
         // eslint-disable-next-line
     }, []);
 
@@ -298,6 +297,29 @@ const MakeListing = (props) => {
     //     setOpenAccountModal(true);
     // };
 
+    const checkResidencePermitStatus = () => {
+        switch (residencePermitStatus) {
+            case APPROVED:
+                break;
+
+            case PENDING:
+                alert('Pending');
+                // Show Modal
+                break;
+
+            case REJECTED:
+                setShowResidencePermitModal(true);
+                break;
+
+            case NOT_SUBMITTED:
+                setShowResidencePermitModal(true);
+                break;
+
+            default:
+                break;
+        }
+    };
+
     const handleCloseAccountModalModal = () => {
         setOpenAccountModal(false);
     };
@@ -338,8 +360,8 @@ const MakeListing = (props) => {
             return setErrors({ ...errors, msg: 'Invalid listing data' });
         }
 
-        if (!customer.hasProvidedResidencePermit) {
-            return setShowResidencePermitModal(true);
+        if (residencePermitStatus !== APPROVED) {
+            return checkResidencePermitStatus();
         }
 
         if (customer.profile.listings >= 2) { // and there is no account number
@@ -627,9 +649,8 @@ const MakeListing = (props) => {
 
 MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
-    getDocuments: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
     getResidencePermitLink: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getCurrencies, getDocuments, getResidencePermitLink })(MakeListing);
+export default connect(undefined, { addListing, getCurrencies, getResidencePermitLink })(MakeListing);

@@ -2,7 +2,8 @@ import {
     ENABLED_2FA,
     CLEAR_CURRENT_CUSTOMER,
     SET_AUTH_TOKEN,
-    SET_CURRENT_CUSTOMER, 
+    SET_CURRENT_CUSTOMER,
+    SET_CUSTOMER_STATS, 
     SET_CUSTOMER_PROFILE,
     SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
@@ -16,6 +17,7 @@ import {
 const initialState = {
     isAuthenticated: false,
     msg: null,
+    stats: {},
     profile: {}
 };
 
@@ -53,6 +55,12 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 email: action.payload
+            };
+
+        case SET_CUSTOMER_STATS:
+            return {
+                ...state,
+                stats: action.payload
             };
 
         case SET_CUSTOMER_MSG:

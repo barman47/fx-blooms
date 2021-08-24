@@ -152,11 +152,11 @@ const MobileFilterModal = (props) => {
 			setErrors({});
 			setLoading(true);
 			getListingsOpenForBid({
-				pageNumber: 0,
+				pageNumber: 1,
 				pageSize: 15,
-				currencyAvailable: 'NGN',
-				currencyNeeded: 'EUR',
-				minimumExchangeAmount: 0,
+				currencyAvailable: AvailableCurrency,
+				currencyNeeded: RequiredCurrency,
+				amount: Number(Amount),
 				useCurrencyFilter: false,
 				useRatingFilter: true,
 				sellerRating: parseInt(SellerRating)
@@ -177,11 +177,11 @@ const MobileFilterModal = (props) => {
 			setErrors({});
 			setLoading(true);
 			getListingsOpenForBid({
-				pageNumber: 0,
+				pageNumber: 1,
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
 				currencyNeeded: RequiredCurrency,
-				minimumExchangeAmount: Number(Amount),
+				amount: Number(Amount),
 				useCurrencyFilter: true,
 				useRatingFilter: false,
 				sellerRating: 0
