@@ -11,7 +11,8 @@ import {
     SET_AUTH_TOKEN,
     SET_2FA_MSG,
     SET_BARCODE,
-    SET_CURRENT_CUSTOMER
+    SET_CURRENT_CUSTOMER,
+    TWO_FACTOR_AUTHORIZED
  } from './types';
 
 const api = `${API}/TwoFactor`;
@@ -21,10 +22,14 @@ export const authorizeTwoFactor = ({ code, profileId }, history) => async (dispa
         const res = await axios.post(`${api}/Authorize?inputCode=${code}&profileId=${profileId}`);
         const token = res.data.data;
         setAuthToken(token);
-        dispatch({
-            type: SET_AUTH_TOKEN,
-            payload: token
+        batch(() => {
+            dispatch({
+                type: SET_AUTH_TOKEN,
+                payload: token
+            });
+            dispatch({ type: TWO_FACTOR_AUTHORIZED });
         });
+        
         return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     } catch (err) {
         return handleError(err, dispatch);

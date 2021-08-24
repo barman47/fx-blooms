@@ -118,7 +118,8 @@ const CreateProfile = (props) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { email, isAuthenticated, twoFactorEnabled } = useSelector(state => state.customer);
+    const { email, isAuthenticated } = useSelector(state => state.customer);
+    const { authorized } = useSelector(state => state.twoFactor);
     const { documents } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
     
@@ -146,7 +147,7 @@ const CreateProfile = (props) => {
         } else {
             return history.push('/');
         }
-        if (isAuthenticated && twoFactorEnabled) {
+        if (isAuthenticated && authorized) {
             return history.push('/');
         }
         if (documents.length === 0) {

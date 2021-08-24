@@ -179,6 +179,11 @@ const VerifyQrCode = (props) => {
         return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     };
 
+    const logout = (e) => {
+        e.preventDefault();
+        props.logout(history);
+    };
+
     const onSubmit = (e) => {
         if (e) {
             e.preventDefault();
@@ -229,7 +234,7 @@ const VerifyQrCode = (props) => {
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
-                <RouterLink to="/" className={classes.logo}>
+                <RouterLink to="/" className={classes.logo} onClick={logout}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
                 </RouterLink>
                 <div className={classes.content}>

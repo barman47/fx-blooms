@@ -1,7 +1,8 @@
-import { SET_BARCODE, SET_2FA_MSG } from '../actions/types';
+import { SET_BARCODE, SET_2FA_MSG, TWO_FACTOR_AUTHORIZED } from '../actions/types';
 
 const initialState = {
-    msg: null
+    msg: null,
+    authorized: false
 };
 
 const twoFactorReducer = (state = initialState, action) => {
@@ -13,6 +14,12 @@ const twoFactorReducer = (state = initialState, action) => {
             return {
                 ...state,
                 msg: action.payload
+            };
+
+        case TWO_FACTOR_AUTHORIZED:
+            return {
+                ...state,
+                authorized: true
             };
 
         default:

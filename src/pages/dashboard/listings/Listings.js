@@ -80,20 +80,21 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const handleAddBid = (e, listing) => {
         e.preventDefault();
         if (!document && !img) {
-            return checkUserId();
+            checkUserId();
+        } else {
+            setLoading(true);
+            dispatch({
+                type: SET_LISTING,
+                payload: listing
+            });
+            addBid({
+                listingId: listing.id,
+                amount: {
+                    currencyType: listing.minExchangeAmount.currencyType,
+                    amount: listing.minExchangeAmount.amount
+                }
+            }, history);
         }
-        setLoading(true);
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        addBid({
-            listingId: listing.id,
-            amount: {
-                currencyType: listing.minExchangeAmount.currencyType,
-                amount: listing.minExchangeAmount.amount
-            }
-        }, history);
     };
 
     const dismissAction = () => {

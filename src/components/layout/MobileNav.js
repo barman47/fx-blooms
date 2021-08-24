@@ -64,7 +64,8 @@ const useStyles = makeStyles(theme => ({
 
 const MobileNav = ({ toggleDrawer, drawerOpen }) => {
     const classes = useStyles();
-    const { isAuthenticated, twoFactorEnabled } = useSelector(state => state.customer);
+    const { isAuthenticated } = useSelector(state => state.customer);
+    const { authorized } = useSelector(state => state.twoFactor);
 
     return (
         <section>
@@ -79,7 +80,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItemLink>
-                    {isAuthenticated === true && twoFactorEnabled === true ? 
+                    {isAuthenticated === true && authorized === true ? 
                         <ListItemLink button divider to={`${DASHBOARD}${DASHBOARD_HOME}`} onClick={toggleDrawer}>
                             <ListItemIcon>
                                 <FormatListText className={classes.listings} />

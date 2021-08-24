@@ -170,7 +170,8 @@ const CreateAccount = (props) => {
 
     const history = useHistory();
 
-    const { isAuthenticated, twoFactorEnabled, msg } = useSelector(state => state.customer);
+    const { isAuthenticated, msg } = useSelector(state => state.customer);
+    const { authorized } = useSelector(state => state.twoFactor);
     const { countries } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
@@ -202,7 +203,7 @@ const CreateAccount = (props) => {
     let timeout = useRef();
 
     useEffect(() => {
-        if (isAuthenticated && twoFactorEnabled) {
+        if (isAuthenticated && authorized) {
             return history.push('/');
         }
         if (countries.length === 0) {
