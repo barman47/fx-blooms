@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     AppBar,
@@ -7,7 +7,6 @@ import {
     Grid, 
     IconButton, 
     InputAdornment, 
-    Link, 
     TextField, 
     Toolbar,
     Typography,
@@ -35,6 +34,7 @@ import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
 import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
+import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { HUB_URL } from '../../../utils/constants';
 import CompleteTransactionModal from './CompleteTransactionModal';
@@ -231,6 +231,7 @@ const MobileConversation = (props) => {
     const [errors, setErrors] = useState({});
 
     const paymentModal = useRef();
+    const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
         const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
@@ -376,6 +377,10 @@ const MobileConversation = (props) => {
 
     const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
 
+    const openTipsAndRecommendationsModal = () => {
+        tipsAndRecommendationsModal.current.openModal();
+    };
+
     const showCompleteTransactionModal = () => {
         setCompleteTransactionOpen(true);
     };
@@ -390,6 +395,7 @@ const MobileConversation = (props) => {
             <Toaster />
             <PaymentConfirmationTipsModal ref={paymentModal} />
             <CompleteTransactionModal open={completeTransactionOpen} />
+            <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             {chat ? 
 		        <section className={classes.root}>
                     <AppBar position="static" color="transparent" elevation={1}>
@@ -412,7 +418,7 @@ const MobileConversation = (props) => {
                     </AppBar>
                     <section className={classes.messageContainer}>
                         <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
-                            Ensure to read our <Link to="#!" color="primary" component={RouterLink} underline="always">disclaimer</Link> before you carry out any transaction.
+                            Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction
                         </Typography>
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}

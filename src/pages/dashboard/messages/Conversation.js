@@ -17,6 +17,7 @@ import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constant
 import { SENT_MESSAGE } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
+import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { HUB_URL } from '../../../utils/constants';
 
@@ -96,6 +97,12 @@ const useStyles = makeStyles(theme => ({
             fontWeight: 300,
             padding: theme.spacing(1)
         }
+    },
+
+    tipsAndRecommendations: {
+        backgroundColor: COLORS.lightTeal,
+        color: theme.palette.primary.main,
+        marginTop: theme.spacing(2)
     },
 
     me: {
@@ -202,6 +209,7 @@ const Conversation = (props) => {
     const [errors, setErrors] = useState({});
 
     const paymentModal = useRef();
+    const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
         connectToSocket();
@@ -274,8 +282,12 @@ const Conversation = (props) => {
         }
     }, [connection, dispatch, connected, newMessage]);
 
-    const openModal = () => {
+    const openPaymentConfirmationTipsModal = () => {
         paymentModal.current.openModal();
+    };
+
+    const openTipsAndRecommendationsModal = () => {
+        tipsAndRecommendationsModal.current.openModal();
     };
 
     const uploadAttachment = useCallback(async () => {
@@ -342,6 +354,7 @@ const Conversation = (props) => {
     return (
         <>
             <PaymentConfirmationTipsModal ref={paymentModal} />
+            <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             {chat ? 
 		        <section className={classes.root}>
                     <Grid container direction="row" justify="space-between" className={classes.header}>
@@ -355,6 +368,7 @@ const Conversation = (props) => {
                     <section className={classes.messageContainer}>
                         <div className={classes.messages}>
                             {/* <ScrollableFeed className={classes.messages}> */}
+                                <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography>
                                 {chat?.messages && chat?.messages.map((message) => (
                                     <Fragment key={message.id}>
                                         {!isEmpty(message.uploadedFileName) ? 
@@ -397,7 +411,7 @@ const Conversation = (props) => {
                                         <Typography variant="subtitle1" component="p">What's next?</Typography>
                                         <ul>
                                             <li>Proceed to your banking app to confirm payment.</li>
-                                            <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openModal}>here.</span></li>
+                                            <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openPaymentConfirmationTipsModal}>here.</span></li>
                                             <li>Send your money to the buyer.</li>
                                         </ul>
                                     </div>

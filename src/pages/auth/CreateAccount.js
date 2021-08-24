@@ -367,7 +367,7 @@ const CreateAccount = (props) => {
         setErrors({});
         dispatch({ type: GET_ERRORS, payload: {} });
         props.registerCustomer({
-            EmailAddress: data.Email,
+            EmailAddress: data.Email.trim(),
             Username,
             Password
         }, history);

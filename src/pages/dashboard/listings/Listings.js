@@ -13,6 +13,7 @@ import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
 import Spinner from '../../../components/common/Spinner';
 import IDVerificationModal from '../listings/IDVerificationModal';
+import PendingIdModal from './PendingIdModal';
 import Listing from './Listing';
 
 const useStyles = makeStyles(theme => ({
@@ -49,6 +50,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
     const { listings } = useSelector(state => state.listings);
 
+    const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
@@ -79,8 +81,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
                 break;
 
             case PENDING:
-                alert('Pending');
-                // Show Modal
+                showPendingIdModal(true);
                 break;
 
             case REJECTED:
@@ -102,7 +103,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
 
     const handleAddBid = (e, listing) => {
         e.preventDefault();
-        if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
+        if (idStatus !== APPROVED) {
             return checkIdStatus();
         } 
 
@@ -124,8 +125,13 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
         window.location.href = idVerificationLink;
     };
 
+    const handleClosePendingIdModal = () => {
+        setShowPendingIdModal(false);
+    };
+
     return (
         <>
+            <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             {loading && <Spinner />}
             {listings.length > 0 ? 

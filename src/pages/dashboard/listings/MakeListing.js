@@ -31,6 +31,7 @@ import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../uti
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
+import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
 
 const useStyles = makeStyles(theme => ({
@@ -148,6 +149,7 @@ const MakeListing = (props) => {
 
     const [openAccountModal, setOpenAccountModal] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
+    const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
@@ -303,8 +305,7 @@ const MakeListing = (props) => {
                 break;
 
             case PENDING:
-                alert('Pending');
-                // Show Modal
+                showPendingIdModal(true);
                 break;
 
             case REJECTED:
@@ -326,6 +327,10 @@ const MakeListing = (props) => {
 
     const handleCloseResidencePermitModal = () => {
         setShowResidencePermitModal(false);
+    };
+    
+    const handleClosePendingIdModal = () => {
+        setShowPendingIdModal(false);
     };
 
     const resetForm = () => {
@@ -401,6 +406,7 @@ const MakeListing = (props) => {
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
+                <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
                     <div>
