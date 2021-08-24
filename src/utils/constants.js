@@ -22,6 +22,7 @@ export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
 export const PROCEED_TO_LOGIN = 'PROCEED_TO_LOGIN';
 export const FILL_FORM1 = 'FILL_FORM1';
 export const FILL_FORM2 = 'FILL_FORM2';
+export const PROCEED_TO_DASHBOARD = 'PROCEED_TO_DASHBOARD';
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 

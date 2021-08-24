@@ -161,7 +161,7 @@ const Login = (props) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        props.login(data);
+        props.login(data, history);
     };   
 
     return (
