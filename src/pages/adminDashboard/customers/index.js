@@ -12,7 +12,7 @@ import {
     Typography
 } from '@material-ui/core';
 
-import { getNewCustomers, getRejectedCustomers, getVerifiedCustomers } from '../../../actions/customer';
+import { getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
 import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 
@@ -106,7 +106,7 @@ const Customers = (props) => {
     const [error, setError] = useState('');
     const [filter, setFilter] = useState(PENDING);
 
-    const { getNewCustomers, getVerifiedCustomers, getRejectedCustomers, handleSetTitle } = props;
+    const { getNewCustomers, getMoreNewCustomers, getVerifiedCustomers, getMoreVerifiedCustomers, getRejectedCustomers, getMoreRejectedCustomers, handleSetTitle } = props;
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -156,6 +156,41 @@ const Customers = (props) => {
             default:
                 break;
         }  
+    };
+
+    const getMoreCustomers = () => {
+        switch (filter) {
+            case CONFIRMED:
+                if (confirmed.hasNext) {
+                    getMoreVerifiedCustomers({
+                        pageSize: 25,
+                        pageNumber: confirmed.currentPageNumber + 1
+                    });
+                }
+                break;
+
+            case PENDING:
+                if (pending.hasNext) {
+                    getMoreNewCustomers({
+                        pageSize: 25,
+                        pageNumber: pending.currentPageNumber + 1
+                    });
+                }
+                break;
+
+            case REJECTED:
+                if (rejected.hasNext) {
+                    getMoreRejectedCustomers({
+                        pageSize: 25,
+                        pageNumber: rejected.currentPageNumber + 1
+                    });
+                }
+                break;
+            // case ALL_CUSTOMERS:
+
+            default:
+                break;
+        }
     };
 
     const downloadRecords = () => {
@@ -287,7 +322,14 @@ const Customers = (props) => {
                         {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
                         {filter === CONFIRMED && <VerifiedCustomers handleSetTitle={handleSetTitle} />}
                         {filter === REJECTED && <RejectedCustomers handleSetTitle={handleSetTitle} />}
-                        <Button color="primary" className={classes.button}>Load More</Button>
+                        <Button 
+                            color="primary" 
+                            className={classes.button} 
+                            onClick={getMoreCustomers}
+                            disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) ? true : false}
+                        >
+                            Load More
+                        </Button>
                     </main>
                 </section>
             </section>
@@ -297,9 +339,12 @@ const Customers = (props) => {
 
 Customers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired,
+    getMoreNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
+    getMoreRejectedCustomers: PropTypes.func.isRequired,
     getVerifiedCustomers: PropTypes.func.isRequired,
+    getMoreVerifiedCustomers: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getNewCustomers, getRejectedCustomers, getVerifiedCustomers })(Customers);
+export default connect(undefined, { getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers })(Customers);

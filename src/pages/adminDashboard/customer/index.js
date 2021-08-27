@@ -6,8 +6,10 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
 import { GET_ERRORS, SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
-import { setCustomerStatus } from '../../../actions/customer';
+import { getCustomerStatus, setCustomerStatus } from '../../../actions/customer';
 import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
+
+// import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -70,8 +72,12 @@ const Customer = (props) => {
     const [loading, setLoading] = useState(false);
 
     const successModal = useRef();
-    
+
     useEffect(() => {
+        // if (isEmpty(customer)) {
+        //     props.getCustomerStatus();
+        // }
+
         return () => dispatch({ 
             type: SET_CUSTOMER,
             payload: {}
@@ -94,11 +100,14 @@ const Customer = (props) => {
             setLoading(false);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
-            return dispatch({
-                type: CLEAR_CUSTOMER_STATUS_MSG
-            });
         }
     }, [customer, dispatch, msg]);
+
+    const dismissAction = () => {
+        dispatch({
+            type: CLEAR_CUSTOMER_STATUS_MSG
+        });
+    };
 
     const setCustomerStatus = (newStatus, currentStatus) => {
         setLoading(true);
@@ -107,7 +116,7 @@ const Customer = (props) => {
 
     return (
         <>
-            <SuccessModal ref={successModal} />
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <Grid container direction="row" justify="space-between" className={classes.header}>
@@ -180,8 +189,9 @@ const Customer = (props) => {
 }
 
 Customer.propTypes = {
+    getCustomerStatus: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired,
     setCustomerStatus: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { setCustomerStatus })(Customer);
+export default connect(undefined, { getCustomerStatus, setCustomerStatus })(Customer);

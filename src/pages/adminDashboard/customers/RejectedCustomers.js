@@ -9,7 +9,6 @@ import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
-import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -34,15 +33,15 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
+const RejectedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { rejected } = useSelector(state => state.customers);
+    const rejectedCustomers = useSelector(state => state.customers.rejected.items);
 
     useEffect(() => {
-        if (isEmpty(rejected)) {
+        if (!rejectedCustomers) {
             getNewCustomers({
                 pageNumber: 1,
                 pageSize: 25
@@ -62,7 +61,7 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     return (
         <>
-            {rejected && rejected.map((customer, index) => (
+            {rejectedCustomers && rejectedCustomers.map((customer, index) => (
                     <div key={customer.id} className={classes.customer}>
                         <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                         <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
@@ -78,8 +77,8 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     );
 };
 
-VerifiedCustomers.propTypes = {
+RejectedCustomers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getNewCustomers })(VerifiedCustomers);
+export default connect(undefined, { getNewCustomers })(RejectedCustomers);

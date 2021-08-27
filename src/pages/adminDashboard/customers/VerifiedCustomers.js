@@ -9,7 +9,6 @@ import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
-import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -39,10 +38,10 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { confirmed } = useSelector(state => state.customers);
+    const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
 
     useEffect(() => {
-        if (isEmpty(confirmed)) {
+        if (!verifiedCustomers) {
             getNewCustomers({
                 pageNumber: 1,
                 pageSize: 25
@@ -62,7 +61,7 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     return (
         <>
-            {confirmed && confirmed.map((customer, index) => (
+            {verifiedCustomers && verifiedCustomers.map((customer, index) => (
                     <div key={customer.id} className={classes.customer}>
                         <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                         <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>

@@ -21,7 +21,9 @@ import {
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
     SET_CONFIRMED_CUSTOMERS,
+    SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
+    SET_MORE_REJECTED_CUSTOMERS,
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER_STATS,
     SET_CUSTOMER,
@@ -29,6 +31,7 @@ import {
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
     SET_NEW_CUSTOMERS,
+    SET_MORE_NEW_CUSTOMERS,
     SET_RESIDENCE_PERMIT,
     SET_PERMIT_URL,
     // eslint-disable-next-line
@@ -294,14 +297,40 @@ export const getCustomer = (customerId) => async(dispatch) => {
     }
 };
 
+export const getCustomerStatus = (customerId) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.get(`${api}/GetCustomer/${customerId}`);
+        console.log(res);
+        return dispatch({
+            type: SET_CUSTOMER,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const getNewCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
         const res = await axios.post(`${api}/GetCustomersAwaitingConfirmation/`, query);
-        const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_NEW_CUSTOMERS,
-            payload: { pending: items, ...rest }
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreNewCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}/GetCustomersAwaitingConfirmation/`, query);
+        return dispatch({
+            type: SET_MORE_NEW_CUSTOMERS,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -312,10 +341,22 @@ export const getRejectedCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
         const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
-        const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_REJECTED_CUSTOMERS,
-            payload: { rejected: items, ...rest }
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreRejectedCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
+        return dispatch({
+            type: SET_MORE_REJECTED_CUSTOMERS,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -326,10 +367,22 @@ export const getVerifiedCustomers = (query) => async(dispatch) => {
     try {
         // Issue admin token
         const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
-        const { items, ...rest } = res.data.data;
         return dispatch({
             type: SET_CONFIRMED_CUSTOMERS,
-            payload: { confirmed: items, ...rest }
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreVerifiedCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
+        return dispatch({
+            type: SET_MORE_CONFIRMED_CUSTOMERS,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

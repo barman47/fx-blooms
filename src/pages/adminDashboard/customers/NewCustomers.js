@@ -9,7 +9,6 @@ import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
-import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -39,10 +38,10 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { pending } = useSelector(state => state.customers);
+    const newCustomers = useSelector(state => state.customers?.pending?.items);
 
     useEffect(() => {
-        if (isEmpty(pending)) {
+        if (!newCustomers) {
             getNewCustomers({
                 pageNumber: 1,
                 pageSize: 25
@@ -62,7 +61,7 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     return (
         <>
-            {pending && pending.map((customer, index) => (
+            {newCustomers && newCustomers.map((customer, index) => (
                 <div key={customer.id} className={classes.customer}>
                     <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                     <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>

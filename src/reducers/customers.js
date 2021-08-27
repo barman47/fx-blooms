@@ -4,8 +4,11 @@ import {
     SET_CUSTOMERS, 
     SET_CUSTOMER_STATUS, 
     SET_NEW_CUSTOMERS,
+    SET_MORE_NEW_CUSTOMERS,
     SET_CONFIRMED_CUSTOMERS,
+    SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
+    SET_MORE_REJECTED_CUSTOMERS,
     SET_ALL_CUSTOMERS,
     CLEAR_ALL_CUSTOMERS
 } from '../actions/types';
@@ -14,17 +17,11 @@ import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 
 const initialState = {
     customer: {},
-    customers: [],
-    confirmed: [],
-    pending: [],
-    rejected: [],
-    msg: null,
-    currentPageNumber: 0,
-    currentPageSize: 0,
-    hasNext: false,
-    hasPrevious: false,
-    count: 0,
-    totalPageCount: 0
+    customers: {},
+    confirmed: {},
+    pending: {},
+    rejected: {},
+    msg: null
 };
 
 const customersReducer = (state = initialState, action) => {
@@ -44,43 +41,91 @@ const customersReducer = (state = initialState, action) => {
         case SET_NEW_CUSTOMERS:
             return {
                 ...state,
-                currentPageNumber: action.payload.currentPageNumber,
-                currentPageSize: action.payload.currentPageSize,
-                hasNext: action.payload.hasNext,
-                hasPrevious: action.payload.hasPrevious,
-                totalItemCount: action.payload.totalItemCount,
-                totalPageCount: action.payload.totalPageCount,
-                pending: action.payload.pending
+                pending: {
+                    items: action.payload.items,
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_MORE_NEW_CUSTOMERS:
+            return {
+                ...state,
+                pending: {
+                    items: [...state.pending.items, ...action.payload.items],
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
             };
 
         case SET_CONFIRMED_CUSTOMERS:
             return {
                 ...state,
-                currentPageNumber: action.payload.currentPageNumber,
-                currentPageSize: action.payload.currentPageSize,
-                hasNext: action.payload.hasNext,
-                hasPrevious: action.payload.hasPrevious,
-                totalItemCount: action.payload.totalItemCount,
-                totalPageCount: action.payload.totalPageCount,
-                confirmed: action.payload.confirmed
+                confirmed: {
+                    items: action.payload.items,
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_MORE_CONFIRMED_CUSTOMERS:
+            return {
+                ...state,
+                confirmed: {
+                    items: [...state.confirmed.items, ...action.payload.items],
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
             };
 
         case SET_REJECTED_CUSTOMERS:
             return {
                 ...state,
-                currentPageNumber: action.payload.currentPageNumber,
-                currentPageSize: action.payload.currentPageSize,
-                hasNext: action.payload.hasNext,
-                hasPrevious: action.payload.hasPrevious,
-                totalItemCount: action.payload.totalItemCount,
-                totalPageCount: action.payload.totalPageCount,
-                rejected: action.payload.rejected
+                rejected: {
+                    items: action.payload.items,
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_MORE_REJECTED_CUSTOMERS:
+            return {
+                ...state,
+                rejected: {
+                    items: [...state.rejected.items, ...action.payload.items],
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
             };
 
         case SET_ALL_CUSTOMERS:
             return {
                 ...state,
-                customers: [...state.pending, ...state.confirmed, ...state.rejected]
+                customers: [...state.pending.items, ...state.confirmed.items, ...state.rejected.items]
             };
 
         case CLEAR_ALL_CUSTOMERS:

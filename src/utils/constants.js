@@ -33,6 +33,7 @@ export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing br
 
 // export const HUB_URL = 'https://fifth-mechanism-322509.ey.r.appspot.com/notificationhub'; // Production branch
 // export const API = 'https://fifth-mechanism-322509.ey.r.appspot.com/api'; // Production Branch
+
 export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'
 

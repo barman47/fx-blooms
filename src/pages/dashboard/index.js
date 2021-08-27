@@ -281,6 +281,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 button 
                                 disableRipple
                                 onClick={() => handleLinkClick(link.url)}
+                                disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
                             >
                                 <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
                                     {link.icon}
@@ -330,7 +331,7 @@ const Dashboard = ({ children, title, logout }) => {
                         showLabels
                     >
                         {mobileLinks.map((item, index) => (
-                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} disabled={item.url === MAKE_LISTING || item.url === MESSAGES ? true : false} />
                         ))}
                     </BottomNavigation>
                 </Box>
