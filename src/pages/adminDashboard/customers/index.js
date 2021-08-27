@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';
@@ -12,14 +12,14 @@ import {
     Typography
 } from '@material-ui/core';
 
-import { getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
+import { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
 import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 
+import AllCustomers from './AllCustomers';
 import NewCustomers from './NewCustomers';
 import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
-import { SET_ALL_CUSTOMERS } from '../../../actions/types';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -97,16 +97,15 @@ const useStyles = makeStyles((theme) => ({
 
 const Customers = (props) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
 
     const { admin } = useSelector(state => state);
-    const { confirmed, pending, rejected, count } = useSelector(state => state.customers);
+    const { confirmed, customers, pending, rejected, count } = useSelector(state => state.customers);
     const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
 
     const [error, setError] = useState('');
     const [filter, setFilter] = useState(PENDING);
 
-    const { getNewCustomers, getMoreNewCustomers, getVerifiedCustomers, getMoreVerifiedCustomers, getRejectedCustomers, getMoreRejectedCustomers, handleSetTitle } = props;
+    const { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getVerifiedCustomers, getMoreVerifiedCustomers, getRejectedCustomers, getMoreRejectedCustomers, handleSetTitle } = props;
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -118,6 +117,7 @@ const Customers = (props) => {
     }, []);
 
     const handleSetFilter = (filter) => {
+        console.log(filter);
         setFilter(filter);
         switch (filter) {
             case CONFIRMED:
@@ -148,9 +148,12 @@ const Customers = (props) => {
                 break;
 
             case ALL_CUSTOMERS:
-                dispatch({
-                    type: SET_ALL_CUSTOMERS
-                });
+                if (isEmpty(customers)) {
+                    getCustomers({
+                        pageNumber: 1,
+                        pageSize: 25
+                    });
+                }
                 break;
 
             default:
@@ -158,7 +161,7 @@ const Customers = (props) => {
         }  
     };
 
-    const getMoreCustomers = () => {
+    const getMore = () => {
         switch (filter) {
             case CONFIRMED:
                 if (confirmed.hasNext) {
@@ -186,7 +189,15 @@ const Customers = (props) => {
                     });
                 }
                 break;
-            // case ALL_CUSTOMERS:
+            
+            case ALL_CUSTOMERS:
+                if (customers.hasNext) {
+                    getMoreCustomers({
+                        pageSize: 25,
+                        pageNumber: customers.currentPageNumber + 1
+                    });
+                }
+                break;
 
             default:
                 break;
@@ -201,19 +212,19 @@ const Customers = (props) => {
 
         switch (filter) {
             case CONFIRMED:
-                data = [...confirmed];
+                data = [...confirmed.items];
                 break;
 
             case PENDING:
-                data = [...pending];
+                data = [...pending.items];
                 break;
 
             case REJECTED:
-                data = [...rejected];
+                data = [...rejected.items];
                 break;
             
             case ALL_CUSTOMERS:
-                data = [...pending, ...confirmed, ...rejected];
+                data = [...customers.items];
                 break;
 
             default:
@@ -322,10 +333,11 @@ const Customers = (props) => {
                         {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
                         {filter === CONFIRMED && <VerifiedCustomers handleSetTitle={handleSetTitle} />}
                         {filter === REJECTED && <RejectedCustomers handleSetTitle={handleSetTitle} />}
+                        {filter === ALL_CUSTOMERS && <AllCustomers handleSetTitle={handleSetTitle} />}
                         <Button 
                             color="primary" 
                             className={classes.button} 
-                            onClick={getMoreCustomers}
+                            onClick={getMore}
                             disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) ? true : false}
                         >
                             Load More
@@ -338,6 +350,8 @@ const Customers = (props) => {
 }
 
 Customers.propTypes = {
+    getCustomers: PropTypes.func.isRequired,
+    getMoreCustomers: PropTypes.func.isRequired,
     getNewCustomers: PropTypes.func.isRequired,
     getMoreNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
@@ -347,4 +361,4 @@ Customers.propTypes = {
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers })(Customers);
+export default connect(undefined, { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers })(Customers);

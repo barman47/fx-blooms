@@ -1,9 +1,12 @@
+import { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
+import { getCustomers } from '../../../actions/customer';
 import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
 
@@ -30,17 +33,30 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AllCustomers = ({ handleSetTitle }) => {
+const AllCustomers = ({ getCustomers, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { customers } = useSelector(state => state.customers);
+    const customers = useSelector(state => state.customers?.customers?.items);
+
+    useEffect(() => {
+        // handleSetTitle('All Customers');
+        if (!customers) {
+            getCustomers({
+                pageNumber: 1,
+                pageSize: 25
+            });
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         return () => {
             dispatch({ type: CLEAR_ALL_CUSTOMERS });
         };
+
+        // eslint-disable-next-line
     }, []);
 
     const handleViewCustomer = (customer) => {
@@ -70,4 +86,8 @@ const AllCustomers = ({ handleSetTitle }) => {
     );
 };
 
-export default AllCustomers;
+AllCustomers.propTypes = {
+    getCustomers: PropTypes.func.isRequired
+};
+
+export default connect(undefined , { getCustomers })(AllCustomers);

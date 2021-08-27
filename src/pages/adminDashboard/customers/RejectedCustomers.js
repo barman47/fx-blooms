@@ -41,6 +41,7 @@ const RejectedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const rejectedCustomers = useSelector(state => state.customers.rejected.items);
 
     useEffect(() => {
+        // handleSetTitle('Rejected Customers');
         if (!rejectedCustomers) {
             getNewCustomers({
                 pageNumber: 1,

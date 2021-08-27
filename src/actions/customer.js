@@ -27,6 +27,8 @@ import {
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER_STATS,
     SET_CUSTOMER,
+    SET_CUSTOMERS,
+    SET_MORE_CUSTOMERS,
     SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
@@ -34,8 +36,6 @@ import {
     SET_MORE_NEW_CUSTOMERS,
     SET_RESIDENCE_PERMIT,
     SET_PERMIT_URL,
-    // eslint-disable-next-line
-    GET_ERRORS,
     SET_EMAIL
  } from './types';
 
@@ -243,46 +243,31 @@ export const addResidentPermit = (data) => async (dispatch) => {
     }
 };
 
-// export const getCustomers = () => async (dispatch) => {
-//     try {
-//         // await reIssueToken();
-//         const res = await axios.post(`${api}/GetAllCustomers`, { pageSize: 10, pageNumber: 1 });
-//         const { items, ...rest } = res.data.data;
-//         const confirmed = [];
-//         const pending = [];
-//         const rejected = [];
-//         items.forEach(customer => {
-//             switch (customer.customerStatus) {
-//                 case CONFIRMED:
-//                     confirmed.push(customer);
-//                     break;
+export const getCustomers = (query) => async (dispatch) => {
+    try {
+        // await reIssueToken();
+        const res = await axios.post(`${api}/GetAllCustomers`, query);
+        dispatch({
+            type: SET_CUSTOMERS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
-//                 case PENDING:
-//                     pending.push(customer);
-//                     break;
-
-//                 case REJECTED:
-//                     rejected.push(customer);
-//                     break;
-
-//                 default:
-//                     break;
-//             }
-//         });
-//         dispatch({
-//             type: SET_CUSTOMERS,
-//             payload: {
-//                 confirmed,
-//                 pending,
-//                 rejected,
-//                 count: items.length,
-//                 ...rest
-//             }
-//         });
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
+export const getMoreCustomers = (query) => async (dispatch) => {
+    try {
+        // await reIssueToken();
+        const res = await axios.post(`${api}/GetAllCustomers`, query);
+        dispatch({
+            type: SET_MORE_CUSTOMERS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const getCustomer = (customerId) => async(dispatch) => {
     try {

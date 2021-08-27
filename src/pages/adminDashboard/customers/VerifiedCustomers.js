@@ -41,6 +41,7 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
 
     useEffect(() => {
+        // handleSetTitle('Verified Customers');
         if (!verifiedCustomers) {
             getNewCustomers({
                 pageNumber: 1,

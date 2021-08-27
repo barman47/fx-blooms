@@ -41,6 +41,7 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
     const newCustomers = useSelector(state => state.customers?.pending?.items);
 
     useEffect(() => {
+        // handleSetTitle('New Customers');
         if (!newCustomers) {
             getNewCustomers({
                 pageNumber: 1,
