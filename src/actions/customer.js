@@ -72,6 +72,10 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
     switch (nextStep) {
         case FILL_FORM1:
             const res2 = await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+            });
             return handleNextStep(res2, history, dispatch, { EmailAddress, Username, Password });
 
         case FILL_FORM2:
