@@ -9,7 +9,7 @@ const AdminRoute = ({ component: Component, isAuthenticated, ...rest }) => (
         render={props => isAuthenticated ? (
             <Component {...props} />
         ) : (
-            <Redirect to="/" />
+            <Redirect to="https://wp.fxblooms.com" />
         )}
     />
 );

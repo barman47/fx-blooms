@@ -102,9 +102,9 @@ const Header = (props) => {
                         <Grid item xs={9}>
                             <Grid container direction="row" alignItems="center" spacing={5} justify="flex-start">
                                 <Grid item>
-                                    <Link to="/" component={RouterLink}>
+                                    <a href="https://wp.fxblooms.com">
                                         <img src={logo} alt="FX Blooms Logo" />
-                                    </Link>
+                                    </a>
                                 </Grid>
                                 <Grid item>
                                     <AnimatedLink 
@@ -185,9 +185,9 @@ const Header = (props) => {
                         </Grid>
                     </Grid>
                     <div className={classes.mobileNav}>
-                        <Link to="/" component={RouterLink}>
+                        <a href="https://wp.fxblooms.com">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
-                        </Link>
+                        </a>
                         <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
                             <MenuIcon />
                         </IconButton>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -234,9 +234,9 @@ const VerifyQrCode = (props) => {
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
-                <RouterLink to="/" className={classes.logo} onClick={logout}>
+                <a href="https://wp.fxblooms.com" className={classes.logo} onClick={logout}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.content}>
                     <Typography variant="h5">Verify Google Authenticator</Typography>
                     <Typography variant="subtitle1" component="p">Enter the 6-digit code displayed on your Google Authenticator to make sure everything works.</Typography>

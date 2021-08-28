@@ -1,3 +1,4 @@
+export const HOME = 'https://wp.fxblooms.com';
 export const ABOUT_US = 'aboutUs';
 export const BLOG = '/blog.fxblooms.com';
 export const WHY = 'whyFXBLOOMS';

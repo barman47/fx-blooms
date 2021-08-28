@@ -25,7 +25,7 @@ import { login } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../routes';
+import { FORGOT_PASSWORD, HOME, SIGN_UP, VERIFY_2FA } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -113,7 +113,7 @@ const Login = (props) => {
 
     useEffect(() => {
         if (customer.isAuthenticated && authorized) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         // eslint-disable-next-line
     }, []);
@@ -173,9 +173,9 @@ const Login = (props) => {
             <TwoFactorModal open={showModal} />
             {loading && <Spinner />}
             <section className={classes.root}>
-                <RouterLink to="/">
+                <a href="https://wp.fxblooms.com">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Welcome back!

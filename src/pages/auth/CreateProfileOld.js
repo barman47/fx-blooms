@@ -30,7 +30,7 @@ import { createCustomer } from '../../actions/customer';
 import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
-import { LOGIN } from '../../routes';
+import { HOME, LOGIN } from '../../routes';
 import { COLORS, NETWORK_ERROR, UPLOAD_LIMIT } from '../../utils/constants';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
@@ -237,7 +237,7 @@ const CreateProfile = (props) => {
         //     return history.push('/');
         // }
         if (isAuthenticated && twoFactorEnabled) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         if (countries.length === 0) {
             props.getCountries();
@@ -554,9 +554,9 @@ const CreateProfile = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <RouterLink to="/">
+                            <a href="https://wp.fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
-                            </RouterLink>
+                            </a>
                             <Typography variant="subtitle2" component="span" className={classes.text} style={{ fontWeight: 500 }}>Hello <span style={{ color: COLORS.primary }}>{Profile.Username},</span></Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thanks for joining!.</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Trust and Security are cornerstones of FXBLOOMS.</Typography>

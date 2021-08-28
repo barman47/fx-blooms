@@ -257,9 +257,9 @@ const Dashboard = ({ children, title, logout }) => {
                 >
                     <div className={classes.toolbar}>
                         {open && 
-                            <RouterLink to="/">
+                            <a href="https://wp.fxblooms.com">
                                 <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
-                            </RouterLink>
+                            </a>
                         }
                         <IconButton onClick={toggleDrawer}>
                             {!open ?

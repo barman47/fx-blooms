@@ -27,7 +27,7 @@ import { getCountries } from '../../actions/countries';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { CREATE_PROFILE, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { HOME, CREATE_PROFILE, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -204,7 +204,7 @@ const CreateAccount = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         if (countries.length === 0) {
             props.getCountries();
@@ -394,9 +394,9 @@ const CreateAccount = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <RouterLink to="/">
+                            <a href="https://wp.fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
-                            </RouterLink>
+                            </a>
                             <img src={img} className={classes.image} alt="FX Blooms logo" />
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thank you for visiting FXBLOOMS!</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless</Typography>

@@ -24,7 +24,7 @@ import  {
     EIGHT_CHARACTERS
 } from '../../utils/constants';
 import validateResetPassword from '../../utils/validation/customer/resetPassword';
-import { LOGIN } from '../../routes';
+import { HOME, LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -135,7 +135,7 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         setToken(history.location.search.split('=')[1]);
         // eslint-disable-next-line
@@ -274,9 +274,9 @@ const ResetPassword = (props) => {
             <SuccessModal ref={successModal} dismissAction={redirectToLogin} />
             {loading && <Spinner />}
             <section className={classes.root}>
-                <RouterLink to="/">
+                <a href="https://wp.fxblooms.com">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Forgot Password

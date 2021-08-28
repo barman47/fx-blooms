@@ -16,7 +16,7 @@ import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
-import { LOGIN } from '../../routes';
+import { HOME, LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -101,7 +101,7 @@ const ForgotPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         // eslint-disable-next-line
     }, []);
@@ -135,7 +135,7 @@ const ForgotPassword = (props) => {
         }
     }, [dispatch, history, msg]);
 
-    const goHome = () => history.push('/');
+    const goHome = () => window.location.href = HOME;;
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -169,9 +169,9 @@ const ForgotPassword = (props) => {
             <SuccessModal ref={successModal} dismissAction={goHome} />
             {loading && <Spinner />}
             <section className={classes.root}>
-                <RouterLink to="/">
+                <a href="https://wp.fxblooms.com">
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Forgot Password

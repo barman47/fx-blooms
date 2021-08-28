@@ -9,7 +9,7 @@ const PrivateRoute = ({ component: Component, isAuthenticated, twoFactorEnabled,
         render={props => isAuthenticated === true && twoFactorEnabled === true ? (
             <Component {...props} />
         ) : (
-            <Redirect to="/" />
+            <Redirect to="https://wp.fxblooms.com" />
         )}
     />
 );

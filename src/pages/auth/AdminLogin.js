@@ -14,6 +14,7 @@ import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
+import { HOME } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -99,7 +100,7 @@ const AdminLogin = (props) => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         // eslint-disable-next-line
     }, []);
@@ -152,9 +153,9 @@ const AdminLogin = (props) => {
             }
             {loading && <Spinner />}
             <section className={classes.root}>
-                <RouterLink to="/">
+                <a href="https://wp.fxblooms.com">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         FXBLOOMS Admin

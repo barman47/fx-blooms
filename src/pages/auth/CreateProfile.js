@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -27,6 +27,7 @@ import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import { countries } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
+import { HOME } from '../../routes';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
@@ -145,10 +146,10 @@ const CreateProfile = (props) => {
         if (location?.state?.verifiedEmail && email) {
             setVerifiedEmail(true);
         } else {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         if (isAuthenticated && authorized) {
-            return history.push('/');
+            return window.location.href = HOME;
         }
         if (documents.length === 0) {
             props.getDocuments();
@@ -242,9 +243,9 @@ const CreateProfile = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <RouterLink to="/">
+                            <a href="https://wp.fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
-                            </RouterLink>
+                            </a>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thanks for joining!.</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Trust and Security are cornerstones of FXBLOOMS.</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>To ensure this platform remain safe and secure, kindly tell us about yourself.</Typography>

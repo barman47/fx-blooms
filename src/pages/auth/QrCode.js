@@ -139,9 +139,9 @@ const QrCode = (props) => {
                 />
             }
             <Container className={classes.root}>
-                <RouterLink to="/" className={classes.logo}>
+                <a href="https://wp.fxblooms.com" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </RouterLink>
+                </a>
                 <div className={classes.content}>
                     <Typography variant="h5">Register FXBLOOMS</Typography>
                     <Typography variant="subtitle1" component="p">Open the Google authenticator app and scan the QR code below.</Typography>
