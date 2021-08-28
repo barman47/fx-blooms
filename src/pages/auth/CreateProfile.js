@@ -146,9 +146,11 @@ const CreateProfile = (props) => {
         if (location?.state?.verifiedEmail && email) {
             setVerifiedEmail(true);
         } else {
-            return window.location.href = HOME;
+            console.log('redirecting');
+            // return window.location.href = HOME;
         }
         if (isAuthenticated && authorized) {
+            console.log('redirecting');
             return window.location.href = HOME;
         }
         if (documents.length === 0) {

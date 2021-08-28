@@ -24,12 +24,12 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
-import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
-import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
+import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
+import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
@@ -161,8 +161,9 @@ const AllListings = (props) => {
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { idStatus } = useSelector(state => state.customer.stats);
 
-	const { getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
+	const { getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
 
 	// useGetListings(query, pageNumber, getListingsOpenForBid);
 
@@ -182,6 +183,12 @@ const AllListings = (props) => {
 		}
 		// eslint-disable-next-line
 	}, []);
+
+	useEffect(() => {
+		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
+            getIdVerificationLink();
+        }
+	}, [getIdVerificationLink, idStatus]);
 
 	useEffect(() => {
 		setDataLength(listings.length);
@@ -556,9 +563,10 @@ Filter.propTypes = {
 AllListings.propTypes = {
 	getCustomerInformation: PropTypes.func.isRequired,
 	getCustomerStats: PropTypes.func.isRequired,
+	getIdVerificationLink: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings })(AllListings);
+export default connect(undefined, { getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings })(AllListings);

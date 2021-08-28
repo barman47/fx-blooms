@@ -36,16 +36,11 @@ import {
     SET_MORE_NEW_CUSTOMERS,
     SET_RESIDENCE_PERMIT,
     SET_PERMIT_URL,
-    SET_EMAIL
+    SET_EMAIL,
+    GET_ERRORS
  } from './types';
 
 const api = `${API}/Customer`;
-
-export const getMe = (history) => async (dispatch) => {
-    try {} catch (err) {
-        return handleError(err, dispatch);
-    }
-};
 
 export const createCustomer = (customer, history) => async (dispatch) => {
     try {
@@ -71,41 +66,68 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-export const registerCustomer = ({EmailAddress, Username, Password}, history) => async (dispatch) => {
+const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, Password } = null) => {
+    const { nextStep } = res.data.data;
+
+    switch (nextStep) {
+        case FILL_FORM1:
+            const res2 = await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+            return handleNextStep(res2, history, dispatch, { EmailAddress, Username, Password });
+
+        case FILL_FORM2:
+            const email = res.data.data.message[0].split(' ')[0];
+            dispatch({ type: SET_EMAIL, payload: email });
+            return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
+
+        case EMAIL_VERIFICATION:
+            return dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+            });
+
+        case GOTO_2FA:
+            setAuthToken(res.data.data.token);
+            return history.push(SETUP_2FA);
+
+        case PROCEED_TO_LOGIN:
+            dispatch({
+                type: GET_ERRORS,
+                payload: { msg: `${EmailAddress} Email has been linked to a profile. Please login to continue` }
+            });
+            return history.push(LOGIN);
+
+        default:
+            return;
+    }
+};
+
+export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
         console.log(res);
-        const { nextStep } = res.data.data;
+        const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
-        switch (nextStep) {
-            case FILL_FORM1:
-                await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
-                return dispatch({
-                    type: SET_CUSTOMER_MSG,
-                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-                });
-
-            case FILL_FORM2:
-                const email = res.data.data.message[0].split(' ')[0];
-                dispatch({ type: SET_EMAIL, payload: email });
-                return history.push(CREATE_PROFILE, { verifiedEmail: true });
-
-            case EMAIL_VERIFICATION:
-                return dispatch({
-                    type: SET_CUSTOMER_MSG,
-                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-                });
-
-            case GOTO_2FA:
-                setAuthToken(res.data.data.token);
-                return history.push(SETUP_2FA);
-
-            case PROCEED_TO_LOGIN:
-                return history.push(LOGIN);
-
-            default:
-                return;
+        if (isEmailAvailable && isUsernameAvailable) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {
+                    usernameAvailable: true
+                }
+            });
+        } else {
+            return dispatch({
+                type: GET_ERRORS,
+                payload: {
+                    msg: message,
+                    usernames: generatedUsernames,
+                    usernameAvailable: isUsernameAvailable,
+                    emailAvailable: isEmailAvailable,
+                    Username: message
+                }
+            });
         }
+
+        return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
 
     } catch (err) {
         return handleError(err, dispatch);
@@ -146,27 +168,27 @@ export const getIdVerificationLink = () => async (dispatch) => {
 // export const registerCustomer = (username, email) => async (dispatch) => {
 //     try {
 //         const res = await axios.get(`${api}/Available/username/${username}/email/${email}`);
-//         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
+        // const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
-//         if (isEmailAvailable && isUsernameAvailable) {
-//             dispatch({
-//                 type: GET_ERRORS,
-//                 payload: {
-//                     usernameAvailable: true
-//                 }
-//             });
-//         } else {
-//             dispatch({
-//                 type: GET_ERRORS,
-//                 payload: {
-//                     msg: message,
-//                     usernames: generatedUsernames,
-//                     usernameAvailable: isUsernameAvailable,
-//                     emailAvailable: isEmailAvailable,
-//                     Username: message
-//                 }
-//             });
-//         }
+        // if (isEmailAvailable && isUsernameAvailable) {
+        //     dispatch({
+        //         type: GET_ERRORS,
+        //         payload: {
+        //             usernameAvailable: true
+        //         }
+        //     });
+        // } else {
+        //     dispatch({
+        //         type: GET_ERRORS,
+        //         payload: {
+        //             msg: message,
+        //             usernames: generatedUsernames,
+        //             usernameAvailable: isUsernameAvailable,
+        //             emailAvailable: isEmailAvailable,
+        //             Username: message
+        //         }
+        //     });
+        // }
 //     } catch (err) {
 //         return handleError(err, dispatch);
 //     }

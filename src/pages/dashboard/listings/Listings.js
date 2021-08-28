@@ -8,7 +8,6 @@ import { FormatListText } from 'mdi-material-ui';
 
 import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../utils/constants';
 import { addBid } from '../../../actions/listings';
-import { getIdVerificationLink } from '../../../actions/customer';
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
 import Spinner from '../../../components/common/Spinner';
@@ -39,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listings = ({ addBid, getIdVerificationLink }) => {
+const Listings = ({ addBid }) => {
     const classes = useStyles();
 
     const dispatch = useDispatch();
@@ -55,14 +54,6 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
     const [loading, setLoading] = useState(false);
 
     const idVerificationModal = useRef();
-
-    useEffect(() => {
-        if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
-            getIdVerificationLink();
-        }
-
-        // eslint-disable-next-line
-    }, []);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -149,8 +140,7 @@ const Listings = ({ addBid, getIdVerificationLink }) => {
 }
 
 Listings.propTypes = {
-    addBid: PropTypes.func.isRequired,
-    getIdVerificationLink: PropTypes.func.isRequired
+    addBid: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addBid, getIdVerificationLink })(Listings);
+export default connect(undefined, { addBid })(Listings);

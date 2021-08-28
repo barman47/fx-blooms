@@ -1,8 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { connect } from 'react-redux';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core';
-import PropTypes from 'prop-types';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 import AdminRoute from './components/common/AdminRoute';
@@ -49,7 +47,7 @@ import AdminHome from './pages/adminDashboard/home/Home';
 import Customers from './pages/adminDashboard/customers/';
 import Customer from './pages/adminDashboard/customer/';
 
-import { getMe } from './actions/customer';
+// import { getMe } from './actions/customer';
 
 import { 
 	ADMIN_DASHBOARD,
@@ -133,16 +131,16 @@ function App(props) {
 const [title, setTitle] = useState('');
 
 
-	useEffect(() => {
-		// isTokenExpired();
-		if (localStorage.FXBloomsAuthToken) {
-			// const token = isTokenExpired(localStorage.FXBloomsAuthToken);
-			// // Set auth token header auth
-			// setAuthToken(localStorage.FXBloomsAuthToken);
-			// props.getMe(history);
-		}
-		// eslint-disable-next-line
-	}, []);
+	// useEffect(() => {
+	// 	// isTokenExpired();
+	// 	if (localStorage.FXBloomsAuthToken) {
+	// 		// const token = isTokenExpired(localStorage.FXBloomsAuthToken);
+	// 		// // Set auth token header auth
+	// 		// setAuthToken(localStorage.FXBloomsAuthToken);
+	// 		// props.getMe(history);
+	// 	}
+	// 	// eslint-disable-next-line
+	// }, []);
 
 	const handleSetTitle = (title) => setTitle(title);
 
@@ -193,8 +191,9 @@ const [title, setTitle] = useState('');
 	);
 }
 
-App.propTypes = {
-	getMe: PropTypes.func.isRequired
-};
+// App.propTypes = {
+// 	getMe: PropTypes.func.isRequired
+// };
 
-export default connect(undefined, { getMe })(App);
+export default App;
+// export default connect(undefined, { getMe })(App);

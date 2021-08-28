@@ -23,7 +23,6 @@ import Spinner from '../../components/common/Spinner';
 import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
-import { getCountries } from '../../actions/countries';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
@@ -172,7 +171,6 @@ const CreateAccount = (props) => {
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
-    const { countries } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setEmail] = useState('');
@@ -205,9 +203,6 @@ const CreateAccount = (props) => {
     useEffect(() => {
         if (isAuthenticated && authorized) {
             return window.location.href = HOME;
-        }
-        if (countries.length === 0) {
-            props.getCountries();
         }
 
         return () => {
@@ -449,9 +444,14 @@ const CreateAccount = (props) => {
                                     {errors.usernames &&
                                         <div className={classes.usernames}>
                                             {errors.usernames.map((username, index) => (
-                                                <Tooltip title={`Select ${username}`} TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
-                                                    <Typography 
-                                                        key={index} 
+                                                <Tooltip 
+                                                    key={index} 
+                                                    title={`Select ${username}`} 
+                                                    TransitionComponent={Zoom} 
+                                                    TransitionProps={{ timeout: 300 }} 
+                                                    arrow
+                                                >
+                                                    <Typography  
                                                         variant="subtitle2" 
                                                         component="span" 
                                                         className={classes.suggestedUsername}
@@ -581,8 +581,7 @@ const CreateAccount = (props) => {
 };
 
 CreateAccount.propTypes = {
-    registerCustomer: PropTypes.func.isRequired,
-    getCountries: PropTypes.func.isRequired
+    registerCustomer: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { registerCustomer, getCountries })(CreateAccount);
+export default connect(undefined, { registerCustomer })(CreateAccount);
