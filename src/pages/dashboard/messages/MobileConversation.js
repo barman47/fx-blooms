@@ -13,7 +13,7 @@ import {
     useMediaQuery 
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ArrowLeft, Attachment, InformationOutline, Send } from 'mdi-material-ui';
+import { ArrowLeft, Attachment, FilePdfOutline, InformationOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -21,12 +21,11 @@ import axios from 'axios';
 import _ from 'lodash';
 import toast, { Toaster } from 'react-hot-toast';
 import copy from 'copy-to-clipboard';
+import { v4 as uuidv4 } from 'uuid';
 
-// import ScrollableFeed from 'react-scrollable-feed'
+import ScrollableFeed from 'react-scrollable-feed';
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
-import { Document } from 'react-pdf';
-// import { Page } from 'react-pdf';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
@@ -38,8 +37,6 @@ import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { HUB_URL } from '../../../utils/constants';
 import CompleteTransactionModal from './CompleteTransactionModal';
-
-// import avatar from '../../../assets/img/avatar.jpg';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -151,8 +148,8 @@ const useStyles = makeStyles(theme => ({
         width: '40%'
     },
 
-    otherAttachment: {
-        alignSelf: 'flex-end',
+    myAttachment: {
+        alignSelf: 'flex-end'
     },
 
     paymentNotification: {
@@ -416,61 +413,60 @@ const MobileConversation = (props) => {
                             </section>
                         </Toolbar>
                     </AppBar>
-                    <section className={classes.messageContainer}>
+                    <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
                         <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
                             Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction
                         </Typography>
                         <div className={classes.messages}>
-                            {/* <ScrollableFeed className={classes.messages}> */}
-                                {chat?.messages && matches && chat?.messages.map((message) => (
-                                    <>
-                                        {!isEmpty(message.uploadedFileName) ? 
-                                            (
-                                                message.uploadedFileName.includes('.pdf') ? 
-                                                    <div 
-                                                        key={message.id} 
-                                                        className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
-                                                    >
-                                                        <Document 
-                                                            file={message.uploadedFileName}
-                                                        >
-                                                        </Document>
-                                                    </div>
-                                                :
-                                                <img 
-                                                    key={message.id}
-                                                    src={message.uploadedFileName} 
-                                                    className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
-                                                    alt="Attachment" 
-                                                />
-                                            )
+                            {chat?.messages && matches && chat?.messages.map((message) => (
+                                <>
+                                    {!isEmpty(message.uploadedFileName) ? 
+                                        (
+                                            message.uploadedFileName.includes('.pdf') ? 
+                                                <div 
+                                                    key={uuidv4()}
+                                                    className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                                >
+                                                    <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                        <div>
+                                                            <FilePdfOutline className={classes.downloadIcon} />
+                                                            <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
+                                                        </div>
+                                                    </a>
+                                                </div>
                                             :
-                                            <Typography 
-                                                key={message.id} 
-                                                variant="subtitle2" 
-                                                component="span" 
-                                                className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
-                                            >
-                                                {/* {message.text} */}
-                                                {decode(message.text)}
-                                            </Typography>
-                                        }
-                                    </>
-                                ))}
-                                {paymentMade && matches &&
-                                    <div className={classes.paymentNotification}>
-                                        <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
-                                        <Typography variant="subtitle1" component="p">What's next?</Typography>
-                                        <ul>
-                                            <li>Proceed to your banking app to confirm payment.</li>
-                                            <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openModal}>here.</span></li>
-                                            <li>Send your money to the buyer.</li>
-                                        </ul>
-                                    </div>
-                                }
-                            {/* </ScrollableFeed> */}
+                                            <img 
+                                                key={uuidv4()}
+                                                src={message.uploadedFileName} 
+                                                className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                                alt="Attachment" 
+                                            />
+                                        )
+                                        :
+                                        <Typography 
+                                            key={uuidv4()}
+                                            variant="subtitle2" 
+                                            component="span" 
+                                            className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                        >
+                                            {decode(message.text)}
+                                        </Typography>
+                                    }
+                                </>
+                            ))}
+                            {paymentMade && matches &&
+                                <div className={classes.paymentNotification}>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p">What's next?</Typography>
+                                    <ul>
+                                        <li>Proceed to your banking app to confirm payment.</li>
+                                        <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openModal}>here.</span></li>
+                                        <li>Send your money to the buyer.</li>
+                                    </ul>
+                                </div>
+                            }
                         </div>
-                    </section>
+                    </ScrollableFeed>
                     <form onSubmit={onSubmit} noValidate className={classes.form}>
                         <Grid container direction="row">
                             <TextField 

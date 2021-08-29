@@ -71,29 +71,33 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 
     switch (nextStep) {
         case FILL_FORM1:
-            const res2 = await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
-            dispatch({
+            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+            return dispatch({
                 type: SET_CUSTOMER_MSG,
                 payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
             });
-            return handleNextStep(res2, history, dispatch, { EmailAddress, Username, Password });
+            // return handleNextStep(res2, history, dispatch, { EmailAddress, Username, Password });
 
         case FILL_FORM2:
             const email = res.data.data.message[0].split(' ')[0];
             dispatch({ type: SET_EMAIL, payload: email });
+            console.log('Redirecting to form 2');
             return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
 
         case EMAIL_VERIFICATION:
+            console.log('Email verification');
             return dispatch({
                 type: SET_CUSTOMER_MSG,
                 payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
             });
 
         case GOTO_2FA:
+            console.log('2FA');
             setAuthToken(res.data.data.token);
             return history.push(SETUP_2FA);
 
         case PROCEED_TO_LOGIN:
+            console.log('Login');
             dispatch({
                 type: GET_ERRORS,
                 payload: { msg: `${EmailAddress} Email has been linked to a profile. Please login to continue` }
@@ -111,14 +115,7 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
         console.log(res);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
-        if (isEmailAvailable && isUsernameAvailable) {
-            dispatch({
-                type: GET_ERRORS,
-                payload: {
-                    usernameAvailable: true
-                }
-            });
-        } else {
+        if (!isEmailAvailable && !isUsernameAvailable) {
             return dispatch({
                 type: GET_ERRORS,
                 payload: {
@@ -129,7 +126,24 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
                     Username: message
                 }
             });
-        }
+            // dispatch({
+            //     type: GET_ERRORS,
+            //     payload: {
+            //         usernameAvailable: true
+            //     }
+            // });
+        } // else {
+        //     return dispatch({
+        //         type: GET_ERRORS,
+        //         payload: {
+        //             msg: message,
+        //             usernames: generatedUsernames,
+        //             usernameAvailable: isUsernameAvailable,
+        //             emailAvailable: isEmailAvailable,
+        //             Username: message
+        //         }
+        //     });
+        // }
 
         return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
 
@@ -168,35 +182,6 @@ export const getIdVerificationLink = () => async (dispatch) => {
         return handleError(err, dispatch);
     }
 };
-
-// export const registerCustomer = (username, email) => async (dispatch) => {
-//     try {
-//         const res = await axios.get(`${api}/Available/username/${username}/email/${email}`);
-        // const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
-
-        // if (isEmailAvailable && isUsernameAvailable) {
-        //     dispatch({
-        //         type: GET_ERRORS,
-        //         payload: {
-        //             usernameAvailable: true
-        //         }
-        //     });
-        // } else {
-        //     dispatch({
-        //         type: GET_ERRORS,
-        //         payload: {
-        //             msg: message,
-        //             usernames: generatedUsernames,
-        //             usernameAvailable: isUsernameAvailable,
-        //             emailAvailable: isEmailAvailable,
-        //             Username: message
-        //         }
-        //     });
-        // }
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
 
 export const login = (data, history) => async (dispatch) => {
     try {
@@ -499,5 +484,5 @@ export const sendMail = (data) => async (dispatch) => {
 export const logout = (history) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    history.push(LOGIN);
+    return history.push(LOGIN);
 };

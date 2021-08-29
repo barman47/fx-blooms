@@ -26,7 +26,7 @@ import Toast from '../../components/common/Toast';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { HOME, CREATE_PROFILE, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -227,11 +227,11 @@ const CreateAccount = (props) => {
         }
     }, [errors]);
 
-    useEffect(() => {
-        if (errorsState.usernameAvailable === true) {
-            history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
-        }
-    }, [Email, Password, Username, history, errorsState.usernameAvailable]);
+    // useEffect(() => {
+    //     if (errorsState.usernameAvailable === true) {
+    //         history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+    //     }
+    // }, [Email, Password, Username, history, errorsState.usernameAvailable]);
 
     useEffect(() => {
         if (errorsState?.msg) {

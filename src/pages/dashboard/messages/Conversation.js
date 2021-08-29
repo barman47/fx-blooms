@@ -1,4 +1,4 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,8 +7,8 @@ import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
-// import { v4 as uuidv4 } from 'uuid';
-// import ScrollableFeed from 'react-scrollable-feed'
+import { v4 as uuidv4 } from 'uuid';
+import ScrollableFeed from 'react-scrollable-feed';
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
 
@@ -130,6 +130,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     attachment: {
+        border: '1px solid red',
         borderRadius: theme.shape.borderRadius,
         width: '40%'
     },
@@ -149,8 +150,8 @@ const useStyles = makeStyles(theme => ({
         float: 'right'
     },
 
-    otherAttachment: {
-        alignSelf: 'flex-end',
+    myAttachment: {
+        alignSelf: 'flex-end'
     },
 
     paymentNotification: {
@@ -365,18 +366,17 @@ const Conversation = (props) => {
                             <Typography variant="subtitle1" component="p" color="primary">ID: {sessionId}</Typography>
                         </Grid>
                     </Grid>
-                    <section className={classes.messageContainer}>
+                    <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
                         <div className={classes.messages}>
-                            {/* <ScrollableFeed className={classes.messages}> */}
                                 <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography>
                                 {chat?.messages && chat?.messages.map((message) => (
-                                    <Fragment key={message.id}>
+                                    <>
                                         {!isEmpty(message.uploadedFileName) ? 
                                             (
                                                 message.uploadedFileName.includes('.pdf') ? 
                                                     <div 
-                                                        // key={uuidv4()}
-                                                        className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
+                                                        key={uuidv4()}
+                                                        className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                                     >
                                                         <a href={message.uploadedFileName} className={classes.downloadLink} download>
                                                             <div>
@@ -387,15 +387,15 @@ const Conversation = (props) => {
                                                     </div>
                                                 :
                                                 <img 
-                                                    // key={uuidv4()}
+                                                    key={uuidv4()}
                                                     src={message.uploadedFileName} 
-                                                    className={clsx(classes.attachment, {[`${classes.otherAttachment}`]: customerId !== message.sender })}
+                                                    className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                                     alt="Attachment" 
                                                 />
                                             )
                                             :
                                             <Typography 
-                                                // key={uuidv4()} 
+                                                key={uuidv4()} 
                                                 variant="subtitle2" 
                                                 component="span" 
                                                 className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
@@ -403,7 +403,7 @@ const Conversation = (props) => {
                                                 {decode(message.text)}
                                             </Typography>
                                         }
-                                    </Fragment>
+                                    </>
                                 ))}
                                 {paymentMade && customerId === chat.seller &&
                                     <div className={classes.paymentNotification}>
@@ -416,9 +416,8 @@ const Conversation = (props) => {
                                         </ul>
                                     </div>
                                 }
-                            {/* </ScrollableFeed> */}
                         </div>
-                    </section>
+                    </ScrollableFeed>
                     <form onSubmit={onSubmit} noValidate className={classes.form}>
                         <Grid container direction="row">
                             <TextField 

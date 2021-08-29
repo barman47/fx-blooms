@@ -89,7 +89,7 @@ const CompleteTransactionModal = (props) => {
 
     const { customerId, msg } = useSelector(state => state.customer);
     const { paymentMade, sessionId } = useSelector(state => state.chat);
-    const { disableBuyerSubmitButton, disableSellerSubmitButton, seller } = useSelector(state => state.chat.chat);
+    const { disableBuyerSubmitButton, disableSellerSubmitButton, seller } = useSelector(state => state?.chat?.chat);
     
     const errorsState = useSelector(state => state.errors);
     const [open, setOpen] = useState(false);
