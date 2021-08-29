@@ -115,7 +115,15 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
         console.log(res);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
-        if (!isEmailAvailable && !isUsernameAvailable) {
+        if (isUsernameAvailable) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {
+                    usernameAvailable: true
+                }
+            });
+            return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
+        } else {
             return dispatch({
                 type: GET_ERRORS,
                 payload: {
@@ -126,26 +134,7 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
                     Username: message
                 }
             });
-            // dispatch({
-            //     type: GET_ERRORS,
-            //     payload: {
-            //         usernameAvailable: true
-            //     }
-            // });
-        } // else {
-        //     return dispatch({
-        //         type: GET_ERRORS,
-        //         payload: {
-        //             msg: message,
-        //             usernames: generatedUsernames,
-        //             usernameAvailable: isUsernameAvailable,
-        //             emailAvailable: isEmailAvailable,
-        //             Username: message
-        //         }
-        //     });
-        // }
-
-        return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
+        }
 
     } catch (err) {
         return handleError(err, dispatch);

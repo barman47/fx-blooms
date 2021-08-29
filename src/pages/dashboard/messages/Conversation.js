@@ -130,7 +130,6 @@ const useStyles = makeStyles(theme => ({
     },
 
     attachment: {
-        border: '1px solid red',
         borderRadius: theme.shape.borderRadius,
         width: '40%'
     },

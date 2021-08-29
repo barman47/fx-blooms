@@ -442,6 +442,8 @@ const CreateAccount = (props) => {
                                         disabled={loading ? true : false}
                                     />
                                     {errors.usernames &&
+                                        <>
+                                        <span>Please try one of the following</span>
                                         <div className={classes.usernames}>
                                             {errors.usernames.map((username, index) => (
                                                 <Tooltip 
@@ -462,6 +464,7 @@ const CreateAccount = (props) => {
                                                 </Tooltip>
                                             ))}
                                         </div>
+                                        </>
                                     }
                                 </Grid>
                                 <Grid item xs={12}>

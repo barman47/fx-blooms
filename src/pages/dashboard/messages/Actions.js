@@ -200,50 +200,34 @@ const Actions = (props) => {
                     <Grid item>
                         <form onSubmit={onSubmit}>
                             <Grid container direction="column" spacing={3}>
-                                    {customerId === seller ? 
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                disabled={loading || paymentReceived ? true : false}
-                                                onClick={() => completeTransaction()}
-                                            >
-                                                Payment Received
-                                            </Button>
-                                        </Grid>
-                                        :
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                disabled={loading || paymentMade ? true : false}
-                                                onClick={handlePayment}
-                                            >
-                                                I've Made Payment
-                                            </Button>
-                                        </Grid>
-                                    }
-                                    {!paymentMade && 
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                onClick={cancelNegotiation}
-                                                disabled={loading ? true : false}
-                                            >
-                                                Cancel Negotiation
-                                            </Button>
-                                        </Grid>
-                                    }
+                                <Grid item xs={12}>
+                                    <Button 
+                                        className={classes.button}
+                                        type="submit"
+                                        variant="outlined"
+                                        color="primary"
+                                        fullWidth
+                                        disabled={loading || paymentMade ? true : false}
+                                        onClick={handlePayment}
+                                    >
+                                        I've Made Payment
+                                    </Button>
+                                </Grid>
+                                {!paymentMade && 
+                                    <Grid item xs={12}>
+                                        <Button 
+                                            className={classes.button}
+                                            type="submit"
+                                            variant="outlined"
+                                            color="primary"
+                                            fullWidth
+                                            onClick={cancelNegotiation}
+                                            disabled={loading ? true : false}
+                                        >
+                                            Cancel Negotiation
+                                        </Button>
+                                    </Grid>
+                                }
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p">Rate this user</Typography>
                                 </Grid>
@@ -283,7 +267,7 @@ const Actions = (props) => {
                                         disabled={seller === customerId && disableSellerSubmitButton ? true : seller !== customerId && disableBuyerSubmitButton}
                                         // disabled={loading ? true : false}
                                     >
-                                        {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                        {!loading ? 'Payment Received' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                     </Button>
                                 </Grid>
                             </Grid>
