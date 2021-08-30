@@ -29,7 +29,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SET_LISTING, SENT_MESSAGE, EXIT_CHAT } from '../../../actions/types';
+import { SET_LISTING, SENT_MESSAGE, SHOW_PAYMENT_NOTIFICATION, EXIT_CHAT } from '../../../actions/types';
 import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
@@ -204,7 +204,7 @@ const MobileConversation = (props) => {
     const history = useHistory();
 
     const { customerId } = useSelector(state => state.customer);
-    const { chat, paymentMade, sessionId } = useSelector(state => state.chat);
+    const { chat, paymentNotification, sessionId } = useSelector(state => state.chat);
     const listings = useSelector(state => state.listings.listings);
 
     const { sendMessage } = props;
@@ -285,16 +285,22 @@ const MobileConversation = (props) => {
                         setMessage('');
                     });
 
-                    // connection.on('TransferNotification', notification => {
-                    //     console.log('notification ', notification);
-                    // });
+                    connection.on('TransferNotification', notification => {
+                        const notificationData = JSON.parse(notification);
+                        if (customerId === notificationData.Receiver) {
+                            dispatch({
+                                type: SHOW_PAYMENT_NOTIFICATION,
+                                payload: notificationData
+                            });
+                        }
+                    });
                 })
                 .catch(err => {
                     setConnected(false);
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, connected, matches, newMessage]);
+    }, [connection, customerId, dispatch, connected, matches, newMessage]);
 
     const openModal = () => {
         paymentModal.current.openModal();
@@ -454,9 +460,9 @@ const MobileConversation = (props) => {
                                     }
                                 </>
                             ))}
-                            {paymentMade && matches &&
+                            {paymentNotification &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentNotification.Sender}</span> claimes to have made the payment.</Typography>
                                     <Typography variant="subtitle1" component="p">What's next?</Typography>
                                     <ul>
                                         <li>Proceed to your banking app to confirm payment.</li>

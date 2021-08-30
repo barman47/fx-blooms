@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,7 +14,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SENT_MESSAGE } from '../../../actions/types';
+import { SENT_MESSAGE, SHOW_PAYMENT_NOTIFICATION } from '../../../actions/types';
 
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
@@ -188,7 +188,7 @@ const Conversation = (props) => {
     const dispatch = useDispatch();
 
     const { customerId } = useSelector(state => state.customer);
-    const { chat, paymentMade, sessionId } = useSelector(state => state.chat);
+    const { chat, sessionId, paymentNotification } = useSelector(state => state.chat);
 
     const { sendMessage } = props;
 
@@ -250,7 +250,6 @@ const Conversation = (props) => {
                     console.log('connected');
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        console.log('new message ', message);
                         if (!newMessage) {
                             setNewMessage(true);
                             let response = JSON.parse(message);
@@ -271,16 +270,22 @@ const Conversation = (props) => {
                         }
                     });
 
-                    // connection.on('TransferNotification', notification => {
-                    //     console.log('notification ', notification);
-                    // });
+                    connection.on('TransferNotification', notification => {
+                        const notificationData = JSON.parse(notification);
+                        if (customerId === notificationData.Receiver) {
+                            dispatch({
+                                type: SHOW_PAYMENT_NOTIFICATION,
+                                payload: notificationData
+                            });
+                        }
+                    });
                 })
                 .catch(err => {
                     setConnected(false);
                     console.error(err);
                 });
         }
-    }, [connection, dispatch, connected, newMessage]);
+    }, [connection, customerId, dispatch, connected, newMessage]);
 
     const openPaymentConfirmationTipsModal = () => {
         paymentModal.current.openModal();
@@ -369,7 +374,7 @@ const Conversation = (props) => {
                         <div className={classes.messages}>
                                 <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography>
                                 {chat?.messages && chat?.messages.map((message) => (
-                                    <>
+                                    <Fragment key={uuidv4()}>
                                         {!isEmpty(message.uploadedFileName) ? 
                                             (
                                                 message.uploadedFileName.includes('.pdf') ? 
@@ -402,11 +407,11 @@ const Conversation = (props) => {
                                                 {decode(message.text)}
                                             </Typography>
                                         }
-                                    </>
+                                    </Fragment>
                                 ))}
-                                {paymentMade && customerId === chat.seller &&
+                                {paymentNotification &&
                                     <div className={classes.paymentNotification}>
-                                        <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentMade.Sender}</span> claimes to have made the payment.</Typography>
+                                        <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentNotification.Sender}</span> claimes to have made the payment.</Typography>
                                         <Typography variant="subtitle1" component="p">What's next?</Typography>
                                         <ul>
                                             <li>Proceed to your banking app to confirm payment.</li>

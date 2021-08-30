@@ -186,6 +186,7 @@ const AllListings = (props) => {
 
 	useEffect(() => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
+			console.log('Getting ID Status');
             getIdVerificationLink();
         }
 	}, [getIdVerificationLink, idStatus]);

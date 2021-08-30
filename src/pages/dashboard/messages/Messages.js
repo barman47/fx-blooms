@@ -30,10 +30,7 @@ const Messages = (props) => {
 	const { chats } = useSelector(state => state.chat);
 
 	useEffect(() => {
-		if (chats.length === 0) {
-			props.getChats();
-		}
-
+		props.getChats();
 		// eslint-disable-next-line
 	}, []);
 

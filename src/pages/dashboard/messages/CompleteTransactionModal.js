@@ -14,10 +14,9 @@ import {
 
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
-import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 import PropTypes from 'prop-types';
 
-import { PAYMENT_MADE, SET_CUSTOMER_MSG } from '../../../actions/types';
+import { SET_CUSTOMER_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
@@ -26,10 +25,7 @@ import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
-import { API, COLORS, SHADOW } from '../../../utils/constants';
-
-
-import validateCompleteTransaction from '../../../utils/validation/customer/completeTransaction';
+import { COLORS, SHADOW } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -87,9 +83,8 @@ const CompleteTransactionModal = (props) => {
 	const dispatch = useDispatch();
     const history = useHistory();
 
-    const { customerId, msg } = useSelector(state => state.customer);
+    const { msg } = useSelector(state => state.customer);
     const { paymentMade, sessionId } = useSelector(state => state.chat);
-    const { disableBuyerSubmitButton, disableSellerSubmitButton, seller } = useSelector(state => state?.chat?.chat);
     
     const errorsState = useSelector(state => state.errors);
     const [open, setOpen] = useState(false);
@@ -97,9 +92,6 @@ const CompleteTransactionModal = (props) => {
     const [Message, setMessage] = useState('');
     const [sellerRating, setSellerRating] = useState(null);
     const [loading, setLoading] = useState(false);
-    
-    const [connection, setConnection] = useState(null);
-    const [connected, setConnected] = useState(false);
 
     const [errors, setErrors] = useState({});
 
@@ -109,37 +101,6 @@ const CompleteTransactionModal = (props) => {
     useEffect(() => {
         setOpen(props.open);
     }, [props.open]);
-
-    useEffect(() => {
-        const connect = new HubConnectionBuilder().withUrl(`${API}/notificationhub`, {
-            skipNegotiation: true,
-            transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
-        console.log(connect);
-        setConnection(connect);
-        // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        if (connection && !connected) {
-            connection.start()
-                .then(() => {
-                    console.log('connected');
-                    setConnected(true);
-                    connection.on('TransferNotification', notification => {
-                        console.log('notification ', notification);
-                        dispatch({
-                            type: PAYMENT_MADE,
-                            payload: { ...JSON.parse(notification) }
-                        }); 
-                    });
-                })
-                .catch(err => {
-                    setConnected(false);
-                    console.error(err);
-                });
-        }
-    }, [connection, dispatch, connected]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -170,30 +131,27 @@ const CompleteTransactionModal = (props) => {
         props.cancelNegotiation(sessionId, history);
     };
 
-    const completeTransaction = (submit) => {
+    const completeTransaction = () => {
         setErrors({});
-        const data = {
+        let data = {
+            ChatSessionId: sessionId,
             Message,
-            Rating: sellerRating
+            Rating: sellerRating ? parseInt(sellerRating) : 0,
+            ReceivedExpectedFunds: true
         };
 
-        if (submit) {
-            const { errors, isValid } = validateCompleteTransaction(data);
+        if (isEmpty(Message)) {
+            delete data.Message;
+        }
 
-            if (!isValid) {
-                return setErrors(errors);
-            }
+        if (!sellerRating) {
+            delete data.Rating;
         }
 
         setErrors({});
         setLoading(true);
 
-        props.completeTransaction({
-            ChatSessionId: sessionId,
-            Rating: !sellerRating ? 0 : parseInt(sellerRating),
-            Message,
-            ReceivedExpectedFunds: true
-        }, history);
+        props.completeTransaction(data, history);
     };
 
     const dismissSuccessModal = () => {
@@ -242,91 +200,80 @@ const CompleteTransactionModal = (props) => {
                         <Grid item>
                             <form onSubmit={onSubmit}>
                                 <Grid container direction="column" spacing={3}>
-                                    {customerId === seller ? 
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    className={classes.button}
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    fullWidth
-                                                    disabled={loading || !paymentMade ? true : false}
-                                                    onClick={() => completeTransaction()}
-                                                >
-                                                    Payment Received
-                                                </Button>
-                                            </Grid>
-                                            :
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    className={classes.button}
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    fullWidth
-                                                    disabled={loading || paymentMade ? true : false}
-                                                    onClick={handlePayment}
-                                                >
-                                                    I've Made Payment
-                                                </Button>
-                                            </Grid>
-                                        }
-                                        {!paymentMade && 
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    className={classes.button}
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    fullWidth
-                                                    onClick={cancelNegotiation}
-                                                    disabled={loading ? true : false}
-                                                >
-                                                    Cancel Negotiation
-                                                </Button>
-                                            </Grid>
-                                        }
-                                    <Grid item xs={12}>
-                                        <Typography variant="subtitle1" component="p">Rate this user</Typography>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Rating 
-                                            color="primary" 
-                                            name="seller-rating"  
-                                            value={sellerRating} 
-                                            onChange={handleSetRating}
-                                            className={classes.rating}
-                                            disabled={loading ? true : false}
-                                        />
-                                        <br />
-                                        {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField 
-                                            type="text"
-                                            variant="outlined"
-                                            value={Message}
-                                            onChange={(e) => setMessage(e.target.value)}
-                                            placeholder="Enter message"
-                                            multiline
-                                            rows={5}
-                                            fullWidth
-                                            helperText={errors.Message}
-                                            error={errors.Message ? true : false}
-                                        />
-                                    </Grid>
                                     <Grid item xs={12}>
                                         <Button 
+                                            className={classes.button}
                                             type="submit"
-                                            variant="contained"
+                                            variant="outlined"
                                             color="primary"
                                             fullWidth
-                                            onClick={() => completeTransaction(true)}
-                                            disabled={seller === customerId && disableSellerSubmitButton ? true : seller !== customerId && disableBuyerSubmitButton}
+                                            disabled={loading || paymentMade ? true : false}
+                                            onClick={handlePayment}
                                         >
-                                            {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                            I've Made Payment
                                         </Button>
                                     </Grid>
+                                    {!paymentMade && 
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                onClick={cancelNegotiation}
+                                                disabled={loading ? true : false}
+                                            >
+                                                Cancel Negotiation
+                                            </Button>
+                                        </Grid>
+                                    }
+                                    {paymentMade &&
+                                        <>
+                                            <Grid item xs={12}>
+                                                <Typography variant="subtitle1" component="p">Rate this user</Typography>
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Rating 
+                                                    color="primary" 
+                                                    name="seller-rating"  
+                                                    value={sellerRating} 
+                                                    onChange={handleSetRating}
+                                                    className={classes.rating}
+                                                    disabled={loading ? true : false}
+                                                />
+                                                <br />
+                                                {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <TextField 
+                                                    type="text"
+                                                    variant="outlined"
+                                                    value={Message}
+                                                    onChange={(e) => setMessage(e.target.value)}
+                                                    placeholder="Enter message"
+                                                    multiline
+                                                    rows={5}
+                                                    fullWidth
+                                                    helperText={errors.Message}
+                                                    error={errors.Message ? true : false}
+                                                />
+                                            </Grid>
+                                            <Grid item xs={12}>
+                                                <Button 
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    onClick={completeTransaction}
+                                                    // disabled={seller === customerId && disableSellerSubmitButton || seller !== customerId && disableBuyerSubmitButton ? true : false}
+                                                    // disabled={loading ? true : false}
+                                                >
+                                                    {!loading ? 'Payment Received' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                                </Button>
+                                            </Grid>
+                                        </>
+                                    }
                                 </Grid>
                             </form>
                         </Grid>

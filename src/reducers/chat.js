@@ -1,11 +1,19 @@
-import { EXIT_CHAT, PAYMENT_MADE, PAYMENT_RECEIVED, SET_CHAT, SET_CHATS, SENT_MESSAGE } from '../actions/types';
+
+import { 
+    EXIT_CHAT, 
+    SET_CHAT, 
+    SET_CHATS, 
+    SENT_MESSAGE, 
+    SHOW_PAYMENT_NOTIFICATION,
+    PAYMENT_MADE
+} from '../actions/types';
 
 const initialState = {
     chat: null,
     chats: [],
     sessionId: null,
-    paymentMade: null,
-    paymentReceived: null
+    paymentNotification: null,
+    paymentMade: false
 };
 
 const chatsReducer = (state = initialState, action) => {
@@ -47,16 +55,16 @@ const chatsReducer = (state = initialState, action) => {
                 chat: { ...rest, messages: messageList }
             }
 
-        case PAYMENT_MADE:
+        case SHOW_PAYMENT_NOTIFICATION:
             return {
                 ...state,
-                paymentMade: action.payload
+                paymentNotification: action.payload
             };
 
-        case PAYMENT_RECEIVED:
+        case PAYMENT_MADE: 
             return {
                 ...state,
-                paymentReceived: action.payload
+                paymentMade:true
             };
 
         default:

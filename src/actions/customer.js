@@ -45,7 +45,6 @@ const api = `${API}/Customer`;
 export const createCustomer = (customer, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
-        console.log(res);
         setAuthToken(res.data.data.token);
         history.push(SETUP_2FA);
     } catch (err) {
@@ -112,7 +111,6 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
-        console.log(res);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
         if (isUsernameAvailable) {
@@ -144,7 +142,6 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
 export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
-        console.log(res);
         batch(() => {
             dispatch({
                 type: SET_EMAIL,
@@ -202,9 +199,7 @@ export const login = (data, history) => async (dispatch) => {
 
 export const getCustomerStats = () => async (dispatch) => {
     try {
-        console.log('getting customer stats');
         const res = await axios.get(`${api}/GetCustomerStats`);
-        console.log(res);
         dispatch({
             type: SET_CUSTOMER_STATS,
             payload: res.data.data
@@ -286,7 +281,6 @@ export const getCustomerStatus = (customerId) => async(dispatch) => {
     try {
         // Issue admin token
         const res = await axios.get(`${api}/GetCustomer/${customerId}`);
-        console.log(res);
         return dispatch({
             type: SET_CUSTOMER,
             payload: res.data.data

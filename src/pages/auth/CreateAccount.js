@@ -8,7 +8,6 @@ import {
     Checkbox,
     Grid, 
     IconButton, 
-    Link,
     InputAdornment, 
     TextField, 
     Tooltip, 
@@ -26,7 +25,7 @@ import Toast from '../../components/common/Toast';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { HOME, LOGIN, PENDING_VERIFICATION } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -443,27 +442,27 @@ const CreateAccount = (props) => {
                                     />
                                     {errors.usernames &&
                                         <>
-                                        <span>Please try one of the following</span>
-                                        <div className={classes.usernames}>
-                                            {errors.usernames.map((username, index) => (
-                                                <Tooltip 
-                                                    key={index} 
-                                                    title={`Select ${username}`} 
-                                                    TransitionComponent={Zoom} 
-                                                    TransitionProps={{ timeout: 300 }} 
-                                                    arrow
-                                                >
-                                                    <Typography  
-                                                        variant="subtitle2" 
-                                                        component="span" 
-                                                        className={classes.suggestedUsername}
-                                                        onClick={() => copyUsername(username)}
-                                                        >
-                                                            {username}
-                                                    </Typography>
-                                                </Tooltip>
-                                            ))}
-                                        </div>
+                                            <span>Please try one of the following</span>
+                                            <div className={classes.usernames}>
+                                                {errors.usernames.map((username, index) => (
+                                                    <Tooltip 
+                                                        key={index} 
+                                                        title={`Select ${username}`} 
+                                                        TransitionComponent={Zoom} 
+                                                        TransitionProps={{ timeout: 300 }} 
+                                                        arrow
+                                                    >
+                                                        <Typography  
+                                                            variant="subtitle2" 
+                                                            component="span" 
+                                                            className={classes.suggestedUsername}
+                                                            onClick={() => copyUsername(username)}
+                                                            >
+                                                                {username}
+                                                        </Typography>
+                                                    </Tooltip>
+                                                ))}
+                                            </div>
                                         </>
                                     }
                                 </Grid>
@@ -555,7 +554,7 @@ const CreateAccount = (props) => {
                                     onChange={() => setChecked(!checked)}
                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                 />
-                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <Link component={RouterLink} to={TERMS} target="_blank">terms and conditions</Link></Typography>
+                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <a href="https://wp.fxblooms.com/terms-and-conditions" target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</a></Typography>
 
                                 </Grid>
                                 <Grid item xs={12}>
