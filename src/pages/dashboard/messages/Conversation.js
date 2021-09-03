@@ -14,8 +14,9 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SENT_MESSAGE, SHOW_PAYMENT_NOTIFICATION } from '../../../actions/types';
+import { SENT_MESSAGE, PAYMENT_NOTIFICATION } from '../../../actions/types';
 
+import EndTransactionModal from './EndTransactionModal';
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
@@ -28,7 +29,11 @@ const useStyles = makeStyles(theme => ({
         position: 'sticky',
         bottom: theme.spacing(1),
         left: 0,
-        overflowY: 'hidden'
+        overflowY: 'hidden',
+
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
+        }
     },
     
     header: {
@@ -188,7 +193,15 @@ const Conversation = (props) => {
     const dispatch = useDispatch();
 
     const { customerId } = useSelector(state => state.customer);
-    const { chat, sessionId, paymentNotification } = useSelector(state => state.chat);
+    const { chat, sessionId } = useSelector(state => state.chat);
+    // const { buyer, buyerHasMadePayment, buyerUsername, seller, sellerHasMadePayment, sellerUsername } = useSelector(state => state.chat?.chat);
+    const buyer = useSelector(state => state.chat?.chat?.buyer);
+    const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
+    const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
+    const seller = useSelector(state => state.chat?.chat?.seller);
+    const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
+    const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
+    const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
     const { sendMessage } = props;
 
@@ -199,6 +212,7 @@ const Conversation = (props) => {
     const [connection, setConnection] = useState(null);
     const [connected, setConnected] = useState(false);
     const [newMessage, setNewMessage] = useState(false);
+    const [chatDisabled, setChatDisabled] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -208,15 +222,15 @@ const Conversation = (props) => {
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
+    const endTransactionModal = useRef();
     const paymentModal = useRef();
     const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
+        if (isDeleted) {
+            setChatDisabled(true);
+        }
         connectToSocket();
-
-        // return () => {
-        //     dispatch({ type: EXIT_CHAT });
-        // };
         // eslint-disable-next-line
     }, []);
 
@@ -250,7 +264,7 @@ const Conversation = (props) => {
                     console.log('connected');
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        if (!newMessage) {
+                        if (!newMessage && chat) {
                             setNewMessage(true);
                             let response = JSON.parse(message);
                             const messageData = {
@@ -272,28 +286,62 @@ const Conversation = (props) => {
 
                     connection.on('TransferNotification', notification => {
                         const notificationData = JSON.parse(notification);
-                        if (customerId === notificationData.Receiver) {
-                            dispatch({
-                                type: SHOW_PAYMENT_NOTIFICATION,
-                                payload: notificationData
-                            });
-                        }
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                                isDeleted: notificationData.IsDeleted
+                            }
+                        });
+                        
+                    });
+                    connection.on('TransferConfrimation', notification => {
+                        const notificationData = JSON.parse(notification);
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                                isDeleted: notificationData.IsDeleted
+                            }
+                        });
                     });
                 })
+
                 .catch(err => {
                     setConnected(false);
                     console.error(err);
                 });
         }
-    }, [connection, customerId, dispatch, connected, newMessage]);
+    }, [connection, chat, customerId, dispatch, connected, newMessage]);
 
-    const openPaymentConfirmationTipsModal = () => {
-        paymentModal.current.openModal();
-    };
+    // End transaction and disable chat
+    // useEffect(() => {
+    //     if (isDeleted && !chatDisabled) {
+    //         console.log('ending transaction');
+    //         endTransactionModal.current.openModal();
+    //         setChatDisabled(true);
+    //     }
+    // }, [chatDisabled, isDeleted]);
 
-    const openTipsAndRecommendationsModal = () => {
-        tipsAndRecommendationsModal.current.openModal();
-    };
+    useEffect(() => {
+        if (isDeleted) {
+            setChatDisabled(true);
+        }
+    }, [isDeleted]);
+
+    // const openPaymentConfirmationTipsModal = () => {
+    //     paymentModal.current.openModal();
+    // };
+
+    // const openTipsAndRecommendationsModal = () => {
+    //     tipsAndRecommendationsModal.current.openModal();
+    // };
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -358,6 +406,8 @@ const Conversation = (props) => {
 
     return (
         <>
+            
+            <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             {chat ? 
@@ -372,70 +422,79 @@ const Conversation = (props) => {
                     </Grid>
                     <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
                         <div className={classes.messages}>
-                                <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography>
-                                {chat?.messages && chat?.messages.map((message) => (
-                                    <Fragment key={uuidv4()}>
-                                        {!isEmpty(message.uploadedFileName) ? 
-                                            (
-                                                message.uploadedFileName.includes('.pdf') ? 
-                                                    <div 
-                                                        key={uuidv4()}
-                                                        className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
-                                                    >
-                                                        <a href={message.uploadedFileName} className={classes.downloadLink} download>
-                                                            <div>
-                                                                <FilePdfOutline className={classes.downloadIcon} />
-                                                                <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                :
-                                                <img 
+                            {/* <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography> */}
+                            {chat?.messages && chat?.messages.map((message) => (
+                                <Fragment key={uuidv4()}>
+                                    {!isEmpty(message.uploadedFileName) ? 
+                                        (
+                                            message.uploadedFileName.includes('.pdf') ? 
+                                                <div 
                                                     key={uuidv4()}
-                                                    src={message.uploadedFileName} 
                                                     className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
-                                                    alt="Attachment" 
-                                                />
-                                            )
+                                                >
+                                                    <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                        <div>
+                                                            <FilePdfOutline className={classes.downloadIcon} />
+                                                            <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
+                                                        </div>
+                                                    </a>
+                                                </div>
                                             :
-                                            <Typography 
-                                                key={uuidv4()} 
-                                                variant="subtitle2" 
-                                                component="span" 
-                                                className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
-                                            >
-                                                {decode(message.text)}
-                                            </Typography>
-                                        }
-                                    </Fragment>
-                                ))}
-                                {paymentNotification &&
-                                    <div className={classes.paymentNotification}>
-                                        <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentNotification.Sender}</span> claimes to have made the payment.</Typography>
-                                        <Typography variant="subtitle1" component="p">What's next?</Typography>
-                                        <ul>
-                                            <li>Proceed to your banking app to confirm payment.</li>
-                                            <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openPaymentConfirmationTipsModal}>here.</span></li>
-                                            <li>Send your money to the buyer.</li>
-                                        </ul>
-                                    </div>
-                                }
+                                            <img 
+                                                key={uuidv4()}
+                                                src={message.uploadedFileName} 
+                                                className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                                alt="Attachment" 
+                                            />
+                                        )
+                                        :
+                                        <Typography 
+                                            key={uuidv4()} 
+                                            variant="subtitle2" 
+                                            component="span" 
+                                            className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                        >
+                                            {decode(message.text)}
+                                        </Typography>
+                                    }
+                                </Fragment>
+                            ))}
+                            {customerId === seller && buyerHasMadePayment &&
+                                <div className={classes.paymentNotification}>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claimes to have made the payment.</Typography>
+                                    <ul>
+                                        <li>Proceed to your banking app to confirm payment.</li>
+                                        <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
+                                        <li>Send the EUR equivalent to the account provided by the buyer and click on I’ve made payment.</li>
+                                    </ul>
+                                </div>
+                            }
+                            {customerId === buyer && sellerHasMadePayment &&
+                                <div className={classes.paymentNotification}>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claimes to have made the payment.</Typography>
+                                    <ul>
+                                        <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
+                                        <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
+                                    </ul>
+                                </div>
+                            }
                         </div>
                     </ScrollableFeed>
                     <form onSubmit={onSubmit} noValidate className={classes.form}>
                         <Grid container direction="row">
                             <TextField 
-                                    onChange={(e) =>setAttachment(e.target.files[0])}
-                                    id="attachment"
-                                    style={{ display: 'none' }}
-                                    type="file"
-                                    variant="outlined" 
-                                    fullWidth
-                                    required
-                                    inputProps={{
-                                        accept: ".png,.jpg,.pdf"
-                                    }}
-                                />
+                                onChange={(e) =>setAttachment(e.target.files[0])}
+                                id="attachment"
+                                style={{ display: 'none' }}
+                                type="file"
+                                variant="outlined" 
+                                fullWidth
+                                required
+                                disabled={chatDisabled}
+                                inputProps={{
+                                    accept: ".png,.jpg,.pdf"
+                                }}
+                            />
                             <Grid item xs={12}>
                                 <TextField 
                                     className={classes.input}
@@ -447,6 +506,7 @@ const Conversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
+                                    disabled={chatDisabled}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -454,6 +514,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
+                                                    disabled={chatDisabled}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -461,6 +522,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
+                                                    disabled={chatDisabled}
                                                 >
                                                     <Send />
                                                 </IconButton>

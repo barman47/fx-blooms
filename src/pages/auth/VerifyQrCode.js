@@ -150,18 +150,20 @@ const VerifyQrCode = (props) => {
     }, [msg]);
 
     const moveToNextField = (current, nextField, previousField) => {
-        if (nextField === null) {
+        if (nextField === null && current.value) {
             return onSubmit();
+        }
+
+        if (previousField && current.value.length === 0) {
+            console.log('previos field');
+            return previousField.getElementsByTagName('input')[0].focus();
         }
 
         const input = nextField.getElementsByTagName('input')[0];
 
         if (current.value.length >= current.maxLength) {
-            input.focus();
-        }
-
-        if (previousField && current.value.length === 0) {
-            previousField.getElementsByTagName('input')[0].focus();
+            console.log('next field');
+            return input.focus();
         }
     };
 

@@ -136,12 +136,10 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
     }
 };
 
-export const completeTransaction = (data, history) => async (dispatch) => {
+export const completeTransaction = (data) => async (dispatch) => {
     try {
         await reIssueToken();
-        const res = await axios.post(`${URL}/CompleteTransaction`, data);
-        console.log(res);
-        history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        await axios.post(`${URL}/CompleteTransaction`, data);
     } catch (err) {
         return handleError(err, dispatch);
     }

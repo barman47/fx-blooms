@@ -79,7 +79,7 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
             }}
         >
             <Fade in={open}>
-                <div container className={classes.container} direction="column">
+                <div className={classes.container} direction="column">
                     <Typography variant="subtitle2" component="span" className={classes.title}>Payment Confirmation Tips</Typography>
                     <ul className={classes.list}>
                         <li>Make sure you have confirmed payment in your banking app before sending funds.</li>

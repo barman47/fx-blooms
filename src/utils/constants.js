@@ -52,3 +52,11 @@ export const LISTING_STATUS = {
     negotiation: 'NEGOTIATION',
     finalized: 'FINALIZED'
 };
+
+export const PAYMENT_METHODS = [
+    'N26',
+    'TransferWise',
+    'Revolut',
+    'Other Banks (with instant)',
+    'Other Banks (without instant)',
+];

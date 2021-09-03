@@ -25,7 +25,7 @@ import { login } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { FORGOT_PASSWORD, HOME, SIGN_UP, VERIFY_2FA } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -113,7 +113,8 @@ const Login = (props) => {
 
     useEffect(() => {
         if (customer.isAuthenticated && authorized) {
-            return window.location.href = HOME;
+            debugger
+            return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line
     }, []);

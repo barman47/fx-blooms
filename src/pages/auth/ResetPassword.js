@@ -24,7 +24,7 @@ import  {
     EIGHT_CHARACTERS
 } from '../../utils/constants';
 import validateResetPassword from '../../utils/validation/customer/resetPassword';
-import { HOME, LOGIN } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -135,7 +135,7 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return window.location.href = HOME;
+            return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         setToken(history.location.search.split('=')[1]);
         // eslint-disable-next-line

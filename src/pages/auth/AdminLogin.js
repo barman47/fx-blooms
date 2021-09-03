@@ -14,7 +14,7 @@ import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
-import { HOME } from '../../routes';
+import { ADMIN_DASHBOARD, ADMIN_HOME } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -100,7 +100,8 @@ const AdminLogin = (props) => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            return window.location.href = HOME;
+            return history.push(`${ADMIN_DASHBOARD}${ADMIN_HOME}`);
+
         }
         // eslint-disable-next-line
     }, []);

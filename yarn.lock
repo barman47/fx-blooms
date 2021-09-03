@@ -9989,6 +9989,11 @@ react-side-effect@^2.1.0:
   resolved "https://registry.yarnpkg.com/react-side-effect/-/react-side-effect-2.1.1.tgz#66c5701c3e7560ab4822a4ee2742dee215d72eb3"
   integrity sha512-2FoTQzRNTncBVtnzxFOk2mCpcfxQpenBMbk5kSVBg5UcPqV9fRbgY2zhb7GTWWOlpFmAxhClBDlIq8Rsubz1yQ==
 
+react-string-clamp@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/react-string-clamp/-/react-string-clamp-0.3.1.tgz#f03b40d7349a80ebf481af76903590082d01e689"
+  integrity sha512-JKCegkX9hr9s1OK02dNTDlZy9O6uJDZllhsY7rtwgceVaKiYcKykKoOobvmaCos1pROyeU86c+3G2QgAWFZxTQ==
+
 react-transition-group@^4.4.0:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/react-transition-group/-/react-transition-group-4.4.2.tgz#8b59a56f09ced7b55cbd53c36768b922890d5470"

@@ -3,12 +3,12 @@ import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button,
-    CircularProgress, 
+    // CircularProgress, 
     Grid,
-    TextField, 
+    // TextField, 
     Typography 
 } from '@material-ui/core';
-import Rating from '@material-ui/lab/Rating';
+// import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -16,6 +16,7 @@ import { SET_CUSTOMER_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
+import { COLORS } from '../../../utils/constants';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
@@ -39,20 +40,48 @@ const useStyles = makeStyles(theme => ({
 
     rating: {
         color: theme.palette.primary.main
-    }
+    },
+
+    tipsContainer: {
+        backgroundColor: COLORS.lightTeal
+    },
+
+    tipsAndRecommendationsTitle: {
+        color: theme.palette.primary.main,
+        fontSize: theme.spacing(1.5)
+    },
+
+    tipsAndRecommendationsList: {
+        fontSize: theme.spacing(1.5),
+
+        '& li': {
+            color: theme.palette.primary.main,
+            fontWeight: 300,
+            marginBottom: theme.spacing(1)
+        }
+    },
 }));
 
 const Actions = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const {  msg } = useSelector(state => state.customer);
+    const { customerId, msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-    const { paymentMade, sessionId } = useSelector(state => state.chat);
+    const { sessionId } = useSelector(state => state.chat);
+    // const { buyer, seller, buyerHasMadePayment, buyerHasRecievedPayment, sellerHasMadePayment, sellerHasReceivedPayment } = useSelector(state => state.chat.chat);
+    const buyer = useSelector(state => state.chat?.chat?.buyer);
+    const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
+    const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
+    const buyerHasRecievedPayment = useSelector(state => state.chat?.chat?.buyerHasRecievedPayment);
+    const seller = useSelector(state => state.chat?.chat?.seller);
+    const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
+    const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
+    const sellerHasRecievedPayment = useSelector(state => state.chat?.chat?.sellerHasRecievedPayment);
 
-    const [Message, setMessage] = useState('');
-    const [sellerRating, setSellerRating] = useState(null);
+    // const [Message, setMessage] = useState('');
+    // const [sellerRating, setSellerRating] = useState(null);
     const [loading, setLoading] = useState(false);
 
 
@@ -90,9 +119,9 @@ const Actions = (props) => {
     //     return history.push(`${DASHBOARD}${EDIT_LISTING}`);
     // };
 
-    const handleSetRating = (e, value) => {
-        setSellerRating(value);
-    }
+    // const handleSetRating = (e, value) => {
+    //     setSellerRating(value);
+    // }
 
     const cancelNegotiation = () => {
         props.cancelNegotiation(sessionId, history);
@@ -102,23 +131,23 @@ const Actions = (props) => {
         setErrors({});
         let data = {
             ChatSessionId: sessionId,
-            Message,
-            Rating: sellerRating ? parseInt(sellerRating) : 0,
+            Message: '',
+            Rating: 0,
             ReceivedExpectedFunds: true
         };
 
-        if (isEmpty(Message)) {
-            delete data.Message;
-        }
+        // if (isEmpty(Message)) {
+        //     delete data.Message;
+        // }
 
-        if (!sellerRating) {
-            delete data.Rating;
-        }
+        // if (!sellerRating) {
+        //     delete data.Rating;
+        // }
 
-        setErrors({});
-        setLoading(true);
+        // setErrors({});
+        // setLoading(true);
 
-        props.completeTransaction(data, history);
+        props.completeTransaction(data);
     };
 
     const dismissSuccessModal = () => {
@@ -129,7 +158,7 @@ const Actions = (props) => {
     };    
 
     const handlePayment = () => {
-        props.sendTransactionNotification(sessionId);
+        props.sendTransactionNotification(sessionId, { customerId, buyer, seller, buyerUsername, sellerUsername });
     };
 
     const onSubmit = (e) => {
@@ -152,38 +181,105 @@ const Actions = (props) => {
                 }
                 <Typography variant="subtitle1" component="p">Actions</Typography>
                 <Grid container direction="column" spacing={2}>
-                    <Grid item>
+                    <Grid item xs={12}>
                         <form onSubmit={onSubmit}>
                             <Grid container direction="column" spacing={3}>
-                                <Grid item xs={12}>
-                                    <Button 
-                                        className={classes.button}
-                                        type="submit"
-                                        variant="outlined"
-                                        color="primary"
-                                        fullWidth
-                                        disabled={loading || paymentMade ? true : false}
-                                        onClick={handlePayment}
-                                    >
-                                        I've Made Payment
-                                    </Button>
-                                </Grid>
-                                {!paymentMade && 
-                                    <Grid item xs={12}>
-                                        <Button 
-                                            className={classes.button}
-                                            type="submit"
-                                            variant="outlined"
-                                            color="primary"
-                                            fullWidth
-                                            onClick={cancelNegotiation}
-                                            disabled={loading ? true : false}
-                                        >
-                                            Cancel Negotiation
-                                        </Button>
-                                    </Grid>
+                                {/* Buyer Start End */}
+                                {buyer === customerId && 
+                                    <>
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                onClick={handlePayment}
+                                            >
+                                                I've Made Payment:Buyer
+                                            </Button>
+                                        </Grid>
+                                        {sellerHasMadePayment &&
+                                            <Grid item xs={12}>
+                                                <Button 
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    onClick={completeTransaction}
+                                                    disabled={loading || buyerHasRecievedPayment ? true : false}
+                                                >
+                                                    Payment Received:Buyer
+                                                </Button>
+                                            </Grid>
+                                        }
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                onClick={cancelNegotiation}
+                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                            >
+                                                Cancel Negotiation:Buyer
+                                            </Button>
+                                        </Grid>
+                                    </>
                                 }
-                                {paymentMade &&
+                                {/* Buyer Buttons End */}
+                            
+                                {/* Seller Buttons Start */}
+                                {seller === customerId && 
+                                    <>
+                                        {sellerHasRecievedPayment && 
+                                            <Grid item xs={12}>
+                                                <Button 
+                                                    className={classes.button}
+                                                    type="submit"
+                                                    variant="outlined"
+                                                    color="primary"
+                                                    fullWidth
+                                                    disabled={loading || sellerHasMadePayment ? true : false}
+                                                    onClick={handlePayment}
+                                                >
+                                                    I've Made Payment:Seller
+                                                </Button>
+                                            </Grid>
+                                        }
+                                        {buyerHasMadePayment &&
+                                            <Grid item xs={12}>
+                                                <Button 
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    onClick={completeTransaction}
+                                                    disabled={loading || sellerHasRecievedPayment ? true : false}
+                                                >
+                                                    Payment Received:Seller
+                                                </Button>
+                                            </Grid>
+                                        }
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                onClick={cancelNegotiation}
+                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                            >
+                                                Cancel Negotiation:Seller
+                                            </Button>
+                                        </Grid>
+                                    </>
+                                }
+                                {/* Seller Buttons End */}
+                                {/* {paymentMade &&
                                     <>
                                         <Grid item xs={12}>
                                             <Typography variant="subtitle1" component="p">Rate this user</Typography>
@@ -228,9 +324,18 @@ const Actions = (props) => {
                                             </Button>
                                         </Grid>
                                     </>
-                                }
+                                } */}
                             </Grid>
                         </form>
+                    </Grid>
+                    <Grid item xs={12} className={classes.tipsContainer}>
+                        <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendationsTitle}>Tips and Recommendations</Typography>
+                        <ul className={classes.tipsAndRecommendationsList}>
+                            <li>The seller should confirm the <strong>NGN(&#8358;) </strong> payment in their account before sending the <strong>EUR(&#163;)</strong> equivalent.</li>
+                            <li>We recommend that the SELLER uses instant <strong>EUR(&#163;)</strong> payment when possible.</li>
+                            <li>Both the SELLER and the BUYER must verify and confirm account details and payment reference provided.</li>
+                            {/* <li>After a successful transaction, please rate the other party involved. Positive ratings will increase your trust level on FXBLOOMS</li> */}
+                        </ul>
                     </Grid>
                 </Grid>
             </section>

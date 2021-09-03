@@ -11,6 +11,7 @@ import Messages from './Messages';
 import { COLORS } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
+// import { REMOVE_CHAT } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -114,12 +115,25 @@ const useStyles = makeStyles(theme => ({
 
 const Index = (props) => {
     const classes = useStyles();
-    const { handleSetTitle } = props;
+    // const theme = useTheme();
+	// const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const { chat } = useSelector(state => state.chat);
+    const { handleSetTitle } = props;
+    // const dispatch = useDispatch();
+
+    const chat = useSelector(state => state.chat?.chat);
 
     useEffect(() => {
         handleSetTitle('Messages');
+
+        return () => {
+
+            // Only remove chat for larger screens, excluding mobile devices. This will be handled in the MobileConverstion component
+            // if (matches === false) {
+            //     console.log('desktop screen');
+            //     dispatch({ type: REMOVE_CHAT });
+            // }
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -134,7 +148,9 @@ const Index = (props) => {
                         <Messages />
                     </div>
                     <div className={classes.conversation}>
-                        <Conversation />
+                        {chat && 
+                            <Conversation />
+                        }
                     </div>
                     {/* <div className={classes.actions}>
                         <Actions />

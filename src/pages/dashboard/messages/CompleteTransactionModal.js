@@ -4,15 +4,15 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Backdrop,
     Button,
-    CircularProgress, 
+    // CircularProgress, 
     Fade,
     Grid,
     Modal,
-    TextField, 
-    Typography 
+    // TextField, 
+    // Typography 
 } from '@material-ui/core';
 
-import Rating from '@material-ui/lab/Rating';
+// import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -83,14 +83,21 @@ const CompleteTransactionModal = (props) => {
 	const dispatch = useDispatch();
     const history = useHistory();
 
-    const { msg } = useSelector(state => state.customer);
-    const { paymentMade, sessionId } = useSelector(state => state.chat);
+    const { customerId, msg } = useSelector(state => state.customer);
+    const { sessionId } = useSelector(state => state.chat);
+
+    const buyer = useSelector(state => state.chat?.chat?.buyer);
+    const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
+    const buyerHasRecievedPayment = useSelector(state => state.chat?.chat?.buyerHasRecievedPayment);
+    const seller = useSelector(state => state.chat?.chat?.seller);
+    const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
+    const sellerHasRecievedPayment = useSelector(state => state.chat?.chat?.sellerHasRecievedPayment);
     
     const errorsState = useSelector(state => state.errors);
     const [open, setOpen] = useState(false);
 
-    const [Message, setMessage] = useState('');
-    const [sellerRating, setSellerRating] = useState(null);
+    // const [Message, setMessage] = useState('');
+    // const [sellerRating, setSellerRating] = useState(null);
     const [loading, setLoading] = useState(false);
 
     const [errors, setErrors] = useState({});
@@ -123,9 +130,13 @@ const CompleteTransactionModal = (props) => {
     }, [dispatch, msg]);
 
 
-    const handleSetRating = (e, value) => {
-        setSellerRating(value);
-    }
+    // const handleSetRating = (e, value) => {
+    //     setSellerRating(value);
+    // }
+
+    const closeModal = () => {
+        props.handleCloseModal();
+    };
 
     const cancelNegotiation = () => {
         props.cancelNegotiation(sessionId, history);
@@ -135,23 +146,23 @@ const CompleteTransactionModal = (props) => {
         setErrors({});
         let data = {
             ChatSessionId: sessionId,
-            Message,
-            Rating: sellerRating ? parseInt(sellerRating) : 0,
+            Message: '',
+            Rating: 0,
             ReceivedExpectedFunds: true
         };
 
-        if (isEmpty(Message)) {
-            delete data.Message;
-        }
+        // if (isEmpty(Message)) {
+        //     delete data.Message;
+        // }
 
-        if (!sellerRating) {
-            delete data.Rating;
-        }
+        // if (!sellerRating) {
+        //     delete data.Rating;
+        // }
 
-        setErrors({});
-        setLoading(true);
+        // setErrors({});
+        // setLoading(true);
 
-        props.completeTransaction(data, history);
+        props.completeTransaction(data);
     };
 
     const dismissSuccessModal = () => {
@@ -175,7 +186,7 @@ const CompleteTransactionModal = (props) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            onClose={() => setOpen(false)}
+            onClose={closeModal}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
@@ -195,25 +206,41 @@ const CompleteTransactionModal = (props) => {
                             type="error"
                         />
                     }
-                    <Typography variant="subtitle1" component="p">CompleteTransactionModal</Typography>
+                    {/* <Typography variant="subtitle1" component="p">CompleteTransactionModal</Typography> */}
                     <Grid container direction="column" spacing={2}>
                         <Grid item>
                             <form onSubmit={onSubmit}>
                                 <Grid container direction="column" spacing={3}>
-                                    <Grid item xs={12}>
-                                        <Button 
-                                            className={classes.button}
-                                            type="submit"
-                                            variant="outlined"
-                                            color="primary"
-                                            fullWidth
-                                            disabled={loading || paymentMade ? true : false}
-                                            onClick={handlePayment}
-                                        >
-                                            I've Made Payment
-                                        </Button>
-                                    </Grid>
-                                    {!paymentMade && 
+                                    {/* Buyer Start End */}
+                                {buyer === customerId && 
+                                    <>
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                onClick={handlePayment}
+                                            >
+                                                I've Made Payment:Buyer
+                                            </Button>
+                                        </Grid>
+                                        {sellerHasMadePayment &&
+                                            <Grid item xs={12}>
+                                                <Button 
+                                                    type="submit"
+                                                    variant="contained"
+                                                    color="primary"
+                                                    fullWidth
+                                                    onClick={completeTransaction}
+                                                    disabled={loading || buyerHasRecievedPayment ? true : false}
+                                                >
+                                                    Payment Received:Buyer
+                                                </Button>
+                                            </Grid>
+                                        }
                                         <Grid item xs={12}>
                                             <Button 
                                                 className={classes.button}
@@ -222,43 +249,34 @@ const CompleteTransactionModal = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading ? true : false}
+                                                disabled={loading || buyerHasMadePayment ? true : false}
                                             >
-                                                Cancel Negotiation
+                                                Cancel Negotiation:Buyer
                                             </Button>
                                         </Grid>
-                                    }
-                                    {paymentMade &&
-                                        <>
+                                    </>
+                                }
+                                {/* Buyer Buttons End */}
+                            
+                                {/* Seller Buttons Start */}
+                                {seller === customerId && 
+                                    <>
+                                        {sellerHasRecievedPayment && 
                                             <Grid item xs={12}>
-                                                <Typography variant="subtitle1" component="p">Rate this user</Typography>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <Rating 
-                                                    color="primary" 
-                                                    name="seller-rating"  
-                                                    value={sellerRating} 
-                                                    onChange={handleSetRating}
-                                                    className={classes.rating}
-                                                    disabled={loading ? true : false}
-                                                />
-                                                <br />
-                                                {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <TextField 
-                                                    type="text"
+                                                <Button 
+                                                    className={classes.button}
+                                                    type="submit"
                                                     variant="outlined"
-                                                    value={Message}
-                                                    onChange={(e) => setMessage(e.target.value)}
-                                                    placeholder="Enter message"
-                                                    multiline
-                                                    rows={5}
+                                                    color="primary"
                                                     fullWidth
-                                                    helperText={errors.Message}
-                                                    error={errors.Message ? true : false}
-                                                />
+                                                    disabled={loading || sellerHasMadePayment ? true : false}
+                                                    onClick={handlePayment}
+                                                >
+                                                    I've Made Payment:Seller
+                                                </Button>
                                             </Grid>
+                                        }
+                                        {buyerHasMadePayment &&
                                             <Grid item xs={12}>
                                                 <Button 
                                                     type="submit"
@@ -266,14 +284,28 @@ const CompleteTransactionModal = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    // disabled={seller === customerId && disableSellerSubmitButton || seller !== customerId && disableBuyerSubmitButton ? true : false}
-                                                    // disabled={loading ? true : false}
+                                                    disabled={loading || sellerHasRecievedPayment ? true : false}
                                                 >
-                                                    {!loading ? 'Payment Received' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                                    Payment Received:Seller
                                                 </Button>
                                             </Grid>
-                                        </>
-                                    }
+                                        }
+                                        <Grid item xs={12}>
+                                            <Button 
+                                                className={classes.button}
+                                                type="submit"
+                                                variant="outlined"
+                                                color="primary"
+                                                fullWidth
+                                                onClick={cancelNegotiation}
+                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                            >
+                                                Cancel Negotiation:Seller
+                                            </Button>
+                                        </Grid>
+                                    </>
+                                }
+                                {/* Seller Buttons End */}
                                 </Grid>
                             </form>
                         </Grid>
@@ -287,7 +319,9 @@ const CompleteTransactionModal = (props) => {
 CompleteTransactionModal.propTypes = {
     cancelNegotiation: PropTypes.func.isRequired,
     completeTransaction: PropTypes.func.isRequired,
-    sendTransactionNotification: PropTypes.func.isRequired
+    sendTransactionNotification: PropTypes.func.isRequired,
+    handleCloseModal: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired
 };
 
 export default connect(undefined, { cancelNegotiation, completeTransaction, sendTransactionNotification })(CompleteTransactionModal);

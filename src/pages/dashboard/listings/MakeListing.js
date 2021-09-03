@@ -27,7 +27,7 @@ import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
-import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../utils/constants';
+import { APPROVED, COLORS, NOT_SUBMITTED, PAYMENT_METHODS, PENDING, REJECTED } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
@@ -163,6 +163,8 @@ const MakeListing = (props) => {
     // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('0');
 
+    const [Bank, setBank] = useState('');
+
     const [previousListings, setPreviousListings] = useState([]);
 
     const [permitUrl, setPermitUrl] = useState('');
@@ -179,9 +181,21 @@ const MakeListing = (props) => {
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             props.getResidencePermitLink();
         }
+
+        if (residencePermitStatus !== APPROVED) {
+            checkResidencePermitStatus();
+        }
         
         // eslint-disable-next-line
     }, []);
+
+    // useEffect(() => {
+    //     if (residencePermitStatus) {
+    //         if (residencePermitStatus !== APPROVED) {
+    //             return checkResidencePermitStatus();
+    //         }
+    //     }
+    // }, []);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -357,7 +371,8 @@ const MakeListing = (props) => {
             ExchangeRate,
             MinExchangeAmount,
             ReceiptAmount,
-            ListingFee
+            ListingFee,
+            Bank
         };
 
         const { errors, isValid } = validateAddListing(data);
@@ -385,7 +400,8 @@ const MakeListing = (props) => {
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
                 Amount: parseFloat(MinExchangeAmount)
-            }
+            },
+            Bank
         };
 
         setLoading(true);
@@ -434,7 +450,7 @@ const MakeListing = (props) => {
                                             onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
-                                            <MenuItem value="">Select Currency</MenuItem>
+                                            <MenuItem value="" disabled>Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
                                                 <MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
                                             ))}
@@ -478,7 +494,7 @@ const MakeListing = (props) => {
                                             onChange={(e) => setRequiredCurrency(e.target.value)}
                                         
                                         >
-                                            <MenuItem value="">Select Currency</MenuItem>
+                                            <MenuItem value="" disabled>Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
                                                 <MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
                                             ))}
@@ -521,7 +537,7 @@ const MakeListing = (props) => {
                                             onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
-                                            <MenuItem value="">Select Currency</MenuItem>
+                                            <MenuItem value="" disabled>Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
                                                 <MenuItem key={index} value={currency.value} disabled={currency.value === RequiredCurrency}>{currency.value}</MenuItem>
                                             ))}
@@ -610,6 +626,29 @@ const MakeListing = (props) => {
                                         disabled={loading ? true : false}
                                         error={errors.ListingFee ? true : false}
                                     />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
+                                    <FormControl 
+                                        variant="outlined" 
+                                        error={errors.Bank ? true : false } 
+                                        fullWidth 
+                                        required
+                                        disabled={loading ? true : false}
+                                    >
+                                        <Select
+                                            labelId="Bank"
+                                            value={Bank}
+                                            onChange={(e) => setBank(e.target.value)}
+                                        
+                                        >
+                                            <MenuItem value="" disabled>Select Payment Method</MenuItem>
+                                            {PAYMENT_METHODS.map((method, index) => (
+                                                <MenuItem key={index} value={method}>{method}</MenuItem>
+                                            ))}
+                                        </Select>
+                                        <FormHelperText>{errors.Bank}</FormHelperText>
+                                    </FormControl>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Button 

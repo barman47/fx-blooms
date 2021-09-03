@@ -85,7 +85,7 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
                         <li>The seller should confirm the NGN(&#8358;) payment in their account before sending the EUR(&#163;) equivalent.</li>
                         <li>We recommend that the SELLER uses instant EUR(&#163;) payment when possible.</li>
                         <li>Both the SELLER and the BUYER must verify and confirm account details and payment reference provided.</li>
-                        <li>After a successful transaction, please rate the other party involved. Positive ratings will increase your trust level on FXBLOOMS</li>
+                        {/* <li>After a successful transaction, please rate the other party involved. Positive ratings will increase your trust level on FXBLOOMS</li> */}
                     </ul>
                     <Button className={classes.button} variant="contained" color="primary" onClick={closeModal} fullWidth>Okay</Button>
                 </div>

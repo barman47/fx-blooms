@@ -16,7 +16,7 @@ import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
-import { HOME, LOGIN } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, HOME, LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -101,7 +101,7 @@ const ForgotPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return window.location.href = HOME;
+            return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line
     }, []);

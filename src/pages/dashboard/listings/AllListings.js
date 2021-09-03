@@ -407,9 +407,9 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 						size="small"
 						onClick={() => setFilter(PRICE)}
 					>
-						Price
+						Amount
 					</Button>
-					<Button 
+					{/* <Button 
 						className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
 						variant="contained" 
 						color="primary" 
@@ -417,7 +417,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 						onClick={() => setFilter(RATING)}
 					>
 						Rating
-					</Button>
+					</Button> */}
 				</header>
 				{
 					filter === PRICE

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
@@ -29,10 +29,9 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SET_LISTING, SENT_MESSAGE, SHOW_PAYMENT_NOTIFICATION, EXIT_CHAT } from '../../../actions/types';
+import { PAYMENT_NOTIFICATION, SET_LISTING, SENT_MESSAGE, } from '../../../actions/types';
 import { DASHBOARD, MESSAGES } from '../../../routes';
 
-import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { HUB_URL } from '../../../utils/constants';
@@ -203,9 +202,18 @@ const MobileConversation = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
+    const buyer = useSelector(state => state.chat?.chat?.buyer);
+    const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
+    const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
+    const seller = useSelector(state => state.chat?.chat?.seller);
+    const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
+    const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
+    const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
+
     const { customerId } = useSelector(state => state.customer);
-    const { chat, paymentNotification, sessionId } = useSelector(state => state.chat);
+    const { chat, sessionId } = useSelector(state => state.chat);
     const listings = useSelector(state => state.listings.listings);
+    const [chatDisabled, setChatDisabled] = useState(false);
 
     const { sendMessage } = props;
 
@@ -227,22 +235,29 @@ const MobileConversation = (props) => {
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
-    const paymentModal = useRef();
     const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
+        props.handleSetTitle('Mobile Conversation');
+        if (isDeleted) {
+            setChatDisabled(true);
+        }
+        connectToSocket();
+
+        // return () => {
+        //     dispatch({ type: REMOVE_CHAT });
+        // };
+        // eslint-disable-next-line
+    }, []);
+
+    const connectToSocket = () => {
         const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
         }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
         console.log(connect);
         setConnection(connect);
-
-        return () => {
-            dispatch({ type: EXIT_CHAT });
-        };
-        // eslint-disable-next-line
-    }, []);
+    };
 
     useEffect(() => {
         if (!_.isEmpty(chat) && _.isEmpty(listings.listing) && matches) {
@@ -253,6 +268,12 @@ const MobileConversation = (props) => {
             });
         }
     }, [chat, dispatch, listings, matches]);
+
+    useEffect(() => {
+        if (isDeleted) {
+            setChatDisabled(true);
+        }
+    }, [isDeleted]);
 
     useEffect(() => {
         if (matches) {
@@ -267,32 +288,69 @@ const MobileConversation = (props) => {
                     console.log('connected');
                     setConnected(true);
                     connection.on('ReceiveNotification', message => {
-                        setNewMessage(true);
-                        let response = JSON.parse(message);
-                        const newMessage = {
-                            chatId: response.ChatId,
-                            dateSent: response.DateSent,
-                            id: response.Id,
-                            sender: response.Sender,
-                            text: response.Text,
-                            uploadedFileName: response.UploadedFileName
-                        };
+                        // setNewMessage(true);
+                        // let response = JSON.parse(message);
+                        // const newMessage = {
+                        //     chatId: response.ChatId,
+                        //     dateSent: response.DateSent,
+                        //     id: response.Id,
+                        //     sender: response.Sender,
+                        //     text: response.Text,
+                        //     uploadedFileName: response.UploadedFileName
+                        // };
 
-                        dispatch({
-                            type: SENT_MESSAGE,
-                            payload: newMessage
-                        });
-                        setMessage('');
+                        // dispatch({
+                        //     type: SENT_MESSAGE,
+                        //     payload: newMessage
+                        // });
+                        // setMessage('');
+
+                        if (!newMessage && chat) {
+                            setNewMessage(true);
+                            let response = JSON.parse(message);
+                            const messageData = {
+                                chatId: response.ChatId,
+                                dateSent: response.DateSent,
+                                id: response.Id,
+                                sender: response.Sender,
+                                text: response.Text,
+                                uploadedFileName: response.UploadedFileName
+                            };
+
+                            dispatch({
+                                type: SENT_MESSAGE,
+                                payload: messageData
+                            });
+                            setMessage('');
+                        }
                     });
 
                     connection.on('TransferNotification', notification => {
                         const notificationData = JSON.parse(notification);
-                        if (customerId === notificationData.Receiver) {
-                            dispatch({
-                                type: SHOW_PAYMENT_NOTIFICATION,
-                                payload: notificationData
-                            });
-                        }
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                                isDeleted: notificationData.IsDeleted
+                            }
+                        });
+                        
+                    });
+                    connection.on('TransferConfrimation', notification => {
+                        const notificationData = JSON.parse(notification);
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                                isDeleted: notificationData.IsDeleted
+                            }
+                        });
                     });
                 })
                 .catch(err => {
@@ -300,11 +358,7 @@ const MobileConversation = (props) => {
                     console.error(err);
                 });
         }
-    }, [connection, customerId, dispatch, connected, matches, newMessage]);
-
-    const openModal = () => {
-        paymentModal.current.openModal();
-    };
+    }, [connection, chat, customerId, dispatch, connected, matches, newMessage]);
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -380,12 +434,16 @@ const MobileConversation = (props) => {
 
     const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
 
-    const openTipsAndRecommendationsModal = () => {
-        tipsAndRecommendationsModal.current.openModal();
-    };
+    // const openTipsAndRecommendationsModal = () => {
+    //     tipsAndRecommendationsModal.current.openModal();
+    // };
 
     const showCompleteTransactionModal = () => {
         setCompleteTransactionOpen(true);
+    };
+
+    const handleCloseCompleteTransactionModal = () => {
+        setCompleteTransactionOpen(false);
     };
 
     const copyChatSessionId = () => {
@@ -396,8 +454,7 @@ const MobileConversation = (props) => {
     return (
         <>
             <Toaster />
-            <PaymentConfirmationTipsModal ref={paymentModal} />
-            <CompleteTransactionModal open={completeTransactionOpen} />
+            <CompleteTransactionModal open={completeTransactionOpen} handleCloseModal={handleCloseCompleteTransactionModal} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             {chat ? 
 		        <section className={classes.root}>
@@ -420,12 +477,12 @@ const MobileConversation = (props) => {
                         </Toolbar>
                     </AppBar>
                     <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
-                        <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
+                        {/* <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
                             Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction
-                        </Typography>
+                        </Typography> */}
                         <div className={classes.messages}>
                             {chat?.messages && matches && chat?.messages.map((message) => (
-                                <>
+                                <Fragment key={uuidv4()}>
                                     {!isEmpty(message.uploadedFileName) ? 
                                         (
                                             message.uploadedFileName.includes('.pdf') ? 
@@ -458,16 +515,25 @@ const MobileConversation = (props) => {
                                             {decode(message.text)}
                                         </Typography>
                                     }
-                                </>
+                                </Fragment>
                             ))}
-                            {paymentNotification &&
+                            {customerId === seller && buyerHasMadePayment &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{paymentNotification.Sender}</span> claimes to have made the payment.</Typography>
-                                    <Typography variant="subtitle1" component="p">What's next?</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claimes to have made the payment.</Typography>
                                     <ul>
                                         <li>Proceed to your banking app to confirm payment.</li>
-                                        <li>See payment confirmation tips <span className={classes.paymentTips} onClick={openModal}>here.</span></li>
-                                        <li>Send your money to the buyer.</li>
+                                        <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
+                                        <li>Send the EUR equivalent to the account provided by the buyer and click on I’ve made payment.</li>
+                                    </ul>
+                                </div>
+                            }
+
+                            {customerId === buyer && sellerHasMadePayment &&
+                                <div className={classes.paymentNotification}>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claimes to have made the payment.</Typography>
+                                    <ul>
+                                        <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
+                                        <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
                                     </ul>
                                 </div>
                             }
@@ -483,6 +549,7 @@ const MobileConversation = (props) => {
                                     variant="outlined" 
                                     fullWidth
                                     required
+                                    disabled={chatDisabled}
                                     inputProps={{
                                         accept: ".png,.jpg,.pdf"
                                     }}
@@ -498,6 +565,7 @@ const MobileConversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
+                                    disabled={chatDisabled}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -505,6 +573,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
+                                                    disabled={chatDisabled}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -512,6 +581,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
+                                                    disabled={chatDisabled}
                                                 >
                                                     <Send />
                                                 </IconButton>
@@ -531,7 +601,8 @@ const MobileConversation = (props) => {
 };
 
 MobileConversation.propTypes = {
-    sendMessage: PropTypes.func.isRequired
+    sendMessage: PropTypes.func.isRequired,
+    handleSetTitle:PropTypes.func.isRequired
 };
 
 export default connect(undefined, { sendMessage })(MobileConversation);

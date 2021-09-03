@@ -33,6 +33,12 @@ const useStyles = makeStyles(theme => ({
             },
 
             '& span': {
+                fontSize: theme.spacing(1.4),
+
+                [theme.breakpoints.down('lg')]: {
+                    fontSize: theme.spacing(1.2)
+                },
+
                 [theme.breakpoints.down('sm')]: {
                     fontSize: theme.spacing(1)
                 },  
@@ -92,6 +98,12 @@ const EditListingItem = ({ edit, listing }) => {
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                     {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountAvailable?.currencyType)} 1`}
                 </Typography>
+                {listing.bank && 
+                    <Typography variant="subtitle2" component="span">
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
+                        {listing.bank}
+                    </Typography>
+                }
                 <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
                     <FileDocumentEdit 
                         className={clsx(classes.editIcon, { [`${classes.disabled}`]: edit === true && listing.id === listingId })} 

@@ -9,6 +9,7 @@ const editListing = (data) => {
     data.ExchangeRate = !isEmpty(data.ExchangeRate) ?  data.ExchangeRate.toString() : '';
     data.MinExchangeAmount = !isEmpty(data.MinExchangeAmount) ?  data.MinExchangeAmount.toString() : '';
     data.ReceiptAmount = !isEmpty(data.ReceiptAmount) ?  data.ReceiptAmount.toString() : '';
+    data.Bank = !isEmpty(data.Bank) ?  data.Bank.toString() : '';
 
     if (Validator.isEmpty(data.AvailableCurrency)) {
         errors.AvailableCurrency = 'Please select a currency!';
@@ -54,6 +55,10 @@ const editListing = (data) => {
     }
     if (Validator.isEmpty(data.ReceiptAmount)) {
         errors.ReceiptAmount = 'Amount is required!';
+    }
+
+    if (Validator.isEmpty(data.Bank)) {
+        errors.Bank = 'Payment method is required!';
     }
    
     return {

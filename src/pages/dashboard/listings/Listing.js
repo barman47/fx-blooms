@@ -51,13 +51,13 @@ const useStyles = makeStyles(theme => ({
 
         '& div': {
             display: 'grid',
-            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 1fr',
-            alignItems: 'center',
+            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
+            alignItems: 'flex-start',
             gap: theme.spacing(2),
             padding: [[theme.spacing(4), theme.spacing(3)]],
 
             [theme.breakpoints.down('lg')]: {
-                gridTemplateColumns: '0.5fr 0.5fr 1fr 0.8fr 1fr',
+                gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
                 gap: theme.spacing(1),
                 padding: theme.spacing(1),
             },
@@ -67,31 +67,21 @@ const useStyles = makeStyles(theme => ({
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 rowGap: theme.spacing(2)
+            },
+
+            '& span': {
+                fontSize: theme.spacing(1.4),
+
+                [theme.breakpoints.down('lg')]: {
+                    fontSize: theme.spacing(1.2)
+                },
             }
         }
-        // '& div': {
-        //     display: 'flex',
-        //     flexDirection: 'row',
-        //     justifyContent: 'space-between',
-        //     alignItems: 'center',
-        //     padding: [[theme.spacing(4), theme.spacing(3)]],
-
-        //     [theme.breakpoints.down('sm')]: {
-        //         padding: theme.spacing(1),
-        //         display: 'grid',
-        //         gridTemplateColumns: '1fr 1fr',
-        //         rowGap: theme.spacing(2)
-        //     }
-        // }
 	},
 
     button: {
         color: `${COLORS.offWhite} !important`,
-        padding: [[theme.spacing(0.5), theme.spacing(5)]],
-
-        [theme.breakpoints.down('lg')]: {
-            padding: [[theme.spacing(0.5), theme.spacing(2)]],
-        },
+        padding: [[theme.spacing(0.5), theme.spacing(1)]],
 
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
@@ -183,13 +173,19 @@ const Listing = ({ handleAddBid, listing, getSeller }) => {
                         {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(amountNeeded?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Min. Amount</span>
                         {`${getCurrencySymbol(minExchangeAmount?.currencyType)}${formatNumber(minExchangeAmount?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(exchangeRate)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
+                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
                     </Typography>
+                    {listing.bank && 
+                        <Typography variant="subtitle2" component="span">
+                            <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
+                            {listing.bank}
+                        </Typography>
+                    }
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 
                             disabled

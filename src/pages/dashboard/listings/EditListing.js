@@ -22,7 +22,7 @@ import Toast from '../../../components/common/Toast';
 
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 import { updateListing } from '../../../actions/listings';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, PAYMENT_METHODS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import validateEditListing from '../../../utils/validation/listing/edit';
 
@@ -125,6 +125,8 @@ const EditListing = (props) => {
     const [ReceiptAmount, setReceiptAmount] = useState('');
     // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('0');
+
+    const [Bank, setBank] = useState('');
 
     const [previousListings, setPreviousListings] = useState([]);
 
@@ -233,7 +235,8 @@ const EditListing = (props) => {
             ExchangeRate,
             MinExchangeAmount,
             ReceiptAmount,
-            ListingFee
+            ListingFee,
+            Bank
         };
 
         const { errors, isValid } = validateEditListing(data);
@@ -254,7 +257,8 @@ const EditListing = (props) => {
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
                 Amount: parseFloat(MinExchangeAmount)
-            }
+            },
+            Bank
         };
 
         setLoading(true);
@@ -296,7 +300,7 @@ const EditListing = (props) => {
                                         value={AvailableCurrency}
                                         onChange={(e) => setAvailableCurrency(e.target.value)}
                                     >
-                                        <MenuItem value="">Select Currency</MenuItem>
+                                        <MenuItem value="" disabled>Select Currency</MenuItem>
                                         {currencies.length > 0 && currencies.map((currency, index) => (
                                             <MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
                                         ))}
@@ -337,7 +341,7 @@ const EditListing = (props) => {
                                         onChange={(e) => setRequiredCurrency(e.target.value)}
                                     
                                     >
-                                        <MenuItem value="">Select Currency</MenuItem>
+                                        <MenuItem value="" disabled>Select Currency</MenuItem>
                                         {currencies.length > 0 && currencies.map((currency, index) => (
                                             <MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
                                         ))}
@@ -378,7 +382,7 @@ const EditListing = (props) => {
                                         onChange={(e) => setAvailableCurrency(e.target.value)}
                                     
                                     >
-                                        <MenuItem value="">Select Currency</MenuItem>
+                                        <MenuItem value="" disabled>Select Currency</MenuItem>
                                         {currencies.length > 0 && currencies.map((currency, index) => (
                                             <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
                                         ))}
@@ -436,6 +440,29 @@ const EditListing = (props) => {
                                         error={errors.ReceiptAmount ? true : false}
                                     />
                                 </Tooltip>
+                            </Grid>
+                            <Grid item xs={12}>
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
+                                <FormControl 
+                                    variant="outlined" 
+                                    error={errors.Bank ? true : false } 
+                                    fullWidth 
+                                    required
+                                    disabled={loading ? true : false}
+                                >
+                                    <Select
+                                        labelId="Bank"
+                                        value={Bank}
+                                        onChange={(e) => setBank(e.target.value)}
+                                    
+                                    >
+                                        <MenuItem value="" disabled>Select Payment Method</MenuItem>
+                                        {PAYMENT_METHODS.map((method, index) => (
+                                            <MenuItem key={index} value={method}>{method}</MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormHelperText>{errors.Bank}</FormHelperText>
+                                </FormControl>
                             </Grid>
                             <Grid item xs={12}>
                                 <Button 
