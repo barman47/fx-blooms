@@ -29,12 +29,11 @@ export const sendMessage = (message) => async (dispatch) => {
     }
 };
 
-export const sendTransactionNotification = (chatId, { customerId, buyer, seller, buyerUsername, sellerUsername }) => async (dispatch) => {
+export const sendTransactionNotification = (chatId, { customerUsername, otherUsername }) => async (dispatch) => {
     try {
         await reIssueToken();
         await axios.post(`${api}/TransactionNotification?chatId=${chatId}`);
-        // const { buyerHasMadePayment, buyerHasRecievedPayment, sellerHasMadePayment, sellerHasRecievedPayment, isDeleted } = res.data.data;
-        const message = `Hi ${customerId === seller ? sellerUsername : buyerUsername} a notification has been sent to $${customerId === seller ? sellerUsername : buyerUsername}`;
+        const message = `Hi ${customerUsername} a notification has been sent to ${otherUsername}`;
         return dispatch({
             type: SET_CUSTOMER_MSG,
             payload: message

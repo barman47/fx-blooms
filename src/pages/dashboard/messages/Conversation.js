@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
-import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+// import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
 
 import { sendMessage } from '../../../actions/chat';
@@ -20,7 +20,8 @@ import EndTransactionModal from './EndTransactionModal';
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
-import { HUB_URL } from '../../../utils/constants';
+// import { HUB_URL } from '../../../utils/constants';
+import SignalRService from '../../../utils/SignalRController.js';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -209,15 +210,15 @@ const Conversation = (props) => {
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
-    const [connection, setConnection] = useState(null);
-    const [connected, setConnected] = useState(false);
-    const [newMessage, setNewMessage] = useState(false);
-    const [chatDisabled, setChatDisabled] = useState(false);
+    // const [connection, setConnection] = useState(null);
+    // const [connected, setConnected] = useState(false);
+    // const [newMessage, setNewMessage] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
+    const [loaded, setLoaded] = useState(false);
     
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -227,21 +228,82 @@ const Conversation = (props) => {
     const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
-        if (isDeleted) {
-            setChatDisabled(true);
-        }
-        connectToSocket();
+        // connectToSocket();
+        setLoaded(true);
+        // handleTransferNotification();
+        // handleTransferConfirmation();
+        // return () => {
+        //     setConnection(null);
+        // };
         // eslint-disable-next-line
     }, []);
 
-    const connectToSocket = () => {
-        const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
-            skipNegotiation: true,
-            transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
-        console.log(connect);
-        setConnection(connect);
-    };
+    const handleSentMessage = useCallback(() => {
+        console.log('calling method');
+        SignalRService.registerReceiveNotification((message) => {
+            let response = JSON.parse(message);
+            // console.log('message ', response);
+            const messageData = {
+                chatId: response.ChatId,
+                dateSent: response.DateSent,
+                id: response.Id,
+                sender: response.Sender,
+                text: response.Text,
+                uploadedFileName: response.UploadedFileName
+            };
+
+            dispatch({
+                type: SENT_MESSAGE,
+                payload: messageData
+            });
+            setMessage('');
+        });
+    },[dispatch]);
+
+    const handleTransferNotification = useCallback(() => {
+        SignalRService.registerTransferConfrimation((notification) => {
+            const notificationData = JSON.parse(notification);
+            dispatch({
+                type: PAYMENT_NOTIFICATION,
+                payload: {
+                    buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                    buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                    sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                    sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                    isDeleted: notificationData.IsDeleted
+                }
+            });
+        });
+    }, [dispatch]);
+
+    const handleTransferConfirmation = useCallback(() => {
+        SignalRService.registerTransferConfrimation((notification) => {
+            const notificationData = JSON.parse(notification);
+            dispatch({
+                type: PAYMENT_NOTIFICATION,
+                payload: {
+                    buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                    buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                    sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                    sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                    isDeleted: notificationData.IsDeleted
+                }
+            });
+        });
+    }, [dispatch]);
+
+    const connectToSocket = useCallback(() => {
+        console.log('connecting socket');
+        handleSentMessage();
+        handleTransferNotification();
+        handleTransferConfirmation();
+    }, [handleSentMessage, handleTransferNotification, handleTransferConfirmation]);
+
+    useEffect(() => {
+        if (loaded) {
+            connectToSocket();
+        }
+    }, [connectToSocket, loaded]);
 
     // useEffect(() => {
     //     if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
@@ -257,68 +319,71 @@ const Conversation = (props) => {
     //     setNewMessage(false);
     // }, [chat]);
 
-    useEffect(() => {
-        if (connection && !connected) {
-            connection.start()
-                .then(() => {
-                    console.log('connected');
-                    setConnected(true);
-                    connection.on('ReceiveNotification', message => {
-                        if (!newMessage && chat) {
-                            setNewMessage(true);
-                            let response = JSON.parse(message);
-                            const messageData = {
-                                chatId: response.ChatId,
-                                dateSent: response.DateSent,
-                                id: response.Id,
-                                sender: response.Sender,
-                                text: response.Text,
-                                uploadedFileName: response.UploadedFileName
-                            };
+    // useEffect(() => {
+    //     if (connection && !connected) {
+            // connection.start()
+            //     .then(() => {
+            //         console.log('connected');
+            //         setConnected(true);
+            //         connection.on('ReceiveNotification', message => {
+            //             // console.log('new message ', message);
+            //             // if (message) {
+            //                 // setNewMessage(true);
+            //                 let response = JSON.parse(message);
+            //                 const messageData = {
+            //                     chatId: response.ChatId,
+            //                     dateSent: response.DateSent,
+            //                     id: response.Id,
+            //                     sender: response.Sender,
+            //                     text: response.Text,
+            //                     uploadedFileName: response.UploadedFileName
+            //                 };
 
-                            dispatch({
-                                type: SENT_MESSAGE,
-                                payload: messageData
-                            });
-                            setMessage('');
-                        }
-                    });
+            //                 dispatch({
+            //                     type: SENT_MESSAGE,
+            //                     payload: messageData
+            //                 });
+            //                 setMessage('');
+            //             // }
+            //         });
 
-                    connection.on('TransferNotification', notification => {
-                        const notificationData = JSON.parse(notification);
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-                                isDeleted: notificationData.IsDeleted
-                            }
-                        });
+            //         connection.on('TransferNotification', notification => {
+            //             console.log('notification ', notification);
+            //             const notificationData = JSON.parse(notification);
+            //             dispatch({
+            //                 type: PAYMENT_NOTIFICATION,
+            //                 payload: {
+            //                     buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+            //                     buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+            //                     sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+            //                     sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+            //                     isDeleted: notificationData.IsDeleted
+            //                 }
+            //             });
                         
-                    });
-                    connection.on('TransferConfrimation', notification => {
-                        const notificationData = JSON.parse(notification);
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-                                isDeleted: notificationData.IsDeleted
-                            }
-                        });
-                    });
-                })
+            //         });
+            //         connection.on('TransferConfrimation', notification => {
+            //             console.log('notification ', notification);
+            //             const notificationData = JSON.parse(notification);
+            //             dispatch({
+            //                 type: PAYMENT_NOTIFICATION,
+            //                 payload: {
+            //                     buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+            //                     buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+            //                     sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+            //                     sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+            //                     isDeleted: notificationData.IsDeleted
+            //                 }
+            //             });
+            //         });
+            //     })
 
-                .catch(err => {
-                    setConnected(false);
-                    console.error(err);
-                });
-        }
-    }, [connection, chat, customerId, dispatch, connected, newMessage]);
+            //     .catch(err => {
+            //         setConnected(false);
+            //         console.error(err);
+            //     });
+    //     }
+    // }, [connection, dispatch, connected]);
 
     // End transaction and disable chat
     // useEffect(() => {
@@ -328,12 +393,6 @@ const Conversation = (props) => {
     //         setChatDisabled(true);
     //     }
     // }, [chatDisabled, isDeleted]);
-
-    useEffect(() => {
-        if (isDeleted) {
-            setChatDisabled(true);
-        }
-    }, [isDeleted]);
 
     // const openPaymentConfirmationTipsModal = () => {
     //     paymentModal.current.openModal();
@@ -398,7 +457,12 @@ const Conversation = (props) => {
                 documentName: ''
             };
     
+            // dispatch({
+            //     type: SENT_MESSAGE,
+            //     payload: chatMessage
+            // });
             sendMessage(chatMessage);
+            setMessage('');
         }
     };
 
@@ -461,7 +525,7 @@ const Conversation = (props) => {
                             ))}
                             {customerId === seller && buyerHasMadePayment &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claims to have made the payment.</Typography>
                                     <ul>
                                         <li>Proceed to your banking app to confirm payment.</li>
                                         <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
@@ -471,7 +535,7 @@ const Conversation = (props) => {
                             }
                             {customerId === buyer && sellerHasMadePayment &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claims to have made the payment.</Typography>
                                     <ul>
                                         <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
                                         <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
@@ -490,7 +554,7 @@ const Conversation = (props) => {
                                 variant="outlined" 
                                 fullWidth
                                 required
-                                disabled={chatDisabled}
+                                disabled={isDeleted}
                                 inputProps={{
                                     accept: ".png,.jpg,.pdf"
                                 }}
@@ -506,7 +570,7 @@ const Conversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={chatDisabled}
+                                    disabled={isDeleted}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -514,7 +578,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={chatDisabled}
+                                                    disabled={isDeleted}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -522,7 +586,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={chatDisabled}
+                                                    disabled={isDeleted}
                                                 >
                                                     <Send />
                                                 </IconButton>

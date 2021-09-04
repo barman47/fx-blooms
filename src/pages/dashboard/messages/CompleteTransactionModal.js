@@ -251,7 +251,7 @@ const CompleteTransactionModal = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment ? true : false}
                                             >
-                                                Cancel Negotiation:Buyer
+                                                Cancel Transaction:Buyer
                                             </Button>
                                         </Grid>
                                     </>
@@ -300,7 +300,7 @@ const CompleteTransactionModal = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment ? true : false}
                                             >
-                                                Cancel Negotiation:Seller
+                                                Cancel Transaction:Seller
                                             </Button>
                                         </Grid>
                                     </>

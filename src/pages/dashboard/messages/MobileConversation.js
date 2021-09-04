@@ -24,17 +24,18 @@ import copy from 'copy-to-clipboard';
 import { v4 as uuidv4 } from 'uuid';
 
 import ScrollableFeed from 'react-scrollable-feed';
-import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+// import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 // import { HubConnection } from '@microsoft/signalr';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { PAYMENT_NOTIFICATION, SET_LISTING, SENT_MESSAGE, } from '../../../actions/types';
+import { SET_LISTING } from '../../../actions/types';
+// import { PAYMENT_NOTIFICATION, SENT_MESSAGE, } from '../../../actions/types';
 import { DASHBOARD, MESSAGES } from '../../../routes';
 
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
-import { HUB_URL } from '../../../utils/constants';
+// import { HUB_URL } from '../../../utils/constants';
 import CompleteTransactionModal from './CompleteTransactionModal';
 
 const useStyles = makeStyles(theme => ({
@@ -213,7 +214,6 @@ const MobileConversation = (props) => {
     const { customerId } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
     const listings = useSelector(state => state.listings.listings);
-    const [chatDisabled, setChatDisabled] = useState(false);
 
     const { sendMessage } = props;
 
@@ -221,9 +221,9 @@ const MobileConversation = (props) => {
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
-    const [connection, setConnection] = useState(null);
-    const [connected, setConnected] = useState(false);
-    const [newMessage, setNewMessage] = useState(false);
+    // const [connection, setConnection] = useState(null);
+    // const [connected, setConnected] = useState(false);
+    // const [newMessage, setNewMessage] = useState(false);
 
     const [completeTransactionOpen, setCompleteTransactionOpen] = useState(false);
 
@@ -239,10 +239,12 @@ const MobileConversation = (props) => {
 
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
-        if (isDeleted) {
-            setChatDisabled(true);
-        }
-        connectToSocket();
+        // if (matches) {
+        //     connectToSocket();
+        // }
+        // return () => {
+        //     setConnection(null);
+        // };
 
         // return () => {
         //     dispatch({ type: REMOVE_CHAT });
@@ -250,14 +252,14 @@ const MobileConversation = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const connectToSocket = () => {
-        const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
-            skipNegotiation: true,
-            transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
-        console.log(connect);
-        setConnection(connect);
-    };
+    // const connectToSocket = () => {
+    //     const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
+    //         skipNegotiation: true,
+    //         transport: HttpTransportType.WebSockets
+    //     }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+    //     console.log(connect);
+    //     setConnection(connect);
+    // };
 
     useEffect(() => {
         if (!_.isEmpty(chat) && _.isEmpty(listings.listing) && matches) {
@@ -269,96 +271,94 @@ const MobileConversation = (props) => {
         }
     }, [chat, dispatch, listings, matches]);
 
-    useEffect(() => {
-        if (isDeleted) {
-            setChatDisabled(true);
-        }
-    }, [isDeleted]);
+    // useEffect(() => {
+    //     if (matches) {
+    //         setNewMessage(false);
+    //     }
+    // }, [matches]);
 
-    useEffect(() => {
-        if (matches) {
-            setNewMessage(false);
-        }
-    }, [chat, matches]);
+    // useEffect(() => {
+    //     if (connection && !connected) {
+    //         connection.start()
+    //             .then(() => {
+    //                 console.log('connected');
+    //                 setConnected(true);
+    //                 connection.on('ReceiveNotification', message => {
+    //                     console.log('new mobile message ', message);
+    //                     // setNewMessage(true);
+    //                     // let response = JSON.parse(message);
+    //                     // const newMessage = {
+    //                     //     chatId: response.ChatId,
+    //                     //     dateSent: response.DateSent,
+    //                     //     id: response.Id,
+    //                     //     sender: response.Sender,
+    //                     //     text: response.Text,
+    //                     //     uploadedFileName: response.UploadedFileName
+    //                     // };
 
-    useEffect(() => {
-        if (connection && !connected) {
-            connection.start()
-                .then(() => {
-                    console.log('connected');
-                    setConnected(true);
-                    connection.on('ReceiveNotification', message => {
-                        // setNewMessage(true);
-                        // let response = JSON.parse(message);
-                        // const newMessage = {
-                        //     chatId: response.ChatId,
-                        //     dateSent: response.DateSent,
-                        //     id: response.Id,
-                        //     sender: response.Sender,
-                        //     text: response.Text,
-                        //     uploadedFileName: response.UploadedFileName
-                        // };
+    //                     // dispatch({
+    //                     //     type: SENT_MESSAGE,
+    //                     //     payload: newMessage
+    //                     // });
+    //                     // setMessage('');
 
-                        // dispatch({
-                        //     type: SENT_MESSAGE,
-                        //     payload: newMessage
-                        // });
-                        // setMessage('');
+    //                     // if (!newMessage && chat && matches) {
+    //                     //     setNewMessage(true);
+    //                         let response = JSON.parse(message);
+    //                         const messageData = {
+    //                             chatId: response.ChatId,
+    //                             dateSent: response.DateSent,
+    //                             id: response.Id,
+    //                             sender: response.Sender,
+    //                             text: response.Text,
+    //                             uploadedFileName: response.UploadedFileName
+    //                         };
 
-                        if (!newMessage && chat) {
-                            setNewMessage(true);
-                            let response = JSON.parse(message);
-                            const messageData = {
-                                chatId: response.ChatId,
-                                dateSent: response.DateSent,
-                                id: response.Id,
-                                sender: response.Sender,
-                                text: response.Text,
-                                uploadedFileName: response.UploadedFileName
-                            };
+    //                         dispatch({
+    //                             type: SENT_MESSAGE,
+    //                             payload: messageData
+    //                         });
+    //                         setMessage('');
+    //                     // }
+    //                 });
 
-                            dispatch({
-                                type: SENT_MESSAGE,
-                                payload: messageData
-                            });
-                            setMessage('');
-                        }
-                    });
-
-                    connection.on('TransferNotification', notification => {
-                        const notificationData = JSON.parse(notification);
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-                                isDeleted: notificationData.IsDeleted
-                            }
-                        });
-                        
-                    });
-                    connection.on('TransferConfrimation', notification => {
-                        const notificationData = JSON.parse(notification);
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-                                isDeleted: notificationData.IsDeleted
-                            }
-                        });
-                    });
-                })
-                .catch(err => {
-                    setConnected(false);
-                    console.error(err);
-                });
-        }
-    }, [connection, chat, customerId, dispatch, connected, matches, newMessage]);
+    //                 connection.on('TransferNotification', notification => {
+    //                     if (matches) {
+    //                         const notificationData = JSON.parse(notification);
+    //                         dispatch({
+    //                             type: PAYMENT_NOTIFICATION,
+    //                             payload: {
+    //                                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+    //                                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+    //                                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+    //                                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+    //                                 isDeleted: notificationData.IsDeleted
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //                 connection.on('TransferConfrimation', notification => {
+    //                     if (matches) {
+    //                         const notificationData = JSON.parse(notification);
+    //                         dispatch({
+    //                             type: PAYMENT_NOTIFICATION,
+    //                             payload: {
+    //                                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+    //                                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+    //                                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+    //                                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+    //                                 isDeleted: notificationData.IsDeleted
+    //                             }
+    //                         });
+    //                     }
+    //                 });
+    //             })
+    //             .catch(err => {
+    //                 setConnected(false);
+    //                 console.error(err);
+    //             });
+    //     }
+    // }, [connection, customerId, dispatch, connected, matches]);
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -519,7 +519,7 @@ const MobileConversation = (props) => {
                             ))}
                             {customerId === seller && buyerHasMadePayment &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claims to have made the payment.</Typography>
                                     <ul>
                                         <li>Proceed to your banking app to confirm payment.</li>
                                         <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
@@ -530,7 +530,7 @@ const MobileConversation = (props) => {
 
                             {customerId === buyer && sellerHasMadePayment &&
                                 <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claimes to have made the payment.</Typography>
+                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claims to have made the payment.</Typography>
                                     <ul>
                                         <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
                                         <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
@@ -549,7 +549,7 @@ const MobileConversation = (props) => {
                                     variant="outlined" 
                                     fullWidth
                                     required
-                                    disabled={chatDisabled}
+                                    disabled={isDeleted}
                                     inputProps={{
                                         accept: ".png,.jpg,.pdf"
                                     }}
@@ -565,7 +565,7 @@ const MobileConversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={chatDisabled}
+                                    disabled={isDeleted}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -573,7 +573,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={chatDisabled}
+                                                    disabled={isDeleted}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -581,7 +581,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={chatDisabled}
+                                                    disabled={isDeleted}
                                                 >
                                                     <Send />
                                                 </IconButton>

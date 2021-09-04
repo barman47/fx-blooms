@@ -66,7 +66,7 @@ const Actions = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId, msg } = useSelector(state => state.customer);
+    const { customerId, msg, userName } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
     const { sessionId } = useSelector(state => state.chat);
@@ -158,7 +158,7 @@ const Actions = (props) => {
     };    
 
     const handlePayment = () => {
-        props.sendTransactionNotification(sessionId, { customerId, buyer, seller, buyerUsername, sellerUsername });
+        props.sendTransactionNotification(sessionId, { customerUsername: userName, otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername });
     };
 
     const onSubmit = (e) => {
@@ -224,7 +224,7 @@ const Actions = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment ? true : false}
                                             >
-                                                Cancel Negotiation:Buyer
+                                                Cancel Transaction:Buyer
                                             </Button>
                                         </Grid>
                                     </>
@@ -273,7 +273,7 @@ const Actions = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment ? true : false}
                                             >
-                                                Cancel Negotiation:Seller
+                                                Cancel Transaction:Seller
                                             </Button>
                                         </Grid>
                                     </>

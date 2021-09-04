@@ -15,7 +15,11 @@ const useStyles = makeStyles(theme => ({
 		borderBottom: `1px solid ${COLORS.borderColor}`,
 		borderRight: `1px solid ${COLORS.borderColor}`,
         cursor: 'pointer',
-		padding: theme.spacing(1), 
+		padding: theme.spacing(1),
+
+        '& p': {
+            fontSize: theme.spacing(1.5)
+        },
         
 		'& span': {
             color: COLORS.grey,
