@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
@@ -171,7 +171,11 @@ const AllListings = (props) => {
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
 
+	let loadedEvent = useRef();
+
 	useEffect(() => {
+		loadedEvent.current = getListings;
+		window.addEventListener('DOMContentLoaded', loadedEvent.current);
 		getCustomerStats();
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
@@ -181,6 +185,10 @@ const AllListings = (props) => {
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
 		}
+
+		return () => {
+			window.removeEventListener('DOMContentLoaded', loadedEvent.current);
+		};
 		// eslint-disable-next-line
 	}, []);
 
@@ -196,6 +204,7 @@ const AllListings = (props) => {
 	}, [listings]);
 
 	const getListings = () => {
+		console.log('Reloading listings');
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
@@ -440,7 +449,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								>
 									<MenuItem value="">Select Currency</MenuItem>
 									{currencies.length > 0 && currencies.map((currency, index) => (
-										<MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+										<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
 									))}
 								</Select>
 								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
@@ -464,7 +473,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 								>
 									<MenuItem value="" disabled>Select</MenuItem>
 									{currencies.length > 0 && currencies.map((currency, index) => (
-										<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+										<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
 									))}
 								</Select>
 								<FormHelperText>{errors.RequiredCurrency}</FormHelperText>

@@ -256,7 +256,7 @@ const MobileFilterModal = (props) => {
 										>
 											<MenuItem value="">Select Currency</MenuItem>
 											{currencies.length > 0 && currencies.map((currency, index) => (
-												<MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
+												<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
 											))}
 										</Select>
 										<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
@@ -280,7 +280,7 @@ const MobileFilterModal = (props) => {
 										>
 											<MenuItem value="" disabled>Select</MenuItem>
 											{currencies.length > 0 && currencies.map((currency, index) => (
-												<MenuItem key={index} value={currency.value} disabled={currency.value === AvailableCurrency ? true : false}>{currency.value}</MenuItem>
+												<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
 											))}
 										</Select>
 										<FormHelperText>{errors.RequiredCurrency}</FormHelperText>

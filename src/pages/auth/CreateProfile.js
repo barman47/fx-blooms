@@ -20,7 +20,6 @@ import { Information } from 'mdi-material-ui';
 import Spinner from '../../components/common/Spinner';
 import Toast from '../../components/common/Toast';
 
-import { getDocuments } from '../../actions/documents';
 import { createCustomer } from '../../actions/customer';
 import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 
@@ -121,7 +120,6 @@ const CreateProfile = (props) => {
 
     const { email, isAuthenticated } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
-    const { documents } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
     
     const [FirstName, setFirstName] = useState('');
@@ -151,10 +149,6 @@ const CreateProfile = (props) => {
         if (isAuthenticated && authorized) {
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);;
         }
-        if (documents.length === 0) {
-            props.getDocuments();
-        }
-
         return () => {
             dispatch({
                 type: SET_CURRENT_CUSTOMER,
@@ -312,7 +306,7 @@ const CreateProfile = (props) => {
                                     </Tooltip>
                                 </Grid>
                                 <Grid item xs={12} md={3}>
-                                    <Typography variant="subtitle2" component="span">Phone Number</Typography>
+                                <Typography variant="subtitle2" component="span">Country Code</Typography>
                                     <Autocomplete
                                         id="country-select"
                                         options={countries}
@@ -340,11 +334,11 @@ const CreateProfile = (props) => {
                                             />
                                         )}
                                     />
-                                    <FormHelperText id="my-helper-text">Country code. e.g. +234</FormHelperText>
+                                    <FormHelperText id="my-helper-text">e.g. +234</FormHelperText>
                                     {errors.CountryCode && <FormHelperText error>{errors.CountryCode}</FormHelperText>}
                                 </Grid>
                                 <Grid item xs={12} md={7}>
-                                    <br />
+                                    <Typography variant="subtitle2" component="span">Phone Number</Typography>
                                     <TextField 
                                         className={classes.input}
                                         value={PhoneNo}
@@ -355,8 +349,12 @@ const CreateProfile = (props) => {
                                         helperText={errors.PhoneNo}
                                         fullWidth
                                         required
+                                        inputProps={{
+                                            maxLength: 10
+                                        }}
                                         error={errors.PhoneNo ? true : false}
                                     />
+                                    <FormHelperText id="my-helper-text">e.g. 8147233058</FormHelperText>
                                 </Grid>
                                 <Grid item xs={12} md={10}>
                                 <Typography variant="subtitle2" component="span">Address</Typography>
@@ -405,26 +403,6 @@ const CreateProfile = (props) => {
                                         )}
                                     />
                                     {errors.Country && <FormHelperText error>{errors.Country}</FormHelperText>}
-                                    {/* <FormControl 
-                                        variant="outlined" 
-                                        error={errors.Country ? true : false } 
-                                        fullWidth 
-                                        required
-                                    >
-                                        <Select
-                                            labelId="Country"
-                                            className={classes.input}
-                                            value={Country}
-                                            onChange={(e) => setCountry(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="">Select Country</MenuItem>
-                                            {countries.map((Country) => (
-                                                <MenuItem key={Country.id} value={Country.name}>{Country.name}</MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.Country}</FormHelperText>
-                                    </FormControl> */}
                                 </Grid>
                                 <Grid item xs={12} md={5}>
                                     {Country.toLowerCase() !== 'nigeria' && 
@@ -465,8 +443,7 @@ const CreateProfile = (props) => {
 };
 
 CreateProfile.propTypes = {
-    createCustomer: PropTypes.func.isRequired,
-    getDocuments: PropTypes.func.isRequired
+    createCustomer: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { createCustomer, getDocuments })(CreateProfile);
+export default connect(undefined, { createCustomer })(CreateProfile);
