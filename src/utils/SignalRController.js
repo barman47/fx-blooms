@@ -3,7 +3,7 @@ import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/si
 import { HUB_URL } from './constants';
 
 class SignalRController {
-    constructor (props) {
+    constructor () {
         this.connection = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
@@ -37,5 +37,5 @@ class SignalRController {
 }
 
 const SignalRService = new SignalRController();
-console.log(SignalRService);
+console.log('SignalRService Initialized ', SignalRService);
 export default SignalRService;

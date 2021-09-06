@@ -42,7 +42,7 @@ const chatsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 chat: action.payload,
-                sessionId: action.payload.sessionId || action.payload.id
+                sessionId: action.payload.id
             };
 
         case REMOVE_CHAT:

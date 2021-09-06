@@ -109,7 +109,6 @@ export const addBid = (bid, history) => async (dispatch) => {
             type: SET_CHAT,
             payload: {
                 chat: res.data.data,
-                sessionId: res.data.data.id
             }
         });
         history.push(`${DASHBOARD}${MESSAGES}`)
