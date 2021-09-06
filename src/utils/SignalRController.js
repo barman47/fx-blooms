@@ -1,6 +1,6 @@
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
-import { HUB_URL } from './constants';
+import { HUB_URL, RECEIVE_NOTIFICATION, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } from './constants';
 
 class SignalRController {
     constructor () {
@@ -15,21 +15,21 @@ class SignalRController {
     }
 
     registerReceiveNotification = (callback) => {
-        this.connection.on('ReceiveNotification', (message) => {
+        this.connection.on(RECEIVE_NOTIFICATION, (message) => {
             console.log('message from service ', message);
             callback(message);
         });
     };
 
     registerTransferNotification = (callback) => {
-        this.connection.on('TransferNotification', (notification) => {
+        this.connection.on(TRANSFER_NOTIFICATION, (notification) => {
             console.log('notification ', notification);
             callback(notification);
         });
     };
 
     registerTransferConfrimation = (callback) => {
-        this.connection.on('TransferConfrimation', (notification) => {
+        this.connection.on(TRANSFER_CONFIRMATION, (notification) => {
             console.log('notification ', notification);
             callback(notification);
         });

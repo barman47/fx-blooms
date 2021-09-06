@@ -155,14 +155,12 @@ const VerifyQrCode = (props) => {
         }
 
         if (previousField && current.value.length === 0) {
-            console.log('previos field');
             return previousField.getElementsByTagName('input')[0].focus();
         }
 
         const input = nextField.getElementsByTagName('input')[0];
 
         if (current.value.length >= current.maxLength) {
-            console.log('next field');
             return input.focus();
         }
     };
