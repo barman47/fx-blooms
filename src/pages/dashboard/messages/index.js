@@ -9,6 +9,7 @@ import Conversation from './Conversation';
 import Messages from './Messages';
 
 import { COLORS } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
 
 import SellerNoticeModal from './SellerNoticeModal';
 // import { REMOVE_CHAT } from '../../../actions/types';
@@ -148,7 +149,7 @@ const Index = (props) => {
                         <Messages />
                     </div>
                     <div className={classes.conversation}>
-                        {chat && 
+                        {!isEmpty(chat) && 
                             <Conversation />
                         }
                     </div>
@@ -156,7 +157,7 @@ const Index = (props) => {
                         <Actions />
                     </div> */}
                     <div className={classes.actions}>
-                        {chat && 
+                        {!isEmpty(chat) && 
                             <Actions />
                         }
                     </div>

@@ -1,6 +1,6 @@
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
 
-import { HUB_URL, RECEIVE_NOTIFICATION, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } from './constants';
+import { HUB_URL, RECEIVE_NOTIFICATION, SEND_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } from './constants';
 
 class SignalRController {
     constructor () {
@@ -12,6 +12,12 @@ class SignalRController {
         this.connection.start().then().catch(err => {
             console.error(err);
         });
+    }
+
+    sendMessage = async (message) => {
+        console.log(message);
+        const res = await this.connection.send(SEND_MESSAGE, message);
+        console.log('Message sent ', res);
     }
 
     registerReceiveNotification = (callback) => {

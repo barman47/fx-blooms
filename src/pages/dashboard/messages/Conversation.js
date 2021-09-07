@@ -193,7 +193,7 @@ const Conversation = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, userName } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
     // const { buyer, buyerHasMadePayment, buyerUsername, seller, sellerHasMadePayment, sellerUsername } = useSelector(state => state.chat?.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
@@ -237,6 +237,10 @@ const Conversation = (props) => {
         // };
         // eslint-disable-next-line
     }, []);
+
+    const handleSendMessage = (message) => {
+        SignalRService.sendMessage(JSON.stringify(message));
+    };
 
     const handleSentMessage = useCallback(() => {
         console.log('calling method');
@@ -451,17 +455,21 @@ const Conversation = (props) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         if (!isEmpty(message)) {
+            // const chatMessage = {
+            //     chatSessionId: sessionId,
+            //     message,
+            //     documentName: '',
+            // };
             const chatMessage = {
                 chatSessionId: sessionId,
                 message,
-                documentName: ''
+                documentName: '',
+                senderId: customerId,
+                userName
             };
     
-            // dispatch({
-            //     type: SENT_MESSAGE,
-            //     payload: chatMessage
-            // });
-            sendMessage(chatMessage);
+            handleSendMessage(chatMessage);
+            // sendMessage(chatMessage);
             setMessage('');
         }
     };
@@ -516,7 +524,7 @@ const Conversation = (props) => {
                                             key={uuidv4()} 
                                             variant="subtitle2" 
                                             component="span" 
-                                            className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                            // className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
                                         >
                                             {decode(message.text)}
                                         </Typography>

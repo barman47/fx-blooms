@@ -107,16 +107,9 @@ export const addBid = (bid, history) => async (dispatch) => {
         console.log(res);
         dispatch({
             type: SET_CHAT,
-            payload: {
-                chat: res.data.data,
-            }
+            payload: res.data.data
         });
-        history.push(`${DASHBOARD}${MESSAGES}`)
-        // const { items, ...rest } = res.data.data;
-        // return dispatch({
-        //     type: SET_LISTINGS,
-        //     payload: { listings: items, ...rest }
-        // });
+        return history.push(`${DASHBOARD}${MESSAGES}`)
     } catch (err) {
         return handleError(err, dispatch);
     }

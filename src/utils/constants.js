@@ -37,6 +37,7 @@ export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing br
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const TRANSFER_CONFIRMATION = 'TransferConfrimation';
 export const TRANSFER_NOTIFICATION = 'TransferNotification';
+export const SEND_MESSAGE = 'SendMessage';
 
 export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'
