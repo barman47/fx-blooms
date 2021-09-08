@@ -14,8 +14,7 @@ import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SENT_MESSAGE } from '../../../actions/types';
-// import { SENT_MESSAGE, PAYMENT_NOTIFICATION } from '../../../actions/types';
+import { SENT_MESSAGE, PAYMENT_NOTIFICATION } from '../../../actions/types';
 
 import EndTransactionModal from './EndTransactionModal';
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
@@ -231,7 +230,7 @@ const Conversation = (props) => {
     useEffect(() => {
         // connectToSocket();
         setLoaded(true);
-        // handleTransferNotification();
+        handleTransferNotification();
         // handleTransferConfirmation();
         // return () => {
         //     setConnection(null);
@@ -264,21 +263,21 @@ const Conversation = (props) => {
         });
     },[dispatch]);
 
-    // const handleTransferNotification = useCallback(() => {
-    //     SignalRService.registerTransferConfrimation((notification) => {
-    //         const notificationData = JSON.parse(notification);
-    //         dispatch({
-    //             type: PAYMENT_NOTIFICATION,
-    //             payload: {
-    //                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-    //                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-    //                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-    //                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-    //                 isDeleted: notificationData.IsDeleted
-    //             }
-    //         });
-    //     });
-    // }, [dispatch]);
+    const handleTransferNotification = useCallback(() => {
+        SignalRService.registerTransferConfrimation((notification) => {
+            const notificationData = JSON.parse(notification);
+            dispatch({
+                type: PAYMENT_NOTIFICATION,
+                payload: {
+                    buyerHasMadePayment: notificationData.BuyerHasMadePayment,
+                    buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
+                    sellerHasMadePayment: notificationData.SellerHasMadePayment, 
+                    sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
+                    isDeleted: notificationData.IsDeleted
+                }
+            });
+        });
+    }, [dispatch]);
 
     // const handleTransferConfirmation = useCallback(() => {
     //     SignalRService.registerTransferConfrimation((notification) => {
