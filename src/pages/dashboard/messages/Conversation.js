@@ -264,7 +264,7 @@ const Conversation = (props) => {
     },[dispatch]);
 
     const handleTransferNotification = useCallback(() => {
-        SignalRService.registerTransferConfrimation((notification) => {
+        SignalRService.registerTransferNotification((notification) => {
             const notificationData = JSON.parse(notification);
             dispatch({
                 type: PAYMENT_NOTIFICATION,
@@ -280,7 +280,7 @@ const Conversation = (props) => {
     }, [dispatch]);
 
     // const handleTransferConfirmation = useCallback(() => {
-    //     SignalRService.registerTransferConfrimation((notification) => {
+    //     SignalRService.registerTransferConfirmation((notification) => {
     //         const notificationData = JSON.parse(notification);
     //         dispatch({
     //             type: PAYMENT_NOTIFICATION,

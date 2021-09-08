@@ -21,21 +21,21 @@ class SignalRController {
     }
 
     registerReceiveNotification = (callback) => {
-        this.connection.on(RECEIVE_NOTIFICATION, (message) => {
+        this.connection.once(RECEIVE_NOTIFICATION, (message) => {
             console.log('message from service ', message);
             callback(message);
         });
     };
 
     registerTransferNotification = (callback) => {
-        this.connection.on(TRANSFER_NOTIFICATION, (notification) => {
+        this.connection.once(TRANSFER_NOTIFICATION, (notification) => {
             console.log('notification ', notification);
             callback(notification);
         });
     };
 
-    registerTransferConfrimation = (callback) => {
-        this.connection.on(TRANSFER_CONFIRMATION, (notification) => {
+    registerTransferConfirmation = (callback) => {
+        this.connection.once(TRANSFER_CONFIRMATION, (notification) => {
             console.log('notification ', notification);
             callback(notification);
         });

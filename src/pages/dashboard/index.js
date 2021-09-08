@@ -194,7 +194,7 @@ const Dashboard = ({ children, title, logout }) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { email, profile, userName } = useSelector(state => state.customer); 
+    const { profile, userName } = useSelector(state => state.customer); 
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
@@ -304,7 +304,6 @@ const Dashboard = ({ children, title, logout }) => {
                             </div>
                             <div>
                                 <Typography variant="subtitle1" component="p">{userName}</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.email}>{email}</Typography>
                             </div>
                         </Link>
                         <Divider />
