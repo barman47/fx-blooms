@@ -35,9 +35,15 @@ export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing br
 // export const API = 'https://fifth-mechanism-322509.ey.r.appspot.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
-export const TRANSFER_CONFIRMATION = 'TransferConfrimation';
-export const TRANSFER_NOTIFICATION = 'TransferNotification';
+// export const TRANSFER_CONFIRMATION = 'TransferConfrimation';
+// export const TRANSFER_NOTIFICATION = 'TransferNotification';
 export const SEND_MESSAGE = 'SendMessage';
+
+export const NOTIFICATION_TYPES = {
+    CHAT_MESSAGE: 'ChatMessage',
+    TRANSFER_CONFIRMATION: 'TransferConfrimation',
+    TRANSFER_NOTIFICATION: 'TransferNotification',
+};
 
 export const NETWORK_ERROR = 'Network Error';
 export const AUTH_TOKEN = 'FXBloomsAuthToken'

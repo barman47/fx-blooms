@@ -1490,10 +1490,10 @@
     prop-types "^15.7.2"
     react-is "^16.8.0 || ^17.0.0"
 
-"@microsoft/signalr@^5.0.8":
-  version "5.0.8"
-  resolved "https://registry.yarnpkg.com/@microsoft/signalr/-/signalr-5.0.8.tgz#0504884a4675956f8a09bbf025b54712171639d6"
-  integrity sha512-g5U7zGa1CeoPztA1VGLiB418sZ6gt8ZEOsX8krpegyMquzH2Qinny1zQjNsg3mgjGlJI+FXD5bO4gVsHGUp2hA==
+"@microsoft/signalr@^5.0.9":
+  version "5.0.9"
+  resolved "https://registry.yarnpkg.com/@microsoft/signalr/-/signalr-5.0.9.tgz#cff2b0a091298049fd012e7b6cd015a814f8698d"
+  integrity sha512-pQufk3+mChfystnmYpglyRYQFp+036QmOxbZUFr2cFf2iiS8ekBX5uVBOG8OexKcsG4TcJNAU/ref90Y9+3ZiA==
   dependencies:
     abort-controller "^3.0.0"
     eventsource "^1.0.7"
@@ -8103,10 +8103,15 @@ no-case@^3.0.4:
     lower-case "^2.0.2"
     tslib "^2.0.3"
 
-node-fetch@2.6.1, node-fetch@^2.6.0:
+node-fetch@2.6.1:
   version "2.6.1"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
+
+node-fetch@^2.6.0:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.2.tgz#986996818b73785e47b1965cc34eb093a1d464d0"
+  integrity sha512-aLoxToI6RfZ+0NOjmWAgn9+LEd30YCkJKFSyWacNZdEKTit/ZMcKjGkTRo8uWEsnIb/hfKecNPEbln02PdWbcA==
 
 node-forge@^0.10.0:
   version "0.10.0"

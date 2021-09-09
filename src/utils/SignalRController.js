@@ -1,45 +1,104 @@
 import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
+import  { batch } from 'react-redux';
 
-import { HUB_URL, RECEIVE_NOTIFICATION, SEND_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } from './constants';
+import { HUB_URL, NOTIFICATION_TYPES, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
+import { SENT_MESSAGE, PAYMENT_NOTIFICATION } from '../actions/types';
+import { store } from '../store';
+
+const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
 
 class SignalRController {
     constructor () {
         this.connection = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+        }).configureLogging(LogLevel.Trace).withAutomaticReconnect().build();
+
         
         this.connection.start().then().catch(err => {
             console.error(err);
+        });
+        
+        this.connection.on(RECEIVE_NOTIFICATION, (data, type) => {
+            console.log('received information ', data);
+            let response = JSON.parse(data);
+            switch (type) {
+                case CHAT_MESSAGE:
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName
+                    };
+                    batch(() => {
+                        store.dispatch({
+                            type: SENT_MESSAGE,
+                            payload: messageData
+                        });
+                    });
+                    break;
+
+                case TRANSFER_CONFIRMATION:
+                    store.dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                case TRANSFER_NOTIFICATION:
+                    store.dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                default:
+                    break;
+            }
         });
     }
 
     sendMessage = async (message) => {
         console.log(message);
-        const res = await this.connection.send(SEND_MESSAGE, message);
-        console.log('Message sent ', res);
+        await this.connection.send(SEND_MESSAGE, message);
+        console.log('Message sent ');
     }
 
-    registerReceiveNotification = (callback) => {
-        this.connection.once(RECEIVE_NOTIFICATION, (message) => {
-            console.log('message from service ', message);
-            callback(message);
-        });
-    };
+    // registerReceiveNotification = (callback) => {
+    //     this.connection.on(RECEIVE_NOTIFICATION, (message, type) => {
+    //         debugger;
+    //         console.log('message from service ', message);
+    //         // callback(message, type);
+    //     });
+    // };
 
-    registerTransferNotification = (callback) => {
-        this.connection.once(TRANSFER_NOTIFICATION, (notification) => {
-            console.log('notification ', notification);
-            callback(notification);
-        });
-    };
+    // registerTransferNotification = (callback) => {
+    //     this.connection.on(TRANSFER_NOTIFICATION, (notification) => {
+    //         console.log('notification ', notification);
+    //         callback(notification);
+    //     });
+    // };
 
-    registerTransferConfirmation = (callback) => {
-        this.connection.once(TRANSFER_CONFIRMATION, (notification) => {
-            console.log('notification ', notification);
-            callback(notification);
-        });
-    };
+    // registerTransferConfirmation = (callback) => {
+    //     this.connection.on(TRANSFER_CONFIRMATION, (notification) => {
+    //         console.log('notification ', notification);
+    //         callback(notification);
+    //     });
+    // };
 }
 
 const SignalRService = new SignalRController();

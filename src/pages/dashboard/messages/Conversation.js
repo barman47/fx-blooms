@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, FilePdfOutline, Send } from 'mdi-material-ui';
@@ -9,19 +9,15 @@ import clsx from 'clsx';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
-// import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-// import { HubConnection } from '@microsoft/signalr';
 
 import { sendMessage } from '../../../actions/chat';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SENT_MESSAGE, PAYMENT_NOTIFICATION } from '../../../actions/types';
 
 import EndTransactionModal from './EndTransactionModal';
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
-// import { HUB_URL } from '../../../utils/constants';
-import SignalRService from '../../../utils/SignalRController.js';
+import SignalRService from '../../../utils/SignalRController';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -191,7 +187,6 @@ const useStyles = makeStyles(theme => ({
 
 const Conversation = (props) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
 
     const { customerId, userName } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
@@ -212,13 +207,11 @@ const Conversation = (props) => {
     const [attachmentUrl, setAttachmentUrl] = useState('');
     // const [connection, setConnection] = useState(null);
     // const [connected, setConnected] = useState(false);
-    // const [newMessage, setNewMessage] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
-    const [loaded, setLoaded] = useState(false);
     
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -228,170 +221,77 @@ const Conversation = (props) => {
     const tipsAndRecommendationsModal = useRef();
 
     useEffect(() => {
-        // connectToSocket();
-        setLoaded(true);
-        handleTransferNotification();
-        // handleTransferConfirmation();
+        // handleSentMessage();
         // return () => {
         //     setConnection(null);
         // };
         // eslint-disable-next-line
     }, []);
 
-    const handleSendMessage = (message) => {
-        SignalRService.sendMessage(JSON.stringify(message));
-    };
+    // const handleSentMessage = () => {
+    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+    //     console.log('calling method');
+    //     SignalRService.registerReceiveNotification((data, type) => {
+            // let response = JSON.parse(data);
+            // console.log('New Notification ', response, type);
+            // switch (type) {
+            //     case CHAT_MESSAGE:
+            //         const messageData = {
+            //             chatId: response.ChatId,
+            //             dateSent: response.DateSent,
+            //             id: response.Id,
+            //             sender: response.Sender,
+            //             text: response.Text,
+            //             uploadedFileName: response.UploadedFileName
+            //         };
+        
+            //         dispatch({
+            //             type: SENT_MESSAGE,
+            //             payload: messageData
+            //         });
+            //         break;
 
-    const handleSentMessage = useCallback(() => {
-        console.log('calling method');
-        SignalRService.registerReceiveNotification((message) => {
-            let response = JSON.parse(message);
-            // console.log('message ', response);
-            const messageData = {
-                chatId: response.ChatId,
-                dateSent: response.DateSent,
-                id: response.Id,
-                sender: response.Sender,
-                text: response.Text,
-                uploadedFileName: response.UploadedFileName
-            };
+            //     case TRANSFER_CONFIRMATION:
+            //         dispatch({
+            //             type: PAYMENT_NOTIFICATION,
+            //             payload: {
+            //                 buyerHasMadePayment: response.BuyerHasMadePayment,
+            //                 buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+            //                 sellerHasMadePayment: response.SellerHasMadePayment, 
+            //                 sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+            //                 isDeleted: response.IsDeleted
+            //             }
+            //         });
+            //         break;
 
-            dispatch({
-                type: SENT_MESSAGE,
-                payload: messageData
-            });
-        });
-    },[dispatch]);
+            //     case TRANSFER_NOTIFICATION:
+            //         dispatch({
+            //             type: PAYMENT_NOTIFICATION,
+            //             payload: {
+            //                 buyerHasMadePayment: response.BuyerHasMadePayment,
+            //                 buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+            //                 sellerHasMadePayment: response.SellerHasMadePayment, 
+            //                 sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+            //                 isDeleted: response.IsDeleted
+            //             }
+            //         });
+            //         break;
 
-    const handleTransferNotification = useCallback(() => {
-        SignalRService.registerTransferNotification((notification) => {
-            const notificationData = JSON.parse(notification);
-            dispatch({
-                type: PAYMENT_NOTIFICATION,
-                payload: {
-                    buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-                    buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-                    sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-                    sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-                    isDeleted: notificationData.IsDeleted
-                }
-            });
-        });
-    }, [dispatch]);
+            //     default:
+            //         break;
+            // }
+        // });
+    // };
 
     // const handleTransferConfirmation = useCallback(() => {
     //     SignalRService.registerTransferConfirmation((notification) => {
     //         const notificationData = JSON.parse(notification);
-    //         dispatch({
-    //             type: PAYMENT_NOTIFICATION,
-    //             payload: {
-    //                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-    //                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-    //                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-    //                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-    //                 isDeleted: notificationData.IsDeleted
-    //             }
-    //         });
+            
     //     });
     // }, [dispatch]);
 
-    const connectToSocket = useCallback(() => {
-        console.log('connecting socket');
-        handleSentMessage();
-    }, [handleSentMessage]);
+    // get average number of successful runs in seconds
 
-    // const connectToSocket = useCallback(() => {
-    //     console.log('connecting socket');
-    //     handleSentMessage();
-    //     handleTransferNotification();
-    //     handleTransferConfirmation();
-    // }, [handleSentMessage, handleTransferNotification, handleTransferConfirmation]);
-
-    useEffect(() => {
-        if (loaded) {
-            connectToSocket();
-        }
-    }, [connectToSocket, loaded]);
-
-    // useEffect(() => {
-    //     if (!_.isEmpty(chat) && _.isEmpty(listings.listing)) {
-    //         const listing = listings.find(item => item.id === chat.listing);
-    //         dispatch({
-    //             type: SET_LISTING,
-    //             payload: listing
-    //         });
-    //     }
-    // }, [chat, dispatch, listings]);
-
-    // useEffect(() => {
-    //     setNewMessage(false);
-    // }, [chat]);
-
-    // useEffect(() => {
-    //     if (connection && !connected) {
-            // connection.start()
-            //     .then(() => {
-            //         console.log('connected');
-            //         setConnected(true);
-            //         connection.on('ReceiveNotification', message => {
-            //             // console.log('new message ', message);
-            //             // if (message) {
-            //                 // setNewMessage(true);
-            //                 let response = JSON.parse(message);
-            //                 const messageData = {
-            //                     chatId: response.ChatId,
-            //                     dateSent: response.DateSent,
-            //                     id: response.Id,
-            //                     sender: response.Sender,
-            //                     text: response.Text,
-            //                     uploadedFileName: response.UploadedFileName
-            //                 };
-
-            //                 dispatch({
-            //                     type: SENT_MESSAGE,
-            //                     payload: messageData
-            //                 });
-            //                 setMessage('');
-            //             // }
-            //         });
-
-            //         connection.on('TransferNotification', notification => {
-            //             console.log('notification ', notification);
-            //             const notificationData = JSON.parse(notification);
-            //             dispatch({
-            //                 type: PAYMENT_NOTIFICATION,
-            //                 payload: {
-            //                     buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-            //                     buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-            //                     sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-            //                     sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-            //                     isDeleted: notificationData.IsDeleted
-            //                 }
-            //             });
-                        
-            //         });
-            //         connection.on('TransferConfrimation', notification => {
-            //             console.log('notification ', notification);
-            //             const notificationData = JSON.parse(notification);
-            //             dispatch({
-            //                 type: PAYMENT_NOTIFICATION,
-            //                 payload: {
-            //                     buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-            //                     buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-            //                     sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-            //                     sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-            //                     isDeleted: notificationData.IsDeleted
-            //                 }
-            //             });
-            //         });
-            //     })
-
-            //     .catch(err => {
-            //         setConnected(false);
-            //         console.error(err);
-            //     });
-    //     }
-    // }, [connection, dispatch, connected]);
 
     // End transaction and disable chat
     // useEffect(() => {
@@ -456,6 +356,10 @@ const Conversation = (props) => {
         return setErrors({ [`${key}`]: msg || 'Upload Failed' });
     };
 
+    const handleSendMessage = (message) => {
+        SignalRService.sendMessage(JSON.stringify(message));
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
         if (!isEmpty(message)) {
@@ -471,7 +375,7 @@ const Conversation = (props) => {
                 senderId: customerId,
                 userName
             };
-    
+
             handleSendMessage(chatMessage);
             // sendMessage(chatMessage);
             setMessage('');
