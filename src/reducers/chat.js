@@ -46,6 +46,7 @@ const chatsReducer = (state = initialState, action) => {
             };
 
         case REMOVE_CHAT:
+            // update chats with current chat
             return {
                 ...state,
                 chat: null,
