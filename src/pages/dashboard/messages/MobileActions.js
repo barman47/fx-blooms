@@ -2,17 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
-    Backdrop,
     Button,
-    // CircularProgress, 
-    Fade,
-    Grid,
-    Modal,
-    // TextField, 
-    // Typography 
+    Grid
 } from '@material-ui/core';
-
-// import Rating from '@material-ui/lab/Rating';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -25,89 +17,43 @@ import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
-
 const useStyles = makeStyles(theme => ({
-    modal: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-
     root: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius,
-        width: '50vw',
-        boxShadow: SHADOW,
-        padding: theme.spacing(3, 5),
-
-        [theme.breakpoints.down('md')]: {
-            width: '50vw',
-        },
-        [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 2),
-            width: '80vw',
-        },
-    },
-
-    item: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        textAlign: 'center'
-    },
-
-    icon: {
-        color: theme.palette.primary.main,
-        fontSize: theme.spacing(5)
+        padding: theme.spacing(2),
+        height: '100%'
     },
 
     button: {
         paddingBottom: theme.spacing(2),
         paddingTop: theme.spacing(2),
-    },
-
-    radio: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr'
-    },
-
-    rating: {
-        color: theme.palette.primary.main
     }
 }));
 
-const CompleteTransactionModal = (props) => {
-	const classes = useStyles();
-	const dispatch = useDispatch();
+const Actions = (props) => {
+    const classes = useStyles();
     const history = useHistory();
-
-    const { customerId, msg } = useSelector(state => state.customer);
+    const dispatch = useDispatch();
+    const { customerId, msg, userName } = useSelector(state => state.customer);
+    const errorsState = useSelector(state => state.errors);
+    
     const { sessionId } = useSelector(state => state.chat);
-
     const buyer = useSelector(state => state.chat?.chat?.buyer);
+    const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerHasRecievedPayment = useSelector(state => state.chat?.chat?.buyerHasRecievedPayment);
     const seller = useSelector(state => state.chat?.chat?.seller);
+    const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
     const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
     const sellerHasRecievedPayment = useSelector(state => state.chat?.chat?.sellerHasRecievedPayment);
-    
-    const errorsState = useSelector(state => state.errors);
-    const [open, setOpen] = useState(false);
+    const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
-    // const [Message, setMessage] = useState('');
-    // const [sellerRating, setSellerRating] = useState(null);
     const [loading, setLoading] = useState(false);
+
 
     const [errors, setErrors] = useState({});
 
     const toast = useRef();
     const successModal = useRef();
-
-    useEffect(() => {
-        setOpen(props.open);
-    }, [props.open]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -129,14 +75,9 @@ const CompleteTransactionModal = (props) => {
         }
     }, [dispatch, msg]);
 
-
     // const handleSetRating = (e, value) => {
     //     setSellerRating(value);
     // }
-
-    const closeModal = () => {
-        props.handleCloseModal();
-    };
 
     const cancelNegotiation = () => {
         props.cancelNegotiation(sessionId, history);
@@ -173,45 +114,43 @@ const CompleteTransactionModal = (props) => {
     };    
 
     const handlePayment = () => {
-        props.sendTransactionNotification(sessionId);
+        props.sendTransactionNotification(sessionId, { customerUsername: userName, otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername });
     };
 
     const onSubmit = (e) => {
         e.preventDefault();
     };
 
-	return (
-        <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            className={classes.modal}
-            open={open}
-            onClose={closeModal}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={open}>
-                <section className={classes.root}>
-                    {loading && <Spinner text="One moment . . ." />}
-                    <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-                    {!isEmpty(errors) && 
-                        <Toast 
+    return (
+        <>
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+            <section className={classes.root}>
+                {loading && <Spinner text="One moment . . ." />}
+                {!isEmpty(errors) && 
+                    <Toast 
                         ref={toast}
                         title="ERROR"
-                            duration={5000}
-                            msg={errors.msg || ''}
-                            type="error"
-                        />
-                    }
-                    {/* <Typography variant="subtitle1" component="p">CompleteTransactionModal</Typography> */}
-                    <Grid container direction="column" spacing={2}>
-                        <Grid item>
-                            <form onSubmit={onSubmit}>
-                                <Grid container direction="column" spacing={3}>
-                                    {/* Buyer Start End */}
+                        duration={5000}
+                        msg={errors.msg || ''}
+                        type="error"
+                    />
+                }
+                <Grid container direction="column" spacing={2}>
+                    <Grid item xs={12}>
+                        <Button 
+                            variant="contained" 
+                            color="primary" 
+                            onClick={() => props.showTipsAndRecommendations()} 
+                            fullWidth
+                            className={classes.button}
+                        >
+                           View Tips and Recommendations
+                        </Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <form onSubmit={onSubmit}>
+                            <Grid container direction="column" spacing={3}>
+                                {/* Buyer Start End */}
                                 {buyer === customerId && 
                                     <>
                                         <Grid item xs={12}>
@@ -221,7 +160,7 @@ const CompleteTransactionModal = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                                 onClick={handlePayment}
                                             >
                                                 I've Made Payment:Buyer
@@ -235,7 +174,7 @@ const CompleteTransactionModal = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || buyerHasRecievedPayment ? true : false}
+                                                    disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
                                                 >
                                                     Payment Received:Buyer
                                                 </Button>
@@ -249,7 +188,7 @@ const CompleteTransactionModal = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                             >
                                                 Cancel Transaction:Buyer
                                             </Button>
@@ -269,7 +208,7 @@ const CompleteTransactionModal = (props) => {
                                                     variant="outlined"
                                                     color="primary"
                                                     fullWidth
-                                                    disabled={loading || sellerHasMadePayment ? true : false}
+                                                    disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
                                                     onClick={handlePayment}
                                                 >
                                                     I've Made Payment:Seller
@@ -284,7 +223,7 @@ const CompleteTransactionModal = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || sellerHasRecievedPayment ? true : false}
+                                                    disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
                                                 >
                                                     Payment Received:Seller
                                                 </Button>
@@ -298,7 +237,7 @@ const CompleteTransactionModal = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                             >
                                                 Cancel Transaction:Seller
                                             </Button>
@@ -306,22 +245,19 @@ const CompleteTransactionModal = (props) => {
                                     </>
                                 }
                                 {/* Seller Buttons End */}
-                                </Grid>
-                            </form>
-                        </Grid>
+                            </Grid>
+                        </form>
                     </Grid>
-                </section>
-            </Fade>
-        </Modal>
-	);
+                </Grid>
+            </section>
+        </>
+    );
 };
 
-CompleteTransactionModal.propTypes = {
+Actions.propTypes = {
     cancelNegotiation: PropTypes.func.isRequired,
     completeTransaction: PropTypes.func.isRequired,
-    sendTransactionNotification: PropTypes.func.isRequired,
-    handleCloseModal: PropTypes.func.isRequired,
-    open: PropTypes.bool.isRequired
+    sendTransactionNotification: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { cancelNegotiation, completeTransaction, sendTransactionNotification })(CompleteTransactionModal);
+export default connect(undefined, { cancelNegotiation, completeTransaction, sendTransactionNotification })(Actions);

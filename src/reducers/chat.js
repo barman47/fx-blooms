@@ -1,6 +1,6 @@
 
 import { 
-    // EXIT_CHAT, 
+    UPDATE_ACTIVE_CHAT, 
     SET_CHAT, 
     SET_CHATS, 
     SENT_MESSAGE,
@@ -17,8 +17,8 @@ const initialState = {
 const chatsReducer = (state = initialState, action) => {
     let messageList = [];
     let chat = {};
-    // let chats = [];
-    // let chatIndex;
+    let chats = [];
+    let chatIndex;
 
     switch (action.type) {    
         case SET_CHATS:
@@ -27,16 +27,15 @@ const chatsReducer = (state = initialState, action) => {
                 chats: [...action.payload]
             }; 
             
-        // case EXIT_CHAT:
-        //     chats = [...state.chats];
-        //     chat = {...state.chat};
-        //     chatIndex = chats.findIndex(item => item.id === chat.id);
-        //     chats.splice(chatIndex, 1, chat);
-        //     return {
-        //         ...state,
-        //         chat: null,
-        //         chats,
-        //     };
+        case UPDATE_ACTIVE_CHAT:
+            chats = state.chats;
+            chat = state.chat;
+            chatIndex = chats.findIndex(item => item.id === chat.id);
+            chats.splice(chatIndex, 1, chat);
+            return {
+                ...state,
+                chats,
+            };
 
         case SET_CHAT:
             return {
@@ -46,7 +45,6 @@ const chatsReducer = (state = initialState, action) => {
             };
 
         case REMOVE_CHAT:
-            // update chats with current chat
             return {
                 ...state,
                 chat: null,

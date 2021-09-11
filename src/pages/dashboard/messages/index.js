@@ -12,7 +12,6 @@ import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 
 import SellerNoticeModal from './SellerNoticeModal';
-// import { REMOVE_CHAT } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -116,25 +115,13 @@ const useStyles = makeStyles(theme => ({
 
 const Index = (props) => {
     const classes = useStyles();
-    // const theme = useTheme();
-	// const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
     const { handleSetTitle } = props;
-    // const dispatch = useDispatch();
 
     const chat = useSelector(state => state.chat?.chat);
 
     useEffect(() => {
         handleSetTitle('Messages');
-
-        return () => {
-
-            // Only remove chat for larger screens, excluding mobile devices. This will be handled in the MobileConverstion component
-            // if (matches === false) {
-            //     console.log('desktop screen');
-            //     dispatch({ type: REMOVE_CHAT });
-            // }
-        };
         // eslint-disable-next-line
     }, []);
 
@@ -143,7 +130,6 @@ const Index = (props) => {
             <SellerNoticeModal />
             <section className={classes.root}>
                 <Typography variant="h5" className={classes.header}>Messages</Typography>
-                {/* <Grid container direction="row" className={classes.gridContainer}> */}
                 <div className={classes.gridContainer}>
                     <div className={classes.messages}>
                         <Messages />
@@ -153,16 +139,12 @@ const Index = (props) => {
                             <Conversation />
                         }
                     </div>
-                    {/* <div className={classes.actions}>
-                        <Actions />
-                    </div> */}
                     <div className={classes.actions}>
                         {!isEmpty(chat) && 
                             <Actions />
                         }
                     </div>
                 </div>
-                {/* </Grid> */}
             </section>
         </>
     );

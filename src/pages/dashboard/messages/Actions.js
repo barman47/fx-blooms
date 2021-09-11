@@ -79,6 +79,7 @@ const Actions = (props) => {
     const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
     const sellerHasMadePayment = useSelector(state => state.chat?.chat?.sellerHasMadePayment);
     const sellerHasRecievedPayment = useSelector(state => state.chat?.chat?.sellerHasRecievedPayment);
+    const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
     // const [Message, setMessage] = useState('');
     // const [sellerRating, setSellerRating] = useState(null);
@@ -109,15 +110,6 @@ const Actions = (props) => {
             successModal.current.setModalText(msg);
         }
     }, [dispatch, msg]);
-
-
-    // const handleEditListing = () => {
-    //     dispatch({
-    //         type: SET_LISTING,
-    //         payload: listing
-    //     });
-    //     return history.push(`${DASHBOARD}${EDIT_LISTING}`);
-    // };
 
     // const handleSetRating = (e, value) => {
     //     setSellerRating(value);
@@ -194,7 +186,7 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                                 onClick={handlePayment}
                                             >
                                                 I've Made Payment:Buyer
@@ -208,7 +200,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || buyerHasRecievedPayment ? true : false}
+                                                    disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
                                                 >
                                                     Payment Received:Buyer
                                                 </Button>
@@ -222,7 +214,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                             >
                                                 Cancel Transaction:Buyer
                                             </Button>
@@ -242,7 +234,7 @@ const Actions = (props) => {
                                                     variant="outlined"
                                                     color="primary"
                                                     fullWidth
-                                                    disabled={loading || sellerHasMadePayment ? true : false}
+                                                    disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
                                                     onClick={handlePayment}
                                                 >
                                                     I've Made Payment:Seller
@@ -257,7 +249,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || sellerHasRecievedPayment ? true : false}
+                                                    disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
                                                 >
                                                     Payment Received:Seller
                                                 </Button>
@@ -271,7 +263,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
                                             >
                                                 Cancel Transaction:Seller
                                             </Button>
@@ -279,52 +271,6 @@ const Actions = (props) => {
                                     </>
                                 }
                                 {/* Seller Buttons End */}
-                                {/* {paymentMade &&
-                                    <>
-                                        <Grid item xs={12}>
-                                            <Typography variant="subtitle1" component="p">Rate this user</Typography>
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Rating 
-                                                color="primary" 
-                                                name="seller-rating"  
-                                                value={sellerRating} 
-                                                onChange={handleSetRating}
-                                                className={classes.rating}
-                                                disabled={loading ? true : false}
-                                            />
-                                            <br />
-                                            {errors.Rating && <small style={{ color: '#f44336' }}>{errors.Rating}</small>}
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <TextField 
-                                                type="text"
-                                                variant="outlined"
-                                                value={Message}
-                                                onChange={(e) => setMessage(e.target.value)}
-                                                placeholder="Enter message"
-                                                multiline
-                                                rows={5}
-                                                fullWidth
-                                                helperText={errors.Message}
-                                                error={errors.Message ? true : false}
-                                            />
-                                        </Grid>
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                type="submit"
-                                                variant="contained"
-                                                color="primary"
-                                                fullWidth
-                                                onClick={completeTransaction}
-                                                // disabled={seller === customerId && disableSellerSubmitButton || seller !== customerId && disableBuyerSubmitButton ? true : false}
-                                                // disabled={loading ? true : false}
-                                            >
-                                                {!loading ? 'Payment Received' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-                                            </Button>
-                                        </Grid>
-                                    </>
-                                } */}
                             </Grid>
                         </form>
                     </Grid>

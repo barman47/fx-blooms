@@ -79,7 +79,7 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
             }}
         >
             <Fade in={open}>
-                <div container className={classes.container} direction="column">
+                <div className={classes.container} direction="column">
                     <Typography variant="subtitle2" component="span" className={classes.title}>Tips and Recommendations</Typography>
                     <ul className={classes.list}>
                         <li>The seller should confirm the NGN(&#8358;) payment in their account before sending the EUR(&#163;) equivalent.</li>

@@ -3,7 +3,6 @@ import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     AppBar,
-    Button, 
     Grid, 
     IconButton, 
     InputAdornment, 
@@ -13,34 +12,33 @@ import {
     useMediaQuery 
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ArrowLeft, Attachment, FilePdfOutline, InformationOutline, Send } from 'mdi-material-ui';
+import { ArrowLeft, Attachment, FilePdfOutline, ContentCopy, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
-import _ from 'lodash';
 import toast, { Toaster } from 'react-hot-toast';
 import copy from 'copy-to-clipboard';
 import { v4 as uuidv4 } from 'uuid';
 
 import ScrollableFeed from 'react-scrollable-feed';
-// import { HttpTransportType, HubConnectionBuilder, LogLevel } from '@microsoft/signalr';
-// import { HubConnection } from '@microsoft/signalr';
 
 import { sendMessage } from '../../../actions/chat';
-import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
-import { SET_LISTING } from '../../../actions/types';
-// import { PAYMENT_NOTIFICATION, SENT_MESSAGE, } from '../../../actions/types';
-import { DASHBOARD, MESSAGES } from '../../../routes';
+import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../../actions/types';
+import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
-// import { HUB_URL } from '../../../utils/constants';
-import CompleteTransactionModal from './CompleteTransactionModal';
+import { DASHBOARD, MESSAGES } from '../../../routes';
+import SignalRService from '../../../utils/SignalRController';
+import audioFile from '../../../assets/sounds/notification.mp3';
+
+import MobileActions from './MobileActions';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        height: '100%',
+        // height: '100%',
+        height: '93vh',
         border: `1px solid ${COLORS.borderColor}`,
         position: 'sticky',
         bottom: theme.spacing(1),
@@ -54,61 +52,42 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'space-between',
         width: '100%'
     },
-    
-    messageContainer: {
-        height: theme.spacing(95),
-        position: 'relative',
-        top: 0,
+
+    container: {
         overflowY: 'scroll',
-        paddingLeft: theme.spacing(2),
-        paddingRight: theme.spacing(2),
-        zIndex: -1,
-
-        [theme.breakpoints.down('lg')]: {
-            height: theme.spacing(55),
-        },
-
-        [theme.breakpoints.down('md')]: {
-            height: theme.spacing(95)
-        },
-
-        [theme.breakpoints.down('sm')]: {
-            height: '79vh'
-        }
     },
     
-    disclaimer: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius,
-        fontSize: theme.spacing(1.7),
-        marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(2),
-        padding: [[theme.spacing(1), 0]],
-        textAlign: 'center'
+    messageContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        height: '45vh',
+        // height: theme.spacing(50),
+        position: 'relative',
+        top: 0,
+        // overflowY: 'scroll',
+        // padding: theme.spacing(1, 2),
+        padding: [[theme.spacing(1), theme.spacing(2), 0, theme.spacing(2)]],
+        zIndex: -1,
     },
     
     messages: {
         display: 'flex',
         flexDirection: 'column',
-        flexGrow: 0,
+        // flexGrow: 1,
         gap: theme.spacing(1),
-        height: '68vh',
+        // height: '10vh',
         // overflowY: 'scroll',
         paddingBottom: theme.spacing(1),
         position: 'relative',
         zIndex: 2,
 
-        overflowY: ["hidden", "-moz-scrollbars-none"],
-        scrollbarWidth: "none",
-        msOverflowStyle: "none",
+        // overflowY: ["hidden", "-moz-scrollbars-none"],
+        // scrollbarWidth: "none",
+        // msOverflowStyle: "none",
 
-        '&::-webkit-scrollbar': {
-            display: 'none'
-        },
-
-        [theme.breakpoints.down('lg')]: {
-            height: '55vh',
-        },
+        // '&::-webkit-scrollbar': {
+        //     display: 'none'
+        // },
 
         '& span': {
             borderRadius: theme.shape.borderRadius,
@@ -122,12 +101,14 @@ const useStyles = makeStyles(theme => ({
     me: {
         backgroundColor: '#069595',
         color: COLORS.offWhite,
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-end',
+        width: '50%'
     },
 
     recipient: {
         alignSelf: 'flex-start',
         backgroundColor: `${COLORS.lightGrey} !important`,
+        maxWidth: '50%'
     },
 
     input: {
@@ -172,28 +153,6 @@ const useStyles = makeStyles(theme => ({
     username: {
         fontSize: '1rem !important',
         fontWeight: '500 !important'
-    },
-
-    paymentTips: {
-        cursor: 'pointer',
-        fontSize: '1rem !important',
-        fontWeight: '500 !important',
-        textDecoration: 'underline'
-    },
-
-    backButton: {
-        backgroundColor: COLORS.white,
-        marginBottom: theme.spacing(2),
-        padding: [[theme.spacing(2), 0, 0, theme.spacing(2)]],
-        margin: 0,
-        position: 'sticky',
-        top: 0,
-        zIndex: 1,
-        display: 'none',
-
-        [theme.breakpoints.down('sm')]: {
-            display: 'block'
-        }
     }
 }));
 const MobileConversation = (props) => {
@@ -211,9 +170,8 @@ const MobileConversation = (props) => {
     const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, userName } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
-    const listings = useSelector(state => state.listings.listings);
 
     const { sendMessage } = props;
 
@@ -221,11 +179,6 @@ const MobileConversation = (props) => {
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
-    // const [connection, setConnection] = useState(null);
-    // const [connected, setConnected] = useState(false);
-    // const [newMessage, setNewMessage] = useState(false);
-
-    const [completeTransactionOpen, setCompleteTransactionOpen] = useState(false);
 
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -236,129 +189,92 @@ const MobileConversation = (props) => {
     const [errors, setErrors] = useState({});
 
     const tipsAndRecommendationsModal = useRef();
-
+    
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
-        // if (matches) {
-        //     connectToSocket();
-        // }
-        // return () => {
-        //     setConnection(null);
-        // };
-
-        // return () => {
-        //     dispatch({ type: REMOVE_CHAT });
-        // };
+        handleSentMessage();
+        return () => {
+            // dispatch({ type: REMOVE_CHAT });
+            SignalRService.closeNotifications();
+        };
         // eslint-disable-next-line
     }, []);
 
-    // const connectToSocket = () => {
-    //     const connect = new HubConnectionBuilder().withUrl(HUB_URL, {
-    //         skipNegotiation: true,
-    //         transport: HttpTransportType.WebSockets
-    //     }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
-    //     console.log(connect);
-    //     setConnection(connect);
+    const handleSentMessage = () => {
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+        SignalRService.registerReceiveNotification((data, type) => {
+            let response = JSON.parse(data);
+            // console.log('New Notification ', response, type);
+            switch (type) {
+                case CHAT_MESSAGE:
+                    if (customerId !== response.Sender) {
+                        const audio = new Audio(audioFile);
+                        audio.play();
+                    }
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName
+                    };
+        
+                    dispatch({
+                        type: SENT_MESSAGE,
+                        payload: messageData
+                    });
+
+                    break;
+
+                case TRANSFER_CONFIRMATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                case TRANSFER_NOTIFICATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    };
+
+    // End transaction and disable chat
+    // useEffect(() => {
+    //     if (isDeleted && !chatDisabled) {
+    //         console.log('ending transaction');
+    //         endTransactionModal.current.openModal();
+    //         setChatDisabled(true);
+    //     }
+    // }, [chatDisabled, isDeleted]);
+
+    // const openPaymentConfirmationTipsModal = () => {
+    //     paymentModal.current.openModal();
     // };
 
-    useEffect(() => {
-        if (!_.isEmpty(chat) && _.isEmpty(listings.listing) && matches) {
-            const listing = listings.find(item => item.id === chat.listing);
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-        }
-    }, [chat, dispatch, listings, matches]);
-
-    // useEffect(() => {
-    //     if (matches) {
-    //         setNewMessage(false);
-    //     }
-    // }, [matches]);
-
-    // useEffect(() => {
-    //     if (connection && !connected) {
-    //         connection.start()
-    //             .then(() => {
-    //                 console.log('connected');
-    //                 setConnected(true);
-    //                 connection.on('ReceiveNotification', message => {
-    //                     console.log('new mobile message ', message);
-    //                     // setNewMessage(true);
-    //                     // let response = JSON.parse(message);
-    //                     // const newMessage = {
-    //                     //     chatId: response.ChatId,
-    //                     //     dateSent: response.DateSent,
-    //                     //     id: response.Id,
-    //                     //     sender: response.Sender,
-    //                     //     text: response.Text,
-    //                     //     uploadedFileName: response.UploadedFileName
-    //                     // };
-
-    //                     // dispatch({
-    //                     //     type: SENT_MESSAGE,
-    //                     //     payload: newMessage
-    //                     // });
-    //                     // setMessage('');
-
-    //                     // if (!newMessage && chat && matches) {
-    //                     //     setNewMessage(true);
-    //                         let response = JSON.parse(message);
-    //                         const messageData = {
-    //                             chatId: response.ChatId,
-    //                             dateSent: response.DateSent,
-    //                             id: response.Id,
-    //                             sender: response.Sender,
-    //                             text: response.Text,
-    //                             uploadedFileName: response.UploadedFileName
-    //                         };
-
-    //                         dispatch({
-    //                             type: SENT_MESSAGE,
-    //                             payload: messageData
-    //                         });
-    //                         setMessage('');
-    //                     // }
-    //                 });
-
-    //                 connection.on('TransferNotification', notification => {
-    //                     if (matches) {
-    //                         const notificationData = JSON.parse(notification);
-    //                         dispatch({
-    //                             type: PAYMENT_NOTIFICATION,
-    //                             payload: {
-    //                                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-    //                                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-    //                                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-    //                                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-    //                                 isDeleted: notificationData.IsDeleted
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //                 connection.on('TransferConfrimation', notification => {
-    //                     if (matches) {
-    //                         const notificationData = JSON.parse(notification);
-    //                         dispatch({
-    //                             type: PAYMENT_NOTIFICATION,
-    //                             payload: {
-    //                                 buyerHasMadePayment: notificationData.BuyerHasMadePayment,
-    //                                 buyerHasRecievedPayment: notificationData.BuyerHasRecievedPayment,
-    //                                 sellerHasMadePayment: notificationData.SellerHasMadePayment, 
-    //                                 sellerHasRecievedPayment: notificationData.SellerHasRecievedPayment, 
-    //                                 isDeleted: notificationData.IsDeleted
-    //                             }
-    //                         });
-    //                     }
-    //                 });
-    //             })
-    //             .catch(err => {
-    //                 setConnected(false);
-    //                 console.error(err);
-    //             });
-    //     }
-    // }, [connection, customerId, dispatch, connected, matches]);
+    const openTipsAndRecommendationsModal = () => {
+        tipsAndRecommendationsModal.current.openModal();
+    };
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -373,7 +289,6 @@ const MobileConversation = (props) => {
             const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/UploadV2`, data, {
                 'Content-Type': 'multipart/form-data'
             });
-            console.log(res);
             setAttachmentUrl(res.data);
             setLoading(false);
             
@@ -406,57 +321,49 @@ const MobileConversation = (props) => {
         return setErrors({ [`${key}`]: msg || 'Upload Failed' });
     };
 
+    const handleSendMessage = (message) => {
+        SignalRService.sendMessage(JSON.stringify(message));
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
         if (!isEmpty(message)) {
+            // const chatMessage = {
+            //     chatSessionId: sessionId,
+            //     message,
+            //     documentName: '',
+            // };
             const chatMessage = {
                 chatSessionId: sessionId,
                 message,
-                documentName: ''
+                documentName: '',
+                senderId: customerId,
+                userName
             };
-    
-            sendMessage(chatMessage);
+
+            handleSendMessage(chatMessage);
+            // dispatch({
+            //     type: SENT_MESSAGE,
+            //     payload: chatMessage
+            // });
+            // sendMessage(chatMessage);
+            setMessage('');
         }
     };
 
     const handleSelectAttachment = () => document.getElementById('attachment').click();
 
-    // const handleSetAttachment = (e) => {
-    //     // setAttachment(e.target.files[0]);
-    //     const reader = new FileReader();
-
-    //     reader.onload = (() => {
-    //         const file = reader.result; //Array Buffer
-    //         setAttachment(file);
-    //     });
-    //     reader.readAsDataURL(e.target.files[0]);
-    // };
-
-    const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
-
-    // const openTipsAndRecommendationsModal = () => {
-    //     tipsAndRecommendationsModal.current.openModal();
-    // };
-
-    const showCompleteTransactionModal = () => {
-        setCompleteTransactionOpen(true);
-    };
-
-    const handleCloseCompleteTransactionModal = () => {
-        setCompleteTransactionOpen(false);
-    };
-
     const copyChatSessionId = () => {
         copy(sessionId);
-        toast.success('Chat Session ID Copied!');
+        toast.success('Copied Conversation ID!');
     };
+
+    const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
 
     return (
         <>
             <Toaster />
-            <CompleteTransactionModal open={completeTransactionOpen} handleCloseModal={handleCloseCompleteTransactionModal} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
-            {chat ? 
 		        <section className={classes.root}>
                     <AppBar position="static" color="transparent" elevation={1}>
                         <Toolbar>
@@ -465,21 +372,16 @@ const MobileConversation = (props) => {
                                     <ArrowLeft />
                                 </IconButton>
                                 <div>
-                                    <Button color="primary" variant="outlined" size="small" onClick={showCompleteTransactionModal}>
-                                        Complete Transaction
-                                    </Button>
+                                    <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId.substring(sessionId.length - 3)}</Typography>
                                     <IconButton 
                                         edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
-                                        <InformationOutline />
+                                        <ContentCopy />
                                     </IconButton>
                                 </div>
                             </section>
                         </Toolbar>
                     </AppBar>
                     <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
-                        {/* <Typography variant="subtitle1" component="p" color="primary" className={classes.disclaimer}>
-                            Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction
-                        </Typography> */}
                         <div className={classes.messages}>
                             {chat?.messages && matches && chat?.messages.map((message) => (
                                 <Fragment key={uuidv4()}>
@@ -538,10 +440,9 @@ const MobileConversation = (props) => {
                                 </div>
                             }
                         </div>
-                    </ScrollableFeed>
-                    <form onSubmit={onSubmit} noValidate className={classes.form}>
-                        <Grid container direction="row">
-                            <TextField 
+                        <form onSubmit={onSubmit} noValidate className={classes.form}>
+                            <Grid container direction="row">
+                                <TextField 
                                     onChange={(e) =>setAttachment(e.target.files[0])}
                                     id="attachment"
                                     style={{ display: 'none' }}
@@ -554,48 +455,47 @@ const MobileConversation = (props) => {
                                         accept: ".png,.jpg,.pdf"
                                     }}
                                 />
-                            <Grid item xs={12}>
-                                <TextField 
-                                    className={classes.input}
-                                    type="text"
-                                    variant="outlined"
-                                    value={message}
-                                    onChange={(e) => setMessage(e.target.value)}
-                                    placeholder="Enter message"
-                                    multiline
-                                    rows={1}
-                                    fullWidth
-                                    disabled={isDeleted}
-                                    InputProps={{
-                                        endAdornment: (
-                                            <InputAdornment position="end">
-                                                <IconButton
-                                                    color="primary"
-                                                    aria-label="attach-file"
-                                                    onClick={handleSelectAttachment}
-                                                    disabled={isDeleted}
-                                                >
-                                                    <Attachment />
-                                                </IconButton>
-                                                <IconButton
-                                                    color="primary"
-                                                    aria-label="send-message"
-                                                    onClick={onSubmit}
-                                                    disabled={isDeleted}
-                                                >
-                                                    <Send />
-                                                </IconButton>
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
+                                <Grid item xs={12}>
+                                    <TextField 
+                                        className={classes.input}
+                                        type="text"
+                                        variant="outlined"
+                                        value={message}
+                                        onChange={(e) => setMessage(e.target.value)}
+                                        placeholder="Enter message"
+                                        multiline
+                                        rows={1}
+                                        fullWidth
+                                        disabled={isDeleted}
+                                        InputProps={{
+                                            endAdornment: (
+                                                <InputAdornment position="end">
+                                                    <IconButton
+                                                        color="primary"
+                                                        aria-label="attach-file"
+                                                        onClick={handleSelectAttachment}
+                                                        disabled={isDeleted}
+                                                    >
+                                                        <Attachment />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        color="primary"
+                                                        aria-label="send-message"
+                                                        onClick={onSubmit}
+                                                        disabled={isDeleted}
+                                                    >
+                                                        <Send />
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </Grid>
                             </Grid>
-                        </Grid>
-                    </form>
+                        </form>
+                    </ScrollableFeed>
+                    <MobileActions showTipsAndRecommendations={openTipsAndRecommendationsModal} />
                 </section>
-                :
-                <div></div>
-            }
         </>
     );
 };

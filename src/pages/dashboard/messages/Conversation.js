@@ -1,8 +1,8 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Grid, IconButton, InputAdornment, TextField, Typography } from '@material-ui/core';
+import { Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Attachment, FilePdfOutline, Send } from 'mdi-material-ui';
+import { Attachment, ContentCopy, FilePdfOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -11,14 +11,17 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { PAYMENT_NOTIFICATION, SENT_MESSAGE, REMOVE_CHAT } from '../../../actions/types';
+import { PAYMENT_NOTIFICATION, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
+import copy from 'copy-to-clipboard';
+import toast, { Toaster } from 'react-hot-toast';
 
 import EndTransactionModal from './EndTransactionModal';
 import PaymentConfirmationTipsModal from './PaymentConfirmationTipsModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import SignalRService from '../../../utils/SignalRController';
+import audioFile from '../../../assets/sounds/notification.mp3';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -102,21 +105,17 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    tipsAndRecommendations: {
-        backgroundColor: COLORS.lightTeal,
-        color: theme.palette.primary.main,
-        marginTop: theme.spacing(2)
-    },
-
     me: {
         backgroundColor: '#069595',
         color: COLORS.offWhite,
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-end',
+        maxWidth: '50%'
     },
 
     recipient: {
         alignSelf: 'flex-start',
         backgroundColor: `${COLORS.lightGrey} !important`,
+        maxWidth: '50%'
     },
 
     input: {
@@ -192,7 +191,6 @@ const Conversation = (props) => {
 
     const { customerId, userName } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
-    // const { buyer, buyerHasMadePayment, buyerUsername, seller, sellerHasMadePayment, sellerUsername } = useSelector(state => state.chat?.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -207,9 +205,8 @@ const Conversation = (props) => {
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
-    // const [connection, setConnection] = useState(null);
-    // const [connected, setConnected] = useState(false);
 
+    // const [chatDisabled, setChatDisabled] = useState(false);
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
@@ -225,9 +222,8 @@ const Conversation = (props) => {
     useEffect(() => {
         handleSentMessage();
         return () => {
-            // setConnection(null);
-            dispatch({ type: REMOVE_CHAT });
-            console.log('closing notifications');
+            dispatch({ type: UPDATE_ACTIVE_CHAT });
+            // dispatch({ type: REMOVE_CHAT });
             SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
@@ -235,29 +231,30 @@ const Conversation = (props) => {
 
     const handleSentMessage = () => {
         const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
-        console.log('calling method');
         SignalRService.registerReceiveNotification((data, type) => {
             let response = JSON.parse(data);
             console.log('New Notification ', response, type);
+            if (customerId !== response.Sender) {
+                const audio = new Audio(audioFile);
+                audio.play();
+            }
             switch (type) {
                 case CHAT_MESSAGE:
-                    // if (customerId !== response.sender) {
-                        const messageData = {
-                            chatId: response.ChatId,
-                            dateSent: response.DateSent,
-                            id: response.Id,
-                            sender: response.Sender,
-                            text: response.Text,
-                            uploadedFileName: response.UploadedFileName
-                        };
-            
-                        dispatch({
-                            type: SENT_MESSAGE,
-                            payload: messageData
-                        });
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName
+                    };
+        
+                    dispatch({
+                        type: SENT_MESSAGE,
+                        payload: messageData
+                    });
 
-                    // }
-                    break;
+                break;
 
                 case TRANSFER_CONFIRMATION:
                     dispatch({
@@ -291,16 +288,6 @@ const Conversation = (props) => {
         });
     };
 
-    // const handleTransferConfirmation = useCallback(() => {
-    //     SignalRService.registerTransferConfirmation((notification) => {
-    //         const notificationData = JSON.parse(notification);
-            
-    //     });
-    // }, [dispatch]);
-
-    // get average number of successful runs in seconds
-
-
     // End transaction and disable chat
     // useEffect(() => {
     //     if (isDeleted && !chatDisabled) {
@@ -331,7 +318,6 @@ const Conversation = (props) => {
             const res = await axios.post(`https://objectcontainer.fxblooms.com/api/UploadFiles/UploadV2`, data, {
                 'Content-Type': 'multipart/form-data'
             });
-            console.log(res);
             setAttachmentUrl(res.data);
             setLoading(false);
             
@@ -394,11 +380,16 @@ const Conversation = (props) => {
         }
     };
 
+    const copyChatSessionId = () => {
+        copy(sessionId);
+        toast.success('Copied Conversation ID!');
+    };
+
     const handleSelectAttachment = () => document.getElementById('attachment').click();
 
     return (
         <>
-            
+            <Toaster />
             <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
@@ -409,12 +400,24 @@ const Conversation = (props) => {
                             <Typography variant="subtitle1" component="p">Conversation</Typography>
                         </Grid>
                         <Grid item>
-                            <Typography variant="subtitle1" component="p" color="primary">ID: {sessionId}</Typography>
+                            <Typography variant="subtitle1" component="p" color="primary">
+                                ID: {sessionId}
+                                <Tooltip title="Copy Conversation ID" aria-label="Conversation ID" arrow>
+                                    <IconButton
+                                        edge="start"
+                                        color="primary" 
+                                        aria-label="copyChatSessionId" 
+                                        onClick={copyChatSessionId} 
+                                        style={{ marginLeft: '5px' }}
+                                    >
+                                        <ContentCopy />
+                                    </IconButton>
+                                </Tooltip>
+                            </Typography>
                         </Grid>
                     </Grid>
                     <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
                         <div className={classes.messages}>
-                            {/* <Typography variant="subtitle2" component="span" className={classes.tipsAndRecommendations}>Ensure to read our <strong onClick={openTipsAndRecommendationsModal} style={{ cursor: 'pointer', textDecoration: 'underline' }}>tips and recommendations</strong> before you carry out any transaction</Typography> */}
                             {chat?.messages && chat?.messages.map((message) => (
                                 <Fragment key={uuidv4()}>
                                     {!isEmpty(message.uploadedFileName) ? 
@@ -494,6 +497,17 @@ const Conversation = (props) => {
                                     variant="outlined"
                                     value={message}
                                     onChange={(e) => setMessage(e.target.value)}
+                                    onKeyUp={(e) => {
+                                        if (e.ctrlKey && e.key === 'Enter') {
+                                            return e.persist();
+                            
+                                            // return e.target.value + '\n';
+                                        }
+
+                                        if (e.code === 'Enter') {
+                                            return onSubmit(e);
+                                        }
+                                    }}
                                     placeholder="Enter message"
                                     multiline
                                     rows={1}

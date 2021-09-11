@@ -5,6 +5,7 @@ import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
+import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 
 import { logout } from '../../actions/customer';
 
@@ -199,6 +200,7 @@ const Dashboard = ({ children, title, logout }) => {
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
+    const [showBottomNavigation, setShowBottomNavigation] = useState(true);
 
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
@@ -214,12 +216,26 @@ const Dashboard = ({ children, title, logout }) => {
     ];
 
     useEffect(() => {
+        hideBottomNavigation();
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         setPath(location.pathname);
     }, [location]);
 
-    // eslint-disable-next-line
-    const handleDrawerOpen = () => {
-        setOpen(true);
+    const hideBottomNavigation = () => {
+        if (isSupported()) {
+            subscribe(visibility => {
+                if (visibility === 'hidden') {
+                    setShowBottomNavigation(true);
+                } else {
+                    setShowBottomNavigation(false);
+                }
+            });
+
+            // unsubscribe();
+        }
     };
 
     const toggleDrawer = () => {
@@ -232,7 +248,6 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        // console.log(`/dashboard${link}`);
         history.push(`/dashboard${link}`);
     };
 
@@ -318,23 +333,24 @@ const Dashboard = ({ children, title, logout }) => {
                 <div className={classes.content}>
                     {children}
                 </div>
-                <Box
-                    boxShadow={5}
-                    className={classes.bottomBar}
-                >
-                    <BottomNavigation
-                        value={value}
-                        onChange={(event, newValue) => {
-                            setValue(newValue)
-                        }}
-                        showLabels
+                {showBottomNavigation && 
+                    <Box
+                        boxShadow={5}
+                        className={classes.bottomBar}
                     >
-                        {mobileLinks.map((item, index) => (
-                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
-                            // <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} disabled={item.url === MAKE_LISTING || item.url === MESSAGES ? true : false} />
-                        ))}
-                    </BottomNavigation>
-                </Box>
+                        <BottomNavigation
+                            value={value}
+                            onChange={(event, newValue) => {
+                                setValue(newValue)
+                            }}
+                            showLabels
+                        >
+                            {mobileLinks.map((item, index) => (
+                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                            ))}
+                        </BottomNavigation>
+                    </Box>
+                }
             </section>
         </>
     );
