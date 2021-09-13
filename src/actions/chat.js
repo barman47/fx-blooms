@@ -42,3 +42,25 @@ export const sendTransactionNotification = (chatId, { customerUsername, otherUse
         return handleError(err, dispatch);
     }
 };
+
+export const updateMessageStatus = (chatId) => async (dispatch) => {
+    try {
+        // await reIssueToken();
+        console.log('Updating message status');
+        const res = await axios.post(`${api}/UpdateMessageStatus?chatId=${chatId}`);
+        console.log('message status ', res);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const acceptChatPopupNotification = (chatId) => async (dispatch) => {
+    try {
+        // await reIssueToken();
+        console.log('Updating message status');
+        const res = await axios.post(`${api}/UpdateMessageStatus?chatId=${chatId}`);
+        console.log('message status ', res);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

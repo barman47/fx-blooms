@@ -27,6 +27,7 @@ import { sendMessage } from '../../../actions/chat';
 import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 
+import SellerNoticeModal from './SellerNoticeModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, MESSAGES } from '../../../routes';
@@ -364,138 +365,140 @@ const MobileConversation = (props) => {
         <>
             <Toaster />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
-		        <section className={classes.root}>
-                    <AppBar position="static" color="transparent" elevation={1}>
-                        <Toolbar>
-                            <section className={classes.headerContainer}>
-                                <IconButton edge="start" color="primary" aria-label="back" onClick={goBack}>
-                                    <ArrowLeft />
+            { (customerId === buyer && chat.buyerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
+            { (customerId === seller && chat.sellerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
+            <section className={classes.root}>
+                <AppBar position="static" color="transparent" elevation={1}>
+                    <Toolbar>
+                        <section className={classes.headerContainer}>
+                            <IconButton edge="start" color="primary" aria-label="back" onClick={goBack}>
+                                <ArrowLeft />
+                            </IconButton>
+                            <div>
+                                <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId.substring(sessionId.length - 3)}</Typography>
+                                <IconButton 
+                                    edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
+                                    <ContentCopy />
                                 </IconButton>
-                                <div>
-                                    <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId.substring(sessionId.length - 3)}</Typography>
-                                    <IconButton 
-                                        edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
-                                        <ContentCopy />
-                                    </IconButton>
-                                </div>
-                            </section>
-                        </Toolbar>
-                    </AppBar>
-                    <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
-                        <div className={classes.messages}>
-                            {chat?.messages && matches && chat?.messages.map((message) => (
-                                <Fragment key={uuidv4()}>
-                                    {!isEmpty(message.uploadedFileName) ? 
-                                        (
-                                            message.uploadedFileName.includes('.pdf') ? 
-                                                <div 
-                                                    key={uuidv4()}
-                                                    className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
-                                                >
-                                                    <a href={message.uploadedFileName} className={classes.downloadLink} download>
-                                                        <div>
-                                                            <FilePdfOutline className={classes.downloadIcon} />
-                                                            <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
-                                                        </div>
-                                                    </a>
-                                                </div>
-                                            :
-                                            <img 
+                            </div>
+                        </section>
+                    </Toolbar>
+                </AppBar>
+                <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
+                    <div className={classes.messages}>
+                        {chat?.messages && matches && chat?.messages.map((message) => (
+                            <Fragment key={uuidv4()}>
+                                {!isEmpty(message.uploadedFileName) ? 
+                                    (
+                                        message.uploadedFileName.includes('.pdf') ? 
+                                            <div 
                                                 key={uuidv4()}
-                                                src={message.uploadedFileName} 
                                                 className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
-                                                alt="Attachment" 
-                                            />
-                                        )
+                                            >
+                                                <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                    <div>
+                                                        <FilePdfOutline className={classes.downloadIcon} />
+                                                        <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
+                                                    </div>
+                                                </a>
+                                            </div>
                                         :
-                                        <Typography 
+                                        <img 
                                             key={uuidv4()}
-                                            variant="subtitle2" 
-                                            component="span" 
-                                            className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
-                                        >
-                                            {decode(message.text)}
-                                        </Typography>
-                                    }
-                                </Fragment>
-                            ))}
-                            {customerId === seller && buyerHasMadePayment &&
-                                <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claims to have made the payment.</Typography>
-                                    <ul>
-                                        <li>Proceed to your banking app to confirm payment.</li>
-                                        <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
-                                        <li>Send the EUR equivalent to the account provided by the buyer and click on I’ve made payment.</li>
-                                    </ul>
-                                </div>
-                            }
+                                            src={message.uploadedFileName} 
+                                            className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                            alt="Attachment" 
+                                        />
+                                    )
+                                    :
+                                    <Typography 
+                                        key={uuidv4()}
+                                        variant="subtitle2" 
+                                        component="span" 
+                                        className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                    >
+                                        {decode(message.text)}
+                                    </Typography>
+                                }
+                            </Fragment>
+                        ))}
+                        {customerId === seller && buyerHasMadePayment &&
+                            <div className={classes.paymentNotification}>
+                                <Typography variant="subtitle1" component="p"><span className={classes.username}>{buyerUsername}</span> claims to have made the payment.</Typography>
+                                <ul>
+                                    <li>Proceed to your banking app to confirm payment.</li>
+                                    <li>Once NGN is received, click on Payment Received button. <br /><strong>N.B: Do not rely on payment receipt or screenshots of payments.</strong></li>
+                                    <li>Send the EUR equivalent to the account provided by the buyer and click on I’ve made payment.</li>
+                                </ul>
+                            </div>
+                        }
 
-                            {customerId === buyer && sellerHasMadePayment &&
-                                <div className={classes.paymentNotification}>
-                                    <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claims to have made the payment.</Typography>
-                                    <ul>
-                                        <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
-                                        <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
-                                    </ul>
-                                </div>
-                            }
-                        </div>
-                        <form onSubmit={onSubmit} noValidate className={classes.form}>
-                            <Grid container direction="row">
+                        {customerId === buyer && sellerHasMadePayment &&
+                            <div className={classes.paymentNotification}>
+                                <Typography variant="subtitle1" component="p"><span className={classes.username}>{sellerUsername}</span> claims to have made the payment.</Typography>
+                                <ul>
+                                    <li>Please confirm receiving the EUR payment by clicking on Payment Received button.<br /><strong>N.B: EUR transfer can take up to 3 days in some cases.</strong></li>
+                                    <li>Reach out to our support via <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> if you do not receive the money after 4 days.</li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                    <form onSubmit={onSubmit} noValidate className={classes.form}>
+                        <Grid container direction="row">
+                            <TextField 
+                                onChange={(e) =>setAttachment(e.target.files[0])}
+                                id="attachment"
+                                style={{ display: 'none' }}
+                                type="file"
+                                variant="outlined" 
+                                fullWidth
+                                required
+                                disabled={isDeleted}
+                                inputProps={{
+                                    accept: ".png,.jpg,.pdf"
+                                }}
+                            />
+                            <Grid item xs={12}>
                                 <TextField 
-                                    onChange={(e) =>setAttachment(e.target.files[0])}
-                                    id="attachment"
-                                    style={{ display: 'none' }}
-                                    type="file"
-                                    variant="outlined" 
+                                    className={classes.input}
+                                    type="text"
+                                    variant="outlined"
+                                    value={message}
+                                    onChange={(e) => setMessage(e.target.value)}
+                                    placeholder="Enter message"
+                                    multiline
+                                    rows={1}
                                     fullWidth
-                                    required
                                     disabled={isDeleted}
-                                    inputProps={{
-                                        accept: ".png,.jpg,.pdf"
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    color="primary"
+                                                    aria-label="attach-file"
+                                                    onClick={handleSelectAttachment}
+                                                    disabled={isDeleted}
+                                                >
+                                                    <Attachment />
+                                                </IconButton>
+                                                <IconButton
+                                                    color="primary"
+                                                    aria-label="send-message"
+                                                    onClick={onSubmit}
+                                                    disabled={isDeleted}
+                                                >
+                                                    <Send />
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
                                     }}
                                 />
-                                <Grid item xs={12}>
-                                    <TextField 
-                                        className={classes.input}
-                                        type="text"
-                                        variant="outlined"
-                                        value={message}
-                                        onChange={(e) => setMessage(e.target.value)}
-                                        placeholder="Enter message"
-                                        multiline
-                                        rows={1}
-                                        fullWidth
-                                        disabled={isDeleted}
-                                        InputProps={{
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <IconButton
-                                                        color="primary"
-                                                        aria-label="attach-file"
-                                                        onClick={handleSelectAttachment}
-                                                        disabled={isDeleted}
-                                                    >
-                                                        <Attachment />
-                                                    </IconButton>
-                                                    <IconButton
-                                                        color="primary"
-                                                        aria-label="send-message"
-                                                        onClick={onSubmit}
-                                                        disabled={isDeleted}
-                                                    >
-                                                        <Send />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </Grid>
                             </Grid>
-                        </form>
-                    </ScrollableFeed>
-                    <MobileActions showTipsAndRecommendations={openTipsAndRecommendationsModal} />
-                </section>
+                        </Grid>
+                    </form>
+                </ScrollableFeed>
+                <MobileActions showTipsAndRecommendations={openTipsAndRecommendationsModal} />
+            </section>
         </>
     );
 };

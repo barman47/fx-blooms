@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,11 +7,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import Actions from './Actions';
 import Conversation from './Conversation';
 import Messages from './Messages';
+import SignalRService from '../../../utils/SignalRController';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-
-import SellerNoticeModal from './SellerNoticeModal';
+import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../../actions/types';
+import audioFile from '../../../assets/sounds/notification.mp3';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -115,19 +116,89 @@ const useStyles = makeStyles(theme => ({
 
 const Index = (props) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const { handleSetTitle } = props;
 
     const chat = useSelector(state => state.chat?.chat);
+    const { customerId } = useSelector(state => state.customer);
 
     useEffect(() => {
+        // eslint-disable-next-line
+    }, []);
+    
+    useEffect(() => {
+        handleSentMessage();
         handleSetTitle('Messages');
+        return () => {
+            SignalRService.closeNotifications();
+        };
         // eslint-disable-next-line
     }, []);
 
+    const handleSentMessage = () => {
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+        SignalRService.registerReceiveNotification((data, type) => {
+            let response = JSON.parse(data);
+            console.log('New Notification ', response, type);
+            if (customerId !== response.Sender) {
+                const audio = new Audio(audioFile);
+                audio.play();
+                navigator.vibrate(1000);
+            }
+            switch (type) {
+                case CHAT_MESSAGE:
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName,
+                        isRead: false
+                    };
+        
+                    dispatch({
+                        type: SENT_MESSAGE,
+                        payload: messageData
+                    });
+
+                break;
+
+                case TRANSFER_CONFIRMATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                case TRANSFER_NOTIFICATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    };
+
     return (
         <>
-            <SellerNoticeModal />
             <section className={classes.root}>
                 <Typography variant="h5" className={classes.header}>Messages</Typography>
                 <div className={classes.gridContainer}>

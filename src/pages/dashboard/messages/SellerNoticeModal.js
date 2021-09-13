@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
     Backdrop,
 	Button,
@@ -9,6 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { Information } from 'mdi-material-ui';
 
+import { acceptChatPopupNotification } from '../../../actions/chat';
 import { COLORS, SHADOW } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
@@ -59,11 +62,15 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SellerNoticeModal = () => {
+const SellerNoticeModal = (props) => {
 	const classes = useStyles();
+
+    const { chat } = useSelector(state => state.chat);
 
     const [open, setOpen] = useState(false);
     // const HAS_SEEN_SELLER_WARNING = 'hasSeenSellerWarning';
+
+    const { acceptChatPopupNotification } = props;
 
     useEffect(() => {
         setOpen(true);
@@ -76,6 +83,7 @@ const SellerNoticeModal = () => {
 
     const closeModal = () => {
         setOpen(false);
+        acceptChatPopupNotification(chat.id);
         // localStorage.setItem(HAS_SEEN_SELLER_WARNING, true);
     };
 
@@ -110,4 +118,8 @@ const SellerNoticeModal = () => {
 	);
 };
 
-export default SellerNoticeModal;
+SellerNoticeModal.propTypes = {
+    acceptChatPopupNotification: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { acceptChatPopupNotification })(SellerNoticeModal);

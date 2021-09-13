@@ -1,4 +1,7 @@
-import { Avatar, Grid, Typography } from '@material-ui/core';
+import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
+import axios from 'axios';
+import { Avatar, Badge, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -7,9 +10,8 @@ import { Account } from 'mdi-material-ui';
 import TextClamp from 'react-string-clamp';
 import clsx from 'clsx';
 
-import { COLORS } from '../../../utils/constants';
-
-import { useSelector } from 'react-redux';
+import { API, COLORS } from '../../../utils/constants';
+import { updateMessageStatus } from '../../../actions/chat';
 
 const useStyles = makeStyles(theme => ({
 	message: {
@@ -47,12 +49,37 @@ const useStyles = makeStyles(theme => ({
 
 const Message = ({ handleSetChat, conversation }) => {
 	const classes = useStyles();
-    const { userName } = useSelector(state => state.customer);
+    const { customerId, userName } = useSelector(state => state.customer);
     const chatId = useSelector(state => state.chat?.chat?.id);
+
+    const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+    // Show unread notifications count
+    useEffect(() => {
+        if (conversation) {
+            if (conversation.messages.length > 0) {
+                console.log('there are messages');
+                let count = 0;
+                for (let i = conversation.messages.length; i >= 0; i--) {
+                    if (conversation.messages[i]?.isRead === false && conversation.messages[i]?.sender !== customerId) {
+                        count += 1;
+                    }
+                }
+                setUnreadNotifications(count);
+            }
+        }
+    }, [conversation, customerId]);
+
+    const handleChatClick = () => {
+        setUnreadNotifications(0);
+        const url = `${API}/Chat`;
+        axios.post(`${url}/UpdateMessageStatus?chatId=${conversation.id}`); // Deliberately did not add await
+        handleSetChat();
+    };
 
     return (
         <Grid 
-            onClick={handleSetChat} 
+            onClick={handleChatClick} 
             container 
             direction="row" 
             justify="space-between" 
@@ -62,9 +89,11 @@ const Message = ({ handleSetChat, conversation }) => {
             <Grid item>
                 <Grid container direction="row" alignItems="center" spacing={1}>
                     <Grid item>
-                        <Avatar>
-                            <Account />
-                        </Avatar>
+                        <Badge color="error" badgeContent={unreadNotifications}>
+                            <Avatar>
+                                <Account />
+                            </Avatar>
+                        </Badge>
                     </Grid>
                     <Grid item>
                         <Typography variant="subtitle1" component="p">
@@ -110,7 +139,8 @@ const Message = ({ handleSetChat, conversation }) => {
 
 Message.propTypes = {
     conversation: PropTypes.object.isRequired,
-    handleSetChat: PropTypes.func.isRequired
+    handleSetChat: PropTypes.func.isRequired,
+    updateMessageStatus: PropTypes.func.isRequired
 };
 
-export default Message;
+export default connect(undefined, { updateMessageStatus })(Message);
