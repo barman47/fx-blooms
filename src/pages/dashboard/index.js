@@ -13,6 +13,7 @@ import logo from '../../assets/img/logo.svg';
 
 import {
     Avatar,
+    Badge,
     Box,
     IconButton,
     Drawer,
@@ -195,7 +196,8 @@ const Dashboard = ({ children, title, logout }) => {
     const history = useHistory();
     const location = useLocation();
 
-    const { profile, userName } = useSelector(state => state.customer); 
+    const { profile, userName } = useSelector(state => state.customer);
+    const { unreadMessages } = useSelector(state => state.chat);
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
@@ -205,13 +207,13 @@ const Dashboard = ({ children, title, logout }) => {
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> }
+        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
     ];
 
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <AndroidMessages /> },
+        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
         { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
 

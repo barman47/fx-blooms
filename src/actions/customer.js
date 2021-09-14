@@ -54,7 +54,7 @@ export const createCustomer = (customer, history) => async (dispatch) => {
 
 export const getCustomerInformation = () => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.get(`${api}/CustomerInformation`);
         dispatch({
             type: SET_CUSTOMER_PROFILE,
@@ -223,7 +223,7 @@ export const getResidencePermitLink = () => async (dispatch) => {
 
 export const addResidentPermit = (data) => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.post(`${api}/AddResidencePermit`, data);
         dispatch({
             type: SET_CUSTOMER_MSG,
@@ -240,7 +240,7 @@ export const addResidentPermit = (data) => async (dispatch) => {
 
 export const getCustomers = (query) => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_CUSTOMERS,
@@ -253,7 +253,7 @@ export const getCustomers = (query) => async (dispatch) => {
 
 export const getMoreCustomers = (query) => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueToken();
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_MORE_CUSTOMERS,
@@ -370,7 +370,7 @@ export const getMoreVerifiedCustomers = (query) => async(dispatch) => {
 
 export const getSeller = (sellerId) => async(dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         const res = await axios.get(`${api}/Seller/${sellerId}`);
         return dispatch({
             type: SET_CUSTOMER,
@@ -383,7 +383,7 @@ export const getSeller = (sellerId) => async(dispatch) => {
 
 export const reportSeller = (message) => async(dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         const res = await axios.post(`${api}/ReportSeller`, message);
         return dispatch({
             type: SET_CUSTOMER_MSG,
@@ -410,7 +410,7 @@ export const setCustomerStatus = ({ customerID, status, currentStatus }) => asyn
 
 export const setHidePhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         await axios.post(`${api}/ShowPhoneNumber/status/false`);
         dispatch({ type: HIDE_PHONE_NUMBER });
     } catch (err) {
@@ -420,7 +420,7 @@ export const setHidePhoneNumber = () => async (dispatch) => {
 
 export const setShowPhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueToken();
+        // await reIssueToken();
         await axios.post(`${api}/ShowPhoneNumber/status/true`);
         dispatch({ type: SHOW_PHONE_NUMBER });
     } catch (err) {
@@ -461,6 +461,28 @@ export const sendMail = (data) => async (dispatch) => {
         });
     } catch (err) {
         return handleError(err, dispatch);
+    }
+};
+
+export const getIdCardValidationResponse = (customerId) => async () => {
+    try {
+        const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`,);
+        console.log(res);
+    } catch (err) {
+        console.log(err.response);
+        console.error(err);
+        // return handleError(err, dispatch);
+    }
+};
+
+export const getResidencePermitValidationResponse = (customerId) => async () => {
+    try {
+        const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`,);
+        console.log(res);
+    } catch (err) {
+        console.log(err.response);
+        console.error(err);
+        // return handleError(err, dispatch);
     }
 };
 

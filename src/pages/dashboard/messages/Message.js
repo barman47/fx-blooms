@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { Avatar, Badge, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,6 +12,7 @@ import clsx from 'clsx';
 
 import { API, COLORS } from '../../../utils/constants';
 import { updateMessageStatus } from '../../../actions/chat';
+import { SET_UNREAD_MESSAGES, SUBTRACT_UNREAD_MESSAGES } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
 	message: {
@@ -49,6 +50,8 @@ const useStyles = makeStyles(theme => ({
 
 const Message = ({ handleSetChat, conversation }) => {
 	const classes = useStyles();
+	const dispatch = useDispatch();
+
     const { customerId, userName } = useSelector(state => state.customer);
     const chatId = useSelector(state => state.chat?.chat?.id);
 
@@ -66,12 +69,20 @@ const Message = ({ handleSetChat, conversation }) => {
                     }
                 }
                 setUnreadNotifications(count);
+                dispatch({
+                    type: SET_UNREAD_MESSAGES,
+                    payload: count
+                });
             }
         }
-    }, [conversation, customerId]);
+    }, [conversation, customerId, dispatch]);
 
     const handleChatClick = () => {
         setUnreadNotifications(0);
+        dispatch({
+            type: SUBTRACT_UNREAD_MESSAGES,
+            payload: unreadNotifications
+        });
         const url = `${API}/Chat`;
         axios.post(`${url}/UpdateMessageStatus?chatId=${conversation.id}`); // Deliberately did not add await
         handleSetChat();

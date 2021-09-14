@@ -5,13 +5,17 @@ import {
     SET_CHATS, 
     SENT_MESSAGE,
     PAYMENT_NOTIFICATION,
-    REMOVE_CHAT
+    REMOVE_CHAT,
+    SET_UNREAD_MESSAGES,
+    SUBTRACT_UNREAD_MESSAGES,
+    CLEAR_UNREAD_MESSAGES
 } from '../actions/types';
 
 const initialState = {
     chat: null,
     chats: [],
-    sessionId: null
+    sessionId: null,
+    unreadMessages: 0
 };
 
 const chatsReducer = (state = initialState, action) => {
@@ -56,7 +60,8 @@ const chatsReducer = (state = initialState, action) => {
             messageList = [...messages, action.payload];
             return {
                 ...state,
-                chat: { ...rest, messages: messageList }
+                chat: { ...rest, messages: messageList },
+                unreadMessages: state.unreadMessages + 1
             }
 
         case PAYMENT_NOTIFICATION: 
@@ -70,6 +75,24 @@ const chatsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 chat: {...state.chat, ...action.payload}
+            };
+
+        case SET_UNREAD_MESSAGES:
+            return {
+                ...state,
+                unreadMessages: state.unreadMessages + action.payload
+            };
+
+        case SUBTRACT_UNREAD_MESSAGES:
+            return {
+                ...state,
+                unreadMessages: state.unreadMessages - action.payload
+            };
+
+        case CLEAR_UNREAD_MESSAGES:
+            return {
+                ...state,
+                unreadMessages: 0
             };
 
         default:

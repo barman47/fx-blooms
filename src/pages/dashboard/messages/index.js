@@ -128,7 +128,7 @@ const Index = (props) => {
     }, []);
     
     useEffect(() => {
-        handleSentMessage();
+        // handleSentMessage();
         handleSetTitle('Messages');
         return () => {
             SignalRService.closeNotifications();
@@ -136,66 +136,69 @@ const Index = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
-        SignalRService.registerReceiveNotification((data, type) => {
-            let response = JSON.parse(data);
-            console.log('New Notification ', response, type);
-            if (customerId !== response.Sender) {
-                const audio = new Audio(audioFile);
-                audio.play();
-                navigator.vibrate(1000);
-            }
-            switch (type) {
-                case CHAT_MESSAGE:
-                    const messageData = {
-                        chatId: response.ChatId,
-                        dateSent: response.DateSent,
-                        id: response.Id,
-                        sender: response.Sender,
-                        text: response.Text,
-                        uploadedFileName: response.UploadedFileName,
-                        isRead: false
-                    };
-        
-                    dispatch({
-                        type: SENT_MESSAGE,
-                        payload: messageData
-                    });
+    // const handleSentMessage = () => {
+    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+    //     SignalRService.registerReceiveNotification((data, type) => {
+    //         let response = JSON.parse(data);
+    //         console.log('New Notification ', response, type);
+    //         if (customerId !== response.Sender) {
+    //             const audio = new Audio(audioFile);
+    //             audio.play();
+    //             navigator.vibrate(1000);
+    //         }
+    //         switch (type) {
+    //             case CHAT_MESSAGE:
+    //                 console.log('id ', response.Id);
+    //                 if (response.chatId === chat.id) {
+    //                     const messageData = {
+    //                         chatId: response.ChatId,
+    //                         dateSent: response.DateSent,
+    //                         id: response.Id,
+    //                         sender: response.Sender,
+    //                         text: response.Text,
+    //                         uploadedFileName: response.UploadedFileName,
+    //                         isRead: false
+    //                     };
+            
+    //                     dispatch({
+    //                         type: SENT_MESSAGE,
+    //                         payload: messageData
+    //                     });
+    //                 }
 
-                break;
+    //             break;
 
-                case TRANSFER_CONFIRMATION:
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: response.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: response.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
-                        }
-                    });
-                    break;
+    //             case TRANSFER_CONFIRMATION:
+    //                 dispatch({
+    //                     type: PAYMENT_NOTIFICATION,
+    //                     payload: {
+    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
+    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
+    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+    //                         isDeleted: response.IsDeleted
+    //                     }
+    //                 });
+    //                 break;
 
-                case TRANSFER_NOTIFICATION:
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: response.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: response.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
-                        }
-                    });
-                    break;
+    //             case TRANSFER_NOTIFICATION:
+    //                 dispatch({
+    //                     type: PAYMENT_NOTIFICATION,
+    //                     payload: {
+    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
+    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
+    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+    //                         isDeleted: response.IsDeleted
+    //                     }
+    //                 });
+    //                 break;
 
-                default:
-                    break;
-            }
-        });
-    };
+    //             default:
+    //                 break;
+    //         }
+    //     });
+    // };
 
     return (
         <>

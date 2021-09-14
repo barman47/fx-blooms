@@ -1,5 +1,6 @@
 import { useState } from 'react'; 
-import { useSelector } from 'react-redux'; 
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { 
     Box, 
     Divider,
@@ -9,6 +10,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS } from '../../../utils/constants';
+import { getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
 
 import ImagePreviewModal from '../../../components/common/ImagePreviewModal';
 
@@ -53,9 +55,10 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const IdentityDetails = () => {
+const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
     const { customer } = useSelector(state => state.customers);
+    const { customerId } = useSelector(state => state.customer);
     
     const [open, setOpen] = useState(false);
     const [modalImage, setModalImage] = useState('');
@@ -89,7 +92,9 @@ const IdentityDetails = () => {
                 <Divider />
                 <br />
                 <Grid item>
-                    <form onSubmit={onSubmit} noValidate>
+                    <button onClick={() => getIdCardValidationResponse(customer.id)}>ID Check</button>
+                    <button onClick={() => getResidencePermitValidationResponse(customer.id)}>Profile Check</button>
+                    {/* <form onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={3}>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Type</Typography>
@@ -114,11 +119,16 @@ const IdentityDetails = () => {
                                 <img src={customer.img} alt="" className={classes.photograph} onMouseEnter={() => handleModalOpen(customer.img, 'Photograph')} />
                             </Grid>
                         </Grid>
-                    </form>
+                    </form> */}
                 </Grid>
             </Grid>
         </>
     );
 };
 
-export default IdentityDetails;
+IdentityDetails.propTypes = {
+    getIdCardValidationResponse: PropTypes.func.isRequired,
+    getResidencePermitValidationResponse: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse })(IdentityDetails);
