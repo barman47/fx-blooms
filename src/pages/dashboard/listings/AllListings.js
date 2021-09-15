@@ -26,6 +26,7 @@ import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
+import { getUnreadMessages } from '../../../actions/chat';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
@@ -162,8 +163,9 @@ const AllListings = (props) => {
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 	const { idStatus } = useSelector(state => state.customer.stats);
+	const { unreadMessages } = useSelector(state => state.chat);
 
-	const { getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, handleSetTitle } = props;
+	const { getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getUnreadMessages, handleSetTitle } = props;
 
 	// useGetListings(query, pageNumber, getListingsOpenForBid);
 
@@ -185,6 +187,10 @@ const AllListings = (props) => {
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
 		}
+
+		if (unreadMessages === 0) {
+            getUnreadMessages();
+        }
 
 		return () => {
 			window.removeEventListener('DOMContentLoaded', loadedEvent.current);
@@ -576,7 +582,8 @@ AllListings.propTypes = {
 	getIdVerificationLink: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
+	getUnreadMessages: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings })(AllListings);
+export default connect(undefined, { getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, getUnreadMessages })(AllListings);

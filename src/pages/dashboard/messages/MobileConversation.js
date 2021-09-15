@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../../actions/types';
+import { PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
@@ -195,69 +195,72 @@ const MobileConversation = (props) => {
         props.handleSetTitle('Mobile Conversation');
         handleSentMessage();
         return () => {
-            // dispatch({ type: REMOVE_CHAT });
+            SignalRService.closeNotifications();
+            dispatch({ type: UPDATE_ACTIVE_CHAT });
+            dispatch({ type: REMOVE_CHAT });
             SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
     }, []);
 
     const handleSentMessage = () => {
-        // const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
-        // SignalRService.registerReceiveNotification((data, type) => {
-        //     let response = JSON.parse(data);
-        //     // console.log('New Notification ', response, type);
-        //     switch (type) {
-        //         case CHAT_MESSAGE:
-        //             if (customerId !== response.Sender) {
-        //                 const audio = new Audio(audioFile);
-        //                 audio.play();
-        //             }
-        //             const messageData = {
-        //                 chatId: response.ChatId,
-        //                 dateSent: response.DateSent,
-        //                 id: response.Id,
-        //                 sender: response.Sender,
-        //                 text: response.Text,
-        //                 uploadedFileName: response.UploadedFileName
-        //             };
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+        SignalRService.registerReceiveNotification((data, type) => {
+            let response = JSON.parse(data);
+            // console.log('New Notification ', response, type);
+            switch (type) {
+                case CHAT_MESSAGE:
+                    if (customerId !== response.Sender) {
+                        const audio = new Audio(audioFile);
+                        audio.play();
+                        navigator.vibrate(1000);
+                    }
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName
+                    };
         
-        //             dispatch({
-        //                 type: SENT_MESSAGE,
-        //                 payload: messageData
-        //             });
+                    dispatch({
+                        type: SENT_MESSAGE,
+                            payload: { message: messageData, customerId }
+                    });
 
-        //             break;
+                    break;
 
-        //         case TRANSFER_CONFIRMATION:
-        //             dispatch({
-        //                 type: PAYMENT_NOTIFICATION,
-        //                 payload: {
-        //                     buyerHasMadePayment: response.BuyerHasMadePayment,
-        //                     buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-        //                     sellerHasMadePayment: response.SellerHasMadePayment, 
-        //                     sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-        //                     isDeleted: response.IsDeleted
-        //                 }
-        //             });
-        //             break;
+                case TRANSFER_CONFIRMATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
 
-        //         case TRANSFER_NOTIFICATION:
-        //             dispatch({
-        //                 type: PAYMENT_NOTIFICATION,
-        //                 payload: {
-        //                     buyerHasMadePayment: response.BuyerHasMadePayment,
-        //                     buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-        //                     sellerHasMadePayment: response.SellerHasMadePayment, 
-        //                     sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-        //                     isDeleted: response.IsDeleted
-        //                 }
-        //             });
-        //             break;
+                case TRANSFER_NOTIFICATION:
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: response.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: response.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+                            isDeleted: response.IsDeleted
+                        }
+                    });
+                    break;
 
-        //         default:
-        //             break;
-        //     }
-        // });
+                default:
+                    break;
+            }
+        });
     };
 
     // End transaction and disable chat

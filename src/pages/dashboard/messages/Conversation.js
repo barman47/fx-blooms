@@ -1,4 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -11,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { REMOVE_CHAT, SENT_MESSAGE, PAYMENT_NOTIFICATION, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
+import { REMOVE_CHAT, SENT_MESSAGE, PAYMENT_NOTIFICATION, UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
@@ -23,6 +24,9 @@ import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import SignalRService from '../../../utils/SignalRController';
 import audioFile from '../../../assets/sounds/notification.mp3';
+import CustomerCanceledModal from './CustomerCanceledModal';
+
+import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -191,6 +195,7 @@ const useStyles = makeStyles(theme => ({
 const Conversation = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const history = useHistory();
 
     const { customerId, userName } = useSelector(state => state.customer);
     const { chat, sessionId } = useSelector(state => state.chat);
@@ -221,6 +226,7 @@ const Conversation = (props) => {
     const endTransactionModal = useRef();
     const paymentModal = useRef();
     const tipsAndRecommendationsModal = useRef();
+    const customerCanceledModal = useRef();
 
     useEffect(() => {
         handleSentMessage();
@@ -232,8 +238,15 @@ const Conversation = (props) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (chat.customerCanceled) {
+            customerCanceledModal.current.openModal();
+            customerCanceledModal.current.setModalText(chat.customerCanceled);
+        }
+    }, [chat.customerCanceled]);
+
     const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             let response = JSON.parse(data);
             console.log('New Notification ', response, type);
@@ -256,7 +269,7 @@ const Conversation = (props) => {
         
                     dispatch({
                         type: SENT_MESSAGE,
-                        payload: messageData
+                        payload: { message: messageData, customerId }
                     });
 
                 break;
@@ -269,7 +282,8 @@ const Conversation = (props) => {
                             buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
                             sellerHasMadePayment: response.SellerHasMadePayment, 
                             sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
+                            isDeleted: response.IsDeleted,
+                            customerId
                         }
                     });
                     break;
@@ -282,9 +296,22 @@ const Conversation = (props) => {
                             buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
                             sellerHasMadePayment: response.SellerHasMadePayment, 
                             sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
+                            isDeleted: response.IsDeleted,
+                            customerId
                         }
                     });
+                    break;
+
+                case CANCEL_NEGOTIATION:
+                    const payload = JSON.parse(response);
+                    const senderId = JSON.parse(response.SenderId);
+                    console.log(payload);
+                    if (senderId !== customerId) {
+                        dispatch({ 
+                            type: CUSTOMER_CANCELED,
+                            payload: `Hi, this transaction has been canceled by the other user`
+                        });
+                    }
                     break;
 
                 default:
@@ -383,9 +410,19 @@ const Conversation = (props) => {
 
     const handleSelectAttachment = () => document.getElementById('attachment').click();
 
+    const clearCustomerCanceled = () => {
+        dispatch({
+            type: CUSTOMER_CANCELED,
+            payload: null
+        });
+
+        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    };
+
     return (
         <>
             <Toaster />
+            <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />

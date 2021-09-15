@@ -40,6 +40,7 @@ export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const SEND_MESSAGE = 'SendMessage';
 
 export const NOTIFICATION_TYPES = {
+    CANCEL_NEGOTIATION: 'CancelNegotiation',
     CHAT_MESSAGE: 'ChatMessage',
     TRANSFER_CONFIRMATION: 'TransferConfrimation',
     TRANSFER_NOTIFICATION: 'TransferNotification',

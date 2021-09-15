@@ -12,7 +12,7 @@ import clsx from 'clsx';
 
 import { API, COLORS } from '../../../utils/constants';
 import { updateMessageStatus } from '../../../actions/chat';
-import { SET_UNREAD_MESSAGES, SUBTRACT_UNREAD_MESSAGES } from '../../../actions/types';
+import { SUBTRACT_UNREAD_MESSAGES } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
 	message: {
@@ -69,10 +69,10 @@ const Message = ({ handleSetChat, conversation }) => {
                     }
                 }
                 setUnreadNotifications(count);
-                dispatch({
-                    type: SET_UNREAD_MESSAGES,
-                    payload: count
-                });
+                // dispatch({
+                //     type: SET_UNREAD_MESSAGES,
+                //     payload: count
+                // });
             }
         }
     }, [conversation, customerId, dispatch]);

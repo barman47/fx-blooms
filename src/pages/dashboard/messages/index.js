@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,12 +7,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Actions from './Actions';
 import Conversation from './Conversation';
 import Messages from './Messages';
-import SignalRService from '../../../utils/SignalRController';
+// import SignalRService from '../../../utils/SignalRController';
 
-import { COLORS, NOTIFICATION_TYPES } from '../../../utils/constants';
+import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../../actions/types';
-import audioFile from '../../../assets/sounds/notification.mp3';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -116,23 +114,14 @@ const useStyles = makeStyles(theme => ({
 
 const Index = (props) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
 
     const { handleSetTitle } = props;
 
     const chat = useSelector(state => state.chat?.chat);
-    const { customerId } = useSelector(state => state.customer);
-
-    useEffect(() => {
-        // eslint-disable-next-line
-    }, []);
     
     useEffect(() => {
         // handleSentMessage();
         handleSetTitle('Messages');
-        return () => {
-            SignalRService.closeNotifications();
-        };
         // eslint-disable-next-line
     }, []);
 

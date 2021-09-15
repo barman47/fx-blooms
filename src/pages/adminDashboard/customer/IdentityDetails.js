@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme =>({
 const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
     const { customer } = useSelector(state => state.customers);
-    const { customerId } = useSelector(state => state.customer);
+    // const { customerId } = useSelector(state => state.customer);
     
     const [open, setOpen] = useState(false);
     const [modalImage, setModalImage] = useState('');
@@ -70,15 +70,15 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         setOpen(false);
     };
 
-    const handleModalOpen = (img, alt) => {
-        setModalImage(img);
-        setAlt(alt);
-        setOpen(true);
-    };
+    // const handleModalOpen = (img, alt) => {
+    //     setModalImage(img);
+    //     setAlt(alt);
+    //     setOpen(true);
+    // };
 
-    const onSubmit = (e) => {
-        e.preventDefault();
-    };
+    // const onSubmit = (e) => {
+    //     e.preventDefault();
+    // };
 
     return (
         <>

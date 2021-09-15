@@ -31,8 +31,13 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
+// import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
+// import audioFile from '../../assets/sounds/notification.mp3';
 
 import { COLORS } from '../../utils/constants';
+// import { COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
+
+// import SignalRService from '../../utils/SignalRController';
 
 const drawerWidth = 240;
 
@@ -193,9 +198,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
+    // const dispatch = useDispatch();
     const history = useHistory();
     const location = useLocation();
-
+    
+    // const { customerId } = useSelector(state => state.customer);
     const { profile, userName } = useSelector(state => state.customer);
     const { unreadMessages } = useSelector(state => state.chat);
 
@@ -219,12 +226,76 @@ const Dashboard = ({ children, title, logout }) => {
 
     useEffect(() => {
         hideBottomNavigation();
+        // handleSentMessage();
         // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
         setPath(location.pathname);
     }, [location]);
+
+    // const handleSentMessage = () => {
+    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+    //     SignalRService.registerReceiveNotification((data, type) => {
+    //         let response = JSON.parse(data);
+    //         console.log('New Notification ', response, type);
+    //         if (customerId !== response.Sender) {
+    //             const audio = new Audio(audioFile);
+    //             audio.play();
+    //             navigator.vibrate(1000);
+    //         }
+    //         switch (type) {
+    //             case CHAT_MESSAGE:
+    //                 const messageData = {
+    //                     chatId: response.ChatId,
+    //                     dateSent: response.DateSent,
+    //                     id: response.Id,
+    //                     sender: response.Sender,
+    //                     text: response.Text,
+    //                     uploadedFileName: response.UploadedFileName,
+    //                     isRead: false
+    //                 };
+        
+    //                 dispatch({
+    //                     type: SENT_MESSAGE,
+    //                     payload: { message: messageData, customerId }
+    //                 });
+
+    //             break;
+
+    //             case TRANSFER_CONFIRMATION:
+    //                 dispatch({
+    //                     type: PAYMENT_NOTIFICATION,
+    //                     payload: {
+    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
+    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
+    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+    //                         isDeleted: response.IsDeleted,
+    //                         customerId
+    //                     }
+    //                 });
+    //                 break;
+
+    //             case TRANSFER_NOTIFICATION:
+    //                 dispatch({
+    //                     type: PAYMENT_NOTIFICATION,
+    //                     payload: {
+    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
+    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
+    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
+    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
+    //                         isDeleted: response.IsDeleted,
+    //                         customerId
+    //                     }
+    //                 });
+    //                 break;
+
+    //             default:
+    //                 break;
+    //         }
+    //     });
+    // };
 
     const hideBottomNavigation = () => {
         if (isSupported()) {
@@ -242,11 +313,6 @@ const Dashboard = ({ children, title, logout }) => {
 
     const toggleDrawer = () => {
         setOpen(!open);
-    };
-    
-    // eslint-disable-next-line
-    const handleDrawerClose = () => {
-        setOpen(false);
     };
 
     const handleLinkClick = (link) => {
@@ -360,7 +426,7 @@ const Dashboard = ({ children, title, logout }) => {
 
 Dashboard.propTypes = {
     logout: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
 };
 
 export default connect(undefined, { logout })(Dashboard);
