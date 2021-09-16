@@ -11,13 +11,17 @@ import {
     SET_REJECTED_CUSTOMERS,
     SET_MORE_REJECTED_CUSTOMERS,
     SET_ALL_CUSTOMERS,
-    CLEAR_ALL_CUSTOMERS
+    CLEAR_ALL_CUSTOMERS,
+    SET_ID_CHECK_DATA,
+    SET_PROFILE_CHECK_DATA
 } from '../actions/types';
 
 import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
 
 const initialState = {
     customer: {},
+    idCheckData: null,
+    profileCheckData: null,
     customers: {},
     confirmed: {},
     pending: {},
@@ -161,6 +165,18 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 }
+            };
+
+        case SET_ID_CHECK_DATA:
+            return {
+                ...state,
+                idCheckData: action.payload
+            };
+
+        case SET_PROFILE_CHECK_DATA:
+            return {
+                ...state,
+                profileCheckData: action.payload
             };
 
         case SET_CUSTOMER_STATUS:

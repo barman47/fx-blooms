@@ -5,7 +5,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
-import { GET_ERRORS, SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
+import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 import { getCustomerStatus, setCustomerStatus } from '../../../actions/customer';
 import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
 
@@ -67,7 +67,7 @@ const Customer = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { customer, msg } = useSelector(state => state.customers);
-    const errorsState = useSelector(state => state.errors);
+    // const errorsState = useSelector(state => state.errors);
 
     const [loading, setLoading] = useState(false);
 
@@ -85,15 +85,15 @@ const Customer = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setLoading(false);
-            dispatch({
-                type: GET_ERRORS,
-                payload: {}
-            });
-        }
-    }, [dispatch, errorsState]);
+    // useEffect(() => {
+    //     if (errorsState?.msg) {
+    //         setLoading(false);
+    //         dispatch({
+    //             type: GET_ERRORS,
+    //             payload: {}
+    //         });
+    //     }
+    // }, [dispatch, errorsState]);
 
     useEffect(() => {
         if (msg && customer) {

@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
+import { PAYMENT_NOTIFICATION, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
@@ -78,7 +78,7 @@ const useStyles = makeStyles(theme => ({
         gap: theme.spacing(1),
         // height: '10vh',
         // overflowY: 'scroll',
-        paddingBottom: theme.spacing(1),
+        // paddingBottom: theme.spacing(10),
         position: 'relative',
         zIndex: 2,
 
@@ -96,6 +96,12 @@ const useStyles = makeStyles(theme => ({
             fontSize: theme.spacing(1.5),
             fontWeight: 300,
             padding: theme.spacing(1)
+        }
+    },
+
+    message: {
+        '&:last-child': {
+            marginBottom: theme.spacing(1)
         }
     },
 
@@ -119,8 +125,11 @@ const useStyles = makeStyles(theme => ({
     },
 
     form: {
+        // justifySelf: 'flex-end',
+        // alignSelf: 'flex-end',
         position: 'sticky',
         bottom: 0,
+        left: 0,
         width: '100%',
         zIndex: 2
     },
@@ -197,7 +206,7 @@ const MobileConversation = (props) => {
         return () => {
             SignalRService.closeNotifications();
             dispatch({ type: UPDATE_ACTIVE_CHAT });
-            dispatch({ type: REMOVE_CHAT });
+            // dispatch({ type: REMOVE_CHAT });
             SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
@@ -226,7 +235,7 @@ const MobileConversation = (props) => {
         
                     dispatch({
                         type: SENT_MESSAGE,
-                            payload: { message: messageData, customerId }
+                        payload: { message: messageData, customerId }
                     });
 
                     break;
@@ -348,7 +357,15 @@ const MobileConversation = (props) => {
             handleSendMessage(chatMessage);
             // dispatch({
             //     type: SENT_MESSAGE,
-            //     payload: chatMessage
+            //     payload: {
+            //         chatId: chatMessage.chatSessionId,
+            //         // dateSent: chatMessage.DateSent,
+            //         // id: chatMessage.Id,
+            //         sender: chatMessage.senderId,
+            //         text: chatMessage.message,
+            //         uploadedFileName: chatMessage.documentName,
+            //         // isRead: false
+            //     }
             // });
             // sendMessage(chatMessage);
             setMessage('');
@@ -378,7 +395,7 @@ const MobileConversation = (props) => {
                                 <ArrowLeft />
                             </IconButton>
                             <div>
-                                <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId.substring(sessionId.length - 3)}</Typography>
+                                <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId?.substring(sessionId?.length - 3)}</Typography>
                                 <IconButton 
                                     edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
                                     <ContentCopy />
@@ -396,7 +413,7 @@ const MobileConversation = (props) => {
                                         message.uploadedFileName.includes('.pdf') ? 
                                             <div 
                                                 key={uuidv4()}
-                                                className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                                className={clsx(classes.attachment, classes.message, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                             >
                                                 <a href={message.uploadedFileName} className={classes.downloadLink} download>
                                                     <div>
@@ -409,7 +426,7 @@ const MobileConversation = (props) => {
                                         <img 
                                             key={uuidv4()}
                                             src={message.uploadedFileName} 
-                                            className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
+                                            className={clsx(classes.attachment, classes.message, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                             alt="Attachment" 
                                         />
                                     )
@@ -418,7 +435,7 @@ const MobileConversation = (props) => {
                                         key={uuidv4()}
                                         variant="subtitle2" 
                                         component="span" 
-                                        className={clsx({[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
+                                        className={clsx(classes.message, {[`${classes.me}`]: customerId === message.sender, [`${classes.recipient}`]: customerId !== message.sender })}
                                     >
                                         {decode(message.text)}
                                     </Typography>
@@ -473,6 +490,17 @@ const MobileConversation = (props) => {
                                     rows={1}
                                     fullWidth
                                     disabled={isDeleted}
+                                    onKeyUp={(e) => {
+                                        if (e.ctrlKey && e.key === 'Enter') {
+                                            return e.persist();
+                            
+                                            // return e.target.value + '\n';
+                                        }
+
+                                        if (e.code === 'Enter') {
+                                            return onSubmit(e);
+                                        }
+                                    }}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">

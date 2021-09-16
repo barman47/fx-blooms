@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { REMOVE_CHAT, SENT_MESSAGE, PAYMENT_NOTIFICATION, UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED } from '../../../actions/types';
+import { SENT_MESSAGE, PAYMENT_NOTIFICATION, UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
@@ -232,7 +232,7 @@ const Conversation = (props) => {
         handleSentMessage();
         return () => {
             dispatch({ type: UPDATE_ACTIVE_CHAT });
-            dispatch({ type: REMOVE_CHAT });
+            // dispatch({ type: REMOVE_CHAT });
             SignalRService.closeNotifications();
         };
         // eslint-disable-next-line

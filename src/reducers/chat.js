@@ -47,8 +47,9 @@ const chatsReducer = (state = initialState, action) => {
                     chats,
                 };
 
+            } else {
+                return state;
             }
-            break;
         
         case SET_CHAT:
             return {

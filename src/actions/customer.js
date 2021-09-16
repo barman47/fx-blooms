@@ -2,6 +2,7 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 
 import { CREATE_PROFILE, LOGIN, SETUP_2FA, SIGN_UP } from '../routes';
+import { SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
@@ -84,19 +85,16 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
             return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
 
         case EMAIL_VERIFICATION:
-            console.log('Email verification');
             return dispatch({
                 type: SET_CUSTOMER_MSG,
                 payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
             });
 
         case GOTO_2FA:
-            console.log('2FA');
             setAuthToken(res.data.data.token);
             return history.push(SETUP_2FA);
 
         case PROCEED_TO_LOGIN:
-            console.log('Login');
             dispatch({
                 type: GET_ERRORS,
                 payload: { msg: `${EmailAddress} Email has been linked to a profile. Please login to continue` }
@@ -464,25 +462,55 @@ export const sendMail = (data) => async (dispatch) => {
     }
 };
 
-export const getIdCardValidationResponse = (customerId) => async () => {
+export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`,);
-        console.log(res);
+        console.log(JSON.parse(res.data.data));
+        const data = JSON.parse(res.data.data);
+        const customerData = {
+            firstName: data.application.fields.$values[1].content,
+            lastName: data.application.fields.$values[2].content,
+            dateOfBirth: data.application.fields.$values[3].content,
+
+            idFront:  data.application.documents.$values[0].files.$values[0].uri,
+            idBack: data.application.documents.$values[0].files.$values[1].uri,
+            issueCountry: data.application.documents.$values[0].issuingCountry,
+            documentType: data.application.documents.$values[0].documentType,
+
+            status: data.overallResult.status
+        };
+        dispatch({
+            type: SET_ID_CHECK_DATA,
+            payload: customerData
+        });
     } catch (err) {
-        console.log(err.response);
-        console.error(err);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 
-export const getResidencePermitValidationResponse = (customerId) => async () => {
+export const getResidencePermitValidationResponse = (customerId) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`,);
-        console.log(res);
+        console.log(JSON.parse(res.data.data));
+        const data = JSON.parse(res.data.data);
+        const customerData = {
+            firstName: data.application.fields.$values[1].content,
+            lastName: data.application.fields.$values[2].content,
+            dateOfBirth: data.application.fields.$values[3].content,
+
+            idFront:  data.application.documents.$values[0].files.$values[0].uri,
+            idBack: data.application.documents.$values[0].files.$values[1].uri,
+            issueCountry: data.application.documents.$values[0].issuingCountry,
+            documentType: data.application.documents.$values[0].documentType,
+
+            status: data.overallResult.status
+        };
+        dispatch({
+            type: SET_PROFILE_CHECK_DATA,
+            payload: customerData
+        });
     } catch (err) {
-        console.log(err.response);
-        console.error(err);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 

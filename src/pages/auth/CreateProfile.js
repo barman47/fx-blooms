@@ -350,7 +350,7 @@ const CreateProfile = (props) => {
                                         fullWidth
                                         required
                                         inputProps={{
-                                            maxLength: 10
+                                            maxLength: 16
                                         }}
                                         error={errors.PhoneNo ? true : false}
                                     />
