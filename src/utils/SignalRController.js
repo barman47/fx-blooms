@@ -8,7 +8,7 @@ class SignalRController {
         this.connection = new HubConnectionBuilder().withUrl(HUB_URL, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets
-        }).configureLogging(LogLevel.Information).withAutomaticReconnect().build();
+        }).configureLogging(LogLevel.Information).withAutomaticReconnect([5, 5, 5, 5, 5, 5, 5, 5, 5, 5]).build();
         
         this.connection.start().then().catch(err => {
             console.error(err);
@@ -16,7 +16,11 @@ class SignalRController {
     }
 
     sendMessage = async (message) => {
-        await this.connection.send(SEND_MESSAGE, message);
+        try {
+            await this.connection.send(SEND_MESSAGE, message);
+        } catch (err) {
+            console.log(err.message);
+        }
     }
 
     registerReceiveNotification = (callback) => {

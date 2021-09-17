@@ -24,15 +24,16 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { PAYMENT_NOTIFICATION, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
 import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
-import { DASHBOARD, MESSAGES } from '../../../routes';
+import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../../../routes';
 import SignalRService from '../../../utils/SignalRController';
 import audioFile from '../../../assets/sounds/notification.mp3';
+import CustomerCanceledModal from './CustomerCanceledModal';
 
 import MobileActions from './MobileActions';
 
@@ -61,7 +62,9 @@ const useStyles = makeStyles(theme => ({
     messageContainer: {
         display: 'flex',
         flexDirection: 'column',
-        height: '45vh',
+        // height: '45vh',
+        height: '58vh',
+        // height: '70%',
         // height: theme.spacing(50),
         position: 'relative',
         top: 0,
@@ -181,7 +184,7 @@ const MobileConversation = (props) => {
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
     const { customerId, userName } = useSelector(state => state.customer);
-    const { chat, sessionId } = useSelector(state => state.chat);
+    const { chat, customerCanceled, sessionId } = useSelector(state => state.chat);
 
     const { sendMessage } = props;
 
@@ -199,6 +202,7 @@ const MobileConversation = (props) => {
     const [errors, setErrors] = useState({});
 
     const tipsAndRecommendationsModal = useRef();
+    const customerCanceledModal = useRef();
     
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
@@ -212,25 +216,34 @@ const MobileConversation = (props) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (customerCanceled !== null) {
+            customerCanceledModal.current.openModal();
+            customerCanceledModal.current.setModalText(customerCanceled);
+        }
+    }, [customerCanceled]);
+
     const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             let response = JSON.parse(data);
-            // console.log('New Notification ', response, type);
+            let payload, senderId;
+            console.log('New Notification ', response, type);
+            if (customerId !== response.Sender) {
+                const audio = new Audio(audioFile);
+                audio.play();
+                navigator.vibrate(1000);
+            }
             switch (type) {
                 case CHAT_MESSAGE:
-                    if (customerId !== response.Sender) {
-                        const audio = new Audio(audioFile);
-                        audio.play();
-                        navigator.vibrate(1000);
-                    }
                     const messageData = {
                         chatId: response.ChatId,
                         dateSent: response.DateSent,
                         id: response.Id,
                         sender: response.Sender,
                         text: response.Text,
-                        uploadedFileName: response.UploadedFileName
+                        uploadedFileName: response.UploadedFileName,
+                        isRead: false
                     };
         
                     dispatch({
@@ -238,32 +251,58 @@ const MobileConversation = (props) => {
                         payload: { message: messageData, customerId }
                     });
 
-                    break;
+                break;
 
                 case TRANSFER_CONFIRMATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
+
                     dispatch({
                         type: PAYMENT_NOTIFICATION,
                         payload: {
-                            buyerHasMadePayment: response.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: response.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
+                            buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
+                            isDeleted: payload.Chat.IsDeleted,
+                            customerId,
+                            senderId,
+                            transactionType: type
                         }
                     });
+                    
                     break;
 
                 case TRANSFER_NOTIFICATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
+
                     dispatch({
                         type: PAYMENT_NOTIFICATION,
                         payload: {
-                            buyerHasMadePayment: response.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: response.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-                            isDeleted: response.IsDeleted
+                            buyerHasMadePayment: payload.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: payload.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                            isDeleted: payload.IsDeleted,
+                            customerId,
+                            senderId,
+                            transactionType: type
                         }
-                    });
+                    });    
+
+                    break;
+
+                case CANCEL_NEGOTIATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
+                    
+                    if (senderId !== customerId) {
+                        dispatch({ 
+                            type: CUSTOMER_CANCELED,
+                            payload: `Hi, this transaction has been canceled by the other user`
+                        });
+                    }
                     break;
 
                 default:
@@ -381,9 +420,19 @@ const MobileConversation = (props) => {
 
     const goBack = () => history.push(`${DASHBOARD}${MESSAGES}`);
 
+    const clearCustomerCanceled = () => {
+        dispatch({
+            type: CUSTOMER_CANCELED,
+            payload: null
+        });
+
+        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    };
+
     return (
         <>
             <Toaster />
+            <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             { (customerId === buyer && chat.buyerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
             { (customerId === seller && chat.sellerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }

@@ -135,120 +135,116 @@ const Actions = (props) => {
                         type="error"
                     />
                 }
-                <Grid container direction="column" spacing={2}>
-                    <Grid item xs={12}>
-                        <Button 
-                            variant="contained" 
-                            color="primary" 
-                            onClick={() => props.showTipsAndRecommendations()} 
-                            fullWidth
-                            className={classes.button}
-                        >
-                           View Tips and Recommendations
-                        </Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <form onSubmit={onSubmit}>
-                            <Grid container direction="column" spacing={3}>
-                                {/* Buyer Start End */}
-                                {buyer === customerId && 
-                                    <>
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
-                                                onClick={handlePayment}
-                                            >
-                                                I've Made Payment:Buyer
-                                            </Button>
-                                        </Grid>
-                                        {sellerHasMadePayment &&
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    type="submit"
-                                                    variant="contained"
-                                                    color="primary"
-                                                    fullWidth
-                                                    onClick={completeTransaction}
-                                                    disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
-                                                >
-                                                    Payment Received:Buyer
-                                                </Button>
-                                            </Grid>
-                                        }
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
-                                            >
-                                                Cancel Transaction:Buyer
-                                            </Button>
-                                        </Grid>
-                                    </>
+                <form onSubmit={onSubmit}>
+                    <Grid container direction="row" spacing={3}>
+                        <Grid item xs={6}>
+                            <Button 
+                                variant="contained" 
+                                color="primary" 
+                                onClick={() => props.showTipsAndRecommendations()} 
+                                fullWidth
+                                className={classes.button}
+                            >
+                                Tips and Recommendations
+                            </Button>
+                        </Grid>
+                        {/* Buyer Start End */}
+                        {buyer === customerId && 
+                            <>
+                                <Grid item xs={6}>
+                                    <Button 
+                                        className={classes.button}
+                                        type="submit"
+                                        variant="outlined"
+                                        color="primary"
+                                        fullWidth
+                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                        onClick={handlePayment}
+                                    >
+                                        I've Made Payment:Buyer
+                                    </Button>
+                                </Grid>
+                                {sellerHasMadePayment &&
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            type="submit"
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            onClick={completeTransaction}
+                                            disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
+                                        >
+                                            Payment Received:Buyer
+                                        </Button>
+                                    </Grid>
                                 }
-                                {/* Buyer Buttons End */}
-                            
-                                {/* Seller Buttons Start */}
-                                {seller === customerId && 
-                                    <>
-                                        {sellerHasRecievedPayment && 
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    className={classes.button}
-                                                    type="submit"
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    fullWidth
-                                                    disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
-                                                    onClick={handlePayment}
-                                                >
-                                                    I've Made Payment:Seller
-                                                </Button>
-                                            </Grid>
-                                        }
-                                        {buyerHasMadePayment &&
-                                            <Grid item xs={12}>
-                                                <Button 
-                                                    type="submit"
-                                                    variant="contained"
-                                                    color="primary"
-                                                    fullWidth
-                                                    onClick={completeTransaction}
-                                                    disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
-                                                >
-                                                    Payment Received:Seller
-                                                </Button>
-                                            </Grid>
-                                        }
-                                        <Grid item xs={12}>
-                                            <Button 
-                                                className={classes.button}
-                                                type="submit"
-                                                variant="outlined"
-                                                color="primary"
-                                                fullWidth
-                                                onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
-                                            >
-                                                Cancel Transaction:Seller
-                                            </Button>
-                                        </Grid>
-                                    </>
+                                <Grid item xs={6}>
+                                    <Button 
+                                        className={classes.button}
+                                        type="submit"
+                                        variant="outlined"
+                                        color="primary"
+                                        fullWidth
+                                        onClick={cancelNegotiation}
+                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                    >
+                                        Cancel Transaction:Buyer
+                                    </Button>
+                                </Grid>
+                            </>
+                        }
+                        {/* Buyer Buttons End */}
+                    
+                        {/* Seller Buttons Start */}
+                        {seller === customerId && 
+                            <>
+                                {sellerHasRecievedPayment && 
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            className={classes.button}
+                                            type="submit"
+                                            variant="outlined"
+                                            color="primary"
+                                            fullWidth
+                                            disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
+                                            onClick={handlePayment}
+                                        >
+                                            I've Made Payment:Seller
+                                        </Button>
+                                    </Grid>
                                 }
-                                {/* Seller Buttons End */}
-                            </Grid>
-                        </form>
+                                {buyerHasMadePayment &&
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            type="submit"
+                                            variant="contained"
+                                            color="primary"
+                                            fullWidth
+                                            onClick={completeTransaction}
+                                            disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
+                                        >
+                                            Payment Received:Seller
+                                        </Button>
+                                    </Grid>
+                                }
+                                <Grid item xs={6}>
+                                    <Button 
+                                        className={classes.button}
+                                        type="submit"
+                                        variant="outlined"
+                                        color="primary"
+                                        fullWidth
+                                        onClick={cancelNegotiation}
+                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                    >
+                                        Cancel Transaction:Seller
+                                    </Button>
+                                </Grid>
+                            </>
+                        }
+                        {/* Seller Buttons End */}
                     </Grid>
-                </Grid>
+                </form>
             </section>
         </>
     );

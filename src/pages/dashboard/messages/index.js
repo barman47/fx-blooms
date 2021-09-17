@@ -15,7 +15,7 @@ import isEmpty from '../../../utils/isEmpty';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100vh',
-        position: 'sticky',
+        position: 'relative',
         // overflowY: 'hidden',
         overflowY: ['hidden', '-moz-scrollbars-none'],
         scrollbarWidth: 'none',
@@ -58,6 +58,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     messages: {
+        position: 'sticky',
+
         maxHeight: '100%',
         // overflowY: 'scroll',
         overflowY: ["hidden", "-moz-scrollbars-none"],

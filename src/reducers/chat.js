@@ -14,6 +14,8 @@ import {
     CUSTOMER_CANCELED
 } from '../actions/types';
 
+import { NOTIFICATION_TYPES } from '../utils/constants';
+
 const initialState = {
     chat: null,
     chats: [],
@@ -100,10 +102,12 @@ const chatsReducer = (state = initialState, action) => {
             chat.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
             chat.isDeleted = action.payload.isDeleted;
 
+            unreadCount = state.chat.id === action.payload.chatId || action.payload.customerId === action.payload.senderId ? state.unreadMessages : state.unreadMessages + 1;
+
             return {
                 ...state,
                 chat: {...state.chat, ...action.payload},
-                unreadMessages: action.payload.customerId === action.payload.sender ? state.unreadMessages : state.unreadMessages + 1
+                unreadMessages: action.payload === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : unreadCount
             };
 
         case CUSTOMER_CANCELED:
