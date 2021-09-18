@@ -1,6 +1,7 @@
 import axios from 'axios';
+import { batch } from 'react-redux';
 
-import { SET_CHATS, SET_CUSTOMER_MSG, SET_TRANSACTION_TERMS, GET_UNREAD_MESSAGES } from './types';
+import { CUSTOMER_MADE_PAYMENT, SET_CHATS, SET_CUSTOMER_MSG, SET_TRANSACTION_TERMS, GET_UNREAD_MESSAGES } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueToken from '../utils/reIssueToken';
@@ -43,14 +44,23 @@ export const getUnreadMessages = () => async (dispatch) => {
     }
 };
 
-export const sendTransactionNotification = (chatId, { customerUsername, otherUsername }) => async (dispatch) => {
+export const sendTransactionNotification = (chatId, { customerUsername, otherUsername, buyerHasMadePayment, sellerHasMadePayment }) => async (dispatch) => {
     try {
         await reIssueToken();
         await axios.post(`${api}/TransactionNotification?chatId=${chatId}`);
         const message = `Hi ${customerUsername} a notification has been sent to ${otherUsername}`;
-        return dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: message
+        return batch(() => {
+            dispatch({
+                type: CUSTOMER_MADE_PAYMENT,
+                payload: {
+                    buyerHasMadePayment,
+                    sellerHasMadePayment,
+                }
+            });
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: message
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

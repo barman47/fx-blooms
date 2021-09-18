@@ -149,8 +149,13 @@ const Actions = (props) => {
         });
     };    
 
-    const handlePayment = () => {
-        props.sendTransactionNotification(sessionId, { customerUsername: userName, otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername });
+    const handlePayment = ({ buyerHasMadePayment, sellerHasMadePayment }) => {
+        props.sendTransactionNotification(sessionId, { 
+            customerUsername: userName, 
+            otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername,
+            buyerHasMadePayment,
+            sellerHasMadePayment 
+        });
     };
 
     const onSubmit = (e) => {
@@ -187,7 +192,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
-                                                onClick={handlePayment}
+                                                onClick={() => handlePayment({ buyerHasMadePayment: true, sellerHasMadePayment })}
                                             >
                                                 I've Made Payment:Buyer
                                             </Button>
@@ -235,7 +240,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
-                                                    onClick={handlePayment}
+                                                    onClick={() => handlePayment({ buyerHasMadePayment, sellerHasMadePayment: true })}
                                                 >
                                                     I've Made Payment:Seller
                                                 </Button>

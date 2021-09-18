@@ -292,26 +292,28 @@ const Conversation = (props) => {
                             transactionType: type
                         }
                     });
-                    
+
                     break;
 
                 case TRANSFER_NOTIFICATION:
                     payload = JSON.parse(response.Payload);
                     senderId = response.SenderId;
 
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: payload.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: payload.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                            isDeleted: payload.IsDeleted,
-                            customerId,
-                            senderId,
-                            transactionType: type
-                        }
-                    });    
+                    if (senderId !== customerId) {
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: payload.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: payload.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                                isDeleted: payload.IsDeleted,
+                                customerId,
+                                senderId,
+                                transactionType: type
+                            }
+                        });    
+                    }
 
                     break;
 

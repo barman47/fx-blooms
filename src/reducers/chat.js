@@ -4,6 +4,7 @@ import {
     SET_CHAT, 
     SET_CHATS, 
     SENT_MESSAGE,
+    CUSTOMER_MADE_PAYMENT,
     PAYMENT_NOTIFICATION,
     REMOVE_CHAT,
     GET_UNREAD_MESSAGES,
@@ -92,7 +93,11 @@ const chatsReducer = (state = initialState, action) => {
                 }
             }
             
-            
+        case CUSTOMER_MADE_PAYMENT:
+            return {
+                ...state,
+                chat: { ...state.chat, ...action.payload }
+            };
 
         case PAYMENT_NOTIFICATION: 
             chat = state.chat;
