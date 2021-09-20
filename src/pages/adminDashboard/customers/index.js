@@ -61,7 +61,7 @@ const useStyles = makeStyles((theme) => ({
         '& header': {
             backgroundColor: COLORS.white,
             display: 'grid',
-            gridTemplateColumns: '0.2fr 1fr 1.2fr 1.2fr 1.7fr 1.2fr 0.8fr',
+            gridTemplateColumns: '0.2fr 1fr 1.2fr 1.7fr 1.2fr 0.8fr',
             marginBottom: theme.spacing(3),
             
             '& span': {
@@ -71,7 +71,11 @@ const useStyles = makeStyles((theme) => ({
 
                 [theme.breakpoints.down('md')]: {
                     fontSize: theme.spacing(1.5)
-                }
+                },
+
+                [theme.breakpoints.down('sm')]: {
+                    fontSize: theme.spacing(1)
+                },
             }
         }
     },
@@ -324,7 +328,7 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span">#</Typography>
                         <Typography variant="subtitle2" component="span">Full Name</Typography>
                         <Typography variant="subtitle2" component="span">Phone Number</Typography>
-                        <Typography variant="subtitle2" component="span">ID Type</Typography>
+                        {/* <Typography variant="subtitle2" component="span">ID Type</Typography> */}
                         <Typography variant="subtitle2" component="span">Email Address</Typography>
                         <Typography variant="subtitle2" component="span">Username</Typography>
                         <Typography variant="subtitle2" component="span"></Typography>

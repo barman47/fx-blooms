@@ -262,43 +262,43 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         <TabPanel value={value} index={1}>
                             {profileCheckData ? 
                                 <Grid container direction="row" spacing={3}>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Type</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.documentType}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Document Number</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.documentNumber}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.firstName}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.lastName}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Gender</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.gender}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.dateOfBirth}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Issuing Country</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.issueCountry}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Date of Expiry</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.expiryDate}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Date of Issue</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.issueDate}</Typography>
                                     </Grid>
-                                    <Grid item xs={12} md={6}>
+                                    <Grid item xs={6}>
                                         <Typography variant="subtitle2" component="span" className={classes.label}>Status</Typography>
                                         <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.status}</Typography>
                                     </Grid>
