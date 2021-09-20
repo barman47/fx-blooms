@@ -12,7 +12,7 @@ import {
     useMediaQuery 
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ArrowLeft, Attachment, FilePdfOutline, ContentCopy, Send } from 'mdi-material-ui';
+import { ArrowLeft, Attachment, FilePdfOutline, ContentCopy, Information, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -57,6 +57,20 @@ const useStyles = makeStyles(theme => ({
 
     container: {
         overflowY: 'scroll',
+    },
+
+    tipsAndRecommendations: {
+        color: theme.palette.primary.main,
+        borderRadius: '10px',
+        display: 'block',
+        border: `1px solid ${theme.palette.primary.main}`,
+        margin: '10px auto',
+        textAlign: 'center'
+    },
+
+    tipsIcon: {
+        position: 'relative',
+        top: 5
     },
     
     messageContainer: {
@@ -455,6 +469,7 @@ const MobileConversation = (props) => {
                         </section>
                     </Toolbar>
                 </AppBar>
+                <Typography variant="subtitle2" component="small" className={classes.tipsAndRecommendations} onClick={() => openTipsAndRecommendationsModal()} ><Information className={classes.tipsIcon} /> &nbsp;Ensure to read our Tips and Recomendations</Typography>
                 <ScrollableFeed className={classes.messageContainer} forceScroll={true}>
                     <div className={classes.messages}>
                         {chat?.messages && matches && chat?.messages.map((message) => (
@@ -579,7 +594,7 @@ const MobileConversation = (props) => {
                         </Grid>
                     </form>
                 </ScrollableFeed>
-                <MobileActions showTipsAndRecommendations={openTipsAndRecommendationsModal} />
+                <MobileActions />
             </section>
         </>
     );

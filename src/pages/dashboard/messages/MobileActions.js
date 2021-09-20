@@ -24,8 +24,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
-        paddingBottom: theme.spacing(2),
-        paddingTop: theme.spacing(2),
+        paddingBottom: theme.spacing(0.5),
+        paddingTop: theme.spacing(0.5),
     }
 }));
 
@@ -136,22 +136,11 @@ const Actions = (props) => {
                     />
                 }
                 <form onSubmit={onSubmit}>
-                    <Grid container direction="row" spacing={3}>
-                        <Grid item xs={6}>
-                            <Button 
-                                variant="contained" 
-                                color="primary" 
-                                onClick={() => props.showTipsAndRecommendations()} 
-                                fullWidth
-                                className={classes.button}
-                            >
-                                Tips and Recommendations
-                            </Button>
-                        </Grid>
+                    <Grid container direction="row" spacing={2}>
                         {/* Buyer Start End */}
                         {buyer === customerId && 
                             <>
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <Button 
                                         className={classes.button}
                                         type="submit"
@@ -165,8 +154,9 @@ const Actions = (props) => {
                                     </Button>
                                 </Grid>
                                 {sellerHasMadePayment &&
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12}>
                                         <Button 
+                                            className={classes.button}
                                             type="submit"
                                             variant="contained"
                                             color="primary"
@@ -178,7 +168,7 @@ const Actions = (props) => {
                                         </Button>
                                     </Grid>
                                 }
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <Button 
                                         className={classes.button}
                                         type="submit"
@@ -199,7 +189,7 @@ const Actions = (props) => {
                         {seller === customerId && 
                             <>
                                 {sellerHasRecievedPayment && 
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12}>
                                         <Button 
                                             className={classes.button}
                                             type="submit"
@@ -214,8 +204,9 @@ const Actions = (props) => {
                                     </Grid>
                                 }
                                 {buyerHasMadePayment &&
-                                    <Grid item xs={6}>
+                                    <Grid item xs={12}>
                                         <Button 
+                                            className={classes.button}
                                             type="submit"
                                             variant="contained"
                                             color="primary"
@@ -227,7 +218,7 @@ const Actions = (props) => {
                                         </Button>
                                     </Grid>
                                 }
-                                <Grid item xs={6}>
+                                <Grid item xs={12}>
                                     <Button 
                                         className={classes.button}
                                         type="submit"
