@@ -241,7 +241,7 @@ const Dashboard = ({ children, title, logout }) => {
             if (customerId !== response.Sender) {
                 const audio = new Audio(audioFile);
                 audio.play();
-                navigator.vibrate(1000);
+                navigator.vibrate(500);
             }
             switch (type) {
                 case CHAT_MESSAGE:
