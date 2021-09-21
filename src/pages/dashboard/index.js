@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { connect, useSelector } from 'react-redux';
 import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
@@ -31,13 +31,12 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-// import { PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
-// import audioFile from '../../assets/sounds/notification.mp3';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
+import audioFile from '../../assets/sounds/notification.mp3';
 
-import { COLORS } from '../../utils/constants';
-// import { COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
 
-// import SignalRService from '../../utils/SignalRController';
+import SignalRService from '../../utils/SignalRController';
 
 const drawerWidth = 240;
 
@@ -198,12 +197,11 @@ const useStyles = makeStyles((theme) => ({
 
 const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
-    // const dispatch = useDispatch();
+    const dispatch = useDispatch();
     const history = useHistory();
     const location = useLocation();
     
-    // const { customerId } = useSelector(state => state.customer);
-    const { profile, userName } = useSelector(state => state.customer);
+    const { customerId, profile, userName } = useSelector(state => state.customer);
     const { unreadMessages } = useSelector(state => state.chat);
 
     const [value, setValue] = useState(0);
@@ -226,7 +224,7 @@ const Dashboard = ({ children, title, logout }) => {
 
     useEffect(() => {
         hideBottomNavigation();
-        // handleSentMessage();
+        handleSentMessage();
         // eslint-disable-next-line
     }, []);
 
@@ -234,68 +232,95 @@ const Dashboard = ({ children, title, logout }) => {
         setPath(location.pathname);
     }, [location]);
 
-    // const handleSentMessage = () => {
-    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
-    //     SignalRService.registerReceiveNotification((data, type) => {
-    //         let response = JSON.parse(data);
-    //         console.log('New Notification ', response, type);
-    //         if (customerId !== response.Sender) {
-    //             const audio = new Audio(audioFile);
-    //             audio.play();
-    //             navigator.vibrate(1000);
-    //         }
-    //         switch (type) {
-    //             case CHAT_MESSAGE:
-    //                 const messageData = {
-    //                     chatId: response.ChatId,
-    //                     dateSent: response.DateSent,
-    //                     id: response.Id,
-    //                     sender: response.Sender,
-    //                     text: response.Text,
-    //                     uploadedFileName: response.UploadedFileName,
-    //                     isRead: false
-    //                 };
+    const handleSentMessage = () => {
+        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
+        SignalRService.registerReceiveNotification((data, type) => {
+            let response = JSON.parse(data);
+            let payload, senderId;
+            console.log('New Notification ', response, type);
+            if (customerId !== response.Sender) {
+                const audio = new Audio(audioFile);
+                audio.play();
+                navigator.vibrate(1000);
+            }
+            switch (type) {
+                case CHAT_MESSAGE:
+                    const messageData = {
+                        chatId: response.ChatId,
+                        dateSent: response.DateSent,
+                        id: response.Id,
+                        sender: response.Sender,
+                        text: response.Text,
+                        uploadedFileName: response.UploadedFileName,
+                        isRead: false
+                    };
         
-    //                 dispatch({
-    //                     type: SENT_MESSAGE,
-    //                     payload: { message: messageData, customerId }
-    //                 });
+                    dispatch({
+                        type: SENT_MESSAGE,
+                        payload: { message: messageData, customerId }
+                    });
 
-    //             break;
+                break;
 
-    //             case TRANSFER_CONFIRMATION:
-    //                 dispatch({
-    //                     type: PAYMENT_NOTIFICATION,
-    //                     payload: {
-    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
-    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
-    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-    //                         isDeleted: response.IsDeleted,
-    //                         customerId
-    //                     }
-    //                 });
-    //                 break;
+                case TRANSFER_CONFIRMATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
 
-    //             case TRANSFER_NOTIFICATION:
-    //                 dispatch({
-    //                     type: PAYMENT_NOTIFICATION,
-    //                     payload: {
-    //                         buyerHasMadePayment: response.BuyerHasMadePayment,
-    //                         buyerHasRecievedPayment: response.BuyerHasRecievedPayment,
-    //                         sellerHasMadePayment: response.SellerHasMadePayment, 
-    //                         sellerHasRecievedPayment: response.SellerHasRecievedPayment, 
-    //                         isDeleted: response.IsDeleted,
-    //                         customerId
-    //                     }
-    //                 });
-    //                 break;
+                    dispatch({
+                        type: PAYMENT_NOTIFICATION,
+                        payload: {
+                            buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
+                            buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
+                            sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
+                            sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
+                            isDeleted: payload.Chat.IsDeleted,
+                            customerId,
+                            senderId,
+                            transactionType: type
+                        }
+                    });
 
-    //             default:
-    //                 break;
-    //         }
-    //     });
-    // };
+                    break;
+
+                case TRANSFER_NOTIFICATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
+
+                    if (senderId !== customerId) {
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: payload.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: payload.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                                isDeleted: payload.IsDeleted,
+                                customerId,
+                                senderId,
+                                transactionType: type
+                            }
+                        });    
+                    }
+
+                    break;
+
+                case CANCEL_NEGOTIATION:
+                    payload = JSON.parse(response.Payload);
+                    senderId = response.SenderId;
+                    
+                    if (senderId !== customerId) {
+                        dispatch({ 
+                            type: CUSTOMER_CANCELED,
+                            payload: `Hi, this transaction has been canceled by the other user`
+                        });
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        });
+    };
 
     const hideBottomNavigation = () => {
         if (isSupported()) {

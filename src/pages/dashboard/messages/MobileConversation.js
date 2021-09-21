@@ -24,15 +24,14 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
-import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR, NOTIFICATION_TYPES } from '../../../utils/constants';
+import { CUSTOMER_CANCELED, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
+import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../../../routes';
 import SignalRService from '../../../utils/SignalRController';
-import audioFile from '../../../assets/sounds/notification.mp3';
 import CustomerCanceledModal from './CustomerCanceledModal';
 
 import MobileActions from './MobileActions';
@@ -220,12 +219,11 @@ const MobileConversation = (props) => {
     
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
-        handleSentMessage();
+        // handleSentMessage();
         return () => {
-            SignalRService.closeNotifications();
             dispatch({ type: UPDATE_ACTIVE_CHAT });
             // dispatch({ type: REMOVE_CHAT });
-            SignalRService.closeNotifications();
+            // SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
     }, []);
@@ -237,95 +235,95 @@ const MobileConversation = (props) => {
         }
     }, [customerCanceled]);
 
-    const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
-        SignalRService.registerReceiveNotification((data, type) => {
-            let response = JSON.parse(data);
-            let payload, senderId;
-            console.log('New Notification ', response, type);
-            if (customerId !== response.Sender) {
-                const audio = new Audio(audioFile);
-                audio.play();
-                navigator.vibrate(1000);
-            }
-            switch (type) {
-                case CHAT_MESSAGE:
-                    const messageData = {
-                        chatId: response.ChatId,
-                        dateSent: response.DateSent,
-                        id: response.Id,
-                        sender: response.Sender,
-                        text: response.Text,
-                        uploadedFileName: response.UploadedFileName,
-                        isRead: false
-                    };
+    // const handleSentMessage = () => {
+    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
+    //     SignalRService.registerReceiveNotification((data, type) => {
+    //         let response = JSON.parse(data);
+    //         let payload, senderId;
+    //         console.log('New Notification ', response, type);
+    //         if (customerId !== response.Sender) {
+    //             const audio = new Audio(audioFile);
+    //             audio.play();
+    //             navigator.vibrate(1000);
+    //         }
+    //         switch (type) {
+    //             case CHAT_MESSAGE:
+    //                 const messageData = {
+    //                     chatId: response.ChatId,
+    //                     dateSent: response.DateSent,
+    //                     id: response.Id,
+    //                     sender: response.Sender,
+    //                     text: response.Text,
+    //                     uploadedFileName: response.UploadedFileName,
+    //                     isRead: false
+    //                 };
         
-                    dispatch({
-                        type: SENT_MESSAGE,
-                        payload: { message: messageData, customerId }
-                    });
+    //                 dispatch({
+    //                     type: SENT_MESSAGE,
+    //                     payload: { message: messageData, customerId }
+    //                 });
 
-                break;
+    //             break;
 
-                case TRANSFER_CONFIRMATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
+    //             case TRANSFER_CONFIRMATION:
+    //                 payload = JSON.parse(response.Payload);
+    //                 senderId = response.SenderId;
 
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-                            isDeleted: payload.Chat.IsDeleted,
-                            customerId,
-                            senderId,
-                            transactionType: type
-                        }
-                    });
+    //                 dispatch({
+    //                     type: PAYMENT_NOTIFICATION,
+    //                     payload: {
+    //                         buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
+    //                         buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
+    //                         sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
+    //                         sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
+    //                         isDeleted: payload.Chat.IsDeleted,
+    //                         customerId,
+    //                         senderId,
+    //                         transactionType: type
+    //                     }
+    //                 });
 
-                    break;
+    //                 break;
 
-                case TRANSFER_NOTIFICATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
+    //             case TRANSFER_NOTIFICATION:
+    //                 payload = JSON.parse(response.Payload);
+    //                 senderId = response.SenderId;
 
-                    if (senderId !== customerId) {
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: payload.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: payload.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                                isDeleted: payload.IsDeleted,
-                                customerId,
-                                senderId,
-                                transactionType: type
-                            }
-                        });    
-                    }
+    //                 if (senderId !== customerId) {
+    //                     dispatch({
+    //                         type: PAYMENT_NOTIFICATION,
+    //                         payload: {
+    //                             buyerHasMadePayment: payload.BuyerHasMadePayment,
+    //                             buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+    //                             sellerHasMadePayment: payload.SellerHasMadePayment, 
+    //                             sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+    //                             isDeleted: payload.IsDeleted,
+    //                             customerId,
+    //                             senderId,
+    //                             transactionType: type
+    //                         }
+    //                     });    
+    //                 }
 
-                    break;
+    //                 break;
 
-                case CANCEL_NEGOTIATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
+    //             case CANCEL_NEGOTIATION:
+    //                 payload = JSON.parse(response.Payload);
+    //                 senderId = response.SenderId;
                     
-                    if (senderId !== customerId) {
-                        dispatch({ 
-                            type: CUSTOMER_CANCELED,
-                            payload: `Hi, this transaction has been canceled by the other user`
-                        });
-                    }
-                    break;
+    //                 if (senderId !== customerId) {
+    //                     dispatch({ 
+    //                         type: CUSTOMER_CANCELED,
+    //                         payload: `Hi, this transaction has been canceled by the other user`
+    //                     });
+    //                 }
+    //                 break;
 
-                default:
-                    break;
-            }
-        });
-    };
+    //             default:
+    //                 break;
+    //         }
+    //     });
+    // };
 
     // End transaction and disable chat
     // useEffect(() => {
