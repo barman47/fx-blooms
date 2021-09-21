@@ -72,13 +72,16 @@ const chatsReducer = (state = initialState, action) => {
             if (state.chat) {
                 const { messages, ...rest } = state.chat;
                 messageList = [...messages, action.payload.message];
-                unreadCount = state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
+                unreadCount = action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
+                // unreadCount = state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
                 
                 // if (state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender) {
                 //     unreadCount = state.unreadMessages
                 // } else {
                 //     unreadCount = state.unreadMessages + 1;
                 // }
+
+                debugger;
 
                 return {
                     ...state,
