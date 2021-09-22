@@ -232,61 +232,69 @@ const Dashboard = ({ children, title, logout }) => {
         setPath(location.pathname);
     }, [location]);
 
+    const playAudioNotifcation = (customerId, senderId) => {
+        if (customerId !== senderId) {
+            const audio = new Audio(audioFile);
+            audio.play();
+            navigator.vibrate(500);
+        }
+    };
+
     const handleSentMessage = () => {
         const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
-            let response = JSON.parse(data);
-            let payload, senderId;
-            console.log('New Notification ', response, type);
-            if (customerId !== response.Sender) {
-                const audio = new Audio(audioFile);
-                audio.play();
-                navigator.vibrate(500);
-            }
-            switch (type) {
-                case CHAT_MESSAGE:
-                    const messageData = {
-                        chatId: response.ChatId,
-                        dateSent: response.DateSent,
-                        id: response.Id,
-                        sender: response.Sender,
-                        text: response.Text,
-                        uploadedFileName: response.UploadedFileName,
-                        isRead: false
-                    };
-        
-                    dispatch({
-                        type: SENT_MESSAGE,
-                        payload: { message: messageData, customerId }
-                    });
+            try {
+                let response = JSON.parse(data);
+                let payload, senderId;
+                console.log('New Notification ', response, type);
+                
+                switch (type) {
+                    case CHAT_MESSAGE:
+                        playAudioNotifcation(customerId, response.Sender);
+                        const messageData = {
+                            chatId: response.ChatId,
+                            dateSent: response.DateSent,
+                            id: response.Id,
+                            sender: response.Sender,
+                            text: response.Text,
+                            uploadedFileName: response.UploadedFileName,
+                            isRead: false
+                        };
 
-                break;
-
-                case TRANSFER_CONFIRMATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
-
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-                            isDeleted: payload.Chat.IsDeleted,
-                            customerId,
-                            senderId,
-                            transactionType: type
-                        }
-                    });
+                        dispatch({
+                            type: SENT_MESSAGE,
+                            payload: { message: messageData, customerId }
+                        });
 
                     break;
 
-                case TRANSFER_NOTIFICATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
+                    case TRANSFER_CONFIRMATION:
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
 
-                    if (senderId !== customerId) {
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION,
+                            payload: {
+                                buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
+                                isDeleted: payload.Chat.IsDeleted,
+                                customerId,
+                                senderId,
+                                chatId: payload.Chat.Id,
+                                transactionType: type
+                            }
+                        });
+
+                        break;
+
+                    case TRANSFER_NOTIFICATION:
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
+
+                        playAudioNotifcation(customerId, senderId);
+
                         dispatch({
                             type: PAYMENT_NOTIFICATION,
                             payload: {
@@ -297,27 +305,34 @@ const Dashboard = ({ children, title, logout }) => {
                                 isDeleted: payload.IsDeleted,
                                 customerId,
                                 senderId,
+                                chatId: payload.Id,
                                 transactionType: type
                             }
-                        });    
-                    }
+                        }); 
+                        
+                        break;
 
-                    break;
+                    case CANCEL_NEGOTIATION:
+                        playAudioNotifcation(customerId, response.Sender);
 
-                case CANCEL_NEGOTIATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
-                    
-                    if (senderId !== customerId) {
-                        dispatch({ 
-                            type: CUSTOMER_CANCELED,
-                            payload: `Hi, this transaction has been canceled by the other user`
-                        });
-                    }
-                    break;
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
 
-                default:
-                    break;
+                        if (senderId !== customerId) {
+                            dispatch({ 
+                                type: CUSTOMER_CANCELED,
+                                payload: `Hi, this transaction has been canceled by the other user`
+                            });
+                        }
+
+                        break;
+
+                    default:
+                        break;
+                }
+            } catch (err) {
+                console.log('Error Ocurred');
+                console.error(err);
             }
         });
     };

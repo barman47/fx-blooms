@@ -340,10 +340,6 @@ const CreateAccount = (props) => {
         e.preventDefault();
         setErrors({});
 
-        if (!isStrongPassword) {
-            return setErrors({ msg: 'Weak password' });
-        }
-
         const data = {
             Email: Email.toLowerCase(),
             Username,
@@ -354,7 +350,11 @@ const CreateAccount = (props) => {
         const { errors, isValid } = validateSignUp(data);
 
         if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid sign up data' });
+            return setErrors({ ...errors, msg: 'Invalid sign up data!' });
+        }
+
+        if (!isStrongPassword) {
+            return setErrors({ Password: 'Your password is weak!', msg: 'Weak password!' });
         }
 
         setLoading(true);

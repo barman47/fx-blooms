@@ -61,7 +61,6 @@ const Message = ({ handleSetChat, conversation }) => {
     useEffect(() => {
         if (conversation) {
             if (conversation.messages.length > 0) {
-                console.log('there are messages');
                 let count = 0;
                 for (let i = conversation.messages.length; i >= 0; i--) {
                     if (conversation.messages[i]?.isRead === false && conversation.messages[i]?.sender !== customerId) {
@@ -69,10 +68,6 @@ const Message = ({ handleSetChat, conversation }) => {
                     }
                 }
                 setUnreadNotifications(count);
-                // dispatch({
-                //     type: SET_UNREAD_MESSAGES,
-                //     payload: count
-                // });
             }
         }
     }, [conversation, customerId, dispatch]);

@@ -113,7 +113,6 @@ const Login = (props) => {
 
     useEffect(() => {
         if (customer.isAuthenticated && authorized) {
-            debugger
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line

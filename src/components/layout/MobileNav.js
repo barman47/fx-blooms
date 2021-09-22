@@ -66,6 +66,12 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
     const { isAuthenticated } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
 
+    const closeDrawer = () => {
+        setTimeout(() => {
+            toggleDrawer();
+        }, 600);
+    };
+
     return (
         <section>
             <Drawer PaperProps={{ className: classes.drawer }} anchor="left" open={drawerOpen} onClose={toggleDrawer}>
@@ -73,14 +79,14 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                     <img src={logo} alt="FX Blooms Logo" className={classes.drawerLogo} />
                 </a>
                 <List>
-                    <ListItemLink button divider to="https://wp.fxblooms.com" onClick={toggleDrawer}>
+                    <ListItemLink button divider to="https://wp.fxblooms.com">
                         <ListItemIcon>
                             <Home />
                         </ListItemIcon>
                         <ListItemText primary="Home" />
                     </ListItemLink>
                     {isAuthenticated === true && authorized === true ? 
-                        <ListItemLink button divider to={`${DASHBOARD}${DASHBOARD_HOME}`} onClick={toggleDrawer}>
+                        <ListItemLink button divider to={`${DASHBOARD}${DASHBOARD_HOME}`}>
                             <ListItemIcon>
                                 <FormatListText className={classes.listings} />
                             </ListItemIcon>
@@ -88,13 +94,13 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                         </ListItemLink>
                         :
                         <>
-                            <ListItemLink button divider to={SIGN_UP} onClick={toggleDrawer}>
+                            <ListItemLink button divider to={SIGN_UP}>
                                 <ListItemIcon>
                                     <AccountOutline />
                                 </ListItemIcon>
                                 <ListItemText primary="Get Started" />
                             </ListItemLink>
-                            <ListItemLink button divider to={LOGIN} onClick={toggleDrawer}>
+                            <ListItemLink button divider to={LOGIN}>
                                 <ListItemIcon>
                                     <Login />
                                 </ListItemIcon>
@@ -102,7 +108,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             </ListItemLink>
                         </>
                     }
-                    <ListItemLink button divider onClick={toggleDrawer}>
+                    <ListItemLink button divider>
                         <ListItemIcon>
                             <Help />
                         </ListItemIcon>
@@ -114,11 +120,12 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             offset={-70}
                             duration={500}
                             className={classes.link}
-                            >
-                                Why FXBLOOMS
+                            onClick={closeDrawer}
+                        >
+                            Why FXBLOOMS
                         </AnimatedLink>
                     </ListItemLink>
-                    <ListItemLink button divider onClick={toggleDrawer}>
+                    <ListItemLink button divider>
                         <ListItemIcon>
                             <InformationVariant />
                         </ListItemIcon>
@@ -130,11 +137,12 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             offset={-70}
                             duration={500}
                             className={classes.link}
-                            >
-                                About Us
+                            onClick={closeDrawer}
+                        >
+                            About Us
                         </AnimatedLink>
                     </ListItemLink>
-                    <ListItemLink button divider onClick={toggleDrawer}>
+                    <ListItemLink>
                         <ListItemIcon>
                             <Phone />
                         </ListItemIcon>
@@ -146,8 +154,9 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             offset={-70}
                             duration={500}
                             className={classes.link}
-                            >
-                                Contact
+                            onClick={closeDrawer}
+                        >
+                            Contact
                         </AnimatedLink>
                     </ListItemLink>
                 </List>

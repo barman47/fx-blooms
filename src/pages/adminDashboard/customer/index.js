@@ -166,7 +166,7 @@ const Customer = (props) => {
                                     size="large" 
                                     className={clsx(classes.button, classes.removeButton)}
                                     disabled={loading ? true : false}
-                                    // onClick={() => setCustomerStatus(REJECTED, CONFIRMED)}
+                                    onClick={() => setCustomerStatus(REJECTED, CONFIRMED)}
                                 >
                                     Remove
                                 </Button>
