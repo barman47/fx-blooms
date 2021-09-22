@@ -180,7 +180,6 @@ const EditListing = (props) => {
     useEffect(() => {
         if (listings.length > 0 && !isEmpty(listing)) {
             // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
-            // debugger
             const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate } = listing;
 
             setAvailableCurrency(amountAvailable.currencyType);

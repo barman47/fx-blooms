@@ -72,16 +72,7 @@ const chatsReducer = (state = initialState, action) => {
             if (state.chat) {
                 const { messages, ...rest } = state.chat;
                 messageList = [...messages, action.payload.message];
-                unreadCount = action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
-                // unreadCount = state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
-                
-                // if (state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender) {
-                //     unreadCount = state.unreadMessages
-                // } else {
-                //     unreadCount = state.unreadMessages + 1;
-                // }
-
-                debugger;
+                unreadCount = action.payload.customerId === action.payload.message.sender || state.chat.id === action.payload.message.chatId ? state.unreadMessages : state.unreadMessages + 1;
 
                 return {
                     ...state,
@@ -103,20 +94,28 @@ const chatsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION: 
-            chat = state.chat;
-            chat.buyerHasMadePayment = action.payload.buyerHasMadePayment;
-            chat.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
-            chat.sellerHasMadePayment = action.payload.sellerHasMadePayment;
-            chat.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
-            chat.isDeleted = action.payload.isDeleted;
+            if (state.chat) {
+                chat = state.chat;
+                chat.buyerHasMadePayment = action.payload.buyerHasMadePayment;
+                chat.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
+                chat.sellerHasMadePayment = action.payload.sellerHasMadePayment;
+                chat.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
+                chat.isDeleted = action.payload.isDeleted;
 
-            unreadCount = state.chat.id === action.payload.chatId || action.payload.customerId === action.payload.senderId ? state.unreadMessages : state.unreadMessages + 1;
+                unreadCount = action.payload.customerId === action.payload.senderId || state.chat.id === action.payload.chatId ? state.unreadMessages : state.unreadMessages + 1;
 
-            return {
-                ...state,
-                chat: {...state.chat, ...action.payload},
-                unreadMessages: action.payload === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : unreadCount
-            };
+                return {
+                    ...state,
+                    chat: {...state.chat, ...action.payload},
+                    unreadMessages: action.payload.transactionType === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : unreadCount
+                };
+
+            } else {
+                return {
+                    ...state,
+                    unreadMessages: action.payload.transactionType === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : state.unreadMessages + 1
+                };
+            }
 
         case CUSTOMER_CANCELED:
             return {

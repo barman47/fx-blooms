@@ -19,7 +19,7 @@ class SignalRController {
         try {
             await this.connection.send(SEND_MESSAGE, message);
         } catch (err) {
-            console.log(err.message);
+            console.log(err);
         }
     }
 
