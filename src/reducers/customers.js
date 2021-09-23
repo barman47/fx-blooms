@@ -180,9 +180,10 @@ const customersReducer = (state = initialState, action) => {
             };
 
         case SET_CUSTOMER_STATUS:
+            debugger
             switch (action.payload.currentStatus) {
                 case CONFIRMED:
-                    customers = [...state.confirmed];
+                    customers = [...state.confirmed.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -192,12 +193,12 @@ const customersReducer = (state = initialState, action) => {
                     return {
                         ...state,
                         customer: { ...updatedCustomer },
-                        confirmed: customers,
+                        confirmed: { ...state.confirmed, items: customers },
                         msg: action.payload.msg
                     };
 
                 case PENDING:
-                    customers = [...state.pending];
+                    customers = [...state.pending.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -207,12 +208,12 @@ const customersReducer = (state = initialState, action) => {
                     return {
                         ...state,
                         customer: { ...updatedCustomer },
-                        pending: customers,
+                        pending: { ...state.pending, items: customers},
                         msg: action.payload.msg
                     };
 
                 case REJECTED:
-                    customers = [...state.rejected];
+                    customers = [...state.rejected.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -222,7 +223,7 @@ const customersReducer = (state = initialState, action) => {
                     return {
                         ...state,
                         customer: { ...updatedCustomer },
-                        rejected: customers,
+                        rejected: { ...state.rejected, items: customers },
                         msg: action.payload.msg
                     };
 

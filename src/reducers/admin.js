@@ -1,7 +1,8 @@
 import { SET_CURRENT_ADMIN } from '../actions/types';
 
 const initialState = {
-    profile: {}
+    profile: {},
+    isAuthenticated: false
 };
 
 const customerReducer =  (state = initialState, action) => {

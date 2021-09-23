@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
 		borderRight: `1px solid ${COLORS.borderColor}`,
         cursor: 'pointer',
 		padding: theme.spacing(1),
+        position: 'relative',
 
         '& p': {
             fontSize: theme.spacing(1.5),
@@ -45,6 +46,16 @@ const useStyles = makeStyles(theme => ({
         fontSize: theme.spacing(1.3),
         fontStyle: 'italic',
         fontWeight: 300
+    },
+
+    deleted: {
+        backgroundColor: '#f44336',
+        borderRadius: theme.shape.borderRadius,
+        color: COLORS.offWhite,
+        fontSize: theme.spacing(1),
+        padding: theme.spacing(0.1, 0.4),
+        position: 'absolute',
+        zIndex: 2
     }
 }));
 
@@ -84,62 +95,65 @@ const Message = ({ handleSetChat, conversation }) => {
     };
 
     return (
-        <Grid 
-            onClick={handleChatClick} 
-            container 
-            direction="row" 
-            justify="space-between" 
-            alignItems="center" 
-            className={clsx(classes.message, {[`${classes.active}`]: chatId === conversation.id })}
-        >
-            <Grid item>
-                <Grid container direction="row" alignItems="center" spacing={1}>
-                    <Grid item>
-                        <Badge color="error" badgeContent={unreadNotifications}>
-                            <Avatar>
-                                <Account />
-                            </Avatar>
-                        </Badge>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle1" component="p">
-                            {conversation && userName === conversation.buyerUsername ? conversation.sellerUsername : conversation.buyerUsername
-                            }
-                        </Typography>
-                        <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>
-                            {conversation?.messages?.length > 0 && 
-                                <TextClamp 
-                                    text={decode(conversation.messages[conversation.messages.length - 1].text)}
-                                    lines={1}
-                                />
-                            }
-                        </Typography>
+        <>
+            {conversation.isDeleted && <Typography variant="subtitle2" component="small" className={classes.deleted}>Completed</Typography>}
+            <Grid 
+                onClick={handleChatClick} 
+                container 
+                direction="row" 
+                justify="space-between" 
+                alignItems="center" 
+                className={clsx(classes.message, {[`${classes.active}`]: chatId === conversation.id })}
+            >
+                <Grid item>
+                    <Grid container direction="row" alignItems="center" spacing={1}>
+                        <Grid item>
+                            <Badge color="error" badgeContent={unreadNotifications}>
+                                <Avatar>
+                                    <Account />
+                                </Avatar>
+                            </Badge>
+                        </Grid>
+                        <Grid item>
+                            <Typography variant="subtitle1" component="p">
+                                {conversation && userName === conversation.buyerUsername ? conversation.sellerUsername : conversation.buyerUsername
+                                }
+                            </Typography>
+                            <Typography variant="subtitle2" component="span" style={{ fontStyle: 'italic' }}>
+                                {conversation?.messages?.length > 0 && 
+                                    <TextClamp 
+                                        text={decode(conversation.messages[conversation.messages.length - 1].text)}
+                                        lines={1}
+                                    />
+                                }
+                            </Typography>
+                        </Grid>
                     </Grid>
                 </Grid>
-            </Grid>
-            <Grid item>
-                <Grid container direction="column">
-                    <Grid item>
-                        <Typography 
-                            variant="subtitle2" 
-                            component="small" 
-                            className={classes.timestamp}
+                <Grid item>
+                    <Grid container direction="column">
+                        <Grid item>
+                            <Typography 
+                                variant="subtitle2" 
+                                component="small" 
+                                className={classes.timestamp}
+                                >
+                                    {conversation?.messages?.length > 0 &&  moment(conversation.messages[conversation.messages.length - 1].dateSent).format('h:mma')}
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <Typography 
+                                variant="subtitle2" 
+                                component="small" 
+                                className={classes.timestamp}
                             >
-                                {conversation?.messages?.length > 0 &&  moment(conversation.messages[conversation.messages.length - 1].dateSent).format('h:mma')}
-                        </Typography>
-                    </Grid>
-                    <Grid item>
-                        <Typography 
-                            variant="subtitle2" 
-                            component="small" 
-                            className={classes.timestamp}
-                        >
-                            {conversation?.messages?.length > 0 &&  moment(conversation.messages[conversation.messages.length - 1].dateSent).fromNow()}
-                        </Typography>
+                                {conversation?.messages?.length > 0 &&  moment(conversation.messages[conversation.messages.length - 1].dateSent).fromNow()}
+                            </Typography>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Grid>
-        </Grid>
+        </>
     );
 };
 

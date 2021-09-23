@@ -71,7 +71,7 @@ const RejectedCustomers = ({ getNewCustomers, handleSetTitle }) => {
                         <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
                         <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
                         <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                        <Typography variant="subtitle2" component="span"></Typography>
+                        {/* <Typography variant="subtitle2" component="span"></Typography> */}
                         <Typography variant="subtitle2" component="span">{customer.email}</Typography>
                         <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
                         <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
