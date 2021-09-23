@@ -397,6 +397,7 @@ export const setCustomerStatus = ({ customerID, status, currentStatus }) => asyn
         // Issue admin token
         const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
         const msg = res.data.data;
+        console.log(res);
         return dispatch({
             type: SET_CUSTOMER_STATUS,
             payload: { customerID, status, currentStatus, msg }

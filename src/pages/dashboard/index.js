@@ -282,7 +282,6 @@ const Dashboard = ({ children, title, logout }) => {
                                 isDeleted: payload.Chat.IsDeleted,
                                 customerId,
                                 senderId,
-                                chatId: payload.Chat.Id,
                                 transactionType: type
                             }
                         });
@@ -305,7 +304,6 @@ const Dashboard = ({ children, title, logout }) => {
                                 isDeleted: payload.IsDeleted,
                                 customerId,
                                 senderId,
-                                chatId: payload.Id,
                                 transactionType: type
                             }
                         }); 
