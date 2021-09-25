@@ -39,6 +39,13 @@ export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 // export const TRANSFER_NOTIFICATION = 'TransferNotification';
 export const SEND_MESSAGE = 'SendMessage';
 
+export const CHAT_CONNECTION_STATUS = {
+    CONNECTED: 'CONNECTED',
+    RECONNECTING: 'RECONNECTING',
+    RECONNECTED: 'RECONNECTED',
+    DISCONNECTED: 'DISCONNECTED'  
+};
+
 export const NOTIFICATION_TYPES = {
     CANCEL_NEGOTIATION: 'CancelNegotiation',
     CHAT_MESSAGE: 'ChatMessage',

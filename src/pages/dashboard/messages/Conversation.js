@@ -13,7 +13,7 @@ import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
 import { UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED, SET_ON_CHAT_PAGE } from '../../../actions/types';
-import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
+import { COLORS,CHAT_CONNECTION_STATUS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -26,6 +26,8 @@ import SignalRService from '../../../utils/SignalRController';
 import CustomerCanceledModal from './CustomerCanceledModal';
 
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
+
+const { CONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -196,7 +198,7 @@ const Conversation = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { customerId, userName } = useSelector(state => state.customer);
+    const { customerId, connectionStatus, userName } = useSelector(state => state.customer);
     const { chat, customerCanceled, sessionId } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
@@ -228,13 +230,10 @@ const Conversation = (props) => {
     const customerCanceledModal = useRef();
 
     useEffect(() => {
-        // handleSentMessage();
         dispatch({ type: SET_ON_CHAT_PAGE, payload: true });
         return () => {
             dispatch({ type: UPDATE_ACTIVE_CHAT });
             dispatch({ type: SET_ON_CHAT_PAGE, payload: false });
-            // dispatch({ type: REMOVE_CHAT });
-            // SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
     }, []);
@@ -245,96 +244,6 @@ const Conversation = (props) => {
             customerCanceledModal.current.setModalText(customerCanceled);
         }
     }, [customerCanceled]);
-
-    // const handleSentMessage = () => {
-    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
-    //     SignalRService.registerReceiveNotification((data, type) => {
-    //         let response = JSON.parse(data);
-    //         let payload, senderId;
-    //         console.log('New Notification ', response, type);
-    //         if (customerId !== response.Sender) {
-    //             const audio = new Audio(audioFile);
-    //             audio.play();
-    //             navigator.vibrate(1000);
-    //         }
-    //         switch (type) {
-    //             case CHAT_MESSAGE:
-    //                 const messageData = {
-    //                     chatId: response.ChatId,
-    //                     dateSent: response.DateSent,
-    //                     id: response.Id,
-    //                     sender: response.Sender,
-    //                     text: response.Text,
-    //                     uploadedFileName: response.UploadedFileName,
-    //                     isRead: false
-    //                 };
-        
-    //                 dispatch({
-    //                     type: SENT_MESSAGE,
-    //                     payload: { message: messageData, customerId }
-    //                 });
-
-    //             break;
-
-    //             case TRANSFER_CONFIRMATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 dispatch({
-    //                     type: PAYMENT_NOTIFICATION,
-    //                     payload: {
-    //                         buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-    //                         buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-    //                         sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-    //                         sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-    //                         isDeleted: payload.Chat.IsDeleted,
-    //                         customerId,
-    //                         senderId,
-    //                         transactionType: type
-    //                     }
-    //                 });
-
-    //                 break;
-
-    //             case TRANSFER_NOTIFICATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 if (senderId !== customerId) {
-    //                     dispatch({
-    //                         type: PAYMENT_NOTIFICATION,
-    //                         payload: {
-    //                             buyerHasMadePayment: payload.BuyerHasMadePayment,
-    //                             buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-    //                             sellerHasMadePayment: payload.SellerHasMadePayment, 
-    //                             sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-    //                             isDeleted: payload.IsDeleted,
-    //                             customerId,
-    //                             senderId,
-    //                             transactionType: type
-    //                         }
-    //                     });    
-    //                 }
-
-    //                 break;
-
-    //             case CANCEL_NEGOTIATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-                    
-    //                 if (senderId !== customerId) {
-    //                     dispatch({ 
-    //                         type: CUSTOMER_CANCELED,
-    //                         payload: `Hi, this transaction has been canceled by the other user`
-    //                     });
-    //                 }
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //     });
-    // };
 
     const uploadAttachment = useCallback(async () => {
         try {
@@ -536,7 +445,7 @@ const Conversation = (props) => {
                                 variant="outlined" 
                                 fullWidth
                                 required
-                                disabled={isDeleted}
+                                disabled={isDeleted || connectionStatus !== CONNECTED}
                                 inputProps={{
                                     accept: ".png,.jpg,.pdf"
                                 }}
@@ -563,7 +472,7 @@ const Conversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={isDeleted}
+                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -571,7 +480,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -579,7 +488,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                                 >
                                                     <Send />
                                                 </IconButton>

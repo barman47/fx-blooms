@@ -27,6 +27,10 @@ const Toast = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         handleClick: () => {
             setOpen(true);
+        },
+
+        close: () => {
+            setOpen(false);
         }
     }));
 
@@ -67,6 +71,7 @@ Toast.propTypes = {
 };
 
 Toast.defaultProps = {
+    type: 'error',
     duration: 3000
 };
 

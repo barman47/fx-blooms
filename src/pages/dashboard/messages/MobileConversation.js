@@ -25,7 +25,7 @@ import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
 import { CUSTOMER_CANCELED, SET_ON_CHAT_PAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
-import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
+import { COLORS, CHAT_CONNECTION_STATUS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
 import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
@@ -35,6 +35,8 @@ import SignalRService from '../../../utils/SignalRController';
 import CustomerCanceledModal from './CustomerCanceledModal';
 
 import MobileActions from './MobileActions';
+
+const { CONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -188,6 +190,7 @@ const MobileConversation = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
+    const { connectionStatus } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -220,12 +223,9 @@ const MobileConversation = (props) => {
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
         dispatch({ type: SET_ON_CHAT_PAGE, payload: true });
-        // handleSentMessage();
         return () => {
             dispatch({ type: UPDATE_ACTIVE_CHAT });
             dispatch({ type: SET_ON_CHAT_PAGE, payload: false });
-            // dispatch({ type: REMOVE_CHAT });
-            // SignalRService.closeNotifications();
         };
         // eslint-disable-next-line
     }, []);
@@ -236,109 +236,6 @@ const MobileConversation = (props) => {
             customerCanceledModal.current.setModalText(customerCanceled);
         }
     }, [customerCanceled]);
-
-    // const handleSentMessage = () => {
-    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
-    //     SignalRService.registerReceiveNotification((data, type) => {
-    //         let response = JSON.parse(data);
-    //         let payload, senderId;
-    //         console.log('New Notification ', response, type);
-    //         if (customerId !== response.Sender) {
-    //             const audio = new Audio(audioFile);
-    //             audio.play();
-    //             navigator.vibrate(1000);
-    //         }
-    //         switch (type) {
-    //             case CHAT_MESSAGE:
-    //                 const messageData = {
-    //                     chatId: response.ChatId,
-    //                     dateSent: response.DateSent,
-    //                     id: response.Id,
-    //                     sender: response.Sender,
-    //                     text: response.Text,
-    //                     uploadedFileName: response.UploadedFileName,
-    //                     isRead: false
-    //                 };
-        
-    //                 dispatch({
-    //                     type: SENT_MESSAGE,
-    //                     payload: { message: messageData, customerId }
-    //                 });
-
-    //             break;
-
-    //             case TRANSFER_CONFIRMATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 dispatch({
-    //                     type: PAYMENT_NOTIFICATION,
-    //                     payload: {
-    //                         buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-    //                         buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-    //                         sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-    //                         sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-    //                         isDeleted: payload.Chat.IsDeleted,
-    //                         customerId,
-    //                         senderId,
-    //                         transactionType: type
-    //                     }
-    //                 });
-
-    //                 break;
-
-    //             case TRANSFER_NOTIFICATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 if (senderId !== customerId) {
-    //                     dispatch({
-    //                         type: PAYMENT_NOTIFICATION,
-    //                         payload: {
-    //                             buyerHasMadePayment: payload.BuyerHasMadePayment,
-    //                             buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-    //                             sellerHasMadePayment: payload.SellerHasMadePayment, 
-    //                             sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-    //                             isDeleted: payload.IsDeleted,
-    //                             customerId,
-    //                             senderId,
-    //                             transactionType: type
-    //                         }
-    //                     });    
-    //                 }
-
-    //                 break;
-
-    //             case CANCEL_NEGOTIATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-                    
-    //                 if (senderId !== customerId) {
-    //                     dispatch({ 
-    //                         type: CUSTOMER_CANCELED,
-    //                         payload: `Hi, this transaction has been canceled by the other user`
-    //                     });
-    //                 }
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //     });
-    // };
-
-    // End transaction and disable chat
-    // useEffect(() => {
-    //     if (isDeleted && !chatDisabled) {
-    //         console.log('ending transaction');
-    //         endTransactionModal.current.openModal();
-    //         setChatDisabled(true);
-    //     }
-    // }, [chatDisabled, isDeleted]);
-
-    // const openPaymentConfirmationTipsModal = () => {
-    //     paymentModal.current.openModal();
-    // };
 
     const openTipsAndRecommendationsModal = () => {
         tipsAndRecommendationsModal.current.openModal();
@@ -539,7 +436,7 @@ const MobileConversation = (props) => {
                                 variant="outlined" 
                                 fullWidth
                                 required
-                                disabled={isDeleted}
+                                disabled={isDeleted || connectionStatus !== CONNECTED}
                                 inputProps={{
                                     accept: ".png,.jpg,.pdf"
                                 }}
@@ -555,7 +452,7 @@ const MobileConversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={isDeleted}
+                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                     onKeyUp={(e) => {
                                         if (e.ctrlKey && e.key === 'Enter') {
                                             return e.persist();
@@ -574,7 +471,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -582,7 +479,7 @@ const MobileConversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
                                                 >
                                                     <Send />
                                                 </IconButton>
