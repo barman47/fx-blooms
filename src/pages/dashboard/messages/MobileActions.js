@@ -39,7 +39,7 @@ const Actions = (props) => {
     const { customerId, msg, userName } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-    const { connectionStatus, sessionId } = useSelector(state => state.chat);
+    const { connectionStatus, chat } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
@@ -94,13 +94,13 @@ const Actions = (props) => {
     // }
 
     const cancelNegotiation = () => {
-        props.cancelNegotiation(sessionId, history);
+        props.cancelNegotiation(chat.id, history);
     };
 
     const completeTransaction = () => {
         setErrors({});
         let data = {
-            ChatSessionId: sessionId,
+            ChatSessionId: chat.id,
             Message: '',
             Rating: 0,
             ReceivedExpectedFunds: true
@@ -128,7 +128,7 @@ const Actions = (props) => {
     };    
 
     const handlePayment = ({ buyerHasMadePayment, sellerHasMadePayment }) => {
-        props.sendTransactionNotification(sessionId, { 
+        props.sendTransactionNotification(chat.id, { 
             customerUsername: userName, 
             otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername,
             buyerHasMadePayment,

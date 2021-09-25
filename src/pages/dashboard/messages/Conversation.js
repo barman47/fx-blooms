@@ -198,7 +198,7 @@ const Conversation = (props) => {
     const history = useHistory();
 
     const { customerId, userName } = useSelector(state => state.customer);
-    const { chat, connectionStatus, customerCanceled, sessionId } = useSelector(state => state.chat);
+    const { chat, connectionStatus, customerCanceled } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -268,7 +268,7 @@ const Conversation = (props) => {
             setLoading(false);
 
             const chatMessage = {
-                chatSessionId: sessionId,
+                chatSessionId: chat.id,
                 message: '',
                 documentName: res.data,
                 senderId: customerId,
@@ -278,7 +278,7 @@ const Conversation = (props) => {
         } catch (err) {
             return handleError(err, 'attachment', 'File not sent');
         }
-    }, [attachment, customerId, sessionId, userName]);
+    }, [attachment, customerId, chat.id, userName]);
 
     useEffect(() => {
         if (attachment) {
@@ -305,7 +305,7 @@ const Conversation = (props) => {
         e.preventDefault();
         if (!isEmpty(message)) {
             const chatMessage = {
-                chatSessionId: sessionId,
+                chatSessionId: chat.id,
                 message,
                 documentName: '',
                 senderId: customerId,
@@ -318,7 +318,7 @@ const Conversation = (props) => {
     };
 
     const copyChatSessionId = () => {
-        copy(sessionId);
+        copy(chat.id);
         toast.success('Copied Conversation ID!');
     };
 
@@ -351,7 +351,7 @@ const Conversation = (props) => {
                         </Grid>
                         <Grid item>
                             <Typography variant="subtitle1" component="p" color="primary">
-                                ID: {sessionId}
+                                ID: {chat.id}
                                 <Tooltip title="Copy Conversation ID" aria-label="Conversation ID" arrow>
                                     <IconButton
                                         edge="start"

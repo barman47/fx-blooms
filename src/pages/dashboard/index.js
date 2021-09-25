@@ -31,7 +31,7 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
@@ -249,6 +249,10 @@ const Dashboard = ({ children, title, logout }) => {
         onClose();
 
         handleSentMessage();
+
+        return () => {
+            dispatch({ type: REMOVE_CHAT });
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -294,8 +298,8 @@ const Dashboard = ({ children, title, logout }) => {
         }
     }, [connectionStatus]);
 
-    const playAudioNotifcation = (customerId, senderId) => {
-        if (customerId !== senderId) {
+    const playAudioNotifcation = (recipientId, senderId) => {
+        if (customerId !== senderId && (customerId === recipientId || customerId === senderId)) {
             const audio = new Audio(audioFile);
             audio.play();
             navigator.vibrate(500);
@@ -319,26 +323,28 @@ const Dashboard = ({ children, title, logout }) => {
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
-                let payload, senderId;
+                let payload, recipientId, senderId;
                 console.log('New Notification ', response, type);
                 
                 switch (type) {
                     case CHAT_MESSAGE:
-                        playAudioNotifcation(customerId, response.Sender);
-                        const messageData = {
-                            chatId: response.ChatId,
-                            dateSent: response.DateSent,
-                            id: response.Id,
-                            sender: response.Sender,
-                            text: response.Text,
-                            uploadedFileName: response.UploadedFileName,
-                            isRead: false
-                        };
+                        playAudioNotifcation(response.Recipient, response.Sender);
+                        if (customerId === response.Recipient || customerId === response.Sender) {
+                            const messageData = {
+                                chatId: response.ChatId,
+                                dateSent: response.DateSent,
+                                id: response.Id,
+                                sender: response.Sender,
+                                text: response.Text,
+                                uploadedFileName: response.UploadedFileName,
+                                isRead: false
+                            };
 
-                        dispatch({
-                            type: SENT_MESSAGE,
-                            payload: { message: messageData, customerId }
-                        });
+                            dispatch({
+                                type: SENT_MESSAGE,
+                                payload: { message: messageData, customerId }
+                            });
+                        }
 
                     break;
 
@@ -365,22 +371,24 @@ const Dashboard = ({ children, title, logout }) => {
                     case TRANSFER_NOTIFICATION:
                         payload = JSON.parse(response.Payload);
                         senderId = response.SenderId;
+                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
 
-                        playAudioNotifcation(customerId, senderId);
-
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: payload.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: payload.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                                isDeleted: payload.IsDeleted,
-                                customerId,
-                                senderId,
-                                transactionType: type
-                            }
-                        }); 
+                        if (customerId === payload.Buyer || customerId === payload.Seller) {
+                            playAudioNotifcation(recipientId, senderId);
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION,
+                                payload: {
+                                    buyerHasMadePayment: payload.BuyerHasMadePayment,
+                                    buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                                    sellerHasMadePayment: payload.SellerHasMadePayment, 
+                                    sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                                    isDeleted: payload.IsDeleted,
+                                    customerId,
+                                    senderId,
+                                    transactionType: type
+                                }
+                            }); 
+                        }
                         
                         break;
 
@@ -389,12 +397,15 @@ const Dashboard = ({ children, title, logout }) => {
 
                         payload = JSON.parse(response.Payload);
                         senderId = response.SenderId;
+                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
 
-                        if (senderId !== customerId) {
-                            dispatch({ 
-                                type: CUSTOMER_CANCELED,
-                                payload: `Hi, this transaction has been canceled by the other user`
-                            });
+                        if (customerId === payload.Buyer || customerId === payload.Seller) {
+                            if (senderId !== customerId) {
+                                dispatch({ 
+                                    type: CUSTOMER_CANCELED,
+                                    payload: `Hi, this transaction has been canceled by the other user`
+                                });
+                            }
                         }
 
                         break;

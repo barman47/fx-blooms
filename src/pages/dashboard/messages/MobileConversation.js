@@ -200,7 +200,7 @@ const MobileConversation = (props) => {
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
     const { customerId, userName } = useSelector(state => state.customer);
-    const { chat, connectionStatus, customerCanceled, sessionId } = useSelector(state => state.chat);
+    const { chat, connectionStatus, customerCanceled } = useSelector(state => state.chat);
 
     const [message, setMessage] = useState('');
     const [attachment, setAttachment] = useState(null);
@@ -263,7 +263,7 @@ const MobileConversation = (props) => {
             setLoading(false);
             
             const chatMessage = {
-                chatSessionId: sessionId,
+                chatSessionId: chat.id,
                 message: '',
                 documentName: res.data,
                 senderId: customerId,
@@ -273,7 +273,7 @@ const MobileConversation = (props) => {
         } catch (err) {
             return handleError(err, 'attachment', 'File not sent');
         }
-    }, [attachment, customerId, userName, sessionId]);
+    }, [attachment, customerId, userName, chat.id]);
 
     useEffect(() => {
         if (attachment) {
@@ -305,7 +305,7 @@ const MobileConversation = (props) => {
             //     documentName: '',
             // };
             const chatMessage = {
-                chatSessionId: sessionId,
+                chatSessionId: chat.id,
                 message,
                 documentName: '',
                 senderId: customerId,
@@ -333,7 +333,7 @@ const MobileConversation = (props) => {
     const handleSelectAttachment = () => document.getElementById('attachment').click();
 
     const copyChatSessionId = () => {
-        copy(sessionId);
+        copy(chat.id);
         toast.success('Copied Conversation ID!');
     };
 
@@ -364,7 +364,7 @@ const MobileConversation = (props) => {
                                 <ArrowLeft />
                             </IconButton>
                             <div>
-                                <Typography variant="subtitle2" component="small">Conversation ID: ...{sessionId?.substring(sessionId?.length - 3)}</Typography>
+                                <Typography variant="subtitle2" component="small">Conversation ID: ...{chat.id?.substring(chat.id?.length - 3)}</Typography>
                                 <IconButton 
                                     edge="start" color="primary" aria-label="copyChatSessionId" onClick={copyChatSessionId} style={{ marginLeft: '5px' }}>
                                     <ContentCopy />

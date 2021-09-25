@@ -22,7 +22,6 @@ import { NOTIFICATION_TYPES } from '../utils/constants';
 const initialState = {
     chat: null,
     chats: [],
-    sessionId: null,
     unreadMessages: 0,
     customerCanceled: null,
     onChatPage: false,
@@ -74,15 +73,13 @@ const chatsReducer = (state = initialState, action) => {
         case SET_CHAT:
             return {
                 ...state,
-                chat: action.payload,
-                sessionId: action.payload.id
+                chat: action.payload
             };
 
         case REMOVE_CHAT:
             return {
                 ...state,
-                chat: null,
-                sessionId: null
+                chat: null
             };
 
         case SENT_MESSAGE: 
