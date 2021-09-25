@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -6,15 +6,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
+import toast, { Toaster } from 'react-hot-toast';
 
-import { logout } from '../../actions/customer';
-
-import logo from '../../assets/img/logo.svg';
+import Toast from '../../components/common/Toast';
 
 import {
     Avatar,
     Badge,
     Box,
+    Button,
     IconButton,
     Drawer,
     Divider,
@@ -31,12 +31,17 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE, SET_CHAT_CONNECTION_STATUS } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
-import { COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
-
+import { logout } from '../../actions/customer';
+import { CHAT_CONNECTION_STATUS, COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
+
+import logo from '../../assets/img/logo.svg';
+
+const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
+
 
 const drawerWidth = 240;
 
@@ -195,6 +200,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const ToastAction = () => {
+    return (
+        <Button onClick={() => SignalRService.connect()}>Reconnect Now</Button>
+    );
+};
+
 const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -202,12 +213,20 @@ const Dashboard = ({ children, title, logout }) => {
     const location = useLocation();
     
     const { customerId, profile, userName } = useSelector(state => state.customer);
-    const { unreadMessages } = useSelector(state => state.chat);
+    const { connectionStatus, unreadMessages } = useSelector(state => state.chat);
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
     const [showBottomNavigation, setShowBottomNavigation] = useState(true);
+
+    const customToast = useRef();
+
+    const [toastDuration, setToastDuration] = useState('');
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastTitle, setToastTitle] = useState('');
+    const [toastType, setToastType] = useState('error');
+    const [toastAction, setToastAction] = useState(null);
 
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
@@ -224,6 +243,11 @@ const Dashboard = ({ children, title, logout }) => {
 
     useEffect(() => {
         hideBottomNavigation();
+        
+        onReconnected();
+        onReconnect();
+        onClose();
+
         handleSentMessage();
         // eslint-disable-next-line
     }, []);
@@ -232,12 +256,67 @@ const Dashboard = ({ children, title, logout }) => {
         setPath(location.pathname);
     }, [location]);
 
+    useEffect(() => {
+        switch (connectionStatus) {
+            case CONNECTED:
+                toast.success('Connected!');
+                setToastAction(null);
+                break;
+
+            case RECONNECTING:
+                setToastTitle('CHAT DISCONNECTED');
+                setToastMessage('Reconnecting . . .');
+                setToastDuration(null);
+                setToastType('info');
+                setToastAction(null);
+                customToast.current.handleClick();
+                break;
+                
+            case RECONNECTED:
+                // customToast.current.close();
+                toast.success('Connected!');
+                break;
+
+            case DISCONNECTED:
+                setToastTitle('ERROR');
+                setToastMessage('Chat Disconnected');
+                setToastType('error');
+                setToastDuration(null);
+                setToastAction(<ToastAction />);
+                customToast.current.handleClick();
+                break;
+
+            default:
+                break;
+        }
+    }, [connectionStatus]);
+
     const playAudioNotifcation = (customerId, senderId) => {
         if (customerId !== senderId) {
             const audio = new Audio(audioFile);
             audio.play();
             navigator.vibrate(500);
         }
+    };
+
+    const onReconnected = () => {
+        SignalRService.onReconnected();
+    };
+
+    const onReconnect = () => {
+        SignalRService.onReconnect();
+        dispatch({
+            type: SET_CHAT_CONNECTION_STATUS,
+            payload: RECONNECTING
+        });
+    };
+    
+    const onClose = () => {
+        SignalRService.onClose();
+        dispatch({
+            type: SET_CHAT_CONNECTION_STATUS,
+            payload: DISCONNECTED
+        });
     };
 
     const handleSentMessage = () => {
@@ -362,6 +441,17 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            {connectionStatus !== CONNECTED && 
+                <Toast 
+                    ref={customToast}
+                    title={toastTitle}
+                    duration={toastDuration}
+                    msg={toastMessage}
+                    type={toastType}
+                    action={toastAction}
+                />
+            }
+            <Toaster />
             <section className={classes.root}>
                 <Drawer 
                     variant="permanent"

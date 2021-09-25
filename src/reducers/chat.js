@@ -13,10 +13,11 @@ import {
     CLEAR_UNREAD_MESSAGES,
     SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
-    SET_ON_CHAT_PAGE
+    SET_ON_CHAT_PAGE,
+    SET_CHAT_CONNECTION_STATUS
 } from '../actions/types';
 
-import { NOTIFICATION_TYPES } from '../utils/constants';
+import { CHAT_CONNECTION_STATUS, NOTIFICATION_TYPES } from '../utils/constants';
 
 const initialState = {
     chat: null,
@@ -24,7 +25,8 @@ const initialState = {
     sessionId: null,
     unreadMessages: 0,
     customerCanceled: null,
-    onChatPage: false
+    onChatPage: false,
+    connectionStatus: CHAT_CONNECTION_STATUS.DISCONNECTED
 };
 
 const chatsReducer = (state = initialState, action) => {
@@ -47,6 +49,12 @@ const chatsReducer = (state = initialState, action) => {
                 onChatPage: action.payload
             };
         }
+
+        case SET_CHAT_CONNECTION_STATUS:
+            return {
+                ...state,
+                connectionStatus: action.payload
+            };
             
         case UPDATE_ACTIVE_CHAT:
             if (state.chat) {

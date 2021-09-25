@@ -16,11 +16,13 @@ import { SET_CUSTOMER_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, CHAT_CONNECTION_STATUS, } from '../../../utils/constants';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+
+const { CONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -69,7 +71,7 @@ const Actions = (props) => {
     const { customerId, msg, userName } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-    const { sessionId } = useSelector(state => state.chat);
+    const { connectionStatus, sessionId } = useSelector(state => state.chat);
     // const { buyer, seller, buyerHasMadePayment, buyerHasRecievedPayment, sellerHasMadePayment, sellerHasReceivedPayment } = useSelector(state => state.chat.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -191,7 +193,7 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                                 onClick={() => handlePayment({ buyerHasMadePayment: true, sellerHasMadePayment })}
                                             >
                                                 I've Made Payment:Buyer
@@ -205,7 +207,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
+                                                    disabled={loading || buyerHasRecievedPayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                                 >
                                                     Payment Received:Buyer
                                                 </Button>
@@ -219,7 +221,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                             >
                                                 Cancel Transaction:Buyer
                                             </Button>
@@ -239,7 +241,7 @@ const Actions = (props) => {
                                                     variant="outlined"
                                                     color="primary"
                                                     fullWidth
-                                                    disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
+                                                    disabled={loading || sellerHasMadePayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                                     onClick={() => handlePayment({ buyerHasMadePayment, sellerHasMadePayment: true })}
                                                 >
                                                     I've Made Payment:Seller
@@ -254,7 +256,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
+                                                    disabled={loading || sellerHasRecievedPayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                                 >
                                                     Payment Received:Seller
                                                 </Button>
@@ -268,7 +270,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || connectionStatus !== CONNECTED ? true : false}
                                             >
                                                 Cancel Transaction:Seller
                                             </Button>
