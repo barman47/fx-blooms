@@ -1,17 +1,15 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, ContentCopy, FilePdfOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
-import { sendMessage } from '../../../actions/chat';
 import { UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED, SET_ON_CHAT_PAGE } from '../../../actions/types';
 import { COLORS,CHAT_CONNECTION_STATUS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import copy from 'copy-to-clipboard';
@@ -24,10 +22,11 @@ import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import SignalRService from '../../../utils/SignalRController';
 import CustomerCanceledModal from './CustomerCanceledModal';
+import Spinner from '../../../components/common/Spinner';
 
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 
-const { CONNECTED } = CHAT_CONNECTION_STATUS;
+const { CONNECTED, RECONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -198,8 +197,8 @@ const Conversation = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { customerId, connectionStatus, userName } = useSelector(state => state.customer);
-    const { chat, customerCanceled, sessionId } = useSelector(state => state.chat);
+    const { customerId, userName } = useSelector(state => state.customer);
+    const { chat, connectionStatus, customerCanceled, sessionId } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -208,18 +207,15 @@ const Conversation = (props) => {
     const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
-    const { sendMessage } = props;
-
     const [message, setMessage] = useState('');
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
 
     // const [chatDisabled, setChatDisabled] = useState(false);
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
+    const [chatDisconnected, setChatDisconnected] = useState(false);
     
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -245,6 +241,16 @@ const Conversation = (props) => {
         }
     }, [customerCanceled]);
 
+    useEffect(() => {
+        if(connectionStatus !== undefined) {
+            if (connectionStatus === CONNECTED || connectionStatus === RECONNECTED) {
+                setChatDisconnected(false);
+            } else {
+                setChatDisconnected(true);
+            }
+        }
+    }, [connectionStatus]);
+
     const uploadAttachment = useCallback(async () => {
         try {
             if (attachment.size / ATTACHMENT_LIMIT > 1) {
@@ -260,18 +266,19 @@ const Conversation = (props) => {
             });
             setAttachmentUrl(res.data);
             setLoading(false);
-            
+
             const chatMessage = {
                 chatSessionId: sessionId,
                 message: '',
-                documentName: res.data
+                documentName: res.data,
+                senderId: customerId,
+                userName
             };
-
-            sendMessage(chatMessage);
+            handleSendMessage(chatMessage);
         } catch (err) {
             return handleError(err, 'attachment', 'File not sent');
         }
-    }, [attachment, sessionId, sendMessage]);
+    }, [attachment, customerId, sessionId, userName]);
 
     useEffect(() => {
         if (attachment) {
@@ -297,11 +304,6 @@ const Conversation = (props) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         if (!isEmpty(message)) {
-            // const chatMessage = {
-            //     chatSessionId: sessionId,
-            //     message,
-            //     documentName: '',
-            // };
             const chatMessage = {
                 chatSessionId: sessionId,
                 message,
@@ -311,19 +313,6 @@ const Conversation = (props) => {
             };
 
             handleSendMessage(chatMessage);
-            // dispatch({
-            //     type: SENT_MESSAGE,
-            //     payload: {
-            //         chatId: chatMessage.chatSessionId,
-            //         // dateSent: chatMessage.DateSent,
-            //         // id: chatMessage.Id,
-            //         sender: chatMessage.senderId,
-            //         text: chatMessage.message,
-            //         uploadedFileName: chatMessage.documentName,
-            //         // isRead: false
-            //     }
-            // });
-            // sendMessage(chatMessage);
             setMessage('');
         }
     };
@@ -350,6 +339,7 @@ const Conversation = (props) => {
             <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
+            {loading && <Spinner text={loadingText} />}
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             { (customerId === buyer && chat.buyerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
             { (customerId === seller && chat.sellerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
@@ -445,7 +435,7 @@ const Conversation = (props) => {
                                 variant="outlined" 
                                 fullWidth
                                 required
-                                disabled={isDeleted || connectionStatus !== CONNECTED}
+                                disabled={isDeleted || chatDisconnected}
                                 inputProps={{
                                     accept: ".png,.jpg,.pdf"
                                 }}
@@ -472,7 +462,7 @@ const Conversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={isDeleted || connectionStatus !== CONNECTED}
+                                    disabled={isDeleted || chatDisconnected}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -480,7 +470,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
+                                                    disabled={isDeleted || chatDisconnected}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -488,7 +478,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={isDeleted || connectionStatus !== CONNECTED}
+                                                    disabled={isDeleted || chatDisconnected}
                                                 >
                                                     <Send />
                                                 </IconButton>
@@ -507,8 +497,4 @@ const Conversation = (props) => {
     );
 };
 
-Conversation.propTypes = {
-    sendMessage: PropTypes.func.isRequired
-};
-
-export default connect(undefined, { sendMessage })(Conversation);
+export default Conversation;

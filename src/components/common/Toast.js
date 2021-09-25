@@ -54,7 +54,7 @@ const Toast = forwardRef((props, ref) => {
                     vertical: 'bottom'
                 }}
             >
-                <Alert variant="standard" onClose={handleClose} severity={type}>
+                <Alert variant="standard" onClose={handleClose} severity={type} action={props.action || null}>
                     {title && <AlertTitle>{title}</AlertTitle>}
                     {msg}
                 </Alert>
@@ -67,7 +67,7 @@ Toast.propTypes = {
     msg: PropTypes.string.isRequired,
     title: PropTypes.string,
     type: PropTypes.string.isRequired,
-    duration: PropTypes.number.isRequired
+    duration: PropTypes.number
 };
 
 Toast.defaultProps = {
