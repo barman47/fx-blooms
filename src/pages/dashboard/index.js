@@ -31,7 +31,7 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE, SET_CHAT_CONNECTION_STATUS } from '../../actions/types';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
@@ -202,7 +202,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ToastAction = () => {
     return (
-        <Button onClick={() => SignalRService.connect()}>Reconnect Now</Button>
+        <Button variant="outlined" color="error" onClick={() => SignalRService.connect()}>Reconnect</Button>
     );
 };
 
@@ -222,7 +222,7 @@ const Dashboard = ({ children, title, logout }) => {
 
     const customToast = useRef();
 
-    const [toastDuration, setToastDuration] = useState('');
+    const [toastDuration, setToastDuration] = useState(0);
     const [toastMessage, setToastMessage] = useState('');
     const [toastTitle, setToastTitle] = useState('');
     const [toastType, setToastType] = useState('error');
@@ -259,22 +259,25 @@ const Dashboard = ({ children, title, logout }) => {
     useEffect(() => {
         switch (connectionStatus) {
             case CONNECTED:
-                toast.success('Connected!');
-                setToastAction(null);
+                if (customToast.current) {
+                    toast.success('Connected!');
+                    setToastAction(null);
+                }
+                
                 break;
 
             case RECONNECTING:
-                setToastTitle('CHAT DISCONNECTED');
+                setToastTitle('NETWORK ERROR');
                 setToastMessage('Reconnecting . . .');
                 setToastDuration(null);
-                setToastType('info');
+                setToastType('error');
                 setToastAction(null);
                 customToast.current.handleClick();
                 break;
                 
             case RECONNECTED:
-                // customToast.current.close();
-                toast.success('Connected!');
+                customToast.current.close();
+                toast.success('Reconnected!');
                 break;
 
             case DISCONNECTED:
@@ -305,18 +308,10 @@ const Dashboard = ({ children, title, logout }) => {
 
     const onReconnect = () => {
         SignalRService.onReconnect();
-        dispatch({
-            type: SET_CHAT_CONNECTION_STATUS,
-            payload: RECONNECTING
-        });
     };
     
     const onClose = () => {
         SignalRService.onClose();
-        dispatch({
-            type: SET_CHAT_CONNECTION_STATUS,
-            payload: DISCONNECTED
-        });
     };
 
     const handleSentMessage = () => {

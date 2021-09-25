@@ -17,7 +17,7 @@ import {
     SET_CHAT_CONNECTION_STATUS
 } from '../actions/types';
 
-import { CHAT_CONNECTION_STATUS, NOTIFICATION_TYPES } from '../utils/constants';
+import { NOTIFICATION_TYPES } from '../utils/constants';
 
 const initialState = {
     chat: null,
@@ -26,7 +26,7 @@ const initialState = {
     unreadMessages: 0,
     customerCanceled: null,
     onChatPage: false,
-    connectionStatus: CHAT_CONNECTION_STATUS.DISCONNECTED
+    connectionStatus: null
 };
 
 const chatsReducer = (state = initialState, action) => {

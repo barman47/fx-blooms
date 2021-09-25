@@ -50,28 +50,21 @@ class SignalRController {
 
     onReconnected = () => {
         this.connection.onreconnected(connectionId => {
-            console.log('Reconnected');
             console.assert(this.connection.state === HubConnectionState.Connected);
             store.dispatch({
                 type: SET_CHAT_CONNECTION_STATUS,
                 payload: RECONNECTED
             });
-            // callback();
-            // Show reconnected message
         });
     }
 
     onClose = () => {
         this.connection.onclose(err => {
-            console.log('Disconnected');
             console.assert(this.connection.state === HubConnectionState.Disconnected);
             store.dispatch({
                 type: SET_CHAT_CONNECTION_STATUS,
                 payload: DISCONNECTED
             });
-            // callback();
-
-            // Disable inputs and ask user to refresh connection
         });
     };
 
@@ -79,15 +72,12 @@ class SignalRController {
         try {
             await this.connection.send(SEND_MESSAGE, message);
         } catch (err) {
-            console.log(err);
-            // await this.connect();
-            // await this.sendMessage(message);
+            console.error(err);
         }
     }
 
     registerReceiveNotification = (callback) => {
         this.connection.on(RECEIVE_NOTIFICATION, (message, type) => {
-            // console.log('message from service ', message);
             callback(message, type);
         });
     };
