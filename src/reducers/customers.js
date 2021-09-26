@@ -180,7 +180,6 @@ const customersReducer = (state = initialState, action) => {
             };
 
         case SET_CUSTOMER_STATUS:
-            debugger
             switch (action.payload.currentStatus) {
                 case CONFIRMED:
                     customers = [...state.confirmed.items];
@@ -192,8 +191,8 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        confirmed: { ...state.confirmed, items: customers },
+                        // customer: { ...updatedCustomer },
+                        // confirmed: { ...state.confirmed, items: customers },
                         msg: action.payload.msg
                     };
 
@@ -207,8 +206,8 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        pending: { ...state.pending, items: customers},
+                        // customer: { ...updatedCustomer },
+                        // pending: { ...state.pending, items: customers},
                         msg: action.payload.msg
                     };
 
@@ -222,8 +221,8 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        rejected: { ...state.rejected, items: customers },
+                        // customer: { ...updatedCustomer },
+                        // rejected: { ...state.rejected, items: customers },
                         msg: action.payload.msg
                     };
 

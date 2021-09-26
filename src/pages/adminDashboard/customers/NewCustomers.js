@@ -46,12 +46,12 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     useEffect(() => {
         // handleSetTitle('New Customers');
-        if (!newCustomers) {
+        // if (!newCustomers) {
             getNewCustomers({
                 pageNumber: 1,
                 pageSize: 25
             });
-        }
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -76,8 +76,7 @@ const NewCustomers = ({ getNewCustomers, handleSetTitle }) => {
                     <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
                     <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
                 </div>
-            ))
-            }
+            ))}
         </>
     );
 };

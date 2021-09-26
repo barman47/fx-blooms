@@ -14,7 +14,7 @@ import {
 
 import { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
 import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
-import isEmpty from '../../../utils/isEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 import AllCustomers from './AllCustomers';
 import NewCustomers from './NewCustomers';
@@ -125,39 +125,39 @@ const Customers = (props) => {
         setFilter(filter);
         switch (filter) {
             case CONFIRMED:
-                if (isEmpty(confirmed)) {
+                // if (isEmpty(confirmed)) {
                     getVerifiedCustomers({
                         pageNumber: 1,
                         pageSize: 25
                     });
-                }
+                // }
                 break;
 
             case PENDING:
-                if (isEmpty(pending)) {
+                // if (isEmpty(pending)) {
                     getNewCustomers({
                         pageNumber: 1,
                         pageSize: 25
                     });
-                }
+                // }
                 break;
 
             case REJECTED:
-                if (isEmpty(rejected)) {
+                // if (isEmpty(rejected)) {
                     getRejectedCustomers({
                         pageNumber: 1,
                         pageSize: 25
                     });
-                }
+                // }
                 break;
 
             case ALL_CUSTOMERS:
-                if (isEmpty(customers)) {
+                // if (isEmpty(customers)) {
                     getCustomers({
                         pageNumber: 1,
                         pageSize: 25
                     });
-                }
+                // }
                 break;
 
             default:
@@ -317,7 +317,7 @@ const Customers = (props) => {
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
+                        <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
                             <Typography variant="subtitle2" component="span">All</Typography>
                             <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
                         </div>

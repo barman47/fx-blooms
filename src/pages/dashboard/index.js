@@ -202,7 +202,7 @@ const useStyles = makeStyles((theme) => ({
 
 const ToastAction = () => {
     return (
-        <Button variant="outlined" color="error" onClick={() => SignalRService.connect()}>Reconnect</Button>
+        <Button variant="outlined" color="inherit" onClick={() => SignalRService.connect()}>Reconnect</Button>
     );
 };
 

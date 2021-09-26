@@ -46,12 +46,12 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
 
     useEffect(() => {
         // handleSetTitle('Verified Customers');
-        if (!verifiedCustomers) {
+        // if (!verifiedCustomers) {
             getNewCustomers({
                 pageNumber: 1,
                 pageSize: 25
             });
-        }
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -67,17 +67,16 @@ const VerifiedCustomers = ({ getNewCustomers, handleSetTitle }) => {
     return (
         <>
             {verifiedCustomers && verifiedCustomers.map((customer, index) => (
-                    <div key={customer.id} className={classes.customer}>
-                        <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
-                        <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
-                        <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                        {/* <Typography variant="subtitle2" component="span"></Typography> */}
-                        <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                        <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
-                        <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
-                    </div>
-                ))
-            }
+                <div key={customer.id} className={classes.customer}>
+                    <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
+                    <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
+                    <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
+                    {/* <Typography variant="subtitle2" component="span"></Typography> */}
+                    <Typography variant="subtitle2" component="span">{customer.email}</Typography>
+                    <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
+                    <Typography variant="subtitle2" component="span" className={classes.customerLink} onClick={() => handleViewCustomer(customer)}>View Details</Typography>
+                </div>
+            ))}
         </>
     );
 };
