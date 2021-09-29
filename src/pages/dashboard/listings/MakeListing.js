@@ -319,7 +319,7 @@ const MakeListing = (props) => {
                 break;
 
             case PENDING:
-                showPendingIdModal(true);
+                setShowPendingIdModal(true);
                 break;
 
             case REJECTED:
