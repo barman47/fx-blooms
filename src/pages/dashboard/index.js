@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 import toast, { Toaster } from 'react-hot-toast';
 
+import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
 
 import {
@@ -219,27 +220,27 @@ const Dashboard = ({ children, title, logout }) => {
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
     const [showBottomNavigation, setShowBottomNavigation] = useState(true);
-
-    const customToast = useRef();
-
+    
     const [toastDuration, setToastDuration] = useState(0);
     const [toastMessage, setToastMessage] = useState('');
     const [toastTitle, setToastTitle] = useState('');
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
-
+    
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
     ];
-
+    
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
         { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
+    
+    const customToast = useRef();
 
     useEffect(() => {
         hideBottomNavigation();
@@ -447,6 +448,7 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
                     ref={customToast}
