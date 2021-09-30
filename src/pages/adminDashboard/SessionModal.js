@@ -15,9 +15,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { InformationOutline } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../utils/constants';
-import { RESET_CUSTOMER_SESSION } from '../../actions/types';
+import { RESET_ADMIN_SESSION } from '../../actions/types';
 import reIssueCustomerToken from '../../utils/reIssueCustomerToken';
-import { logout } from '../../actions/customer';
+import { logout } from '../../actions/admin';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -67,7 +67,7 @@ const SessionModal = ({ logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { resetSession } = useSelector(state => state.customer);
+    const { resetSession } = useSelector(state => state.admin);
 
     const [open, setOpen] = useState(false);
     const [inactiveTime, setInActiveTime] = useState(0);
@@ -122,7 +122,7 @@ const SessionModal = ({ logout }) => {
         if (resetSession === true) {
             resetSessionTimer();
             dispatch({
-                type: RESET_CUSTOMER_SESSION,
+                type: RESET_ADMIN_SESSION,
                 payload: false
             });
         }

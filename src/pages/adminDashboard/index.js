@@ -17,6 +17,8 @@ import logo from '../../assets/img/logo.svg';
 import { getStats } from '../../actions/admin';
 import { COLORS } from '../../utils/constants';
 
+import SessionModal from './SessionModal';
+
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: COLORS.white,
@@ -100,6 +102,7 @@ const AdminDashboard = ({ children, title, getStats }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            <SessionModal />
             <AppBar 
                 position="fixed"
                 elevation={0}

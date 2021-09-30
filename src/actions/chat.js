@@ -34,7 +34,6 @@ export const getUnreadMessages = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${api}/UnreadMessagesCount`);
-        console.log('Unread messages ', res);
         return dispatch({
             type: GET_UNREAD_MESSAGES,
             payload: res.data.data
@@ -70,8 +69,7 @@ export const sendTransactionNotification = (chatId, { customerUsername, otherUse
 export const updateMessageStatus = (chatId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.post(`${api}/UpdateMessageStatus?chatId=${chatId}`);
-        console.log('message status ', res);
+        await axios.post(`${api}/UpdateMessageStatus?chatId=${chatId}`);
     } catch (err) {
         return handleError(err, dispatch);
     }
