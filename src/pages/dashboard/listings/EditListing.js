@@ -20,8 +20,9 @@ import EditListingItem from './EditListingItem';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
-import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
+import { GET_ERRORS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { updateListing } from '../../../actions/listings';
+import { getCurrencies } from '../../../actions/currencies';
 import { COLORS, PAYMENT_METHODS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import validateEditListing from '../../../utils/validation/listing/edit';
@@ -114,14 +115,9 @@ const EditListing = (props) => {
 
     const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
-
-    // eslint-disable-next-line
     const [RequiredCurrency, setRequiredCurrency] = useState('');
     const [ExchangeRate, setExchangeRate] = useState('');
-
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
-
-    // eslint-disable-next-line
     const [ReceiptAmount, setReceiptAmount] = useState('');
     // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('0');
@@ -137,7 +133,12 @@ const EditListing = (props) => {
     const toast = useRef();
 
     useEffect(() => {
+        if (currencies.length === 0) {
+            props.getCurrencies();
+        }
+
         return () => {
+            console.log('removing listing')
             dispatch({
                 type: SET_LISTING,
                 payload: {}
@@ -172,21 +173,16 @@ const EditListing = (props) => {
     }, [updatedListing, dispatch, msg]);
 
     useEffect(() => {
-        if (!isEmpty(listing)) {
-            
-        }
-    }, [listing]);
-
-    useEffect(() => {
         if (listings.length > 0 && !isEmpty(listing)) {
             // const listingsList = listings.filter(item => item.customerId === customerId && item.id !== listing.id);
-            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate } = listing;
+            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank } = listing;
 
             setAvailableCurrency(amountAvailable.currencyType);
             setExchangeAmount(amountAvailable.amount);
             setRequiredCurrency(amountNeeded.currencyType);
             setExchangeRate(exchangeRate);
             setMinExchangeAmount(minExchangeAmount.amount);
+            setBank(bank);
 
             setPreviousListings(listings.filter(item => item.customerId === customerId)); 
         }
@@ -264,6 +260,13 @@ const EditListing = (props) => {
         props.updateListing(listingItem);
     };
 
+    const dismissAction = () => {
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: undefined
+        });
+    };
+
     return (
         <section className={classes.root}>
             {!isEmpty(errors) && 
@@ -275,7 +278,7 @@ const EditListing = (props) => {
                     type="error"
                 />
             }
-            <SuccessModal ref={successModal} />
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <header>
                 <div>
                     <Typography variant="h6">Edit Listing</Typography>
@@ -502,7 +505,8 @@ const EditListing = (props) => {
 };
 
 EditListing.propTypes = {
+    getCurrencies: PropTypes.func.isRequired,
     updateListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { updateListing })(EditListing);
+export default connect(undefined, { getCurrencies, updateListing })(EditListing);

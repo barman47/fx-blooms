@@ -46,7 +46,6 @@ const api = `${API}/Customer`;
 
 export const createCustomer = (customer, history) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
         setAuthToken(res.data.data.token);
         history.push(SETUP_2FA);
@@ -82,7 +81,6 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
         case FILL_FORM2:
             const email = res.data.data.message[0].split(' ')[0];
             dispatch({ type: SET_EMAIL, payload: email });
-            console.log('Redirecting to form 2');
             return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
 
         case EMAIL_VERIFICATION:

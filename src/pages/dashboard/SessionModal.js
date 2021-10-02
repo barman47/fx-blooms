@@ -83,6 +83,7 @@ const SessionModal = ({ logout }) => {
         setInActiveTime(0);
         setTimeToLogout(60);
         clearInterval(logoutTimer.current);
+        logoutTimer.current = undefined;
         startSessionTimer();
     }, []);
 
@@ -91,7 +92,9 @@ const SessionModal = ({ logout }) => {
         
         return () => {
             clearInterval(sessionTimer.current);
+            sessionTimer.current = undefined;
             clearInterval(logoutTimer.current);
+            logoutTimer.current = undefined;
         };
         // eslint-disable-next-line
     }, []);
@@ -101,6 +104,7 @@ const SessionModal = ({ logout }) => {
         if (inactiveTime >= timeoutDuration) {
             setOpen(true);
             clearInterval(sessionTimer.current);
+            sessionTimer.current = undefined;
             startLogoutTimer();
         }
     }, [inactiveTime]);
@@ -114,6 +118,7 @@ const SessionModal = ({ logout }) => {
     useEffect(() => {
         if (timeToLogout <= 0) {
             clearInterval(logoutTimer.current);
+            logoutTimer.current = undefined;
             setExpired(true);
         }
     }, [timeToLogout]);
