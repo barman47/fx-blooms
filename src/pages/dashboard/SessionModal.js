@@ -29,10 +29,10 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '50vw',
-        height: '30vh',
+        width: '30vw',
+        height: '20vh',
         boxShadow: SHADOW,
-        padding: theme.spacing(5, 10),
+        padding: theme.spacing(2, 5),
 
         [theme.breakpoints.down('lg')]: {
             height: '50vh',
@@ -42,7 +42,6 @@ const useStyles = makeStyles(theme => ({
             width: '70vw',
         },
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 2),
             height: '40vh',
             width: '90vw',
         },
@@ -70,6 +69,7 @@ const SessionModal = ({ logout }) => {
     const { resetSession } = useSelector(state => state.customer);
 
     const [open, setOpen] = useState(false);
+    const [expired, setExpired] = useState(false);
     const [inactiveTime, setInActiveTime] = useState(0);
     const [timeToLogout, setTimeToLogout] = useState(60);
 
@@ -105,7 +105,7 @@ const SessionModal = ({ logout }) => {
         }
     }, [inactiveTime]);
 
-    const handleLogout = useCallback(() => {
+    const handleLogin = useCallback(() => {
         setOpen(false);
         logout(history);
     }, [history, logout]);
@@ -114,9 +114,9 @@ const SessionModal = ({ logout }) => {
     useEffect(() => {
         if (timeToLogout <= 0) {
             clearInterval(logoutTimer.current);
-            handleLogout();
+            setExpired(true);
         }
-    }, [handleLogout, timeToLogout]);
+    }, [timeToLogout]);
 
     useEffect(() => {
         if (resetSession === true) {
@@ -168,10 +168,21 @@ const SessionModal = ({ logout }) => {
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
                         <InformationOutline className={classes.icon} />
-                        <Typography variant="subtitle1">
-                            Sorry your session has expired due to inactivity. You will be logged out in {timeToLogout}.
-                        </Typography>
-                        <Button color="primary" onClick={handleReissueToken}>Keep me signed in</Button>
+                        {expired ? 
+                            <>
+                                <Typography variant="subtitle1">
+                                    Sorry your session has expired due to inactivity.
+                                </Typography>
+                                <Button color="primary" onClick={handleLogin}>Log Me In</Button>
+                            </>
+                            :
+                            <>
+                                <Typography variant="subtitle1">
+                                    Sorry your session is expiring due to inactivity. You will be logged out in {timeToLogout} second(s).
+                                </Typography>
+                                <Button color="primary" onClick={handleReissueToken}>Keep me signed in</Button>
+                            </>
+                        }
                     </Grid>
                 </Grid>
             </Fade>

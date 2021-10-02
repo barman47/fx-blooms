@@ -10,8 +10,8 @@ import {
     Toolbar,
     Typography
 } from '@material-ui/core';
+import { Account } from 'mdi-material-ui';
 
-import avatar from '../../assets/img/avatar.jpg';
 import logo from '../../assets/img/logo.svg';
 
 import { getStats } from '../../actions/admin';
@@ -119,7 +119,9 @@ const AdminDashboard = ({ children, title, getStats }) => {
                                 <Typography variant="h6" className={classes.name}>{`${admin.firstName} ${admin.lastName}`}</Typography>
                                 <Typography variant="subtitle2" className={classes.email}>{admin.email}</Typography>
                             </div>
-                            <Avatar src={avatar} />
+                            <Avatar>
+                                <Account />
+                            </Avatar>
                         </div>
                     </section>
                 </Toolbar>

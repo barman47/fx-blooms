@@ -242,7 +242,8 @@ export const addResidentPermit = (data) => async (dispatch) => {
 
 export const getCustomers = (query) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
+        // Issue admin token
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_CUSTOMERS,
@@ -255,7 +256,8 @@ export const getCustomers = (query) => async (dispatch) => {
 
 export const getMoreCustomers = (query) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
+        // Issue admin token
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_MORE_CUSTOMERS,

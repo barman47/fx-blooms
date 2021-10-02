@@ -157,7 +157,7 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 customers: {
-                    items: [...state.confirmed.items, ...action.payload.items],
+                    items: [...state.customers.items, ...action.payload.items],
                     totalItemCount: action.payload.totalItemCount,
                     totalPageCount: action.payload.totalPageCount,
                     currentPageSize: action.payload.currentPageSize,
