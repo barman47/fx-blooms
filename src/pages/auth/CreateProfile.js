@@ -26,7 +26,7 @@ import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import { countries } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD, DASHBOARD_HOME, HOME } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN } from '../../routes';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
@@ -144,7 +144,7 @@ const CreateProfile = (props) => {
         if (location?.state?.verifiedEmail && email) {
             setVerifiedEmail(true);
         } else {
-            return window.location.href = HOME;
+            return history.push(LOGIN);
         }
         if (isAuthenticated && authorized) {
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);;

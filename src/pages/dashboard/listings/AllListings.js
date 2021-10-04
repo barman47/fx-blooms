@@ -200,7 +200,6 @@ const AllListings = (props) => {
 
 	useEffect(() => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
-			console.log('Getting ID Status');
             getIdVerificationLink();
         }
 	}, [getIdVerificationLink, idStatus]);
@@ -210,7 +209,6 @@ const AllListings = (props) => {
 	}, [listings]);
 
 	const getListings = () => {
-		console.log('Reloading listings');
 		setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
@@ -223,7 +221,6 @@ const AllListings = (props) => {
 	};
 
 	const getMore = () => {
-		console.log('getting more');
 		getMoreListings({
 			pageNumber: currentPageNumber + 1,
 			pageSize: 10,

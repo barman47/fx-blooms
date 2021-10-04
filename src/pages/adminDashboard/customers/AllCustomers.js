@@ -46,12 +46,10 @@ const AllCustomers = ({ getCustomers, handleSetTitle }) => {
 
     useEffect(() => {
         // handleSetTitle('All Customers');
-        // if (!customers) {
-            getCustomers({
-                pageNumber: 1,
-                pageSize: 25
-            });
-        // }
+        getCustomers({
+            pageNumber: 1,
+            pageSize: 25
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -77,7 +75,7 @@ const AllCustomers = ({ getCustomers, handleSetTitle }) => {
             {customers && customers.map((customer, index) => (
                 <div key={customer.id} className={classes.customer}>
                     <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
-                    <Typography variant="subtitle2" component="span">{`${customer.firstName} ${customer.lastName}`}</Typography>
+                    <Typography variant="subtitle2" component="span">{`${customer.firstName ? customer.firstName : ''} ${customer.lastName ? customer.lastName : ''}`}</Typography>
                     <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
                     <Typography variant="subtitle2" component="span">{customer.email}</Typography>
                     <Typography variant="subtitle2" component="span">{customer.userName}</Typography>

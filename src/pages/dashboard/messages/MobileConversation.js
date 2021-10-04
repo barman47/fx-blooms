@@ -128,13 +128,13 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: '#069595',
         color: COLORS.offWhite,
         alignSelf: 'flex-end',
-        width: '50%'
+        maxWidth: '75%'
     },
 
     recipient: {
         alignSelf: 'flex-start',
         backgroundColor: `${COLORS.lightGrey} !important`,
-        maxWidth: '50%'
+        maxWidth: '75%'
     },
 
     input: {

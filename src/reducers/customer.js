@@ -11,14 +11,16 @@ import {
     SET_RESIDENCE_PERMIT,
     SET_ID_VERIFICATION_LINK,
     SET_PERMIT_URL,
-    SET_EMAIL
+    SET_EMAIL,
+    RESET_CUSTOMER_SESSION
 } from '../actions/types';
 
 const initialState = {
     isAuthenticated: false,
     msg: null,
     stats: {},
-    profile: {}
+    profile: {},
+    resetSession: false
 };
 
 const customerReducer =  (state = initialState, action) => {
@@ -103,6 +105,12 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 idVerificationLink: action.payload
+            };
+
+        case RESET_CUSTOMER_SESSION:
+            return {
+                ...state,
+                resetSession: action.payload
             };
             
             default:
