@@ -261,7 +261,7 @@ const CreateProfile = (props) => {
                             <Grid container direction="row" spacing={2}>
                                 {verifiedEmail && email && 
                                     <Grid item xs={10}>
-                                        <Alert severity="success">Email successfuly verified</Alert>
+                                        <Alert severity="success">Email successfully verified</Alert>
                                     </Grid>
                                 }
                                 <Grid item xs={12} md={5}>
