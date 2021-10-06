@@ -39,6 +39,9 @@ const Toast = forwardRef((props, ref) => {
             return;
         }
         setOpen(false);
+        if (props.onClose) {
+            props.onClose();
+        }
     }
 
     // types: success, warning, error, info,
@@ -67,7 +70,8 @@ Toast.propTypes = {
     msg: PropTypes.string.isRequired,
     title: PropTypes.string,
     type: PropTypes.string.isRequired,
-    duration: PropTypes.number
+    duration: PropTypes.number,
+    onClose: PropTypes.func
 };
 
 Toast.defaultProps = {

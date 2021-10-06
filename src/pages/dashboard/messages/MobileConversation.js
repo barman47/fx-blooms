@@ -36,6 +36,7 @@ import CustomerCanceledModal from './CustomerCanceledModal';
 
 import MobileActions from './MobileActions';
 import Spinner from '../../../components/common/Spinner';
+import Toast from '../../../components/common/Toast';
 
 const { CONNECTED, RECONNECTED } = CHAT_CONNECTION_STATUS;
 
@@ -214,6 +215,7 @@ const MobileConversation = (props) => {
 
     const tipsAndRecommendationsModal = useRef();
     const customerCanceledModal = useRef();
+    const toastRef = useRef();
     
     useEffect(() => {
         props.handleSetTitle('Mobile Conversation');
@@ -242,6 +244,12 @@ const MobileConversation = (props) => {
         }
     }, [connectionStatus]);
 
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toastRef.current.handleClick();
+        }
+    }, [errors]);
+
     const openTipsAndRecommendationsModal = () => {
         tipsAndRecommendationsModal.current.openModal();
     };
@@ -249,9 +257,10 @@ const MobileConversation = (props) => {
     const uploadAttachment = useCallback(async () => {
         try {
             if (attachment.size / ATTACHMENT_LIMIT > 1) {
-                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
+                return setErrors({ msg: 'File too large (limit 3MB).', photo: 'Photo must not be greater than 3MB' });
             }
 
+            setErrors({});
             setLoadingText('Sending File . . ');
             setLoading(true);
             const data = new FormData();
@@ -351,6 +360,19 @@ const MobileConversation = (props) => {
     return (
         <>
             <Toaster />
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toastRef}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    onClose={() => {
+                        setAttachment(null);
+                        setErrors({});
+                    }}
+                    type="error"
+                />
+            }
             <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             {loading && <Spinner text={loadingText} />}
@@ -385,7 +407,7 @@ const MobileConversation = (props) => {
                                                 key={uuidv4()}
                                                 className={clsx(classes.attachment, classes.message, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                             >
-                                                <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                <a href={message.uploadedFileName} target="_blank" rel="noreferrer" className={classes.downloadLink} download>
                                                     <div>
                                                         <FilePdfOutline className={classes.downloadIcon} />
                                                         <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>

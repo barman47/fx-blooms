@@ -23,6 +23,7 @@ import isEmpty from '../../../utils/isEmpty';
 import SignalRService from '../../../utils/SignalRController';
 import CustomerCanceledModal from './CustomerCanceledModal';
 import Spinner from '../../../components/common/Spinner';
+import Toast from '../../../components/common/Toast';
 
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 
@@ -217,19 +218,20 @@ const Conversation = (props) => {
     const [loadingText, setLoadingText] = useState('');
     const [chatDisconnected, setChatDisconnected] = useState(false);
     
-    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     const endTransactionModal = useRef();
     const paymentModal = useRef();
     const tipsAndRecommendationsModal = useRef();
     const customerCanceledModal = useRef();
+    const toastRef = useRef();
 
     useEffect(() => {
         dispatch({ type: SET_ON_CHAT_PAGE, payload: true });
         return () => {
             dispatch({ type: UPDATE_ACTIVE_CHAT });
             dispatch({ type: SET_ON_CHAT_PAGE, payload: false });
+            setErrors({});
         };
         // eslint-disable-next-line
     }, []);
@@ -251,10 +253,17 @@ const Conversation = (props) => {
         }
     }, [connectionStatus]);
 
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toastRef.current.handleClick();
+            
+        }
+    }, [errors]);
+
     const uploadAttachment = useCallback(async () => {
         try {
             if (attachment.size / ATTACHMENT_LIMIT > 1) {
-                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
+                return setErrors({ msg: 'File too large (limit 3MB).', photo: 'Photo must not be greater than 3MB' });
             }
 
             setLoadingText('Sending File . . ');
@@ -336,6 +345,19 @@ const Conversation = (props) => {
     return (
         <>
             <Toaster />
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toastRef}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    onClose={() => {
+                        setAttachment(null);
+                        setErrors({});
+                    }}
+                    type="error"
+                />
+            }
             <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
@@ -377,7 +399,7 @@ const Conversation = (props) => {
                                                     key={uuidv4()}
                                                     className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                                 >
-                                                    <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                    <a href={message.uploadedFileName} target="_blank" rel="noreferrer" className={classes.downloadLink} download>
                                                         <div>
                                                             <FilePdfOutline className={classes.downloadIcon} />
                                                             <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
