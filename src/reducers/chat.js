@@ -81,8 +81,6 @@ const chatsReducer = (state = initialState, action) => {
                 //     unreadCount = state.unreadMessages + 1;
                 // }
 
-                debugger;
-
                 return {
                     ...state,
                     chat: { ...rest, messages: messageList },

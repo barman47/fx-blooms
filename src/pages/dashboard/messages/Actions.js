@@ -178,6 +178,9 @@ const Actions = (props) => {
                 }
                 <Typography variant="subtitle1" component="p">Actions</Typography>
                 <Grid container direction="column" spacing={2}>
+                    {console.log({ seller })}
+                    {console.log({ buyer })}
+                    {console.log({ customerId })}
                     <Grid item xs={12}>
                         <form onSubmit={onSubmit}>
                             <Grid container direction="column" spacing={3}>
