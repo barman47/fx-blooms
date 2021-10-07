@@ -554,7 +554,7 @@ const CreateProfile = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <a href="https://wp.fxblooms.com">
+                            <a href="https://fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </a>
                             <Typography variant="subtitle2" component="span" className={classes.text} style={{ fontWeight: 500 }}>Hello <span style={{ color: COLORS.primary }}>{Profile.Username},</span></Typography>

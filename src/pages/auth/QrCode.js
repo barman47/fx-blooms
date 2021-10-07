@@ -139,7 +139,7 @@ const QrCode = (props) => {
                 />
             }
             <Container className={classes.root}>
-                <a href="https://wp.fxblooms.com" className={classes.logo}>
+                <a href="https://fxblooms.com" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
                 </a>
                 <div className={classes.content}>

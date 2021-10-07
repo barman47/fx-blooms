@@ -102,7 +102,7 @@ const Header = (props) => {
                         <Grid item xs={9}>
                             <Grid container direction="row" alignItems="center" spacing={5} justify="flex-start">
                                 <Grid item>
-                                    <a href="https://wp.fxblooms.com">
+                                    <a href="https://fxblooms.com">
                                         <img src={logo} alt="FX Blooms Logo" />
                                     </a>
                                 </Grid>
@@ -185,7 +185,7 @@ const Header = (props) => {
                         </Grid>
                     </Grid>
                     <div className={classes.mobileNav}>
-                        <a href="https://wp.fxblooms.com">
+                        <a href="https://fxblooms.com">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
                         </a>
                         <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >

@@ -75,11 +75,11 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
     return (
         <section>
             <Drawer PaperProps={{ className: classes.drawer }} anchor="left" open={drawerOpen} onClose={toggleDrawer}>
-                <a href="https://wp.fxblooms.com" className={classes.link}>
+                <a href="https://fxblooms.com" className={classes.link}>
                     <img src={logo} alt="FX Blooms Logo" className={classes.drawerLogo} />
                 </a>
                 <List>
-                    <ListItemLink button divider to="https://wp.fxblooms.com">
+                    <ListItemLink button divider to="https://fxblooms.com">
                         <ListItemIcon>
                             <Home />
                         </ListItemIcon>
