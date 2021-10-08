@@ -31,7 +31,7 @@ export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
-// export const HUB_URL = 'https://positron.fxblooms.com/api/notificationhub'; // Production branch
+// export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
 // export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
