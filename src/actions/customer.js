@@ -2,7 +2,7 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 
 import { CREATE_PROFILE, LOGIN, SETUP_2FA, SIGN_UP } from '../routes';
-import { SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
+import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
@@ -522,6 +522,31 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
         dispatch({
             type: SET_PROFILE_CHECK_DATA,
             payload: customerData
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const approveIdCard = (customerId) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/ApproveIDCard`, { customerId, status: 'APPROVED' });
+        console.log(res);
+        dispatch({
+            type: ACCEPTED_CUSTOMER_ID
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+export const approveResidencePermit = (customerId) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: 'APPROVED' });
+        console.log(res);
+        dispatch({
+            type: ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
         });
     } catch (err) {
         return handleError(err, dispatch);

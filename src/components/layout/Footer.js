@@ -143,9 +143,6 @@ const Footer = () => {
                     <a className={classes.link} target="_blank" href={PRIVACY_POLICY} rel="noreferrer">Privacy Policy</a>
                     <a className={classes.link} target="_blank" href={TERMS}  rel="noreferrer">Terms &amp; Conditions</a>
                     <a className={classes.link} target="_blank" href={DISCLAIMER}  rel="noreferrer">Disclaimer</a>
-                    {/* <Link className={classes.link} underline="hover" to={PRIVACY_POLICY} component={RouterLink}>Privacy Policy</Link>
-                    <Link className={classes.link} underline="hover" to={TERMS} component={RouterLink}>Terms &amp; Conditions</Link>
-                    <Link className={classes.link} underline="hover" to={DISCLAIMER} component={RouterLink}>Disclaimer</Link> */}
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>
@@ -155,19 +152,8 @@ const Footer = () => {
                 </div>
                 <div>
                     <Typography variant="h6">Help</Typography>
-                    {/* <Link className={classes.link} underline="hover" to={FAQS} component={RouterLink}>FAQs</Link> */}
                     <a className={classes.link} target="_blank" href={FAQS}  rel="noreferrer">FAQs</a>
                     <a className={classes.link} target="_blank" href={CONTACT_US}  rel="noreferrer">Contact Us</a>
-                    {/* <AnimatedLink 
-                        to={CONTACT_US} 
-                        spy={true}
-                        smooth={true}
-                        offset={-70}
-                        duration={500}
-                        className={classes.link}
-                        >
-                            Contact Us
-                    </AnimatedLink> */}
                 </div>
                 <div>
                     <Typography variant="h6">Connect</Typography>

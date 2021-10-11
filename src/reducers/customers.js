@@ -13,7 +13,9 @@ import {
     SET_ALL_CUSTOMERS,
     CLEAR_ALL_CUSTOMERS,
     SET_ID_CHECK_DATA,
-    SET_PROFILE_CHECK_DATA
+    SET_PROFILE_CHECK_DATA,
+    ACCEPTED_CUSTOMER_ID,
+    ACCEPTED_CUSTOMER_RESIDENCE_PERMIT
 } from '../actions/types';
 
 import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
@@ -231,6 +233,18 @@ const customersReducer = (state = initialState, action) => {
             }
 
         break;
+
+        case ACCEPTED_CUSTOMER_ID:
+            return {
+                ...state,
+                msg: 'Customer ID card has been verified'
+            };
+        
+        case ACCEPTED_CUSTOMER_RESIDENCE_PERMIT:
+            return {
+                ...state,
+                msg: 'Customer residencen permit has been verified'
+            };
 
         case CLEAR_CUSTOMER_STATUS_MSG:
             return {
