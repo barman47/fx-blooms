@@ -24,7 +24,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
 import { sendMessage } from '../../../actions/chat';
-import { CUSTOMER_CANCELED, SET_ON_CHAT_PAGE, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
+import { CUSTOMER_CANCELED, SET_ON_CHAT_PAGE } from '../../../actions/types';
 import { COLORS, CHAT_CONNECTION_STATUS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 
 import SellerNoticeModal from './SellerNoticeModal';
@@ -221,7 +221,6 @@ const MobileConversation = (props) => {
         props.handleSetTitle('Mobile Conversation');
         dispatch({ type: SET_ON_CHAT_PAGE, payload: true });
         return () => {
-            dispatch({ type: UPDATE_ACTIVE_CHAT });
             dispatch({ type: SET_ON_CHAT_PAGE, payload: false });
         };
         // eslint-disable-next-line

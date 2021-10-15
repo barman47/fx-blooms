@@ -207,7 +207,7 @@ const Actions = (props) => {
                                                 disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                                 onClick={() => handlePayment({ buyerHasMadePayment: true, sellerHasMadePayment })}
                                             >
-                                                I've Made Payment
+                                                I've Made Payment:Buyer
                                             </Button>
                                         </Grid>
                                         {sellerHasMadePayment &&
@@ -220,7 +220,7 @@ const Actions = (props) => {
                                                     onClick={completeTransaction}
                                                     disabled={loading || buyerHasRecievedPayment || isDeleted || chatDisconnected ? true : false}
                                                 >
-                                                    Payment Received
+                                                    Payment Received:Buyer
                                                 </Button>
                                             </Grid>
                                         }
@@ -234,7 +234,7 @@ const Actions = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                             >
-                                                Cancel Transaction
+                                                Cancel Transaction:Buyer
                                             </Button>
                                         </Grid>
                                     </>
@@ -255,7 +255,7 @@ const Actions = (props) => {
                                                     disabled={loading || sellerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                                     onClick={() => handlePayment({ buyerHasMadePayment, sellerHasMadePayment: true })}
                                                 >
-                                                    I've Made Payment
+                                                    I've Made Payment:Seller
                                                 </Button>
                                             </Grid>
                                         }
@@ -269,7 +269,7 @@ const Actions = (props) => {
                                                     onClick={completeTransaction}
                                                     disabled={loading || sellerHasRecievedPayment || isDeleted || chatDisconnected ? true : false ? true : false}
                                                 >
-                                                    Payment Received
+                                                    Payment Received:Seller
                                                 </Button>
                                             </Grid>
                                         }
@@ -283,7 +283,7 @@ const Actions = (props) => {
                                                 onClick={cancelNegotiation}
                                                 disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false ? true : false}
                                             >
-                                                Cancel Transaction
+                                                Cancel Transaction:Seller
                                             </Button>
                                         </Grid>
                                     </>
