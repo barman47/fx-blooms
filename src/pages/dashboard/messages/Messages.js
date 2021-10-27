@@ -35,7 +35,7 @@ const Messages = (props) => {
 	}, []);
 
 	const handleSetChat = (newChat) => {
-		if (chat.id !== newChat.id) {
+		if (chat && chat.id !== newChat.id) {
 			dispatch({
 				type: UPDATE_ACTIVE_CHAT,
 				payload: chat
