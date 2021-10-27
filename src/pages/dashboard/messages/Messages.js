@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { getChats } from '../../../actions/chat';
 
 import Message from './Message';
-import { SET_CHAT } from '../../../actions/types';
+import { SET_CHAT, UPDATE_ACTIVE_CHAT } from '../../../actions/types';
 import { DASHBOARD, MOBILE_CONVERSATION } from '../../../routes';
 import { useMediaQuery } from '@material-ui/core';
 import { useTheme } from '@material-ui/core/styles';
@@ -27,17 +27,23 @@ const Messages = (props) => {
 	const matches = useMediaQuery(theme.breakpoints.down('sm'));
 	const dispatch = useDispatch();
 
-	const { chats } = useSelector(state => state.chat);
+	const { chat, chats } = useSelector(state => state.chat);
 
 	useEffect(() => {
 		props.getChats();
 		// eslint-disable-next-line
 	}, []);
 
-	const handleSetChat = (chat) => {
+	const handleSetChat = (newChat) => {
+		if (chat.id !== newChat.id) {
+			dispatch({
+				type: UPDATE_ACTIVE_CHAT,
+				payload: chat
+			});
+		}
 		dispatch({
 			type: SET_CHAT,
-			payload: chat
+			payload: newChat
 		});
 
 		if (matches) {

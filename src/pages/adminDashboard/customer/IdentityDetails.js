@@ -3,6 +3,7 @@ import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box, 
+    Button,
     Grid,
     Tab,
     Tabs,
@@ -11,10 +12,12 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS } from '../../../utils/constants';
-import { getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
-import { GET_ERRORS, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
+import { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
+import { GET_ERRORS, SET_ID_CHECK_DATA, CLEAR_CUSTOMER_STATUS_MSG, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 
+import Spinner from '../../../components/common/Spinner';
+import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
 import ImagePreviewModal from '../../../components/common/ImagePreviewModal';
@@ -93,26 +96,22 @@ function a11yProps(index) {
     };
 }
 
-const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
+const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { customer, idCheckData, profileCheckData } = useSelector(state => state.customers);
+    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
     const errorsState = useSelector(state => state.errors);
-    // const { customerId } = useSelector(state => state.customer);
     
+    const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [modalImage, setModalImage] = useState('');
     const [alt, setAlt] = useState('');
     const [value, setValue] = useState(0);
-    // const [errors, setErrors] = useState({});
+    // eslint-disable-next-line
+    const [errors, setErrors] = useState({});
 
     const toast = useRef();
-
-    // useEffect(() => {
-    //     if (errorsState?.msg) {
-    //         setErrors({ msg: errorsState.msg });
-    //     }
-    // }, [errorsState, errors]);
+    const successModal = useRef();
 
     useEffect(() => {
         getIdCardValidationResponse(customer.id);
@@ -137,6 +136,28 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setLoading(false);
+            toast.current.handleClick();
+        }
+    }, [errorsState, errors]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [dispatch, msg]);
+
+    const dismissSuccessModal = () => {
+        dispatch({
+            type: CLEAR_CUSTOMER_STATUS_MSG,
+            payload: null
+        });
+    };
+
     const handleChange = (event, newValue) => {
         setValue(newValue);
     };
@@ -151,6 +172,16 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         setModalImage(img);
         setAlt(alt);
         setOpen(true);
+    };
+
+    const handleApproveId = () => {
+        setLoading(true);
+        approveIdCard(customer.id);
+    };
+
+    const handleApproveResidencePermit = () => {
+        setLoading(true);
+        approveResidencePermit(customer.id);
     };
 
     // const onSubmit = (e) => {
@@ -168,6 +199,8 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                     type="error"
                 />
             }
+            {loading && <Spinner />}
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <ImagePreviewModal handleCloseModal={handleCloseModal} open={open} alt={alt} img={modalImage} />
             <Grid className={classes.root} container direction="column">
                 {/* <Grid item>
@@ -202,6 +235,7 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                             </Tabs>
                         </Box>
                         <TabPanel value={value} index={0}>
+                            <Button variant="outlined" color="primary" onClick={handleApproveId}>Approve ID</Button>
                             {idCheckData ? 
                                 <Grid container direction="row" spacing={3}>
                                     <Grid item xs={12} md={6}>
@@ -260,6 +294,7 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                             }
                         </TabPanel>
                         <TabPanel value={value} index={1}>
+                            <Button variant="outlined" color="primary" onClick={handleApproveResidencePermit}>Approve Residence Permit</Button>
                             {profileCheckData ? 
                                 <Grid container direction="row" spacing={3}>
                                     <Grid item xs={6}>
@@ -325,8 +360,10 @@ const IdentityDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 };
 
 IdentityDetails.propTypes = {
+    approveIdCard: PropTypes.func.isRequired,
+    approveResidencePermit: PropTypes.func.isRequired,
     getIdCardValidationResponse: PropTypes.func.isRequired,
     getResidencePermitValidationResponse: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse })(IdentityDetails);
+export default connect(undefined, { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse })(IdentityDetails);

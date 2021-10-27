@@ -2,39 +2,34 @@ import axios from 'axios';
 import { API } from './constants';
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
-// import { tokenExpiring } from './checkToken';
 import { AUTH_TOKEN } from './constants';
-import { SET_AUTH_TOKEN } from '../actions/types';
+import { RESET_CUSTOMER_SESSION, SET_AUTH_TOKEN } from '../actions/types';
 import { LOGIN } from '../routes';
 
-const reIssueToken = () => {
-    // const { token } = store.getState().customer;
-    // if (!tokenExpiring()) {
-    //     console.log('token not expiring');
-    //     return token;
-    // }
-
+const reIssueCustomerToken = () => {
     return new Promise(async(resolve, reject) => {
         try {
             const res = await axios.get(`${API}/Customer/ReIssueToken`, {
                 headers: {
                     'Authorization': 'Bearer',
-                    token: localStorage.getItem(AUTH_TOKEN)
+                    token: sessionStorage.getItem(AUTH_TOKEN)
                 } 
             });
             setAuthToken(res.data.data);
-            console.log('reIssued token ', res);
-            resolve(store.dispatch({
+            store.dispatch({
                 type: SET_AUTH_TOKEN,
                 payload: res.data.data
-            }));
-
+            });
+            store.dispatch({
+                type: RESET_CUSTOMER_SESSION,
+                payload: true
+            });
+            resolve('Reissued token');
         } catch (err) {
-            console.log(err.response);
-            reject('Token expired!');
+            console.error(err);
             window.location.href = LOGIN;
         }
     }); 
 };
 
-export default reIssueToken;
+export default reIssueCustomerToken;

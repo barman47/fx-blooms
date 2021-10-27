@@ -8,11 +8,11 @@ const setAuthToken =  async (token) => {
         axios.defaults.headers.common['Authorization'] = 'Bearer';
         axios.defaults.headers.common['Accept'] = 'application/json';
         axios.defaults.headers.common['token'] = token;
-        localStorage.setItem(AUTH_TOKEN, token);
+        sessionStorage.setItem(AUTH_TOKEN, token);
     } else {
         // Delete auth header
         delete axios.defaults.headers.common['Authorization'];
-        localStorage.removeItem(AUTH_TOKEN);
+        sessionStorage.removeItem(AUTH_TOKEN);
     }
 };
 

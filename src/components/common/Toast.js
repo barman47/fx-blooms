@@ -27,6 +27,10 @@ const Toast = forwardRef((props, ref) => {
     useImperativeHandle(ref, () => ({
         handleClick: () => {
             setOpen(true);
+        },
+
+        close: () => {
+            setOpen(false);
         }
     }));
 
@@ -35,6 +39,9 @@ const Toast = forwardRef((props, ref) => {
             return;
         }
         setOpen(false);
+        if (props.onClose) {
+            props.onClose();
+        }
     }
 
     // types: success, warning, error, info,
@@ -50,7 +57,7 @@ const Toast = forwardRef((props, ref) => {
                     vertical: 'bottom'
                 }}
             >
-                <Alert variant="standard" onClose={handleClose} severity={type}>
+                <Alert variant="standard" onClose={handleClose} severity={type} action={props.action || null}>
                     {title && <AlertTitle>{title}</AlertTitle>}
                     {msg}
                 </Alert>
@@ -63,10 +70,12 @@ Toast.propTypes = {
     msg: PropTypes.string.isRequired,
     title: PropTypes.string,
     type: PropTypes.string.isRequired,
-    duration: PropTypes.number.isRequired
+    duration: PropTypes.number,
+    onClose: PropTypes.func
 };
 
 Toast.defaultProps = {
+    type: 'error',
     duration: 3000
 };
 

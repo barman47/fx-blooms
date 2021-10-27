@@ -12,7 +12,9 @@ import {
     SUBTRACT_UNREAD_MESSAGES,
     CLEAR_UNREAD_MESSAGES,
     SET_TRANSACTION_TERMS,
-    CUSTOMER_CANCELED
+    CUSTOMER_CANCELED,
+    SET_ON_CHAT_PAGE,
+    SET_CHAT_CONNECTION_STATUS
 } from '../actions/types';
 
 import { NOTIFICATION_TYPES } from '../utils/constants';
@@ -20,9 +22,10 @@ import { NOTIFICATION_TYPES } from '../utils/constants';
 const initialState = {
     chat: null,
     chats: [],
-    sessionId: null,
     unreadMessages: 0,
-    customerCanceled: null
+    customerCanceled: null,
+    onChatPage: false,
+    connectionStatus: null
 };
 
 const chatsReducer = (state = initialState, action) => {
@@ -38,6 +41,19 @@ const chatsReducer = (state = initialState, action) => {
                 ...state,
                 chats: [...action.payload]
             }; 
+
+        case SET_ON_CHAT_PAGE: {
+            return {
+                ...state,
+                onChatPage: action.payload
+            };
+        }
+
+        case SET_CHAT_CONNECTION_STATUS:
+            return {
+                ...state,
+                connectionStatus: action.payload
+            };
             
         case UPDATE_ACTIVE_CHAT:
             if (state.chat) {
@@ -57,34 +73,25 @@ const chatsReducer = (state = initialState, action) => {
         case SET_CHAT:
             return {
                 ...state,
-                chat: action.payload,
-                sessionId: action.payload.id
+                chat: action.payload
             };
 
         case REMOVE_CHAT:
             return {
                 ...state,
-                chat: null,
-                sessionId: null
+                chat: null
             };
 
         case SENT_MESSAGE: 
-            if (state.chat) {
+            if (state.onChatPage) {
                 const { messages, ...rest } = state.chat;
                 messageList = [...messages, action.payload.message];
                 unreadCount = action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
-                // unreadCount = state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender ? state.unreadMessages : state.unreadMessages + 1;
-                
-                // if (state.chat.id === action.payload.message.chatId || action.payload.customerId === action.payload.message.sender) {
-                //     unreadCount = state.unreadMessages
-                // } else {
-                //     unreadCount = state.unreadMessages + 1;
-                // }
 
                 return {
                     ...state,
                     chat: { ...rest, messages: messageList },
-                    unreadMessages: unreadCount
+                    // unreadMessages: unreadCount
                 }
 
             } else {
@@ -101,20 +108,28 @@ const chatsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION: 
-            chat = state.chat;
-            chat.buyerHasMadePayment = action.payload.buyerHasMadePayment;
-            chat.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
-            chat.sellerHasMadePayment = action.payload.sellerHasMadePayment;
-            chat.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
-            chat.isDeleted = action.payload.isDeleted;
+            if (state.onChatPage) {
+                chat = state.chat;
+                chat.buyerHasMadePayment = action.payload.buyerHasMadePayment;
+                chat.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
+                chat.sellerHasMadePayment = action.payload.sellerHasMadePayment;
+                chat.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
+                chat.isDeleted = action.payload.isDeleted;
 
-            unreadCount = state.chat.id === action.payload.chatId || action.payload.customerId === action.payload.senderId ? state.unreadMessages : state.unreadMessages + 1;
+                // unreadCount = action.payload.customerId === action.payload.senderId ? state.unreadMessages : state.unreadMessages + 1;
 
-            return {
-                ...state,
-                chat: {...state.chat, ...action.payload},
-                unreadMessages: action.payload === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : unreadCount
-            };
+                return {
+                    ...state,
+                    chat: {...state.chat, ...action.payload},
+                    // unreadMessages: action.payload.transactionType === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : unreadCount
+                };
+
+            } else {
+                return {
+                    ...state,
+                    unreadMessages: action.payload.transactionType === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadMessages : state.unreadMessages + 1
+                };
+            }
 
         case CUSTOMER_CANCELED:
             return {

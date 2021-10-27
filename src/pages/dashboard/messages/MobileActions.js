@@ -10,12 +10,15 @@ import PropTypes from 'prop-types';
 
 import { SET_CUSTOMER_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
+import { CHAT_CONNECTION_STATUS } from '../../../utils/constants';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+
+const { CONNECTED, RECONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -36,7 +39,7 @@ const Actions = (props) => {
     const { customerId, msg, userName } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-    const { sessionId } = useSelector(state => state.chat);
+    const { connectionStatus, chat } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
@@ -48,6 +51,7 @@ const Actions = (props) => {
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
     const [loading, setLoading] = useState(false);
+    const [chatDisconnected, setChatDisconnected] = useState(false);
 
 
     const [errors, setErrors] = useState({});
@@ -75,18 +79,28 @@ const Actions = (props) => {
         }
     }, [dispatch, msg]);
 
+    useEffect(() => {
+        if(connectionStatus !== undefined) {
+            if (connectionStatus === CONNECTED || connectionStatus === RECONNECTED) {
+                setChatDisconnected(false);
+            } else {
+                setChatDisconnected(true);
+            }
+        }
+    }, [connectionStatus]);
+
     // const handleSetRating = (e, value) => {
     //     setSellerRating(value);
     // }
 
     const cancelNegotiation = () => {
-        props.cancelNegotiation(sessionId, history);
+        props.cancelNegotiation(chat.id, history);
     };
 
     const completeTransaction = () => {
         setErrors({});
         let data = {
-            ChatSessionId: sessionId,
+            ChatSessionId: chat.id,
             Message: '',
             Rating: 0,
             ReceivedExpectedFunds: true
@@ -113,8 +127,13 @@ const Actions = (props) => {
         });
     };    
 
-    const handlePayment = () => {
-        props.sendTransactionNotification(sessionId, { customerUsername: userName, otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername });
+    const handlePayment = ({ buyerHasMadePayment, sellerHasMadePayment }) => {
+        props.sendTransactionNotification(chat.id, { 
+            customerUsername: userName, 
+            otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername,
+            buyerHasMadePayment,
+            sellerHasMadePayment 
+        });
     };
 
     const onSubmit = (e) => {
@@ -147,10 +166,10 @@ const Actions = (props) => {
                                         variant="outlined"
                                         color="primary"
                                         fullWidth
-                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
-                                        onClick={handlePayment}
+                                        disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
+                                        onClick={() => handlePayment({ buyerHasMadePayment: true, sellerHasMadePayment })}
                                     >
-                                        I've Made Payment:Buyer
+                                        I've Made Payment
                                     </Button>
                                 </Grid>
                                 {sellerHasMadePayment &&
@@ -162,9 +181,9 @@ const Actions = (props) => {
                                             color="primary"
                                             fullWidth
                                             onClick={completeTransaction}
-                                            disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
+                                            disabled={loading || buyerHasRecievedPayment || isDeleted || chatDisconnected ? true : false}
                                         >
-                                            Payment Received:Buyer
+                                            Payment Received
                                         </Button>
                                     </Grid>
                                 }
@@ -176,9 +195,9 @@ const Actions = (props) => {
                                         color="primary"
                                         fullWidth
                                         onClick={cancelNegotiation}
-                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                        disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                     >
-                                        Cancel Transaction:Buyer
+                                        Cancel Transaction
                                     </Button>
                                 </Grid>
                             </>
@@ -196,10 +215,10 @@ const Actions = (props) => {
                                             variant="outlined"
                                             color="primary"
                                             fullWidth
-                                            disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
-                                            onClick={handlePayment}
+                                            disabled={loading || sellerHasMadePayment || isDeleted || chatDisconnected ? true : false}
+                                            onClick={() => handlePayment({ buyerHasMadePayment, sellerHasMadePayment: true })}
                                         >
-                                            I've Made Payment:Seller
+                                            I've Made Payment
                                         </Button>
                                     </Grid>
                                 }
@@ -212,9 +231,9 @@ const Actions = (props) => {
                                             color="primary"
                                             fullWidth
                                             onClick={completeTransaction}
-                                            disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
+                                            disabled={loading || sellerHasRecievedPayment || isDeleted || chatDisconnected ? true : false}
                                         >
-                                            Payment Received:Seller
+                                            Payment Received
                                         </Button>
                                     </Grid>
                                 }
@@ -226,9 +245,9 @@ const Actions = (props) => {
                                         color="primary"
                                         fullWidth
                                         onClick={cancelNegotiation}
-                                        disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                        disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                     >
-                                        Cancel Transaction:Seller
+                                        Cancel Transaction
                                     </Button>
                                 </Grid>
                             </>

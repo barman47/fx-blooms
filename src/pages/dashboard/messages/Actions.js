@@ -16,11 +16,13 @@ import { SET_CUSTOMER_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import { sendTransactionNotification } from '../../../actions/chat';
 import { cancelNegotiation, completeTransaction } from '../../../actions/listings';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, CHAT_CONNECTION_STATUS, } from '../../../utils/constants';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+
+const { CONNECTED, RECONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -69,7 +71,7 @@ const Actions = (props) => {
     const { customerId, msg, userName } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     
-    const { sessionId } = useSelector(state => state.chat);
+    const { connectionStatus, chat } = useSelector(state => state.chat);
     // const { buyer, seller, buyerHasMadePayment, buyerHasRecievedPayment, sellerHasMadePayment, sellerHasReceivedPayment } = useSelector(state => state.chat.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -84,6 +86,7 @@ const Actions = (props) => {
     // const [Message, setMessage] = useState('');
     // const [sellerRating, setSellerRating] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [chatDisconnected, setChatDisconnected] = useState(false);
 
 
     const [errors, setErrors] = useState({});
@@ -111,18 +114,28 @@ const Actions = (props) => {
         }
     }, [dispatch, msg]);
 
+    useEffect(() => {
+        if(connectionStatus !== undefined) {
+            if (connectionStatus === CONNECTED || connectionStatus === RECONNECTED) {
+                setChatDisconnected(false);
+            } else {
+                setChatDisconnected(true);
+            }
+        }
+    }, [connectionStatus]);
+
     // const handleSetRating = (e, value) => {
     //     setSellerRating(value);
     // }
 
     const cancelNegotiation = () => {
-        props.cancelNegotiation(sessionId, history);
+        props.cancelNegotiation(chat.id, history);
     };
 
     const completeTransaction = () => {
         setErrors({});
         let data = {
-            ChatSessionId: sessionId,
+            ChatSessionId: chat.id,
             Message: '',
             Rating: 0,
             ReceivedExpectedFunds: true
@@ -150,7 +163,7 @@ const Actions = (props) => {
     };    
 
     const handlePayment = ({ buyerHasMadePayment, sellerHasMadePayment }) => {
-        props.sendTransactionNotification(sessionId, { 
+        props.sendTransactionNotification(chat.id, { 
             customerUsername: userName, 
             otherUsername: userName === buyerUsername ? sellerUsername : buyerUsername,
             buyerHasMadePayment,
@@ -194,7 +207,7 @@ const Actions = (props) => {
                                                 variant="outlined"
                                                 color="primary"
                                                 fullWidth
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                                 onClick={() => handlePayment({ buyerHasMadePayment: true, sellerHasMadePayment })}
                                             >
                                                 I've Made Payment:Buyer
@@ -208,7 +221,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || buyerHasRecievedPayment || isDeleted ? true : false}
+                                                    disabled={loading || buyerHasRecievedPayment || isDeleted || chatDisconnected ? true : false}
                                                 >
                                                     Payment Received:Buyer
                                                 </Button>
@@ -222,7 +235,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                             >
                                                 Cancel Transaction:Buyer
                                             </Button>
@@ -242,7 +255,7 @@ const Actions = (props) => {
                                                     variant="outlined"
                                                     color="primary"
                                                     fullWidth
-                                                    disabled={loading || sellerHasMadePayment || isDeleted ? true : false}
+                                                    disabled={loading || sellerHasMadePayment || isDeleted || chatDisconnected ? true : false}
                                                     onClick={() => handlePayment({ buyerHasMadePayment, sellerHasMadePayment: true })}
                                                 >
                                                     I've Made Payment:Seller
@@ -257,7 +270,7 @@ const Actions = (props) => {
                                                     color="primary"
                                                     fullWidth
                                                     onClick={completeTransaction}
-                                                    disabled={loading || sellerHasRecievedPayment || isDeleted ? true : false}
+                                                    disabled={loading || sellerHasRecievedPayment || isDeleted || chatDisconnected ? true : false ? true : false}
                                                 >
                                                     Payment Received:Seller
                                                 </Button>
@@ -271,7 +284,7 @@ const Actions = (props) => {
                                                 color="primary"
                                                 fullWidth
                                                 onClick={cancelNegotiation}
-                                                disabled={loading || buyerHasMadePayment || isDeleted ? true : false}
+                                                disabled={loading || buyerHasMadePayment || isDeleted || chatDisconnected ? true : false ? true : false}
                                             >
                                                 Cancel Transaction:Seller
                                             </Button>

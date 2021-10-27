@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme => ({
         '& div': {
             display: 'grid',
             gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-            alignItems: 'flex-start',
+            alignItems: 'center',
             gap: theme.spacing(2),
             padding: [[theme.spacing(4), theme.spacing(3)]],
 

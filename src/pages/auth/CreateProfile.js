@@ -26,7 +26,7 @@ import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import { countries } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD, DASHBOARD_HOME, HOME } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN } from '../../routes';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
 import logo from '../../assets/img/logo.svg';
@@ -144,7 +144,7 @@ const CreateProfile = (props) => {
         if (location?.state?.verifiedEmail && email) {
             setVerifiedEmail(true);
         } else {
-            return window.location.href = HOME;
+            return history.push(LOGIN);
         }
         if (isAuthenticated && authorized) {
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);;
@@ -237,7 +237,7 @@ const CreateProfile = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <a href="https://wp.fxblooms.com">
+                            <a href="https://fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </a>
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thanks for joining!.</Typography>
@@ -261,7 +261,7 @@ const CreateProfile = (props) => {
                             <Grid container direction="row" spacing={2}>
                                 {verifiedEmail && email && 
                                     <Grid item xs={10}>
-                                        <Alert severity="success">Email successfuly verified</Alert>
+                                        <Alert severity="success">Email successfully verified</Alert>
                                     </Grid>
                                 }
                                 <Grid item xs={12} md={5}>

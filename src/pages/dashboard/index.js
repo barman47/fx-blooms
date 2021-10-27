@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -6,15 +6,16 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
+import toast, { Toaster } from 'react-hot-toast';
 
-import { logout } from '../../actions/customer';
-
-import logo from '../../assets/img/logo.svg';
+import SessionModal from './SessionModal';
+import Toast from '../../components/common/Toast';
 
 import {
     Avatar,
     Badge,
     Box,
+    Button,
     IconButton,
     Drawer,
     Divider,
@@ -31,12 +32,17 @@ import {
 
 import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, SENT_MESSAGE } from '../../actions/types';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
-import { COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
-
+import { logout } from '../../actions/customer';
+import { CHAT_CONNECTION_STATUS, COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
+
+import logo from '../../assets/img/logo.svg';
+
+const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
+
 
 const drawerWidth = 240;
 
@@ -195,6 +201,12 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
+const ToastAction = () => {
+    return (
+        <Button variant="outlined" color="inherit" onClick={() => SignalRService.connect()}>Reconnect</Button>
+    );
+};
+
 const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
@@ -202,29 +214,46 @@ const Dashboard = ({ children, title, logout }) => {
     const location = useLocation();
     
     const { customerId, profile, userName } = useSelector(state => state.customer);
-    const { unreadMessages } = useSelector(state => state.chat);
+    const { connectionStatus, unreadMessages } = useSelector(state => state.chat);
 
     const [value, setValue] = useState(0);
     const [open, setOpen] = useState(true);
     const [path, setPath] = useState('');
     const [showBottomNavigation, setShowBottomNavigation] = useState(true);
-
+    
+    const [toastDuration, setToastDuration] = useState(0);
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastTitle, setToastTitle] = useState('');
+    const [toastType, setToastType] = useState('error');
+    const [toastAction, setToastAction] = useState(null);
+    
     const links = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
     ];
-
+    
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
         { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
         { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
+    
+    const customToast = useRef();
 
     useEffect(() => {
         hideBottomNavigation();
+        
+        onReconnected();
+        onReconnect();
+        onClose();
+
         handleSentMessage();
+
+        return () => {
+            dispatch({ type: REMOVE_CHAT });
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -232,92 +261,162 @@ const Dashboard = ({ children, title, logout }) => {
         setPath(location.pathname);
     }, [location]);
 
+    useEffect(() => {
+        switch (connectionStatus) {
+            case CONNECTED:
+                if (customToast.current) {
+                    toast.success('Connected!');
+                    setToastAction(null);
+                }
+                
+                break;
+
+            case RECONNECTING:
+                setToastTitle('NETWORK ERROR');
+                setToastMessage('Reconnecting . . .');
+                setToastDuration(null);
+                setToastType('error');
+                setToastAction(null);
+                customToast.current.handleClick();
+                break;
+                
+            case RECONNECTED:
+                customToast.current.close();
+                toast.success('Reconnected!');
+                break;
+
+            case DISCONNECTED:
+                setToastTitle('ERROR');
+                setToastMessage('Chat Disconnected');
+                setToastType('error');
+                setToastDuration(null);
+                setToastAction(<ToastAction />);
+                customToast.current.handleClick();
+                break;
+
+            default:
+                break;
+        }
+    }, [connectionStatus]);
+
+    const playAudioNotifcation = (recipientId, senderId) => {
+        if (customerId !== senderId && (customerId === recipientId || customerId === senderId)) {
+            const audio = new Audio(audioFile);
+            audio.play();
+            navigator.vibrate(500);
+        }
+    };
+
+    const onReconnected = () => {
+        SignalRService.onReconnected();
+    };
+
+    const onReconnect = () => {
+        SignalRService.onReconnect();
+    };
+    
+    const onClose = () => {
+        SignalRService.onClose();
+    };
+
     const handleSentMessage = () => {
         const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
-            let response = JSON.parse(data);
-            let payload, senderId;
-            console.log('New Notification ', response, type);
-            if (customerId !== response.Sender) {
-                const audio = new Audio(audioFile);
-                audio.play();
-                navigator.vibrate(500);
-            }
-            switch (type) {
-                case CHAT_MESSAGE:
-                    const messageData = {
-                        chatId: response.ChatId,
-                        dateSent: response.DateSent,
-                        id: response.Id,
-                        sender: response.Sender,
-                        text: response.Text,
-                        uploadedFileName: response.UploadedFileName,
-                        isRead: false
-                    };
-        
-                    dispatch({
-                        type: SENT_MESSAGE,
-                        payload: { message: messageData, customerId }
-                    });
+            try {
+                let response = JSON.parse(data);
+                let payload, recipientId, senderId;
+                // console.log('New Notification ', response, type);
+                
+                switch (type) {
+                    case CHAT_MESSAGE:
+                        playAudioNotifcation(response.Recipient, response.Sender);
+                        if (customerId === response.Recipient || customerId === response.Sender) {
+                            const messageData = {
+                                chatId: response.ChatId,
+                                dateSent: response.DateSent,
+                                id: response.Id,
+                                sender: response.Sender,
+                                text: response.Text,
+                                uploadedFileName: response.UploadedFileName,
+                                isRead: false
+                            };
 
-                break;
-
-                case TRANSFER_CONFIRMATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
-
-                    dispatch({
-                        type: PAYMENT_NOTIFICATION,
-                        payload: {
-                            buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-                            buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-                            sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-                            sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-                            isDeleted: payload.Chat.IsDeleted,
-                            customerId,
-                            senderId,
-                            transactionType: type
+                            dispatch({
+                                type: SENT_MESSAGE,
+                                payload: { message: messageData, customerId }
+                            });
                         }
-                    });
 
                     break;
 
-                case TRANSFER_NOTIFICATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
+                    case TRANSFER_CONFIRMATION:
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
 
-                    if (senderId !== customerId) {
                         dispatch({
                             type: PAYMENT_NOTIFICATION,
                             payload: {
-                                buyerHasMadePayment: payload.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: payload.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                                isDeleted: payload.IsDeleted,
+                                buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
+                                buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
+                                sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
+                                sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
+                                isDeleted: payload.Chat.IsDeleted,
                                 customerId,
                                 senderId,
                                 transactionType: type
                             }
-                        });    
-                    }
-
-                    break;
-
-                case CANCEL_NEGOTIATION:
-                    payload = JSON.parse(response.Payload);
-                    senderId = response.SenderId;
-                    
-                    if (senderId !== customerId) {
-                        dispatch({ 
-                            type: CUSTOMER_CANCELED,
-                            payload: `Hi, this transaction has been canceled by the other user`
                         });
-                    }
-                    break;
 
-                default:
-                    break;
+                        break;
+
+                    case TRANSFER_NOTIFICATION:
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
+                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
+
+                        if (customerId === payload.Buyer || customerId === payload.Seller) {
+                            playAudioNotifcation(recipientId, senderId);
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION,
+                                payload: {
+                                    buyerHasMadePayment: payload.BuyerHasMadePayment,
+                                    buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                                    sellerHasMadePayment: payload.SellerHasMadePayment, 
+                                    sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                                    isDeleted: payload.IsDeleted,
+                                    customerId,
+                                    senderId,
+                                    transactionType: type
+                                }
+                            }); 
+                        }
+                        
+                        break;
+
+                    case CANCEL_NEGOTIATION:
+                        playAudioNotifcation(customerId, response.Sender);
+
+                        payload = JSON.parse(response.Payload);
+                        senderId = response.SenderId;
+                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
+
+                        if (customerId === payload.Buyer || customerId === payload.Seller) {
+                            if (senderId !== customerId) {
+                                dispatch({ 
+                                    type: CUSTOMER_CANCELED,
+                                    payload: `Hi, this transaction has been canceled by the other user`
+                                });
+                            }
+                        }
+
+                        break;
+
+                    default:
+                        break;
+                }
+            } catch (err) {
+                console.log('Error Ocurred');
+                console.error(err);
             }
         });
     };
@@ -349,6 +448,18 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            <SessionModal />
+            {connectionStatus !== CONNECTED && 
+                <Toast 
+                    ref={customToast}
+                    title={toastTitle}
+                    duration={toastDuration}
+                    msg={toastMessage}
+                    type={toastType}
+                    action={toastAction}
+                />
+            }
+            <Toaster />
             <section className={classes.root}>
                 <Drawer 
                     variant="permanent"

@@ -31,13 +31,20 @@ export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
-// export const HUB_URL = 'https://fifth-mechanism-322509.ey.r.appspot.com/notificationhub'; // Production branch
-// export const API = 'https://fifth-mechanism-322509.ey.r.appspot.com/api'; // Production Branch
+// export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
+// export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 // export const TRANSFER_CONFIRMATION = 'TransferConfrimation';
 // export const TRANSFER_NOTIFICATION = 'TransferNotification';
 export const SEND_MESSAGE = 'SendMessage';
+
+export const CHAT_CONNECTION_STATUS = {
+    CONNECTED: 'CONNECTED',
+    RECONNECTING: 'RECONNECTING',
+    RECONNECTED: 'RECONNECTED',
+    DISCONNECTED: 'DISCONNECTED'  
+};
 
 export const NOTIFICATION_TYPES = {
     CANCEL_NEGOTIATION: 'CancelNegotiation',
@@ -56,7 +63,7 @@ export const ONE_SPECIAL_CHARACTER = new RegExp(/(?=.*?[#?!@$%^&*-])/);
 export const EIGHT_CHARACTERS = new RegExp(/.{8,}/);
 
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
-export const ATTACHMENT_LIMIT = 15000000; // 15 Megabytes
+export const ATTACHMENT_LIMIT = 3000000; // 3 Megabytes
 
 export const LISTING_STATUS = {
     open: 'OPEN',

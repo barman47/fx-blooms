@@ -274,7 +274,7 @@ const ResetPassword = (props) => {
             <SuccessModal ref={successModal} dismissAction={redirectToLogin} />
             {loading && <Spinner />}
             <section className={classes.root}>
-                <a href="https://wp.fxblooms.com">
+                <a href="https://fxblooms.com">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
                 </a>
                 <div className={classes.formContainer}>

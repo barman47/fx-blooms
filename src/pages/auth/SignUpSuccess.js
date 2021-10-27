@@ -92,7 +92,7 @@ const SignupSuccess = () => {
         <>
             <Helmet><title>Signup Successful | FXBLOOMS.com</title></Helmet>
             <Container className={classes.root}>
-                <a href="https://wp.fxblooms.com" className={classes.logo}>
+                <a href="https://fxblooms.com" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
                 </a>
                 <div className={classes.content}>

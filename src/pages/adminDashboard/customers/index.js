@@ -14,7 +14,6 @@ import {
 
 import { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
 import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
-import isEmpty from '../../../utils/isEmpty';
 
 import AllCustomers from './AllCustomers';
 import NewCustomers from './NewCustomers';
@@ -116,48 +115,39 @@ const Customers = (props) => {
         if (count === 0) {
             getNewCustomers();
         }
-        // handleSetTitle('Customers');
         // eslint-disable-next-line
     }, []);
 
     const handleSetFilter = (filter) => {
-        console.log(filter);
         setFilter(filter);
         switch (filter) {
             case CONFIRMED:
-                if (isEmpty(confirmed)) {
-                    getVerifiedCustomers({
-                        pageNumber: 1,
-                        pageSize: 25
-                    });
-                }
+                getVerifiedCustomers({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
                 break;
 
             case PENDING:
-                if (isEmpty(pending)) {
-                    getNewCustomers({
-                        pageNumber: 1,
-                        pageSize: 25
-                    });
-                }
+                getNewCustomers({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
                 break;
 
             case REJECTED:
-                if (isEmpty(rejected)) {
-                    getRejectedCustomers({
-                        pageNumber: 1,
-                        pageSize: 25
-                    });
-                }
+                getRejectedCustomers({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
                 break;
 
             case ALL_CUSTOMERS:
-                if (isEmpty(customers)) {
-                    getCustomers({
-                        pageNumber: 1,
-                        pageSize: 25
-                    });
-                }
+                getCustomers({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
+                // }
                 break;
 
             default:
@@ -317,7 +307,7 @@ const Customers = (props) => {
                         </div>
                     </Grid>
                     <Grid item xs={6} md={3}>
-                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
+                        <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
                             <Typography variant="subtitle2" component="span">All</Typography>
                             <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
                         </div>
@@ -342,7 +332,7 @@ const Customers = (props) => {
                             color="primary" 
                             className={classes.button} 
                             onClick={getMore}
-                            disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) ? true : false}
+                            disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) || (filter === ALL_CUSTOMERS && !AllCustomers.hasNext) ? true : false}
                         >
                             Load More
                         </Button>

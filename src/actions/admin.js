@@ -1,11 +1,11 @@
 import axios from 'axios';
 
 import { API } from '../utils/constants';
-import { ADMIN_DASHBOARD, ADMIN_HOME } from '../routes';
+import { ADMIN_DASHBOARD, ADMIN_HOME, ADMIN_LOGIN } from '../routes';
 import handleError from '../utils/handleError';
-// import reIssueToken from '../utils/reIssueToken';
+import reIssueAdminToken from '../utils/reIssueAdminToken';
 import setAuthToken from '../utils/setAuthToken';
-import { SET_CURRENT_ADMIN, SET_STATS } from './types';
+import { RESET_STORE, SET_CURRENT_ADMIN, SET_STATS } from './types';
 
 const api = `${API}/Admin`;
 
@@ -26,7 +26,7 @@ export const login = (data, history) => async (dispatch) => {
 
 export const getStats = () => async (dispatch) => {
     try {
-        // await reIssueToken();
+        await reIssueAdminToken();
         const res = await axios.get(`${api}/GetAppStatistics`);
         return dispatch({
             type: SET_STATS,
@@ -35,4 +35,10 @@ export const getStats = () => async (dispatch) => {
     } catch (err) {
         return handleError(err, dispatch);
     }
+};
+
+export const logout = (history) => dispatch => {
+    setAuthToken(null);
+    dispatch({ type: RESET_STORE });
+    return history.push(ADMIN_LOGIN);
 };

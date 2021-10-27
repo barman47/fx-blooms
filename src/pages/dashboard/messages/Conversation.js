@@ -1,19 +1,17 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import {  useDispatch, useSelector } from 'react-redux';
 import { Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Attachment, ContentCopy, FilePdfOutline, Send } from 'mdi-material-ui';
 import { decode } from 'html-entities';
-import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import ScrollableFeed from 'react-scrollable-feed';
 
-import { sendMessage } from '../../../actions/chat';
-import { UPDATE_ACTIVE_CHAT, CUSTOMER_CANCELED } from '../../../actions/types';
-import { COLORS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
+import { CUSTOMER_CANCELED, SET_ON_CHAT_PAGE } from '../../../actions/types';
+import { COLORS,CHAT_CONNECTION_STATUS, ATTACHMENT_LIMIT, NETWORK_ERROR } from '../../../utils/constants';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -24,8 +22,12 @@ import TipsAndRecommendationsModal from './TipsAndRecommendationsModal';
 import isEmpty from '../../../utils/isEmpty';
 import SignalRService from '../../../utils/SignalRController';
 import CustomerCanceledModal from './CustomerCanceledModal';
+import Spinner from '../../../components/common/Spinner';
+import Toast from '../../../components/common/Toast';
 
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
+
+const { CONNECTED, RECONNECTED } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -197,7 +199,7 @@ const Conversation = (props) => {
     const history = useHistory();
 
     const { customerId, userName } = useSelector(state => state.customer);
-    const { chat, customerCanceled, sessionId } = useSelector(state => state.chat);
+    const { chat, connectionStatus, customerCanceled } = useSelector(state => state.chat);
     const buyer = useSelector(state => state.chat?.chat?.buyer);
     const buyerHasMadePayment = useSelector(state => state.chat?.chat?.buyerHasMadePayment);
     const buyerUsername = useSelector(state => state.chat?.chat?.buyerUsername);
@@ -206,33 +208,29 @@ const Conversation = (props) => {
     const sellerUsername = useSelector(state => state.chat?.chat?.sellerUsername);
     const isDeleted = useSelector(state => state.chat?.chat?.isDeleted);
 
-    const { sendMessage } = props;
-
     const [message, setMessage] = useState('');
     const [attachment, setAttachment] = useState(null);
     // eslint-disable-next-line
     const [attachmentUrl, setAttachmentUrl] = useState('');
 
     // const [chatDisabled, setChatDisabled] = useState(false);
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
+    const [chatDisconnected, setChatDisconnected] = useState(false);
     
-    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     const endTransactionModal = useRef();
     const paymentModal = useRef();
     const tipsAndRecommendationsModal = useRef();
     const customerCanceledModal = useRef();
+    const toastRef = useRef();
 
     useEffect(() => {
-        // handleSentMessage();
+        dispatch({ type: SET_ON_CHAT_PAGE, payload: true });
         return () => {
-            dispatch({ type: UPDATE_ACTIVE_CHAT });
-            // dispatch({ type: REMOVE_CHAT });
-            // SignalRService.closeNotifications();
+            dispatch({ type: SET_ON_CHAT_PAGE, payload: false });
+            setErrors({});
         };
         // eslint-disable-next-line
     }, []);
@@ -244,100 +242,27 @@ const Conversation = (props) => {
         }
     }, [customerCanceled]);
 
-    // const handleSentMessage = () => {
-    //     const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
-    //     SignalRService.registerReceiveNotification((data, type) => {
-    //         let response = JSON.parse(data);
-    //         let payload, senderId;
-    //         console.log('New Notification ', response, type);
-    //         if (customerId !== response.Sender) {
-    //             const audio = new Audio(audioFile);
-    //             audio.play();
-    //             navigator.vibrate(1000);
-    //         }
-    //         switch (type) {
-    //             case CHAT_MESSAGE:
-    //                 const messageData = {
-    //                     chatId: response.ChatId,
-    //                     dateSent: response.DateSent,
-    //                     id: response.Id,
-    //                     sender: response.Sender,
-    //                     text: response.Text,
-    //                     uploadedFileName: response.UploadedFileName,
-    //                     isRead: false
-    //                 };
-        
-    //                 dispatch({
-    //                     type: SENT_MESSAGE,
-    //                     payload: { message: messageData, customerId }
-    //                 });
+    useEffect(() => {
+        if(connectionStatus !== undefined) {
+            if (connectionStatus === CONNECTED || connectionStatus === RECONNECTED) {
+                setChatDisconnected(false);
+            } else {
+                setChatDisconnected(true);
+            }
+        }
+    }, [connectionStatus]);
 
-    //             break;
-
-    //             case TRANSFER_CONFIRMATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 dispatch({
-    //                     type: PAYMENT_NOTIFICATION,
-    //                     payload: {
-    //                         buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-    //                         buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-    //                         sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-    //                         sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-    //                         isDeleted: payload.Chat.IsDeleted,
-    //                         customerId,
-    //                         senderId,
-    //                         transactionType: type
-    //                     }
-    //                 });
-
-    //                 break;
-
-    //             case TRANSFER_NOTIFICATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-
-    //                 if (senderId !== customerId) {
-    //                     dispatch({
-    //                         type: PAYMENT_NOTIFICATION,
-    //                         payload: {
-    //                             buyerHasMadePayment: payload.BuyerHasMadePayment,
-    //                             buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-    //                             sellerHasMadePayment: payload.SellerHasMadePayment, 
-    //                             sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-    //                             isDeleted: payload.IsDeleted,
-    //                             customerId,
-    //                             senderId,
-    //                             transactionType: type
-    //                         }
-    //                     });    
-    //                 }
-
-    //                 break;
-
-    //             case CANCEL_NEGOTIATION:
-    //                 payload = JSON.parse(response.Payload);
-    //                 senderId = response.SenderId;
-                    
-    //                 if (senderId !== customerId) {
-    //                     dispatch({ 
-    //                         type: CUSTOMER_CANCELED,
-    //                         payload: `Hi, this transaction has been canceled by the other user`
-    //                     });
-    //                 }
-    //                 break;
-
-    //             default:
-    //                 break;
-    //         }
-    //     });
-    // };
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toastRef.current.handleClick();
+            
+        }
+    }, [errors]);
 
     const uploadAttachment = useCallback(async () => {
         try {
             if (attachment.size / ATTACHMENT_LIMIT > 1) {
-                return setErrors({ msg: 'File too large', photo: 'Photo must not be greater than 3MB' });
+                return setErrors({ msg: 'File too large (limit 3MB).', photo: 'Photo must not be greater than 3MB' });
             }
 
             setLoadingText('Sending File . . ');
@@ -349,18 +274,19 @@ const Conversation = (props) => {
             });
             setAttachmentUrl(res.data);
             setLoading(false);
-            
-            const chatMessage = {
-                chatSessionId: sessionId,
-                message: '',
-                documentName: res.data
-            };
 
-            sendMessage(chatMessage);
+            const chatMessage = {
+                chatSessionId: chat.id,
+                message: '',
+                documentName: res.data,
+                senderId: customerId,
+                userName
+            };
+            handleSendMessage(chatMessage);
         } catch (err) {
             return handleError(err, 'attachment', 'File not sent');
         }
-    }, [attachment, sessionId, sendMessage]);
+    }, [attachment, customerId, chat.id, userName]);
 
     useEffect(() => {
         if (attachment) {
@@ -386,13 +312,8 @@ const Conversation = (props) => {
     const onSubmit = async (e) => {
         e.preventDefault();
         if (!isEmpty(message)) {
-            // const chatMessage = {
-            //     chatSessionId: sessionId,
-            //     message,
-            //     documentName: '',
-            // };
             const chatMessage = {
-                chatSessionId: sessionId,
+                chatSessionId: chat.id,
                 message,
                 documentName: '',
                 senderId: customerId,
@@ -400,25 +321,12 @@ const Conversation = (props) => {
             };
 
             handleSendMessage(chatMessage);
-            // dispatch({
-            //     type: SENT_MESSAGE,
-            //     payload: {
-            //         chatId: chatMessage.chatSessionId,
-            //         // dateSent: chatMessage.DateSent,
-            //         // id: chatMessage.Id,
-            //         sender: chatMessage.senderId,
-            //         text: chatMessage.message,
-            //         uploadedFileName: chatMessage.documentName,
-            //         // isRead: false
-            //     }
-            // });
-            // sendMessage(chatMessage);
             setMessage('');
         }
     };
 
     const copyChatSessionId = () => {
-        copy(sessionId);
+        copy(chat.id);
         toast.success('Copied Conversation ID!');
     };
 
@@ -436,9 +344,23 @@ const Conversation = (props) => {
     return (
         <>
             <Toaster />
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toastRef}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    onClose={() => {
+                        setAttachment(null);
+                        setErrors({});
+                    }}
+                    type="error"
+                />
+            }
             <CustomerCanceledModal ref={customerCanceledModal} dismissAction={clearCustomerCanceled} />
             <EndTransactionModal ref={endTransactionModal} />
             <PaymentConfirmationTipsModal ref={paymentModal} />
+            {loading && <Spinner text={loadingText} />}
             <TipsAndRecommendationsModal ref={tipsAndRecommendationsModal} />
             { (customerId === buyer && chat.buyerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
             { (customerId === seller && chat.sellerAcceptedTransactionTerms === false) && <SellerNoticeModal /> }
@@ -450,7 +372,7 @@ const Conversation = (props) => {
                         </Grid>
                         <Grid item>
                             <Typography variant="subtitle1" component="p" color="primary">
-                                ID: {sessionId}
+                                ID: {chat.id}
                                 <Tooltip title="Copy Conversation ID" aria-label="Conversation ID" arrow>
                                     <IconButton
                                         edge="start"
@@ -476,7 +398,7 @@ const Conversation = (props) => {
                                                     key={uuidv4()}
                                                     className={clsx(classes.attachment, {[`${classes.myAttachment}`]: customerId === message.sender })}
                                                 >
-                                                    <a href={message.uploadedFileName} className={classes.downloadLink} download>
+                                                    <a href={message.uploadedFileName} target="_blank" rel="noreferrer" className={classes.downloadLink} download>
                                                         <div>
                                                             <FilePdfOutline className={classes.downloadIcon} />
                                                             <Typography variant="subtitle2"component="span" style={{ color: '#333333' }}>Attachment</Typography>
@@ -534,7 +456,7 @@ const Conversation = (props) => {
                                 variant="outlined" 
                                 fullWidth
                                 required
-                                disabled={isDeleted}
+                                disabled={isDeleted || chatDisconnected}
                                 inputProps={{
                                     accept: ".png,.jpg,.pdf"
                                 }}
@@ -561,7 +483,7 @@ const Conversation = (props) => {
                                     multiline
                                     rows={1}
                                     fullWidth
-                                    disabled={isDeleted}
+                                    disabled={isDeleted || chatDisconnected}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
@@ -569,7 +491,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="attach-file"
                                                     onClick={handleSelectAttachment}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || chatDisconnected}
                                                 >
                                                     <Attachment />
                                                 </IconButton>
@@ -577,7 +499,7 @@ const Conversation = (props) => {
                                                     color="primary"
                                                     aria-label="send-message"
                                                     onClick={onSubmit}
-                                                    disabled={isDeleted}
+                                                    disabled={isDeleted || chatDisconnected}
                                                 >
                                                     <Send />
                                                 </IconButton>
@@ -596,8 +518,4 @@ const Conversation = (props) => {
     );
 };
 
-Conversation.propTypes = {
-    sendMessage: PropTypes.func.isRequired
-};
-
-export default connect(undefined, { sendMessage })(Conversation);
+export default Conversation;

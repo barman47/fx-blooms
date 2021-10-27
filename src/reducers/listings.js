@@ -5,7 +5,8 @@ import {
     SET_MORE_LISTINGS,
     SET_LISTING,
     UPDATED_LISTING, 
-    CANCELED_NEGOTIATION
+    CANCELED_NEGOTIATION,
+    SET_LISTING_MSG
 } from '../actions/types';
 import { LISTING_STATUS } from '../utils/constants';
 
@@ -73,12 +74,12 @@ const listingsReducer = (state = initialState, action) => {
             listing = {...action.payload.listing};
             listingId = listing.id;
             listingIndex = listingsList.findIndex(item => item.id === listingId);
-            updatedListing = { ...listing };
-            listingsList.splice(listingIndex, 1, updatedListing);
+            // updatedListing = { ...listing };
+            listingsList.splice(listingIndex, 1, listing);
 
             return {
                 ...state,
-                listing: { ...updatedListing },
+                listing,
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
@@ -103,6 +104,12 @@ const listingsReducer = (state = initialState, action) => {
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
+            };
+
+        case SET_LISTING_MSG:
+            return {
+                ...state,
+                msg: action.payload
             };
 
         default:

@@ -340,10 +340,6 @@ const CreateAccount = (props) => {
         e.preventDefault();
         setErrors({});
 
-        if (!isStrongPassword) {
-            return setErrors({ msg: 'Weak password' });
-        }
-
         const data = {
             Email: Email.toLowerCase(),
             Username,
@@ -354,7 +350,11 @@ const CreateAccount = (props) => {
         const { errors, isValid } = validateSignUp(data);
 
         if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid sign up data' });
+            return setErrors({ ...errors, msg: 'Invalid sign up data!' });
+        }
+
+        if (!isStrongPassword) {
+            return setErrors({ Password: 'Your password is weak!', msg: 'Weak password!' });
         }
 
         setLoading(true);
@@ -388,7 +388,7 @@ const CreateAccount = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <a href="https://wp.fxblooms.com">
+                            <a href="https://fxblooms.com">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
                             </a>
                             <img src={img} className={classes.image} alt="FX Blooms logo" />
@@ -554,7 +554,7 @@ const CreateAccount = (props) => {
                                     onChange={() => setChecked(!checked)}
                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                 />
-                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <a href="https://wp.fxblooms.com/terms-and-conditions" target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</a></Typography>
+                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <a href="https://fxblooms.com/terms-and-conditions" target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</a></Typography>
 
                                 </Grid>
                                 <Grid item xs={12}>

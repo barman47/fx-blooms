@@ -3,7 +3,7 @@ import { persistStore, persistReducer }  from 'redux-persist';
 import storage from 'redux-persist/lib/storage/session';
 import { batchedSubscribe } from 'redux-batched-subscribe';
 import thunk from 'redux-thunk';
-import { composeWithDevTools } from 'redux-devtools-extension';
+import { composeWithDevTools } from 'redux-devtools-extension/developmentOnly';
 import rootReducer from './reducers';
 
 const persistConfig = {

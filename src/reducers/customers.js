@@ -13,7 +13,9 @@ import {
     SET_ALL_CUSTOMERS,
     CLEAR_ALL_CUSTOMERS,
     SET_ID_CHECK_DATA,
-    SET_PROFILE_CHECK_DATA
+    SET_PROFILE_CHECK_DATA,
+    ACCEPTED_CUSTOMER_ID,
+    ACCEPTED_CUSTOMER_RESIDENCE_PERMIT
 } from '../actions/types';
 
 import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
@@ -157,7 +159,7 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 customers: {
-                    items: [...state.confirmed.items, ...action.payload.items],
+                    items: [...state.customers.items, ...action.payload.items],
                     totalItemCount: action.payload.totalItemCount,
                     totalPageCount: action.payload.totalPageCount,
                     currentPageSize: action.payload.currentPageSize,
@@ -182,7 +184,7 @@ const customersReducer = (state = initialState, action) => {
         case SET_CUSTOMER_STATUS:
             switch (action.payload.currentStatus) {
                 case CONFIRMED:
-                    customers = [...state.confirmed];
+                    customers = [...state.confirmed.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -191,13 +193,13 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        confirmed: customers,
+                        // customer: { ...updatedCustomer },
+                        // confirmed: { ...state.confirmed, items: customers },
                         msg: action.payload.msg
                     };
 
                 case PENDING:
-                    customers = [...state.pending];
+                    customers = [...state.pending.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -206,13 +208,13 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        pending: customers,
+                        // customer: { ...updatedCustomer },
+                        // pending: { ...state.pending, items: customers},
                         msg: action.payload.msg
                     };
 
                 case REJECTED:
-                    customers = [...state.rejected];
+                    customers = [...state.rejected.items];
                     status = action.payload.status;
                     customerId = action.payload.customerID;
                     customerIndex = customers.findIndex(customer => customer.id === customerId);
@@ -221,8 +223,8 @@ const customersReducer = (state = initialState, action) => {
                     
                     return {
                         ...state,
-                        customer: { ...updatedCustomer },
-                        rejected: customers,
+                        // customer: { ...updatedCustomer },
+                        // rejected: { ...state.rejected, items: customers },
                         msg: action.payload.msg
                     };
 
@@ -231,6 +233,18 @@ const customersReducer = (state = initialState, action) => {
             }
 
         break;
+
+        case ACCEPTED_CUSTOMER_ID:
+            return {
+                ...state,
+                msg: 'Customer ID card has been verified'
+            };
+        
+        case ACCEPTED_CUSTOMER_RESIDENCE_PERMIT:
+            return {
+                ...state,
+                msg: 'Customer residencen permit has been verified'
+            };
 
         case CLEAR_CUSTOMER_STATUS_MSG:
             return {

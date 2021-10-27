@@ -50,6 +50,13 @@ const handleError =  (err, dispatch) => {
             payload: err.response.data
         }); 
     }
+
+    if (err?.response?.status === 401) {
+        dispatch({
+            type: GET_ERRORS,
+            payload: 'UnAuthorized!'
+        });
+    }
     
     // return dispatch({
     //     type: GET_ERRORS,
