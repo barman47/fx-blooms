@@ -244,7 +244,7 @@ const CreateProfile = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.text}>Trust and Security are cornerstones of FXBLOOMS.</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>To ensure this platform remain safe and secure, kindly tell us about yourself.</Typography>
                             <div className={classes.info}>
-                                <Typography variant="subtitle2" component="span">Please not that all information provided on this page must be true and accurate.</Typography>
+                                <Typography variant="subtitle2" component="span">Please note that all information provided on this page must be true and accurate.</Typography>
                                 <Typography variant="subtitle2" component="span">If any misinformation is spotted, you will not be allowed to use the platform.</Typography>
                             </div>
                         </div>
