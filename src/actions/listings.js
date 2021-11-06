@@ -43,6 +43,20 @@ export const addListing = (listing) => async (dispatch) => {
     }
 };
 
+export const deleteListing = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.delete(`${URL}/DeleteListing?listingId=${listingId}`);
+        console.log(res);
+        // return dispatch({
+        //     type: ADDED_LISTING,
+        //     payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+        // });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const updateListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();

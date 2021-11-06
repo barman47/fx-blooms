@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Typography } from '@material-ui/core';
+import { Button, IconButton, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { DeleteForeverOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import { SET_LISTING } from '../../../actions/types';
 import { getCustomer, getSeller } from '../../../actions/customer';
+import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
@@ -32,11 +34,10 @@ const useStyles = makeStyles(theme => ({
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            padding: [[theme.spacing(2), theme.spacing(3)]],
+            alignItems: 'center',
+            padding: [[theme.spacing(1), theme.spacing(3)]],
 
             [theme.breakpoints.down('sm')]: {
-                display: 'grid',
-                gridTemplateColumns: '1fr',
                 rowGap: theme.spacing(2),
                 padding: theme.spacing(1, 2)
             },
@@ -86,10 +87,18 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
         }
+    },
+
+    deleteButton: {
+        padding: theme.spacing(0.8),
+        
+        '&:hover': {
+            color: COLORS.red,
+        }
     }
 }));
 
-const Listing = ({ handleAddBid, listing, getSeller }) => {
+const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -100,7 +109,7 @@ const Listing = ({ handleAddBid, listing, getSeller }) => {
 
     const [errors, setErrors] = useState({});
 
-    const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
     // const { bids, status, id } = listing;
 
     const toast = useRef();
@@ -139,6 +148,13 @@ const Listing = ({ handleAddBid, listing, getSeller }) => {
         return history.push(`${DASHBOARD}${PROFILE}`);
     };
 
+    const handleDeleteListing = () => {
+        const confirm = window.confirm('Are you sure you want to delete this listing?');
+        if (confirm) {
+            deleteListing(id);
+        }
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -161,6 +177,13 @@ const Listing = ({ handleAddBid, listing, getSeller }) => {
                                 <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
                         </RouterLink>
                     </Typography>
+                    {listing.customerId === userId && 
+                        <IconButton classes={{ root: classes.deleteButton }} onClick={handleDeleteListing}>
+                            {/* <Tooltip title="Edit Listing" aria-label="Delete Listing" arrow> */}
+                                <DeleteForeverOutline />
+                            {/* </Tooltip> */}
+                        </IconButton>
+                    }
                     {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
                 </header>
                 <div>
@@ -246,7 +269,8 @@ Listing.propTypes = {
     getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
     handleAddBid: PropTypes.func.isRequired,
-    listing: PropTypes.object.isRequired
+    listing: PropTypes.object.isRequired,
+    deleteListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomer, getSeller })(Listing);
+export default connect(undefined, { deleteListing, getCustomer, getSeller })(Listing);

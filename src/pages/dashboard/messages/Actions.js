@@ -269,7 +269,7 @@ const Actions = (props) => {
                                                     onClick={completeTransaction}
                                                     disabled={loading || sellerHasRecievedPayment || isDeleted || chatDisconnected ? true : false ? true : false}
                                                 >
-                                                    Payment Received:Seller
+                                                    Payment Received
                                                 </Button>
                                             </Grid>
                                         }

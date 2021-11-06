@@ -1,13 +1,14 @@
 import { useHistory, useLocation } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { FileDocumentEdit } from 'mdi-material-ui';
+import { FileDocumentEdit, DeleteForever } from 'mdi-material-ui';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
+import { deleteListing } from '../../../actions/listings';
 import { SET_LISTING } from '../../../actions/types';
 import { COLORS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, EDIT_LISTING, MAKE_LISTING } from '../../../routes';
@@ -51,13 +52,18 @@ const useStyles = makeStyles(theme => ({
         cursor: 'pointer'
     },
 
+    deleteButton: {
+        color: COLORS.darkRed,
+        cursor: 'pointer'
+    },
+
     disabled: {
         color: COLORS.grey,
         pointerEvents: 'disabled'
     }
 }));
 
-const EditListingItem = ({ edit, listing }) => {
+const EditListingItem = ({ deleteListing, edit, listing }) => {
     const dispatch = useDispatch();
     const classes = useStyles();
     const history = useHistory();
@@ -77,6 +83,13 @@ const EditListingItem = ({ edit, listing }) => {
             type: SET_LISTING,
             payload: listing
         });
+    };
+
+    const handleDeleteListing = () => {
+        const confirm = window.confirm('Are you sure you want to delete this listing?');
+        if (confirm) {
+            deleteListing(listing.id);
+        }
     };
     
     return (
@@ -98,19 +111,27 @@ const EditListingItem = ({ edit, listing }) => {
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                     {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountAvailable?.currencyType)} 1`}
                 </Typography>
-                {listing.bank && 
+                {/* {listing.bank &&  */}
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
                         {listing.bank}
                     </Typography>
-                }
-                <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
-                    <FileDocumentEdit 
-                        className={clsx(classes.editIcon, { [`${classes.disabled}`]: edit === true && listing.id === listingId })} 
-                        // onClick={edit === true && listing.id === listingId ? () => {} : () => setListing(listing)} 
-                        onClick={() => setListing(listing)} 
-                    />
-                </Tooltip>
+                {/* } */}
+                <section>
+                    <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
+                        <FileDocumentEdit 
+                            className={clsx(classes.editIcon, { [`${classes.disabled}`]: edit === true && listing.id === listingId })} 
+                            // onClick={edit === true && listing.id === listingId ? () => {} : () => setListing(listing)} 
+                            onClick={() => setListing(listing)} 
+                        />
+                    </Tooltip>
+                    <Tooltip title="Delete Listing" aria-label="Delete Listing" arrow style={{ marginLeft: '10px' }}>
+                        <DeleteForever 
+                            className={classes.deleteButton}
+                            onClick={handleDeleteListing} 
+                        />
+                    </Tooltip>
+                </section>
             </div>
         </section>
     );
@@ -118,7 +139,8 @@ const EditListingItem = ({ edit, listing }) => {
 
 EditListingItem.propTypes = {
     edit: PropTypes.bool,
+    deleteListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default EditListingItem;
+export default connect(undefined, { deleteListing })(EditListingItem);
