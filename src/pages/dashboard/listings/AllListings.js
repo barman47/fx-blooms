@@ -29,13 +29,14 @@ import { getCurrencies } from '../../../actions/currencies';
 import { getUnreadMessages } from '../../../actions/chat';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
+import { DELETED_LISTING, HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -161,7 +162,7 @@ const AllListings = (props) => {
 
 	const dispatch = useDispatch();
 	const { profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, deletedListing, currentPageNumber, hasNext, msg } = useSelector(state => state.listings);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadMessages } = useSelector(state => state.chat);
 
@@ -174,6 +175,7 @@ const AllListings = (props) => {
 	const [open, setOpen] = useState(false);
 
 	let loadedEvent = useRef();
+	let successModal = useRef();
 
 	useEffect(() => {
 		loadedEvent.current = getListings;
@@ -207,6 +209,13 @@ const AllListings = (props) => {
 	useEffect(() => {
 		setDataLength(listings.length);
 	}, [listings]);
+
+	useEffect(() => {
+        if (deletedListing) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [deletedListing, dispatch, msg]);
 
 	const getListings = () => {
 		setHideNegotiationListings(false);
@@ -244,10 +253,17 @@ const AllListings = (props) => {
 		// console.log('scrolling');
 	};
 
+	const dismissSuccessModal = () => {
+		dispatch({
+			type: DELETED_LISTING
+		});
+	};
+
 	return (
 		<>
 			<RiskNoticeModal />
 			<FilterListingModal open={open} />
+			<SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
 			<section className={classes.root} onScroll={handleScroll}>
 				<Tooltip title="Filter Listings" arrow>
 					<Fab 
