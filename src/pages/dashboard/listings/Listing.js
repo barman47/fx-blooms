@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, IconButton, Typography } from '@material-ui/core';
+import { Button, IconButton, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { DeleteForeverOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
@@ -91,10 +91,7 @@ const useStyles = makeStyles(theme => ({
 
     deleteButton: {
         padding: theme.spacing(0.8),
-        
-        '&:hover': {
-            color: COLORS.red,
-        }
+        color: COLORS.red
     }
 }));
 
@@ -179,9 +176,9 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                     </Typography>
                     {listing.customerId === userId && 
                         <IconButton classes={{ root: classes.deleteButton }} onClick={handleDeleteListing}>
-                            {/* <Tooltip title="Edit Listing" aria-label="Delete Listing" arrow> */}
+                            <Tooltip title="Delete Listing" aria-label="Delete Listing" arrow>
                                 <DeleteForeverOutline />
-                            {/* </Tooltip> */}
+                            </Tooltip>
                         </IconButton>
                     }
                     {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
