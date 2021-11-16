@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { AppBar, Avatar, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
+import { AppBar, Avatar, Badge, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
 import { Link as AnimatedLink } from 'react-scroll';
 import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message, Wallet } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,7 +12,8 @@ import MobileNav from './MobileNav';
 import logo from '../../assets/img/logo.svg';
 import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
-import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME, PROFILE } from '../../routes';
+// import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES, NOTIFICATIONS } from '../../routes';
+import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, WALLET, PROFILE } from '../../routes';
 
 function HideOnScroll (props) {
     const { children } = props;
@@ -109,10 +110,24 @@ const Header = (props) => {
 
     const { firstName, lastName, isAuthenticated } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
+    const { unreadMessages } = useSelector(state => state.chat);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
     };
+
+    const protectedRoutes = [
+        { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
+        { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
+        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge color="error" badgeContent={unreadMessages}><Message /></Badge> }
+    ];
+
+    const publicRoutes = [
+        { url: WHY, text:'Why FXBLOOMS' },
+        { url: ABOUT_US, text:'About Us' },
+        { url: CONTACT_US, text:'Contact' }
+    ];
 
     return (
         <HideOnScroll {...props}>
@@ -128,92 +143,36 @@ const Header = (props) => {
                                 </Grid>
                                 {isAuthenticated && authorized ?
                                     <>
-                                        <Grid item>
-                                            <Link 
-                                                to={`${DASHBOARD}${DASHBOARD_HOME}`}
-                                                activeClass={classes.activeLink} 
-                                                component={RouterLink}
-                                                className={classes.link}
-                                                underline="none"
-                                            >
-                                                <span className={classes.linkIcon}><HomeMinus /></span>&nbsp;&nbsp;&nbsp;Dashboard
-                                            </Link>
-                                        </Grid>
-                                        <Grid item>
-                                            <Link 
-                                                MAKE_LISTING
-                                                activeClass={classes.activeLink} 
-                                                component={RouterLink}
-                                                className={classes.link}
-                                                underline="none"
-                                            >
-                                               <span className={classes.linkIcon}><FormatListText /></span>&nbsp;&nbsp;Make a Listing
-                                            </Link>
-                                        </Grid>
-                                        <Grid item>
-                                            <Link 
-                                                to={WHY} 
-                                                activeClass={classes.activeLink} 
-                                                component={RouterLink}
-                                                className={classes.link}
-                                                underline="none"
-                                            >
-                                                <span className={classes.linkIcon}><Wallet /></span>&nbsp;&nbsp;Wallet
-                                            </Link>
-                                        </Grid>
-                                        <Grid item>
-                                            <Link 
-                                                to={WHY} 
-                                                activeClass={classes.activeLink} 
-                                                component={RouterLink}
-                                                className={classes.link}
-                                                underline="none"
-                                            >
-                                                <span className={classes.linkIcon}><Message /></span>&nbsp;&nbsp;Notifications
-                                            </Link>
-                                        </Grid>
+                                        {protectedRoutes.map((link, index) =>(
+                                            <Grid item key={index}>
+                                                <Link
+                                                    to={`${DASHBOARD}${link.url}`}
+                                                    component={RouterLink}
+                                                    className={classes.link}
+                                                    underline="none"
+                                                >
+                                                    <span className={classes.linkIcon}>{link.icon}</span>&nbsp;&nbsp;&nbsp;{link.text}
+                                                </Link>
+                                            </Grid>
+                                        ))}
                                     </>
                                     :
                                     <>
-                                        <Grid item>
-                                            <AnimatedLink 
-                                                to={WHY} 
-                                                activeClass={classes.activeLink} 
-                                                spy={true}
-                                                smooth={true}
-                                                offset={-70}
-                                                duration={500}
-                                                className={classes.link}
-                                                >
-                                                    Why FXBLOOMS
-                                            </AnimatedLink>
-                                        </Grid>
-                                        <Grid item>
-                                            <AnimatedLink 
-                                                to={ABOUT_US} 
-                                                activeClass={classes.activeLink} 
-                                                spy={true}
-                                                smooth={true}
-                                                offset={-70}
-                                                duration={500}
-                                                className={classes.link}
-                                                >
-                                                    About Us
-                                            </AnimatedLink>
-                                        </Grid>
-                                        <Grid item>
-                                            <AnimatedLink 
-                                                to={CONTACT_US} 
-                                                activeClass={classes.activeLink} 
-                                                spy={true}
-                                                smooth={true}
-                                                offset={-70}
-                                                duration={500}
-                                                className={classes.link}
-                                                >
-                                                    Contact
-                                            </AnimatedLink>
-                                        </Grid>
+                                        {publicRoutes.map((link, index) => (
+                                            <Grid item key={index}>
+                                                <AnimatedLink 
+                                                    to={link.url} 
+                                                    activeClass={classes.activeLink} 
+                                                    spy={true}
+                                                    smooth={true}
+                                                    offset={-70}
+                                                    duration={500}
+                                                    className={classes.link}
+                                                    >
+                                                        {link.text}
+                                                </AnimatedLink>
+                                            </Grid>
+                                        ))}
                                     </>
                                 }
                             </Grid>
