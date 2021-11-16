@@ -226,7 +226,7 @@ const CreateProfile = (props) => {
     const [open, setOpen] = useState(false);
     const [loadingText, setLoadingText] = useState('');
 
-    const [verifiedEmail, setVerifiedEmail] = useState(false);
+    // const [verifiedEmail, setVerifiedEmail] = useState(false);
 
     const toast = useRef();
 

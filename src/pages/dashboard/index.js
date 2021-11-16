@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 import toast, { Toaster } from 'react-hot-toast';
@@ -12,26 +12,15 @@ import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
 
 import {
-    Avatar,
     Badge,
     Box,
     Button,
-    IconButton,
-    Drawer,
-    Divider,
-    Link,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     BottomNavigation,
-    BottomNavigationAction,
-    Tooltip,
-    Typography
+    BottomNavigationAction
 } from '@material-ui/core';
 
-import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
+import {  HomeMinus, FormatListText, AndroidMessages, Wallet } from 'mdi-material-ui';
+import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
 import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
@@ -39,7 +28,9 @@ import { logout } from '../../actions/customer';
 import { CHAT_CONNECTION_STATUS, COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
-import logo from '../../assets/img/logo.svg';
+// import logo from '../../assets/img/logo.svg';
+
+import Header from '../../components/layout/Header';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
 
@@ -211,14 +202,14 @@ const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
-    const location = useLocation();
+    // const location = useLocation();
     
-    const { customerId, profile, userName } = useSelector(state => state.customer);
+    const { customerId } = useSelector(state => state.customer);
     const { connectionStatus, unreadMessages } = useSelector(state => state.chat);
 
     const [value, setValue] = useState(0);
-    const [open, setOpen] = useState(true);
-    const [path, setPath] = useState('');
+    // const [open, setOpen] = useState(true);
+    // const [path, setPath] = useState('');
     const [showBottomNavigation, setShowBottomNavigation] = useState(true);
     
     const [toastDuration, setToastDuration] = useState(0);
@@ -227,17 +218,18 @@ const Dashboard = ({ children, title, logout }) => {
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
     
-    const links = [
-        { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
-        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
-    ];
+    // const links = [
+    //     { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
+    //     { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
+    //     { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
+    // ];
     
     const mobileLinks = [
-        { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
+        { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
-        { url : PROFILE, text:'Profile', icon: <Account /> }
+        { url : MESSAGES, text:'Wallet', icon: <Wallet /> },
+        { url : MESSAGES, text:'Notifications', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
+        // { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
     
     const customToast = useRef();
@@ -257,9 +249,9 @@ const Dashboard = ({ children, title, logout }) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        setPath(location.pathname);
-    }, [location]);
+    // useEffect(() => {
+    //     setPath(location.pathname);
+    // }, [location]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -435,15 +427,15 @@ const Dashboard = ({ children, title, logout }) => {
         }
     };
 
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
+    // const toggleDrawer = () => {
+    //     setOpen(!open);
+    // };
 
     const handleLinkClick = (link) => {
         history.push(`/dashboard${link}`);
     };
 
-    const handleLogout = () => logout(history);
+    // const handleLogout = () => logout(history);
 
     return (
         <>
@@ -460,8 +452,9 @@ const Dashboard = ({ children, title, logout }) => {
                 />
             }
             <Toaster />
+            <Header />
             <section className={classes.root}>
-                <Drawer 
+                {/* <Drawer 
                     variant="permanent"
                     className={clsx(classes.drawer, {
                         [classes.drawerOpen]: open,
@@ -533,7 +526,7 @@ const Dashboard = ({ children, title, logout }) => {
                             <ListItemText primary="Logout" />
                         </ListItem>
                     </section>
-                </Drawer>
+                </Drawer> */}
                 <div className={classes.content}>
                     {children}
                 </div>

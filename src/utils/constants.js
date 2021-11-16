@@ -9,8 +9,8 @@ export const COLORS = {
     white: '#ffffff',
     offWhite: '#f8f8f8',
     lightTeal: '#f6fafa',
-    red: '#ff0000',
-    darkRed: '#c20a0a'
+    red: '#EB5757',
+    darkRed: '#f21c1c'
 };
 
 export const CONFIRMED = 'CONFIRMED';
