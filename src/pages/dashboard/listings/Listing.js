@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, IconButton, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { DeleteForeverOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
-import { SET_LISTING } from '../../../actions/types';
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
@@ -15,13 +13,14 @@ import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { GET_ERRORS } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, EDIT_LISTING, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
+import { DASHBOARD, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
 
 import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
 	root: {
         backgroundColor: COLORS.white,
+        border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
         display: 'grid',
@@ -30,37 +29,42 @@ const useStyles = makeStyles(theme => ({
         overflow: 'hidden',
 
         '& header': {
-            backgroundColor: COLORS.lightTeal,
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: [[theme.spacing(1), theme.spacing(3)]],
-
+            padding: [[theme.spacing(1.5), theme.spacing(3)]],
+            
             [theme.breakpoints.down('sm')]: {
                 rowGap: theme.spacing(2),
                 padding: theme.spacing(1, 2)
             },
-
+            
             '& p': {
                 fontWeight: 300,
+                margin: 0,
+                
                 '& a': {
                     textDecoration: 'none'
                 }
             }
         },
-
+        
         '& div': {
+            backgroundColor: COLORS.lightTeal,
             display: 'grid',
-            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
+            gridTemplateColumns: 'repeat(5, 1fr)',
+            // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
             alignItems: 'center',
-            gap: theme.spacing(2),
+            gap: theme.spacing(1),
             padding: [[theme.spacing(4), theme.spacing(3)]],
 
             [theme.breakpoints.down('lg')]: {
-                gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
+                gridTemplateColumns: 'repeat(5, 1fr)',
+                // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
                 gap: theme.spacing(1),
-                padding: theme.spacing(1),
+                // padding: theme.spacing(1),
+                padding: [[theme.spacing(3), theme.spacing(3)]]
             },
 
             [theme.breakpoints.down('sm')]: {
@@ -72,9 +76,11 @@ const useStyles = makeStyles(theme => ({
 
             '& span': {
                 fontSize: theme.spacing(1.4),
+                // fontSize: theme.spacing(1.4),
 
                 [theme.breakpoints.down('lg')]: {
-                    fontSize: theme.spacing(1.2)
+                    // fontSize: theme.spacing(1.2)
+                    fontSize: theme.spacing(1.5)
                 },
             }
         }
@@ -82,7 +88,7 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         color: `${COLORS.offWhite} !important`,
-        padding: [[theme.spacing(0.5), theme.spacing(1)]],
+        height: '100%',
 
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
@@ -90,10 +96,16 @@ const useStyles = makeStyles(theme => ({
     },
 
     deleteButton: {
-        padding: theme.spacing(0.8),
+        color: COLORS.offWhite,
+        backgroundColor: COLORS.red,
+        height: '100%',
+
+        [theme.breakpoints.down('sm')]: {
+            gridColumn: '1 / span 2'
+        },
         
         '&:hover': {
-            color: COLORS.red,
+            backgroundColor: `${COLORS.darkRed} !important`
         }
     }
 }));
@@ -130,14 +142,14 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
         }
     }, [dispatch, errors]);
 
-    const setListing = (e, listing) => {
-        e.preventDefault();
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        return history.push(`${DASHBOARD}${EDIT_LISTING}`);
-    };
+    // const setListing = (e, listing) => {
+    //     e.preventDefault();
+    //     dispatch({
+    //         type: SET_LISTING,
+    //         payload: listing
+    //     });
+    //     return history.push(`${DASHBOARD}${EDIT_LISTING}`);
+    // };
 
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
@@ -177,38 +189,25 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                                 <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
                         </RouterLink>
                     </Typography>
-                    {listing.customerId === userId && 
-                        <IconButton classes={{ root: classes.deleteButton }} onClick={handleDeleteListing}>
-                            {/* <Tooltip title="Edit Listing" aria-label="Delete Listing" arrow> */}
-                                <DeleteForeverOutline />
-                            {/* </Tooltip> */}
-                        </IconButton>
-                    }
-                    {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
+                    <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography>
                 </header>
                 <div>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
-                        {`${getCurrencySymbol(amountAvailable?.currencyType)}${formatNumber(amountAvailable?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I want to sell</span>
+                        {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
-                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(amountNeeded?.amount)}`}
-                    </Typography>
-                    <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Min. Amount</span>
-                        {`${getCurrencySymbol(minExchangeAmount?.currencyType)}${formatNumber(minExchangeAmount?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange Currency</span>
+                        {amountNeeded?.currencyType}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                        {`${getCurrencySymbol(amountNeeded?.currencyType)}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
+                        {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
                     </Typography>
-                    {listing.bank && 
-                        <Typography variant="subtitle2" component="span">
-                            <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
-                            {listing.bank}
-                        </Typography>
-                    }
+                    <Typography variant="subtitle2" component="span">
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
+                        {`${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}`}
+                    </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 
                             disabled
@@ -228,26 +227,23 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                         :
                         listing.customerId === userId ? 
                         <Button 
-                            to={`${DASHBOARD}${EDIT_LISTING}`}
-                            component={RouterLink} 
                             variant="contained" 
-                            size="small" 
-                            color="primary"
+                            size="large"
                             disableElevation
                             classes={{ 
-                                contained: classes.button,
-                                root: classes.button
+                                contained: classes.deleteButton,
+                                root: classes.deleteButton
                             }}
-                            onClick={(e) => setListing(e, listing)}
+                            onClick={handleDeleteListing}
                         >
-                            Edit
+                            Delete
                         </Button>
                         :
                         <Button
                             to={MESSAGES}
                             component={RouterLink} 
                             variant="contained" 
-                            size="small" 
+                            size="large" 
                             color="primary"
                             disableElevation
                             classes={{ 
@@ -256,7 +252,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                             }}
                             onClick={(e) => handleAddBid(e, listing)}
                         >
-                            Contact
+                            Buy EUR
                         </Button>
                     }
                 </div>

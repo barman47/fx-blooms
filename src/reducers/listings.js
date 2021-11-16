@@ -1,6 +1,6 @@
 import { 
     ADDED_LISTING, 
-    HIDE_NEGOTIATION_LISTINGS, 
+    // HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
@@ -8,7 +8,7 @@ import {
     CANCELED_NEGOTIATION,
     SET_LISTING_MSG
 } from '../actions/types';
-import { LISTING_STATUS } from '../utils/constants';
+// import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
@@ -85,10 +85,10 @@ const listingsReducer = (state = initialState, action) => {
                 msg: action.payload.msg
             }; 
 
-        case HIDE_NEGOTIATION_LISTINGS: 
-            return {
-                listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
-            };
+        // case HIDE_NEGOTIATION_LISTINGS: 
+        //     return {
+        //         listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
+        //     };
 
         case CANCELED_NEGOTIATION:
             listingsList = [...state.listings];

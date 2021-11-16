@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -11,7 +10,6 @@ import {
 	FormControl,
 	FormHelperText,
 	Grid,
-	Link, 
 	MenuItem,
 	Select,
 	TextField,
@@ -21,7 +19,7 @@ import {
 } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { FilterOutline } from 'mdi-material-ui';
+import { ChevronDown, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
@@ -29,7 +27,6 @@ import { getCurrencies } from '../../../actions/currencies';
 import { getUnreadMessages } from '../../../actions/chat';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -38,10 +35,6 @@ import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
 
 const useStyles = makeStyles(theme => ({
-	root: {
-		position: 'relative',
-	},
-	
 	fab: {
 		display: 'none',
 		[theme.breakpoints.down('md')]: {
@@ -52,13 +45,68 @@ const useStyles = makeStyles(theme => ({
 			zIndex: 1
 		}
 	},
+
+	header: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+
+		paddingLeft: theme.spacing(10),
+		paddingRight: theme.spacing(10),
+
+		[theme.breakpoints.down('md')]: {
+			display: 'grid',
+			gridTemplateColumns: '1fr',
+			paddingLeft: theme.spacing(5),
+			paddingRight: theme.spacing(5)
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2)
+		},
+
+		'& div:first-child': {
+			'& p:last-child': {
+				marginTop: theme.spacing(2),
+				color: COLORS.grey
+			}
+		}
+	},
+
+	walletToggle: {
+		alignSelf: 'flex-end',
+		color: theme.palette.primary.main,
+
+		[theme.breakpoints.down('sm')]: {
+			justifySelf: 'flex-start'
+		},
+
+		'&:hover': {
+			backgroundColor: 'transparent'
+		}
+	},
 	
 	listings: {
 		height: '100vh',
 		overflow: 'auto',
-		paddingLeft: theme.spacing(2),
-		paddingRight: theme.spacing(4),
-		maxWidth: '100%',
+		display: 'grid',
+		gridTemplateColumns: '3fr 1fr',
+		gap: theme.spacing(2.5),
+		paddingLeft: theme.spacing(10),
+		paddingRight: theme.spacing(10),
+
+		[theme.breakpoints.down('md')]: {
+			gridTemplateColumns: '1fr',
+			paddingLeft: theme.spacing(5),
+			paddingRight: theme.spacing(5)
+		},
+		
+		'& p': {
+			color: theme.palette.primary.main,
+			fontWeight: 600,
+			marginBottom: theme.spacing(2.5)
+		},
 
 		[theme.breakpoints.down('sm')]: {
 			paddingLeft: theme.spacing(1),
@@ -66,53 +114,45 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	listingHeader: {
-		marginTop: theme.spacing(4),
-		[theme.breakpoints.down('md')]: {
-			marginTop: theme.spacing(2)
-		},
-
-		'& h5': {
-			fontWeight: 500
-		},
-	},
-
-	headerContent: {
-		display: 'flex',
-		flexDirection: 'row',
-		fontWeight: 300,
-		justifyContent: 'space-between',
-
-		[theme.breakpoints.down('sm')]: {
-			flexDirection: 'column',
-			marginBottom: theme.spacing(2),
-			marginTop: theme.spacing(2)
-		},
-
-		'& span': {
-			fontWeight: 300,
-		}
-	},
-
 	listingContainer: {
-		height: '1vh',
-		position: 'relative',
-		left: 0,
-		// border: '1px solid red',
 		marginTop: theme.spacing(5)
+	},
+
+	filter: {
+		marginTop: theme.spacing(4),
+
+		'& header': {
+			display: 'flex',
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			marginBottom: theme.spacing(3),
+			paddingTop: theme.spacing(1),
+
+			[theme.breakpoints.down('md')]: {
+				display: 'none'
+			}
+		}
 	},
 
 	filterContainer: {
 		backgroundColor: COLORS.lightTeal,
-		padding: theme.spacing(2),
-		position: 'fixed',
-		right: 0,
-		width: '21%',
-		minWidth: '21%',
-		height: '100vh',
+		borderRadius: theme.shape.borderRadius,
+		padding: [[theme.spacing(4), theme.spacing(2)]],
+		height: 'initial',
+		alignSelf: 'flex-start',
+		position: 'sticky',
 
 		[theme.breakpoints.down('md')]: {
 			display: 'none'
+		},
+
+		'& header': {
+			display: 'grid',
+			gridTemplateColumns: '1.2fr 2fr',
+			alignItems: 'center',
+			columnGap: theme.spacing(1),
+			marginBottom: theme.spacing(4),
+			padding: 0,
 		},
 
 		'& form': {
@@ -135,7 +175,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	filterButton: {
-		borderRadius: '25px',
 		'&:hover': {
 			textDecoration: 'none !important'
 		}
@@ -159,18 +198,15 @@ const AllListings = (props) => {
 	// const theme = useTheme();
     // const matches = useMediaQuery(theme.breakpoints.down('md'));
 
-	const dispatch = useDispatch();
-	const { profile, isAuthenticated } = useSelector(state => state.customer);
+	const { firstName, lastName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadMessages } = useSelector(state => state.chat);
 
 	const { getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getUnreadMessages, handleSetTitle } = props;
 
-	// useGetListings(query, pageNumber, getListingsOpenForBid);
-
 	const [dataLength, setDataLength] = useState(0);
-	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
+	// const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
 
 	let loadedEvent = useRef();
@@ -209,7 +245,7 @@ const AllListings = (props) => {
 	}, [listings]);
 
 	const getListings = () => {
-		setHideNegotiationListings(false);
+		// setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 10,
@@ -235,68 +271,61 @@ const AllListings = (props) => {
 		setOpen(true);
 	};
 
-	const hideListingsInNegotiation = () => {
-		dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
-		setHideNegotiationListings(true);
-	};
-
-	const handleScroll = () => {
-		// console.log('scrolling');
-	};
-
 	return (
 		<>
 			<RiskNoticeModal />
 			<FilterListingModal open={open} />
-			<section className={classes.root} onScroll={handleScroll}>
-				<Tooltip title="Filter Listings" arrow>
-					<Fab 
-						className={classes.fab} 
-						color="primary" 
-						aria-label="filter listings"
-						onClick={handleOpenModal}
-					>
-						<FilterOutline />
-					</Fab>
-				</Tooltip>
-				<Grid container direction="row">
-					<Grid item xs={12} lg={9} className={classes.listings} id="scrollableParent">
-						<header className={classes.listingHeader}>
-							<Typography variant="h5">All Listings</Typography>
-							<div className={classes.headerContent}>
-								<Typography variant="subtitle1" component="span">Here are all the listings available right now</Typography>
-								{hideNegotiationListings ? 
-									<Link to="#!" component={RouterLink} onClick={() => getListings()}>Show all listings</Link>
-									:
-									<Link to="#!" component={RouterLink} onClick={hideListingsInNegotiation}>Hide listings in negotiation</Link>
-								}
-							</div>
-						</header>
-						<InfiniteScroll 
-							className={classes.listingContainer}
-							dataLength={dataLength}
-							next={getMore}
-							hasMore={hasNext}
-							scrollThreshold={1}
-							loader={<h4 style={{ textAlign: 'center' }}>Fetching Listings . . .</h4>}
-							refreshFunction={getListings}
-							// pullDownToRefresh
-							// pullDownToRefreshThreshold={80}
-							// releaseToRefreshContent={
-							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-							// }
-							// pullDownToRefreshContent={
-							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-							// }
-							endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
-							scrollableTarget="scrollableParent"
-							// height={1000}
-						>
-							<Listings setHideNegotiationListings={setHideNegotiationListings} />
-						</InfiniteScroll>
-					</Grid>
-					<Filter />
-				</Grid>
+			<Tooltip title="Filter Listings" arrow>
+				<Fab 
+					className={classes.fab} 
+					color="primary" 
+					aria-label="filter listings"
+					onClick={handleOpenModal}
+				>
+					<FilterOutline />
+				</Fab>
+			</Tooltip>
+			<section className={classes.header}>
+				<div>
+					<Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography> 
+					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
+				</div>
+				<Button
+					variant="standard"
+					size="small"
+					startIcon={<ChevronDown />}
+					classes={{
+						root: classes.walletToggle
+					}}
+				>
+					Show Wallet
+				</Button>
+			</section>
+			<section className={classes.listings} id="scrollableParent">
+				<InfiniteScroll 
+					className={classes.listingContainer}
+					dataLength={dataLength}
+					next={getMore}
+					hasMore={hasNext}
+					scrollThreshold={1}
+					loader={<h4 style={{ textAlign: 'center' }}>Fetching Listings . . .</h4>}
+					refreshFunction={getListings}
+					// pullDownToRefresh
+					// pullDownToRefreshThreshold={80}
+					// releaseToRefreshContent={
+					// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+					// }
+					// pullDownToRefreshContent={
+					// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+					// }
+					endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
+					scrollableTarget="scrollableParent"
+					// height={1000}
+				>
+					<Typography variant="body1" component="p">All Listings</Typography>
+					<Listings />
+				</InfiniteScroll>
+				<Filter />
 			</section>
 		</>
 	);
@@ -359,7 +388,6 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 
 			setErrors({});
 			setLoading(true);
-			console.log(SellerRating);
 			props.getListingsOpenForBid({
 				pageNumber: 1,
 				pageSize: 15,
@@ -399,172 +427,175 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 	};
 
 	return (
-		<Grid item lg={3} className={classes.filterContainer}>
-			<form onSubmit={onSubmit} noValidate>
+		<section className={classes.filter}>
+			<header>
+				<Typography variant="subtitle2" component="span">Filter</Typography>
+				<Typography 
+					className={classes.clear}
+					variant="subtitle2" 
+					component="span" 
+					color="primary"
+					onClick={handleClearFilter}
+					>
+						Clear
+				</Typography>
+			</header>
+			<div className={classes.filterContainer}>
 				<header>
-					<Typography variant="subtitle2" component="span">Filter</Typography>
-					<Typography 
-						className={classes.clear}
-						variant="subtitle2" 
-						component="span" 
-						color="primary"
-						onClick={handleClearFilter}
-						>
-							Clear
-					</Typography>
 					<Button 
-						className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
-						variant="contained" 
-						color="primary" 
-						size="small"
-						onClick={() => setFilter(PRICE)}
-					>
-						Amount
+							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
+							variant="contained" 
+							color="primary" 
+							size="small"
+							onClick={() => setFilter(PRICE)}
+						>
+							Amount
+						</Button>
+						<Button 
+							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
+							variant="contained" 
+							color="primary" 
+							size="small"
+						>
+							Completion Rate
 					</Button>
-					{/* <Button 
-						className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
-						variant="contained" 
-						color="primary" 
-						size="small"
-						onClick={() => setFilter(RATING)}
-					>
-						Rating
-					</Button> */}
 				</header>
-				{
-					filter === PRICE
-					?
-					<Grid container direction="row" spacing={1}>
-						<Grid item xs={12}>
-							<Typography variant="subtitle2">I Have</Typography>
-							<FormControl 
-								variant="outlined" 
-								error={errors.AvailableCurrency ? true : false } 
-								fullWidth 
-								required
-								disabled={loading ? true : false}
-							>
-								<Select
-									labelId="AvailableCurrency"
-									value={AvailableCurrency}
-									onChange={(e) => setAvailableCurrency(e.target.value)}
-								
-								>
-									<MenuItem value="">Select Currency</MenuItem>
-									{currencies.length > 0 && currencies.map((currency, index) => (
-										<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
-									))}
-								</Select>
-								<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-							</FormControl>
-						</Grid>
-						<Grid item xs={12}>
-							<Typography variant="subtitle2">I Want</Typography>
-						</Grid>
-						<Grid item xs={5}>
-							<FormControl 
-								variant="outlined" 
-								error={errors.RequiredCurrency ? true : false } 
-								fullWidth 
-								required
-								disabled={loading ? true : false}
-							>
-								<Select
-									labelId="RequiredCurrency"
-									value={RequiredCurrency}
-									onChange={(e) => setRequiredCurrency(e.target.value)}
-								>
-									<MenuItem value="" disabled>Select</MenuItem>
-									{currencies.length > 0 && currencies.map((currency, index) => (
-										<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
-									))}
-								</Select>
-								<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
-							</FormControl>
-						</Grid>
-						<Grid item xs={7}>
-							<TextField 
-								value={Amount}
-								onChange={(e) => setAmount(e.target.value)}
-								type="text"
-								variant="outlined" 
-								placeholder="Enter Amount"
-								helperText={errors.Amount}
-								fullWidth
-								required
-								error={errors.Amount ? true : false}
-								disabled={loading ? true : false}
-							/>
-						</Grid>
-						<Grid item xs={12}>
-							<Button 
-								type="submit" 
-								variant="contained" 
-								color="primary"
-								fullWidth
-								disabled={loading ? true : false}
-							>
-								{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-							</Button>
-						</Grid>
-					</Grid>
-					:
-					<Grid container direction="row" spacing={2}>
-						<Grid item xs={12}>
-							<Rating 
-								color="primary" 
-								name="seller-rating"  
-								style={{ color: theme.palette.primary.main }}
-								value={SellerRating}
-								onChange={(e) => setSellerRating(e.target.value)}
-								disabled={loading ? true : false}
-							/>
-							{/* <Typography variant="subtitle2">Number of Stars</Typography> */}
-								{/* <FormControl 
+				<form onSubmit={onSubmit} noValidate>
+					{
+						filter === PRICE
+						?
+						<Grid container direction="row" spacing={1}>
+							<Grid item xs={12}>
+								<Typography variant="subtitle2">I Have</Typography>
+								<FormControl 
 									variant="outlined" 
-									error={errors.SellerRating ? true : false } 
+									error={errors.AvailableCurrency ? true : false } 
 									fullWidth 
 									required
 									disabled={loading ? true : false}
 								>
 									<Select
-										labelId="SellerRating"
-										value={SellerRating}
-										onChange={(e) => setSellerRating(e.target.value)}
+										labelId="AvailableCurrency"
+										value={AvailableCurrency}
+										onChange={(e) => setAvailableCurrency(e.target.value)}
 									
 									>
-										<MenuItem value="">Select Number of Stars</MenuItem>
-										<MenuItem value="1">1</MenuItem>
-										<MenuItem value="2">2</MenuItem>
-										<MenuItem value="3">3</MenuItem>
-										<MenuItem value="4">4</MenuItem>
-										<MenuItem value="5">5</MenuItem>
+										<MenuItem value="">Select Currency</MenuItem>
+										{currencies.length > 0 && currencies.map((currency, index) => (
+											<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
+										))}
 									</Select>
-									<FormHelperText>{errors.SellerRating}</FormHelperText>
-								</FormControl> */}
+									<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
+								</FormControl>
+							</Grid>
+							<Grid item xs={12}>
+								<Typography variant="subtitle2">I Want</Typography>
+							</Grid>
+							<Grid item xs={5}>
+								<FormControl 
+									variant="outlined" 
+									error={errors.RequiredCurrency ? true : false } 
+									fullWidth 
+									required
+									disabled={loading ? true : false}
+								>
+									<Select
+										labelId="RequiredCurrency"
+										value={RequiredCurrency}
+										onChange={(e) => setRequiredCurrency(e.target.value)}
+									>
+										<MenuItem value="" disabled>Select</MenuItem>
+										{currencies.length > 0 && currencies.map((currency, index) => (
+											<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
+										))}
+									</Select>
+									<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
+								</FormControl>
+							</Grid>
+							<Grid item xs={7}>
+								<TextField 
+									value={Amount}
+									onChange={(e) => setAmount(e.target.value)}
+									type="text"
+									variant="outlined" 
+									placeholder="Enter Amount"
+									helperText={errors.Amount}
+									fullWidth
+									required
+									error={errors.Amount ? true : false}
+									disabled={loading ? true : false}
+								/>
+							</Grid>
+							<Grid item xs={12}>
+								<Button 
+									type="submit" 
+									variant="contained" 
+									color="primary"
+									fullWidth
+									disabled={loading ? true : false}
+								>
+									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+								</Button>
+							</Grid>
 						</Grid>
-						<Grid item xs={12}>
-							<Button 
-								type="submit" 
-								variant="contained" 
-								color="primary"
-								fullWidth
-								disabled={loading ? true : false}
-							>
-								{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-							</Button>
+						:
+						<Grid container direction="row" spacing={2}>
+							<Grid item xs={12}>
+								<Rating 
+									color="primary" 
+									name="seller-rating"  
+									style={{ color: theme.palette.primary.main }}
+									value={SellerRating}
+									onChange={(e) => setSellerRating(e.target.value)}
+									disabled={loading ? true : false}
+								/>
+								{/* <Typography variant="subtitle2">Number of Stars</Typography> */}
+									{/* <FormControl 
+										variant="outlined" 
+										error={errors.SellerRating ? true : false } 
+										fullWidth 
+										required
+										disabled={loading ? true : false}
+									>
+										<Select
+											labelId="SellerRating"
+											value={SellerRating}
+											onChange={(e) => setSellerRating(e.target.value)}
+										
+										>
+											<MenuItem value="">Select Number of Stars</MenuItem>
+											<MenuItem value="1">1</MenuItem>
+											<MenuItem value="2">2</MenuItem>
+											<MenuItem value="3">3</MenuItem>
+											<MenuItem value="4">4</MenuItem>
+											<MenuItem value="5">5</MenuItem>
+										</Select>
+										<FormHelperText>{errors.SellerRating}</FormHelperText>
+									</FormControl> */}
+							</Grid>
+							<Grid item xs={12}>
+								<Button 
+									type="submit" 
+									variant="contained" 
+									color="primary"
+									fullWidth
+									disabled={loading ? true : false}
+								>
+									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+								</Button>
+							</Grid>
 						</Grid>
-					</Grid>
-				}
-			</form>
-			{/* <Link 
-				to="#!" 
-				component={RouterLink}
-				className={classes.buyerPopup}
-			>
-				Buyer Account Details Popup
-			</Link> */}
-		</Grid>
+					}
+				</form>
+				{/* <Link 
+					to="#!" 
+					component={RouterLink}
+					className={classes.buyerPopup}
+				>
+					Buyer Account Details Popup
+				</Link> */}
+			</div>
+		</section>
 	);
 });
 
