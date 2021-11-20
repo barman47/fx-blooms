@@ -215,7 +215,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                     </div>
                     {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
                     <section className={classes.timestamp}>
-                        <Tooltip title={moment(new Date(dateCreated)).format('Do MMM YYYY, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
+                        <Tooltip title={moment(new Date(dateCreated)).format('Do MMM, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
                             <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey, cursor: 'pointer', }} />
                         </Tooltip>
                         &nbsp;&nbsp;
