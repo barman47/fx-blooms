@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, IconButton, Typography } from '@material-ui/core';
+import { Button, IconButton, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { DeleteForeverOutline } from 'mdi-material-ui';
+import { ClockOutline, DeleteForeverOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { SET_LISTING } from '../../../actions/types';
 import { getCustomer, getSeller } from '../../../actions/customer';
@@ -31,54 +32,73 @@ const useStyles = makeStyles(theme => ({
 
         '& header': {
             backgroundColor: COLORS.lightTeal,
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            padding: [[theme.spacing(1), theme.spacing(3)]],
-
-            [theme.breakpoints.down('sm')]: {
-                rowGap: theme.spacing(2),
-                padding: theme.spacing(1, 2)
-            },
-
-            '& p': {
-                fontWeight: 300,
-                '& a': {
-                    textDecoration: 'none'
-                }
-            }
-        },
-
-        '& div': {
             display: 'grid',
-            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-            alignItems: 'center',
-            gap: theme.spacing(2),
-            padding: [[theme.spacing(4), theme.spacing(3)]],
-
-            [theme.breakpoints.down('lg')]: {
-                gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-                gap: theme.spacing(1),
-                padding: theme.spacing(1),
-            },
-
+            gridTemplateColumns: '1fr',
+            padding: [[theme.spacing(1), theme.spacing(3)]],
+    
             [theme.breakpoints.down('sm')]: {
-                padding: theme.spacing(1),
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                rowGap: theme.spacing(2)
-            },
+                padding: theme.spacing(1, 2)
+            }
+        }    
+	},
 
-            '& span': {
-                fontSize: theme.spacing(1.4),
+    
+    listingHeader: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
 
-                [theme.breakpoints.down('lg')]: {
-                    fontSize: theme.spacing(1.2)
-                },
+        
+
+        '& p': {
+            fontWeight: 300,
+            '& a': {
+                textDecoration: 'none'
             }
         }
-	},
+    },
+
+    timestamp: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        '& span': {
+            color: COLORS.darkGrey,
+            fontSize: theme.spacing(1.3),
+            fontWeight: 300
+        }
+    },
+
+    listingBody: {
+        display: 'grid',
+        gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
+        alignItems: 'center',
+        gap: theme.spacing(2),
+        padding: [[theme.spacing(4), theme.spacing(3)]],
+
+        [theme.breakpoints.down('lg')]: {
+            gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
+            gap: theme.spacing(1),
+            padding: theme.spacing(1),
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            rowGap: theme.spacing(2)
+        },
+
+        '& span': {
+            fontSize: theme.spacing(1.4),
+
+            [theme.breakpoints.down('lg')]: {
+                fontSize: theme.spacing(1.2)
+            },
+        }
+    },
 
     button: {
         color: `${COLORS.offWhite} !important`,
@@ -90,6 +110,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     deleteButton: {
+        alignSelf: 'flex-end !important',
         padding: theme.spacing(0.8),
         
         '&:hover': {
@@ -107,9 +128,10 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
     const errorsState = useSelector(state => state.errors);
     const userId = useSelector(state => state.customer.customerId);
 
+    const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
     // const { bids, status, id } = listing;
 
     const toast = useRef();
@@ -155,6 +177,13 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
         }
     };
 
+    const openTooltip = () => {
+        setTooltipOpen(true);
+    };
+    const closeTooltip = () => {
+        setTooltipOpen(false);
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -168,25 +197,34 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
             }
             <section className={classes.root}>
                 <header>
-                    <Typography variant="body2" component="p">
-                        Listed by:&nbsp;
-                        <RouterLink 
-                            to={`${DASHBOARD}${USER_DETAILS}`} 
-                            onClick={(e) =>handleSetCustomer(e, customerId)}
-                            >
-                                <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
-                        </RouterLink>
-                    </Typography>
-                    {listing.customerId === userId && 
-                        <IconButton classes={{ root: classes.deleteButton }} onClick={handleDeleteListing}>
-                            {/* <Tooltip title="Edit Listing" aria-label="Delete Listing" arrow> */}
-                                <DeleteForeverOutline />
-                            {/* </Tooltip> */}
-                        </IconButton>
-                    }
+                    <div className={classes.listingHeader}>
+                        <Typography variant="body2" component="p">
+                            Listed by:&nbsp;
+                            <RouterLink 
+                                to={`${DASHBOARD}${USER_DETAILS}`} 
+                                onClick={(e) =>handleSetCustomer(e, customerId)}
+                                >
+                                    <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
+                            </RouterLink>
+                        </Typography>
+                        {listing.customerId === userId && 
+                            <IconButton classes={{ root: classes.deleteButton }} onClick={handleDeleteListing}>
+                                <Tooltip title="Edit Listing" aria-label="Delete Listing" arrow>
+                                    <DeleteForeverOutline />
+                                </Tooltip>
+                            </IconButton>
+                        }
+                    </div>
                     {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
+                    <section className={classes.timestamp}>
+                        <Tooltip title={moment(new Date(dateCreated)).format('Do MMM YYYY, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
+                            <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey }} />
+                        </Tooltip>
+                        &nbsp;&nbsp;
+                        <Typography variant="subtitle2" component="span" onMouseEnter={openTooltip} onMouseLeave={closeTooltip}>{moment(new Date(dateCreated)).fromNow()}</Typography>
+                    </section>
                 </header>
-                <div>
+                <div className={classes.listingBody}>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Have</span>
                         {`${getCurrencySymbol(amountAvailable?.currencyType)}${formatNumber(amountAvailable?.amount)}`}
