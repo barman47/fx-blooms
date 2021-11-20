@@ -66,6 +66,7 @@ const useStyles = makeStyles(theme => ({
 
         '& span': {
             color: COLORS.darkGrey,
+            cursor: 'pointer',
             fontSize: theme.spacing(1.3),
             fontWeight: 300
         }
@@ -112,10 +113,7 @@ const useStyles = makeStyles(theme => ({
     deleteButton: {
         alignSelf: 'flex-end !important',
         padding: theme.spacing(0.8),
-        
-        '&:hover': {
-            color: COLORS.red,
-        }
+        color: COLORS.red
     }
 }));
 
@@ -218,7 +216,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                     {/* <Typography variant="body2" component="p">100% Listings, 89% Completion</Typography> */}
                     <section className={classes.timestamp}>
                         <Tooltip title={moment(new Date(dateCreated)).format('Do MMM YYYY, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
-                            <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey }} />
+                            <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey, cursor: 'pointer', }} />
                         </Tooltip>
                         &nbsp;&nbsp;
                         <Typography variant="subtitle2" component="span" onMouseEnter={openTooltip} onMouseLeave={closeTooltip}>{moment(new Date(dateCreated)).fromNow()}</Typography>

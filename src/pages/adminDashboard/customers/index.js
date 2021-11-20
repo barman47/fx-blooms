@@ -106,6 +106,7 @@ const Customers = (props) => {
     const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
 
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState(PENDING);
 
     const { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getVerifiedCustomers, getMoreVerifiedCustomers, getRejectedCustomers, getMoreRejectedCustomers, handleSetTitle } = props;
@@ -117,6 +118,10 @@ const Customers = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [confirmed.items, customers.items, pending.items, rejected.items]);
 
     const handleSetFilter = (filter) => {
         setFilter(filter);
@@ -156,6 +161,7 @@ const Customers = (props) => {
     };
 
     const getMore = () => {
+        setLoading(true);
         switch (filter) {
             case CONFIRMED:
                 if (confirmed.hasNext) {
@@ -194,6 +200,7 @@ const Customers = (props) => {
                 break;
 
             default:
+                setLoading(false);
                 break;
         }
     };
@@ -332,9 +339,9 @@ const Customers = (props) => {
                             color="primary" 
                             className={classes.button} 
                             onClick={getMore}
-                            disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) || (filter === ALL_CUSTOMERS && !AllCustomers.hasNext) ? true : false}
+                            disabled={(filter === PENDING && !pending.hasNext) || (filter === CONFIRMED && !confirmed.hasNext) || (filter === REJECTED && !rejected.hasNext) || (filter === ALL_CUSTOMERS && !customers.hasNext) || (loading) ? true : false}
                         >
-                            Load More
+                            {loading ? 'Please Wait . . . ' : 'Load More'}
                         </Button>
                     </main>
                 </section>

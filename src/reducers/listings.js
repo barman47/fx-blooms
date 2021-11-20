@@ -1,5 +1,6 @@
 import { 
-    ADDED_LISTING, 
+    ADDED_LISTING,
+    DELETED_LISTING, 
     HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
@@ -12,6 +13,7 @@ import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
+    deletedListing: false,
     updatedListing: false,
     listing: {},
     listings: []
@@ -34,6 +36,18 @@ const listingsReducer = (state = initialState, action) => {
             } : {
                 ...state,
                 addedListing: !state.addedListing,
+                msg: null
+            };
+
+        case DELETED_LISTING:
+            return action.payload ? {
+                ...state,
+                listings: state.listings.filter(listing => listing.id !== action.payload.listingId),
+                msg: action.payload.msg,
+                deletedListing: true
+            } : {
+                ...state,
+                deletedListing: false,
                 msg: null
             };
         
