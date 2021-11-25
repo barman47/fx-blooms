@@ -20,6 +20,11 @@ const useStyles = makeStyles(theme => ({
             // paddingRight: theme.spacing(5),
         },
 
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(2),
+            paddingRight: theme.spacing(2),
+        },
+
         '& h6': {
             color: COLORS.offBlack,
             fontWeight: '600',
@@ -85,57 +90,55 @@ const Index = (props) => {
     }, []);
 
     return (
-        <>
-            <section className={classes.root}>
-                <Typography variant="h6" className={classes.header}>Notifications</Typography>
-                <Typography variant="body2" component="p" className={classes.header}>View notifications below</Typography>
-                <div>
-                    <section className={classes.notifications}>
-                        <Notification 
-                            title="Account Setup Pending"
-                            message="You are yet to fully set up your account. Click Set Up Account to proceed"
-                            buttonText="Set Up Account"
-                            link="/dashboard/account-setup"
-                            buttonAction={() => {}}
-                        />
-                        <Notification 
-                            title="Withdrawal Request Processing"
-                            message="Your withdrawal request of N500,000 to your bank account is currently being processed."
-                        />
-                        <Notification 
-                            title="Credit (Withdrawal)"
-                            message="FXBLOOMS has successfully sent N500,000 to your bank account"
-                        />
-                        <Notification 
-                            title="Debit (Exchange)"
-                            message="We have successfully sent walecalfos a sum of N500,000 from your EUR wallet."
-                            buttonText="View Wallet Balance"
-                            link="/dashboard/account-setup"
-                            buttonAction={() => {}}
-                        />
-                        <Notification 
-                            title="Wallet Fund"
-                            message="Your EUR has been successfully funded with the sum of N500,000"
-                            buttonText="View Wallet Balance"
-                            link="/dashboard/account-setup"
-                            buttonAction={() => {}}
-                        />
-                        <Notification 
-                            title="Credit (Withdrawal)"
-                            message="walecalfos has made a payment of N500,000 to your GTBank | 8849958473"
-                            buttonText="Payment Confirmed"
-                            link="/dashboard/account-setup"
-                            buttonAction={() => {}}
-                        />
-                    </section>
-                    <aside>
-                        <Typography variant="h6">Attention</Typography>
-                        <Typography variant="body2" component="p">Make sure you confirm all payments in your banking app.</Typography>
-                        <Typography variant="body2" component="p">Do not rely on transaction receipts or any other form of confirmation.</Typography>
-                    </aside>
-                </div>
-            </section>
-        </>
+        <section className={classes.root}>
+            <Typography variant="h6">Notifications</Typography>
+            <Typography variant="body2" component="p">View notifications below</Typography>
+            <div>
+                <section className={classes.notifications}>
+                    <Notification 
+                        title="Account Setup Pending"
+                        message="You are yet to fully set up your account. Click Set Up Account to proceed"
+                        buttonText="Set Up Account"
+                        link="/dashboard/account-setup"
+                        buttonAction={() => {}}
+                    />
+                    <Notification 
+                        title="Withdrawal Request Processing"
+                        message="Your withdrawal request of N500,000 to your bank account is currently being processed."
+                    />
+                    <Notification 
+                        title="Credit (Withdrawal)"
+                        message="FXBLOOMS has successfully sent N500,000 to your bank account"
+                    />
+                    <Notification 
+                        title="Debit (Exchange)"
+                        message="We have successfully sent walecalfos a sum of N500,000 from your EUR wallet."
+                        buttonText="View Wallet Balance"
+                        link="/dashboard/account-setup"
+                        buttonAction={() => {}}
+                    />
+                    <Notification 
+                        title="Wallet Fund"
+                        message="Your EUR has been successfully funded with the sum of N500,000"
+                        buttonText="View Wallet Balance"
+                        link="/dashboard/account-setup"
+                        buttonAction={() => {}}
+                    />
+                    <Notification 
+                        title="Credit (Withdrawal)"
+                        message="walecalfos has made a payment of N500,000 to your GTBank | 8849958473"
+                        buttonText="Payment Confirmed"
+                        link="/dashboard/account-setup"
+                        buttonAction={() => {}}
+                    />
+                </section>
+                <aside>
+                    <Typography variant="h6">Attention</Typography>
+                    <Typography variant="body2" component="p">Make sure you confirm all payments in your banking app.</Typography>
+                    <Typography variant="body2" component="p">Do not rely on transaction receipts or any other form of confirmation.</Typography>
+                </aside>
+            </div>
+        </section>
     );
 };
 

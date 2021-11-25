@@ -56,8 +56,8 @@ const Notification = ({ title, message, buttonText, buttonAction, link }) => {
     return (
         <section className={classes.root}>
             <div>
-                <Typography variant="body" component="p">{title}</Typography>
-                <Typography variant="body" component="p">{message}</Typography>
+                <Typography variant="body1" component="p">{title}</Typography>
+                <Typography variant="body1" component="p">{message}</Typography>
             </div>
             {buttonText && buttonAction && 
                 <Button 

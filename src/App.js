@@ -40,6 +40,8 @@ import MobileConversation from './pages/dashboard/messages/MobileConversation';
 
 import Notifications from './pages/dashboard/notifications';
 
+import Wallet from './pages/dashboard/wallet';
+
 // import setAuthToken from './utils/setAuthToken';
 // import isTokenExpired from './utils/tokenExpired';
 
@@ -79,7 +81,8 @@ import {
 	PRIVACY_POLICY,
 	MOBILE_CONVERSATION,
 	VERIFY_EMAIL,
-	PENDING_VERIFICATION
+	PENDING_VERIFICATION,
+	WALLET
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -178,6 +181,7 @@ const [title, setTitle] = useState('');
 								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${MOBILE_CONVERSATION}`} exact component={() => <MobileConversation handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
 						</PrivateRoute>
 						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />

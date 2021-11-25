@@ -1,7 +1,25 @@
-import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { AppBar, Avatar, Badge, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
+import { useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import { 
+    AppBar, 
+    Avatar, 
+    Badge, 
+    ClickAwayListener,
+    Button, 
+    Grid, 
+    Grow,
+    IconButton, 
+    Link, 
+    MenuList, 
+    MenuItem, 
+    Paper,
+    Popper,
+    Slide, 
+    Toolbar, 
+    useScrollTrigger 
+} from '@material-ui/core';
+
 import { Link as AnimatedLink } from 'react-scroll';
 import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message, Wallet } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,10 +27,11 @@ import PropTypes from 'prop-types';
 
 import MobileNav from './MobileNav';
 
+import { logout } from '../../actions/customer';
+
 import logo from '../../assets/img/logo.svg';
 import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
-// import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES, NOTIFICATIONS } from '../../routes';
 import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, WALLET, PROFILE } from '../../routes';
 
 function HideOnScroll (props) {
@@ -37,6 +56,9 @@ const useStyles = makeStyles(theme => ({
     },
     
     nav: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         padding: [[0, theme.spacing(10)]],
 
         [theme.breakpoints.down('lg')]: { 
@@ -105,12 +127,17 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Header = (props) => {
+    const history = useHistory();
     const classes = useStyles();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
     const { firstName, lastName, isAuthenticated } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const { unreadMessages } = useSelector(state => state.chat);
+
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+    const prevOpen = useRef(open);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
@@ -128,6 +155,42 @@ const Header = (props) => {
         { url: ABOUT_US, text:'About Us' },
         { url: CONTACT_US, text:'Contact' }
     ];
+
+    
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleMenuClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    function handleListKeyDown(event) {
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            setOpen(false);
+        }
+    }
+
+    // return focus to the button when we transitioned from !open -> open
+    useEffect(() => {
+        if (prevOpen.current === true && open === false) {
+        anchorRef.current.focus();
+        }
+        prevOpen.current = open;
+    }, [open]);
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        props.logout(history);
+    };
+
+
 
     return (
         <HideOnScroll {...props}>
@@ -181,16 +244,45 @@ const Header = (props) => {
                             <Grid container direction="row" justify="flex-end" alignItems="center" spacing={2}>
                                 {
                                     isAuthenticated && authorized ?
-                                    <div className={classes.avatarContainer}>
-                                        <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
-                                        <Button
-                                            to={`${DASHBOARD}${DASHBOARD_HOME}`}
-                                            endIcon={<ChevronDown />}
-                                            classes={{ root: classes.avatarButton }}
-                                        >
-                                            Account
-                                        </Button>
-                                    </div>
+                                    <>
+                                        <div className={classes.avatarContainer}>
+                                            <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                                            <Button
+                                                to={`${DASHBOARD}${DASHBOARD_HOME}`}
+                                                endIcon={<ChevronDown />}
+                                                classes={{ root: classes.avatarButton }}
+                                                ref={anchorRef}
+                                                onClick={handleToggle}
+                                                aria-controls={open ? 'profile-menu' : undefined}
+                                                aria-haspopup="true"
+                                            >
+                                                Account
+                                            </Button>
+                                        </div>
+                                        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                                            {({ TransitionProps, placement }) => (
+                                                <Grow
+                                                    {...TransitionProps}
+                                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                                                >
+                                                    <Paper>
+                                                        <ClickAwayListener onClickAway={handleMenuClose}>
+                                                            <MenuList autoFocusItem={open} id="profile-menu" onKeyDown={handleListKeyDown}>
+                                                                <MenuItem
+                                                                    onClick={(e) => handleMenuClose(e, `${DASHBOARD}${PROFILE}`)}
+                                                                >
+                                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>My Profile</RouterLink>
+                                                                </MenuItem>
+                                                                <MenuItem>
+                                                                    <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
+                                                                </MenuItem>
+                                                            </MenuList>
+                                                        </ClickAwayListener>
+                                                    </Paper>
+                                                </Grow>
+                                            )}
+                                        </Popper>
+                                    </>
                                     :
                                     <>
                                         <Grid item>
@@ -243,4 +335,8 @@ const Header = (props) => {
     );
 };
 
-export default Header;
+Header.propTypes = {
+    logout: PropTypes.func.isRequired,
+};
+
+export default connect(undefined, { logout })(Header);

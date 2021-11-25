@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Typography } from '@material-ui/core';
+import { Button, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { ClockOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
@@ -86,6 +88,19 @@ const useStyles = makeStyles(theme => ({
         }
 	},
 
+    timestamp: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        '& span': {
+            color: COLORS.darkGrey,
+            cursor: 'pointer',
+            fontSize: theme.spacing(1.3),
+            fontWeight: 300
+        }
+    },
+
     button: {
         color: `${COLORS.offWhite} !important`,
         height: '100%',
@@ -119,9 +134,10 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
     const errorsState = useSelector(state => state.errors);
     const userId = useSelector(state => state.customer.customerId);
 
+    const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId } = listing;
+    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
     // const { bids, status, id } = listing;
 
     const toast = useRef();
@@ -167,6 +183,13 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
         }
     };
 
+    const openTooltip = () => {
+        setTooltipOpen(true);
+    };
+    const closeTooltip = () => {
+        setTooltipOpen(false);
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -189,7 +212,14 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                                 <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
                         </RouterLink>
                     </Typography>
-                    <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography>
+                    <section className={classes.timestamp}>
+                        <Tooltip title={moment(new Date(dateCreated)).format('Do MMM, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
+                            <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey, cursor: 'pointer', }} />
+                        </Tooltip>
+                        &nbsp;&nbsp;
+                        <Typography variant="subtitle2" component="span" onMouseEnter={openTooltip} onMouseLeave={closeTooltip}>{moment(new Date(dateCreated)).fromNow()}</Typography>
+                    </section>
+                    {/* <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography> */}
                 </header>
                 <div>
                     <Typography variant="subtitle2" component="span">
