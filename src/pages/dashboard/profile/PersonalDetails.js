@@ -1,14 +1,13 @@
 import { useEffect, useState } from 'react'; 
 import { connect, useSelector } from 'react-redux'; 
 import { 
-    Box, 
     Button, 
-    Divider,
     Grid,
     TextField, 
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { AlertOctagram } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import { setHidePhoneNumber, setShowPhoneNumber } from '../../../actions/customer'; 
@@ -18,23 +17,23 @@ import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme =>({
     root: {
+        // backgroundColor: COLORS.lightTeal,
+        // borderRadius: theme.shape.borderRadius,
+        // padding: [[theme.spacing(2), theme.spacing(3)]],
+
+        // [theme.breakpoints.down('md')]: {
+        //     paddingBottom: theme.spacing(4)
+        // }
+    },
+
+    container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        padding: [[theme.spacing(2), theme.spacing(3)]],
+        // padding: [[theme.spacing(2), theme.spacing(3)]],
 
         [theme.breakpoints.down('md')]: {
             paddingBottom: theme.spacing(4)
         }
-    },
-
-    header: {
-        color: theme.palette.primary.main,
-        display: 'flex',
-        flexDirection: 'row',
-        fontWeight: 500,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: theme.spacing(1)
     },
 
     button: {
@@ -47,6 +46,13 @@ const useStyles = makeStyles(theme =>({
 
     info: {
         fontWeight: 600
+    },
+
+    unverified: {
+        borderRadius: '70px',
+        color: theme.palette.primary.main,
+        backgroundColor: 'rgba(196, 196, 196, 1)',
+        padding: theme.spacing(1, 3)
     }
 }));
 
@@ -75,6 +81,7 @@ const PersonalDetails = (props) => {
     
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line
     const [editable, setEditable] = useState(false);
 
     const { setHidePhoneNumber, setShowPhoneNumber } = props;
@@ -143,16 +150,8 @@ const PersonalDetails = (props) => {
     return (
         <Grid className={classes.root} container direction="column">
             <Grid item>
-                <Box className={classes.header}>
-                    <Typography variant="subtitle2">Personal Details</Typography>
-                    <Button color="primary" classes={{ root: classes.button }} onClick={() => setEditable(true)}>Edit</Button>
-                </Box>
-            </Grid>
-            <Divider />
-            <br />
-            <Grid item>
                 <form onSubmit={onSubmit} noValidate>
-                    <Grid container direction="row" spacing={3}>
+                    <Grid container direction="row" spacing={3} className={classes.container}>
                         <Grid item xs={12} md={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{FirstName}</Typography>
@@ -195,7 +194,7 @@ const PersonalDetails = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
                             <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{Username}</Typography>
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={6}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                             {showNumber ?
                                 <Button color="primary" onClick={handleHidePhoneNumber}>Hide</Button>
@@ -215,6 +214,14 @@ const PersonalDetails = (props) => {
                                 disabled={editable ? false : true}
                                 error={errors.PhoneNo ? true : false}
                             />
+                        </Grid>
+                        <Grid item xs={3}>
+                            <br /><br />
+                            <Typography variant="subtitle2" component="span" className={classes.unverified}>Unverified</Typography>
+                        </Grid>
+                        <Grid item xs={3}>
+                            <br /><br />
+                            <Button variant="text" color="primary" startIcon={<AlertOctagram />}>Verify Now</Button>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
@@ -306,17 +313,6 @@ const PersonalDetails = (props) => {
                                 disabled
                                 error={errors.PostalCode ? true : false}
                             /> */}
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Button
-                                type="submit"
-                                variant="contained"
-                                color="primary"
-                                fullWidth
-                                disabled={editable ? false : true}
-                            >
-                                Submit
-                            </Button>
                         </Grid>
                         <Grid item xs={4}>
                             <Typography variant="subtitle2" component="span" className={classes.label}>Listings</Typography>

@@ -110,7 +110,7 @@ TabPanel.propTypes = {
 
 function a11yProps(index) {
     return {
-        id: `simple-tab-${index}`,
+        id: `fund-tabs-${index}`,
         'aria-controls': `simple-tabpanel-${index}`,
     };
 }

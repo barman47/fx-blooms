@@ -291,7 +291,7 @@ const AllListings = (props) => {
 					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
 				</div>
 				<Button
-					variant="standard"
+					variant="text"
 					size="small"
 					startIcon={<ChevronDown />}
 					classes={{
