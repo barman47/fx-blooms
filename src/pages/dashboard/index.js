@@ -218,12 +218,6 @@ const Dashboard = ({ children, title, logout }) => {
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
     
-    // const links = [
-    //     { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
-    //     { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-    //     { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
-    // ];
-    
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
