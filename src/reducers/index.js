@@ -2,8 +2,8 @@ import { combineReducers } from 'redux';
 
 import { RESET_STORE } from '../actions/types';
 
-import accountReducer from './account';
 import adminReducer from './admin';
+import bankAccountsReducer from './bankAccounts';
 import chatsReducer from './chat';
 import countriesReducer from './countries';
 import currencyReducer from './currencies';
@@ -15,21 +15,23 @@ import errorsReducer from './errors';
 import statsReducer from './stats';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
+import walletsReducer from './wallets';
 
 const appReducer = combineReducers({
-    account: accountReducer,
     admin: adminReducer,
-    countries: countriesReducer,
+    bankAccounts: bankAccountsReducer,
     chat: chatsReducer,
+    countries: countriesReducer,
     customer: customerReducer,
     customers: customersReducer,
     currencies: currencyReducer,
     documents: documentsReducer,
-    listings: listingsReducer,
     errors: errorsReducer,
+    listings: listingsReducer,
     stats: statsReducer,
     subscription: subscriptionReducer,
-    twoFactor: twoFactorReducer
+    twoFactor: twoFactorReducer,
+    wallets: walletsReducer
 });
 
 const rootReducer = (state, action) => {

@@ -15,7 +15,9 @@ import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { GET_ERRORS } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, MESSAGES, PROFILE, USER_DETAILS } from '../../../routes';
+import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
+
+import BuyEurDrawer from './BuyEurDrawer';
 
 import Toast from '../../../components/common/Toast';
 
@@ -134,6 +136,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
     const errorsState = useSelector(state => state.errors);
     const userId = useSelector(state => state.customer.customerId);
 
+    const [openBuyEurDrawer, setOpenBuyEurDrawer] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -186,9 +189,12 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
     const openTooltip = () => {
         setTooltipOpen(true);
     };
+
     const closeTooltip = () => {
         setTooltipOpen(false);
     };
+
+    const toggleBuyEurDrawer = () => setOpenBuyEurDrawer(!openBuyEurDrawer);
 
     return (
         <>
@@ -270,8 +276,6 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                         </Button>
                         :
                         <Button
-                            to={MESSAGES}
-                            component={RouterLink} 
                             variant="contained" 
                             size="large" 
                             color="primary"
@@ -280,13 +284,15 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            onClick={(e) => handleAddBid(e, listing)}
+                            // onClick={(e) => handleAddBid(e, listing)}
+                            onClick={toggleBuyEurDrawer}
                         >
                             Buy EUR
                         </Button>
                     }
                 </div>
             </section>
+            <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} />
         </>
     );
 };

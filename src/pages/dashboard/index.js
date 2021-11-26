@@ -8,6 +8,7 @@ import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 import toast, { Toaster } from 'react-hot-toast';
 
+import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
 
@@ -434,6 +435,7 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            <AccountSetupModal />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 

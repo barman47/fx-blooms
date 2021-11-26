@@ -1,14 +1,14 @@
 import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
-const login = (data) => {
+const addBankAccount = (data) => {
     let errors = {};
-    data.AccountName = !isEmpty(data.AccountName) ?  data.AccountName : '';
-    data.AccountNumber = !isEmpty(data.AccountNumber) ?  data.AccountNumber : '';
-    data.BankName = !isEmpty(data.BankName) ?  data.BankName : '';
+    data.accountName = !isEmpty(data.accountName) ?  data.accountName : '';
+    data.accountNumber = !isEmpty(data.accountNumber) ?  data.accountNumber : '';
+    data.bankName = !isEmpty(data.bankName) ?  data.bankName : '';
 
-    if (Validator.isEmpty(data.AccountName)) {
-        errors.AccountName = 'Account name is required!';
+    if (Validator.isEmpty(data.accountName)) {
+        errors.accountName = 'Account name is required!';
     }
 
     // if (!Validator.isIBAN(data.AccountNumber)) {
@@ -28,4 +28,4 @@ const login = (data) => {
     };
 };
 
-export default login;
+export default addBankAccount;

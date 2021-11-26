@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box,
@@ -12,7 +13,10 @@ import {
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
+import { addAccount } from '../../../actions/bankAccounts';
+
 import { COLORS } from '../../../utils/constants';
+import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -86,16 +90,19 @@ function a11yProps(index) {
 }
   
 
-const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
+const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const theme = useTheme();
     const matches = theme.breakpoints.down('md');
 
+    const { customerId } = useSelector(state => state.customer);
+
     const [bankName, setBankName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
     const [accountName, setAccountName] = useState('');
-    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
+    const [loading, setLoading] = useState(false);
+    const [loadingText, setLoadingText] = useState('');
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
 
@@ -109,6 +116,30 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
 
     const onSubmit = (e) => {
         e.preventDefault();
+        console.log('submitting');
+        setErrors({});
+        const data = {
+            bankName,
+            accountName,
+            accountNumber,
+            currency: value === 0 ? 'NGN' : 'USD',
+            customerId
+        };
+
+        return console.log(data);
+
+        const { errors, isValid } = validateAddBankAccount(data);
+
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid account information' });
+        }
+
+        console.log('data ', data);
+
+        setErrors({});
+        setLoadingText('Adding Account . . . ');
+        setLoading(true);
+        addAccount(data)
     };
 
 	return (
@@ -129,7 +160,7 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
             </Tabs>
             <TabPanel value={value} index={0}>
                 <form className={classes.form} onSubmit={onSubmit} noValidate>
-                    <Grid container direction="column" spacing={matches ? 6 : 2}>
+                    <Grid container direction="column" spacing={matches ? 3 : 2}>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span">Add your NGN receiving account</Typography>
                         </Grid>
@@ -164,7 +195,7 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span">Bank Name</Typography>
+                            <Typography variant="subtitle2" component="span">Account Name</Typography>
                             <TextField 
                                 className={classes.input}
                                 value={accountName}
@@ -179,14 +210,14 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Button variant="contained" color="primary" fullWidth disableFocusRipple>Add Account</Button>            
+                            <Button type="submit" variant="contained" color="primary" fullWidth disableFocusRipple>Add Account</Button>            
                         </Grid>
                     </Grid>
                 </form>
             </TabPanel>
             <TabPanel value={value} index={1}>
                 <form className={classes.form} onSubmit={onSubmit} noValidate>
-                    <Grid container direction="column" spacing={matches ? 6 : 2}>
+                    <Grid container direction="column" spacing={matches ? 3 : 2}>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span">Add your NGN receiving account</Typography>
                         </Grid>
@@ -236,7 +267,7 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Button variant="contained" color="primary" fullWidth disableFocusRipple>Add Account</Button>            
+                            <Button type="submit" variant="contained" color="primary" fullWidth disableFocusRipple>Add Account</Button>            
                         </Grid>
                     </Grid>
                 </form>
@@ -246,8 +277,9 @@ const AddAccountDrawer = ({ toggleDrawer, drawerOpen }) => {
 };
 
 AddAccountDrawer.propTypes = {
+    addAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
 };
 
-export default AddAccountDrawer;
+export default connect(undefined, { addAccount })(AddAccountDrawer);

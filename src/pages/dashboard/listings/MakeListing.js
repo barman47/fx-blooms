@@ -18,7 +18,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-import SellerAccountModal from './SellerAccountModal';
+// import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import EditListingItem from './EditListingItem';
@@ -139,7 +139,8 @@ const MakeListing = (props) => {
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
-    const { customer, currencies } = useSelector(state => state);
+    const { currencies } = useSelector(state => state);
+    // const { customer } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
@@ -147,7 +148,7 @@ const MakeListing = (props) => {
 
     const { getCurrencies, handleSetTitle } = props;
 
-    const [openAccountModal, setOpenAccountModal] = useState(false);
+    // const [openAccountModal, setOpenAccountModal] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
@@ -335,9 +336,9 @@ const MakeListing = (props) => {
         }
     };
 
-    const handleCloseAccountModalModal = () => {
-        setOpenAccountModal(false);
-    };
+    // const handleCloseAccountModalModal = () => {
+    //     setOpenAccountModal(false);
+    // };
 
     const handleCloseResidencePermitModal = () => {
         setShowResidencePermitModal(false);
@@ -384,9 +385,9 @@ const MakeListing = (props) => {
             return checkResidencePermitStatus();
         }
 
-        if (customer.profile.listings >= 2) { // and there is no account number
-            return setOpenAccountModal(true);
-        }
+        // if (customer.profile.listings >= 2) { // and there is no account number
+        //     return setOpenAccountModal(true);
+        // }
 
         setErrors({});
         setLoading(true);
@@ -423,7 +424,7 @@ const MakeListing = (props) => {
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
-                <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
+                {/* <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} /> */}
                 <header>
                     <div>
                         <Typography variant="h6">Make a Listing</Typography>

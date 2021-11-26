@@ -131,10 +131,6 @@ const FundWalletDrawer = ({ toggleDrawer, drawerOpen }) => {
         setValue(newValue);
     };
 
-    const closeModal = () => {
-        setOpen(false);
-    };
-
 	return (
         <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={open} onClose={toggleDrawer}>
             <Typography variant="h6" className={classes.header}>Fund Wallet</Typography>
@@ -212,7 +208,7 @@ const FundWalletDrawer = ({ toggleDrawer, drawerOpen }) => {
                 <Typography variant="body2" component="p" className={classes.text}>
                     To fund your wallet via your debit/credit card, you will be charged a transaction fee of 1.8% of your total transaction amount.
                 </Typography>
-                <Button onClick={closeModal} variant="contained" color="primary" fullWidth disableFocusRipple className={classes.button}>Proceed to Stripe</Button>
+                <Button variant="contained" color="primary" fullWidth disableFocusRipple className={classes.button}>Proceed to Stripe</Button>
             </TabPanel>
         </Drawer>
 	);
