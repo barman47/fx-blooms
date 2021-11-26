@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { 
     AppBar, 
@@ -128,6 +128,7 @@ const useStyles = makeStyles(theme => ({
 
 const Header = (props) => {
     const history = useHistory();
+    const location = useLocation();
     const classes = useStyles();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -147,7 +148,7 @@ const Header = (props) => {
         { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url: WALLET, text:'Wallet', icon: <Wallet /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge color="error" badgeContent={unreadMessages}><Message /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadMessages}><Message /></Badge> }
     ];
 
     const publicRoutes = [
@@ -180,7 +181,7 @@ const Header = (props) => {
     // return focus to the button when we transitioned from !open -> open
     useEffect(() => {
         if (prevOpen.current === true && open === false) {
-        anchorRef.current.focus();
+            anchorRef.current.focus();
         }
         prevOpen.current = open;
     }, [open]);
@@ -190,20 +191,18 @@ const Header = (props) => {
         props.logout(history);
     };
 
-
-
     return (
         <HideOnScroll {...props}>
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <Grid container direction="row" alignItems="center" className={classes.nav}>
-                        <Grid item xs={9}>
-                            <Grid container direction="row" alignItems="center" spacing={5} justify="flex-start">
-                                <Grid item>
-                                    <a href="https://fxblooms.com">
-                                        <img src={logo} alt="FX Blooms Logo" />
-                                    </a>
-                                </Grid>
+                        <Grid item xs={1}>
+                            <a href="https://fxblooms.com">
+                                <img src={logo} alt="FX Blooms Logo" />
+                            </a>
+                        </Grid>
+                        <Grid item xs={location.pathname.includes(DASHBOARD) ? 9 : 8}>
+                            <Grid container direction="row" alignItems="center" spacing={5} justify="center">
                                 {isAuthenticated && authorized ?
                                     <>
                                         {protectedRoutes.map((link, index) =>(
@@ -240,7 +239,7 @@ const Header = (props) => {
                                 }
                             </Grid>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={location.pathname.includes(DASHBOARD) ? 2 : 3}>
                             <Grid container direction="row" justify="flex-end" alignItems="center" spacing={2}>
                                 {
                                     isAuthenticated && authorized ?
@@ -324,9 +323,11 @@ const Header = (props) => {
                         >
                             <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
                         </Link>
-                        <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
-                            <MenuIcon />
-                        </IconButton>
+                        {!location.pathname.includes(DASHBOARD) && 
+                            <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
+                                <MenuIcon />
+                            </IconButton>
+                        }
                     </div>
                     <MobileNav toggleDrawer={toggleDrawer} drawerOpen={drawerOpen} />
                 </Toolbar>

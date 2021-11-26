@@ -95,13 +95,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
     const theme = useTheme();
     const matches = theme.breakpoints.down('md');
 
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, firstName, lastName } = useSelector(state => state.customer);
 
     const [bankName, setBankName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
-    const [accountName, setAccountName] = useState('');
+    const [accountName, setAccountName] = useState(`${firstName} ${lastName}`);
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
+    // eslint-disable-next-line
     const [loadingText, setLoadingText] = useState('');
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
@@ -126,15 +128,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
             customerId
         };
 
-        return console.log(data);
-
         const { errors, isValid } = validateAddBankAccount(data);
 
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid account information' });
         }
-
-        console.log('data ', data);
 
         setErrors({});
         setLoadingText('Adding Account . . . ');

@@ -11,15 +11,15 @@ const addBankAccount = (data) => {
         errors.accountName = 'Account name is required!';
     }
 
-    // if (!Validator.isIBAN(data.AccountNumber)) {
-    //     errors.AccountNumber = 'Invalid IBAN!';
+    // if (!Validator.isIBAN(data.accountNumber)) {
+    //     errors.accountNumber = 'Invalid IBAN!';
     // }
-    if (Validator.isEmpty(data.AccountNumber)) {
-        errors.AccountNumber = 'Account number is required!';
+    if (Validator.isEmpty(data.accountNumber)) {
+        errors.accountNumber = 'Account number is required!';
     }
 
-    if (Validator.isEmpty(data.BankName)) {
-        errors.BankName = 'Bank name is required!';
+    if (Validator.isEmpty(data.bankName)) {
+        errors.bankName = 'Bank name is required!';
     }
    
     return {

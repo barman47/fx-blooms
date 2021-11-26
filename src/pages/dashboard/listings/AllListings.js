@@ -12,6 +12,7 @@ import {
 	Grid,
 	MenuItem,
 	Select,
+	Paper,
 	TextField,
 	Tooltip,
 	Typography,
@@ -19,7 +20,7 @@ import {
 } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, FilterOutline } from 'mdi-material-ui';
+import { ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
@@ -33,6 +34,13 @@ import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 import FilterListingModal from './FilterListingModal';
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
+import WalletInfoModal from '../wallet/WalletInfoModal';
+import FundWalletDrawer from '../wallet/FundWalletDrawer';
+import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
+import Wallet from '../wallet/Wallet';
+// import RiskNoticeModal from './RiskNoticeModal';
+
+import img from '../../../assets/img/decentralized.svg';
 
 const useStyles = makeStyles(theme => ({
 	fab: {
@@ -50,6 +58,7 @@ const useStyles = makeStyles(theme => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		marginTop: theme.spacing(10),
 
 		paddingLeft: theme.spacing(10),
 		paddingRight: theme.spacing(10),
@@ -74,16 +83,66 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
+	walletsContainer: {
+		borderRadius: theme.shape.borderRadius,
+		paddingLeft: theme.spacing(5),
+		paddingRight: theme.spacing(5),
+		marginTop: theme.spacing(5),
+
+		[theme.breakpoints.down('md')]: {
+			display: 'none'
+		}
+	},
+
+	wallets: {
+		backgroundColor: COLORS.lightTeal,
+		display: 'grid',
+		gridTemplateColumns: '1fr 1fr 1fr',
+		padding: theme.spacing(5),
+		gap: theme.spacing(5),
+	},
+
 	walletToggle: {
 		alignSelf: 'flex-end',
 		color: theme.palette.primary.main,
 
-		[theme.breakpoints.down('sm')]: {
-			justifySelf: 'flex-start'
+		[theme.breakpoints.down('md')]: {
+			display: 'none'
 		},
 
 		'&:hover': {
 			backgroundColor: 'transparent'
+		}
+	},
+
+	gateway: {
+		background: 'linear-gradient(238.08deg, #25AEAE -0.48%, #1E6262 99.63%)',
+		boxShadow: '1px 14px 30px -16px rgba(30, 98, 98, 1)',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		height: 'initial',
+        padding: [[theme.spacing(5), 0, 0, theme.spacing(2)]],
+
+		'& div:first-child': {
+			display: 'flex',
+			flexDirection: 'column',
+			justifyContent: 'space-between',
+
+			'& h5': {
+				color: COLORS.offWhite,
+				fontWeight: 600
+			},
+
+			'& p': {
+				color: COLORS.offWhite,
+				marginBottom: theme.spacing(3)
+			},
+		},
+
+		'& img': {
+			width: '35%',
+			alignSelf: 'flex-end'
 		}
 	},
 	
@@ -93,13 +152,11 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '3fr 1fr',
 		gap: theme.spacing(2.5),
-		paddingLeft: theme.spacing(10),
-		paddingRight: theme.spacing(10),
+		paddingLeft: theme.spacing(5),
+		paddingRight: theme.spacing(5),
 
 		[theme.breakpoints.down('md')]: {
-			gridTemplateColumns: '1fr',
-			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5)
+			gridTemplateColumns: '1fr'
 		},
 		
 		'& p': {
@@ -208,8 +265,20 @@ const AllListings = (props) => {
 	const [dataLength, setDataLength] = useState(0);
 	// const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
+	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
+    const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
+	const [showWallets, setShowWallets] = useState(true);
 
 	let loadedEvent = useRef();
+    const walletInfoModal = useRef();
+
+    const toggleFundDrawer = () => {
+        setFundDrawerOpen(!fundDrawerOpen);
+    };
+
+    const toggleWithdrawalDrawer = () => {
+        setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
+    };
 
 	useEffect(() => {
 		loadedEvent.current = getListings;
@@ -285,6 +354,9 @@ const AllListings = (props) => {
 					<FilterOutline />
 				</Fab>
 			</Tooltip>
+			{fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
+            {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
+            <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography> 
@@ -293,14 +365,44 @@ const AllListings = (props) => {
 				<Button
 					variant="text"
 					size="small"
-					startIcon={<ChevronDown />}
+					startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
 					classes={{
 						root: classes.walletToggle
 					}}
+					onClick={() => setShowWallets(!showWallets)}
 				>
 					Show Wallet
 				</Button>
 			</section>
+			{showWallets && 
+				<section className={classes.walletsContainer}>
+					<section className={classes.wallets}>
+						<Wallet 
+							id="dsdsds"
+							type="EUR"
+							balance={1000}
+							toggleWalletWithdrawal={toggleWithdrawalDrawer}
+							toggleWalletFund={toggleFundDrawer}
+							showWalletInfoModal={() => walletInfoModal.current.openModal()}
+						/>
+						<Wallet 
+							id="dsdsds"
+							type="NGN"
+							balance={1000}
+							toggleWalletWithdrawal={toggleWithdrawalDrawer}
+							toggleWalletFund={toggleFundDrawer}
+							showWalletInfoModal={() => walletInfoModal.current.openModal()}
+						/>
+						<Paper className={classes.gateway}>
+							<div>
+								<Typography variant="h5">Your Gateway<br />into Decentralized<br />Money Exchange</Typography>
+								<Typography variant="subtitle1" component="p">Learn More</Typography>
+							</div>
+							<img src={img} alt="decentralized money exchange" />
+						</Paper>
+					</section>
+				</section>
+			}
 			<section className={classes.listings} id="scrollableParent">
 				<InfiniteScroll 
 					className={classes.listingContainer}

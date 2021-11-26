@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
-import { Button } from '@material-ui/core';
+// import { Button } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Plus } from 'mdi-material-ui';
+// import { Plus } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -16,6 +16,7 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         borderRadius: theme.shape.borderRadius,
         gridTemplateColumns: '1fr',
+        alignSelf: 'flex-start',
         padding: theme.spacing(4),
         rowGap: theme.spacing(3),
         marginTop: theme.spacing(4),
@@ -62,7 +63,7 @@ const Wallets = () => {
                 toggleWalletFund={toggleFundDrawer}
                 showWalletInfoModal={() => walletInfoModal.current.openModal()}
             />
-            <Button variant="outlined" color="primary" startIcon={<Plus />}>Create a New Wallet</Button>
+            {/* <Button variant="outlined" color="primary" startIcon={<Plus />}>Create a New Wallet</Button> */}
             {fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
             {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
             <WalletInfoModal ref={walletInfoModal} />
