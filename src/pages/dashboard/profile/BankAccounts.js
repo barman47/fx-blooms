@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import AddAccountDrawer from './AddAccountDrawer';
 import BankAccount from './BankAccount';
+import { useSelector } from 'react-redux';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -26,11 +27,24 @@ const useStyles = makeStyles(theme =>({
         gridTemplateColumns: '1fr',
         gap: theme.spacing(4),
         marginTop: theme.spacing(4),
+    },
+
+    noAccount: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+
+        '& h5': {
+            marginBottom: theme.spacing(2)
+        }
     }
 }));
 
 const BankAccounts = (props) => {
     const classes = useStyles();
+
+    const { accounts } = useSelector(state => state.bankAccounts);
 
     const [showAddAccountDrawer, setShowAddAccountDrawer] = useState(false);
 
@@ -44,30 +58,21 @@ const BankAccounts = (props) => {
                     <Button variant="text" color="primary" onClick={toggleShowAddAccountDrawer}>Add Receiving Account</Button>
                 </div>
                 <div className={classes.bankAccounts}>
-                    <BankAccount 
-                        bankName="Chase Bank"
-                        accountName="Wale Calfos"
-                        sortCode="09-00-09"
-                        currency="EUR"
-                    />
-                    <BankAccount 
-                        bankName="Bank of America"
-                        accountName="Wale Calfos"
-                        sortCode="09-00-09"
-                        currency="USD"
-                    />
-                    <BankAccount 
-                        bankName="GTBank"
-                        accountName="Wale Calfos"
-                        sortCode="09-00-09"
-                        currency="NGN"
-                    />
-                    <BankAccount 
-                        bankName="Access Bank"
-                        accountName="Wale Calfos"
-                        sortCode="09-00-09"
-                        currency="NGN"
-                    />
+                    {accounts ? accounts.map(account => (
+                        <BankAccount 
+                            key={account.accountID}
+                            bankName={account.bankName}
+                            accountName={account.accountName}
+                            sortCode="09-00-09"
+                            currency={account.currency}
+                        />
+                    ))
+                    :
+                        <div className={classes.noAccount}>
+                            <Typography variant="h5">No Accounts Added</Typography>   
+                            <Button variant="contained" color="primary" onClick={toggleShowAddAccountDrawer}>Add Receiving Account</Button>               
+                        </div>
+                    }
                 </div>
             </section>
             <AddAccountDrawer drawerOpen={showAddAccountDrawer} toggleDrawer={toggleShowAddAccountDrawer} />

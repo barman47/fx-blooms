@@ -7,6 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation } from '../../../actions/customer'; 
+import { getAccounts } from '../../../actions/bankAccounts';
 import { getDocuments } from '../../../actions/documents'; 
 
 import { COLORS } from '../../../utils/constants'; 
@@ -78,14 +79,18 @@ function a11yProps(index) {
 const Profile = (props) => {
     const classes = useStyles();
     const { countries, documents } = useSelector(state => state);
-    const { profile } = useSelector(state => state.customer);
+    const { customerId, profile } = useSelector(state => state.customer);
+    const { accounts } = useSelector(state => state.bankAccounts);
 
-    const { getDocuments, getCountries, getCustomerInformation, handleSetTitle } = props;
+    const { getAccounts, getDocuments, getCountries, getCustomerInformation, handleSetTitle } = props;
 
     const [value, setValue] = useState(0);
 
     useEffect(() => {
         handleSetTitle('Profile');
+        if (accounts.length === 0) {
+            getAccounts(customerId);
+        }
         // eslint-disable-next-line
     }, []);
     
@@ -165,7 +170,7 @@ const Profile = (props) => {
                         </Button>
                     </TabPanel>
                 </Grid>
-                <Grid item xs={12} lg={8}>
+                <Grid item xs={12} lg={12}>
                     <TabPanel value={value} index={1}>  
                         <BankAccounts />
                     </TabPanel>
@@ -176,10 +181,11 @@ const Profile = (props) => {
 }
 
 Profile.propTypes = {
+    getAccounts: PropTypes.func.isRequired,
     getCountries: PropTypes.func.isRequired,
     getCustomerInformation: PropTypes.func.isRequired,
     getDocuments: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCountries, getCustomerInformation, getDocuments })(Profile);
+export default connect(undefined, { getAccounts, getCountries, getCustomerInformation, getDocuments })(Profile);
