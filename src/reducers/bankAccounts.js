@@ -1,12 +1,19 @@
-import { SET_ACCOUNTS, SET_ACCOUNT_MSG } from "../actions/types";
+import { SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_MSG } from "../actions/types";
 
 const initialState = {
+    account: {},
     accounts: [],
     msg: null
 };
 
 const bankAccountsReducer = (state = initialState, action) => {
-    switch (action.type) {      
+    switch (action.type) {   
+        case SET_ACCOUNT:
+            return {
+                ...state,
+                account: action.payload
+            };   
+            
         case SET_ACCOUNTS:
             if (action.payload.msg) {
                 return {

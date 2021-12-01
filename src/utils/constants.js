@@ -29,6 +29,8 @@ export const PROCEED_TO_DASHBOARD = 'PROCEED_TO_DASHBOARD'
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
 
+export const ADD_ACCOUNT = 'Add Account';
+
 export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch

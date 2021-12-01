@@ -48,7 +48,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -56,7 +56,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -64,7 +64,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -72,7 +72,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -80,7 +80,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -88,7 +88,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -96,7 +96,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -104,7 +104,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -112,7 +112,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
                 <Transaction 
@@ -120,7 +120,7 @@ const Transactions = () => {
                     time="10:34 PM"
                     type="Fund"
                     bank="Revolute"
-                    amount="1,000"
+                    amount={1000}
                     walletId="854584594"
                 />
             </div>

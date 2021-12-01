@@ -41,7 +41,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccounts = (props) => {
+const BankAccounts = () => {
     const classes = useStyles();
 
     const { accounts } = useSelector(state => state.bankAccounts);

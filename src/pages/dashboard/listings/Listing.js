@@ -13,7 +13,8 @@ import { deleteListing } from '../../../actions/listings';
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
-import { GET_ERRORS } from '../../../actions/types';
+import { getAccount } from '../../../actions/bankAccounts';
+import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
 
@@ -127,7 +128,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
+const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -160,6 +161,17 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
             });
         }
     }, [dispatch, errors]);
+
+    useEffect(() => {
+        if (openBuyEurDrawer) {
+            getAccount(listing.sellersAccountId);
+        } else {
+            dispatch({
+                type: SET_ACCOUNT,
+                payload: {}
+            });
+        }
+    }, [dispatch, getAccount, listing.sellersAccountId, openBuyEurDrawer]);
 
     // const setListing = (e, listing) => {
     //     e.preventDefault();
@@ -284,7 +296,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            // onClick={(e) => handleAddBid(e, listing)}
+                            // onClick={() => toggleBuyEurDrawer(listing.sellersAccountId)}
                             onClick={toggleBuyEurDrawer}
                         >
                             Buy EUR
@@ -292,17 +304,17 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                     }
                 </div>
             </section>
-            <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} />
+            <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} listing={listing} />
         </>
     );
 };
 
 Listing.propTypes = {
+    getAccount: PropTypes.func.isRequired,
     getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
-    handleAddBid: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
     deleteListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { deleteListing, getCustomer, getSeller })(Listing);
+export default connect(undefined, { deleteListing, getAccount, getCustomer, getSeller })(Listing);

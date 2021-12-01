@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../routes';
+import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_CHAT, SET_LISTINGS, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_LISTINGS, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/Listing`;
@@ -104,15 +104,11 @@ export const getMoreListings = (query) => async (dispatch) => {
     }
 };
 
-export const addBid = (bid, history) => async (dispatch) => {
+export const addBid = (bid) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddBid`, bid);
-        dispatch({
-            type: SET_CHAT,
-            payload: res.data.data
-        });
-        return history.push(`${DASHBOARD}${MESSAGES}`)
+        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }
