@@ -245,8 +245,8 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
                         {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange Currency</span>
-                        {amountNeeded?.currencyType}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
+                        {`${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>

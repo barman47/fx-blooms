@@ -99,7 +99,7 @@ function a11yProps(index) {
 }
   
 
-const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
+const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -119,6 +119,12 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
     const successModal = useRef();
 
     useEffect(() => {
+        setReceivingAccountType();
+
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         setOpen(drawerOpen);
     }, [drawerOpen]);
 
@@ -135,6 +141,16 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
             successModal.current.openModal();
         }
     }, [msg]);
+
+    const setReceivingAccountType = () => {
+        if (eur && ngn) {
+            setValue(0);
+        } else if (eur) {
+            setValue(1);
+        } else if (ngn) {
+            setValue(0);
+        }
+    };
 
     const dismissAction = () => {
         dispatch({
@@ -172,18 +188,22 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen }) => {
                 <Typography variant="h6" className={classes.header}>Add Account</Typography>
                 <Typography variant="subtitle2" component="small" className={classes.info}>Please note that you will only be paid via a linked account number.</Typography>
                 <Tabs value={value} onChange={handleChange} aria-label="fund-tabs" indicatorColor="primary" textColor="primary" variant="fullWidth" className={classes.tabs}>
-                    <Tab 
-                        label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>NGN Account</Typography>} 
-                        {...a11yProps(0)} 
-                        disableRipple
-                        disabled={loading ? true : false}
-                    />
-                    <Tab 
-                        label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>EUR Account</Typography>} 
-                        {...a11yProps(1)} 
-                        disableRipple
-                        disabled={loading ? true : false}
-                    />
+                    {ngn && 
+                        <Tab 
+                            label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>NGN Account</Typography>} 
+                            {...a11yProps(0)} 
+                            disableRipple
+                            disabled={loading ? true : false}
+                        />
+                    }
+                    {eur && 
+                        <Tab 
+                            label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>EUR Account</Typography>} 
+                            {...a11yProps(1)} 
+                            disableRipple
+                            disabled={loading ? true : false}
+                        />
+                    }
                 </Tabs>
                 <TabPanel value={value} index={0}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
@@ -332,6 +352,8 @@ AddAccountDrawer.propTypes = {
     addAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
+    eur: PropTypes.bool.isRequired,
+    ngn: PropTypes.bool.isRequired
 };
 
 export default connect(undefined, { addAccount })(AddAccountDrawer);

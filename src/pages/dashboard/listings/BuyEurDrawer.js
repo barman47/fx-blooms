@@ -172,14 +172,14 @@ const BuyEurDrawer = ({ addBid, listing, getAccounts, toggleDrawer, drawerOpen }
 
     // Prevent user from entering amount less than minimum exchange amount
     useEffect(() => {
-            if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
-                setButtonDisabled(true);
-                setErrors({  amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
-                setTransferAmount('');
-            } else {
-                setButtonDisabled(false);
-                setErrors({});
-            }
+        if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
+            setButtonDisabled(true);
+            setErrors({  amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
+            setTransferAmount('');
+        } else {
+            setButtonDisabled(false);
+            setErrors({});
+        }
     }, [listing.minExchangeAmount.amount, Amount]);
 
     // Prevent user from entering amount greater than amount available
@@ -235,7 +235,7 @@ const BuyEurDrawer = ({ addBid, listing, getAccounts, toggleDrawer, drawerOpen }
 
 	return (
         <>
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={open} onClose={toggleDrawer}>
                 <Typography variant="h6" className={classes.header}>Buy EUR</Typography>
                 <Typography variant="body1" component="p" className={classes.text}>Check how much you need to send to seller below and make a transfer to the account details provided below.</Typography>
@@ -285,10 +285,15 @@ const BuyEurDrawer = ({ addBid, listing, getAccounts, toggleDrawer, drawerOpen }
                                     onChange={(e) => setReceivingAccount(e.target.value)}
                                 >
                                     <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                    {accounts.map((account) => (
-                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                    ))}
                                     <MenuItem value={ADD_ACCOUNT}>{ADD_ACCOUNT}</MenuItem>
+                                    {accounts.map((account) => {
+                                        if (account.currency === 'NGN') {
+                                            return (
+                                                <MenuItem key={account.id} value={account.bankName}>{account.bankName}</MenuItem>
+                                            )
+                                        }
+                                        return null;
+                                    })}
                                 </Select>
                                 <FormHelperText>{errors.receivingAccount}</FormHelperText>
                             </FormControl>

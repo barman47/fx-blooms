@@ -455,7 +455,7 @@ const MakeListing = (props) => {
                     type="error"
                 />
             }
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
@@ -617,10 +617,15 @@ const MakeListing = (props) => {
                                         
                                         >
                                             <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            {accounts.map((account) => (
-                                                <MenuItem key={account.id} value={account.bankName}>{account.bankName}</MenuItem>
-                                            ))}
                                             <MenuItem value={ADD_ACCOUNT}>{ADD_ACCOUNT}</MenuItem>
+                                            {accounts.map((account) => {
+                                                if (account.currency === 'NGN') {
+                                                    return (
+                                                        <MenuItem key={account.id} value={account.bankName}>{account.bankName}</MenuItem>
+                                                    )
+                                                }
+                                                return null;
+                                            })}
                                         </Select>
                                         <FormHelperText>{errors.setReceivingAccount}</FormHelperText>
                                     </FormControl>

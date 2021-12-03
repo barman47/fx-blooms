@@ -97,7 +97,7 @@ const BankAccounts = ({ deleteAccount }) => {
                     }
                 </div>
             </section>
-            <AddAccountDrawer drawerOpen={showAddAccountDrawer} toggleDrawer={toggleShowAddAccountDrawer} />
+            <AddAccountDrawer drawerOpen={showAddAccountDrawer} toggleDrawer={toggleShowAddAccountDrawer} eur={true} ngn={true} />
         </>
     );
 }
