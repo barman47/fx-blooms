@@ -1,21 +1,32 @@
 import { useState } from 'react';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import AddAccountDrawer from './AddAccountDrawer';
 import BankAccount from './BankAccount';
-import { useSelector } from 'react-redux';
+
+import { deleteAccount } from '../../../actions/bankAccounts';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        marginTop: theme.spacing(-8)
+        marginTop: theme.spacing(-2)
     },
 
     header: {
         display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column',
+        
+        '& div:first-child': {
+            marginBottom: theme.spacing(2)
+        },
+
+        '& hr': {
+            margin: 0,
+            marginTop: theme.spacing(1),
+            width: '20%'
+        },
 
         '& p': {
             fontWeight: 300
@@ -41,7 +52,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccounts = () => {
+const BankAccounts = ({ deleteAccount }) => {
     const classes = useStyles();
 
     const { accounts } = useSelector(state => state.bankAccounts);
@@ -50,12 +61,23 @@ const BankAccounts = () => {
 
     const toggleShowAddAccountDrawer = () => setShowAddAccountDrawer(!showAddAccountDrawer);
 
+    const handleDeleteAccount = (id) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this account?');
+        if (confirmDelete) {
+            deleteAccount(id);
+        }
+    };
+
     return (
         <>
             <section className={classes.root}>
                 <div className={classes.header}>
-                    <Typography variant="body1" component="p">Here are your linked accounts.</Typography>
-                    <Button variant="text" color="primary" onClick={toggleShowAddAccountDrawer}>Add Receiving Account</Button>
+                    <div>
+                        <Typography variant="h4" color="primary">Bank Account</Typography>
+                        <Typography variant="body1" component="p">Kindly provide your bank details below</Typography>
+                        <hr className={classes.hr} />
+                    </div>
+                    <Button variant="text" color="primary" onClick={toggleShowAddAccountDrawer} style={{ alignSelf: 'flex-start' }}>Add Account</Button>
                 </div>
                 <div className={classes.bankAccounts}>
                     {accounts ? accounts.map(account => (
@@ -63,8 +85,8 @@ const BankAccounts = () => {
                             key={account.accountID}
                             bankName={account.bankName}
                             accountName={account.accountName}
-                            sortCode="09-00-09"
                             currency={account.currency}
+                            handleDeleteAccount={() => handleDeleteAccount(account.accountID)}
                         />
                     ))
                     :
@@ -80,4 +102,8 @@ const BankAccounts = () => {
     );
 }
 
-export default BankAccounts;
+BankAccounts.propTypes = {
+    deleteAccount: PropTypes.func
+};
+
+export default connect( undefined, { deleteAccount })(BankAccounts);

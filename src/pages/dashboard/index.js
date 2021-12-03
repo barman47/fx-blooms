@@ -312,7 +312,7 @@ const Dashboard = ({ children, title, logout }) => {
             try {
                 let response = JSON.parse(data);
                 let payload, recipientId, senderId;
-                // console.log('New Notification ', response, type);
+                console.log('New Notification ', response, type);
                 
                 switch (type) {
                     case CHAT_MESSAGE:

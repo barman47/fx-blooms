@@ -20,7 +20,7 @@ import { ADD_ACCOUNT, COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import validateAddBid from '../../../utils/validation/listing/addBid';
 
-import AddAccountDrawer from '../profile/AddAccountDrawer';
+import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
     drawer: {

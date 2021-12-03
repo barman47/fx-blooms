@@ -35,7 +35,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
-import AddAccountDrawer from '../profile/AddAccountDrawer';
+import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
     root: {

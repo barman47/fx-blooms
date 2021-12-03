@@ -28,6 +28,7 @@ export const FILL_FORM2 = 'FILL_FORM2';
 export const PROCEED_TO_DASHBOARD = 'PROCEED_TO_DASHBOARD'
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
+export const TRANSITION = '0.3s linear all';
 
 export const ADD_ACCOUNT = 'Add Account';
 

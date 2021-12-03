@@ -3,8 +3,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Box, Grid, Tab, Tabs, Typography } from '@material-ui/core';
+import { Box, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Account, BagChecked, CardAccountDetailsOutline, KeyVariant, LockOutline } from 'mdi-material-ui';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation } from '../../../actions/customer'; 
@@ -13,34 +14,63 @@ import { getDocuments } from '../../../actions/documents';
 
 import { COLORS } from '../../../utils/constants'; 
 
-import BankAccounts from './BankAccounts';
+import BankAccounts from '../bankAccount/BankAccounts';
 import PersonalDetails from './PersonalDetails';
-// import IdentityDetails from './IdentityDetails';
+import IDVerification from './IDVerification';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        padding: [[theme.spacing(10), theme.spacing(3)]],
+        display: 'grid',
+        gridTemplateColumns: '1fr 4fr',
+        padding: [[theme.spacing(15), theme.spacing(10), 0, theme.spacing(10)]],
+        gap: theme.spacing(5),
 
         [theme.breakpoints.down('sm')]: {
             padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
         }
     },
 
-    container: {
-        marginTop: theme.spacing(1),
-
-        '& h6': {
-            fontWeight: 600
-        }
+    tabContainer: {
+        backgroundColor: COLORS.lightTeal,
+        borderTopLeftRadius: theme.spacing(3),
+        borderBottomLeftRadius: theme.spacing(3),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        alignSelf: 'flex-start',
+        padding: theme.spacing(4, 0)
     },
 
     tabs: {
-        borderBottom: `1px solid ${COLORS.borderColor}`,
+        // marginTop: theme.spacing(10),
+        width: '100%',
+
+        '& .MuiTab-wrapper': {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'flex-start'
+        }
     },
 
     tabLabel: {
+        textAlign: 'left',
         textTransform: 'capitalize',
         fontWeight: 600
+    },
+
+    selectedTab: {
+        backgroundColor: theme.palette.primary.main,
+        border: 'none !important',
+        color: COLORS.offWhite,
+
+        '& .MuiTab-wrapper': {
+            color: COLORS.offWhite,
+        }
+    },
+
+    icon: {
+        postion: 'relative',
+        top: '10px'
     }
 }));
 
@@ -126,64 +156,94 @@ const Profile = (props) => {
 
     return (
         <section className={classes.root}>
-            <Grid container direction="row" spacing={3} className={classes.container}>
-                <Grid item xs={2} style={{ height: '100%' }}>
-                    <Tabs
-                        value={value} 
-                        onChange={handleChange} 
-                        aria-label="fund-tabs" 
-                        indicatorColor="primary" 
-                        textColor="primary" 
-                        // variant="fullWidth" 
-                        className={classes.tabs}
-                        orientation="vertical"
-                        variant="scrollable"
-                    >
-                        <LinkTab 
-                            label={
+            <div className={classes.tabContainer}>
+                <Tabs
+                    value={value} 
+                    onChange={handleChange} 
+                    aria-label="fund-tabs" 
+                    indicatorColor="primary" 
+                    textColor="primary" 
+                    // variant="fullWidth" 
+                    className={classes.tabs}
+                    orientation="vertical"
+                    variant="scrollable"
+                >
+                    <LinkTab 
+                        label={
+                            <>
+                                <Account className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Profile</Typography>
-                            } 
-                            {...a11yProps(0)} 
-                            disableRipple
-                        />
-                        <LinkTab 
-                            label={
+                            </>
+                        } 
+                        {...a11yProps(0)} 
+                        classes={{ selected: classes.selectedTab }}
+                        disableRipple
+                        disableFocusRipple
+                    />
+                    <LinkTab 
+                        label={
+                            <>
+                                <LockOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>2FA Setup</Typography>
-                            } 
-                            {...a11yProps(1)} 
-                            disableRipple
-                        />
-                        <LinkTab 
-                            label={
+                            </>
+                        } 
+                        {...a11yProps(1)} 
+                        classes={{ selected: classes.selectedTab }}
+                        disableRipple
+                        disableFocusRipple
+                    />
+                    <LinkTab 
+                        label={
+                            <>
+                                <BagChecked className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Account</Typography>
-                            } 
-                            {...a11yProps(2)} 
-                            disableRipple
-                        />
-                        <LinkTab 
-                            label={
+                            </>
+                        } 
+                        {...a11yProps(2)} 
+                        classes={{ selected: classes.selectedTab }}
+                        disableRipple
+                        disableFocusRipple
+                    />
+                    <LinkTab 
+                        label={
+                            <>
+                                <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
-                            } 
-                            {...a11yProps(3)} 
-                            disableRipple
-                        />
-                    </Tabs>
-                </Grid>
-                <Grid item xs={8}>
-                    <TabPanel value={value} index={0}>  
-                        <PersonalDetails />
-                    </TabPanel>
-                    <TabPanel value={value} index={1}>  
-                        <BankAccounts />
-                    </TabPanel>
-                    {/* <TabPanel value={value} index={2}>  
-                        <BankAccounts />
-                    </TabPanel>
-                    <TabPanel value={value} index={1}>  
-                        <BankAccounts />
-                    </TabPanel> */}
-                </Grid>
-            </Grid>
+                            </>
+                        } 
+                        {...a11yProps(3)} 
+                        classes={{ selected: classes.selectedTab }}
+                        disableRipple
+                        disableFocusRipple
+                    />
+                    <LinkTab 
+                        label={
+                            <>
+                                <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
+                            </>
+                        } 
+                        {...a11yProps(3)} 
+                        classes={{ selected: classes.selectedTab }}
+                        disableRipple
+                        disableFocusRipple
+                    />
+                </Tabs>
+            </div>
+            <div>
+                <TabPanel value={value} index={0}>  
+                    <PersonalDetails />
+                </TabPanel>
+                <TabPanel value={value} index={1}>  
+                    
+                </TabPanel>
+                <TabPanel value={value} index={2}>  
+                    <BankAccounts />
+                </TabPanel>
+                <TabPanel value={value} index={3}>  
+                    <IDVerification />
+                </TabPanel>
+            </div>
         </section>
     );
 }
