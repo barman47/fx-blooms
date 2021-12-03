@@ -270,7 +270,7 @@ const Header = (props) => {
                                                                 <MenuItem
                                                                     onClick={(e) => handleMenuClose(e, `${DASHBOARD}${PROFILE}`)}
                                                                 >
-                                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>My Profile</RouterLink>
+                                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>Settings</RouterLink>
                                                                 </MenuItem>
                                                                 <MenuItem>
                                                                     <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Box, Button, Grid, Tab, Tabs, Typography } from '@material-ui/core';
+import { Box, Grid, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { getCountries } from '../../../actions/countries'; 
@@ -14,7 +15,7 @@ import { COLORS } from '../../../utils/constants';
 
 import BankAccounts from './BankAccounts';
 import PersonalDetails from './PersonalDetails';
-import IdentityDetails from './IdentityDetails';
+// import IdentityDetails from './IdentityDetails';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -76,6 +77,18 @@ function a11yProps(index) {
     };
 }
 
+function LinkTab(props) {
+    return (
+        <Tab
+            component={RouterLink}
+            onClick={(event) => {
+            event.preventDefault();
+            }}
+            {...props}
+        />
+    );
+}
+
 const Profile = (props) => {
     const classes = useStyles();
     const { countries, documents } = useSelector(state => state);
@@ -114,66 +127,61 @@ const Profile = (props) => {
     return (
         <section className={classes.root}>
             <Grid container direction="row" spacing={3} className={classes.container}>
-                <Grid item xs={6}>
-                    <Typography variant="h6">Profile</Typography>
-                </Grid>
-                {value === 0 && 
-                    <Grid item xs={6} justifySelf="flex-end">
-                        <Button variant="outlined" color="primary">Edit Details</Button>
-                    </Grid>
-                }
-                <Grid item xs={8}>
-                    <Tabs value={value} onChange={handleChange} aria-label="fund-tabs" indicatorColor="primary" textColor="primary" variant="fullWidth" className={classes.tabs}>
-                        <Tab 
+                <Grid item xs={2} style={{ height: '100%' }}>
+                    <Tabs
+                        value={value} 
+                        onChange={handleChange} 
+                        aria-label="fund-tabs" 
+                        indicatorColor="primary" 
+                        textColor="primary" 
+                        // variant="fullWidth" 
+                        className={classes.tabs}
+                        orientation="vertical"
+                        variant="scrollable"
+                    >
+                        <LinkTab 
                             label={
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bio Details</Typography>
+                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Profile</Typography>
                             } 
                             {...a11yProps(0)} 
                             disableRipple
                         />
-                        <Tab 
+                        <LinkTab 
                             label={
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Accounts</Typography>
+                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>2FA Setup</Typography>
                             } 
                             {...a11yProps(1)} 
                             disableRipple
                         />
-                        <Tab 
+                        <LinkTab 
                             label={
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Verification &amp; Security</Typography>
+                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Account</Typography>
                             } 
-                            {...a11yProps(1)} 
+                            {...a11yProps(2)} 
+                            disableRipple
+                        />
+                        <LinkTab 
+                            label={
+                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
+                            } 
+                            {...a11yProps(3)} 
                             disableRipple
                         />
                     </Tabs>
                 </Grid>
-                <Grid item xs={12} lg={6}>
+                <Grid item xs={8}>
                     <TabPanel value={value} index={0}>  
                         <PersonalDetails />
                     </TabPanel>
-                </Grid>
-                <Grid item xs={12} lg={6}>
-                    <TabPanel value={value} index={0}>  
-                        <IdentityDetails />
-                    </TabPanel>
-                </Grid>
-                <Grid item xs={12} lg={6}>
-                    <TabPanel value={value} index={0}>  
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                            fullWidth
-                            // disabled={editable ? false : true}
-                        >
-                            Submit
-                        </Button>
-                    </TabPanel>
-                </Grid>
-                <Grid item xs={12} lg={12}>
                     <TabPanel value={value} index={1}>  
                         <BankAccounts />
                     </TabPanel>
+                    {/* <TabPanel value={value} index={2}>  
+                        <BankAccounts />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>  
+                        <BankAccounts />
+                    </TabPanel> */}
                 </Grid>
             </Grid>
         </section>

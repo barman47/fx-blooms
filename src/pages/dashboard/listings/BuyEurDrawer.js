@@ -340,7 +340,7 @@ const BuyEurDrawer = ({ addBid, listing, getAccounts, toggleDrawer, drawerOpen }
                                 className={classes.button}
                                 disabled={loading || buttonDisabled ? true : false}
                             >
-                                {loading ? 'One Moment . . .' : 'I\'ve Made Payment'}
+                                {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
                             </Button>
                         </Grid>
                     </Grid>

@@ -149,7 +149,7 @@ const PersonalDetails = (props) => {
 
     return (
         <Grid className={classes.root} container direction="column">
-            <Grid item>
+            <Grid item xs={12}>
                 <form onSubmit={onSubmit} noValidate>
                     <Grid container direction="row" spacing={3} className={classes.container}>
                         <Grid item xs={12} md={6}>
