@@ -14,7 +14,8 @@ const initialState = {
     addedListing: false,
     updatedListing: false,
     listing: {},
-    listings: []
+    listings: [],
+    msg: null
 };
 
 const listingsReducer = (state = initialState, action) => {

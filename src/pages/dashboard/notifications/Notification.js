@@ -10,16 +10,14 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS.lightTeal,
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        display: 'grid',
+        gridTemplateColumns: '5fr 1fr',
+        gap: theme.spacing(2),
         alignItems: 'center',
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('md')]: {
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            width: '100%'
+            gridTemplateColumns: '1fr',
         },
 
         '& div:first-child': {
@@ -40,7 +38,12 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
+        fontSize: theme.spacing(1.3),
         marginTop: theme.spacing(2),
+
+        [theme.breakpoints.down('md')]: {
+            justifySelf: 'flex-start'
+        },
 
         [theme.breakpoints.down('sm')]: {
             width: '100%'
@@ -48,7 +51,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Notification = ({ title, message, buttonText, buttonAction, link }) => {
+const Notification = ({ title, message, buttonText, buttonAction }) => {
     const classes = useStyles();
 
     return (
@@ -60,8 +63,8 @@ const Notification = ({ title, message, buttonText, buttonAction, link }) => {
             {buttonText && buttonAction && 
                 <Button 
                     underline="none" 
-                    to={link} 
-                    component={Link} 
+                    // to={link} 
+                    // component={Link} 
                     variant="contained" 
                     color="primary" 
                     onClick={buttonAction}
@@ -79,7 +82,7 @@ Notification.propTypes = {
     message: PropTypes.string.isRequired,
     buttonText: PropTypes.string,
     buttonAction: PropTypes.func,
-    link: PropTypes.string
+    // link: PropTypes.string
 };
 
 export default Notification;

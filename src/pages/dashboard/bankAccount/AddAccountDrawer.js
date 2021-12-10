@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -118,15 +118,22 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
 
     const successModal = useRef();
 
-    useEffect(() => {
-        setReceivingAccountType();
-
-        // eslint-disable-next-line
-    }, []);
+    const setReceivingAccountType = useCallback(() => {
+        if (eur && ngn) {
+            setValue(0);
+        } else if (eur) {
+            setValue(0);
+        } else if (ngn) {
+            setValue(0);
+        }
+    }, [eur, ngn]);
 
     useEffect(() => {
         setOpen(drawerOpen);
-    }, [drawerOpen]);
+        if (drawerOpen) {
+            setReceivingAccountType();
+        }
+    }, [drawerOpen, setReceivingAccountType]);
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -142,21 +149,26 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         }
     }, [msg]);
 
-    const setReceivingAccountType = () => {
-        if (eur && ngn) {
-            setValue(0);
-        } else if (eur) {
-            setValue(1);
-        } else if (ngn) {
-            setValue(0);
-        }
-    };
-
     const dismissAction = () => {
+        toggleDrawer();
         dispatch({
             type: SET_ACCOUNT_MSG,
             payload: null
         });
+    };
+
+    const handleSetCurrency = () => {
+        if (eur && ngn) {
+            if (value === 0) {
+                return'NGN';
+            } else {
+                return 'EUR';
+            }
+        } else if (eur) {
+            return 'EUR';
+        } else if (ngn) {
+            return'NGN';
+        }
     };
 
     const onSubmit = (e) => {
@@ -166,7 +178,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
             bankName,
             accountName,
             accountNumber,
-            currency: value === 0 ? 'NGN' : 'EUR',
+            currency: handleSetCurrency(),
             customerId
         };
 
@@ -191,7 +203,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                     {ngn && 
                         <Tab 
                             label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>NGN Account</Typography>} 
-                            {...a11yProps(0)} 
+                            {...a11yProps(ngn && eur ? 0 : ngn && !eur ? 0 : 1)} 
                             disableRipple
                             disabled={loading ? true : false}
                         />
@@ -199,13 +211,13 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                     {eur && 
                         <Tab 
                             label={<Typography variant="subtitle1" component="p" className={classes.tabLabel}>EUR Account</Typography>} 
-                            {...a11yProps(1)} 
+                            {...a11yProps(ngn && eur ? 1 : !ngn && eur ? 0 : 1)} 
                             disableRipple
                             disabled={loading ? true : false}
                         />
                     }
                 </Tabs>
-                <TabPanel value={value} index={0}>
+                <TabPanel value={value} index={ngn && eur ? 0 : ngn && !eur ? 0 : 1}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
                         <Grid container direction="column" spacing={matches ? 3 : 2}>
                             <Grid item xs={12}>
@@ -274,11 +286,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                         </Grid>
                     </form>
                 </TabPanel>
-                <TabPanel value={value} index={1}>
+                <TabPanel value={value} index={ngn && eur ? 1 : !ngn && eur ? 0 : 1}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
                         <Grid container direction="column" spacing={matches ? 3 : 2}>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">Add your NGN receiving account</Typography>
+                                <Typography variant="subtitle2" component="span">Add your EUR receiving account</Typography>
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Bank Name</Typography>
@@ -313,7 +325,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">Bank Name</Typography>
+                                <Typography variant="subtitle2" component="span">Account Name</Typography>
                                 <TextField 
                                     className={classes.input}
                                     value={accountName}

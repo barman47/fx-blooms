@@ -58,14 +58,14 @@ const useStyles = makeStyles(theme => ({
         '& div': {
             backgroundColor: COLORS.lightTeal,
             display: 'grid',
-            gridTemplateColumns: 'repeat(5, 1fr)',
+            gridTemplateColumns: 'repeat(6, 1fr)',
             // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-            alignItems: 'center',
+            // alignItems: 'center',
             gap: theme.spacing(1),
             padding: [[theme.spacing(4), theme.spacing(3)]],
 
             [theme.breakpoints.down('lg')]: {
-                gridTemplateColumns: 'repeat(5, 1fr)',
+                gridTemplateColumns: 'repeat(6, 1fr)',
                 // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
                 gap: theme.spacing(1),
                 // padding: theme.spacing(1),
@@ -105,8 +105,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
-        color: `${COLORS.offWhite} !important`,
-        height: '100%',
+        alignSelf: 'center',
+        color: COLORS.offWhite,
 
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
@@ -114,9 +114,9 @@ const useStyles = makeStyles(theme => ({
     },
 
     deleteButton: {
+        alignSelf: 'center',
         color: COLORS.offWhite,
         backgroundColor: COLORS.red,
-        height: '100%',
 
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
@@ -141,7 +141,7 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const { id, amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
+    const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
     // const { bids, status, id } = listing;
 
     const toast = useRef();
@@ -256,13 +256,17 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
                         {`${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}`}
                     </Typography>
+                    <Typography variant="subtitle2" component="span">
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
+                        {bank}
+                    </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 
                             disabled
                             to="#!"
                             component={RouterLink} 
                             variant="contained" 
-                            size="small" 
+                            size="large" 
                             color="primary"
                             disableElevation
                             classes={{ 
@@ -270,7 +274,7 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
                                 root: classes.button
                             }}
                         >
-                            In Negotiation
+                            Buy EUR
                         </Button>
                         :
                         listing.customerId === userId ? 
@@ -304,7 +308,7 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
                     }
                 </div>
             </section>
-            <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} listing={listing} />
+            {openBuyEurDrawer && <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} listing={listing} />}
         </>
     );
 };

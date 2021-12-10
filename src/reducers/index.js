@@ -4,7 +4,7 @@ import { RESET_STORE } from '../actions/types';
 
 import adminReducer from './admin';
 import bankAccountsReducer from './bankAccounts';
-import chatsReducer from './chat';
+import notificationsReducer from './notifications';
 import countriesReducer from './countries';
 import currencyReducer from './currencies';
 import customerReducer from './customer';
@@ -20,7 +20,7 @@ import walletsReducer from './wallets';
 const appReducer = combineReducers({
     admin: adminReducer,
     bankAccounts: bankAccountsReducer,
-    chat: chatsReducer,
+    notifications: notificationsReducer,
     countries: countriesReducer,
     customer: customerReducer,
     customers: customersReducer,

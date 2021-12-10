@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_LISTINGS, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/Listing`;
@@ -107,8 +107,11 @@ export const getMoreListings = (query) => async (dispatch) => {
 export const addBid = (bid) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/AddBid`, bid);
-        console.log(res);
+        await axios.post(`${URL}/AddBid`, bid);
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: 'A notification of your payment has been sent to the seller.'
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

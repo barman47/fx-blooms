@@ -1,8 +1,9 @@
+import { useSelector } from 'react-redux';
 import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { AccountMultiple, ArrowRight, CardAccountDetailsOutline } from 'mdi-material-ui';
 
-import { COLORS, TRANSITION } from '../../../utils/constants';
+import { APPROVED, COLORS, TRANSITION } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -128,6 +129,8 @@ const useStyles = makeStyles(theme => ({
 const IDVerification = () => {
     const classes = useStyles();
 
+    const { idStatus, residencePermitStatus } = useSelector(state => state.customer.stats);
+
     return (
         <>
             <section className={classes.root}>
@@ -148,10 +151,16 @@ const IDVerification = () => {
                             <CardAccountDetailsOutline className={classes.icon} />
                         </div>
                         <Typography variant="h6" color="primary">EU Resident Permit</Typography>
-                        <Typography variant="body2" component="p" color="primary">we need your lorem ipsum content here to create descriptive text for user to know why we need them to provide eu id</Typography>
+                        <Typography variant="body2" component="p" color="primary">Required to SELL and BUY.</Typography>
                         <div>
-                            <Typography variant="body2" component="p" className={classes.unverifiedButton}>Unverified</Typography>
-                            <Button size="small" variant="contained" color="primary" className={classes.verifyButton} startIcon={<ArrowRight className={classes.arrowIcon} />}>Verify</Button>
+                            {residencePermitStatus !== APPROVED ? 
+                                <>
+                                    <Typography variant="body2" component="p" className={classes.unverifiedButton}>Unverified</Typography>
+                                    <Button size="small" variant="contained" color="primary" className={classes.verifyButton} startIcon={<ArrowRight className={classes.arrowIcon} />}>Verify</Button>
+                                </>
+                                :
+                                <Typography variant="body2" component="p" className={classes.unverifiedButton}>Verified</Typography>
+                            }
                         </div>
                     </section>
                     <div></div>
@@ -160,10 +169,16 @@ const IDVerification = () => {
                             <AccountMultiple className={classes.icon} />
                         </div>
                         <Typography variant="h6" color="primary">National ID</Typography>
-                        <Typography variant="body2" component="p" color="primary">we need your lorem ipsum content here to create descriptive text for user to know why we need them to provide eu id</Typography>
+                        <Typography variant="body2" component="p" color="primary">Required to BUY only.</Typography>
                         <div>
-                            <Typography variant="body2" component="p" className={classes.unverifiedButton}>Unverified</Typography>
-                            <Button size="small" variant="contained" color="primary" className={classes.verifyButton} startIcon={<ArrowRight className={classes.arrowIcon} />}>Verify</Button>
+                            {idStatus !== APPROVED ? 
+                                <>
+                                    <Typography variant="body2" component="p" className={classes.unverifiedButton}>Unverified</Typography>
+                                    <Button size="small" variant="contained" color="primary" className={classes.verifyButton} startIcon={<ArrowRight className={classes.arrowIcon} />}>Verify</Button>
+                                </>
+                                :
+                                <Typography variant="body2" component="p" className={classes.unverifiedButton}>Verified</Typography>
+                            }
                         </div>
                     </section>
                 </div>

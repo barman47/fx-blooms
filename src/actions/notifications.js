@@ -1,43 +1,37 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { CUSTOMER_MADE_PAYMENT, SET_CHATS, SET_CUSTOMER_MSG, SET_TRANSACTION_TERMS, GET_UNREAD_MESSAGES } from './types';
+import { CUSTOMER_MADE_PAYMENT, SET_BIDS, SET_CUSTOMER_MSG, SET_NOTIFICATIONS, SET_TRANSACTION_TERMS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
-const api = `${API}/Chat`;
+const api = `${API}/Transfer`;
 
-export const getChats = () => async (dispatch) => {
+export const getNotifications = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.get(`${api}/Chats`);
-        return dispatch({
-            type: SET_CHATS,
-            payload: res.data.data
+        const res = await axios.get(`${api}/Transfers`);
+        let events = [];
+        let bids = [];
+        res.data.data.forEach(item => {
+            const { transferEvents, ...rest } = item;
+            bids.push({ ...rest });
+            if (transferEvents.length > 0){
+                transferEvents.forEach(event => events.push(event));
+            }
         });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const sendMessage = (message) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/SendMessage`, message);
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getUnreadMessages = () => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${api}/UnreadMessagesCount`);
-        return dispatch({
-            type: GET_UNREAD_MESSAGES,
-            payload: res.data.data
+        batch(() => {
+            dispatch({
+                type: SET_BIDS,
+                payload: bids
+            });
+            dispatch({
+                type: SET_NOTIFICATIONS,
+                payload: events
+            });
         });
+        return 
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -61,15 +55,6 @@ export const sendTransactionNotification = (chatId, { customerUsername, otherUse
                 payload: message
             });
         });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const updateMessageStatus = (chatId) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/UpdateMessageStatus?chatId=${chatId}`);
     } catch (err) {
         return handleError(err, dispatch);
     }

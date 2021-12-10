@@ -52,8 +52,8 @@ export const CHAT_CONNECTION_STATUS = {
 };
 
 export const NOTIFICATION_TYPES = {
+    ACCOUNT_SETUP: 'AccountSetup',
     CANCEL_NEGOTIATION: 'CancelNegotiation',
-    CHAT_MESSAGE: 'ChatMessage',
     TRANSFER_CONFIRMATION: 'TransferConfrimation',
     TRANSFER_NOTIFICATION: 'TransferNotification',
 };

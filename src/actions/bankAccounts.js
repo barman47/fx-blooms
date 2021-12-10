@@ -2,7 +2,7 @@ import axios from 'axios';
 
 import { WALLET_API as API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS } from './types';
+import { ADDED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/account-management`;
@@ -12,7 +12,7 @@ export const addAccount = (account) => async (dispatch) => {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/accounts/add`, account);
         dispatch({
-            type: SET_ACCOUNTS,
+            type: ADDED_ACCOUNT,
             payload: {
                 msg: 'Bank account added successfully!',
                 account: res.data
@@ -51,9 +51,7 @@ export const getAccount = (accountId) => async (dispatch) => {
 
 export const deleteAccount = (accountId) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.put(`${URL}/accounts/${accountId}/delete`);
-        console.log(res);
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/accounts/${accountId}/delete`)]);
         dispatch({
             type: DELETED_ACCOUNT,
             payload: accountId

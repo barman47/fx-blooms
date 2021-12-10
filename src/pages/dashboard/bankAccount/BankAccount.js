@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme =>({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gap: theme.spacing(1),
-        gridTemplateColumns: '1.3fr 1.3fr 0.7fr 0.5fr',
+        gridTemplateColumns: '1.3fr 1.3fr 1.3fr 0.7fr 0.5fr',
         alignItems: 'center',
         padding: [[theme.spacing(2), 0, theme.spacing(2), theme.spacing(2)]],
 
@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccount = ({ bankName, accountName, currency, handleDeleteAccount }) => {
+const BankAccount = ({ bankName, accountName, accountNumber, currency, handleDeleteAccount }) => {
     const classes = useStyles();
 
     return (
@@ -55,10 +55,12 @@ const BankAccount = ({ bankName, accountName, currency, handleDeleteAccount }) =
             
             <Typography variant="subtitle2" component="small">Bank Name</Typography>
             <Typography variant="subtitle2" component="small">Account Name</Typography>
+            <Typography variant="subtitle2" component="small">{currency === 'NGN' ? 'Account Number' : 'IBAN'}</Typography>
             <Typography variant="subtitle2" component="small">Currency</Typography>
             <Typography variant="subtitle2" component="small"></Typography>
             <Typography variant="subtitle1" component="p">{bankName}</Typography>
             <Typography variant="subtitle1" component="p">{accountName}</Typography>
+            <Typography variant="subtitle1" component="p">{accountNumber}</Typography>
             <Typography variant="subtitle1" component="p">{currency}</Typography>
             <IconButton disableRipple style={{ justifySelf: 'center' }} onClick={handleDeleteAccount}>
                 <DeleteForever className={classes.icon} />
@@ -69,7 +71,8 @@ const BankAccount = ({ bankName, accountName, currency, handleDeleteAccount }) =
 
 BankAccount.propTypes = {
     bankName: PropTypes.string.isRequired, 
-    accountName: PropTypes.string.isRequired, 
+    accountName: PropTypes.string.isRequired,
+    accountNumber: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
     handleDeleteAccount: PropTypes.func.isRequired
 };

@@ -1,18 +1,22 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 // import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, NOTIFICATION_TYPES } from '../../../utils/constants';
 
 import Notification from './Notification';
+import SendEurDrawer from './SendEurDrawer';
+import { DASHBOARD, PROFILE } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
         marginBottom: theme.spacing(8),
         marginTop: theme.spacing(8),
-        paddingLeft: theme.spacing(10),
-        paddingRight: theme.spacing(10),
+        paddingLeft: theme.spacing(5),
+        paddingRight: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
             marginBottom: theme.spacing(3),
@@ -81,64 +85,67 @@ const useStyles = makeStyles(theme => ({
 
 const Index = (props) => {
     const classes = useStyles();
-
+    const history = useHistory();
+    const { notifications } = useSelector(state => state.notifications);
     const { handleSetTitle } = props;
+
+    const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState('');
     
     useEffect(() => {
         handleSetTitle('Notifications');
         // eslint-disable-next-line
     }, []);
 
+    const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
+
+    const getButtonText = (type) => {
+        switch (type) {
+            case NOTIFICATION_TYPES.ACCOUNT_SETUP:
+                return 'Set Up Account';
+
+            default:
+                return;
+        }
+    };
+
+    const gotoAccountSetup = () => history.push(`${DASHBOARD}${PROFILE}`);
+
+    const getButtonAction = (type) => {
+        switch (type) {
+            case NOTIFICATION_TYPES.ACCOUNT_SETUP:
+                return gotoAccountSetup;
+
+            default:
+                return;
+        }
+    };
+
     return (
-        <section className={classes.root}>
-            <Typography variant="h6">Notifications</Typography>
-            <Typography variant="body2" component="p">View notifications below</Typography>
-            <div>
-                <section className={classes.notifications}>
-                    <Notification 
-                        title="Account Setup Pending"
-                        message="You are yet to fully set up your account. Click Set Up Account to proceed"
-                        buttonText="Set Up Account"
-                        link="/dashboard/account-setup"
-                        buttonAction={() => {}}
-                    />
-                    <Notification 
-                        title="Withdrawal Request Processing"
-                        message="Your withdrawal request of N500,000 to your bank account is currently being processed."
-                    />
-                    <Notification 
-                        title="Credit (Withdrawal)"
-                        message="FXBLOOMS has successfully sent N500,000 to your bank account"
-                    />
-                    <Notification 
-                        title="Debit (Exchange)"
-                        message="We have successfully sent walecalfos a sum of N500,000 from your EUR wallet."
-                        buttonText="View Wallet Balance"
-                        link="/dashboard/account-setup"
-                        buttonAction={() => {}}
-                    />
-                    <Notification 
-                        title="Wallet Fund"
-                        message="Your EUR has been successfully funded with the sum of N500,000"
-                        buttonText="View Wallet Balance"
-                        link="/dashboard/account-setup"
-                        buttonAction={() => {}}
-                    />
-                    <Notification 
-                        title="Credit (Withdrawal)"
-                        message="walecalfos has made a payment of N500,000 to your GTBank | 8849958473"
-                        buttonText="Payment Confirmed"
-                        link="/dashboard/account-setup"
-                        buttonAction={() => {}}
-                    />
-                </section>
-                <aside>
-                    <Typography variant="h6">Attention</Typography>
-                    <Typography variant="body2" component="p">Make sure you confirm all payments in your banking app.</Typography>
-                    <Typography variant="body2" component="p">Do not rely on transaction receipts or any other form of confirmation.</Typography>
-                </aside>
-            </div>
-        </section>
+        <>
+            {sendEurDrawerOpen && <SendEurDrawer toggleDrawer={toggleSendEurDrawer} drawerOpen={sendEurDrawerOpen} />}
+            <section className={classes.root}>
+                <Typography variant="h6">Notifications</Typography>
+                <Typography variant="body2" component="p">View notifications below</Typography>
+                <div>
+                    <section className={classes.notifications}>
+                        {notifications.map((notification, index) => (
+                            <Notification 
+                                key={index}
+                                title={notification.title}
+                                message={notification.message}
+                                buttonText={() => getButtonText(notification.type)}
+                                buttonAction={() => getButtonAction(notification.type)}
+                            />
+                        ))}
+                    </section>
+                    <aside>
+                        <Typography variant="h6">Attention</Typography>
+                        <Typography variant="body2" component="p">Make sure you confirm all payments in your banking app.</Typography>
+                        <Typography variant="body2" component="p">Do not rely on transaction receipts or any other form of confirmation.</Typography>
+                    </aside>
+                </div>
+            </section>
+        </>
     );
 };
 

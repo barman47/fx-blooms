@@ -5,7 +5,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Box, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Account, BagChecked, CardAccountDetailsOutline, KeyVariant, LockOutline } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, LockOutline } from 'mdi-material-ui';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation } from '../../../actions/customer'; 
@@ -17,6 +17,7 @@ import { COLORS } from '../../../utils/constants';
 import BankAccounts from '../bankAccount/BankAccounts';
 import PersonalDetails from './PersonalDetails';
 import IDVerification from './IDVerification';
+import TwoFactor from '../twoFactor';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -207,7 +208,7 @@ const Profile = (props) => {
                     <LinkTab 
                         label={
                             <>
-                                <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
                             </>
                         } 
@@ -216,10 +217,10 @@ const Profile = (props) => {
                         disableRipple
                         disableFocusRipple
                     />
-                    <LinkTab 
+                    {/* <LinkTab 
                         label={
                             <>
-                                <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                 <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
                             </>
                         } 
@@ -227,7 +228,7 @@ const Profile = (props) => {
                         classes={{ selected: classes.selectedTab }}
                         disableRipple
                         disableFocusRipple
-                    />
+                    /> */}
                 </Tabs>
             </div>
             <div>
@@ -235,7 +236,7 @@ const Profile = (props) => {
                     <PersonalDetails />
                 </TabPanel>
                 <TabPanel value={value} index={1}>  
-                    
+                    <TwoFactor />
                 </TabPanel>
                 <TabPanel value={value} index={2}>  
                     <BankAccounts />

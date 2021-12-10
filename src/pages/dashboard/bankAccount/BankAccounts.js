@@ -80,11 +80,12 @@ const BankAccounts = ({ deleteAccount }) => {
                     <Button variant="text" color="primary" onClick={toggleShowAddAccountDrawer} style={{ alignSelf: 'flex-start' }}>Add Account</Button>
                 </div>
                 <div className={classes.bankAccounts}>
-                    {accounts ? accounts.map(account => (
+                    {accounts.length > 0 ? accounts.map(account => (
                         <BankAccount 
                             key={account.accountID}
                             bankName={account.bankName}
                             accountName={account.accountName}
+                            accountNumber={account.accountNumber}
                             currency={account.currency}
                             handleDeleteAccount={() => handleDeleteAccount(account.accountID)}
                         />

@@ -1,0 +1,70 @@
+{
+    "data": {
+        "data": {
+            "sellerUsername": "FXB12",
+            "buyerUsername": "twu14958@zwoho.com",
+            "buyer": "63a8e5c8-ad72-4e72-88f8-e0dab6229480",
+            "seller": "e1f97fa2-e5a7-46bf-9341-e155059e73df",
+            "bid": "fd0baa61-0df3-4f9c-8ef0-4a9e1e4a502c",
+            "listing": "feaef1fb-fcfa-4522-9198-375409485e6c",
+            "isDeleted": false,
+            "dateCreated": "2021-12-10T10:42:27.0681821Z",
+            "buyerHasMadePayment": true,
+            "buyerHasRecievedPayment": false,
+            "sellerHasMadePayment": false,
+            "sellerHasRecievedPayment": false,
+            "sellerAcceptedTransactionTerms": false,
+            "buyerAcceptedTransactionTerms": false,
+            "buyersAccountId": "cb80d13a-48ca-43a3-b080-745db63dac3f",
+            "message": "twu14958@zwoho.com made a payment to your GTB | 0123456789.",
+            "transferEvents": [
+                {
+                    "notification": "twu14958@zwoho.com made a payment to your GTB | 0123456789.",
+                    "receiver": "27cffec8-e772-4e17-89fb-e8fc70200e02",
+                    "dateCreated": "2021-12-10T10:42:27.3716365Z",
+                    "transferId": "20ab239f-ef8e-466b-acf3-36d2cc1a36a6",
+                    "id": "cad54d9f-ff0d-45f1-9b7c-4ff15972793c"
+                }
+            ],
+            "id": "20ab239f-ef8e-466b-acf3-36d2cc1a36a6"
+        },
+        "message": null,
+        "messages": null,
+        "hasMessage": false,
+        "timeGenerated": "2021-12-10T09:42:27.7077982Z"
+    },
+    "status": 200,
+    "statusText": "",
+    "headers": {
+        "content-type": "application/json; charset=utf-8"
+    },
+    "config": {
+        "url": "https://api.fxblooms.com/api/Listing/AddBid",
+        "method": "post",
+        "data": "{\"amount\":{\"currencyType\":\"NGN\",\"amount\":500},\"listingId\":\"feaef1fb-fcfa-4522-9198-375409485e6c\",\"accountId\":\"cb80d13a-48ca-43a3-b080-745db63dac3f\"}",
+        "headers": {
+            "Accept": "application/json",
+            "Authorization": "Bearer",
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InR3dTE0OTU4QHp3b2hvLmNvbSIsInVuaXF1ZV9uYW1lIjoiRG9taW5pYyIsImZhbWlseV9uYW1lIjoiVXpvYW55YSIsImdpdmVuX25hbWUiOiJUd3UxNDk1OEBad29oby5Db20iLCJjdXN0b21lci1pZCI6IjYzYThlNWM4LWFkNzItNGU3Mi04OGY4LWUwZGFiNjIyOTQ4MCIsInJvbGUiOiJDdXN0b21lciIsIm5iZiI6MTYzOTEyOTM0NiwiZXhwIjoxNjM5MjE1NzQ2LCJpYXQiOjE2MzkxMjkzNDYsImlzcyI6Imh0dHBzOi8vd3d3LmZ4Ymxvb21zLmNvbSIsImF1ZCI6Imh0dHBzOi8vd3d3LmZ4Ymxvb21zLmNvbSJ9.GV1dbmIIsYd1gs-9i9n8YIIx7GsPt0H-m7oQQatSpTI",
+            "Content-Type": "application/json;charset=utf-8"
+        },
+        "transformRequest": [
+            null
+        ],
+        "transformResponse": [
+            null
+        ],
+        "timeout": 0,
+        "xsrfCookieName": "XSRF-TOKEN",
+        "xsrfHeaderName": "X-XSRF-TOKEN",
+        "maxContentLength": -1,
+        "maxBodyLength": -1
+    },
+    "request": {}
+}
+
+{
+    "$id": "1",
+    "Payload": "{\r\n  \"$id\": \"1\",\r\n  \"_transferEvents\": {\r\n    \"$id\": \"2\",\r\n    \"$values\": [\r\n      {\r\n        \"$id\": \"3\",\r\n        \"Notification\": \"twu14958@zwoho.com made a payment to your GTB | 0123456789.\",\r\n        \"Receiver\": \"27cffec8-e772-4e17-89fb-e8fc70200e02\",\r\n        \"DateCreated\": \"2021-12-10T10:42:27.3716365Z\",\r\n        \"TransferId\": \"20ab239f-ef8e-466b-acf3-36d2cc1a36a6\",\r\n        \"Id\": \"cad54d9f-ff0d-45f1-9b7c-4ff15972793c\"\r\n      }\r\n    ]\r\n  },\r\n  \"SellerUsername\": \"FXB12\",\r\n  \"BuyerUsername\": \"twu14958@zwoho.com\",\r\n  \"Buyer\": \"63a8e5c8-ad72-4e72-88f8-e0dab6229480\",\r\n  \"Seller\": \"e1f97fa2-e5a7-46bf-9341-e155059e73df\",\r\n  \"Bid\": \"fd0baa61-0df3-4f9c-8ef0-4a9e1e4a502c\",\r\n  \"Listing\": \"feaef1fb-fcfa-4522-9198-375409485e6c\",\r\n  \"IsDeleted\": false,\r\n  \"DateCreated\": \"2021-12-10T10:42:27.0681821Z\",\r\n  \"BuyerHasMadePayment\": true,\r\n  \"BuyerHasRecievedPayment\": false,\r\n  \"SellerHasMadePayment\": false,\r\n  \"SellerHasRecievedPayment\": false,\r\n  \"SellerAcceptedTransactionTerms\": false,\r\n  \"BuyerAcceptedTransactionTerms\": false,\r\n  \"BuyersAccountId\": \"cb80d13a-48ca-43a3-b080-745db63dac3f\",\r\n  \"Message\": \"twu14958@zwoho.com made a payment to your GTB | 0123456789.\",\r\n  \"TransferEvents\": {\r\n    \"$ref\": \"2\"\r\n  },\r\n  \"Id\": \"20ab239f-ef8e-466b-acf3-36d2cc1a36a6\"\r\n}",
+    "SenderId": "63a8e5c8-ad72-4e72-88f8-e0dab6229480"
+}

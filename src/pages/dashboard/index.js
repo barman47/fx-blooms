@@ -20,9 +20,9 @@ import {
     BottomNavigationAction
 } from '@material-ui/core';
 
-import {  HomeMinus, FormatListText, AndroidMessages, Wallet } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, MESSAGES } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
+import {  HomeMinus, FormatListText, Message, Wallet } from 'mdi-material-ui';
+import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, WALLET } from '../../routes';
+import { ADD_NOTIFICATION, CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
@@ -206,7 +206,7 @@ const Dashboard = ({ children, title, logout }) => {
     // const location = useLocation();
     
     const { customerId } = useSelector(state => state.customer);
-    const { connectionStatus, unreadMessages } = useSelector(state => state.chat);
+    const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
 
     const [value, setValue] = useState(0);
     // const [open, setOpen] = useState(true);
@@ -222,8 +222,8 @@ const Dashboard = ({ children, title, logout }) => {
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Wallet', icon: <Wallet /> },
-        { url : MESSAGES, text:'Notifications', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
+        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
         // { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
     
@@ -286,12 +286,11 @@ const Dashboard = ({ children, title, logout }) => {
         }
     }, [connectionStatus]);
 
-    const playAudioNotifcation = (recipientId, senderId) => {
-        if (customerId !== senderId && (customerId === recipientId || customerId === senderId)) {
-            const audio = new Audio(audioFile);
-            audio.play();
+    const playAudioNotifcation = () => {
+        // if (window.)
+            audioFile.play();
             navigator.vibrate(500);
-        }
+        // }
     };
 
     const onReconnected = () => {
@@ -307,7 +306,7 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
+        const { TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
@@ -315,27 +314,6 @@ const Dashboard = ({ children, title, logout }) => {
                 console.log('New Notification ', response, type);
                 
                 switch (type) {
-                    case CHAT_MESSAGE:
-                        playAudioNotifcation(response.Recipient, response.Sender);
-                        if (customerId === response.Recipient || customerId === response.Sender) {
-                            const messageData = {
-                                chatId: response.ChatId,
-                                dateSent: response.DateSent,
-                                id: response.Id,
-                                sender: response.Sender,
-                                text: response.Text,
-                                uploadedFileName: response.UploadedFileName,
-                                isRead: false
-                            };
-
-                            dispatch({
-                                type: SENT_MESSAGE,
-                                payload: { message: messageData, customerId }
-                            });
-                        }
-
-                    break;
-
                     case TRANSFER_CONFIRMATION:
                         payload = JSON.parse(response.Payload);
                         senderId = response.SenderId;
@@ -360,24 +338,29 @@ const Dashboard = ({ children, title, logout }) => {
                         payload = JSON.parse(response.Payload);
                         senderId = response.SenderId;
                         recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
-
-                        if (customerId === payload.Buyer || customerId === payload.Seller) {
-                            playAudioNotifcation(recipientId, senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION,
-                                payload: {
-                                    buyerHasMadePayment: payload.BuyerHasMadePayment,
-                                    buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                                    sellerHasMadePayment: payload.SellerHasMadePayment, 
-                                    sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                                    isDeleted: payload.IsDeleted,
-                                    customerId,
-                                    senderId,
-                                    transactionType: type
-                                }
-                            }); 
-                        }
+                        const notification = payload._transferEvents.$values[payload._transferEvents.$values.length - 1];
                         
+                        if (senderId !== customerId) {
+                            // playAudioNotifcation(recipientId, senderId);
+                            
+                            dispatch({
+                                type: ADD_NOTIFICATION,
+                                payload: notification
+                            }); 
+                            // dispatch({
+                            //     type: ADD_NOTIFICATION,
+                            //     payload: {
+                            //         buyerHasMadePayment: payload.BuyerHasMadePayment,
+                            //         buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
+                            //         sellerHasMadePayment: payload.SellerHasMadePayment, 
+                            //         sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
+                            //         isDeleted: payload.IsDeleted,
+                            //         customerId,
+                            //         senderId,
+                            //         transactionType: type
+                            //     }
+                            // }); 
+                        }
                         break;
 
                     case CANCEL_NEGOTIATION:

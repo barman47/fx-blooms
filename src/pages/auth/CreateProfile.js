@@ -26,6 +26,7 @@ import { SET_CURRENT_CUSTOMER } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import { countries } from '../../utils/countries';
 import isEmpty from '../../utils/isEmpty';
+import countryToFlag from '../../utils/countryToFlag';
 import { DASHBOARD, DASHBOARD_HOME, LOGIN } from '../../routes';
 import validateCreateProfile from '../../utils/validation/customer/createProfile';
 
@@ -179,14 +180,6 @@ const CreateProfile = (props) => {
         }
     };
 
-    const countryToFlag = (countryCode) => {
-        const codePoints = countryCode
-          .toUpperCase()
-          .split('')
-          .map(char =>  127397 + char.charCodeAt());
-        return String.fromCodePoint(...codePoints);
-      }
-
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -306,7 +299,7 @@ const CreateProfile = (props) => {
                                     </Tooltip>
                                 </Grid>
                                 <Grid item xs={12} md={3}>
-                                <Typography variant="subtitle2" component="span">Country Code</Typography>
+                                    <Typography variant="subtitle2" component="span">Country Code</Typography>
                                     <Autocomplete
                                         id="country-select"
                                         options={countries}

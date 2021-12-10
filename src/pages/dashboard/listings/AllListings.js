@@ -25,8 +25,9 @@ import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
 import { getCurrencies } from '../../../actions/currencies';
-import { getUnreadMessages } from '../../../actions/chat';
+import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
+import { getAccounts } from '../../../actions/bankAccounts';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -255,12 +256,13 @@ const AllListings = (props) => {
 	// const theme = useTheme();
     // const matches = useMediaQuery(theme.breakpoints.down('md'));
 
-	const { firstName, lastName, profile, isAuthenticated } = useSelector(state => state.customer);
+	const { customerId, firstName, lastName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
-	const { unreadMessages } = useSelector(state => state.chat);
+	const { unreadNotifications } = useSelector(state => state.notifications);
 
-	const { getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getUnreadMessages, handleSetTitle } = props;
+	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
 
 	const [dataLength, setDataLength] = useState(0);
 	// const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
@@ -293,8 +295,12 @@ const AllListings = (props) => {
 			getCustomerInformation();
 		}
 
-		if (unreadMessages === 0) {
-            getUnreadMessages();
+		if (unreadNotifications === 0) {
+            getNotifications();
+        }
+
+		if (accounts.length === 0) {
+            getAccounts(customerId);
         }
 
 		return () => {
@@ -371,7 +377,7 @@ const AllListings = (props) => {
 					}}
 					onClick={() => setShowWallets(!showWallets)}
 				>
-					Show Wallet
+					{showWallets ? 'Hide Wallets' : 'Show Wallets'}
 				</Button>
 			</section>
 			{showWallets && 
@@ -707,13 +713,14 @@ Filter.propTypes = {
 };
 
 AllListings.propTypes = {
+	getAccounts: PropTypes.func.isRequired,
 	getCustomerInformation: PropTypes.func.isRequired,
 	getCustomerStats: PropTypes.func.isRequired,
 	getIdVerificationLink: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
-	getUnreadMessages: PropTypes.func.isRequired,
+	getNotifications: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, getUnreadMessages })(AllListings);
+export default connect(undefined, { getAccounts, getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, getNotifications })(AllListings);
