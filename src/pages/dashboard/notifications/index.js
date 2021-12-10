@@ -132,7 +132,7 @@ const Index = (props) => {
                             <Notification 
                                 key={index}
                                 title={notification.title}
-                                message={notification.message}
+                                message={notification.Notification}
                                 buttonText={() => getButtonText(notification.type)}
                                 buttonAction={() => getButtonAction(notification.type)}
                             />
