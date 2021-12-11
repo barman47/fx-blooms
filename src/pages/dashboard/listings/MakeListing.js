@@ -18,7 +18,6 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-// import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import EditListingItem from './EditListingItem';
@@ -154,23 +153,20 @@ const MakeListing = (props) => {
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { currencies } = useSelector(state => state);
-    // const { customer } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-
     const { addedListing, listings, msg } = useSelector(state => state.listings);
 
     const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
 
-    // const [openAccountModal, setOpenAccountModal] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('');
+    const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
-    const [RequiredCurrency, setRequiredCurrency] = useState('');
+    const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
@@ -460,7 +456,6 @@ const MakeListing = (props) => {
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
-                {/* <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} /> */}
                 <header>
                     <div>
                         <Typography variant="h6">Make a Listing</Typography>
@@ -479,12 +474,13 @@ const MakeListing = (props) => {
                                         error={errors.AvailableCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        // disabled={loading ? true : false}
+                                        disabled
                                     >
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
-                                            onChange={(e) => setAvailableCurrency(e.target.value)}
+                                            // onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
                                             <MenuItem value="" disabled>Select Currency</MenuItem>
@@ -523,7 +519,8 @@ const MakeListing = (props) => {
                                         error={errors.RequiredCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        disabled
+                                        // disabled={loading ? true : false}
                                     >
                                         <Select
                                             labelId="RequiredCurrency"
@@ -566,7 +563,8 @@ const MakeListing = (props) => {
                                         error={errors.AvailableCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        // disabled={loading ? true : false}
+                                        disabled
                                     >
                                         <Select
                                             labelId="AvailableCurrency"
@@ -719,9 +717,6 @@ const MakeListing = (props) => {
                                 <Divider />
                                 <br />
                                 {previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))}
-                                {/* {listings.map(listing => (
-                                    <EditListingItem key={listing.id} listing={listing} />
-                                ))} */}
                             </div>
                         }
                     </Grid>

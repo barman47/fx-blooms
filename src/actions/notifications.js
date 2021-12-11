@@ -12,6 +12,7 @@ export const getNotifications = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${api}/Transfers`);
+        console.log(res);
         let events = [];
         let bids = [];
         res.data.data.forEach(item => {

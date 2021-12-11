@@ -22,7 +22,7 @@ import {
 
 import {  HomeMinus, FormatListText, Message, Wallet } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, WALLET } from '../../routes';
-import { ADD_NOTIFICATION, CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
+import { ADD_NOTIFICATION, CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
@@ -328,43 +328,31 @@ const Dashboard = ({ children, title, logout }) => {
                                 isDeleted: payload.Chat.IsDeleted,
                                 customerId,
                                 senderId,
+                                id: payload.Chat.Id,
                                 transactionType: type
                             }
                         });
 
                         break;
 
-                    case TRANSFER_NOTIFICATION:
-                        payload = JSON.parse(response.Payload);
-                        senderId = response.SenderId;
-                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
-                        const notification = payload._transferEvents.$values[payload._transferEvents.$values.length - 1];
-                        
-                        if (senderId !== customerId) {
-                            // playAudioNotifcation(recipientId, senderId);
+                        case TRANSFER_NOTIFICATION:
+                            payload = JSON.parse(response.Payload);
+                            senderId = response.SenderId;
+                            recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
+                            const notification = payload._transferEvents.$values[payload._transferEvents.$values.length - 1];
                             
-                            dispatch({
-                                type: ADD_NOTIFICATION,
-                                payload: notification
-                            }); 
-                            // dispatch({
-                            //     type: ADD_NOTIFICATION,
-                            //     payload: {
-                            //         buyerHasMadePayment: payload.BuyerHasMadePayment,
-                            //         buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                            //         sellerHasMadePayment: payload.SellerHasMadePayment, 
-                            //         sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                            //         isDeleted: payload.IsDeleted,
-                            //         customerId,
-                            //         senderId,
-                            //         transactionType: type
-                            //     }
-                            // }); 
-                        }
+                            if (recipientId === customerId) {
+                                // playAudioNotifcation(recipientId, senderId);
+                                dispatch({
+                                    type: ADD_NOTIFICATION,
+                                    payload: notification
+                                }); 
+                            }
                         break;
 
+
                     case CANCEL_NEGOTIATION:
-                        playAudioNotifcation(customerId, response.Sender);
+                        // playAudioNotifcation(customerId, response.Sender);
 
                         payload = JSON.parse(response.Payload);
                         senderId = response.SenderId;

@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-// import PropTypes from 'prop-types';
+import { connect, useDispatch, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { COLORS, NOTIFICATION_TYPES } from '../../../utils/constants';
+import { COLORS } from '../../../utils/constants';
+
+import { completeTransaction } from '../../../actions/listings';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
 import { DASHBOARD, PROFILE } from '../../../routes';
+import { SET_ACCOUNT } from '../../../actions/types';
+import isEmpty from '../../../utils/isEmpty';
+import { getAccount } from '../../../actions/bankAccounts';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -83,42 +88,54 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = (props) => {
+const Index = ({ completeTransaction, getAccount, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
-    const { notifications } = useSelector(state => state.notifications);
-    const { handleSetTitle } = props;
+    const dispatch = useDispatch();
+    const { account } = useSelector(state => state.bankAccounts);
+    const { bids } = useSelector(state => state.notifications);
 
-    const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState('');
+    const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
     
     useEffect(() => {
         handleSetTitle('Notifications');
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (!sendEurDrawerOpen) {
+            dispatch({
+                type: SET_ACCOUNT,
+                payload: {}
+            });
+        }
+    }, [dispatch, sendEurDrawerOpen]);
+
+    // Open Send Eur Drawer Once Buyer Account is Available
+    useEffect(() => {
+        if (!isEmpty(account)) {
+            setSendEurDrawerOpen(true);
+        }
+    }, [account]);
+
+    const handlePaymentReceived = (id) => {
+        const data = {
+            transactionSessionId: id,
+            message: '',
+            rating: 0,
+            receivedExpectedFunds: true
+        };
+        completeTransaction(data);
+    };
+
+    const getBuyerAccount = (accountId, id) => {
+        toggleSendEurDrawer();
+        getAccount(accountId);
+        handlePaymentReceived(id);
+    };
+
     const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
-
-    const getButtonText = (type) => {
-        switch (type) {
-            case NOTIFICATION_TYPES.ACCOUNT_SETUP:
-                return 'Set Up Account';
-
-            default:
-                return;
-        }
-    };
-
     const gotoAccountSetup = () => history.push(`${DASHBOARD}${PROFILE}`);
-
-    const getButtonAction = (type) => {
-        switch (type) {
-            case NOTIFICATION_TYPES.ACCOUNT_SETUP:
-                return gotoAccountSetup;
-
-            default:
-                return;
-        }
-    };
 
     return (
         <>
@@ -128,13 +145,19 @@ const Index = (props) => {
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
-                        {notifications.map((notification, index) => (
+                        <Notification 
+                            title="Account Setup Pending"
+                            message="You are yet to fully setup your account. Click Set Up Account to proceed."
+                            buttonText="Set Up Account"
+                            buttonAction={gotoAccountSetup}
+                        />
+                        {bids.map((bid, index) => (
                             <Notification 
                                 key={index}
-                                title={notification.title}
-                                message={notification.Notification}
-                                buttonText={() => getButtonText(notification.type)}
-                                buttonAction={() => getButtonAction(notification.type)}
+                                title="Credit (Exchange)"
+                                message={bid.message}
+                                buttonText="Payment Confirmed"
+                                buttonAction={() => getBuyerAccount(bid.buyersAccountId, bid.id)}
                             />
                         ))}
                     </section>
@@ -149,4 +172,9 @@ const Index = (props) => {
     );
 };
 
-export default Index;
+Index.propTypes = {
+    completeTransaction: PropTypes.func.isRequired,
+    getAccount: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { completeTransaction, getAccount })(Index);

@@ -29,7 +29,6 @@ import Disclaimer from './pages/disclaimer';
 import Dashboard from './pages/dashboard';
 
 import AllListings from './pages/dashboard/listings/AllListings';
-import EditListing from './pages/dashboard/listings/EditListing';
 import MakeListing from './pages/dashboard/listings/MakeListing';
 import UserDetails from './pages/dashboard/listings/UserDetails';
 
@@ -67,7 +66,6 @@ import {
 	DASHBOARD,
 	DASHBOARD_HOME, 
 	DISCLAIMER,
-	EDIT_LISTING,
 	USER_DETAILS,
 	PROFILE,
 	FORGOT_PASSWORD,
@@ -170,7 +168,6 @@ const [title, setTitle] = useState('');
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />

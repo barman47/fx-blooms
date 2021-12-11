@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme =>({
         '& hr': {
             margin: 0,
             marginTop: theme.spacing(1),
-            width: '20%'
+            width: '30%'
         },
 
         '& p': {
@@ -161,8 +161,8 @@ const PersonalDetails = () => {
         <>
             <div className={classes.header}>
                 <div>
-                    <Typography variant="h4" color="primary">Bank Account</Typography>
-                    <Typography variant="body1" component="p">Kindly provide your bank details below</Typography>
+                    <Typography variant="h4" color="primary">Account Setup (Profile)</Typography>
+                    <Typography variant="body1" component="p">Kindly provide your profile details</Typography>
                     <hr className={classes.hr} />
                 </div>
                 {!isEmpty(profile) && 

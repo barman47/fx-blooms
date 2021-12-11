@@ -9,12 +9,12 @@ import {
     REMOVE_CHAT,
     SUBTRACT_UNREAD_NOTIFICATIONS,
     CLEAR_UNREAD_NOTIFICATIONS,
-    SET_TRANSACTION_TERMS,
+    // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
     SET_CHAT_CONNECTION_STATUS
 } from '../actions/types';
 
-import { NOTIFICATION_TYPES } from '../utils/constants';
+// import { NOTIFICATION_TYPES } from '../utils/constants';
 
 const initialState = {
     notifications: [],
@@ -25,7 +25,9 @@ const initialState = {
 };
 
 const notificationsReducer = (state = initialState, action) => {
-    let chat = {};
+    let notification = {};
+    let notifications = [];
+    let notificationIndex;
     let unreadCount;
 
     switch (action.type) {    
@@ -74,10 +76,20 @@ const notificationsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION: 
-        // ADD NOTIFICATION INSTEAD
+            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
+            notification = state.notifications[notificationIndex];
+            notification.buyerHasMadePayment = action.payload.buyerHasMadePayment;
+            notification.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
+            notification.sellerHasMadePayment = action.payload.sellerHasMadePayment;
+            notification.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
+            notification.isDeleted = action.payload.isDeleted;
+
+            notifications = state.notifications;
+            notifications[notificationIndex] = notification;
+
             return {
                 ...state,
-                unreadNotifications: action.payload.transactionType === NOTIFICATION_TYPES.TRANSFER_CONFIRMATION ? state.unreadNotifications : state.unreadNotifications + 1
+                notifications: [...notifications]
             };
 
         case CUSTOMER_CANCELED:
@@ -86,16 +98,16 @@ const notificationsReducer = (state = initialState, action) => {
                 customerCanceled: action.payload
             };
 
-        case SET_TRANSACTION_TERMS:
-            chat = state.chat;
-            const { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms } = action.payload;
-            chat.buyerAcceptedTransactionTerms = buyerAcceptedTransactionTerms;
-            chat.sellerAcceptedTransactionTerms = sellerAcceptedTransactionTerms;
+        // case SET_TRANSACTION_TERMS:
+        //     chat = state.chat;
+        //     const { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms } = action.payload;
+        //     chat.buyerAcceptedTransactionTerms = buyerAcceptedTransactionTerms;
+        //     chat.sellerAcceptedTransactionTerms = sellerAcceptedTransactionTerms;
 
-            return {
-                ...state,
-                chat
-            };
+        //     return {
+        //         ...state,
+        //         chat
+        //     };
 
         case SUBTRACT_UNREAD_NOTIFICATIONS:
             unreadCount = state.unreadNotifications - action.payload;

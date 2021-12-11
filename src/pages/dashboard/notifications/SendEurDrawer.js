@@ -92,9 +92,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SendEurDrawer = ({ toggleDrawer, drawerOpen }) => {
+const SendEurDrawer = ({ toggleDrawer, drawerOpen, amount }) => {
 	const classes = useStyles();
     const [open, setOpen] = useState(false);
+
+    const { account } = useSelector(state => state.bankAccounts);
     
     const [loading, setLoading] = useState(false);
     
@@ -105,7 +107,7 @@ const SendEurDrawer = ({ toggleDrawer, drawerOpen }) => {
 
 	return (
         <>
-            <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={true} onClose={toggleDrawer}>
+            <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={open} onClose={toggleDrawer}>
                 <Grid container direction="row" spacing={3}>
                     <Grid item xs={12}>
                         <Typography variant="h6" className={classes.header}>Send EUR</Typography>
@@ -115,23 +117,23 @@ const SendEurDrawer = ({ toggleDrawer, drawerOpen }) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>I Will Send</Typography>
-                        <Typography variant="subtitle1" component="p" className={classes.transferAmount}>&#8364;3,250</Typography>
+                        <Typography variant="subtitle1" component="p" className={classes.transferAmount}>&#8364;{formatNumber(amount)}</Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
                         <section className={classes.accountDetailsContainer}>
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Uzoanya Dominic</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
                             </div>
                             <div className={classes.accountContainer}>
                                 <section>
                                     <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>0043031752</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
                                 </section>
                                 <section>
                                     <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Diamond Bank</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
                                 </section>
                             </div>
                             <div>
@@ -150,7 +152,7 @@ const SendEurDrawer = ({ toggleDrawer, drawerOpen }) => {
 };
 
 SendEurDrawer.propTypes = {
-    account: PropTypes.object.isRequired
+    
 };
 
 export default SendEurDrawer;

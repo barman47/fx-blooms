@@ -176,7 +176,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
 
     // Prevent user from entering invalid amounts
     useEffect(() => {
-        if (Amount) {
+        if (Amount && receivingAccount) {
             if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
                 // Prevent user from entering amount less than minimum exchange amount
                 setButtonDisabled(true);
@@ -192,7 +192,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                 setErrors({});
             }
         }
-    }, [listing.amountAvailable.amount, listing.minExchangeAmount.amount, Amount]);
+    }, [listing.amountAvailable.amount, listing.minExchangeAmount.amount, Amount, receivingAccount]);
 
     // Set transfer amount when user enters amount he wants to buy
     useEffect(() => {

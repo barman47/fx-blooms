@@ -32,7 +32,6 @@ export const CUSTOMERS = '/customers';
 export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = '/home';
 export const MAKE_LISTING = '/listings/create';
-export const EDIT_LISTING = '/listings/edit';
 export const USER_DETAILS = '/listings/sellerDetails';
 export const NOTIFICATIONS = '/notifications';
 export const WALLET = '/wallet';
