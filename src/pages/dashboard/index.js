@@ -5,7 +5,6 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 // import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 import toast, { Toaster } from 'react-hot-toast';
 
 import AccountSetupModal from './AccountSetupModal';
@@ -107,7 +106,7 @@ const ToastAction = () => {
     );
 };
 
-const Dashboard = ({ children, title, logout }) => {
+const Dashboard = ({ children, title }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -116,7 +115,6 @@ const Dashboard = ({ children, title, logout }) => {
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
 
     const [value, setValue] = useState(0);
-    const [showBottomNavigation, setShowBottomNavigation] = useState(true);
     
     const [toastDuration, setToastDuration] = useState(0);
     const [toastMessage, setToastMessage] = useState('');
@@ -136,7 +134,6 @@ const Dashboard = ({ children, title, logout }) => {
     const successModal = useRef();
 
     useEffect(() => {
-        hideBottomNavigation();
         
         onReconnected();
         onReconnect();
@@ -333,20 +330,6 @@ const Dashboard = ({ children, title, logout }) => {
         });
     };
 
-    const hideBottomNavigation = () => {
-        if (isSupported()) {
-            subscribe(visibility => {
-                if (visibility === 'hidden') {
-                    setShowBottomNavigation(true);
-                } else {
-                    setShowBottomNavigation(false);
-                }
-            });
-
-            // unsubscribe();
-        }
-    };
-
     const handleLinkClick = (link) => {
         history.push(`/dashboard${link}`);
     };
@@ -375,24 +358,22 @@ const Dashboard = ({ children, title, logout }) => {
                 <div className={classes.content}>
                     {children}
                 </div>
-                {showBottomNavigation && 
-                    <Box
-                        boxShadow={5}
-                        className={classes.bottomBar}
+                <Box
+                    boxShadow={5}
+                    className={classes.bottomBar}
+                >
+                    <BottomNavigation
+                        value={value}
+                        onChange={(event, newValue) => {
+                            setValue(newValue)
+                        }}
+                        showLabels
                     >
-                        <BottomNavigation
-                            value={value}
-                            onChange={(event, newValue) => {
-                                setValue(newValue)
-                            }}
-                            showLabels
-                        >
-                            {mobileLinks.map((item, index) => (
-                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
-                            ))}
-                        </BottomNavigation>
-                    </Box>
-                }
+                        {mobileLinks.map((item, index) => (
+                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                        ))}
+                    </BottomNavigation>
+                </Box>
             </section>
         </>
     );
