@@ -71,18 +71,17 @@ const SessionModal = ({ logout }) => {
     const [open, setOpen] = useState(false);
     const [expired, setExpired] = useState(false);
     const [inactiveTime, setInActiveTime] = useState(0);
-    const [timeToLogout, setTimeToLogout] = useState(10);
+    const [timeToLogout, setTimeToLogout] = useState(60);
 
     let sessionTimer = useRef();
     let logoutTimer = useRef();
 
-    // const timeoutDuration = 300; //300 seconds: 5 minutes
-    const timeoutDuration = 10; //300 seconds: 5 minutes
+    const timeoutDuration = 300; //300 seconds: 5 minutes
 
     const resetSessionTimer = useCallback(() => {
         setOpen(false);
         setInActiveTime(0);
-        setTimeToLogout(10);
+        setTimeToLogout(60);
         clearInterval(logoutTimer.current);
         logoutTimer.current = undefined;
         startSessionTimer();
