@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import Spinner from '../../components/common/Spinner';
 import TwoFactorModal from './TwoFactorModal';
 
-import { login } from '../../actions/customer';
+import { login, logout } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
@@ -93,7 +93,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = (props) => {
+const Login = ({ login, logout }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -117,6 +117,12 @@ const Login = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+    
+    useEffect(() => {
+        if (customer.token) {
+            logout(history);
+        }
+    }, [history, logout, customer.token]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -161,7 +167,7 @@ const Login = (props) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        props.login(data, history);
+        login(data, history);
     };   
 
     return (
@@ -290,7 +296,8 @@ const Login = (props) => {
 };
 
 Login.propTypes = {
-    login: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login })(Login);
+export default connect(undefined, { login, logout })(Login);
