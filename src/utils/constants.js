@@ -38,8 +38,6 @@ export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing br
 // export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
-// export const TRANSFER_CONFIRMATION = 'TransferConfrimation';
-// export const TRANSFER_NOTIFICATION = 'TransferNotification';
 export const SEND_MESSAGE = 'SendMessage';
 
 export const CHAT_CONNECTION_STATUS = {
