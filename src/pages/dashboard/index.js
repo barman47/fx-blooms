@@ -1,50 +1,38 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useHistory, useLocation, Link as RouterLink } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { subscribe, isSupported } from 'on-screen-keyboard-detector';
 import toast, { Toaster } from 'react-hot-toast';
 
+import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
 
 import {
-    Avatar,
     Badge,
     Box,
     Button,
-    IconButton,
-    Drawer,
-    Divider,
-    Link,
-    List,
-    ListItem,
-    ListItemIcon,
-    ListItemText,
     BottomNavigation,
-    BottomNavigationAction,
-    Tooltip,
-    Typography
+    BottomNavigationAction
 } from '@material-ui/core';
 
-import { Account, ChevronRight, ChevronLeft, HomeMinus, FormatListText, AndroidMessages, Logout } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD, DASHBOARD_HOME, MESSAGES, PROFILE } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION, REMOVE_CHAT, SENT_MESSAGE } from '../../actions/types';
+import {  HomeMinus, FormatListText, Message, Wallet } from 'mdi-material-ui';
+import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, WALLET } from '../../routes';
+import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
 import { CHAT_CONNECTION_STATUS, COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
-import logo from '../../assets/img/logo.svg';
+import Header from '../../components/layout/Header';
+import SuccessModal from '../../components/common/SuccessModal';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
-
-
-const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -61,30 +49,6 @@ const useStyles = makeStyles((theme) => ({
         }
     },
 
-    appBar: {
-        zIndex: theme.zIndex.drawer + 1,
-        transition: theme.transitions.create(['width', 'margin'], {
-          easing: theme.transitions.easing.sharp,
-          duration: theme.transitions.duration.leavingScreen,
-        }),
-    },
-
-    // appBarShift: {
-    //     marginLeft: drawerWidth,
-    //     width: `calc(100% - ${drawerWidth}px)`,
-    //     transition: theme.transitions.create(['width', 'margin'], {
-    //       easing: theme.transitions.easing.sharp,
-    //       duration: theme.transitions.duration.enteringScreen,
-    //     }),
-    // },
-
-    menuButton: {
-        marginRight: 36,
-        [theme.breakpoints.down('sm')]: {
-            display: 'none'
-        }
-    },
-
     title: {
         flexGrow: 1,
     },
@@ -93,47 +57,8 @@ const useStyles = makeStyles((theme) => ({
         display: 'none',
     },
 
-    drawer: {
-        width: drawerWidth,
-        flexShrink: 0,
-        whiteSpace: 'nowrap',
-        [theme.breakpoints.down('md')]: {
-            display: 'none'
-        }
-    },
-
-    drawerOpen: {
-        width: drawerWidth,
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.enteringScreen,
-        }),
-    },
-
-    drawerClose: {
-        transition: theme.transitions.create('width', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        overflowX: 'hidden',
-        width: theme.spacing(7) + 1,
-        [theme.breakpoints.up('sm')]: {
-            width: theme.spacing(9) + 1,
-        },
-    },
-
     logo: {
         width: '100%'
-    },
-
-    toolbar: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        // padding: theme.spacing(2, 1),
-        padding: [[theme.spacing(2), theme.spacing(2), 0, theme.spacing(2)]],
-        // necessary for content to be below app bar
-        ...theme.mixins.toolbar,
     },
 
     content: {
@@ -159,35 +84,10 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main
     },
 
-    logoutContainer: {
-        position: 'absolute',
-        bottom: 0,
-        width: drawerWidth,
-
-        '& p': {
-            color: COLORS.offBlack,
-            fontWeight: 600   
-        }
-    },
-
     avatar: {
         borderRadius: '30px',
         maxWidth: theme.spacing(8),
         width: '50%'
-    },
-
-    avatarContainer: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-evenly',
-        width: '100%',
-    },
-
-    email: {
-        color: COLORS.grey,
-        fontWeight: 300
     },
 
     bottomBar: {
@@ -211,14 +111,11 @@ const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
-    const location = useLocation();
     
-    const { customerId, profile, userName } = useSelector(state => state.customer);
-    const { connectionStatus, unreadMessages } = useSelector(state => state.chat);
+    const { customerId } = useSelector(state => state.customer);
+    const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
 
     const [value, setValue] = useState(0);
-    const [open, setOpen] = useState(true);
-    const [path, setPath] = useState('');
     const [showBottomNavigation, setShowBottomNavigation] = useState(true);
     
     const [toastDuration, setToastDuration] = useState(0);
@@ -227,20 +124,16 @@ const Dashboard = ({ children, title, logout }) => {
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
     
-    const links = [
-        { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
-        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> }
-    ];
-    
     const mobileLinks = [
-        { url : DASHBOARD_HOME, text:'Home', icon: <HomeMinus /> },
+        { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url : MESSAGES, text:'Messages', icon: <Badge color="error" badgeContent={unreadMessages}><AndroidMessages /></Badge> },
-        { url : PROFILE, text:'Profile', icon: <Account /> }
+        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
+        // { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
     
     const customToast = useRef();
+    const successModal = useRef();
 
     useEffect(() => {
         hideBottomNavigation();
@@ -250,16 +143,12 @@ const Dashboard = ({ children, title, logout }) => {
         onClose();
 
         handleSentMessage();
-
-        return () => {
-            dispatch({ type: REMOVE_CHAT });
-        };
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        setPath(location.pathname);
-    }, [location]);
+    // useEffect(() => {
+    //     setPath(location.pathname);
+    // }, [location]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -287,7 +176,7 @@ const Dashboard = ({ children, title, logout }) => {
 
             case DISCONNECTED:
                 setToastTitle('ERROR');
-                setToastMessage('Chat Disconnected');
+                setToastMessage('Network Disconnected');
                 setToastType('error');
                 setToastDuration(null);
                 setToastAction(<ToastAction />);
@@ -299,13 +188,14 @@ const Dashboard = ({ children, title, logout }) => {
         }
     }, [connectionStatus]);
 
-    const playAudioNotifcation = (recipientId, senderId) => {
-        if (customerId !== senderId && (customerId === recipientId || customerId === senderId)) {
+    const playAudioNotifcation = (senderId) => {
+        if (senderId !== customerId) {
             const audio = new Audio(audioFile);
             audio.play();
-            navigator.vibrate(500);
+            // navigator.vibrate(500);
         }
     };
+
 
     const onReconnected = () => {
         SignalRService.onReconnected();
@@ -320,85 +210,107 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleSentMessage = () => {
-        const { CHAT_MESSAGE, TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION, CANCEL_NEGOTIATION } = NOTIFICATION_TYPES;
+        const { CANCEL_NEGOTIATION, BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
-                let payload, recipientId, senderId;
-                // console.log('New Notification ', response, type);
+                const payload = JSON.parse(response.Payload);
+                console.log('Payload ', payload);
+                console.log('New Notification ', response, type);
+                const senderId = response.SenderId;
+                let buyer = {};
+                let seller = {};
+                let id;
                 
                 switch (type) {
-                    case CHAT_MESSAGE:
-                        playAudioNotifcation(response.Recipient, response.Sender);
-                        if (customerId === response.Recipient || customerId === response.Sender) {
-                            const messageData = {
-                                chatId: response.ChatId,
-                                dateSent: response.DateSent,
-                                id: response.Id,
-                                sender: response.Sender,
-                                text: response.Text,
-                                uploadedFileName: response.UploadedFileName,
-                                isRead: false
-                            };
-
-                            dispatch({
-                                type: SENT_MESSAGE,
-                                payload: { message: messageData, customerId }
-                            });
-                        }
-
-                    break;
-
-                    case TRANSFER_CONFIRMATION:
-                        payload = JSON.parse(response.Payload);
-                        senderId = response.SenderId;
-
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION,
-                            payload: {
-                                buyerHasMadePayment: payload.Chat.BuyerHasMadePayment,
-                                buyerHasRecievedPayment: payload.Chat.BuyerHasRecievedPayment,
-                                sellerHasMadePayment: payload.Chat.SellerHasMadePayment, 
-                                sellerHasRecievedPayment: payload.Chat.SellerHasRecievedPayment, 
-                                isDeleted: payload.Chat.IsDeleted,
-                                customerId,
-                                senderId,
-                                transactionType: type
-                            }
-                        });
-
-                        break;
-
-                    case TRANSFER_NOTIFICATION:
-                        payload = JSON.parse(response.Payload);
-                        senderId = response.SenderId;
-                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
-
-                        if (customerId === payload.Buyer || customerId === payload.Seller) {
-                            playAudioNotifcation(recipientId, senderId);
+                    case BUYER_MADE_PAYMENT:
+                        buyer = payload.Buyer;
+                        seller = payload.Seller;
+                        id = payload.Id;
+                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
                                 type: PAYMENT_NOTIFICATION,
-                                payload: {
-                                    buyerHasMadePayment: payload.BuyerHasMadePayment,
-                                    buyerHasRecievedPayment: payload.BuyerHasRecievedPayment,
-                                    sellerHasMadePayment: payload.SellerHasMadePayment, 
-                                    sellerHasRecievedPayment: payload.SellerHasRecievedPayment, 
-                                    isDeleted: payload.IsDeleted,
-                                    customerId,
-                                    senderId,
-                                    transactionType: type
+                                payload: { 
+                                    notification: {
+                                        id,
+                                        isClosed: payload.IsClosed,
+                                        buyer: {
+                                            accountName: buyer.AccountName,
+                                            accountNumber: buyer.AccountNumber,
+                                            amountTransfered: buyer.AmountTransfered,
+                                            bankName: buyer.BankName,
+                                            customerId: buyer.CustomerId,
+                                            hasMadePayment: buyer.HasMadePayment,
+                                            hasReceivedPayment: buyer.HasReceivedPayment,
+                                            userName: buyer.UserName
+                                        },
+                                        seller: {
+                                            accountName: seller.AccountName,
+                                            accountNumber: seller.AccountNumber,
+                                            amountTransfered: seller.AmountTransfered,
+                                            bankName: seller.BankName,
+                                            customerId: seller.CustomerId,
+                                            hasMadePayment: seller.HasMadePayment,
+                                            hasReceivedPayment: seller.HasReceivedPayment,
+                                            userName: seller.UserName
+                                        },
+                                        listingId: payload.ListingId,
+                                        bidId: payload.BidId
+                                    },
+                                    customerId
                                 }
-                            }); 
+                            });
                         }
-                        
+                        break;
+
+                    case BUYER_CONFIRMED_PAYMENT:
+                        buyer = payload.Transfer.Buyer;
+                        seller = payload.Transfer.Seller;
+                        id = payload.Transfer.Id;
+                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            console.log('Dispatching PAYMENT_NOTIFICATION');
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION,
+                                payload: { type: BUYER_CONFIRMED_PAYMENT, id }
+                            });
+                            successModal.current.openModal();
+                            successModal.current.setModalText('This transaction has been completed successfully by both the buyer and seller and will be permanently closed.');
+                            // Show transaction completed message here
+                        }
+                        break;
+
+                    case SELLER_MADE_PAYMENT:
+                        buyer = payload.Buyer;
+                        seller = payload.Seller;
+                        id = payload.Id;
+                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            console.log('Dispatching PAYMENT_NOTIFICATION');
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION,
+                                payload: { type: SELLER_MADE_PAYMENT, id }
+                            });
+                        }
+                        break;
+
+                    case SELLER_CONFIRMED_PAYMENT:
+                        buyer = payload.Transfer.Buyer;
+                        seller = payload.Transfer.Seller;
+                        id = payload.Transfer.Id;
+                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                            console.log('Dispatching PAYMENT_NOTIFICATION');
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION,
+                                payload: { type: SELLER_CONFIRMED_PAYMENT, id }
+                            });
+                        }
                         break;
 
                     case CANCEL_NEGOTIATION:
-                        playAudioNotifcation(customerId, response.Sender);
-
-                        payload = JSON.parse(response.Payload);
-                        senderId = response.SenderId;
-                        recipientId = payload.Buyer === senderId ? payload.Seller : payload.Buyer;
+                        // playAudioNotifcation(customerId, response.Sender);
 
                         if (customerId === payload.Buyer || customerId === payload.Seller) {
                             if (senderId !== customerId) {
@@ -415,8 +327,8 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
                 }
             } catch (err) {
-                console.log('Error Ocurred');
-                console.error(err);
+                // console.log('Error Ocurred');
+                // console.error(err);
             }
         });
     };
@@ -435,19 +347,17 @@ const Dashboard = ({ children, title, logout }) => {
         }
     };
 
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
-
     const handleLinkClick = (link) => {
         history.push(`/dashboard${link}`);
     };
 
-    const handleLogout = () => logout(history);
+    const dismissSuccessModal = () => {};
 
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
+            <AccountSetupModal />
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -460,80 +370,8 @@ const Dashboard = ({ children, title, logout }) => {
                 />
             }
             <Toaster />
+            <Header />
             <section className={classes.root}>
-                <Drawer 
-                    variant="permanent"
-                    className={clsx(classes.drawer, {
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open
-                    })}
-                    classes={{
-                        paper: clsx({
-                        [classes.drawerOpen]: open,
-                        [classes.drawerClose]: !open,
-                        }),
-                    }}
-                >
-                    <div className={classes.toolbar}>
-                        {open && 
-                            <Link to={`${DASHBOARD}${DASHBOARD_HOME}`}>
-                                <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
-                            </Link>
-                        }
-                        <IconButton onClick={toggleDrawer}>
-                            {!open ?
-                                <Tooltip title="Expand Navigation" placement="top" arrow>
-                                    <ChevronRight />
-                                </Tooltip>
-                                :
-                                <Tooltip title="Collapse Navigation" placement="top" arrow>
-                                    <ChevronLeft />
-                                </Tooltip>
-                            }
-                        </IconButton>
-                    </div> 
-                    <List className={classes.links}>
-                        {links.map((link, index) => (
-                            <ListItem 
-                                className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
-                                key={index} 
-                                button 
-                                disableRipple
-                                onClick={() => handleLinkClick(link.url)}
-                                // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
-                            >
-                                <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
-                                    {link.icon}
-                                </ListItemIcon>
-                                <ListItemText primary={link.text} />
-                            </ListItem>
-                        ))}
-                    </List>
-                    <Divider />
-                    <section className={classes.logoutContainer}>
-                        <Link underline="none" to={`${DASHBOARD}${PROFILE}`} component={RouterLink} className={classes.avatarContainer}>
-                            <div>
-                                <Avatar>
-                                    {profile.img ? 
-                                        <img src={profile.img} alt={userName} />
-                                        :
-                                        <Account />
-                                    }
-                                </Avatar>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p">{userName}</Typography>
-                            </div>
-                        </Link>
-                        <Divider />
-                        <ListItem button className={classes.logout} onClick={handleLogout}>
-                            <ListItemIcon>
-                                <Logout />
-                            </ListItemIcon>
-                            <ListItemText primary="Logout" />
-                        </ListItem>
-                    </section>
-                </Drawer>
                 <div className={classes.content}>
                     {children}
                 </div>

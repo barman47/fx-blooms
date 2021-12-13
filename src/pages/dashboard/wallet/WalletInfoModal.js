@@ -1,8 +1,8 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
 import { 
     Backdrop,
-	Button,
     Fade,
+	Grid,
     Modal,
 	Typography 
 } from '@material-ui/core';
@@ -20,48 +20,45 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '25vw',
+        width: '30vw',
+        height: '25vh',
         boxShadow: SHADOW,
         padding: theme.spacing(5),
-
+        
         [theme.breakpoints.down('md')]: {
-            width: '40vw',
+            width: '35vw',
         },
-
         [theme.breakpoints.down('sm')]: {
-            width: '65vw',
+            padding: theme.spacing(5, 2),
+            width: '80vw',
         },
     },
 
-    title: {
-        fontWeight: 600
-    },
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        textAlign: 'center',
 
-    list: {
-        '& li': {
-            fontWeight: 300,
-            marginBottom: theme.spacing(2)
+        '& p': {
+            fontWeight: 300
         }
-    },
-
-    button: {
-        fontWeight: 300,
-        marginTop: theme.spacing(2)
     }
 }));
 
-const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
+const WalletInfoModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
 
-    const closeModal = () => {
-        setOpen(false);
-    };
-
     useImperativeHandle(ref, () => ({
         openModal: () => {
             setOpen(true);
+        },
+
+        closeModal: () => {
+            setOpen(false);
         }
     }));
 
@@ -79,17 +76,16 @@ const PaymentConfirmationTipsModal = forwardRef((props, ref) => {
             }}
         >
             <Fade in={open}>
-                <div className={classes.container} direction="column">
-                    <Typography variant="subtitle2" component="span" className={classes.title}>Payment Confirmation Tips</Typography>
-                    <ul className={classes.list}>
-                        <li>Make sure you have confirmed payment in your banking app before sending funds.</li>
-                        <li>Do not rely on payment receipts or proof of payments (screenshots).</li>
-                    </ul>
-                    <Button className={classes.button} variant="contained" color="primary" onClick={closeModal} fullWidth>Okay</Button>
-                </div>
+                <Grid container className={classes.container}>
+                    <Grid item xs={12} className={classes.item}>
+                        <Typography variant="subtitle1" component="p">
+                            Use this ID as your reference anytime you want to fund your wallet via Bank transfer.
+                        </Typography>
+                    </Grid>
+                </Grid>
             </Fade>
         </Modal>
 	);
 });
 
-export default PaymentConfirmationTipsModal;
+export default WalletInfoModal;

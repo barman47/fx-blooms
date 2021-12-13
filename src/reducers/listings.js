@@ -1,7 +1,7 @@
 import { 
-    ADDED_LISTING,
-    DELETED_LISTING, 
-    HIDE_NEGOTIATION_LISTINGS, 
+    ADDED_LISTING, 
+    DELETED_LISTING,
+    // HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
@@ -9,14 +9,14 @@ import {
     CANCELED_NEGOTIATION,
     SET_LISTING_MSG
 } from '../actions/types';
-import { LISTING_STATUS } from '../utils/constants';
+// import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
-    deletedListing: false,
     updatedListing: false,
     listing: {},
-    listings: []
+    listings: [],
+    msg: null
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -38,17 +38,15 @@ const listingsReducer = (state = initialState, action) => {
                 addedListing: !state.addedListing,
                 msg: null
             };
-
+        
         case DELETED_LISTING:
-            return action.payload ? {
+            listingId = action.payload.listingId;
+            listingIndex = state.listings.findIndex(listing => listing._id === listingId);
+            listingsList = [...state.listings];
+            listingsList.splice(listingIndex, 1);
+            return {
                 ...state,
-                listings: state.listings.filter(listing => listing.id !== action.payload.listingId),
-                msg: action.payload.msg,
-                deletedListing: true
-            } : {
-                ...state,
-                deletedListing: false,
-                msg: null
+                listings: [...listingsList]
             };
         
         case SET_LISTING:
@@ -99,10 +97,10 @@ const listingsReducer = (state = initialState, action) => {
                 msg: action.payload.msg
             }; 
 
-        case HIDE_NEGOTIATION_LISTINGS: 
-            return {
-                listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
-            };
+        // case HIDE_NEGOTIATION_LISTINGS: 
+        //     return {
+        //         listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
+        //     };
 
         case CANCELED_NEGOTIATION:
             listingsList = [...state.listings];

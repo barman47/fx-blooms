@@ -1,4 +1,5 @@
 import { 
+    DISABLED_2FA,
     ENABLED_2FA,
     CLEAR_CURRENT_CUSTOMER,
     SET_AUTH_TOKEN,
@@ -50,7 +51,13 @@ const customerReducer =  (state = initialState, action) => {
         case ENABLED_2FA:
             return {
                 ...state,
-                customer: { twoFactorEnabled: true }
+                twoFactorEnabled: true 
+            };
+
+        case DISABLED_2FA:
+            return {
+                ...state,
+                twoFactorEnabled: false 
             };
 
         case SET_EMAIL:

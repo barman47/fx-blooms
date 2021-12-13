@@ -8,7 +8,8 @@ const addListing = (data) => {
     data.RequiredCurrency = !isEmpty(data.RequiredCurrency) ?  data.RequiredCurrency.toString() : '';
     data.ExchangeRate = !isEmpty(data.ExchangeRate) ?  data.ExchangeRate.toString() : '';
     data.MinExchangeAmount = !isEmpty(data.MinExchangeAmount) ?  data.MinExchangeAmount.toString() : '';
-    data.ReceiptAmount = !isEmpty(data.ReceiptAmount) ?  data.ReceiptAmount.toString() : '';
+    data.ReceivingAccount = !isEmpty(data.ReceivingAccount) ?  data.ReceivingAccount.toString() : '';
+    // data.ReceiptAmount = !isEmpty(data.ReceiptAmount) ?  data.ReceiptAmount.toString() : '';
     // data.ListingFee = !isEmpty(data.ListingFee) ?  data.ListingFee.toString() : '';
     data.Bank = !isEmpty(data.Bank) ?  data.Bank.toString() : '';
 
@@ -51,12 +52,12 @@ const addListing = (data) => {
         }
     }
 
-    if (!Validator.isNumeric(data.ReceiptAmount) || data.ReceiptAmount <= 0) {
-        errors.ReceiptAmount = 'Invalid amount!';
-    }
-    if (Validator.isEmpty(data.ReceiptAmount)) {
-        errors.ReceiptAmount = 'Amount is required!';
-    }
+    // if (!Validator.isNumeric(data.ReceiptAmount) || data.ReceiptAmount <= 0) {
+    //     errors.ReceiptAmount = 'Invalid amount!';
+    // }
+    // if (Validator.isEmpty(data.ReceiptAmount)) {
+    //     errors.ReceiptAmount = 'Amount is required!';
+    // }
 
     // if (!Validator.isNumeric(data.ListingFee) || data.ListingFee <= 0) {
     //     errors.ListingFee = 'Invalid listing fee!';
@@ -64,6 +65,10 @@ const addListing = (data) => {
     // if (Validator.isEmpty(data.ListingFee)) {
     //     errors.ListingFee = 'Listing fee is required!';
     // }
+
+    if (Validator.isEmpty(data.ReceivingAccount)) {
+        errors.ReceivingAccount = 'Please provide a bank account!';
+    }
 
     if (Validator.isEmpty(data.Bank)) {
         errors.Bank = 'Payment method is required!';

@@ -2,13 +2,17 @@ import { SET_BARCODE, SET_2FA_MSG, TWO_FACTOR_AUTHORIZED } from '../actions/type
 
 const initialState = {
     msg: null,
-    authorized: false
+    authorized: false,
+    barcode: null
 };
 
 const twoFactorReducer = (state = initialState, action) => {
     switch (action.type) {      
         case SET_BARCODE:
-            return action.payload;
+            return {
+                ...state,
+                barcode: action.payload
+            };
 
         case SET_2FA_MSG: 
             return {

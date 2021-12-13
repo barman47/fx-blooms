@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { DASHBOARD, DASHBOARD_HOME, MESSAGES } from '../routes';
+import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_CHAT, SET_LISTINGS, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/Listing`;
@@ -45,11 +45,14 @@ export const addListing = (listing) => async (dispatch) => {
 
 export const deleteListing = (listingId) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/DeleteListing/${listingId}`);
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${URL}/DeleteListing/${listingId}`)
+        ]);
+
         return dispatch({
             type: DELETED_LISTING,
-            payload: { listingId, msg: res.data.data }
+            payload: { id: listingId }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -104,15 +107,14 @@ export const getMoreListings = (query) => async (dispatch) => {
     }
 };
 
-export const addBid = (bid, history) => async (dispatch) => {
+export const addBid = (bid) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/AddBid`, bid);
+        await axios.post(`${URL}/AddBid`, bid);
         dispatch({
-            type: SET_CHAT,
-            payload: res.data.data
+            type: SET_LISTING_MSG,
+            payload: 'A notification of your payment has been sent to the seller.'
         });
-        return history.push(`${DASHBOARD}${MESSAGES}`)
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -135,7 +137,12 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
 export const completeTransaction = (data) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        await axios.post(`${URL}/CompleteTransaction`, data);
+        const res = await axios.post(`${URL}/CompleteTransaction`, data);
+        console.log(res)
+        // return dispatch({
+        //     UPDATE_NOTIFICATION,
+        //     payload: res.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

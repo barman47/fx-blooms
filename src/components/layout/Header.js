@@ -1,17 +1,38 @@
-import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { AppBar, Button, Toolbar, Grid, IconButton, Link, Slide, useScrollTrigger } from '@material-ui/core';
+import { useEffect, useRef, useState } from 'react';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import { 
+    AppBar, 
+    Avatar, 
+    Badge, 
+    ClickAwayListener,
+    Button, 
+    Grid, 
+    Grow,
+    IconButton, 
+    Link, 
+    MenuList, 
+    MenuItem, 
+    Paper,
+    Popper,
+    Slide, 
+    Toolbar, 
+    useScrollTrigger 
+} from '@material-ui/core';
+
 import { Link as AnimatedLink } from 'react-scroll';
-import { Menu as MenuIcon } from 'mdi-material-ui';
+import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message, Wallet } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
 import MobileNav from './MobileNav';
 
+import { logout } from '../../actions/customer';
+
 import logo from '../../assets/img/logo.svg';
+import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
-import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME } from '../../routes';
+import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, WALLET, PROFILE } from '../../routes';
 
 function HideOnScroll (props) {
     const { children } = props;
@@ -35,6 +56,9 @@ const useStyles = makeStyles(theme => ({
     },
     
     nav: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
         padding: [[0, theme.spacing(10)]],
 
         [theme.breakpoints.down('lg')]: { 
@@ -62,6 +86,11 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 600
     },
 
+    linkIcon: {
+        position: 'relative',
+        top: 5
+    },
+
     signUp: {
         color: theme.palette.primary.main
     },
@@ -80,18 +109,86 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('md')]: {
             display: 'flex'
         }
+    },
+
+    avatarContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+
+    avatarButton: {
+        color: 'primary',
+        marginLeft: theme.spacing(2),
+        
+        '&:hover': {
+            background: 'transparent'
+        }
     }
 }));
 
 const Header = (props) => {
+    const history = useHistory();
+    const location = useLocation();
     const classes = useStyles();
     const [drawerOpen, setDrawerOpen] = useState(false);
 
-    const { isAuthenticated } = useSelector(state => state.customer);
+    const { firstName, lastName, isAuthenticated } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
+    const { unreadNotifications } = useSelector(state => state.notifications);
+
+    const [open, setOpen] = useState(false);
+    const anchorRef = useRef(null);
+    const prevOpen = useRef(open);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
+    };
+
+    const protectedRoutes = [
+        { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
+        { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
+        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
+    ];
+
+    const publicRoutes = [
+        { url: WHY, text:'Why FXBLOOMS' },
+        { url: ABOUT_US, text:'About Us' },
+        { url: CONTACT_US, text:'Contact' }
+    ];
+
+    
+
+    const handleToggle = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
+    const handleMenuClose = (event) => {
+        if (anchorRef.current && anchorRef.current.contains(event.target)) {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    function handleListKeyDown(event) {
+        if (event.key === 'Tab') {
+            event.preventDefault();
+            setOpen(false);
+        }
+    }
+
+    // return focus to the button when we transitioned from !open -> open
+    useEffect(() => {
+        if (prevOpen.current === true && open === false) {
+            anchorRef.current.focus();
+        }
+        prevOpen.current = open;
+    }, [open]);
+
+    const handleLogout = (e) => {
+        e.preventDefault();
+        props.logout(history);
     };
 
     return (
@@ -99,61 +196,92 @@ const Header = (props) => {
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <Grid container direction="row" alignItems="center" className={classes.nav}>
-                        <Grid item xs={9}>
-                            <Grid container direction="row" alignItems="center" spacing={5} justify="flex-start">
-                                <Grid item>
-                                    <a href="https://fxblooms.com">
-                                        <img src={logo} alt="FX Blooms Logo" />
-                                    </a>
-                                </Grid>
-                                <Grid item>
-                                    <AnimatedLink 
-                                        to={WHY} 
-                                        activeClass={classes.activeLink} 
-                                        spy={true}
-                                        smooth={true}
-                                        offset={-70}
-                                        duration={500}
-                                        className={classes.link}
-                                        >
-                                            Why FXBLOOMS
-                                    </AnimatedLink>
-                                </Grid>
-                                <Grid item>
-                                    <AnimatedLink 
-                                        to={ABOUT_US} 
-                                        activeClass={classes.activeLink} 
-                                        spy={true}
-                                        smooth={true}
-                                        offset={-70}
-                                        duration={500}
-                                        className={classes.link}
-                                        >
-                                            About Us
-                                    </AnimatedLink>
-                                </Grid>
-                                <Grid item>
-                                    <AnimatedLink 
-                                        to={CONTACT_US} 
-                                        activeClass={classes.activeLink} 
-                                        spy={true}
-                                        smooth={true}
-                                        offset={-70}
-                                        duration={500}
-                                        className={classes.link}
-                                        >
-                                            Contact
-                                    </AnimatedLink>
-                                </Grid>
+                        <Grid item xs={1}>
+                            <a href="https://fxblooms.com">
+                                <img src={logo} alt="FX Blooms Logo" />
+                            </a>
+                        </Grid>
+                        <Grid item xs={location.pathname.includes(DASHBOARD) ? 9 : 8}>
+                            <Grid container direction="row" alignItems="center" spacing={5} justify="center">
+                                {isAuthenticated && authorized ?
+                                    <>
+                                        {protectedRoutes.map((link, index) =>(
+                                            <Grid item key={index}>
+                                                <Link
+                                                    to={`${DASHBOARD}${link.url}`}
+                                                    component={RouterLink}
+                                                    className={classes.link}
+                                                    underline="none"
+                                                >
+                                                    <span className={classes.linkIcon}>{link.icon}</span>&nbsp;&nbsp;&nbsp;{link.text}
+                                                </Link>
+                                            </Grid>
+                                        ))}
+                                    </>
+                                    :
+                                    <>
+                                        {publicRoutes.map((link, index) => (
+                                            <Grid item key={index}>
+                                                <AnimatedLink 
+                                                    to={link.url} 
+                                                    activeClass={classes.activeLink} 
+                                                    spy={true}
+                                                    smooth={true}
+                                                    offset={-70}
+                                                    duration={500}
+                                                    className={classes.link}
+                                                    >
+                                                        {link.text}
+                                                </AnimatedLink>
+                                            </Grid>
+                                        ))}
+                                    </>
+                                }
                             </Grid>
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={location.pathname.includes(DASHBOARD) ? 2 : 3}>
                             <Grid container direction="row" justify="flex-end" alignItems="center" spacing={2}>
                                 {
                                     isAuthenticated && authorized ?
-                                    <Grid item>
-                                        <Link to={`${DASHBOARD}${DASHBOARD_HOME}`} component={RouterLink}>All Listings</Link>
-                                    </Grid>
+                                    <>
+                                        <div className={classes.avatarContainer}>
+                                            <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                                            <Button
+                                                to={`${DASHBOARD}${DASHBOARD_HOME}`}
+                                                endIcon={<ChevronDown />}
+                                                classes={{ root: classes.avatarButton }}
+                                                ref={anchorRef}
+                                                onClick={handleToggle}
+                                                aria-controls={open ? 'profile-menu' : undefined}
+                                                aria-haspopup="true"
+                                            >
+                                                Account
+                                            </Button>
+                                        </div>
+                                        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+                                            {({ TransitionProps, placement }) => (
+                                                <Grow
+                                                    {...TransitionProps}
+                                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
+                                                >
+                                                    <Paper>
+                                                        <ClickAwayListener onClickAway={handleMenuClose}>
+                                                            <MenuList autoFocusItem={open} id="profile-menu" onKeyDown={handleListKeyDown}>
+                                                                <MenuItem
+                                                                    onClick={(e) => handleMenuClose(e, `${DASHBOARD}${PROFILE}`)}
+                                                                >
+                                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>Settings</RouterLink>
+                                                                </MenuItem>
+                                                                <MenuItem>
+                                                                    <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
+                                                                </MenuItem>
+                                                            </MenuList>
+                                                        </ClickAwayListener>
+                                                    </Paper>
+                                                </Grow>
+                                            )}
+                                        </Popper>
+                                    </>
                                     :
                                     <>
                                         <Grid item>
@@ -188,9 +316,18 @@ const Header = (props) => {
                         <a href="https://fxblooms.com">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
                         </a>
-                        <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
-                            <MenuIcon />
-                        </IconButton>
+                        {/* Show when user not on dashboard  and is logged in*/}
+                        <Link 
+                            to={PROFILE}
+                            component={RouterLink}
+                        >
+                            <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                        </Link>
+                        {!location.pathname.includes(DASHBOARD) && 
+                            <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
+                                <MenuIcon />
+                            </IconButton>
+                        }
                     </div>
                     <MobileNav toggleDrawer={toggleDrawer} drawerOpen={drawerOpen} />
                 </Toolbar>
@@ -199,4 +336,8 @@ const Header = (props) => {
     );
 };
 
-export default Header;
+Header.propTypes = {
+    logout: PropTypes.func.isRequired,
+};
+
+export default connect(undefined, { logout })(Header);

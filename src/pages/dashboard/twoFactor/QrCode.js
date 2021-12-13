@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
-import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 import { 
     Button, 
     Container, 
@@ -14,20 +12,18 @@ import {
     } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import Toast from '../../components/common/Toast';
+import Toast from '../../../components/common/Toast';
 
-import { logout } from '../../actions/customer';
-import { getBarcode } from '../../actions/twoFactor';
-import { COLORS } from '../../utils/constants';
-import { VERIFY_2FA } from '../../routes';
+import { logout } from '../../../actions/customer';
+import { getBarcode } from '../../../actions/twoFactor';
+import { COLORS } from '../../../utils/constants';
+import { VERIFY_2FA } from '../../../routes';
 
-import logo from '../../assets/img/logo.svg';
 import { ContentCopy } from 'mdi-material-ui';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        paddingTop: theme.spacing(5),
-
+        marginTop: theme.spacing(-8),
         [theme.breakpoints.down('sm')]: {
             paddingTop: theme.spacing(2)
         }
@@ -35,6 +31,7 @@ const useStyles = makeStyles(theme => ({
     
     content: {
         backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(3),
@@ -51,7 +48,7 @@ const useStyles = makeStyles(theme => ({
 
     image: {
         margin: '0 auto',
-        width: 'initial',
+        width: '20vw',
 
         [theme.breakpoints.down('sm')]: {
             width: '90vw'
@@ -87,8 +84,6 @@ const useStyles = makeStyles(theme => ({
 
 const QrCode = (props) => {
     const classes = useStyles();
-    
-    const history = useHistory();
 
     const { barcode } = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);
@@ -105,7 +100,7 @@ const QrCode = (props) => {
         if (barcode?.qrCodeSetupImageUrl) {
             setBarcodeImage(barcode.qrCodeSetupImageUrl);
         }
-    }, [barcode.qrCodeSetupImageUrl]);
+    }, [barcode?.qrCodeSetupImageUrl]);
 
     useEffect(() => {
         if (msg) {
@@ -129,7 +124,6 @@ const QrCode = (props) => {
 
     return (
         <>
-            <Helmet><title>Setup Two Factor Authentication | FXBLOOMS.com</title></Helmet>
             {msg && 
                 <Toast 
                     ref={toast}
@@ -139,9 +133,6 @@ const QrCode = (props) => {
                 />
             }
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo}>
-                    <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </a>
                 <div className={classes.content}>
                     <Typography variant="h5">Register FXBLOOMS</Typography>
                     <Typography variant="subtitle1" component="p">Open the Google authenticator app and scan the QR code below.</Typography>
@@ -160,7 +151,7 @@ const QrCode = (props) => {
                         </IconButton>
                     </Typography>
                     <TextField
-                        value={barcode.manualEntryKey}
+                        value={barcode?.manualEntryKey}
                         variant="outlined"
                         multiline
                         rows={4}
@@ -168,7 +159,7 @@ const QrCode = (props) => {
                     />
                     <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                     <Button variant="contained" color="primary" component={RouterLink} to={VERIFY_2FA} className={classes.button}>Proceed</Button>
-                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button>
+                    {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
                 </div>
             </Container>
         </>

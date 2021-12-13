@@ -18,21 +18,23 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-import SellerAccountModal from './SellerAccountModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import EditListingItem from './EditListingItem';
 
+import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
-import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
+import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
 import { APPROVED, COLORS, NOT_SUBMITTED, PAYMENT_METHODS, PENDING, REJECTED } from '../../../utils/constants';
+import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
+import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -61,6 +63,16 @@ const useStyles = makeStyles(theme => ({
                     marginTop: theme.spacing(2)
                 },
             }
+        }
+    },
+
+    darkInput: {
+        backgroundColor: 'rgba(81, 103, 103, 1)',
+        border: 'none',
+        borderRadius: theme.shape.borderRadius,
+        
+        '& .MuiInputBase-root': {
+            color: COLORS.offWhite
         }
     },
 
@@ -98,6 +110,10 @@ const useStyles = makeStyles(theme => ({
     helperText: {
         color: COLORS.offBlack,
         fontSize: theme.spacing(1.2)
+    },
+
+    addAccountButton: {
+        justifySelf: 'flex-end'
     },
 
     noListing: {
@@ -139,29 +155,31 @@ const MakeListing = (props) => {
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
-    const { customer, currencies } = useSelector(state => state);
+    const { accounts } = useSelector(state => state.bankAccounts);
+    const { currencies } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-
     const { addedListing, listings, msg } = useSelector(state => state.listings);
 
-    const { getCurrencies, handleSetTitle } = props;
+    const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
 
-    const [openAccountModal, setOpenAccountModal] = useState(false);
+    const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('');
+    const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
-    const [RequiredCurrency, setRequiredCurrency] = useState('');
+    const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
     const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
+    const [ReceivingAccount, setReceivingAccount] = useState('');
+
     const [ReceiptAmount, setReceiptAmount] = useState('');
     // eslint-disable-next-line
-    const [ListingFee, setListingFee] = useState('0');
+    const [ListingFee, setListingFee] = useState('');
 
     const [Bank, setBank] = useState('');
 
@@ -173,17 +191,20 @@ const MakeListing = (props) => {
     const [errors, setErrors] = useState({});
 
     const successModal = useRef();
-
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Add Listing');
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
-            props.getResidencePermitLink();
+            getResidencePermitLink();
         }
 
         if (residencePermitStatus !== APPROVED) {
             checkResidencePermitStatus();
+        }
+
+        if (accounts.length === 0) {
+            getAccounts(customerId);
         }
         
         // eslint-disable-next-line
@@ -234,13 +255,10 @@ const MakeListing = (props) => {
     }, [customerId, listings]);
 
     useEffect(() => {
-        if (addedListing) {
+        if (addedListing && msg) {
             resetForm();
             successModal.current.openModal();
             successModal.current.setModalText(msg);
-            return dispatch({
-                type: ADDED_LISTING
-            });
         }
     }, [addedListing, dispatch, msg]);
 
@@ -260,10 +278,9 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         if (ExchangeAmount && ExchangeRate) {
-            setReceiptAmount(Number(ExchangeAmount) * Number(ExchangeRate))
+            setReceiptAmount(`NGN ${formatNumber(Number(ExchangeAmount) * Number(ExchangeRate), 2)}`);
         }
     }, [ExchangeAmount, ExchangeRate]);
-
 
     // Set Listing Fee
     // useEffect(() => {
@@ -335,9 +352,9 @@ const MakeListing = (props) => {
         }
     };
 
-    const handleCloseAccountModalModal = () => {
-        setOpenAccountModal(false);
-    };
+    // const handleCloseAccountModalModal = () => {
+    //     setOpenAccountModal(false);
+    // };
 
     const handleCloseResidencePermitModal = () => {
         setShowResidencePermitModal(false);
@@ -358,7 +375,23 @@ const MakeListing = (props) => {
         setLoading(false);
     };
 
-    const dismissSuccessModal = () => history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    const dismissSuccessModal = () => {
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: null
+        });
+        if (addedListing) {
+            dispatch({
+                type: ADDED_LISTING
+            });
+            history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        }
+    };
+
+    const getAccountId = (account) => {
+        const bank = accounts.find(item => item.bankName === account);
+        return bank.accountID;
+    };
 
     const onSubmit = (e) => {
         e.preventDefault();
@@ -370,7 +403,8 @@ const MakeListing = (props) => {
             RequiredCurrency,
             ExchangeRate,
             MinExchangeAmount,
-            ReceiptAmount,
+            // ReceiptAmount,
+            ReceivingAccount,
             ListingFee,
             Bank
         };
@@ -384,9 +418,9 @@ const MakeListing = (props) => {
             return checkResidencePermitStatus();
         }
 
-        if (customer.profile.listings >= 2) { // and there is no account number
-            return setOpenAccountModal(true);
-        }
+        // if (customer.profile.listings >= 2) { // and there is no account number
+        //     return setOpenAccountModal(true);
+        // }
 
         setErrors({});
         setLoading(true);
@@ -401,11 +435,18 @@ const MakeListing = (props) => {
                 CurrencyType: AvailableCurrency,
                 Amount: parseFloat(MinExchangeAmount)
             },
-            Bank
+            Bank,
+            accountID: getAccountId(ReceivingAccount)
         };
 
-        setLoading(true);
-        props.addListing(listing);
+        addListing(listing);
+    };
+
+    const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
+
+    const handleAddAccount = () => {
+        setAddAccountDrawerOpen(true);
+        setReceivingAccount('');
     };
 
     return (
@@ -419,11 +460,11 @@ const MakeListing = (props) => {
                     type="error"
                 />
             }
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
-                <SellerAccountModal open={openAccountModal} handleCloseModal={handleCloseAccountModalModal} />
                 <header>
                     <div>
                         <Typography variant="h6">Make a Listing</Typography>
@@ -436,18 +477,19 @@ const MakeListing = (props) => {
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={1}>
                                 <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Have</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.AvailableCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        // disabled={loading ? true : false}
+                                        disabled
                                     >
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
-                                            onChange={(e) => setAvailableCurrency(e.target.value)}
+                                            // onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
                                             <MenuItem value="" disabled>Select Currency</MenuItem>
@@ -480,13 +522,14 @@ const MakeListing = (props) => {
                                     </Tooltip>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Currency</Typography>
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.RequiredCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        disabled
+                                        // disabled={loading ? true : false}
                                     >
                                         <Select
                                             labelId="RequiredCurrency"
@@ -503,7 +546,7 @@ const MakeListing = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <br />
+                                <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                     <Tooltip title="This is the exchange rate you want." aria-label="Exchange Rate" arrow>
                                         <TextField
                                             value={ExchangeRate}
@@ -529,7 +572,8 @@ const MakeListing = (props) => {
                                         error={errors.AvailableCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled={loading ? true : false}
+                                        // disabled={loading ? true : false}
+                                        disabled
                                     >
                                         <Select
                                             labelId="AvailableCurrency"
@@ -564,68 +608,33 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Will Receive</Typography>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
                                     <FormControl 
                                         variant="outlined" 
+                                        error={errors.ReceivingAccount ? true : false } 
                                         fullWidth 
-                                        required
-                                        disabled
-                                    >
-                                        <Select
-                                            labelId="RequiredCurrency"
-                                            value={RequiredCurrency}                                        
-                                        >
-                                            <MenuItem value={RequiredCurrency}>{RequiredCurrency}</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <br />
-                                    <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
-                                        <TextField
-                                            value={ReceiptAmount}
-                                            // onChange={(e) => setReceiptAmount(e.target.value)}
-                                            // onKeyUp={handleSetExchangeAmount}
-                                            type="text"
-                                            variant="outlined" 
-                                            placeholder="Enter Amount"
-                                            helperText={errors.ReceiptAmount}
-                                            fullWidth
-                                            required
-                                            disabled={loading ? true : false}
-                                            error={errors.ReceiptAmount ? true : false}
-                                        />
-                                    </Tooltip>
-                                </Grid>
-                                <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        fullWidth 
-                                        required
-                                        disabled
-                                    >
-                                        <Select
-                                            labelId="AvailableCurrency"
-                                            value={AvailableCurrency}                                        
-                                        >
-                                            <MenuItem value={AvailableCurrency}>{AvailableCurrency}</MenuItem>
-                                        </Select>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <br />
-                                    <TextField
-                                        value={ListingFee}
-                                        type="text"
-                                        variant="outlined" 
-                                        helperText={errors.ListingFee}
-                                        fullWidth
                                         required
                                         disabled={loading ? true : false}
-                                        error={errors.ListingFee ? true : false}
-                                    />
+                                    >
+                                        <Select
+                                            labelId="ReceivingAccount"
+                                            value={ReceivingAccount}
+                                            onChange={(e) => setReceivingAccount(e.target.value)}
+                                        >
+                                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                            {accounts.map((account) => {
+                                                if (account.currency === 'NGN') {
+                                                    return (
+                                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                                    )
+                                                }
+                                                return null;
+                                            })}
+                                        </Select>
+                                        <FormHelperText>{errors.setReceivingAccount}</FormHelperText>
+                                    </FormControl>
+                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add Receiving Account</Button>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
@@ -650,6 +659,28 @@ const MakeListing = (props) => {
                                         <FormHelperText>{errors.Bank}</FormHelperText>
                                     </FormControl>
                                 </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I will receive</Typography>
+                                    <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
+                                        <TextField
+                                            className={classes.darkInput}
+                                            value={ReceiptAmount}
+                                            // onChange={(e) => setReceiptAmount(e.target.value)}
+                                            // onKeyUp={handleSetExchangeAmount}
+                                            type="text"
+                                            variant="outlined" 
+                                            placeholder="NGN 0.00"
+                                            helperText={errors.ReceiptAmount}
+                                            fullWidth
+                                            required
+                                            // disabled={loading ? true : false}
+                                            disabled
+                                            error={errors.ReceiptAmount ? true : false}
+                                        />
+                                    </Tooltip>
+                                    <FormHelperText>Listing Fee: EUR 0.00</FormHelperText>
+                                </Grid>
+
                                 <Grid item xs={12}>
                                     <Button 
                                         type="submit" 
@@ -680,9 +711,6 @@ const MakeListing = (props) => {
                                 <Divider />
                                 <br />
                                 {previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))}
-                                {/* {listings.map(listing => (
-                                    <EditListingItem key={listing.id} listing={listing} />
-                                ))} */}
                             </div>
                         }
                     </Grid>
@@ -695,7 +723,8 @@ const MakeListing = (props) => {
 MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
+    getAccounts: PropTypes.func.isRequired,
     getResidencePermitLink: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getCurrencies, getResidencePermitLink })(MakeListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink })(MakeListing);

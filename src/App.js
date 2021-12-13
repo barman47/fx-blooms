@@ -29,14 +29,14 @@ import Disclaimer from './pages/disclaimer';
 import Dashboard from './pages/dashboard';
 
 import AllListings from './pages/dashboard/listings/AllListings';
-import EditListing from './pages/dashboard/listings/EditListing';
 import MakeListing from './pages/dashboard/listings/MakeListing';
 import UserDetails from './pages/dashboard/listings/UserDetails';
 
 import Profile from './pages/dashboard/profile';
 
-import Messages from './pages/dashboard/messages';
-import MobileConversation from './pages/dashboard/messages/MobileConversation';
+import Notifications from './pages/dashboard/notifications';
+
+import Wallet from './pages/dashboard/wallet';
 
 // import setAuthToken from './utils/setAuthToken';
 // import isTokenExpired from './utils/tokenExpired';
@@ -62,11 +62,10 @@ import {
 	SIGNUP_FAILURE,
 	CREATE_PROFILE, 
 	MAKE_LISTING,
-	MESSAGES,
+	NOTIFICATIONS,
 	DASHBOARD,
 	DASHBOARD_HOME, 
 	DISCLAIMER,
-	EDIT_LISTING,
 	USER_DETAILS,
 	PROFILE,
 	FORGOT_PASSWORD,
@@ -74,9 +73,9 @@ import {
 	TERMS,
 	FAQS,
 	PRIVACY_POLICY,
-	MOBILE_CONVERSATION,
 	VERIFY_EMAIL,
-	PENDING_VERIFICATION
+	PENDING_VERIFICATION,
+	WALLET
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -169,11 +168,10 @@ const [title, setTitle] = useState('');
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${MESSAGES}`} exact component={() => <Messages handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${MOBILE_CONVERSATION}`} exact component={() => <MobileConversation handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
+								<PrivateRoute path={`${DASHBOARD}${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
 							</Dashboard>
 						</PrivateRoute>
 						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />

@@ -1,5 +1,5 @@
-import { useState, forwardRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
+import { useState } from 'react';
+// import { useHistory } from 'react-router-dom';
 import { 
     Backdrop,
 	Button,
@@ -9,9 +9,8 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CheckboxMarkedCircle } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
+import { COLORS, SHADOW } from '../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -23,22 +22,22 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '50vw',
-        height: '30vh',
+        width: '20vw',
+        height: '20vw',
         boxShadow: SHADOW,
-        padding: theme.spacing(5, 10),
+        padding: theme.spacing(2, 5),
 
         [theme.breakpoints.down('lg')]: {
-            height: '50vh',
+            width: '30vw',
+            height: '30vw',
         },
         [theme.breakpoints.down('md')]: {
-            height: '40vh',
-            width: '70vw',
+            width: '35vw',
+            height: '35vw',
         },
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 2),
-            height: '40vh',
             width: '90vw',
+            height: '30vh'
         },
     },
 
@@ -49,41 +48,23 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         textAlign: 'center'
     },
-
-    icon: {
-        color: theme.palette.primary.main,
-        fontSize: theme.spacing(5)
-    }
 }));
 
-const CustomerCanceledModal = forwardRef((props, ref) => {
+const AccountSetupModal = () => {
 	const classes = useStyles();
+    // const history = useHistory();
 
     const [open, setOpen] = useState(false);
-    const [text, setText] = useState('');
 
-    const { dismissAction } = props;
+    // useEffect(() => {
+    //     if (!sessionStorage.getItem(ACCOUNT_SETUP)) {
 
-    const closeModal = () => {
-        setOpen(false);
-        if (dismissAction) {
-            dismissAction();
-        }
-    };
+    //     }
+    // }, []);
 
-    useImperativeHandle(ref, () => ({
-        openModal: () => {
-            setOpen(true);
-        },
-
-        closeModal: () => {
-            setOpen(false);
-        },
-
-        setModalText: (text) => {
-            setText(text);
-        }
-    }));
+    // const setupAccount = () => {
+    //     sessionStorage.setItem(ACCOUNT_SETUP, true);
+    // };
 
 	return (
         <Modal
@@ -91,8 +72,6 @@ const CustomerCanceledModal = forwardRef((props, ref) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            disableBackdropClick
-            disableEscapeKeyDown
             onClose={() => setOpen(false)}
             closeAfterTransition
             BackdropComponent={Backdrop}
@@ -103,20 +82,15 @@ const CustomerCanceledModal = forwardRef((props, ref) => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
                         <Typography variant="subtitle1">
-                            {text}
+                            You are required to complete your account setup and verification in order to be able to use FXBLOOMS
                         </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
+                        <Button variant="contained" color="primary" onClick={() => setOpen(false)}>Go to Set Up Account</Button>
                     </Grid>
                 </Grid>
             </Fade>
         </Modal>
 	);
-});
-
-CustomerCanceledModal.propTypes = {
-    dismissAction: PropTypes.func
 };
 
-export default CustomerCanceledModal;
+export default AccountSetupModal;

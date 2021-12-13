@@ -9,8 +9,8 @@ export const COLORS = {
     white: '#ffffff',
     offWhite: '#f8f8f8',
     lightTeal: '#f6fafa',
-    red: '#ff0000',
-    darkRed: '#c20a0a'
+    red: '#EB5757',
+    darkRed: '#f21c1c'
 };
 
 export const CONFIRMED = 'CONFIRMED';
@@ -28,7 +28,9 @@ export const FILL_FORM2 = 'FILL_FORM2';
 export const PROCEED_TO_DASHBOARD = 'PROCEED_TO_DASHBOARD'
 
 export const SHADOW = '0px 4px 14px rgba(0, 0, 0, 0.05)';
+export const TRANSITION = '0.3s linear all';
 
+export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
@@ -48,10 +50,12 @@ export const CHAT_CONNECTION_STATUS = {
 };
 
 export const NOTIFICATION_TYPES = {
-    CANCEL_NEGOTIATION: 'CancelNegotiation',
-    CHAT_MESSAGE: 'ChatMessage',
-    TRANSFER_CONFIRMATION: 'TransferConfrimation',
-    TRANSFER_NOTIFICATION: 'TransferNotification',
+    ACCOUNT_SETUP: 'AccountSetup',
+    BUYER_CONFIRMED_PAYMENT: 'BuyerConfirmedPayment',
+    BUYER_MADE_PAYMENT: 'BuyerPaymentMade',
+    SELLER_MADE_PAYMENT: 'SellerPaymentMade',
+    SELLER_CONFIRMED_PAYMENT: 'SellerConfirmedPayment',
+    CANCEL_NEGOTIATION: 'CancelNegotiation'
 };
 
 export const NETWORK_ERROR = 'Network Error';
