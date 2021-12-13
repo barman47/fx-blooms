@@ -2,15 +2,16 @@
 import { 
     ADD_NOTIFICATION,
     SET_NOTIFICATIONS, 
-    PAYMENT_NOTIFICATION,
+    PAYMENT_NOTIFICATION_BUYER_PAID,
+    PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
+    PAYMENT_NOTIFICATION_SELLER_PAID,
+    PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
     SUBTRACT_UNREAD_NOTIFICATIONS,
     // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
     SET_SOCKET_CONNECTION_STATUS,
     UPDATE_NOTIFICATION
 } from '../actions/types';
-
-import { NOTIFICATION_TYPES } from '../utils/constants';
 
 const initialState = {
     notifications: [],
@@ -57,77 +58,47 @@ const notificationsReducer = (state = initialState, action) => {
                 connectionStatus: action.payload
             };
 
-        case PAYMENT_NOTIFICATION: 
-            console.log('payment notification ', action.payload);
+        case PAYMENT_NOTIFICATION_BUYER_PAID:
+             notifications = [action.payload.notification, ...notifications];
+             return {
+                 ...state,
+                 notifications: [...notifications],
+                 unreadNotifications: action.payload.customerId === action.payload.notification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
+             };
+
+        case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
+            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
+            notifications.splice(notificationIndex, 1);
+
+            return {
+                ...state,
+                notifications: [...notifications],
+                unreadNotifications: state.unreadNotifications - 1
+            };
+
+        case PAYMENT_NOTIFICATION_SELLER_PAID:
             notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
             notifications = state.notifications;
             notification = notifications[notificationIndex];
+            notification.seller.hasMadePayment = true;
+            notifications[notificationIndex] = notification;
 
-            const { BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT } = NOTIFICATION_TYPES;
+            return {
+                ...state,
+                notifications: [...notifications]
+            };
 
-            switch (action.payload.type) {
-                case BUYER_MADE_PAYMENT:
-                    // If notification exists, update it, else create a new one
-                    let newNotification;
-                    newNotification = state.notifications.find(item => item.id === action.payload.notification.id);
-                    if (newNotification) {
-                        return {
-                            ...state,
-                            notifications: [newNotification, ...notifications],
-                            unreadNotifications: action.payload.customerId === newNotification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
-                        };
-                    }
+        case PAYMENT_NOTIFICATION_SELLER_CONFIRMED:
+            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
+            notifications = state.notifications;
+            notification = notifications[notificationIndex];
+            notification.seller.hasReceivedPayment = true;
+            notifications[notificationIndex] = notification;
 
-                    notificationIndex = state.notifications.findIndex(item => item.id === action.payload.notification.id);
-                    notification = notifications[notificationIndex];
-                    return {
-                        ...state,
-                        notifications: [...notifications],
-                        unreadNotifications: action.payload.customerId === newNotification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
-                    };
-                    
-                    // notification.buyer.hasMadePayment = true;
-                    // notifications[notificationIndex] = notification;
-                    // console.log('updating notifications');
-                    // debugger;
-
-                    // return {
-                    //     ...state,
-                    //     notifications: [...notifications]
-                    // };
-
-                    // End transaction because buyer has confirmed seller's payment
-                case BUYER_CONFIRMED_PAYMENT:
-                    notifications.splice(notificationIndex, 1);
-
-                    return {
-                        ...state,
-                        notifications: [...notifications],
-                        unreadNotifications: state.unreadNotifications - 1
-                    };
-
-                case SELLER_MADE_PAYMENT:
-                    notification.seller.hasMadePayment = true;
-                    notifications[notificationIndex] = notification;
-
-                    return {
-                        ...state,
-                        notifications: [...notifications]
-                    };
-                    
-                case SELLER_CONFIRMED_PAYMENT:
-                    notification.seller.hasReceivedPayment = true;
-                    notifications[notificationIndex] = notification;
-
-                    return {
-                        ...state,
-                        notifications: [...notifications]
-                    };
-                    
-                default:
-                    break;
-            }
-           break;
+            return {
+                ...state,
+                notifications: [...notifications]
+            }            
 
         case CUSTOMER_CANCELED:
             return {

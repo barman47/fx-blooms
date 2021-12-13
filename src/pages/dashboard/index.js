@@ -21,7 +21,13 @@ import {
 
 import {  HomeMinus, FormatListText, Message, Wallet } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, WALLET } from '../../routes';
-import { CUSTOMER_CANCELED, PAYMENT_NOTIFICATION } from '../../actions/types';
+import { 
+    CUSTOMER_CANCELED, 
+    PAYMENT_NOTIFICATION_BUYER_PAID, 
+    PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
+    PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
+    PAYMENT_NOTIFICATION_SELLER_PAID 
+} from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
@@ -228,7 +234,7 @@ const Dashboard = ({ children, title }) => {
                             playAudioNotifcation(senderId);
                             console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
-                                type: PAYMENT_NOTIFICATION,
+                                type: PAYMENT_NOTIFICATION_BUYER_PAID,
                                 payload: { 
                                     notification: {
                                         id,
@@ -270,7 +276,7 @@ const Dashboard = ({ children, title }) => {
                             playAudioNotifcation(senderId);
                             console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
-                                type: PAYMENT_NOTIFICATION,
+                                type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
                                 payload: { type: BUYER_CONFIRMED_PAYMENT, id }
                             });
                             successModal.current.openModal();
@@ -287,7 +293,7 @@ const Dashboard = ({ children, title }) => {
                             playAudioNotifcation(senderId);
                             console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
-                                type: PAYMENT_NOTIFICATION,
+                                type: PAYMENT_NOTIFICATION_SELLER_PAID,
                                 payload: { type: SELLER_MADE_PAYMENT, id }
                             });
                         }
@@ -300,7 +306,7 @@ const Dashboard = ({ children, title }) => {
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
-                                type: PAYMENT_NOTIFICATION,
+                                type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
                                 payload: { type: SELLER_CONFIRMED_PAYMENT, id }
                             });
                         }

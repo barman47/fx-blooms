@@ -1,13 +1,12 @@
 import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { SET_SOCKET_CONNECTION_STATUS } from '../actions/types';
 
-import { HUB_URL, NOTIFICATION_TYPES, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
+import { HUB_URL, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
 import { store } from '../store';
 
 import { CHAT_CONNECTION_STATUS } from '../utils/constants';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
-const { TRANSFER_CONFIRMATION, TRANSFER_NOTIFICATION } = NOTIFICATION_TYPES;
 
 class SignalRController {
     connected = false;
@@ -84,8 +83,6 @@ class SignalRController {
 
     closeNotifications = () => {
         this.connection.off(RECEIVE_NOTIFICATION);
-        this.connection.off(TRANSFER_NOTIFICATION);
-        this.connection.off(TRANSFER_CONFIRMATION);
     };
 }
 
