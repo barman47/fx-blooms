@@ -1,5 +1,6 @@
 import { 
     ADDED_LISTING, 
+    DELETED_LISTING,
     // HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
@@ -36,6 +37,16 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 addedListing: !state.addedListing,
                 msg: null
+            };
+        
+        case DELETED_LISTING:
+            listingId = action.payload.listingId;
+            listingIndex = state.listings.findIndex(listing => listing._id === listingId);
+            listingsList = [...state.listings];
+            listingsList.splice(listingIndex, 1);
+            return {
+                ...state,
+                listings: [...listingsList]
             };
         
         case SET_LISTING:

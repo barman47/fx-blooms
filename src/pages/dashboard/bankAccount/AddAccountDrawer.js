@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box,
@@ -15,11 +15,11 @@ import {
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { addAccount } from '../../../actions/bankAccounts';
+import { SET_ACCOUNT, SET_ACCOUNT_MSG } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
 import SuccessModal from '../../../components/common/SuccessModal';
-import { SET_ACCOUNT_MSG } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -106,6 +106,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
     const matches = theme.breakpoints.down('md');
 
     const { customerId, firstName, lastName } = useSelector(state => state.customer);
+    const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.bankAccounts);
 
     const [bankName, setBankName] = useState('');
@@ -135,9 +136,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         }
     }, [drawerOpen, setReceivingAccountType]);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    useEffect(() => {
+        if (errorsState) {
+            setErrors(errorsState);
+        }
+    }, [errorsState]);
 
     useEffect(() => {
         if (msg) {
@@ -149,12 +152,8 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         }
     }, [msg]);
 
-    const dismissAction = () => {
-        toggleDrawer();
-        dispatch({
-            type: SET_ACCOUNT_MSG,
-            payload: null
-        });
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
     };
 
     const handleSetCurrency = () => {
@@ -169,6 +168,20 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         } else if (ngn) {
             return'NGN';
         }
+    };
+
+    const dismissAction = () => {
+        setOpen(false);
+        batch(() => {
+            dispatch({
+                type: SET_ACCOUNT,
+                payload: {}
+            });
+            dispatch({
+                type: SET_ACCOUNT_MSG,
+                payload: null
+            });
+        });
     };
 
     const onSubmit = (e) => {
@@ -195,7 +208,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
 
 	return (
         <>
-            <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            {msg && <SuccessModal ref={successModal} dismissAction={dismissAction} /> }
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={loading ? true : open} onClose={toggleDrawer}>
                 <Typography variant="h6" className={classes.header}>Add Account</Typography>
                 <Typography variant="subtitle2" component="small" className={classes.info}>Please note that you will only be paid via a linked account number.</Typography>

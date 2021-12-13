@@ -26,8 +26,8 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
-import { ADDED_LISTING, GET_ERRORS } from '../../../actions/types';
-import { ADD_ACCOUNT, APPROVED, COLORS, NOT_SUBMITTED, PAYMENT_METHODS, PENDING, REJECTED } from '../../../utils/constants';
+import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
+import { APPROVED, COLORS, NOT_SUBMITTED, PAYMENT_METHODS, PENDING, REJECTED } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
@@ -110,6 +110,10 @@ const useStyles = makeStyles(theme => ({
     helperText: {
         color: COLORS.offBlack,
         fontSize: theme.spacing(1.2)
+    },
+
+    addAccountButton: {
+        justifySelf: 'flex-end'
     },
 
     noListing: {
@@ -251,13 +255,10 @@ const MakeListing = (props) => {
     }, [customerId, listings]);
 
     useEffect(() => {
-        if (addedListing) {
+        if (addedListing && msg) {
             resetForm();
             successModal.current.openModal();
             successModal.current.setModalText(msg);
-            return dispatch({
-                type: ADDED_LISTING
-            });
         }
     }, [addedListing, dispatch, msg]);
 
@@ -280,14 +281,6 @@ const MakeListing = (props) => {
             setReceiptAmount(`NGN ${formatNumber(Number(ExchangeAmount) * Number(ExchangeRate), 2)}`);
         }
     }, [ExchangeAmount, ExchangeRate]);
-
-    // Display Add Account Drawer
-    useEffect(() => {
-        if (ReceivingAccount === ADD_ACCOUNT) {
-            setAddAccountDrawerOpen(true);
-            setReceivingAccount('');
-        }
-    }, [ReceivingAccount]);
 
     // Set Listing Fee
     // useEffect(() => {
@@ -382,7 +375,18 @@ const MakeListing = (props) => {
         setLoading(false);
     };
 
-    const dismissSuccessModal = () => history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+    const dismissSuccessModal = () => {
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: null
+        });
+        if (addedListing) {
+            dispatch({
+                type: ADDED_LISTING
+            });
+            history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        }
+    };
 
     const getAccountId = (account) => {
         const bank = accounts.find(item => item.bankName === account);
@@ -439,6 +443,11 @@ const MakeListing = (props) => {
     };
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
+
+    const handleAddAccount = () => {
+        setAddAccountDrawerOpen(true);
+        setReceivingAccount('');
+    };
 
     return (
         <>
@@ -612,14 +621,12 @@ const MakeListing = (props) => {
                                             labelId="ReceivingAccount"
                                             value={ReceivingAccount}
                                             onChange={(e) => setReceivingAccount(e.target.value)}
-                                        
                                         >
                                             <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            <MenuItem value={ADD_ACCOUNT}>{ADD_ACCOUNT}</MenuItem>
                                             {accounts.map((account) => {
                                                 if (account.currency === 'NGN') {
                                                     return (
-                                                        <MenuItem key={account.id} value={account.bankName}>{account.bankName}</MenuItem>
+                                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
                                                     )
                                                 }
                                                 return null;
@@ -627,6 +634,7 @@ const MakeListing = (props) => {
                                         </Select>
                                         <FormHelperText>{errors.setReceivingAccount}</FormHelperText>
                                     </FormControl>
+                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add Receiving Account</Button>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
@@ -670,23 +678,9 @@ const MakeListing = (props) => {
                                             error={errors.ReceiptAmount ? true : false}
                                         />
                                     </Tooltip>
+                                    <FormHelperText>Listing Fee: EUR 0.00</FormHelperText>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Listing Fee</Typography>
-                                    <TextField
-                                        className={classes.darkInput}
-                                        value={ListingFee}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="EUR 0.00"
-                                        helperText={errors.ListingFee}
-                                        fullWidth
-                                        required
-                                        // disabled={loading ? true : false}
-                                        disabled
-                                        error={errors.ListingFee ? true : false}
-                                    />
-                                </Grid>
+
                                 <Grid item xs={12}>
                                     <Button 
                                         type="submit" 

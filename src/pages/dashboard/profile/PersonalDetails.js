@@ -92,15 +92,19 @@ const PersonalDetails = () => {
     const [Username, setUsername] = useState('');
     const [PhoneNo, setPhoneNo] = useState('');
     const [Address, setAddress] = useState('');
+    // eslint-disable-next-line
     const [CountryCode, setCountryCode] = useState('');
     const [country, setCountry] = useState('');
     const [countryId, setCountryId] = useState('');
+    // eslint-disable-next-line
     const [city, setCity] = useState('');
     const [stateId, setStateId] = useState('');
     // eslint-disable-next-line
     const [states, setStates] = useState([]);
     const [PostalCode, setPostalCode] = useState('');
+    // eslint-disable-next-line
     const [Listings, setListings] = useState(0);
+    // eslint-disable-next-line
     const [Transactions, setTransactions] = useState(0);
     
     // eslint-disable-next-line

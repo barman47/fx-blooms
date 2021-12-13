@@ -4,17 +4,18 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { decode } from 'html-entities'
 
 import { COLORS } from '../../../utils/constants';
+import formatNumber from '../../../utils/formatNumber';
 
 import { completeTransaction } from '../../../actions/listings';
+import { getNotifications } from '../../../actions/notifications';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
 import { DASHBOARD, PROFILE } from '../../../routes';
 import { SET_ACCOUNT } from '../../../actions/types';
-import isEmpty from '../../../utils/isEmpty';
-import { getAccount } from '../../../actions/bankAccounts';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -80,6 +81,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     notifications: {
+        alignItems: 'flex-start',
         display: 'grid',
         gridTemplateColumns: '1fr',
         gap: theme.spacing(4),
@@ -88,35 +90,35 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getAccount, handleSetTitle }) => {
+const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { account } = useSelector(state => state.bankAccounts);
-    const { bids } = useSelector(state => state.notifications);
+    const { customerId } = useSelector(state => state.customer);
+    const { notifications } = useSelector(state => state.notifications);
 
+    const [amount, setAmount] = useState(0);
+    const [sellerUsername, setSellerUsername] = useState('');
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
+    const [transactionId, setTransactionId] = useState(null);
     
     useEffect(() => {
+        getNotifications();
         handleSetTitle('Notifications');
         // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
         if (!sendEurDrawerOpen) {
+            setAmount(0);
+            setTransactionId(null);
+            setSellerUsername('');
             dispatch({
                 type: SET_ACCOUNT,
                 payload: {}
             });
         }
     }, [dispatch, sendEurDrawerOpen]);
-
-    // Open Send Eur Drawer Once Buyer Account is Available
-    useEffect(() => {
-        if (!isEmpty(account)) {
-            setSendEurDrawerOpen(true);
-        }
-    }, [account]);
 
     const handlePaymentReceived = (id) => {
         const data = {
@@ -128,18 +130,103 @@ const Index = ({ completeTransaction, getAccount, handleSetTitle }) => {
         completeTransaction(data);
     };
 
-    const getBuyerAccount = (accountId, id) => {
+    const setBuyerAccount = (notification) => {
+        const { buyer, seller } = notification;
+        setTransactionId(notification.id);
+        setSellerUsername(seller.userName);
+        
+        const sellerAccount = {
+            accounName: seller.accountName,
+            accountNumber: seller.accountNumber,
+            bankName: seller.bankName
+        };
+
+        if (buyer.hasMadePayment) {
+            // Seller should make payment since buyer has paid
+            setAmount(Number(seller.amountTransfered));
+            dispatch({
+                type: SET_ACCOUNT,
+                payload: sellerAccount
+            });
+        }
+        
         toggleSendEurDrawer();
-        getAccount(accountId);
-        handlePaymentReceived(id);
     };
 
     const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
     const gotoAccountSetup = () => history.push(`${DASHBOARD}${PROFILE}`);
 
+    const setMessage = (notification) => {
+        const { buyer, seller } = notification;
+        const isBuyer = customerId === buyer.customerId ? true : false;
+        const isSeller = customerId === seller.customerId ? true : false;
+
+        let message;
+
+        if (isSeller && buyer.hasMadePayment) {
+            message=`${buyer.userName} has made a payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(buyer.amountTransfered)} to your ${seller.bankName} account | ${seller.accountNumber}`;
+        }
+
+        if (isBuyer && seller.hasMadePayment) {
+            message=`${seller.userName} has made a payment of ${decode('&#8364;', { level: 'html5' })}${formatNumber(seller.amountTransfered)} to your ${buyer.bankName} account | ${buyer.accountNumber}`;
+        }
+        return message;
+    };
+
+    const hasNotification = (notification) => {
+        const { buyer, seller } = notification;
+        const isBuyer = customerId === buyer.customerId ? true : false;
+        const isSeller = customerId === seller.customerId ? true : false;
+        let result = false;
+
+        if (isBuyer && seller.hasMadePayment) {
+            result = true;
+        }
+        if (isSeller && buyer.hasMadePayment) {
+            result = true;
+        }
+        return result;
+    };
+
+    const buttonDisabled = (seller) => {
+        const isSeller = customerId === seller.customerId ? true : false;
+
+        if (isSeller && seller.hasReceivedPayment && seller.hasMadePayment) {
+            return true;
+        }
+    };
+
+    const handleButtonAction = (notification) => {
+        const { id, seller } = notification;
+        if (customerId === seller.customerId) {
+            if (seller.hasReceivedPayment) {
+                console.log('Seller already received payment');
+                setBuyerAccount(notification);
+
+            } else {
+                // Seller should make payment
+                console.log('Seller has not acknowledged, acknowledging payment');
+                setBuyerAccount(notification);
+                handlePaymentReceived(id);
+            }
+
+        } else {
+            // End Transaction
+            handlePaymentReceived(notification.id);
+        }
+    };
+
     return (
         <>
-            {sendEurDrawerOpen && <SendEurDrawer toggleDrawer={toggleSendEurDrawer} drawerOpen={sendEurDrawerOpen} />}
+            {sendEurDrawerOpen && 
+                <SendEurDrawer 
+                    toggleDrawer={toggleSendEurDrawer} 
+                    drawerOpen={sendEurDrawerOpen} 
+                    amount={amount} 
+                    transactionId={transactionId}
+                    sellerUsername={sellerUsername}
+                />
+            }
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>
                 <Typography variant="body2" component="p">View notifications below</Typography>
@@ -147,19 +234,26 @@ const Index = ({ completeTransaction, getAccount, handleSetTitle }) => {
                     <section className={classes.notifications}>
                         <Notification 
                             title="Account Setup Pending"
-                            message="You are yet to fully setup your account. Click Set Up Account to proceed."
+                            message={"You are yet to fully setup your account. Click Set Up Account to proceed."}
                             buttonText="Set Up Account"
                             buttonAction={gotoAccountSetup}
                         />
-                        {bids.map((bid, index) => (
-                            <Notification 
-                                key={index}
-                                title="Credit (Exchange)"
-                                message={bid.message}
-                                buttonText="Payment Confirmed"
-                                buttonAction={() => getBuyerAccount(bid.buyersAccountId, bid.id)}
-                            />
-                        ))}
+                        {notifications.map(notification => {
+                            if (hasNotification(notification)) {
+                                return (
+                                    <Notification 
+                                        key={notification.id}
+                                        title="Credit (Exchange)"
+                                        message={setMessage(notification)}
+                                        buttonText={buttonDisabled(notification.seller) ? 'Payment Confirmed' : 'Confirm payment'}
+                                        buttonAction={() => handleButtonAction(notification)}
+                                        // buttonAction={() => setBuyerAccount(notification)}
+                                        buttonDisabled={buttonDisabled(notification.seller)}
+                                    />
+                                )
+                            }
+                            return null;
+                        })}
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>
@@ -174,7 +268,7 @@ const Index = ({ completeTransaction, getAccount, handleSetTitle }) => {
 
 Index.propTypes = {
     completeTransaction: PropTypes.func.isRequired,
-    getAccount: PropTypes.func.isRequired
+    getNotifications: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction, getAccount })(Index);
+export default connect(undefined, { completeTransaction, getNotifications })(Index);

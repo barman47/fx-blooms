@@ -7,6 +7,7 @@ import setAuthToken from '../utils/setAuthToken';
 import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { 
+    DISABLED_2FA,
     ENABLED_2FA,
     SET_AUTH_TOKEN,
     SET_2FA_MSG,
@@ -42,6 +43,24 @@ export const getBarcode = () => async (dispatch) => {
         return dispatch({
             type: SET_BARCODE,
             payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const disableTwoFactor = (code) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/Disable?inputCode=${code}`);
+        batch(() => {
+            dispatch({
+                type: DISABLED_2FA,
+                payload: true
+            });
+            dispatch({
+                type: SET_2FA_MSG,
+                payload: res.data.data
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

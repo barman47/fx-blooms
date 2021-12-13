@@ -1,24 +1,19 @@
 
 import { 
-    ADD_BID,
     ADD_NOTIFICATION,
-    SET_BIDS,
     SET_NOTIFICATIONS, 
-    CUSTOMER_MADE_PAYMENT,
     PAYMENT_NOTIFICATION,
-    REMOVE_CHAT,
     SUBTRACT_UNREAD_NOTIFICATIONS,
-    CLEAR_UNREAD_NOTIFICATIONS,
     // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
-    SET_CHAT_CONNECTION_STATUS
+    SET_SOCKET_CONNECTION_STATUS,
+    UPDATE_NOTIFICATION
 } from '../actions/types';
 
-// import { NOTIFICATION_TYPES } from '../utils/constants';
+import { NOTIFICATION_TYPES } from '../utils/constants';
 
 const initialState = {
     notifications: [],
-    bids: [],
     unreadNotifications: 0,
     customerCanceled: null,
     connectionStatus: null
@@ -38,18 +33,6 @@ const notificationsReducer = (state = initialState, action) => {
                 unreadNotifications: action.payload.length
             }; 
 
-        case SET_BIDS:
-            return {
-                ...state,
-                bids: action.payload
-            };
-
-        case ADD_BID:
-            return {
-                ...state,
-                bids: [ action.payload, ...state.bids ]
-            };
-
         case ADD_NOTIFICATION:
             return {
                 ...state,
@@ -57,40 +40,94 @@ const notificationsReducer = (state = initialState, action) => {
                 unreadNotifications: state.unreadNotifications + 1
             };
 
-        case SET_CHAT_CONNECTION_STATUS:
+        case UPDATE_NOTIFICATION:
+            notification = action.payload;
+            notifications = state.notifications;
+            notificationIndex = notifications.findIndex(item => item.id === notification.id);
+            notifications[notificationIndex] = notification;
+
+            return {
+                ...state,
+                notifications
+            };
+
+        case SET_SOCKET_CONNECTION_STATUS:
             return {
                 ...state,
                 connectionStatus: action.payload
             };
 
-        case REMOVE_CHAT:
-            return {
-                ...state,
-                chat: null
-            };
-            
-        case CUSTOMER_MADE_PAYMENT:
-            return {
-                ...state,
-                chat: { ...state.chat, ...action.payload }
-            };
-
         case PAYMENT_NOTIFICATION: 
+            console.log('payment notification ', action.payload);
             notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
-            notification = state.notifications[notificationIndex];
-            notification.buyerHasMadePayment = action.payload.buyerHasMadePayment;
-            notification.buyerHasRecievedPayment = action.payload.buyerHasRecievedPayment;
-            notification.sellerHasMadePayment = action.payload.sellerHasMadePayment;
-            notification.sellerHasRecievedPayment = action.payload.sellerHasRecievedPayment;
-            notification.isDeleted = action.payload.isDeleted;
-
             notifications = state.notifications;
-            notifications[notificationIndex] = notification;
+            notification = notifications[notificationIndex];
 
-            return {
-                ...state,
-                notifications: [...notifications]
-            };
+            const { BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT } = NOTIFICATION_TYPES;
+
+            switch (action.payload.type) {
+                case BUYER_MADE_PAYMENT:
+                    // If notification exists, update it, else create a new one
+                    let newNotification;
+                    newNotification = state.notifications.find(item => item.id === action.payload.notification.id);
+                    if (newNotification) {
+                        return {
+                            ...state,
+                            notifications: [newNotification, ...notifications],
+                            unreadNotifications: action.payload.customerId === newNotification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
+                        };
+                    }
+
+                    notificationIndex = state.notifications.findIndex(item => item.id === action.payload.notification.id);
+                    notification = notifications[notificationIndex];
+                    return {
+                        ...state,
+                        notifications: [...notifications],
+                        unreadNotifications: action.payload.customerId === newNotification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
+                    };
+                    
+                    // notification.buyer.hasMadePayment = true;
+                    // notifications[notificationIndex] = notification;
+                    // console.log('updating notifications');
+                    // debugger;
+
+                    // return {
+                    //     ...state,
+                    //     notifications: [...notifications]
+                    // };
+
+                    // End transaction because buyer has confirmed seller's payment
+                case BUYER_CONFIRMED_PAYMENT:
+                    notifications.splice(notificationIndex, 1);
+
+                    return {
+                        ...state,
+                        notifications: [...notifications],
+                        unreadNotifications: state.unreadNotifications - 1
+                    };
+
+                case SELLER_MADE_PAYMENT:
+                    notification.seller.hasMadePayment = true;
+                    notifications[notificationIndex] = notification;
+
+                    return {
+                        ...state,
+                        notifications: [...notifications]
+                    };
+                    
+                case SELLER_CONFIRMED_PAYMENT:
+                    notification.seller.hasReceivedPayment = true;
+                    notifications[notificationIndex] = notification;
+
+                    return {
+                        ...state,
+                        notifications: [...notifications]
+                    };
+                    
+                default:
+                    break;
+            }
+           break;
 
         case CUSTOMER_CANCELED:
             return {
@@ -114,13 +151,7 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 unreadNotifications: unreadCount < 0 ? 0 : unreadCount
-            };
-
-        case CLEAR_UNREAD_NOTIFICATIONS:
-            return {
-                ...state,
-                unreadNotifications: 0
-            };
+            }
 
         default:
             return state;

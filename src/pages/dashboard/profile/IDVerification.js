@@ -9,8 +9,7 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: 'grid',
         gridTemplateColumns: '1fr',
-        gap: theme.spacing(5),
-        marginTop: theme.spacing(-4)
+        gap: theme.spacing(5)
     },
 
     header: {
@@ -52,6 +51,10 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr 0.1fr 1fr',
         gap: theme.spacing(10),
 
+        [theme.breakpoints.down('sm')]: {
+            gridTemplateColumns: '1fr',
+        },
+
         '& section': {
             backgroundColor: 'rgba(30, 98, 98, 0.92)',
             borderRadius: theme.shape.borderRadius,
@@ -89,14 +92,18 @@ const useStyles = makeStyles(theme => ({
                 alignItems: 'center',
                 marginTop: theme.spacing(2)
             }
-        },
+        }
+    },
 
-        '& div:nth-child(2)': {
-            backgroundColor: theme.palette.primary.main,
-            borderRadius: theme.shape.borderRadius,
-            alignSelf: 'center',
-            height: '65%',
-            width: '3px'
+    divider: {
+        backgroundColor: theme.palette.primary.main,
+        borderRadius: theme.shape.borderRadius,
+        alignSelf: 'center',
+        height: '65%',
+        width: '3px',
+
+        [theme.breakpoints.down('sm')]: {
+            display: 'none'
         }
     },
 
@@ -163,7 +170,7 @@ const IDVerification = () => {
                             }
                         </div>
                     </section>
-                    <div></div>
+                    <div className={classes.divider}></div>
                     <section>
                         <div>
                             <AccountMultiple className={classes.icon} />

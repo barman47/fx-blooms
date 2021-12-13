@@ -1,4 +1,3 @@
-import { Link } from '@material-ui/core';
 import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
@@ -51,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Notification = ({ title, message, buttonText, buttonAction }) => {
+const Notification = ({ title, message, buttonText, buttonAction, buttonDisabled }) => {
     const classes = useStyles();
 
     return (
@@ -69,6 +68,7 @@ const Notification = ({ title, message, buttonText, buttonAction }) => {
                     color="primary" 
                     onClick={buttonAction}
                     classes={{ root: classes.button }}
+                    disabled={buttonDisabled ? true : false}
                 >
                     {buttonText}
                 </Button>
@@ -82,6 +82,7 @@ Notification.propTypes = {
     message: PropTypes.string.isRequired,
     buttonText: PropTypes.string,
     buttonAction: PropTypes.func,
+    buttonDisabled: PropTypes.bool
     // link: PropTypes.string
 };
 

@@ -1,4 +1,4 @@
-import { ADDED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_MSG } from '../actions/types';
+import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_MSG } from '../actions/types';
 
 const initialState = {
     account: {},
@@ -8,6 +8,7 @@ const initialState = {
 
 const bankAccountsReducer = (state = initialState, action) => {
     let accounts = [];
+    let accountIndex;
     switch (action.type) {   
         case SET_ACCOUNT:
             return {
@@ -34,6 +35,17 @@ const bankAccountsReducer = (state = initialState, action) => {
                 accounts: [action.payload.account, ...state.accounts]
             };
         }
+
+        case EDITED_ACCOUNT: 
+            accounts = state.accounts;
+            accountIndex = accounts.findIndex(account => account.accountID === action.payload.account.accountID);
+            accounts[accountIndex] = action.payload.account;
+            
+            return {
+                ...state,
+                accounts: [...accounts],
+                msg: action.payload.msg,
+            };
 
         case DELETED_ACCOUNT:
             accounts = state.accounts.filter(account => account.accountID !== action.payload);

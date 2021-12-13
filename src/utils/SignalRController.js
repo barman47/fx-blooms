@@ -1,5 +1,5 @@
 import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
-import { SET_CHAT_CONNECTION_STATUS } from '../actions/types';
+import { SET_SOCKET_CONNECTION_STATUS } from '../actions/types';
 
 import { HUB_URL, NOTIFICATION_TYPES, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
 import { store } from '../store';
@@ -25,7 +25,7 @@ class SignalRController {
             await this.connection.start();
             console.log('SignalR Connected');
             store.dispatch({
-                type: SET_CHAT_CONNECTION_STATUS,
+                type: SET_SOCKET_CONNECTION_STATUS,
                 payload: CONNECTED
             });
         } catch (err) {
@@ -41,7 +41,7 @@ class SignalRController {
             console.assert(this.connection.state === HubConnectionState.Reconnecting);
             // callback(err);
             store.dispatch({
-                type: SET_CHAT_CONNECTION_STATUS,
+                type: SET_SOCKET_CONNECTION_STATUS,
                 payload: RECONNECTING
             });
             // disable inputs and show reconnection message
@@ -52,7 +52,7 @@ class SignalRController {
         this.connection.onreconnected(connectionId => {
             console.assert(this.connection.state === HubConnectionState.Connected);
             store.dispatch({
-                type: SET_CHAT_CONNECTION_STATUS,
+                type: SET_SOCKET_CONNECTION_STATUS,
                 payload: RECONNECTED
             });
         });
@@ -62,7 +62,7 @@ class SignalRController {
         this.connection.onclose(err => {
             console.assert(this.connection.state === HubConnectionState.Disconnected);
             store.dispatch({
-                type: SET_CHAT_CONNECTION_STATUS,
+                type: SET_SOCKET_CONNECTION_STATUS,
                 payload: DISCONNECTED
             });
         });

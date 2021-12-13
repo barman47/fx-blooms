@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, TextField, Typography, useMediaQuery } from '@material-ui/core'; 
 import { makeStyles, useTheme } from '@material-ui/core/styles'; 
+import PropTypes from 'prop-types';
+
+import { disableTwoFactor } from '../../../actions/twoFactor';
 
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import { GET_ERRORS } from '../../../actions/types';
+import { GET_ERRORS, SET_2FA_MSG } from '../../../actions/types';
 import validateAuthenticatorCode from '../../../utils/validation/customer/authenticator';
 
 import Spinner from '../../../components/common/Spinner';
@@ -25,22 +28,17 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(-3),
         padding: theme.spacing(3),
         textAlign: 'center',
-        width: '100%',
-
-        [theme.breakpoints.down('md')]: {
-            width: '70%'
-        },
+        // width: '100%',
 
         [theme.breakpoints.down('sm')]: {
             marginTop: theme.spacing(2),
-            padding: theme.spacing(1),
-            width: '95%'
+            padding: theme.spacing(1)
         }
     },
 
     form: {
         justifySelf: 'center',
-        width: '50%'
+        width: '90%'
     },
 
     input: {
@@ -66,7 +64,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const DisableTwoFactor = (props) => {
+const DisableTwoFactor = ({ disableTwoFactor }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -144,7 +142,10 @@ const DisableTwoFactor = (props) => {
         //         payload: null
         //     });
         // });
-        // return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        dispatch({
+            type: SET_2FA_MSG,
+            payload: null
+        });
     };
 
     const onSubmit = (e) => {
@@ -175,7 +176,7 @@ const DisableTwoFactor = (props) => {
             payload: {}
         });
 
-        return props.enableTwoFactor(code);
+        return disableTwoFactor(code);
     };
 
     return (
@@ -203,7 +204,7 @@ const DisableTwoFactor = (props) => {
                                 onChange={(e) => setFirst(e.target.value)}
                                 onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
                                 type="text"
-                                variant="outlined" 
+                                variant="outlined"                                 
                                 inputProps={{
                                     maxLength: 1
                                 }}
@@ -305,4 +306,8 @@ const DisableTwoFactor = (props) => {
     );
 };
 
-export default DisableTwoFactor;
+DisableTwoFactor.propTypes = {
+    disableTwoFactor: PropTypes.func.isRequired,
+};
+
+export default connect(undefined, { disableTwoFactor })(DisableTwoFactor);

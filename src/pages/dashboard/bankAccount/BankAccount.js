@@ -1,7 +1,8 @@
 import PropTypes from 'prop-types';
-import { IconButton, Typography } from '@material-ui/core';
+import { IconButton, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { DeleteForever } from 'mdi-material-ui';
+import { DeleteForever, FileEdit } from 'mdi-material-ui';
+import clsx from 'clsx';
 
 import { COLORS } from '../../../utils/constants'; 
 
@@ -12,20 +13,28 @@ const useStyles = makeStyles(theme =>({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gap: theme.spacing(1),
-        gridTemplateColumns: '1.3fr 1.3fr 1.3fr 0.7fr 0.5fr',
-        alignItems: 'center',
+        gridTemplateColumns: '1.3fr 1.3fr 1.3fr 0.7fr 0.5fr 0.1fr',
+        // alignItems: 'center',
         padding: [[theme.spacing(2), 0, theme.spacing(2), theme.spacing(2)]],
 
         [theme.breakpoints.down('sm')]: {
-            alignItems: 'flex-start',
-            gap: theme.spacing(0.5),
-            height: 'initial',
-            padding: [[theme.spacing(0.5), 0, theme.spacing(0.5), theme.spacing(0.5)]],
-            width: '100%'
+            padding: theme.spacing(1)
         },
+        // [theme.breakpoints.down('sm')]: {
+        //     gridTemplateColumns: '1fr 1r',
+        //     // alignItems: 'flex-start',
+        //     // gap: theme.spacing(0.5),
+        //     // height: 'initial',
+        //     // padding: [[theme.spacing(0.5), 0, theme.spacing(0.5), theme.spacing(0.5)]],
+        //     // width: '100%'
+        // },
 
         '& small': {
             fontWeight: 300,
+
+            [theme.breakpoints.down('md')]: {
+                fontSize: theme.spacing(1.2)
+            },
 
             [theme.breakpoints.down('sm')]: {
                 fontSize: theme.spacing(0.8)
@@ -33,43 +42,86 @@ const useStyles = makeStyles(theme =>({
         },
 
         '& p': {
+            [theme.breakpoints.down('md')]: {
+                fontSize: theme.spacing(1.4)
+            },
+
             [theme.breakpoints.down('sm')]: {
                 fontSize: theme.spacing(0.9)
             },
         }
     },
 
-    icon: {
+    // item: {
+    //     [theme.breakpoints.down('sm')]: {
+    //         display: 'flex',
+    //         justifyContent: 'space-between',
+    //         flexDirection: 'row',
+    //         padding: theme.spacing(0, 2)
+    //     }
+    // },
+
+    iconContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+
+    deleteIcon: {
         color: theme.palette.error.main,
         [theme.breakpoints.down('sm')]: {
             fontSize: theme.spacing(1.5)
         },
+    },
+
+    editIcon: {
+        color: theme.palette.primary.main,
+        [theme.breakpoints.down('sm')]: {
+            fontSize: theme.spacing(1.5)
+        }
     }
 }));
 
-const BankAccount = ({ bankName, accountName, accountNumber, currency, handleDeleteAccount }) => {
+const BankAccount = ({ bankName, accountName, accountNumber, currency, handleDeleteAccount, handleEditAccount }) => {
     const classes = useStyles();
 
     return (
-        <section className={classes.root}>
-            
-            <Typography variant="subtitle2" component="small">Bank Name</Typography>
-            <Typography variant="subtitle2" component="small">Account Name</Typography>
-            <Typography variant="subtitle2" component="small">{currency === 'NGN' ? 'Account Number' : 'IBAN'}</Typography>
-            <Typography variant="subtitle2" component="small">Currency</Typography>
-            <Typography variant="subtitle2" component="small"></Typography>
-            <Typography variant="subtitle1" component="p">{bankName}</Typography>
-            <Typography variant="subtitle1" component="p">{accountName}</Typography>
-            <Typography variant="subtitle1" component="p">{accountNumber}</Typography>
-            <Typography variant="subtitle1" component="p">{currency}</Typography>
-            <IconButton disableRipple style={{ justifySelf: 'center' }} onClick={handleDeleteAccount}>
-                <DeleteForever className={classes.icon} />
-            </IconButton>
-        </section>
+        <>
+            <section className={classes.root}>
+                <div className={classes.item}>
+                    <Typography variant="subtitle2" component="small">Bank Name</Typography>
+                    <Typography variant="subtitle1" component="p">{bankName}</Typography>
+                </div>
+                <div className={classes.item}>
+                    <Typography variant="subtitle2" component="small">Account Name</Typography>
+                    <Typography variant="subtitle1" component="p">{accountName}</Typography>
+                </div>
+                <div className={classes.item}>
+                    <Typography variant="subtitle2" component="small">{currency === 'NGN' ? 'Account Number' : 'IBAN'}</Typography>
+                    <Typography variant="subtitle1" component="p">{accountNumber}</Typography>
+                </div>
+                <div className={classes.item}>
+                    <Typography variant="subtitle2" component="small">Currency</Typography>
+                    <Typography variant="subtitle1" component="p">{currency}</Typography>
+                </div>
+                <div className={clsx(classes.iconContainer, classes.item)}>
+                    <Tooltip title="Delete Account" placement="top">
+                        <IconButton disableRipple style={{ justifySelf: 'center' }} onClick={handleDeleteAccount}>
+                            <DeleteForever className={classes.deleteIcon} />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Edit Account" placement="top">
+                        <IconButton disableRipple style={{ justifySelf: 'center' }} onClick={handleEditAccount}>
+                            <FileEdit className={classes.editIcon} />
+                        </IconButton>
+                    </Tooltip>
+                </div>
+            </section>
+        </>
     );
 }
 
 BankAccount.propTypes = {
+    accountID: PropTypes.string, 
     bankName: PropTypes.string.isRequired, 
     accountName: PropTypes.string.isRequired,
     accountNumber: PropTypes.string.isRequired,

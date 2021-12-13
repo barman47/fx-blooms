@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
-import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
-import clsx from 'clsx';
 import { 
     Button, 
     Container, 
@@ -86,8 +84,6 @@ const useStyles = makeStyles(theme => ({
 
 const QrCode = (props) => {
     const classes = useStyles();
-    
-    const history = useHistory();
 
     const { barcode } = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);
@@ -104,7 +100,7 @@ const QrCode = (props) => {
         if (barcode?.qrCodeSetupImageUrl) {
             setBarcodeImage(barcode.qrCodeSetupImageUrl);
         }
-    }, [barcode.qrCodeSetupImageUrl]);
+    }, [barcode?.qrCodeSetupImageUrl]);
 
     useEffect(() => {
         if (msg) {
@@ -155,7 +151,7 @@ const QrCode = (props) => {
                         </IconButton>
                     </Typography>
                     <TextField
-                        value={barcode.manualEntryKey}
+                        value={barcode?.manualEntryKey}
                         variant="outlined"
                         multiline
                         rows={4}

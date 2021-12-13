@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/Listing`;
@@ -45,12 +45,16 @@ export const addListing = (listing) => async (dispatch) => {
 
 export const deleteListing = (listingId) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.delete(`${URL}/DeleteListing?listingId=${listingId}`);
-        // return dispatch({
-        //     type: ADDED_LISTING,
-        //     payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
-        // });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${URL}/DeleteListing/${listingId}`),
+
+        ]);
+
+        return dispatch({
+            type: DELETED_LISTING,
+            payload: { id: listingId }
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -134,7 +138,12 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
 export const completeTransaction = (data) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        await axios.post(`${URL}/CompleteTransaction`, data);
+        const res = await axios.post(`${URL}/CompleteTransaction`, data);
+        console.log(res)
+        // return dispatch({
+        //     UPDATE_NOTIFICATION,
+        //     payload: res.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

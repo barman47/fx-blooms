@@ -26,8 +26,13 @@ const useStyles = makeStyles(theme =>({
         padding: [[theme.spacing(15), theme.spacing(10), 0, theme.spacing(10)]],
         gap: theme.spacing(5),
 
+        [theme.breakpoints.down('md')]: {
+            gridTemplateColumns: '1fr',
+            padding: [[theme.spacing(10), theme.spacing(1), 0, theme.spacing(1)]]
+        },
+
         [theme.breakpoints.down('sm')]: {
-            padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
+            padding: theme.spacing(5, 0.5)
         }
     },
 
@@ -39,7 +44,11 @@ const useStyles = makeStyles(theme =>({
         flexDirection: 'column',
         alignItems: 'center',
         alignSelf: 'flex-start',
-        padding: theme.spacing(4, 0)
+        padding: theme.spacing(4, 0),
+
+        [theme.breakpoints.down('md')]: {
+            display: 'none',
+        }
     },
 
     tabs: {

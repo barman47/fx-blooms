@@ -173,15 +173,6 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
         }
     }, [dispatch, getAccount, listing.sellersAccountId, openBuyEurDrawer]);
 
-    // const setListing = (e, listing) => {
-    //     e.preventDefault();
-    //     dispatch({
-    //         type: SET_LISTING,
-    //         payload: listing
-    //     });
-    //     return history.push(`${DASHBOARD}${EDIT_LISTING}`);
-    // };
-
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
         if (userId !== customerId) {
@@ -241,11 +232,11 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
                 </header>
                 <div>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I want to sell</span>
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You receive</span>
                         {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I Want</span>
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You send</span>
                         {`${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
