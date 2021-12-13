@@ -14,7 +14,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { InformationOutline } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS, LOGOUT, SHADOW } from '../../utils/constants';
 import { RESET_CUSTOMER_SESSION } from '../../actions/types';
 import reIssueCustomerToken from '../../utils/reIssueCustomerToken';
 import { logout } from '../../actions/customer';
@@ -120,6 +120,7 @@ const SessionModal = ({ logout }) => {
             clearInterval(logoutTimer.current);
             logoutTimer.current = undefined;
             setExpired(true);
+            sessionStorage.setItem(LOGOUT, 'true');
         }
     }, [timeToLogout]);
 

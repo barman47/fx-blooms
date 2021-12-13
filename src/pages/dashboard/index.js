@@ -31,7 +31,7 @@ import {
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
-import { CHAT_CONNECTION_STATUS, COLORS, NOTIFICATION_TYPES } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import Header from '../../components/layout/Header';
@@ -112,7 +112,7 @@ const ToastAction = () => {
     );
 };
 
-const Dashboard = ({ children, title }) => {
+const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -140,7 +140,7 @@ const Dashboard = ({ children, title }) => {
     const successModal = useRef();
 
     useEffect(() => {
-        
+        checkSession();
         onReconnected();
         onReconnect();
         onClose();
@@ -190,6 +190,13 @@ const Dashboard = ({ children, title }) => {
                 break;
         }
     }, [connectionStatus]);
+
+    const checkSession = () => {
+        if (sessionStorage.getItem(LOGOUT)) {
+            sessionStorage.removeItem(LOGOUT);
+            logout(history);
+        }
+    };
 
     const playAudioNotifcation = (senderId) => {
         if (senderId !== customerId) {

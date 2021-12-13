@@ -14,7 +14,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { InformationOutline } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS, LOGOUT, SHADOW } from '../../utils/constants';
 import { RESET_ADMIN_SESSION } from '../../actions/types';
 import reIssueAdminToken from '../../utils/reIssueAdminToken';
 import { logout } from '../../actions/admin';
@@ -71,17 +71,18 @@ const SessionModal = ({ logout }) => {
     const [open, setOpen] = useState(false);
     const [expired, setExpired] = useState(false);
     const [inactiveTime, setInActiveTime] = useState(0);
-    const [timeToLogout, setTimeToLogout] = useState(60);
+    const [timeToLogout, setTimeToLogout] = useState(10);
 
     let sessionTimer = useRef();
     let logoutTimer = useRef();
 
-    const timeoutDuration = 300; //300 seconds: 5 minutes
+    // const timeoutDuration = 300; //300 seconds: 5 minutes
+    const timeoutDuration = 10; //300 seconds: 5 minutes
 
     const resetSessionTimer = useCallback(() => {
         setOpen(false);
         setInActiveTime(0);
-        setTimeToLogout(60);
+        setTimeToLogout(10);
         clearInterval(logoutTimer.current);
         logoutTimer.current = undefined;
         startSessionTimer();
@@ -120,6 +121,7 @@ const SessionModal = ({ logout }) => {
             clearInterval(logoutTimer.current);
             logoutTimer.current = undefined;
             setExpired(true);
+            sessionStorage.setItem(LOGOUT, 'true');
         }
     }, [timeToLogout]);
 

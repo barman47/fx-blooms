@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
@@ -14,8 +15,8 @@ import { Account } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
 
-import { getStats } from '../../actions/admin';
-import { COLORS } from '../../utils/constants';
+import { getStats, logout } from '../../actions/admin';
+import { COLORS, LOGOUT } from '../../utils/constants';
 
 import SessionModal from './SessionModal';
 
@@ -90,14 +91,23 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getStats }) => {
+const AdminDashboard = ({ children, title, getStats, logout }) => {
     const classes = useStyles();
+    const history = useHistory();
     const { admin } = useSelector(state => state);
 
     useEffect(() => {
+        checkSession();
         getStats();
         // eslint-disable-next-line
     }, []);
+
+    const checkSession = () => {
+        if (sessionStorage.getItem(LOGOUT)) {
+            sessionStorage.removeItem(LOGOUT);
+            logout(history);
+        }
+    };
 
     return (
         <>
@@ -135,7 +145,8 @@ const AdminDashboard = ({ children, title, getStats }) => {
 
 AdminDashboard.propTypes = {
     title: PropTypes.string.isRequired,
-    getStats: PropTypes.func.isRequired
+    getStats: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getStats })(AdminDashboard);
+export default connect(undefined, { getStats, logout })(AdminDashboard);
