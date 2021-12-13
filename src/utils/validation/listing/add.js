@@ -48,7 +48,7 @@ const addListing = (data) => {
             errors.MinExchangeAmount = 'Minimum exchange amount cannot be greater than available amount!';
         }
         if (Validator.isEmpty(data.MinExchangeAmount)) {
-            errors.MinExchangeAmount = 'Amount is required!';
+            errors.MinExchangeAmount = 'Please fill in the minimum amount you are willing to exchange.';
         }
     }
 

@@ -47,8 +47,7 @@ export const deleteListing = (listingId) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
-            axios.post(`${URL}/DeleteListing/${listingId}`),
-
+            axios.post(`${URL}/DeleteListing/${listingId}`)
         ]);
 
         return dispatch({
