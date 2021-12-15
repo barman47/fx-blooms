@@ -416,7 +416,6 @@ export default ResidencePermitModal;
 //         const { errors, isValid } = validateResidencePermit(data);
 
 //         if (!isValid) {
-//             console.log(errors);
 //             return setErrors(errors);
 //         }
 

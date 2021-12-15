@@ -3,7 +3,6 @@ import { Helmet } from 'react-helmet';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
-// import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -34,7 +33,7 @@ import { logout } from '../../actions/customer';
 import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
-import Header from '../../components/layout/Header';
+import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
 import SuccessModal from '../../components/common/SuccessModal';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
@@ -239,7 +238,6 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_BUYER_PAID,
                                 payload: { 
@@ -281,7 +279,6 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Transfer.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
                                 payload: { type: BUYER_CONFIRMED_PAYMENT, id }
@@ -298,7 +295,6 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_SELLER_PAID,
                                 payload: { type: SELLER_MADE_PAYMENT, id }
@@ -311,7 +307,6 @@ const Dashboard = ({ children, title, logout }) => {
                         seller = payload.Transfer.Seller;
                         id = payload.Transfer.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
-                            console.log('Dispatching PAYMENT_NOTIFICATION');
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
                                 payload: { type: SELLER_CONFIRMED_PAYMENT, id }
@@ -366,27 +361,29 @@ const Dashboard = ({ children, title, logout }) => {
                 />
             }
             <Toaster />
-            <Header />
+            <PrivateHeader />
             <section className={classes.root}>
                 <div className={classes.content}>
                     {children}
                 </div>
-                <Box
-                    boxShadow={5}
-                    className={classes.bottomBar}
-                >
-                    <BottomNavigation
-                        value={value}
-                        onChange={(event, newValue) => {
-                            setValue(newValue)
-                        }}
-                        showLabels
+                <HideOnScroll direction="up">
+                    <Box
+                        boxShadow={5}
+                        className={classes.bottomBar}
                     >
-                        {mobileLinks.map((item, index) => (
-                            <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
-                        ))}
-                    </BottomNavigation>
-                </Box>
+                        <BottomNavigation
+                            value={value}
+                            onChange={(event, newValue) => {
+                                setValue(newValue)
+                            }}
+                            showLabels
+                        >
+                            {mobileLinks.map((item, index) => (
+                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                            ))}
+                        </BottomNavigation>
+                    </Box>
+                </HideOnScroll>
             </section>
         </>
     );

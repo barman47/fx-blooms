@@ -136,13 +136,10 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
 
 export const completeTransaction = (data) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/CompleteTransaction`, data);
-        console.log(res)
-        // return dispatch({
-        //     UPDATE_NOTIFICATION,
-        //     payload: res.data.data
-        // });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${URL}/CompleteTransaction`, data)
+        ]);
     } catch (err) {
         return handleError(err, dispatch);
     }

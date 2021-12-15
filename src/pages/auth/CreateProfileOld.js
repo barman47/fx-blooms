@@ -262,10 +262,6 @@ const CreateProfile = (props) => {
         }
     }, [successMessage]);
 
-    // useEffect(() => {
-    //     console.log(emojiFlags.data);
-    // }, []);
-
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errors, msg: errorsState.msg });
@@ -475,7 +471,6 @@ const CreateProfile = (props) => {
         setErrors({});
         try {
             const file = IdBack;
-            console.log(file);
             if (!file) {
                 return setErrors({ msg: 'Photo is required!', idBack: 'Photo is required!' });
             }

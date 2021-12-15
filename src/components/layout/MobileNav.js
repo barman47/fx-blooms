@@ -90,7 +90,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                             <ListItemIcon>
                                 <FormatListText className={classes.listings} />
                             </ListItemIcon>
-                            <ListItemText primary="All Listings" />
+                            <ListItemText primary="Dashboard" />
                         </ListItemLink>
                         :
                         <>

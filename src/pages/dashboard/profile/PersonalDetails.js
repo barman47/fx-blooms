@@ -26,10 +26,21 @@ const useStyles = makeStyles(theme =>({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: theme.spacing(2),
-        marginTop: theme.spacing(-4),
+
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            marginBottom: theme.spacing(4),
+        },
         
         '& div:first-child': {
-            marginBottom: theme.spacing(2)
+            marginBottom: theme.spacing(2),
+
+            '& h4': {
+                [theme.breakpoints.down('sm')]: {
+                    fontSize: theme.spacing(3)
+                }
+            }
         },
 
         '& hr': {
@@ -179,7 +190,7 @@ const PersonalDetails = () => {
                         <Grid container direction="row" spacing={3} className={classes.container}>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                                {profile.firstName && !editable ?
+                                {profile.firstName ?
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.firstName}</Typography>
                                     :
                                     <TextField 

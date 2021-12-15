@@ -2,7 +2,7 @@
 
 html {
   width: 100vw;
-  /* overflow-x: hidden; */
+  overflow-x: hidden;
 }
 
 body {
@@ -12,7 +12,7 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  width: 100%;
+  max-width: 100%;
 }
 
 code {

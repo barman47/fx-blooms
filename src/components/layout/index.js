@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 
-import Header from './Header';
+import PublicHeader from './PublicHeader';
 import Footer from './Footer';
 
 const index = ({ children, title, description }) => (
@@ -10,7 +10,7 @@ const index = ({ children, title, description }) => (
             <title>{`${title} | FXBLOOMS.com`}</title>
             {description && <meta name="description" content={description} />}
         </Helmet>
-        <Header />
+        <PublicHeader />
         {children} 
         <Footer />
     </>
