@@ -17,7 +17,11 @@ import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        marginTop: theme.spacing(-2)
+        marginTop: theme.spacing(-2),
+
+        [theme.breakpoints.down('sm')]: {
+            marginTop: 0
+        }
     },
 
     header: {

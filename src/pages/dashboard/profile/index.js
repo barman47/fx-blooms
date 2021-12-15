@@ -18,6 +18,7 @@ import BankAccounts from '../bankAccount/BankAccounts';
 import PersonalDetails from './PersonalDetails';
 import IDVerification from './IDVerification';
 import TwoFactor from '../twoFactor';
+import AccountSettingsDrawer from '../../../components/common/AccountSettingsDrawer';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -84,7 +85,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-function TabPanel(props) {
+export const TabPanel = (props) => {
     const { children, value, index, ...other } = props;
 
     return (
@@ -110,24 +111,37 @@ TabPanel.propTypes = {
     value: PropTypes.any.isRequired,
 };
 
-function a11yProps(index) {
+export const a11yProps = (index) => {
     return {
         id: `fund-tabs-${index}`,
         'aria-controls': `simple-tabpanel-${index}`,
     };
 }
 
-function LinkTab(props) {
+export const LinkTab = (props) => {
     return (
         <Tab
             component={RouterLink}
             onClick={(event) => {
-            event.preventDefault();
+                event.preventDefault();
             }}
             {...props}
         />
     );
 }
+
+let setTabValue;
+let setOpenDrawer;
+let isDrawerOpen;
+
+export const handleChange = (event, newValue) => {
+    setTabValue(newValue);
+    return newValue;
+};
+
+export const toggleDrawer = () => {
+    setOpenDrawer(!isDrawerOpen);
+};
 
 const Profile = (props) => {
     const classes = useStyles();
@@ -137,10 +151,14 @@ const Profile = (props) => {
 
     const { getAccounts, getDocuments, getCountries, getCustomerInformation, handleSetTitle } = props;
 
+    const [drawerOpen, setDrawerOpen] = useState(false);
     const [value, setValue] = useState(0);
+    setTabValue = setValue;
+    setOpenDrawer = setDrawerOpen;
+    isDrawerOpen = drawerOpen;
 
     useEffect(() => {
-        handleSetTitle('Profile');
+        handleSetTitle('Account Setup');
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
@@ -160,101 +178,102 @@ const Profile = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    
 
     return (
-        <section className={classes.root}>
-            <div className={classes.tabContainer}>
-                <Tabs
-                    value={value} 
-                    onChange={handleChange} 
-                    aria-label="fund-tabs" 
-                    indicatorColor="primary" 
-                    textColor="primary" 
-                    // variant="fullWidth" 
-                    className={classes.tabs}
-                    orientation="vertical"
-                    variant="scrollable"
-                >
-                    <LinkTab 
-                        label={
-                            <>
-                                <Account className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Profile</Typography>
-                            </>
-                        } 
-                        {...a11yProps(0)} 
-                        classes={{ selected: classes.selectedTab }}
-                        disableRipple
-                        disableFocusRipple
-                    />
-                    <LinkTab 
-                        label={
-                            <>
-                                <LockOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>2FA Setup</Typography>
-                            </>
-                        } 
-                        {...a11yProps(1)} 
-                        classes={{ selected: classes.selectedTab }}
-                        disableRipple
-                        disableFocusRipple
-                    />
-                    <LinkTab 
-                        label={
-                            <>
-                                <BagChecked className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Account</Typography>
-                            </>
-                        } 
-                        {...a11yProps(2)} 
-                        classes={{ selected: classes.selectedTab }}
-                        disableRipple
-                        disableFocusRipple
-                    />
-                    <LinkTab 
-                        label={
-                            <>
-                                <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
-                            </>
-                        } 
-                        {...a11yProps(3)} 
-                        classes={{ selected: classes.selectedTab }}
-                        disableRipple
-                        disableFocusRipple
-                    />
-                    {/* <LinkTab 
-                        label={
-                            <>
-                                <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
-                            </>
-                        } 
-                        {...a11yProps(3)} 
-                        classes={{ selected: classes.selectedTab }}
-                        disableRipple
-                        disableFocusRipple
-                    /> */}
-                </Tabs>
-            </div>
-            <div>
-                <TabPanel value={value} index={0}>  
-                    <PersonalDetails />
-                </TabPanel>
-                <TabPanel value={value} index={1}>  
-                    <TwoFactor />
-                </TabPanel>
-                <TabPanel value={value} index={2}>  
-                    <BankAccounts />
-                </TabPanel>
-                <TabPanel value={value} index={3}>  
-                    <IDVerification />
-                </TabPanel>
-            </div>
-        </section>
+        <>
+            <section className={classes.root}>
+                <div className={classes.tabContainer}>
+                    <Tabs
+                        value={value} 
+                        onChange={handleChange} 
+                        aria-label="fund-tabs" 
+                        indicatorColor="primary" 
+                        textColor="primary" 
+                        // variant="fullWidth" 
+                        className={classes.tabs}
+                        orientation="vertical"
+                        variant="scrollable"
+                    >
+                        <LinkTab 
+                            label={
+                                <>
+                                    <Account className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Profile</Typography>
+                                </>
+                            } 
+                            {...a11yProps(0)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        />
+                        <LinkTab 
+                            label={
+                                <>
+                                    <LockOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>2FA Setup</Typography>
+                                </>
+                            } 
+                            {...a11yProps(1)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        />
+                        <LinkTab 
+                            label={
+                                <>
+                                    <BagChecked className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Account</Typography>
+                                </>
+                            } 
+                            {...a11yProps(2)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        />
+                        <LinkTab 
+                            label={
+                                <>
+                                    <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
+                                </>
+                            } 
+                            {...a11yProps(3)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        />
+                        {/* <LinkTab 
+                            label={
+                                <>
+                                    <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
+                                </>
+                            } 
+                            {...a11yProps(3)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        /> */}
+                    </Tabs>
+                </div>
+                <div>
+                    <TabPanel value={value} index={0}>  
+                        <PersonalDetails />
+                    </TabPanel>
+                    <TabPanel value={value} index={1}>  
+                        <TwoFactor />
+                    </TabPanel>
+                    <TabPanel value={value} index={2}>  
+                        <BankAccounts />
+                    </TabPanel>
+                    <TabPanel value={value} index={3}>  
+                        <IDVerification />
+                    </TabPanel>
+                </div>
+            </section>
+            <AccountSettingsDrawer toggleDrawer={toggleDrawer} drawerOpen={drawerOpen} />
+        </>
     );
 }
 

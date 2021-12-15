@@ -31,41 +31,6 @@ const Spinner = ({ text }) => {
         </div>
     );
 };
-// const Spinner = forwardRef((props, ref) => {
-//     const classes = useStyles();
-//     const [open, setOpen] = useState(false);
-
-//     useEffect(() => {
-//         if (open) {
-//             console.log('is open ', open)
-//         }
-//     }, [open]);
-
-//     useImperativeHandle(ref, () => ({
-//         open: () => {
-//             setOpen(true);
-//         },
-
-//         close: () => {
-//             setOpen(false);
-//         },
-
-//         toggle: () => {
-//             setOpen(!open);
-//         }
-//     }));
-
-//     return (
-//         <div>
-//             <Backdrop className={classes.backdrop} open={open}>
-//                 <CircularProgress color="inherit" />
-//                 <Typography variant="h5" className={classes.text}>
-//                     {props.text}
-//                 </Typography>
-//             </Backdrop>
-//         </div>
-//     );
-// });
 
 Spinner.propTypes = {
     text: PropTypes.string

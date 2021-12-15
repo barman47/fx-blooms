@@ -410,7 +410,6 @@ export const setCustomerStatus = ({ customerID, status, currentStatus }) => asyn
         await reIssueAdminToken();
         const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
         const msg = res.data.data;
-        console.log(res);
         return dispatch({
             type: SET_CUSTOMER_STATUS,
             payload: { customerID, status, currentStatus, msg }
@@ -531,8 +530,7 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
 export const approveIdCard = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.post(`${api}/ApproveIDCard`, { customerId, status: 'APPROVED' });
-        console.log(res);
+        await axios.post(`${api}/ApproveIDCard`, { customerId, status: 'APPROVED' });
         dispatch({
             type: ACCEPTED_CUSTOMER_ID
         });
@@ -543,8 +541,7 @@ export const approveIdCard = (customerId) => async (dispatch) => {
 export const approveResidencePermit = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: 'APPROVED' });
-        console.log(res);
+        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: 'APPROVED' });
         dispatch({
             type: ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
         });
