@@ -16,12 +16,6 @@ const addBankAccount = (data) => {
         errors.AccountNumber = 'Account number is required!';
     }
 
-    if (data.Currency === 'EUR') {
-        if (!Validator.isIBAN(data.Currency)) {
-            errors.AccountNumber = 'IBAN is not valid';
-        }
-    }
-
     if (Validator.isEmpty(data.BankName)) {
         errors.BankName = 'Bank name is required!';
     }
