@@ -10,6 +10,7 @@ import {
 	FormControl,
 	FormHelperText,
 	Grid,
+	Link,
 	MenuItem,
 	Select,
 	Paper,
@@ -20,7 +21,7 @@ import {
 } from '@material-ui/core';
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
@@ -42,6 +43,7 @@ import Wallet from '../wallet/Wallet';
 // import RiskNoticeModal from './RiskNoticeModal';
 
 import img from '../../../assets/img/decentralized.svg';
+import { ABOUT_US } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	fab: {
@@ -256,7 +258,7 @@ const AllListings = (props) => {
 	// const theme = useTheme();
     // const matches = useMediaQuery(theme.breakpoints.down('md'));
 
-	const { customerId, firstName, lastName, profile, isAuthenticated } = useSelector(state => state.customer);
+	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
@@ -269,7 +271,8 @@ const AllListings = (props) => {
 	const [open, setOpen] = useState(false);
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
-	const [showWallets, setShowWallets] = useState(true);
+	// eslint-disable-next-line
+	const [showWallets, setShowWallets] = useState(false);
 
 	let loadedEvent = useRef();
     const walletInfoModal = useRef();
@@ -365,10 +368,11 @@ const AllListings = (props) => {
             <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
-					<Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography> 
+					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
+					{/* <Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography>  */}
 					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
 				</div>
-				<Button
+				{/* <Button
 					variant="text"
 					size="small"
 					startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
@@ -378,7 +382,7 @@ const AllListings = (props) => {
 					onClick={() => setShowWallets(!showWallets)}
 				>
 					{showWallets ? 'Hide Wallets' : 'Show Wallets'}
-				</Button>
+				</Button> */}
 			</section>
 			{showWallets && 
 				<section className={classes.walletsContainer}>
@@ -402,7 +406,7 @@ const AllListings = (props) => {
 						<Paper className={classes.gateway}>
 							<div>
 								<Typography variant="h5">Your Gateway<br />into Decentralized<br />Money Exchange</Typography>
-								<Typography variant="subtitle1" component="p">Learn More</Typography>
+								<Link to={ABOUT_US} component="a" target="_blank">Learn More</Link>
 							</div>
 							<img src={img} alt="decentralized money exchange" />
 						</Paper>
@@ -446,8 +450,8 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 	const theme = useTheme();
 	const { currencies, listings } = useSelector(state => state);
 
-	const [AvailableCurrency, setAvailableCurrency] = useState('');
-	const [RequiredCurrency, setRequiredCurrency] = useState('');
+	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
+	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
 
 	const [SellerRating, setSellerRating] = useState(0);
@@ -559,14 +563,14 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 						>
 							Amount
 						</Button>
-						<Button 
+						{/* <Button 
 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
 							variant="contained" 
 							color="primary" 
 							size="small"
 						>
 							Completion Rate
-					</Button>
+					</Button> */}
 				</header>
 				<form onSubmit={onSubmit} noValidate>
 					{
@@ -580,12 +584,13 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 									error={errors.AvailableCurrency ? true : false } 
 									fullWidth 
 									required
-									disabled={loading ? true : false}
+									disabled
+									// disabled={loading ? true : false}
 								>
 									<Select
 										labelId="AvailableCurrency"
 										value={AvailableCurrency}
-										onChange={(e) => setAvailableCurrency(e.target.value)}
+										// onChange={(e) => setAvailableCurrency(e.target.value)}
 									
 									>
 										<MenuItem value="">Select Currency</MenuItem>
@@ -605,12 +610,13 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 									error={errors.RequiredCurrency ? true : false } 
 									fullWidth 
 									required
-									disabled={loading ? true : false}
+									disabled
+									// disabled={loading ? true : false}
 								>
 									<Select
 										labelId="RequiredCurrency"
 										value={RequiredCurrency}
-										onChange={(e) => setRequiredCurrency(e.target.value)}
+										// onChange={(e) => setRequiredCurrency(e.target.value)}
 									>
 										<MenuItem value="" disabled>Select</MenuItem>
 										{currencies.length > 0 && currencies.map((currency, index) => (

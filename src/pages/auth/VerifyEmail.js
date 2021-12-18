@@ -17,7 +17,7 @@ import Toast from '../../components/common/Toast';
 import isEmpty from '../../utils/isEmpty';
 
 import logo from '../../assets/img/logo.svg';
-import { CREATE_PROFILE } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME } from '../../routes';
 import { SET_CUSTOMER_MSG } from '../../actions/types';
 
 const useStyles = makeStyles(theme => ({
@@ -99,7 +99,7 @@ const VerifyEmail = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history.push(CREATE_PROFILE, { verifiedEmail: true });
+        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     };
 
     return (

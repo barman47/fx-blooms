@@ -20,7 +20,7 @@ import {
     useScrollTrigger 
 } from '@material-ui/core';
 
-import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message, Wallet } from 'mdi-material-ui';
+import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -32,7 +32,7 @@ import { logout } from '../../actions/customer';
 import logo from '../../assets/img/logo.svg';
 import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
-import { DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, WALLET, PROFILE } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
 
 export const HideOnScroll = (props) => {
     const { children, direction } = props;
@@ -167,7 +167,7 @@ export const PrivateHeader = (props) => {
     const protectedRoutes = [
         { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        // { url: WALLET, text:'Wallet', icon: <Wallet /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
     ];
 

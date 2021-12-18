@@ -157,6 +157,14 @@ const Profile = (props) => {
     setOpenDrawer = setDrawerOpen;
     isDrawerOpen = drawerOpen;
 
+    const tablList = [
+        { icon: <Account className={classes.icon} />, text: 'Profile' },
+        { icon: <LockOutline className={classes.icon} />, text: 'Authentication' },
+        { icon: <BagChecked className={classes.icon} />, text: 'Bank Account' },
+        { icon: <CardAccountDetailsOutline className={classes.icon} />, text: 'ID Verification' },
+        // { icon: <KeyVariant className={classes.icon} />, text: 'Set PIN' },
+    ];
+
     useEffect(() => {
         handleSetTitle('Account Setup');
         if (accounts.length === 0) {
@@ -195,66 +203,21 @@ const Profile = (props) => {
                         orientation="vertical"
                         variant="scrollable"
                     >
-                        <LinkTab 
-                            label={
-                                <>
-                                    <Account className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Profile</Typography>
-                                </>
-                            } 
-                            {...a11yProps(0)} 
-                            classes={{ selected: classes.selectedTab }}
-                            disableRipple
-                            disableFocusRipple
-                        />
-                        <LinkTab 
-                            label={
-                                <>
-                                    <LockOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>2FA Setup</Typography>
-                                </>
-                            } 
-                            {...a11yProps(1)} 
-                            classes={{ selected: classes.selectedTab }}
-                            disableRipple
-                            disableFocusRipple
-                        />
-                        <LinkTab 
-                            label={
-                                <>
-                                    <BagChecked className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Bank Account</Typography>
-                                </>
-                            } 
-                            {...a11yProps(2)} 
-                            classes={{ selected: classes.selectedTab }}
-                            disableRipple
-                            disableFocusRipple
-                        />
-                        <LinkTab 
-                            label={
-                                <>
-                                    <CardAccountDetailsOutline className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>ID Verification</Typography>
-                                </>
-                            } 
-                            {...a11yProps(3)} 
-                            classes={{ selected: classes.selectedTab }}
-                            disableRipple
-                            disableFocusRipple
-                        />
-                        {/* <LinkTab 
-                            label={
-                                <>
-                                    <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
-                                </>
-                            } 
-                            {...a11yProps(3)} 
-                            classes={{ selected: classes.selectedTab }}
-                            disableRipple
-                            disableFocusRipple
-                        /> */}
+                        {tablList.map((tab, index) => (
+                            <LinkTab 
+                                key={index}
+                                label={
+                                    <>
+                                        {tab.icon}&nbsp;&nbsp;&nbsp;
+                                        <Typography variant="subtitle1" component="p" className={classes.tabLabel}>{tab.text}</Typography>
+                                    </>
+                                } 
+                                {...a11yProps(index)} 
+                                classes={{ selected: classes.selectedTab }}
+                                disableRipple
+                                disableFocusRipple
+                            />    
+                        ))}
                     </Tabs>
                 </div>
                 <div>

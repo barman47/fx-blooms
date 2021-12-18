@@ -19,7 +19,6 @@ import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
-import TwoFactorModal from './TwoFactorModal';
 
 import { login, logout } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
@@ -100,7 +99,6 @@ const Login = ({ login, logout }) => {
     const history = useHistory();
     const errorsState = useSelector(state => state.errors);
     const { customer } = useSelector(state => state);
-    const { authorized } = useSelector(state => state.twoFactor);
 
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
@@ -108,21 +106,15 @@ const Login = ({ login, logout }) => {
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
-    const [showModal, setShowModal] = useState(false);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        if (customer.isAuthenticated && authorized) {
+        if (customer.isAuthenticated) {
+            console.log(history);
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line
     }, []);
-    
-    useEffect(() => {
-        if (customer.token) {
-            logout(history);
-        }
-    }, [history, logout, customer.token]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -140,11 +132,6 @@ const Login = ({ login, logout }) => {
         if (customer.twoFactorEnabled === true && loading) {
             setLoading(false);
             history.push(VERIFY_2FA, { twoFactorEnabled: true });
-        }
-
-        if (customer.twoFactorEnabled === false && loading) {
-            setLoading(false);
-            setShowModal(true);
         }
     }, [customer, history, loading]);
 
@@ -176,7 +163,6 @@ const Login = ({ login, logout }) => {
                 <title>Login | FXBLOOMS.com</title>
                 <meta name="description" content="Thanks for joining FXBLOOMS. Trust and security are our cornerstones. Log in to enjoy unbeatable rates and service." />
             </Helmet>
-            <TwoFactorModal open={showModal} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <a href="https://fxblooms.com">

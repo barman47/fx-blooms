@@ -1,5 +1,5 @@
 export const HOME = 'https://fxblooms.com';
-export const ABOUT_US = 'aboutUs';
+export const ABOUT_US = `${HOME}/about-us`;
 export const BLOG = '/blog.fxblooms.com';
 export const WHY = 'whyFXBLOOMS';
 // export const CONTACT_US = 'contactUs';

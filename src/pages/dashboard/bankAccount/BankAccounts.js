@@ -173,7 +173,7 @@ const BankAccounts = ({ deleteAccount }) => {
                     :
                         <div className={classes.noAccount}>
                             <Typography variant="h5">No Accounts Added</Typography>   
-                            <Button variant="contained" color="primary" onClick={toggleShowAddAccountDrawer}>Add Receiving Account</Button>               
+                            <Button variant="contained" color="primary" onClick={toggleShowAddAccountDrawer}>Add New Account</Button>               
                         </div>
                     }
                 </div>

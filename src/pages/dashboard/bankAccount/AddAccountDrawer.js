@@ -15,11 +15,13 @@ import {
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 
 import { addAccount } from '../../../actions/bankAccounts';
-import { SET_ACCOUNT, SET_ACCOUNT_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -109,15 +111,16 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
     const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.bankAccounts);
 
-    const [bankName, setBankName] = useState('');
-    const [accountNumber, setAccountNumber] = useState('');
-    const [accountName, setAccountName] = useState(`${firstName} ${lastName}`);
+    const [BankName, setBankName] = useState('');
+    const [AccountNumber, setAccountNumber] = useState('');
+    const [AccountName, setAccountName] = useState(`${firstName} ${lastName}`);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
 
     const successModal = useRef();
+    const toast = useRef();
 
     const setReceivingAccountType = useCallback(() => {
         if (eur && ngn) {
@@ -137,10 +140,33 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
     }, [drawerOpen, setReceivingAccountType]);
 
     useEffect(() => {
-        if (errorsState) {
+        if (!isEmpty(errorsState)) {
             setErrors(errorsState);
         }
     }, [errorsState]);
+
+    useEffect(() => {
+        if (!isEmpty(errors) && !isEmpty(errorsState)) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errors, errorsState]);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            
+        }
+    }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
         if (msg) {
@@ -188,11 +214,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         e.preventDefault();
         setErrors({});
         const data = {
-            bankName,
-            accountName,
-            accountNumber,
-            currency: handleSetCurrency(),
-            customerId
+            BankName,
+            AccountName,
+            AccountNumber,
+            Currency: handleSetCurrency(),
+            CustomerId: customerId
         };
 
         const { errors, isValid } = validateAddBankAccount(data);
@@ -209,6 +235,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
 	return (
         <>
             {msg && <SuccessModal ref={successModal} dismissAction={dismissAction} /> }
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={loading ? true : open} onClose={toggleDrawer}>
                 <Typography variant="h6" className={classes.header}>Add Account</Typography>
                 <Typography variant="subtitle2" component="small" className={classes.info}>Please note that you will only be paid via a linked account number.</Typography>
@@ -240,15 +275,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">Bank Name</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={bankName}
+                                    value={BankName}
                                     onChange={(e) => setBankName(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Bank Name"
-                                    helperText={errors.bankName}
+                                    helperText={errors.BankName}
                                     fullWidth
                                     required
-                                    error={errors.bankName ? true : false}
+                                    error={errors.BankName ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>
@@ -256,15 +291,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">Account Number</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={accountNumber}
+                                    value={AccountNumber}
                                     onChange={(e) => setAccountNumber(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Account Number"
-                                    helperText={errors.accountNumber}
+                                    helperText={errors.AccountNumber}
                                     fullWidth
                                     required
-                                    error={errors.accountNumber ? true : false}
+                                    error={errors.AccountNumber ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>
@@ -272,15 +307,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">Account Name</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={accountName}
+                                    value={AccountName}
                                     onChange={(e) => setAccountName(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Account Name"
-                                    helperText={errors.accountName}
+                                    helperText={errors.AccountName}
                                     fullWidth
                                     required
-                                    error={errors.accountName ? true : false}
+                                    error={errors.AccountName ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>
@@ -309,15 +344,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">Bank Name</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={bankName}
+                                    value={BankName}
                                     onChange={(e) => setBankName(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Bank Name"
-                                    helperText={errors.bankName}
+                                    helperText={errors.BankName}
                                     fullWidth
                                     required
-                                    error={errors.bankName ? true : false}
+                                    error={errors.BankName ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>
@@ -325,15 +360,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">IBAN</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={accountNumber}
+                                    value={AccountNumber}
                                     onChange={(e) => setAccountNumber(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter IBAN"
-                                    helperText={errors.accountNumber}
+                                    helperText={errors.AccountNumber}
                                     fullWidth
                                     required
-                                    error={errors.accountNumber ? true : false}
+                                    error={errors.AccountNumber ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>
@@ -341,15 +376,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 <Typography variant="subtitle2" component="span">Account Name</Typography>
                                 <TextField 
                                     className={classes.input}
-                                    value={accountName}
+                                    value={AccountName}
                                     onChange={(e) => setAccountName(e.target.value)}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Account Name"
-                                    helperText={errors.accountName}
+                                    helperText={errors.AccountName}
                                     fullWidth
                                     required
-                                    error={errors.accountName ? true : false}
+                                    error={errors.AccountName ? true : false}
                                     disabled={loading ? true : false}
                                 />
                             </Grid>

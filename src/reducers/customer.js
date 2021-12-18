@@ -28,7 +28,7 @@ const customerReducer =  (state = initialState, action) => {
     let profile = {};
     switch (action.type) {
         case SET_CURRENT_CUSTOMER:
-            return { ...state, ...action.payload, isAuthenticated: true };
+            return { ...state, ...action.payload };
 
         case CLEAR_CURRENT_CUSTOMER:
             return {
