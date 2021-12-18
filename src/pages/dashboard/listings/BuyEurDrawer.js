@@ -15,13 +15,14 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { addBid } from '../../../actions/listings';
+import { SET_LISTING_MSG } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
+import isEmpty from '../../../utils/isEmpty';
 import validateAddBid from '../../../utils/validation/listing/addBid';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
-import { SET_LISTING_MSG } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -176,8 +177,8 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
 
     // Prevent user from entering invalid amounts
     useEffect(() => {
-        if (Amount && receivingAccount) {
-            if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
+        if (Amount) {
+             if (Number(Amount) < Number(listing.minExchangeAmount.amount) && Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
                 // Prevent user from entering amount less than minimum exchange amount
                 setButtonDisabled(true);
                 setErrors({ Amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
@@ -192,7 +193,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                 setErrors({});
             }
         }
-    }, [listing.amountAvailable.amount, listing.minExchangeAmount.amount, Amount, receivingAccount]);
+    }, [listing.amountAvailable.amount, listing.minExchangeAmount.amount, Amount]);
 
     // Set transfer amount when user enters amount he wants to buy
     useEffect(() => {
@@ -200,6 +201,12 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
             setTransferAmount(`NGN ${formatNumber(Number(Amount) * Number(listing.exchangeRate), 2)}`);
         }
     }, [Amount, listing.exchangeRate]);
+
+    useEffect(() => {
+        if (Amount && receivingAccount) {
+            setButtonDisabled(false);
+        }
+    }, [Amount, receivingAccount]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
@@ -305,7 +312,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                                     })}
                                 </Select>
                                 <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                                <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add Receiving Account</Button>
+                                <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                             </FormControl>
                         </Grid>
                         <Grid item xs={12}>
@@ -322,7 +329,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                                 required
                             />
                         </Grid>
-                        {!buttonDisabled && 
+                        {!buttonDisabled && !isEmpty(receivingAccount) && !isEmpty(Amount) &&
                             <>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
@@ -353,9 +360,9 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                                         variant="contained" 
                                         color="primary" 
                                         fullWidth 
-                                        disableFocusRipple 
+                                        disableFocusRipple
                                         className={classes.button}
-                                        disabled={loading || buttonDisabled ? true : false}
+                                        disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
                                     >
                                         {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
                                     </Button>

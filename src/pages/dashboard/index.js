@@ -18,8 +18,8 @@ import {
     BottomNavigationAction
 } from '@material-ui/core';
 
-import {  HomeMinus, FormatListText, Message, Wallet } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, WALLET } from '../../routes';
+import {  HomeMinus, FormatListText, Message } from 'mdi-material-ui';
+import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
 import { 
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
@@ -130,9 +130,8 @@ const Dashboard = ({ children, title, logout }) => {
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url: WALLET, text:'Wallet', icon: <Wallet /> },
+        // { url: WALLET, text:'Wallet', icon: <Wallet /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
-        // { url : PROFILE, text:'Profile', icon: <Account /> }
     ];
     
     const customToast = useRef();
@@ -224,8 +223,8 @@ const Dashboard = ({ children, title, logout }) => {
             try {
                 let response = JSON.parse(data);
                 const payload = JSON.parse(response.Payload);
-                console.log('Payload ', payload);
-                console.log('New Notification ', response, type);
+                // console.log('Payload ', payload);
+                // console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 let buyer = {};
                 let seller = {};
@@ -281,11 +280,10 @@ const Dashboard = ({ children, title, logout }) => {
                             playAudioNotifcation(senderId);
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
-                                payload: { type: BUYER_CONFIRMED_PAYMENT, id }
+                                payload: { id }
                             });
                             successModal.current.openModal();
                             successModal.current.setModalText('This transaction has been completed successfully by both the buyer and seller and will be permanently closed.');
-                            // Show transaction completed message here
                         }
                         break;
 
@@ -297,7 +295,7 @@ const Dashboard = ({ children, title, logout }) => {
                             playAudioNotifcation(senderId);
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_SELLER_PAID,
-                                payload: { type: SELLER_MADE_PAYMENT, id }
+                                payload: { id }
                             });
                         }
                         break;
@@ -309,7 +307,7 @@ const Dashboard = ({ children, title, logout }) => {
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             dispatch({
                                 type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
-                                payload: { type: SELLER_CONFIRMED_PAYMENT, id }
+                                payload: { id }
                             });
                         }
                         break;
@@ -332,8 +330,7 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
                 }
             } catch (err) {
-                // console.log('Error Ocurred');
-                // console.error(err);
+                console.error(err);
             }
         });
     };
@@ -342,13 +339,11 @@ const Dashboard = ({ children, title, logout }) => {
         history.push(`/dashboard${link}`);
     };
 
-    const dismissSuccessModal = () => {};
-
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal />
-            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+            <SuccessModal ref={successModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 

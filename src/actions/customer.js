@@ -1,14 +1,14 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { CREATE_PROFILE, LOGIN, SETUP_2FA, SIGN_UP } from '../routes';
+import { CREATE_PROFILE, DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
 import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
     EMAIL_VERIFICATION,
     PROCEED_TO_LOGIN,
-    PROCEED_TO_DASHBOARD,
+    // PROCEED_TO_DASHBOARD,
     FILL_FORM1,
     FILL_FORM2,
 } from '../utils/constants';
@@ -170,26 +170,13 @@ export const getIdVerificationLink = () => async (dispatch) => {
 export const login = (data, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/login`, data);
-        const { nextStep } = res.data.data;
-
-        switch (nextStep) {
-        case PROCEED_TO_DASHBOARD:
-                setAuthToken(res.data.data.token);
-                dispatch({
-                    type: SET_CURRENT_CUSTOMER,
-                    payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
-                });
-                break;
-
-            case FILL_FORM1:
-                history.push(SIGN_UP);
-                break;
-
-            default: 
-                break;
-        }
-
-        
+        const {  token } = res.data.data;
+        setAuthToken(token);
+        dispatch({
+            type: SET_CURRENT_CUSTOMER,
+            payload: res.data.data
+        });
+        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
     } catch (err) {
         return handleError(err, dispatch);
     }

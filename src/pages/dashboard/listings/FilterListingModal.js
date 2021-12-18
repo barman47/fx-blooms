@@ -110,8 +110,8 @@ const MobileFilterModal = (props) => {
 	const { listings } = useSelector(state => state.listings);
 	const { currencies } = useSelector(state => state);
 
-	const [AvailableCurrency, setAvailableCurrency] = useState('');
-	const [RequiredCurrency, setRequiredCurrency] = useState('');
+	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
+	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
 
 	const [SellerRating, setSellerRating] = useState(0);
@@ -246,12 +246,13 @@ const MobileFilterModal = (props) => {
 										error={errors.AvailableCurrency ? true : false } 
 										fullWidth 
 										required
-										disabled={loading ? true : false}
+										disabled
+										// disabled={loading ? true : false}
 									>
 										<Select
 											labelId="AvailableCurrency"
 											value={AvailableCurrency}
-											onChange={(e) => setAvailableCurrency(e.target.value)}
+											// onChange={(e) => setAvailableCurrency(e.target.value)}
 										
 										>
 											<MenuItem value="">Select Currency</MenuItem>
@@ -271,12 +272,13 @@ const MobileFilterModal = (props) => {
 										error={errors.RequiredCurrency ? true : false } 
 										fullWidth 
 										required
-										disabled={loading ? true : false}
+										disabled
+										// disabled={loading ? true : false}
 									>
 										<Select
 											labelId="RequiredCurrency"
 											value={RequiredCurrency}
-											onChange={(e) => setRequiredCurrency(e.target.value)}
+											// onChange={(e) => setRequiredCurrency(e.target.value)}
 										>
 											<MenuItem value="" disabled>Select</MenuItem>
 											{currencies.length > 0 && currencies.map((currency, index) => (

@@ -634,7 +634,7 @@ const MakeListing = (props) => {
                                         </Select>
                                         <FormHelperText>{errors.setReceivingAccount}</FormHelperText>
                                     </FormControl>
-                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add Receiving Account</Button>
+                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>

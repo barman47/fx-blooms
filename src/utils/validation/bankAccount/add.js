@@ -3,23 +3,27 @@ import isEmpty from '../../isEmpty';
 
 const addBankAccount = (data) => {
     let errors = {};
-    data.accountName = !isEmpty(data.accountName) ?  data.accountName : '';
-    data.accountNumber = !isEmpty(data.accountNumber) ?  data.accountNumber : '';
-    data.bankName = !isEmpty(data.bankName) ?  data.bankName : '';
+    data.AccountName = !isEmpty(data.AccountName) ?  data.AccountName : '';
+    data.AccountNumber = !isEmpty(data.AccountNumber) ?  data.AccountNumber : '';
+    data.BankName = !isEmpty(data.BankName) ?  data.BankName : '';
+    data.Currency = !isEmpty(data.Currency) ?  data.Currency : '';
 
-    if (Validator.isEmpty(data.accountName)) {
-        errors.accountName = 'Account name is required!';
+    if (Validator.isEmpty(data.AccountName)) {
+        errors.AccountName = 'Account name is required!';
     }
 
-    // if (!Validator.isIBAN(data.accountNumber)) {
-    //     errors.accountNumber = 'Invalid IBAN!';
-    // }
-    if (Validator.isEmpty(data.accountNumber)) {
-        errors.accountNumber = 'Account number is required!';
+    if (Validator.isEmpty(data.AccountNumber)) {
+        errors.AccountNumber = 'Account number is required!';
     }
 
-    if (Validator.isEmpty(data.bankName)) {
-        errors.bankName = 'Bank name is required!';
+    if (data.Currency === 'EUR') {
+        if (!Validator.isIBAN(data.Currency)) {
+            errors.AccountNumber = 'IBAN is not valid';
+        }
+    }
+
+    if (Validator.isEmpty(data.BankName)) {
+        errors.BankName = 'Bank name is required!';
     }
    
     return {

@@ -59,20 +59,16 @@ const notificationsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION_BUYER_PAID:
-             notifications = [action.payload.notification, ...notifications];
              return {
                  ...state,
-                 notifications: [...notifications],
+                 notifications: [action.payload.notification, ...state.notifications],
                  unreadNotifications: action.payload.customerId === action.payload.notification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
              };
 
         case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
-            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
-            notifications.splice(notificationIndex, 1);
-
             return {
                 ...state,
-                notifications: [...notifications],
+                notifications: state.notifications.filter(notification => notification.id !== action.payload.id),
                 unreadNotifications: state.unreadNotifications - 1
             };
 
@@ -81,7 +77,7 @@ const notificationsReducer = (state = initialState, action) => {
             notifications = state.notifications;
             notification = notifications[notificationIndex];
             notification.seller.hasMadePayment = true;
-            notifications[notificationIndex] = notification;
+            notifications.splice(notificationIndex, 1, notification);
 
             return {
                 ...state,
@@ -93,7 +89,7 @@ const notificationsReducer = (state = initialState, action) => {
             notifications = state.notifications;
             notification = notifications[notificationIndex];
             notification.seller.hasReceivedPayment = true;
-            notifications[notificationIndex] = notification;
+            notifications.splice(notificationIndex, 1, notification);
 
             return {
                 ...state,

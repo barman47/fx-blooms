@@ -203,7 +203,6 @@ const PersonalDetails = () => {
                                         helperText={errors.FirstName}
                                         fullWidth
                                         required
-                                        disabled={editable ? false : true}
                                         error={errors.FirstName ? true : false}
                                     />
                                 }
@@ -223,7 +222,6 @@ const PersonalDetails = () => {
                                         helperText={errors.LastName}
                                         fullWidth
                                         required
-                                        disabled={editable ? false : true}
                                         error={errors.LastName ? true : false}
                                     />
                                 }
@@ -236,9 +234,9 @@ const PersonalDetails = () => {
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
                                 <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{Username}</Typography>
                             </Grid>
-                            {!profile.phoneNo && 
+                            {editable &&
                                 <Grid item xs={2}>
-                                    <Typography variant="subtitle2" component="span">Country Code</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.label}>Country Code</Typography>
                                     <Autocomplete
                                         id="country-select"
                                         options={countries}
@@ -272,7 +270,7 @@ const PersonalDetails = () => {
                             }
                             <Grid item xs={10}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
-                                {profile.phoneNo ?
+                                {profile.phoneNo && !editable ?
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
                                     :
                                     <TextField 
@@ -285,7 +283,6 @@ const PersonalDetails = () => {
                                         helperText={errors.PhoneNo}
                                         fullWidth
                                         required
-                                        disabled={editable ? false : true}
                                         error={errors.PhoneNo ? true : false}
                                     />
                                 }
@@ -305,7 +302,7 @@ const PersonalDetails = () => {
                             </Grid> */}
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
-                                {profile.address ?
+                                {profile.address && !editable ?
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.address}</Typography>
                                     :
                                     <TextField 
@@ -320,7 +317,6 @@ const PersonalDetails = () => {
                                         multiline
                                         rows={1}
                                         required
-                                        disabled
                                         error={errors.Address ? true : false}
                                     />
                                 }
@@ -334,7 +330,6 @@ const PersonalDetails = () => {
                                             variant="outlined" 
                                             helperText={errors.country}
                                             error={errors.country ? true : false}
-                                            disabled={editable ? false : true}
                                             fullWidth 
                                             required
                                         >
@@ -374,6 +369,11 @@ const PersonalDetails = () => {
                                     />
                                 }
                             </Grid>
+                            {editable && 
+                                <Grid item xs={12}>
+                                    <Button type="submit" variant="contained" color="primary" fullWidth>Save and Continue</Button>
+                                </Grid>
+                            }
                             {/* <Grid item xs={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Listings</Typography>
                                 <Typography variant="subtitle2" className={classes.info}>{Listings}</Typography>
