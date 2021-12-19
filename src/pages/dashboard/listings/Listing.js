@@ -259,7 +259,7 @@ const Listing = ({ deleteListing, handleAddBid, listing, getSeller }) => {
                                 root: classes.button
                             }}
                         >
-                            In Negotiation
+                            Listing Accepted
                         </Button>
                         :
                         listing.customerId === userId ? 
