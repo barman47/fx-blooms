@@ -9,6 +9,7 @@ import {
     Toolbar, 
     useScrollTrigger 
 } from '@material-ui/core';
+import clsx from 'clsx';
 
 import { Link as AnimatedLink } from 'react-scroll';
 import { Menu as MenuIcon } from 'mdi-material-ui';
@@ -45,8 +46,9 @@ HideOnScroll.propTypes = {
 
 const useStyles = makeStyles(theme => ({
     root: {
-        background: COLORS.white,
-        boxShadow: `0px 1px 0px #e5e9f2`,
+        background: 'transparent',
+        // boxShadow: `0px 1px 0px #e5e9f2`,
+        // position: 'absolute',
         width: '100%'
     },
     
@@ -66,7 +68,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     link: {
-        color: COLORS.darkGrey,
+        color: COLORS.offWhite,
         cursor: 'pointer',
         fontSize: theme.spacing(1.8),
         fontWeight: 500,
@@ -112,6 +114,16 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    login: {
+        border: `2px solid ${COLORS.offWhite}`,
+        color: COLORS.offWhite,
+        
+        '&:hover': {
+            border: `2px solid ${COLORS.offWhite}`,
+            color: COLORS.offWhite,
+        }
+    },
+
     signUp: {
         color: theme.palette.primary.main
     },
@@ -151,8 +163,10 @@ export const PublicHeader = (props) => {
     };
 
     const publicRoutes = [
-        { url: WHY, text:'Why FXBLOOMS' },
+        { url: WHY, text: 'Home' },
+        { url: WHY, text: 'How it Works' },
         { url: ABOUT_US, text:'About Us' },
+        { url: WHY, text: 'Frequently Asked Questions' },
         { url: CONTACT_US, text:'Contact' }
     ];
 
@@ -210,7 +224,7 @@ export const PublicHeader = (props) => {
                                     to={LOGIN} 
                                     component={RouterLink}
                                     size="large"
-                                    className={classes.button}
+                                    className={clsx(classes.login, classes.button)}
                                 >
                                     Log In
                                 </Button>

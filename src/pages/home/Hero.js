@@ -1,87 +1,96 @@
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Button, Grid, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { PlayCircle } from 'mdi-material-ui';
 
+import { COLORS } from '../../utils/constants';
 import { SIGN_UP } from '../../routes';
-import banner from '../../assets/img/banner.png';
+import banner from '../../assets/img/banner.jpg';
+import patterns from '../../assets/img/logo-pattern.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(8.1),
-        paddingLeft: theme.spacing(15),
-
-        [theme.breakpoints.down('lg')]: {
-            paddingBottom: theme.spacing(5),
-            paddingLeft: theme.spacing(10),
-        },
+        width: '100vw',
+        height: '100vh',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        // position: 'relative',
+        // position: 'absolute',
+        // zIndex: -1
 
         [theme.breakpoints.down('md')]: {
-            paddingLeft: 0
-        },
-        
-        [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(4),
-            marginTop: theme.spacing(7),
+            gridTemplateColumns: '1fr',
+            height: '80vh',
         }
     },
 
-    hero: {
+    left: {
+        backgroundImage: `url(${patterns})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingLeft: theme.spacing(12),
+        paddingRight: theme.spacing(12),
+        width: 'initial',
         height: '100%',
-        paddingLeft: theme.spacing(5),
-        
+
         [theme.breakpoints.down('sm')]: {
-            paddingLeft: 0
+            alignItems: 'flex-start',
+            paddingLeft: theme.spacing(4),
+            paddingRight: theme.spacing(4),
+            width: 'initial',
+        },
+
+        '& div': {
+            display: 'grid',
+            gridTemplateRows: 'repeat(3, 1fr)',
+            alignItems: 'center',
+            // rowGap: theme.spacing(1),
+
+            
+            [theme.breakpoints.down('sm')]: {
+                rowGap: theme.spacing(2),
+            },
+
+            '& h3': {
+                color: COLORS.offWhite,
+                fontWeight: 600,
+
+                [theme.breakpoints.down('sm')]: {
+                    fontSize: theme.spacing(3.5)
+                },
+            },
+
+            '& p': {
+                color: COLORS.offWhite,
+                fontWeight: 300,
+            },
         }
     },
 
-    banner: {
+    right: {
+        backgroundImage: `url(${banner})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        width: '100%',
+        height: '100%',
+
         [theme.breakpoints.down('md')]: {
-            display: 'none'
-        },
-
-        '& img': {
-            width: '100%'
+            display: 'none',
         }
     },
 
-    text: {
-        '& h1': {
-            fontWeight: 300,
-            margin: [[theme.spacing(35), 0, theme.spacing(5), 0]],
+    button: {
+        justifySelf: 'flex-start',
 
-            [theme.breakpoints.down('lg')]: {
-                fontSize: theme.spacing(5),
-                marginTop: theme.spacing(23)
-            },
-
-            [theme.breakpoints.down('md')]: {
-                marginTop: theme.spacing(2)
-            },
-
-            [theme.breakpoints.down('sm')]: {
-                fontSize: theme.spacing(4),
-                marginTop: 0
-            }
-        },
-
-        '& h6': {
-            width: '95%',
-
-            [theme.breakpoints.down('sm')]: {
-                fontSize: theme.spacing(2)
-            }
+        [theme.breakpoints.down('sm')]: {
+            justifySelf: 'stretch',
         }
-    },
-
-    highlight: {
-        color: theme.palette.primary.main
-    },
-
-    getStarted: {
-        paddingBottom: theme.spacing(2),
-        paddingTop: theme.spacing(2)
     }
 }));
 
@@ -91,54 +100,14 @@ const Hero = () => {
 
     return (
         <section className={classes.root}>
-            <Grid container direction="row" spacing={10} className={classes.hero}>
-                <Grid item sm={12} lg={6} xl={6} className={classes.text}>
-                    <Grid container direction="row" spacing={3} alignItems="center">
-                        <Grid item xs={12}>
-                            <Typography variant="h1">
-                                Decentralized Money Exchange
-                            </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="h6">
-                                FXBLOOMS is a <span className={classes.highlight}>peer-to-peer </span> 
-                                currency exchange platform that gives you the freedom to exchange money
-                                <span className={classes.highlight}> seamlessly and securely</span> at <span className={classes.highlight}>any rate you desire</span>
-                            </Typography>
-                        </Grid>
-                        {!isAuthenticated && 
-                            <Grid item xs={12} md={5}>
-                                <Button 
-                                    classes={{ root: classes.getStarted }}
-                                    variant="contained" 
-                                    component={Link} 
-                                    color="primary" 
-                                    to={SIGN_UP}
-                                    size="large"
-                                    fullWidth
-                                >
-                                    Get Started
-                                </Button>                            
-                            </Grid>
-                        }
-                        <Grid item xs={12} md={5}>
-                            <Button 
-                                component={Link} 
-                                color="primary" 
-                                to={SIGN_UP}
-                                size="large"
-                                fullWidth
-                            >
-                                <PlayCircle />
-                                <strong>See how it works</strong>
-                            </Button>                            
-                        </Grid>
-                    </Grid>
-                </Grid>
-                <Grid item sm={12} lg={6} xl={6} className={classes.banner}>
-                    <img src={banner} alt="FXBLOOMS" />
-                </Grid>
-            </Grid>
+            <div className={classes.left}>
+                <div>
+                    <Typography variant="h3">Decentralized<br /> Money Exchange</Typography>
+                    <Typography variant="subtitle2" component="p">FXBLOOMS is a peer-to-peer currency exchange platform that empowers you to exchange money seamlessly and securely at your desired rate.</Typography>
+                    {!isAuthenticated && <Button to={SIGN_UP} component={Link} variant="contained" color="primary" className={classes.button}>GET STARTED</Button>}
+                </div>
+            </div>
+            <div className={classes.right}></div>
         </section>
     );
 };
