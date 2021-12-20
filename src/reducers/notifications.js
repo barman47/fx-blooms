@@ -6,6 +6,7 @@ import {
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
     PAYMENT_NOTIFICATION_SELLER_PAID,
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+    ADD_UNREAD_NOTIFICATIONS,
     SUBTRACT_UNREAD_NOTIFICATIONS,
     // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
@@ -112,6 +113,13 @@ const notificationsReducer = (state = initialState, action) => {
         //         ...state,
         //         chat
         //     };
+
+        case ADD_UNREAD_NOTIFICATIONS:
+            unreadCount = state.unreadNotifications + action.payload;
+            return {
+                ...state,
+                unreadNotifications: unreadCount
+            }
 
         case SUBTRACT_UNREAD_NOTIFICATIONS:
             unreadCount = state.unreadNotifications - action.payload;

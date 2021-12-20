@@ -140,15 +140,16 @@ const Footer = () => {
                         >
                             About us
                     </AnimatedLink>
-                    <a className={classes.link} target="_blank" href={PRIVACY_POLICY} rel="noreferrer">Privacy Policy</a>
-                    <a className={classes.link} target="_blank" href={TERMS}  rel="noreferrer">Terms &amp; Conditions</a>
-                    <a className={classes.link} target="_blank" href={DISCLAIMER}  rel="noreferrer">Disclaimer</a>
+                    <Link className={classes.link} target="_blank" to={PRIVACY_POLICY} rel="noreferrer">Privacy Policy</Link>
+                    <Link className={classes.link} target="_blank" to={TERMS}  rel="noreferrer">Terms &amp; Conditions</Link>
+                    <Link className={classes.link} target="_blank" to={DISCLAIMER}  rel="noreferrer">Disclaimer</Link>
+                    <Link className={classes.link} target="_blank" to="#!"  rel="noreferrer">User Agreement</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>
-                    <Link className={classes.link} underline="hover" to={LOGIN} component={RouterLink}>Login</Link>
-                    <Link className={classes.link} underline="hover" to={SIGN_UP} component={RouterLink}>Sign Up</Link>
-                    <Link className={classes.link} underline="hover" to={BLOG} target="_blank" component={RouterLink}>Blog</Link>
+                    <Link className={classes.link} to={LOGIN} component={RouterLink}>Login</Link>
+                    <Link className={classes.link} to={SIGN_UP} component={RouterLink}>Sign Up</Link>
+                    <a className={classes.link} href={BLOG} target="_blank" rel="noreferrer">Blog</a>
                 </div>
                 <div>
                     <Typography variant="h6">Help</Typography>

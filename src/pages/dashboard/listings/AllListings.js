@@ -30,7 +30,7 @@ import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
@@ -277,6 +277,9 @@ const AllListings = (props) => {
 	let loadedEvent = useRef();
     const walletInfoModal = useRef();
 
+	const { REJECTED } = CUSTOMER_CATEGORY;
+	const { NOT_SUBMITTED } = ID_STATUS;
+
     const toggleFundDrawer = () => {
         setFundDrawerOpen(!fundDrawerOpen);
     };
@@ -316,7 +319,7 @@ const AllListings = (props) => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
             getIdVerificationLink();
         }
-	}, [getIdVerificationLink, idStatus]);
+	}, [getIdVerificationLink, idStatus, NOT_SUBMITTED, REJECTED]);
 
 	useEffect(() => {
 		setDataLength(listings.length);

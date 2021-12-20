@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
@@ -19,18 +19,20 @@ import {
 } from '@material-ui/core';
 
 import {  HomeMinus, FormatListText, Message } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
+import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, PROFILE, DASHBOARD } from '../../routes';
 import { 
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
-    PAYMENT_NOTIFICATION_SELLER_PAID 
+    PAYMENT_NOTIFICATION_SELLER_PAID, 
+    ADD_UNREAD_NOTIFICATIONS
 } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
-import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, ID_STATUS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
+import isEmpty from '../../utils/isEmpty';
 import SignalRService from '../../utils/SignalRController';
 
 import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
@@ -116,7 +118,7 @@ const Dashboard = ({ children, title, logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId } = useSelector(state => state.customer);
+    const { isAuthenticated, customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
 
     const [value, setValue] = useState(0);
@@ -136,6 +138,9 @@ const Dashboard = ({ children, title, logout }) => {
     
     const customToast = useRef();
     const successModal = useRef();
+    const accountSetupModal = useRef();
+    
+    const { APPROVED } = ID_STATUS
 
     useEffect(() => {
         checkSession();
@@ -147,9 +152,60 @@ const Dashboard = ({ children, title, logout }) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (!isEmpty(stats)) {
+            console.log('stats ', stats);
+            if (stats.idStatus !== APPROVED || stats.residencePermitStatus !== APPROVED) {
+                console.log('no id ', stats.idStatus);
+                console.log('no id ', stats.residencePermitStatus);
+                verifyIdentity();
+            }
+        }
+    }, [APPROVED, stats]);
+
+    const verifyIdentity = () => {
+        if (!sessionStorage.getItem('accountSetup')) {
+            sessionStorage.setItem('accountSetup', 'true');
+            accountSetupModal.current.openModal();
+        }
+    };
+
+    const dismissAction = () => {
+        accountSetupModal.current.closeModal();
+        history.push(`${DASHBOARD}${PROFILE}`, { eu: true });
+    };
+
     // useEffect(() => {
     //     setPath(location.pathname);
     // }, [location]);
+
+    const checkAccountSetup = useCallback(() => {
+        let count = 0;
+        const { APPROVED } = ID_STATUS;
+
+        if (!hasSetup2FA) {
+            count++;
+        }
+        if (!hasVerifiedPhoeNumber) {
+            count++;
+        }
+        if (!stats.residencePermitStatus !== APPROVED) {
+            count++;
+        }
+        if (!stats.idStatus !== APPROVED) {
+            count++;
+        }
+        dispatch({
+            type: ADD_UNREAD_NOTIFICATIONS,
+            payload: count
+        });
+    }, [dispatch, hasSetup2FA, hasVerifiedPhoeNumber, stats]);
+
+    useEffect(() => {
+        if (isAuthenticated && stats) {
+            checkAccountSetup();
+        }
+    }, [checkAccountSetup, isAuthenticated, stats]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -342,7 +398,7 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
-            <AccountSetupModal />
+            <AccountSetupModal ref={accountSetupModal} dismissAction={dismissAction} />
             <SuccessModal ref={successModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 

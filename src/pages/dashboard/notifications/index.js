@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { decode } from 'html-entities'
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
 import { completeTransaction } from '../../../actions/listings';
@@ -94,13 +94,15 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
+
+    const { APPROVED } = ID_STATUS;
     
     useEffect(() => {
         getNotifications();
@@ -154,7 +156,6 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
     };
 
     const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
-    const gotoAccountSetup = () => history.push(`${DASHBOARD}${PROFILE}`);
 
     const setMessage = (notification) => {
         const { buyer, seller } = notification;
@@ -200,12 +201,10 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
         const { id, seller } = notification;
         if (customerId === seller.customerId) {
             if (seller.hasReceivedPayment) {
-                console.log('Seller already received payment');
                 setBuyerAccount(notification);
 
             } else {
                 // Seller should make payment
-                console.log('Seller has not acknowledged, acknowledging payment');
                 setBuyerAccount(notification);
                 handlePaymentReceived(id);
             }
@@ -215,6 +214,12 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
             handlePaymentReceived(notification.id);
         }
     };
+
+    const verifyEuId = () => history.push(`${DASHBOARD}${PROFILE}`, { eu: true });
+    const verifyOtherId = () => history.push(`${DASHBOARD}${PROFILE}`, { otherId: true });
+    const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });
+    const verifyPhone = () => history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true });
+    const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });;
 
     return (
         <>
@@ -232,11 +237,44 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
+                        {stats.residencePermitStatus !== APPROVED &&
+                            <Notification 
+                                title="Verify your EU Government Issued ID"
+                                message="Required to enable you buy and sell. Click Verify ID to proceed."
+                                buttonText="Verify ID"
+                                buttonAction={verifyEuId}
+                            />
+                        }
+                        {/* eslint-disable-next-line no-mixed-operators */}
+                        {((stats.idStatus !== APPROVED) || (stats.residencePermitStatus !== APPROVED)) && (
+                            <Notification 
+                                title="Verify Other Government Issued ID"
+                                message="Required to enable you buy only. Click Verify ID to proceed."
+                                buttonText="Verify ID"
+                                buttonAction={verifyOtherId}
+                            />
+                        )}
+                        {!hasSetup2FA &&
+                            <Notification 
+                                title="Set up  2FA"
+                                message="Required to keep your account more secure. Click Setup 2FA to proceed."
+                                buttonText="Setup 2FA"
+                                buttonAction={setup2FA}
+                            />
+                        }
+                        {!hasVerifiedPhoeNumber && 
+                            <Notification 
+                                title="Verify phone number"
+                                message="Required to receive SMS notifications. Click Verify Phone to proceed."
+                                buttonText="Verify Phone"
+                                buttonAction={verifyPhone}
+                            />
+                        }
                         <Notification 
-                            title="Account Setup Pending"
-                            message={"You are yet to fully setup your account. Click Set Up Account to proceed."}
-                            buttonText="Set Up Account"
-                            buttonAction={gotoAccountSetup}
+                            title="Set PIN"
+                            message="Required for wallet withdrawals.. Click Set PIN to proceed."
+                            buttonText="Set PIN"
+                            buttonAction={setPin}
                         />
                         {notifications.map(notification => {
                             if (hasNotification(notification)) {

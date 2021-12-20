@@ -18,7 +18,9 @@ import {
     ACCEPTED_CUSTOMER_RESIDENCE_PERMIT
 } from '../actions/types';
 
-import { CONFIRMED, PENDING, REJECTED } from '../utils/constants';
+import { CUSTOMER_CATEGORY } from '../utils/constants';
+
+const { CONFIRMED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
 const initialState = {
     customer: {},

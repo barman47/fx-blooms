@@ -9,6 +9,7 @@ import {
     EMAIL_VERIFICATION,
     PROCEED_TO_LOGIN,
     // PROCEED_TO_DASHBOARD,
+    ID_STATUS,
     FILL_FORM1,
     FILL_FORM2,
 } from '../utils/constants';
@@ -41,6 +42,8 @@ import {
     SET_EMAIL,
     GET_ERRORS
  } from './types';
+
+ const { APPROVED } = ID_STATUS;
 
 const api = `${API}/Customer`;
 
@@ -517,7 +520,7 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
 export const approveIdCard = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        await axios.post(`${api}/ApproveIDCard`, { customerId, status: 'APPROVED' });
+        await axios.post(`${api}/ApproveIDCard`, { customerId, status: APPROVED });
         dispatch({
             type: ACCEPTED_CUSTOMER_ID
         });
@@ -528,7 +531,7 @@ export const approveIdCard = (customerId) => async (dispatch) => {
 export const approveResidencePermit = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: 'APPROVED' });
+        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: APPROVED });
         dispatch({
             type: ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
         });

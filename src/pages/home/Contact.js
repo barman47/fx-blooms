@@ -284,7 +284,8 @@ const Contact = ({ sendMail, subscribeToNewsletter }) => {
                                         variant="outlined" 
                                         placeholder="Enter Your Message"
                                         helperText={errors.Message}
-                                        rows={1}
+                                        rows={2}
+                                        rowsMax={10}
                                         fullWidth
                                         required
                                         multiline

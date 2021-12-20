@@ -51,7 +51,8 @@ const customerReducer =  (state = initialState, action) => {
         case ENABLED_2FA:
             return {
                 ...state,
-                twoFactorEnabled: true 
+                twoFactorEnabled: true,
+                hasSetup2FA: !state.hasSetup2FA && true
             };
 
         case DISABLED_2FA:

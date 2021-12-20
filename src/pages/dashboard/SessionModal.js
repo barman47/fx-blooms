@@ -157,8 +157,8 @@ const SessionModal = ({ logout }) => {
 
 	return (
         <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
+            aria-labelledby="session-modal-title"
+            aria-describedby="session-modal-description"
             className={classes.modal}
             open={open}
             disableBackdropClick

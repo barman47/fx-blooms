@@ -15,7 +15,7 @@ import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { getAccount } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
-import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
 
 import BuyEurDrawer from './BuyEurDrawer';
@@ -128,13 +128,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
+const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const history = useHistory();
 
     const errorsState = useSelector(state => state.errors);
+    const { stats } = useSelector(state => state.customer);
     const userId = useSelector(state => state.customer.customerId);
 
     const [openBuyEurDrawer, setOpenBuyEurDrawer] = useState(false);
@@ -145,6 +146,8 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
     // const { bids, status, id } = listing;
 
     const toast = useRef();
+
+    const { APPROVED } = ID_STATUS;
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -197,7 +200,12 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
         setTooltipOpen(false);
     };
 
-    const toggleBuyEurDrawer = () => setOpenBuyEurDrawer(!openBuyEurDrawer);
+    const toggleBuyEurDrawer = () => {
+        if (stats.idStatus !== APPROVED || stats.residencePermitStatus !== APPROVED) {
+            return checkIdStatus();
+        }
+        setOpenBuyEurDrawer(!openBuyEurDrawer);
+    };
 
     return (
         <>
@@ -305,6 +313,7 @@ const Listing = ({ deleteListing, listing, getAccount, getSeller }) => {
 };
 
 Listing.propTypes = {
+    checkIdStatus: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,

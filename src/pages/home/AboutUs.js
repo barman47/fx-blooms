@@ -63,7 +63,7 @@ const AboutUs = () => {
     return (
         <Grid container direction="row" spacing={10} className={classes.root} id={ABOUT_US}>
             <Grid item xs={12} lg={6} className={classes.left}>
-                <Grid container direction="column" spacing={2} justifyContent="center">
+                <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h3">What is FXBLOOMS?</Typography>
                     </Grid>

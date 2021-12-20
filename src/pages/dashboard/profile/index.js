@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -145,6 +145,7 @@ export const toggleDrawer = () => {
 
 const Profile = (props) => {
     const classes = useStyles();
+    const location = useLocation();
     const { countries, documents } = useSelector(state => state);
     const { customerId, profile } = useSelector(state => state.customer);
     const { accounts } = useSelector(state => state.bankAccounts);
@@ -166,12 +167,26 @@ const Profile = (props) => {
     ];
 
     useEffect(() => {
+        console.log(location);
         handleSetTitle('Account Setup');
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        const { state } = location;
+        if (state) {
+            if (state.eu || state.otherId) {
+                setValue(3);
+            } else if (state.mfa) {
+                setValue(1);
+            } else if (state.verifyPhone) {
+                setValue(0);
+            }
+        }   
+    }, [location]);
     
     useEffect(() => {
         if (_.isEmpty(profile)) {
@@ -185,8 +200,6 @@ const Profile = (props) => {
         }
         // eslint-disable-next-line
     }, []);
-
-    
 
     return (
         <>

@@ -9,7 +9,7 @@ import SuccessModal from '../../../components/common/SuccessModal';
 
 const Index = () => {
     const dispatch = useDispatch();
-    const { msg, twoFactorEnabled } = useSelector(state => state.customer);
+    const { hasSetup2FA, msg, twoFactorEnabled } = useSelector(state => state.customer);
 
     const successModal = useRef();
 
@@ -17,7 +17,6 @@ const Index = () => {
         if (msg) {
             successModal.current.openModal();
             successModal.current.setModalText(msg);
-            console.log('opening modal');
         }
     }, [msg]);
 
@@ -30,7 +29,14 @@ const Index = () => {
     return (
         <>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {twoFactorEnabled ? <DisableTwoFactor /> : <QrCode />}
+            {hasSetup2FA ? 
+                <QrCode />
+                :
+                twoFactorEnabled ?
+                <DisableTwoFactor />
+                :
+                <QrCode />
+            }
         </>
     );
 };

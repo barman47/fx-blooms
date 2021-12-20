@@ -6,7 +6,7 @@ import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-import { APPROVED, COLORS, NOT_SUBMITTED, PENDING, REJECTED } from '../../../utils/constants';
+import { COLORS, ID_STATUS } from '../../../utils/constants';
 import { addBid } from '../../../actions/listings';
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
@@ -14,6 +14,8 @@ import Spinner from '../../../components/common/Spinner';
 import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
 import Listing from './Listing';
+
+const { APPROVED, NOT_SUBMITTED, PENDING, REJECTED } = ID_STATUS;
 
 const useStyles = makeStyles(theme => ({
     noListingContent: {
@@ -127,7 +129,7 @@ const Listings = ({ addBid }) => {
             {loading && <Spinner />}
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
-                    <Listing key={index} listing={listing} handleAddBid={handleAddBid} />
+                    <Listing key={index} listing={listing} handleAddBid={handleAddBid} checkIdStatus={checkIdStatus} />
                 ))
                 :
                 <div className={classes.noListingContent}>

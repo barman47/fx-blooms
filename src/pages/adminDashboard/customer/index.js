@@ -9,9 +9,7 @@ import PropTypes from 'prop-types';
 import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 import { getStats } from '../../../actions/admin';
 import { getCustomerStatus, setCustomerStatus } from '../../../actions/customer';
-import { COLORS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
-
-// import isEmpty from '../../../utils/isEmpty';
+import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -80,7 +78,6 @@ const Customer = (props) => {
     const dispatch = useDispatch();
     const history = useHistory();
     const { customer, msg } = useSelector(state => state.customers);
-    // const errorsState = useSelector(state => state.errors);
 
     const [loading, setLoading] = useState(false);
 
@@ -88,11 +85,9 @@ const Customer = (props) => {
 
     const { getStats } = props;
 
-    useEffect(() => {
-        // if (isEmpty(customer)) {
-        //     props.getCustomerStatus();
-        // }
+    const { CONFIRMED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
+    useEffect(() => {
         return () => dispatch({ 
             type: SET_CUSTOMER,
             payload: {}

@@ -13,13 +13,6 @@ export const COLORS = {
     darkRed: '#f21c1c'
 };
 
-export const CONFIRMED = 'CONFIRMED';
-export const PENDING = 'PENDING';
-export const REJECTED = 'REJECTED';
-export const ALL_CUSTOMERS = 'ALL_CUSTOMERS';
-export const APPROVED =  'APPROVED';
-export const NOT_SUBMITTED = 'NOT_SUBMITTED';
-
 export const SETUP_2FA = 'SETUP_2FA';
 export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
 export const PROCEED_TO_LOGIN = 'PROCEED_TO_LOGIN';
@@ -47,6 +40,18 @@ export const CHAT_CONNECTION_STATUS = {
     RECONNECTING: 'RECONNECTING',
     RECONNECTED: 'RECONNECTED',
     DISCONNECTED: 'DISCONNECTED'  
+};
+
+export const CUSTOMER_CATEGORY = {
+    CONFIRMED: 'CONFIRMED',
+    PENDING: 'PENDING',
+    REJECTED: 'REJECTED',
+    ALL_CUSTOMERS: 'ALL_CUSTOMERS',
+};
+
+export const ID_STATUS = {
+    APPROVED: 'APPROVED',
+    NOT_SUBMITTED:'NOT_SUBMITTED'
 };
 
 export const NOTIFICATION_TYPES = {

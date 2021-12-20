@@ -49,6 +49,10 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
+        '&:visited': {
+            color: COLORS.offWhite,
+        },
+
         [theme.breakpoints.down('sm')]: {
             width: '100%'
         }
@@ -80,7 +84,7 @@ const Features = () => {
                         <Typography variant="subtitle1" component="p">- Just list, buyers await you.</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        {!isAuthenticated && <Button to={SIGN_UP} component={Link} variant="contained" color="primary" className={classes.button}>GET STARTED</Button>}
+                        {!isAuthenticated && <Button to={SIGN_UP} underline="none" component={Link} variant="contained" color="primary" className={classes.button}>GET STARTED</Button>}
                     </Grid>
                 </Grid>
             </Grid>
