@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { COLORS } from '../../utils/constants';
 import { SIGN_UP } from '../../routes';
 import banner from '../../assets/img/banner.jpg';
-import patterns from '../../assets/img/logo-pattern.png';
+import patterns from '../../assets/img/patterns-black.jpg';
 
 const useStyles = makeStyles(theme => ({
     root: {

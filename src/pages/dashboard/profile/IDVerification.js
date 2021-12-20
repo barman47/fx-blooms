@@ -157,7 +157,7 @@ const IDVerification = () => {
                         <div>
                             <CardAccountDetailsOutline className={classes.icon} />
                         </div>
-                        <Typography variant="h6" color="primary">EU Resident Permit</Typography>
+                        <Typography variant="h6" color="primary">EU issued ID</Typography>
                         <Typography variant="body2" component="p" color="primary">Required to SELL and BUY.</Typography>
                         <div>
                             {residencePermitStatus !== APPROVED ? 
@@ -175,7 +175,7 @@ const IDVerification = () => {
                         <div>
                             <AccountMultiple className={classes.icon} />
                         </div>
-                        <Typography variant="h6" color="primary">National ID</Typography>
+                        <Typography variant="h6" color="primary">Other ID</Typography>
                         <Typography variant="body2" component="p" color="primary">Required to BUY only.</Typography>
                         <div>
                             {idStatus !== APPROVED ? 
