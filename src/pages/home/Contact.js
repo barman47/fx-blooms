@@ -3,7 +3,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
+import Validator from 'validator';
 
 import { sendMail } from '../../actions/customer';
 import { SET_CUSTOMER_MSG } from '../../actions/types';
@@ -15,14 +15,15 @@ import SuccessModal from '../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        backgroundColor: COLORS.lightTeal,
         color: COLORS.offBlack,
-        marginTop: theme.spacing(8),
-        padding: [[theme.spacing(5), theme.spacing(10)]],
+        padding: theme.spacing(15),
 
-        '& h3': {
-            fontWeight: 800,
-            fontStyle: 'italic',
+        [theme.breakpoints.down('md')]: {
+            padding: theme.spacing(10),
+        },
+
+        '& h4': {
+            fontWeight: 700,
             marginBottom: theme.spacing(3)
         },
 
@@ -32,50 +33,30 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    title: {
-        color: theme.palette.primary.main,
-        fontWeight: 600,
-
-        [theme.breakpoints.down('sm')]: {
-            textAlign: 'center'
-        },
-    },
-
-    social: {
-        backgroundColor: COLORS.white,
-        borderRadius: '25px',
-        display: 'inline-block',
-        marginTop: theme.spacing(5),
-        padding: [[theme.spacing(1), theme.spacing(2)]],
-        width: 'initial', 
+    subscribeContainer: {
+        backgroundColor: COLORS.lightTeal,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        padding: theme.spacing(13),
 
         [theme.breakpoints.down('md')]: {
-            margin: [[theme.spacing(1), 0]]
-        },
-
-        [theme.breakpoints.down('sm')]: {
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            marginBottom: theme.spacing(4),
-            width: '90%'
-        },
-
-        '& a': {
-            marginRight: theme.spacing(4),
-
-            '&:last-child': {
-                marginRight: 0
-            }
+            marginBottom: theme.spacing(10)
         }
     },
 
-    icon: {
-        color: theme.palette.primary.main
+    formHeader: {
+        marginTop: theme.spacing(-6)
     },
 
     input: {
         backgroundColor: 'transparent',
+
+        '.MuiInputBase-root MuiOutlinedInput-root MuiInputBase-fullWidth MuiInputBase-formControl MuiInputBase-multiline MuiOutlinedInput-multiline': {
+            border: 'none !important',
+            outline: 'none !important',
+        },
+
         '&:focus': {
             backgroundColor: 'transparent'
         }
@@ -94,6 +75,8 @@ const Contact = (props) => {
 
     const { msg } = useSelector(state => state.customer);
 
+    const [NewsLetterEmail, setNewsLetterEmail] = useState('');
+
     const [FullName, setFullName] = useState('');
     const [EmailAddress, setEmailAddress] = useState('');
     const [PhoneNumber, setPhoneNumber] = useState('');
@@ -101,6 +84,7 @@ const Contact = (props) => {
     const [Message, setMessage] = useState('');
 
     const [loading, setLoading] = useState(false);
+    const [newsLetterLoading, setNewsLetterLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
     const { sendMail } = props;
@@ -131,7 +115,7 @@ const Contact = (props) => {
         });
     };
 
-    const handleFormSubmit = (e) => {
+    const handleSendContactMessage = (e) => {
         e.preventDefault();
         setErrors({});
         const data = {
@@ -153,44 +137,74 @@ const Contact = (props) => {
         sendMail(data);
     };
 
+    const handleSubscribe = (e) => {
+        e.preventDefault();
+        setErrors({});
+        
+        if (!Validator.isEmail(NewsLetterEmail)) {
+            return setErrors({ NewsLetterEmail: 'Please enter a valid email' });
+        }
+
+        setNewsLetterLoading(true);
+        setErrors({});
+        sendMail(NewsLetterEmail);
+    };
+
     return (
         <>
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <section className={classes.root} id={CONTACT_US}>
-                <Grid container direction="row">
-                    <Grid item xs={12} md={12} lg={4}>
-                        <Typography variant="subtitle1" component="p" className={classes.title}>Connect with us on social media</Typography>
-                        <br />
-                        <div className={classes.social}>
-                            <a href="https://www.instagram.com/fxblooms/" target="_blank" rel="noreferrer">
-                                <Instagram className={classes.icon} />
-                            </a>
-                        
-                            <a href="https://www.linkedin.com/company/fxblooms/" target="_blank" rel="noreferrer">
-                                <Linkedin className={classes.icon} />
-                            </a>
-                            <a href="https://twitter.com/FXBLOOM1" target="_blank" rel="noreferrer">
-                                <Twitter className={classes.icon} />
-                            </a>
-                            <a href="https://t.me/joinchat/4zNq4cJg-fA1NjFi" target="_blank" rel="noreferrer">
-                                <Telegram className={classes.icon} />
-                            </a>
-                        </div>
-                    </Grid>
-                    <Grid item xs={12} md={12} lg={6}>
-                        <Typography variant="subtitle1" component="p" className={classes.title}>Send us a mail</Typography>
-                        <br />
-                        <form onSubmit={handleFormSubmit} noValidate>
-                            <Grid container direction="row" spacing={4}>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Full name</Typography>
+                <Grid container direction="row" spacing={10}>
+                    <Grid item xs={12} lg={6} className={classes.subscribeContainer}>
+                        <form onSubmit={handleSubscribe} noValidate>
+                            <Typography variant="h4">Stay in the loop</Typography>
+                            <Typography variant="h6">Subscribe to our newsletter</Typography>
+                            <br />
+                            <Grid container direction="column" spacing={4}>
+                                <Grid item xs={12}>
                                     <TextField 
-                                        className={classes.input}
+                                        classes={{ root: classes.input }}
+                                        value={NewsLetterEmail}
+                                        onChange={(e) => setNewsLetterEmail(e.target.value)}
+                                        type="text"
+                                        variant="outlined" 
+                                        placeholder="Enter Your Email Address"
+                                        helperText={errors.NewsLetterEmail}
+                                        fullWidth
+                                        required
+                                        error={errors.NewsLetterEmail ? true : false}
+                                        disabled={newsLetterLoading ? true : false}
+                                    />
+                                </Grid>
+                                <Grid item xs={12} className={classes.buttonContainer}>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary"
+                                        type="submit"
+                                        disabled={newsLetterLoading ? true : false}
+                                        fullWidth
+                                    >
+                                        {!newsLetterLoading ? 'Subscribe' : <CircularProgress style={{ color: '#f8f8f8' }} />}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Grid>
+                    <Grid item xs={12} lg={6}>
+                        <Typography variant="h4" className={classes.formHeader}>Contact us!</Typography>
+                        <Typography variant="h6">Give us a call or drop by any time.</Typography>
+                        <br />
+                        <form onSubmit={handleSendContactMessage} noValidate>
+                            <Grid container direction="row" spacing={4}>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Your Name</Typography>
+                                    <TextField 
+                                        classes={{ root: classes.input }}
                                         value={FullName}
                                         onChange={(e) => setFullName(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter full name"
+                                        placeholder="Enter Your Name"
                                         helperText={errors.FullName}
                                         fullWidth
                                         required
@@ -198,31 +212,15 @@ const Contact = (props) => {
                                         disabled={loading ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Phone number</Typography>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Your Email</Typography>
                                     <TextField 
-                                        className={classes.input}
-                                        value={PhoneNumber}
-                                        onChange={(e) => setPhoneNumber(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="Enter phone number"
-                                        helperText={errors.PhoneNumber}
-                                        fullWidth
-                                        required
-                                        error={errors.PhoneNumber ? true : false}
-                                        disabled={loading ? true : false}
-                                    />
-                                </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Email address</Typography>
-                                    <TextField 
-                                        className={classes.input}
+                                        classes={{ root: classes.input }}
                                         value={EmailAddress}
                                         onChange={(e) => setEmailAddress(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter email address"
+                                        placeholder="Enter Your Email Address"
                                         helperText={errors.EmailAddress}
                                         fullWidth
                                         required
@@ -230,15 +228,15 @@ const Contact = (props) => {
                                         disabled={loading ? true : false}
                                     />
                                 </Grid>
-                                <Grid item xs={12} md={6}>
-                                    <Typography variant="subtitle2" component="span">Subject</Typography>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Your Subject</Typography>
                                     <TextField 
-                                        className={classes.input}
+                                        classes={{ root: classes.input }}
                                         value={Subject}
                                         onChange={(e) => setSubject(e.target.value.toUpperCase())}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter subject"
+                                        placeholder="Enter Your Subject"
                                         helperText={errors.Subject}
                                         fullWidth
                                         required
@@ -247,14 +245,14 @@ const Contact = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">Message</Typography>
+                                    <Typography variant="subtitle2" component="span">Your Message</Typography>
                                     <TextField 
-                                        className={classes.input}
+                                        classes={{ root: classes.input }}
                                         value={Message}
                                         onChange={(e) => setMessage(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter message"
+                                        placeholder="Enter Your Message"
                                         helperText={errors.Message}
                                         rows={1}
                                         fullWidth
@@ -270,6 +268,7 @@ const Contact = (props) => {
                                         color="primary"
                                         type="submit"
                                         disabled={loading ? true : false}
+                                        fullWidth
                                     >
                                         {!loading ? 'Send Message' : <CircularProgress style={{ color: '#f8f8f8' }} />}
                                     </Button>

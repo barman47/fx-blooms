@@ -125,7 +125,7 @@ const Footer = () => {
                 <div>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
-                        FXBLOOMS gives YOU the autonomy to exchange on your own terms - after all, it's YOUR money, YOU should have total control over it.
+                        FXBLOOMS OÜ (Registry code: 16262446) is a company acting as a Commercial Agent and located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia.
                     </Typography>
                 </div>
                 <div>
@@ -158,7 +158,7 @@ const Footer = () => {
                 <div>
                     <Typography variant="h6">Connect</Typography>
                     <a className={classes.link} href="mailto:hello@fxblooms.com">hello@fxblooms.com</a>
-                    <a className={classes.link} href="tel:+4917647003124">+49 176 4700 3124</a>
+                    <a className={classes.link} href="tel:+4917647003124">+37 255 6174 40</a>
                     <section className={classes.socialContainer}>
                         <Tooltip title="Follow FXBLOOMS on Instagram" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
                             <IconButton 
