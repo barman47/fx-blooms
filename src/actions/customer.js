@@ -542,3 +542,15 @@ export const logout = (history) => dispatch => {
     dispatch({ type: RESET_STORE });
     return history.push(LOGIN);
 };
+
+export const subscribeToNewsletter = (email) => async (dispatch) => {
+    try {
+        await axios.post(`${API}/Subscription/CreateSubscription`, { email, isCurrentlySubscribed: true });
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: 'Thanks for subscribing to FXBLOOMS newsletter.'
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

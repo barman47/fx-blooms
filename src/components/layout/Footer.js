@@ -158,7 +158,7 @@ const Footer = () => {
                 <div>
                     <Typography variant="h6">Connect</Typography>
                     <a className={classes.link} href="mailto:hello@fxblooms.com">hello@fxblooms.com</a>
-                    <a className={classes.link} href="tel:+4917647003124">+37 255 6174 40</a>
+                    <a className={classes.link} href="tel:+37255617440">+372 5561 7440</a>
                     <section className={classes.socialContainer}>
                         <Tooltip title="Follow FXBLOOMS on Instagram" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
                             <IconButton 
