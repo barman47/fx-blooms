@@ -214,9 +214,9 @@ export const PrivateHeader = (props) => {
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <section className={classes.nav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" />
-                        </a>
+                        </RouterLink>
                         <div className={classes.links}>
                             {protectedRoutes.map((link, index) =>(
                                 <Grid item key={index}>
@@ -270,9 +270,9 @@ export const PrivateHeader = (props) => {
                         </Popper>
                     </section>
                     <div className={classes.mobileNav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
-                        </a>
+                        </RouterLink>
                         {isProfilePage ? 
                             <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
                                 <MenuIcon />

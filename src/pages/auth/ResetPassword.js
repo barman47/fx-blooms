@@ -274,9 +274,9 @@ const ResetPassword = (props) => {
             <SuccessModal ref={successModal} dismissAction={redirectToLogin} />
             {loading && <Spinner />}
             <section className={classes.root}>
-                <a href="https://fxblooms.com">
+                <RouterLink to="/">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </a>
+                </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Forgot Password

@@ -234,7 +234,7 @@ const VerifyQrCode = (props) => {
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo} onClick={logout}>
+                <RouterLink to="/" className={classes.logo} onClick={logout}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
                 </a>
                 <div className={classes.content}>

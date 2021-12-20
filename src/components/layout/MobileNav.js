@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import { Link as AnimatedLink } from 'react-scroll';
@@ -75,11 +76,11 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
     return (
         <section>
             <Drawer PaperProps={{ className: classes.drawer }} anchor="left" open={drawerOpen} onClose={toggleDrawer}>
-                <a href="https://fxblooms.com" className={classes.link}>
+                <Link to="/" className={classes.link}>
                     <img src={logo} alt="FX Blooms Logo" className={classes.drawerLogo} />
-                </a>
+                </Link>
                 <List>
-                    <ListItemLink button divider to="https://fxblooms.com">
+                    <ListItemLink button divider to="/">
                         <ListItemIcon>
                             <Home />
                         </ListItemIcon>

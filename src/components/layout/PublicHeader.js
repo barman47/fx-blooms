@@ -189,9 +189,9 @@ export const PublicHeader = (props) => {
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <section className={classes.nav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" />
-                        </a>
+                        </RouterLink>
                         <div className={classes.links}>
                             {isAuthenticated && 
                                 <RouterLink 
@@ -243,9 +243,9 @@ export const PublicHeader = (props) => {
                         }
                     </section>
                     <div className={classes.mobileNav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
-                        </a>
+                        </RouterLink>
                         <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
                             <MenuIcon />
                         </IconButton>
