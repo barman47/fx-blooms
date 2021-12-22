@@ -1,15 +1,19 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
-import QrCode from './QrCode';
-import DisableTwoFactor from './DisableTwoFactor';
 import { SET_2FA_MSG } from '../../../actions/types';
 
+import DisableTwoFactor from './DisableTwoFactor';
+import QrCode from './QrCode';
+import VerifyQrCode from './VerifyQrCode';
 import SuccessModal from '../../../components/common/SuccessModal';
 
 const Index = () => {
     const dispatch = useDispatch();
-    const { hasSetup2FA, msg, twoFactorEnabled } = useSelector(state => state.customer);
+    const { hasSetup2FA, twoFactorEnabled } = useSelector(state => state.customer);
+    const {  msg } = useSelector(state => state.twoFactor);
+    
+    const [showVerifyQrCode, setShowVerifyQrCode] = useState(false);
 
     const successModal = useRef();
 
@@ -21,25 +25,30 @@ const Index = () => {
     }, [msg]);
 
     const dismissSuccessModal = () => {
+        setShowVerifyQrCode(false);
         dispatch({
             type: SET_2FA_MSG,
             payload: null
         });
     };
+
+    const toggleShowVerifyQrCode = () => setShowVerifyQrCode(!showVerifyQrCode);
+
     return (
         <>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {hasSetup2FA ? 
-                <>
-                    <h6>2FA Already Setup</h6>
-                    <QrCode />
-                </>
-                :
-                twoFactorEnabled ?
+            {!hasSetup2FA && !twoFactorEnabled && <QrCode />}
+            {hasSetup2FA && twoFactorEnabled
+                ?
                 <DisableTwoFactor />
                 :
-                <QrCode />
+                <>
+                    {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
+                </>
+
             }
+            {/* {hasSetup2FA && twoFactorEnabled && <DisableTwoFactor />}
+            {hasSetup2FA && !twoFactorEnabled && !verifyQrCode ? <QrCode /> : <VerifyQrCode />} */}
         </>
     );
 };

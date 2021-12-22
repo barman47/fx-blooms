@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
 	Button,
-    Divider,
     Fade,
 	Grid,
     IconButton,
@@ -16,7 +15,6 @@ import {
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ChevronLeft } from 'mdi-material-ui';
-import clsx from 'clsx';
 
 import { validatePhoneNumber } from '../../../actions/notifications';
 import { GET_ERRORS } from '../../../actions/types';
@@ -102,7 +100,6 @@ const useStyles = makeStyles(theme => ({
 const VerifyPhoneNumberModal = ({ dismissAction, isOpen, validatePhoneNumber }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
 
     const [open, setOpen] = useState(false);
 
@@ -113,13 +110,14 @@ const VerifyPhoneNumberModal = ({ dismissAction, isOpen, validatePhoneNumber }) 
     const [fifth, setFifth] = useState('');
     const [sixth, setSixth] = useState('');
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const toast = useRef();
-    const successModal = useRef();
+    // const toast = useRef();
+    // const successModal = useRef();
     
     const firstField = useRef();
     const secondField = useRef();

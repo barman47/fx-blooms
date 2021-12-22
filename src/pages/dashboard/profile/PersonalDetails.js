@@ -238,7 +238,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
         // if (!Validator.isMobilePhone(data)) {
         //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Invalid Phone Number!' });
         // }
-        const phoneRegExp =  /^[0-9]{1,15}$/
+        // const phoneRegExp =  /^[0-9]{1,15}$/
 
         // if (Validator.isEmpty(countryCode)) {
         //     return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });

@@ -12,7 +12,6 @@ import {
     SET_AUTH_TOKEN,
     SET_2FA_MSG,
     SET_BARCODE,
-    SET_CURRENT_CUSTOMER,
     TWO_FACTOR_AUTHORIZED
  } from './types';
 
@@ -83,11 +82,11 @@ export const enableTwoFactor = () => async (dispatch) => {
             });
         });
 
-        const customer = await axios.get(`${API}/Customer/CustomerInformation`);
-        dispatch({
-            type: SET_CURRENT_CUSTOMER,
-            payload: customer.data.data
-        });
+        // const customer = await axios.get(`${API}/Customer/CustomerInformation`);
+        // dispatch({
+        //     type: SET_CURRENT_CUSTOMER,
+        //     payload: customer.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }
