@@ -59,6 +59,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         gap: theme.spacing(3),
         padding: [[0, theme.spacing(10)]],
+        width: '100%',
 
         [theme.breakpoints.down('lg')]: { 
             padding: 0
@@ -125,9 +126,9 @@ const useStyles = makeStyles(theme => ({
     
     button: {
         width: 'initial',
-        [theme.breakpoints.down('lg')]: {
-            fontSize: theme.spacing(1)
-        },
+        // [theme.breakpoints.down('lg')]: {
+        //     fontSize: theme.spacing(1)
+        // },
         [theme.breakpoints.down('md')]: {
             fontSize: 'initial'
         }
@@ -196,7 +197,7 @@ export const PublicHeader = (props) => {
         { url: WHY, text: 'Home' },
         { url: WHY, text: 'How it Works' },
         { url: ABOUT_US, text:'About Us' },
-        { url: WHY, text: 'Frequently Asked Questions' },
+        { url: WHY, text: 'FAQs' },
         { url: CONTACT_US, text:'Contact' }
     ];
 
@@ -265,21 +266,21 @@ export const PublicHeader = (props) => {
                                     color="primary" 
                                     to={LOGIN} 
                                     component={RouterLink}
-                                    size="large"
+                                    size="medium"
                                     className={clsx(classes.login, classes.button, {[ classes.scrollingLogin ]: scrollPosition > 100 || location.pathname !== '/' })}
                                 >
-                                    Log In
+                                    LOG IN
                                 </Button>
                                 <Button 
                                     variant="outlined" 
                                     color="primary" 
                                     to={SIGN_UP} 
                                     component={RouterLink}
-                                    size="large"
+                                    size="medium"
                                     className={classes.button}
                                     style={{ backgroundColor: theme.palette.primary.main, color: COLORS.offWhite }}
                                 >
-                                    Get Started
+                                    GET STARTED
                                 </Button>
                             </div>
                         }

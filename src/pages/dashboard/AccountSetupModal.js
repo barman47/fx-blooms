@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useHistory } from 'react-router-dom';
 import { 
     Backdrop,
 	Button,
@@ -10,6 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS, SHADOW } from '../../utils/constants';
+import { DASHBOARD, PROFILE } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -51,10 +53,9 @@ const useStyles = makeStyles(theme => ({
 
 const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
+    const history = useHistory();
 
     const [open, setOpen] = useState(false);
-
-    const { dismissAction } = props;
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -65,6 +66,11 @@ const AccountSetupModal = forwardRef((props, ref) => {
             setOpen(false);
         }
     }));
+
+    const handleVerifyId = () => {
+        setOpen(false);
+        history.push(`${DASHBOARD}${PROFILE}`, { eu: true });
+    };
 
 	return (
         <Modal
@@ -84,7 +90,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <Typography variant="h6" color="primary">First, let's verify your Identity</Typography>
                         <Typography variant="subtitle1">We are required by law to verify users' identity before buying or selling.</Typography>
-                        <Button variant="contained" color="primary" onClick={dismissAction}>Okay, Verify Me</Button>
+                        <Button variant="contained" color="primary" onClick={handleVerifyId}>Okay, Verify Me</Button>
                     </Grid>
                 </Grid>
             </Fade>

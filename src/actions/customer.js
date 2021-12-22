@@ -142,14 +142,19 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
 export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
+        setAuthToken(res.data.data.token);
         batch(() => {
+            dispatch({
+                type: SET_CURRENT_CUSTOMER,
+                payload: res.data.data
+            });
             dispatch({
                 type: SET_EMAIL,
                 payload: res.data.data.emailAddress
             });
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
+                payload: 'Email successfully verified. Welcome to FXBLOOMS.'
             });
         });
     } catch (err) {

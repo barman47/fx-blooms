@@ -37,7 +37,17 @@ const Index = () => {
     return (
         <>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {!hasSetup2FA && !twoFactorEnabled && <QrCode />}
+            {!hasSetup2FA ? 
+                <QrCode />
+                :
+                twoFactorEnabled ?
+                <DisableTwoFactor />
+                :
+                <>
+                    {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
+                </>
+            }
+            {/* {!hasSetup2FA && <QrCode />}
             {hasSetup2FA && twoFactorEnabled
                 ?
                 <DisableTwoFactor />
@@ -46,9 +56,7 @@ const Index = () => {
                     {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
                 </>
 
-            }
-            {/* {hasSetup2FA && twoFactorEnabled && <DisableTwoFactor />}
-            {hasSetup2FA && !twoFactorEnabled && !verifyQrCode ? <QrCode /> : <VerifyQrCode />} */}
+            } */}
         </>
     );
 };

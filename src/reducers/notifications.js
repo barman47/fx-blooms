@@ -32,13 +32,13 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notifications: action.payload,
-                unreadNotifications: action.payload.length
+                unreadNotifications: state.unreadNotifications === 0 ? action.payload.length : state.unreadNotifications + action.payload.length
             }; 
 
         case ADD_NOTIFICATION:
             return {
                 ...state,
-                notifications: [ action.payload, ...state.notifications ],
+                notifications: action.payload ? [ action.payload, ...state.notifications ] : [ ...state.notifications ],
                 unreadNotifications: state.unreadNotifications + 1
             };
 

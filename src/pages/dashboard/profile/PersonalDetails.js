@@ -93,8 +93,10 @@ const useStyles = makeStyles(theme =>({
         borderTopLeftRadius: '15px',
         color: theme.palette.error.main,
         backgroundColor: theme.palette.primary.main,
-        padding: theme.spacing(1, 3),
+        padding: theme.spacing(1),
+        textAlign: 'center',
         textTransform: 'uppercase',
+        width: 'initial !important',
     },
 
     verified: {
@@ -402,7 +404,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
                                     <Button color="primary" onClick={handleShowPhoneNumber}>Show</Button>
                                 } */}
                             </Grid>
-                            <Grid item xs={6} md={3}>
+                            <Grid item xs={6} md={3} xlg={2}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
                                 <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: hasVerifiedPhoeNumber, [classes.unverified]: !hasVerifiedPhoeNumber })}>{ hasVerifiedPhoeNumber ? 'Verified' : 'Unverified' }</Typography>
                             </Grid>
@@ -476,7 +478,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
                                 {profile.postalCode && !editable ? 
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.postalCode}</Typography>
                                     :
-                                    (country.toLowerCase() !== 'nigeria' ?
+                                    (country?.toLowerCase() !== 'nigeria' ?
                                         <TextField 
                                             className={classes.info}
                                             value={postalCode}

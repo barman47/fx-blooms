@@ -199,7 +199,7 @@ export const PrivateHeader = (props) => {
             anchorRef.current.focus();
         }
         if (prevOpen.current === true && open === false) {
-            mobileDropdown.current.focus();
+            mobileDropdown?.current?.focus();
         }
         prevOpen.current = open;
     }, [open]);
@@ -232,7 +232,7 @@ export const PrivateHeader = (props) => {
                             ))}
                         </div>
                         <div className={classes.avatarContainer}>
-                            <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                            <Avatar alt={`${firstName} ${lastName}`} />
                             <Button
                                 to={`${DASHBOARD}${DASHBOARD_HOME}`}
                                 endIcon={<ChevronDown />}

@@ -4,11 +4,12 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { decode } from 'html-entities'
+import { decode } from 'html-entities';
 
 import { COLORS, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
+import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
 import { getNotifications } from '../../../actions/notifications';
 
@@ -90,11 +91,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
+const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, idVerificationLink, residencePermitUrl, stats } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [amount, setAmount] = useState(0);
@@ -105,8 +106,17 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
     const { APPROVED } = ID_STATUS;
     
     useEffect(() => {
-        getNotifications();
+        if (notifications.length === 0) {
+            getNotifications();
+        }
         handleSetTitle('Notifications');
+
+        if (!residencePermitUrl) {
+            getResidencePermitLink()
+        }
+        if (!residencePermitUrl) {
+            getIdVerificationLink();
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -215,11 +225,17 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
         }
     };
 
-    const verifyEuId = () => history.push(`${DASHBOARD}${PROFILE}`, { eu: true });
-    const verifyOtherId = () => history.push(`${DASHBOARD}${PROFILE}`, { otherId: true });
+    const verifyEuId = () => {
+        window.open(idVerificationLink);
+    };
+
+    const verifyOtherId = () => {
+        window.open(residencePermitUrl);
+    };
+
     const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });
     const verifyPhone = () => history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true });
-    const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });;
+    // const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });
 
     return (
         <>
@@ -240,7 +256,7 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                         {stats.residencePermitStatus !== APPROVED &&
                             <Notification 
                                 title="Verify your EU Government Issued ID"
-                                message="Required to enable you buy and sell. Click Verify ID to proceed."
+                                message="Required to BUY and SELL. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyEuId}
                             />
@@ -249,7 +265,7 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                         {((stats.idStatus !== APPROVED) || (stats.residencePermitStatus !== APPROVED)) && (
                             <Notification 
                                 title="Verify Other Government Issued ID"
-                                message="Required to enable you buy only. Click Verify ID to proceed."
+                                message="Required to BUY only. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyOtherId}
                             />
@@ -270,12 +286,12 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                                 buttonAction={verifyPhone}
                             />
                         }
-                        <Notification 
+                        {/* <Notification 
                             title="Set PIN"
                             message="Required for wallet withdrawals.. Click Set PIN to proceed."
                             buttonText="Set PIN"
                             buttonAction={setPin}
-                        />
+                        /> */}
                         {notifications.map(notification => {
                             if (hasNotification(notification)) {
                                 return (
@@ -306,7 +322,9 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
 
 Index.propTypes = {
     completeTransaction: PropTypes.func.isRequired,
-    getNotifications: PropTypes.func.isRequired
+    getNotifications: PropTypes.func.isRequired,
+    getIdVerificationLink: PropTypes.func.isRequired,
+    getResidencePermitLink: PropTypes.func.isRequired,
 };
 
-export default connect(undefined, { completeTransaction, getNotifications })(Index);
+export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications })(Index);

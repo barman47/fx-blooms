@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
+import _ from 'lodash';
 
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
@@ -21,6 +22,7 @@ import {
 import {  HomeMinus, FormatListText, Message } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
 import { 
+    ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
@@ -30,7 +32,7 @@ import {
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
-import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES, ID_STATUS } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
@@ -116,7 +118,7 @@ const Dashboard = ({ children, title, logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
 
     const [value, setValue] = useState(0);
@@ -136,6 +138,9 @@ const Dashboard = ({ children, title, logout }) => {
     
     const customToast = useRef();
     const successModal = useRef();
+    const accountSetupModal = useRef();
+
+    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         checkSession();
@@ -144,8 +149,47 @@ const Dashboard = ({ children, title, logout }) => {
         onClose();
 
         handleSentMessage();
+
+        if (!hasSetup2FA) {
+            dispatch({
+                type: ADD_NOTIFICATION,
+            });
+        }
+
+        if (!hasVerifiedPhoeNumber) {
+            dispatch({
+                type: ADD_NOTIFICATION,
+            });
+        }
+
+        if (!_.isEmpty(stats)) {
+            const { residencePermitStatus, idStatus } = stats;
+            if (residencePermitStatus === NOT_SUBMITTED) {
+                dispatch({
+                    type: ADD_NOTIFICATION,
+                });
+            }
+
+            if (idStatus === NOT_SUBMITTED) {
+                dispatch({
+                    type: ADD_NOTIFICATION,
+                });
+            }
+        }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(stats)) {
+            if (!sessionStorage.getItem('checkedIdStatus')) {
+                sessionStorage.setItem('checkedIdStatus', 'true');
+                const { idStatus, residencePermitStatus } = stats;
+                if (residencePermitStatus === NOT_SUBMITTED || idStatus === NOT_SUBMITTED) {
+                    accountSetupModal.current.openModal();
+                }
+            }
+        }
+    }, [NOT_SUBMITTED, stats]);
 
     // useEffect(() => {
     //     setPath(location.pathname);
@@ -342,7 +386,7 @@ const Dashboard = ({ children, title, logout }) => {
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
-            <AccountSetupModal />
+            <AccountSetupModal ref={accountSetupModal} />
             <SuccessModal ref={successModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 

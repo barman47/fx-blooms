@@ -85,7 +85,7 @@ const theme = createMuiTheme({
 		MuiButton: {
 		  	root: {
 				borderRadius: '5px',
-				boxShadow: 'none !important',
+				boxShadow: 'none',
 				paddingBottom: '14px',
 				paddingTop: '14px',
 				textTransform: 'capitalize'

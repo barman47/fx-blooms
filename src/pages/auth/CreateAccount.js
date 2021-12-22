@@ -400,9 +400,7 @@ const CreateAccount = (props) => {
                         <div className={classes.header}>
                             <Typography variant="h4">Create Account</Typography>
                             <Typography variant="subtitle2" component="span">Complete the form below to create an account.</Typography>
-                            <br /><br /><br />
-                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Account details).</Typography>
-                            <br />
+                            <br /><br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
