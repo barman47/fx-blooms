@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -18,13 +18,11 @@ import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
-import { logout } from '../../../actions/customer';
 import { authorizeTwoFactor, enableTwoFactor } from '../../../actions/twoFactor';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS } from '../../../utils/constants';
 import validateAuthenticatorCode from '../../../utils/validation/customer/authenticator';
 
-import logo from '../../../assets/img/logo.svg';
 import { GET_ERRORS, SET_2FA_MSG, SET_BARCODE } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
@@ -177,11 +175,6 @@ const VerifyQrCode = (props) => {
         });
     };
 
-    const logout = (e) => {
-        e.preventDefault();
-        props.logout(history);
-    };
-
     const onSubmit = (e) => {
         if (e) {
             e.preventDefault();
@@ -232,9 +225,6 @@ const VerifyQrCode = (props) => {
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
-                <Link to="/" className={classes.logo} onClick={logout}>
-                    <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </Link>
                 <div className={classes.content}>
                     <Typography variant="h5">Verify Google Authenticator</Typography>
                     <Typography variant="subtitle1" component="p">Enter the 6-digit code displayed on your Google Authenticator to make sure everything works.</Typography>
@@ -355,8 +345,7 @@ const VerifyQrCode = (props) => {
 
 VerifyQrCode.propTypes = {
     authorizeTwoFactor: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired,
     enableTwoFactor: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { authorizeTwoFactor, enableTwoFactor, logout })(VerifyQrCode);
+export default connect(undefined, { authorizeTwoFactor, enableTwoFactor })(VerifyQrCode);

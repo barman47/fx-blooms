@@ -202,7 +202,6 @@ const Dashboard = ({ children, title, logout }) => {
                     toast.success('Connected!');
                     setToastAction(null);
                 }
-                
                 break;
 
             case RECONNECTING:

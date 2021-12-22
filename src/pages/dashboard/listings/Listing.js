@@ -147,7 +147,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 
     const toast = useRef();
 
-    const { APPROVED } = ID_STATUS;
+    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -201,7 +201,8 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     };
 
     const toggleBuyEurDrawer = () => {
-        if (stats.idStatus !== APPROVED || stats.residencePermitStatus !== APPROVED) {
+        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus !== NOT_SUBMITTED) {
+            console.log('checking id status');
             return checkIdStatus();
         }
         setOpenBuyEurDrawer(!openBuyEurDrawer);

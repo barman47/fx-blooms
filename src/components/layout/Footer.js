@@ -16,6 +16,7 @@ import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP
 import { COLORS } from '../../utils/constants';
 
 import logo from '../../assets/img/logo-white.svg';
+import septemLogo from '../../assets/img/septem-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         gridTemplateColumns: '1fr',
         gap: theme.spacing(4),
-        padding: [[theme.spacing(5), theme.spacing(15)]],
+        padding: [[theme.spacing(5), theme.spacing(10)]],
 
         [theme.breakpoints.down('md')]: {
             alignItems: 'center',
@@ -109,10 +110,38 @@ const useStyles = makeStyles(theme => ({
         borderTop: `1px solid ${COLORS.offBlack}`
     },
 
+    copyrightContainer: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+
+        [theme.breakpoints.down('md')]: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
+    },
+
     copyright: {
         [theme.breakpoints.down('sm')]: {
             textAlign: 'center'
         }
+    },
+
+    septem: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        [theme.breakpoints.down('md')]: {
+            justifyContent: 'center',
+            marginTop: theme.spacing(2)
+        }
+    },
+
+    septemStacksLogo: {
+        cursor: 'pointer',
+        width: '25%'
     }
 }));
 
@@ -205,9 +234,26 @@ const Footer = () => {
                 </div>
             </section>
             <Divider className={classes.divider} />
-            <Typography variant="subtitle2" component="span" className={classes.copyright}>
-                FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
-            </Typography>  
+            <section className={classes.copyrightContainer}>
+                <Typography variant="subtitle2" component="span" className={classes.copyright}>
+                    FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
+                </Typography>  
+                <div item xs={12} md={6} className={classes.septem}>
+                    <Typography variant="body2">
+                        Powered by &nbsp;&nbsp;
+                    </Typography>
+                    <Tooltip title="https://septemstacks.com" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }}>
+                        <img 
+                            src={septemLogo} 
+                            alt="Septem Stacks LLC" 
+                            className={classes.septemStacksLogo}
+                            onClick={() => {
+                                window.open('https://septemstacks.com', '_blank', 'noopener,noreferrer')
+                            }}
+                        />
+                    </Tooltip>
+                </div>
+            </section>
         </footer>
     );
 };

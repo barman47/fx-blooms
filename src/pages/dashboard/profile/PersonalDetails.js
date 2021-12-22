@@ -167,6 +167,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
             successModal.current.setModalText(msg);
             successModal.current.openModal();
             setLoading(false);
+            setEditable(false);
         }
     }, [msg]);
 

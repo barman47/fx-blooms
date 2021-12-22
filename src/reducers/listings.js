@@ -38,8 +38,8 @@ const listingsReducer = (state = initialState, action) => {
             };
         
         case DELETED_LISTING:
-            listingId = action.payload.listingId;
-            listingIndex = state.listings.findIndex(listing => listing._id === listingId);
+            listingId = action.payload.id;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
             listingsList = [...state.listings];
             listingsList.splice(listingIndex, 1);
             return {

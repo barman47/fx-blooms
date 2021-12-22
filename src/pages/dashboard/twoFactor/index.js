@@ -32,13 +32,18 @@ const Index = () => {
         });
     };
 
-    const toggleShowVerifyQrCode = () => setShowVerifyQrCode(!showVerifyQrCode);
+    const toggleShowVerifyQrCode = () => {
+        console.log('toggling showVerifyQrCode');
+        setShowVerifyQrCode(!showVerifyQrCode)
+    };
 
     return (
         <>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {!hasSetup2FA ? 
-                <QrCode />
+                <>
+                    {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
+                </>
                 :
                 twoFactorEnabled ?
                 <DisableTwoFactor />
