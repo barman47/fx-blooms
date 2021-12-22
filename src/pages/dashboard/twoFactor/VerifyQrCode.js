@@ -27,7 +27,7 @@ import { GET_ERRORS, SET_2FA_MSG, SET_BARCODE } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        paddingTop: theme.spacing(5),
+        marginTop: theme.spacing(-7),
         
         [theme.breakpoints.down('sm')]: {
             paddingTop: theme.spacing(2)
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
         margin: [[theme.spacing(5), 'auto', 0, 'auto']],
         padding: theme.spacing(3),
         textAlign: 'center',
-        width: '50%',
+        width: '60%',
 
         [theme.breakpoints.down('md')]: {
             width: '70%'
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             marginTop: theme.spacing(2),
             padding: theme.spacing(1),
-            width: '95%'
+            width: '99%'
         }
     },
 

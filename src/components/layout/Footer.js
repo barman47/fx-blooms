@@ -238,7 +238,7 @@ const Footer = () => {
                 <Typography variant="subtitle2" component="span" className={classes.copyright}>
                     FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
                 </Typography>  
-                <div item xs={12} md={6} className={classes.septem}>
+                <div className={classes.septem}>
                     <Typography variant="body2">
                         Powered by &nbsp;&nbsp;
                     </Typography>
