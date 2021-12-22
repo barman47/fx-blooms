@@ -52,13 +52,13 @@ const AboutUs = () => {
             autoplay: 0,
             color: 'white',
             playsinline: 1
-        },
+        }
     };
 
     const onReady = (e) => {
         // access to player in all event handlers via e.target
         e.target.pauseVideo();
-      }
+    };
 
     return (
         <Grid container direction="row" spacing={10} className={classes.root} id={ABOUT_US}>
@@ -76,7 +76,7 @@ const AboutUs = () => {
                 </Grid>
             </Grid>
             <Grid item xs={12} lg={6}>
-                <YouTube className={classes.video} videoId="71YM28sN0vE" opts={opts} onReady={onReady} />
+                <YouTube className={classes.video} videoId="0gfyjfo7GO0" opts={opts} onReady={onReady} />
             </Grid>
         </Grid>
     );

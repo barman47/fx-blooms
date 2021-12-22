@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS, UPDATED_LISTING } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LISTING_MSG, SET_MORE_LISTINGS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const URL = `${API}/Listing`;
@@ -53,19 +53,6 @@ export const deleteListing = (listingId) => async (dispatch) => {
         return dispatch({
             type: DELETED_LISTING,
             payload: { id: listingId }
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const updateListing = (listing) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.patch(`${URL}/UpdateList`, listing);
-        return dispatch({
-            type: UPDATED_LISTING,
-            payload: { listing: res.data.data, msg: 'Your listing has been updated successfully' }
         });
     } catch (err) {
         return handleError(err, dispatch);

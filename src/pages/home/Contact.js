@@ -26,7 +26,17 @@ const useStyles = makeStyles(theme => ({
 
         '& h4': {
             fontWeight: 700,
-            marginBottom: theme.spacing(3)
+            marginBottom: theme.spacing(3),
+
+            [theme.breakpoints.down('sm')]: {
+                textAlign: 'center'
+            }
+        },
+
+        '& h6': {
+            [theme.breakpoints.down('sm')]: {
+                textAlign: 'center'
+            }
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -44,7 +54,12 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('md')]: {
             marginBottom: theme.spacing(10)
-        }
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            marginTop: theme.spacing(-5),
+            marginBottom: theme.spacing(5)
+        },
     },
 
     formHeader: {

@@ -29,22 +29,20 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '30vw',
-        height: '20vh',
+        width: '35vw',
+        height: '25vw',
         boxShadow: SHADOW,
         padding: theme.spacing(2, 5),
 
-        [theme.breakpoints.down('lg')]: {
-            height: '50vh',
-        },
         [theme.breakpoints.down('md')]: {
-            height: '40vh',
-            width: '70vw',
+            height: '50vw',
+            width: '50vw',
         },
+        
         [theme.breakpoints.down('sm')]: {
             height: '40vh',
-            width: '90vw',
-        },
+            width: '90vw'
+        }
     },
 
     item: {

@@ -25,7 +25,8 @@ export const TRANSITION = '0.3s linear all';
 
 export const LOGOUT = 'logout';
 
-export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
+export const WALLET_API = 'https://wallet.fxblooms.com/api';
+
 export const API = 'https://api.fxblooms.com/api'; // Testing branch
 export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 

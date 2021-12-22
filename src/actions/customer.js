@@ -2,7 +2,7 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 
 import { CREATE_PROFILE, DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
-import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
+import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
@@ -447,6 +447,18 @@ export const resetPassword = (data) => async (dispatch) => {
         return dispatch({
             type: SET_CUSTOMER_MSG,
             payload: 'A new passwod has been set'
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const updateProfile = (data) => async (dispatch) => {
+    try {
+        await Promise.all([reIssueCustomerToken(), axios.post(`${api}/UpdateProfile`, data)]);
+        return dispatch({
+            type: PROFILE_UPDATED,
+            payload: data
         });
     } catch (err) {
         return handleError(err, dispatch);

@@ -167,7 +167,6 @@ const Profile = (props) => {
     ];
 
     useEffect(() => {
-        console.log(location);
         handleSetTitle('Account Setup');
         if (accounts.length === 0) {
             getAccounts(customerId);

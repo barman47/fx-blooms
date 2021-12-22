@@ -49,7 +49,11 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
-        '&:visited': {
+        color: COLORS.offWhite,
+        backgroundColor: theme.palette.primary.main,
+        
+        '&:hover': {
+            backgroundColor: theme.palette.primary.main,
             color: COLORS.offWhite,
         },
 
@@ -84,7 +88,7 @@ const Features = () => {
                         <Typography variant="subtitle1" component="p">- Just list, buyers await you.</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        {!isAuthenticated && <Button to={SIGN_UP} underline="none" component={Link} variant="contained" color="primary" className={classes.button}>GET STARTED</Button>}
+                        {!isAuthenticated && <Button to={SIGN_UP} underline="none" component={Link} variant="contained" className={classes.button}>GET STARTED</Button>}
                     </Grid>
                 </Grid>
             </Grid>

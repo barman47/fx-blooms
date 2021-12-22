@@ -13,6 +13,7 @@ import {
     SET_ID_VERIFICATION_LINK,
     SET_PERMIT_URL,
     SET_EMAIL,
+    PROFILE_UPDATED,
     RESET_CUSTOMER_SESSION
 } from '../actions/types';
 
@@ -113,6 +114,13 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 idVerificationLink: action.payload
+            };
+
+        case PROFILE_UPDATED:
+            return {
+                ...state,
+                profile: { ...state.profile, ...action.payload },
+                msg: 'Profile updated successfully'
             };
 
         case RESET_CUSTOMER_SESSION:

@@ -30,7 +30,10 @@ const Index = () => {
         <>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {hasSetup2FA ? 
-                <QrCode />
+                <>
+                    <h6>2FA Already Setup</h6>
+                    <QrCode />
+                </>
                 :
                 twoFactorEnabled ?
                 <DisableTwoFactor />

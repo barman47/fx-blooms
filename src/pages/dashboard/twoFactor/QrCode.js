@@ -158,7 +158,7 @@ const QrCode = (props) => {
                         fullWidth
                     />
                     <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
-                    <Button variant="contained" color="primary" component={RouterLink} to={VERIFY_2FA} className={classes.button}>Proceed</Button>
+                    <Button variant="contained" color="primary" className={classes.button}>Proceed</Button>
                     {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
                 </div>
             </Container>

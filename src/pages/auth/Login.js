@@ -110,7 +110,6 @@ const Login = ({ login, logout }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            console.log(history);
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line

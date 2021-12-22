@@ -1,11 +1,9 @@
 import { 
     ADDED_LISTING, 
     DELETED_LISTING,
-    // HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
-    UPDATED_LISTING, 
     CANCELED_NEGOTIATION,
     SET_LISTING_MSG
 } from '../actions/types';
@@ -70,6 +68,7 @@ const listingsReducer = (state = initialState, action) => {
                 totalItemCount,
                 totalPageCount
             } = action.payload;
+            
             return {
                 ...state,
                 listings: [...state.listings, ...action.payload.listings],
@@ -79,28 +78,6 @@ const listingsReducer = (state = initialState, action) => {
                 totalItemCount,
                 totalPageCount
             };
-
-        case UPDATED_LISTING: 
-        // listing update logic here
-            listingsList = [...state.listings];
-            listing = {...action.payload.listing};
-            listingId = listing.id;
-            listingIndex = listingsList.findIndex(item => item.id === listingId);
-            // updatedListing = { ...listing };
-            listingsList.splice(listingIndex, 1, listing);
-
-            return {
-                ...state,
-                listing,
-                listings: [...listingsList],
-                updatedListing: !state.addedListing,
-                msg: action.payload.msg
-            }; 
-
-        // case HIDE_NEGOTIATION_LISTINGS: 
-        //     return {
-        //         listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
-        //     };
 
         case CANCELED_NEGOTIATION:
             listingsList = [...state.listings];
