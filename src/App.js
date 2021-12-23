@@ -21,7 +21,7 @@ import VerifyQrCode from './pages/auth/VerifyQrCode';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import PendingVerification from './pages/auth/PendingVerification';
 
-import Faqs from './pages/faqs';
+import FAQs from './pages/faqs/FAQs';
 import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
 import Disclaimer from './pages/disclaimer/Disclaimer';
@@ -161,7 +161,7 @@ const [title, setTitle] = useState('');
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
 						<Route path={TERMS} exact component={TermsAndConditions} />
-						<Route path={FAQS} exact component={Faqs} />
+						<Route path={FAQS} exact component={FAQs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
 						<Route path={DISCLAIMER} exact component={Disclaimer} />
 						<PrivateRoute path={DASHBOARD}>

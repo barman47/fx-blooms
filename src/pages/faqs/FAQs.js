@@ -5,6 +5,7 @@ import { ChevronUp } from 'mdi-material-ui';
 import Layout from '../../components/layout';
 
 import { COLORS } from '../../utils/constants';
+import background from '../../assets/img/patterns-black.jpg';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -19,7 +20,10 @@ const useStyles = makeStyles(theme => ({
     },
 
     content: {
-        backgroundColor: COLORS.darkTeal,
+        backgroundImage: `url(${background})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         position: 'absolute',
         left: 0,
         top: 0,
@@ -40,7 +44,11 @@ const useStyles = makeStyles(theme => ({
 
         '& h4:first-child': {
             color: COLORS.offWhite,
-            fontWeight: 800
+            fontWeight: 800,
+
+            [theme.breakpoints.down('sm')]: {
+                fontSize: theme.spacing(3)
+            }
         },
 
         '& p': {
@@ -63,6 +71,7 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.down('sm')]: {
+            gridTemplateColumns: '1fr',
             marginTop: theme.spacing(45),
             padding: [[theme.spacing(2), theme.spacing(3), theme.spacing(3), theme.spacing(3)]]
         }
