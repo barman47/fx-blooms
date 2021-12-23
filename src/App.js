@@ -22,9 +22,9 @@ import VerifyEmail from './pages/auth/VerifyEmail';
 import PendingVerification from './pages/auth/PendingVerification';
 
 import Faqs from './pages/faqs';
-import PrivacyPolicy from './pages/privacyPolicy';
-import TermsAndConditions from './pages/termsAndConditions';
-import Disclaimer from './pages/disclaimer';
+import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
+import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
+import Disclaimer from './pages/disclaimer/Disclaimer';
 
 import Dashboard from './pages/dashboard';
 

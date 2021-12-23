@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = () => {
+const PrivacyPolicy = () => {
     const classes = useStyles();
 
     return (
@@ -218,4 +218,4 @@ const Index = () => {
     );
 };
 
-export default Index
+export default PrivacyPolicy;

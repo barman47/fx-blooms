@@ -61,6 +61,7 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.down('sm')]: {
+            // justifyContent: 'center',
             gap: theme.spacing(5),
             gridTemplateColumns: '1fr 1fr',
         },
@@ -81,6 +82,9 @@ const useStyles = makeStyles(theme => ({
 
         '& div:first-child': {
             [theme.breakpoints.down('md')]: {
+                gridColumn: '1 / span 5'
+            },
+            [theme.breakpoints.down('sm')]: {
                 gridColumn: '1 / span 2'
             }
         }
@@ -169,10 +173,10 @@ const Footer = () => {
                         >
                             About us
                     </AnimatedLink>
-                    <Link className={classes.link} target="_blank" to={PRIVACY_POLICY} rel="noreferrer">Privacy Policy</Link>
-                    <Link className={classes.link} target="_blank" to={TERMS}  rel="noreferrer">Terms &amp; Conditions</Link>
-                    <Link className={classes.link} target="_blank" to={DISCLAIMER}  rel="noreferrer">Disclaimer</Link>
-                    <Link className={classes.link} target="_blank" to="#!"  rel="noreferrer">User Agreement</Link>
+                    <Link className={classes.link} component={RouterLink} to={PRIVACY_POLICY}>Privacy Policy</Link>
+                    <Link className={classes.link} component={RouterLink} to={TERMS}>Terms &amp; Conditions</Link>
+                    <Link className={classes.link} component={RouterLink} to={DISCLAIMER}>Disclaimer</Link>
+                    <Link className={classes.link} component={RouterLink} to="#!">User Agreement</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>
@@ -182,8 +186,8 @@ const Footer = () => {
                 </div>
                 <div>
                     <Typography variant="h6">Help</Typography>
-                    <a className={classes.link} target="_blank" href={FAQS}  rel="noreferrer">FAQs</a>
-                    <a className={classes.link} target="_blank" href={CONTACT_US}  rel="noreferrer">Contact Us</a>
+                    <Link className={classes.link} to={FAQS} component={RouterLink}>FAQs</Link>
+                    <Link className={classes.link} to={CONTACT_US} component={RouterLink}>Contact Us</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Connect</Typography>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
     AppBar, 
@@ -48,8 +48,6 @@ HideOnScroll.propTypes = {
 const useStyles = makeStyles(theme => ({
     root: {
         background: 'transparent',
-        // boxShadow: `0px 1px 0px #e5e9f2`,
-        // position: 'absolute',
         width: '100%'
     },
     
@@ -178,14 +176,12 @@ const useStyles = makeStyles(theme => ({
 export const PublicHeader = (props) => {
     const classes = useStyles();
     const theme = useTheme();
-    const location = useLocation();
 
     const { isAuthenticated } = useSelector(state => state.customer);
     
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
-    // eslint-disable-next-line
-    const [open, setOpen] = useState(false);
+    const [open] = useState(false);
     const anchorRef = useRef(null);
     const prevOpen = useRef(open);
 
@@ -223,10 +219,10 @@ export const PublicHeader = (props) => {
 
     return (
         <HideOnScroll {...props}>
-            <AppBar className={clsx(classes.root, { [classes.scrollingNav] : scrollPosition > 100 || location.pathname !== '/' })} elevation={0}>
+            <AppBar className={clsx(classes.root, { [classes.scrollingNav] : scrollPosition > 100 })} elevation={0}>
                 <Toolbar>
                     <section className={classes.nav}>
-                        {scrollPosition > 100 || location.pathname !== '/' ?
+                        {scrollPosition > 100 ?
                             <RouterLink to="/">
                                 <img src={logo} alt="FX Blooms Logo" />
                             </RouterLink>
@@ -239,7 +235,7 @@ export const PublicHeader = (props) => {
                             {isAuthenticated && 
                                 <RouterLink 
                                     to={`${DASHBOARD}${DASHBOARD_HOME}`}  
-                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 || location.pathname !== '/' })}
+                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
                                 >
                                     Dashboard
                                 </RouterLink>
@@ -253,7 +249,7 @@ export const PublicHeader = (props) => {
                                     smooth={true}
                                     offset={-70}
                                     duration={500}
-                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 || location.pathname !== '/' })}
+                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
                                 >
                                     {link.text}
                                 </AnimatedLink>
@@ -267,7 +263,7 @@ export const PublicHeader = (props) => {
                                     to={LOGIN} 
                                     component={RouterLink}
                                     size="medium"
-                                    className={clsx(classes.login, classes.button, {[ classes.scrollingLogin ]: scrollPosition > 100 || location.pathname !== '/' })}
+                                    className={clsx(classes.login, classes.button, {[ classes.scrollingLogin ]: scrollPosition > 100 })}
                                 >
                                     LOG IN
                                 </Button>
