@@ -55,7 +55,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
     const history = useHistory();
 
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -90,7 +90,14 @@ const AccountSetupModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <Typography variant="h6" color="primary">First, let's verify your Identity</Typography>
                         <Typography variant="subtitle1">We are required by law to verify users' identity before buying or selling.</Typography>
-                        <Button variant="contained" color="primary" onClick={handleVerifyId}>Okay, Verify Me</Button>
+                        <Grid container direction="row">
+                            <Grid item xs={6}>
+                                <Button variant="text" size="small" color="secondary" onClick={() => setOpen(false)}>Skip</Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button variant="contained" size="small" color="primary" onClick={handleVerifyId}>Okay, Verify Me</Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Fade>

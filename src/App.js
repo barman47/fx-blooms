@@ -11,7 +11,6 @@ import Home from './pages/home';
 
 import Login from './pages/auth/Login';
 import CreateAccount from './pages/auth/CreateAccount';
-import CreateProfile from './pages/auth/CreateProfile';
 import SignUpSuccess from './pages/auth/SignUpSuccess';
 import SignUpFailure from './pages/auth/SignUpFailure';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -62,7 +61,6 @@ import {
 	VERIFY_2FA,
 	SIGNUP_SUCCESS,
 	SIGNUP_FAILURE,
-	CREATE_PROFILE, 
 	MAKE_LISTING,
 	NOTIFICATIONS,
 	DASHBOARD,
@@ -159,7 +157,6 @@ const [title, setTitle] = useState('');
 						<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
 						<Route path={SETUP_2FA} exact component={QrCode} />
 						<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
-						<Route path={CREATE_PROFILE} exact component={CreateProfile} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
 						<Route path={TERMS} exact component={TermsAndConditions} />

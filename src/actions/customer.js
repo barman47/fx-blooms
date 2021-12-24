@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { CREATE_PROFILE, DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
 import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
@@ -10,8 +10,7 @@ import {
     PROCEED_TO_LOGIN,
     // PROCEED_TO_DASHBOARD,
     ID_STATUS,
-    FILL_FORM1,
-    FILL_FORM2,
+    FILL_FORM1
 } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -75,22 +74,25 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 
     switch (nextStep) {
         case FILL_FORM1:
-            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
-            return dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-            });
-
-        case FILL_FORM2:
-            const email = res.data.data.message[0].split(' ')[0];
-            dispatch({ type: SET_EMAIL, payload: email });
-            return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
+            try {
+                await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+            } catch (err) {
+                return handleError(err, dispatch);
+            }
 
         case EMAIL_VERIFICATION:
-            return dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-            });
+            try {
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+            } catch (err) {
+                return handleError(err, dispatch);
+            }
 
         case GOTO_2FA:
             setAuthToken(res.data.data.token);
@@ -111,6 +113,7 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
+        console.log(res);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
         if (isUsernameAvailable) {
@@ -135,7 +138,8 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
         }
 
     } catch (err) {
-        return handleError(err, dispatch);
+        console.log(err.response);
+        // return handleError(err, dispatch);
     }
 };
 

@@ -226,11 +226,11 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
 
     const verifyEuId = () => {
-        window.open(idVerificationLink);
+        window.open(residencePermitUrl);
     };
 
     const verifyOtherId = () => {
-        window.open(residencePermitUrl);
+        window.open(idVerificationLink);
     };
 
     const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });

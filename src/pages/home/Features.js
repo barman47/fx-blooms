@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Button, Grid, Link, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import listing from '../../assets/img/listing.png';

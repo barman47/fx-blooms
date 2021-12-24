@@ -4,7 +4,6 @@ export const BLOG = '/blog.fxblooms.com';
 export const HOW_IT_WORKS = 'howItWorks';
 export const CONTACT_US = 'contactUs';
 export const SIGN_UP = '/user/signUp';
-export const CREATE_PROFILE = '/user/profile';
 export const LOGIN = '/user/login';
 export const FORGOT_PASSWORD = '/user/forgotPassword';
 export const RESET_PASSWORD = '/user/resetPassword';
