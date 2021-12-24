@@ -148,9 +148,9 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         setSellerUsername(seller.userName);
         
         const sellerAccount = {
-            accounName: seller.accountName,
-            accountNumber: seller.accountNumber,
-            bankName: seller.bankName
+            accounName: buyer.accountName,
+            accountNumber: buyer.accountNumber,
+            bankName: buyer.bankName
         };
 
         if (buyer.hasMadePayment) {
@@ -253,6 +253,22 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
+                    {notifications.map(notification => {
+                            if (hasNotification(notification)) {
+                                return (
+                                    <Notification 
+                                        key={notification.id}
+                                        title="Credit (Exchange)"
+                                        message={setMessage(notification)}
+                                        buttonText={buttonDisabled(notification.seller) ? 'Payment Confirmed' : 'Confirm payment'}
+                                        buttonAction={() => handleButtonAction(notification)}
+                                        // buttonAction={() => setBuyerAccount(notification)}
+                                        buttonDisabled={buttonDisabled(notification.seller)}
+                                    />
+                                )
+                            }
+                            return null;
+                        })}
                         {stats.residencePermitStatus !== APPROVED &&
                             <Notification 
                                 title="Verify your EU Government Issued ID"
@@ -292,22 +308,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                             buttonText="Set PIN"
                             buttonAction={setPin}
                         /> */}
-                        {notifications.map(notification => {
-                            if (hasNotification(notification)) {
-                                return (
-                                    <Notification 
-                                        key={notification.id}
-                                        title="Credit (Exchange)"
-                                        message={setMessage(notification)}
-                                        buttonText={buttonDisabled(notification.seller) ? 'Payment Confirmed' : 'Confirm payment'}
-                                        buttonAction={() => handleButtonAction(notification)}
-                                        // buttonAction={() => setBuyerAccount(notification)}
-                                        buttonDisabled={buttonDisabled(notification.seller)}
-                                    />
-                                )
-                            }
-                            return null;
-                        })}
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>

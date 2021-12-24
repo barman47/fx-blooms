@@ -152,11 +152,11 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
                         <Typography variant="subtitle1" component="p" className={classes.transferAmount}>&#8364;{formatNumber(amount)}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
                         <section className={classes.accountDetailsContainer}>
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accounName}</Typography>
                             </div>
                             <div className={classes.accountContainer}>
                                 <section>
