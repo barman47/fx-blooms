@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
     AppBar, 
@@ -21,7 +21,7 @@ import MobileNav from './MobileNav';
 import logo from '../../assets/img/logo.svg';
 import logoWhite from '../../assets/img/logo-white.svg';
 import { COLORS, SHADOW } from '../../utils/constants';
-import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME } from '../../routes';
+import { ABOUT_US, CONTACT_US, HOW_IT_WORKS, SIGN_UP, LOGIN, FAQS, DASHBOARD, DASHBOARD_HOME } from '../../routes';
 import { useTheme } from '@material-ui/styles';
 
 export const HideOnScroll = (props) => {
@@ -176,6 +176,7 @@ const useStyles = makeStyles(theme => ({
 export const PublicHeader = (props) => {
     const classes = useStyles();
     const theme = useTheme();
+    const location  = useLocation();
 
     const { isAuthenticated } = useSelector(state => state.customer);
     
@@ -190,10 +191,10 @@ export const PublicHeader = (props) => {
     };
 
     const publicRoutes = [
-        { url: WHY, text: 'Home' },
-        { url: WHY, text: 'How it Works' },
+        { url: '/', text: 'Home' },
+        { url: HOW_IT_WORKS, text: 'How it Works' },
         { url: ABOUT_US, text:'About Us' },
-        { url: WHY, text: 'FAQs' },
+        { url: FAQS, text: 'FAQs' },
         { url: CONTACT_US, text:'Contact' }
     ];
 
@@ -240,20 +241,33 @@ export const PublicHeader = (props) => {
                                     Dashboard
                                 </RouterLink>
                             }
-                            {publicRoutes.map((link, index) => (
-                                <AnimatedLink 
-                                    key={index}
-                                    to={link.url} 
-                                    activeClass={classes.activeLink} 
-                                    spy={true}
-                                    smooth={true}
-                                    offset={-70}
-                                    duration={500}
-                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
-                                >
-                                    {link.text}
-                                </AnimatedLink>
-                            ))}
+                            {publicRoutes.map((link, index) => {
+                                if (location.pathname === '/') {
+                                    return (
+                                        <AnimatedLink 
+                                            key={index}
+                                            to={link.url} 
+                                            activeClass={classes.activeLink} 
+                                            spy={true}
+                                            smooth={true}
+                                            offset={-70}
+                                            duration={500}
+                                            className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
+                                        >
+                                            {link.text}
+                                        </AnimatedLink>
+                                    )
+                                }
+                                return (
+                                    <RouterLink 
+                                        key={index}
+                                        to={link.url} 
+                                        className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
+                                    >
+                                        {link.text}
+                                    </RouterLink>
+                                );
+                            })}
                         </div>
                         {!isAuthenticated &&
                             <div className={classes.buttonContainer}>

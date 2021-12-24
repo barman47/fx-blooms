@@ -142,6 +142,8 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
 
+    const [phoneNumber, setPhoneNumber] = useState('');
+
     const toast = useRef();
     const successModal = useRef();
 
@@ -238,30 +240,26 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
 
     const handleGenerateOtp = () => {
         const data = `${countryCode}${phoneNo.substring(1, phoneNo.length)}`;
-        // if (!Validator.isMobilePhone(data)) {
-        //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Invalid Phone Number!' });
-        // }
-        // const phoneRegExp =  /^[0-9]{1,15}$/
+        if (Validator.isEmpty(countryCode)) {
+            return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
+        }
 
-        // if (Validator.isEmpty(countryCode)) {
-        //     return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
-        // }
-
-        // if (!phoneRegExp.test(data)) {
-        //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Invalid Phone Number!' });
+        // const phoneRegExp =  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        // if (phoneRegExp.test(data)) {
+        //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Number should be be in this format: 08080808080' });
         // }
 
         if (Validator.isEmpty(data)) {
             return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Phone Number is required!' });
         }
-
-        console.log(data);
         
         setOpen(!open);
+        setPhoneNumber(data);
         generateOtp(data);
     };
 
     const dismissAction = () => {
+        setPhoneNumber('');
         setEditable(false);
         setOpen(false);
         dispatch({
@@ -283,7 +281,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
             }
             {loading && <Spinner text={spinnerText} />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <VerifyPhoneNumberModal isOpen={open} dismissAction={dismissAction} />
+            <VerifyPhoneNumberModal isOpen={open} dismissAction={dismissAction} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
             <div className={classes.header}>
                 <div>
                     <Typography variant="h4" color="primary">Account Setup (Profile)</Typography>
@@ -291,7 +289,10 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
                     <hr className={classes.hr} />
                 </div>
                 {!isEmpty(profile) && 
-                    <Button variant="outlined" color="primary" onClick={() => setEditable(true)}>Edit Details</Button>
+                    <Button variant="outlined" color="primary" onClick={() => {
+                        setEditable(true);
+                        setPhoneNumber(phoneNumber.substring(3, phoneNumber.length));
+                    }}>Edit Details</Button>
                 }
             </div>
             <Grid className={classes.root} container direction="column">
@@ -382,7 +383,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                                 {profile.phoneNo && !editable ?
                                     <>
-                                        <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
+                                        <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{`0${profile.phoneNo.substring(3, profile.phoneNo.length)}`}</Typography>
                                         <FormHelperText style={{ color: COLORS.red }}>{errors.phoneNo}</FormHelperText>
                                     </>
                                     :

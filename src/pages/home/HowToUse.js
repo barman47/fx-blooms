@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 import { COLORS } from '../../utils/constants';
-import { SIGN_UP } from '../../routes';
+import { SIGN_UP, HOW_IT_WORKS } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -163,7 +163,7 @@ const HowToUse = () => {
     const classes = useStyles();
 
     return (
-        <section className={classes.root}>
+        <section className={classes.root} id={HOW_IT_WORKS}>
             <Typography variant="h3" className={classes.header}>How to Use</Typography>
             <Typography variant="h6" align="center">Quick description of how to get started with FXBLOOMS</Typography>
             <section className={classes.container}>

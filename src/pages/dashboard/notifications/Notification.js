@@ -37,6 +37,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
+        fontSize: theme.spacing(1.3),
         textTransform: 'uppercase',
         marginTop: theme.spacing(2),
 

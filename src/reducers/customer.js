@@ -14,6 +14,7 @@ import {
     SET_PERMIT_URL,
     SET_EMAIL,
     PROFILE_UPDATED,
+    VERIFIED_PHONE_NUMBER,
     RESET_CUSTOMER_SESSION
 } from '../actions/types';
 
@@ -121,6 +122,16 @@ const customerReducer =  (state = initialState, action) => {
                 ...state,
                 profile: { ...state.profile, ...action.payload },
                 msg: 'Profile updated successfully'
+            };
+
+        case VERIFIED_PHONE_NUMBER:
+            return {
+                ...state,
+                msg: 'Phone number verified successfully',
+                phoneNumber: action.payload.phoneNumber,
+                profile: { ...state.profile, phoneNo: action.payload.phoneNumber },
+                hasVerifiedPhoeNumber: true
+
             };
 
         case RESET_CUSTOMER_SESSION:

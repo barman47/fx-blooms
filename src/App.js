@@ -47,6 +47,8 @@ import AdminHome from './pages/adminDashboard/home/Home';
 import Customers from './pages/adminDashboard/customers/';
 import Customer from './pages/adminDashboard/customer/';
 
+import PageNotFound from './pages/PageNotFound';
+
 // import { getMe } from './actions/customer';
 
 import { 
@@ -146,8 +148,8 @@ const [title, setTitle] = useState('');
 	return (
 		<ThemeProvider theme={theme}>
 			<Router>
-				<Switch>
-					<ScrollToTop>
+				<ScrollToTop>
+					<Switch>
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
 						<Route path={SIGN_UP} exact component={CreateAccount} />
@@ -164,6 +166,7 @@ const [title, setTitle] = useState('');
 						<Route path={FAQS} exact component={FAQs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
 						<Route path={DISCLAIMER} exact component={Disclaimer} />
+						<Route component={PageNotFound} exact />
 						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
@@ -182,8 +185,8 @@ const [title, setTitle] = useState('');
 								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 							</AdminDashboard>
 						</AdminRoute>
-					</ScrollToTop>
-				</Switch>
+					</Switch>
+				</ScrollToTop>
 			</Router>
 		</ThemeProvider>
 	);

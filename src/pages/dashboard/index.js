@@ -118,8 +118,9 @@ const Dashboard = ({ children, title, logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
     
@@ -143,6 +144,7 @@ const Dashboard = ({ children, title, logout }) => {
     const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        checkTwoFactorStatus();
         checkSession();
         onReconnected();
         onReconnect();
@@ -231,6 +233,13 @@ const Dashboard = ({ children, title, logout }) => {
                 break;
         }
     }, [connectionStatus]);
+
+    // Logout user if he tries to beat 2FA
+    const checkTwoFactorStatus = () => {
+        if (twoFactorEnabled && !authorized) {
+            logout(history);
+        }
+    };
 
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
@@ -417,7 +426,12 @@ const Dashboard = ({ children, title, logout }) => {
                             showLabels
                         >
                             {mobileLinks.map((item, index) => (
-                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                                <BottomNavigationAction 
+                                    onClick={() => handleLinkClick(item.url)} 
+                                    key={index} 
+                                    label={item.text} 
+                                    icon={item.icon} 
+                                />
                             ))}
                         </BottomNavigation>
                     </Box>

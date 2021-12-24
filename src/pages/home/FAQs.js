@@ -109,7 +109,7 @@ const FAQs = () => {
     const classes = useStyles();
 
     return (
-        <section className={classes.root}>
+        <section className={classes.root} id={FAQS}>
             <Typography variant="h3" className={classes.header}>Frequently Asked Questions</Typography>
             <Typography variant="h6" align="center">We now have an FAQ list that we hope will help you answer some of the more common ones.</Typography>
             <section className={classes.container}>

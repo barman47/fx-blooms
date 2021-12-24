@@ -53,9 +53,11 @@ export const acceptChatPopupNotification = (chatId) => async (dispatch) => {
 
 export const generateOtp = (phoneNumber) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${API}/Notification/GenerateOTP`, { phoneNumber });
-        console.log(res);
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${API}/Notification/GenerateOTP`, { phoneNumber })
+        ]);
+        // console.log(res);
         // return dispatch({
         //     type: SET_CUSTOMER_MSG,
         //     payload: res.data.data
@@ -67,10 +69,14 @@ export const generateOtp = (phoneNumber) => async (dispatch) => {
 
 export const validatePhoneNumber = (data) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${API}/Notification/ValidatePhoneNumber`, data);
-        console.log(res);
-        return dispatch({ type: VERIFIED_PHONE_NUMBER });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${API}/Notification/ValidatePhoneNumber`, data)
+        ]);
+        return dispatch({ 
+            type: VERIFIED_PHONE_NUMBER, 
+            payload: { phoneNumber: data.phoneNumber }
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

@@ -24,7 +24,6 @@ import { ContentCopy } from 'mdi-material-ui';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        border: '1px solid red',
         padding: 0,
         marginTop: theme.spacing(-8),
         [theme.breakpoints.down('sm')]: {
@@ -54,7 +53,7 @@ const useStyles = makeStyles(theme => ({
         width: '20vw',
 
         [theme.breakpoints.down('sm')]: {
-            width: '90vw'
+            width: '100%'
         }
     },
 

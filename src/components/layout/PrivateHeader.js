@@ -30,7 +30,6 @@ import { toggleDrawer } from '../../pages/dashboard/profile';
 import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
-import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
 
@@ -285,7 +284,7 @@ export const PrivateHeader = (props) => {
                                 aria-controls={open ? 'mobile-profile-menu' : undefined}
                                 aria-haspopup="true"
                             >
-                                <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                                <Avatar alt={`${firstName} ${lastName}`} />
                             </Button>
                         }
                         <Popper open={open} anchorEl={mobileDropdown.current} role={undefined} transition disablePortal>
