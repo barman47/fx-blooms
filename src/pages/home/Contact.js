@@ -299,7 +299,7 @@ const Contact = ({ sendMail, subscribeToNewsletter }) => {
                                         variant="outlined" 
                                         placeholder="Enter Your Message"
                                         helperText={errors.Message}
-                                        rows={2}
+                                        minRows={2}
                                         rowsMax={10}
                                         fullWidth
                                         required

@@ -5,6 +5,7 @@ import {
     SET_MORE_LISTINGS,
     SET_LISTING,
     CANCELED_NEGOTIATION,
+    SET_LOADING_LISTINGS,
     SET_LISTING_MSG
 } from '../actions/types';
 // import { LISTING_STATUS } from '../utils/constants';
@@ -14,6 +15,7 @@ const initialState = {
     updatedListing: false,
     listing: {},
     listings: [],
+    loading: false,
     msg: null
 };
 
@@ -93,6 +95,12 @@ const listingsReducer = (state = initialState, action) => {
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
+            };
+
+        case SET_LOADING_LISTINGS:
+            return {
+                ...state,
+                loading: action.payload
             };
 
         case SET_LISTING_MSG:

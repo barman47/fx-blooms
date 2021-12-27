@@ -30,10 +30,6 @@ const useStyles = makeStyles(theme =>({
         [theme.breakpoints.down('md')]: {
             gridTemplateColumns: '1fr',
             padding: [[theme.spacing(10), theme.spacing(1), 0, theme.spacing(1)]]
-        },
-
-        [theme.breakpoints.down('sm')]: {
-            // padding: theme.spacing(5, 0.5)
         }
     },
 
@@ -200,6 +196,8 @@ const Profile = (props) => {
         // eslint-disable-next-line
     }, []);
 
+    const verifyIdentity = () => setValue(3);
+
     return (
         <>
             <section className={classes.root}>
@@ -234,7 +232,7 @@ const Profile = (props) => {
                 </div>
                 <div>
                     <TabPanel value={value} index={0}>  
-                        <PersonalDetails />
+                        <PersonalDetails verifyIdentity={verifyIdentity} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>  
                         <TwoFactor />

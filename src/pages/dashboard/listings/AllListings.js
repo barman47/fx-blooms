@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -25,10 +25,10 @@ import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
-import { getCurrencies } from '../../../actions/currencies';
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { SET_LOADING_LISTINGS } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -44,6 +44,7 @@ import Wallet from '../wallet/Wallet';
 
 import img from '../../../assets/img/decentralized.svg';
 import { ABOUT_US } from '../../../routes';
+import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
 	fab: {
@@ -255,11 +256,11 @@ const useStyles = makeStyles(theme => ({
 
 const AllListings = (props) => {
 	const classes = useStyles();
-	// const theme = useTheme();
-    // const matches = useMediaQuery(theme.breakpoints.down('md'));
+	const dispatch = useDispatch();
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const listingsLoading = useSelector(state => state.listings.loading);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
@@ -294,6 +295,10 @@ const AllListings = (props) => {
 		getCustomerStats();
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
+			dispatch({
+				type: SET_LOADING_LISTINGS,
+				payload: true
+			});
 			getListings();
 		}
 
@@ -323,7 +328,7 @@ const AllListings = (props) => {
 
 	useEffect(() => {
 		setDataLength(listings.length);
-	}, [listings]);
+	}, [dispatch, listings]);
 
 	const getListings = () => {
 		// setHideNegotiationListings(false);
@@ -438,7 +443,12 @@ const AllListings = (props) => {
 					// height={1000}
 				>
 					<Typography variant="body1" component="p">All Listings</Typography>
-					<Listings />
+					{listingsLoading === true ?
+						<ListingsSkeleton />
+						:
+						<Listings />
+					}
+					
 				</InfiniteScroll>
 				<Filter />
 			</section>
@@ -446,7 +456,7 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((props) => {
+const Filter = connect(undefined, { getListingsOpenForBid })((props) => {
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
@@ -461,13 +471,6 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
-
-	useEffect(() => {
-		if (currencies.length === 0) {
-			props.getCurrencies();
-		}
-		// eslint-disable-next-line
-	}, []);
 
 	useEffect(() => {
 		setLoading(false);
@@ -717,7 +720,6 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 });
 
 Filter.propTypes = {
-	getCurrencies: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired
 };
 

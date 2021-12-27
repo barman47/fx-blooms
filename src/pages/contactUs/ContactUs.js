@@ -24,9 +24,7 @@ const useStyles = makeStyles(theme => ({
         marginTop: theme.spacing(8.1),
 
         [theme.breakpoints.down('sm')]: {
-            marginTop: theme.spacing(7),
-            // paddingLeft: theme.spacing(2),
-            // paddingRight: theme.spacing(2)
+            marginTop: theme.spacing(7)
         }
     },
 
@@ -49,9 +47,6 @@ const useStyles = makeStyles(theme => ({
             flexDirection: 'column',
             height: '95vh'
         },
-        // [theme.breakpoints.down('sm')]: {
-        //     height: '40vh'
-        // },
 
         '& h4:first-child': {
             color: COLORS.offWhite,
@@ -65,12 +60,6 @@ const useStyles = makeStyles(theme => ({
         height: theme.spacing(20),
         overflow: 'hidden',
         width: theme.spacing(45),
-
-        '&:first-child': {
-            // [theme.breakpoints.down('md')]: {
-            //     marginTop: theme.spacing(20)
-            // }
-        },
 
         '& div': {
             backgroundColor: COLORS.offWhite,
@@ -91,7 +80,7 @@ const useStyles = makeStyles(theme => ({
                 color: COLORS.offBlack,
                 display: 'block',
                 marginTop: theme.spacing(2)
-            },
+            }
         }
     },
 
@@ -148,7 +137,6 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& form': {
-            // margin: '0 auto',
             width: '50%',
 
             [theme.breakpoints.down('md')]: {

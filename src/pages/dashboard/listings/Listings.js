@@ -10,7 +10,6 @@ import { COLORS, ID_STATUS } from '../../../utils/constants';
 import { addBid } from '../../../actions/listings';
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
-import Spinner from '../../../components/common/Spinner';
 import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
 import Listing from './Listing';
@@ -53,14 +52,12 @@ const Listings = ({ addBid }) => {
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
 
     const idVerificationModal = useRef();
 
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors(errorsState);
-            setLoading(false);
             dispatch({
                 type: GET_ERRORS,
                 payload: {}
@@ -100,7 +97,6 @@ const Listings = ({ addBid }) => {
             return checkIdStatus();
         } 
 
-        setLoading(true);
         dispatch({
             type: SET_LISTING,
             payload: listing
@@ -126,7 +122,6 @@ const Listings = ({ addBid }) => {
         <>
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
-            {loading && <Spinner />}
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
                     <Listing key={index} listing={listing} handleAddBid={handleAddBid} checkIdStatus={checkIdStatus} />

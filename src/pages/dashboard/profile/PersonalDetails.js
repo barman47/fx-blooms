@@ -22,7 +22,7 @@ import { generateOtp } from '../../../actions/notifications';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import isEmpty from '../../../utils/isEmpty'; 
-import { COLORS } from '../../../utils/constants'; 
+import { COLORS, ID_STATUS } from '../../../utils/constants'; 
 import countryToFlag from '../../../utils/countryToFlag'; 
 import { countries } from '../../../utils/countries'; 
 import validateUpdateProfile from '../../../utils/validation/customer/updateProfile';
@@ -33,6 +33,27 @@ import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme =>({
+    noProfile: {
+        backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: theme.spacing(-3),
+        padding: theme.spacing(5),
+
+        '& h5': {
+            fontWeight: 600,
+            marginBottom: theme.spacing(2)
+        },
+
+        '& p': {
+            color: COLORS.offBlack,
+            marginBottom: theme.spacing(2)
+        },
+    },
+
     header: {
         display: 'flex',
         flexDirection: 'row',
@@ -117,10 +138,10 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const PersonalDetails = ({ generateOtp, updateProfile }) => {
+const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { hasVerifiedPhoeNumber, msg, profile } = useSelector(state => state.customer); 
+    const { hasVerifiedPhoeNumber, msg, profile, stats } = useSelector(state => state.customer); 
     const errorsState = useSelector(state => state.errors); 
 
     const [FirstName, setFirstName] = useState('');
@@ -146,6 +167,8 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
 
     const toast = useRef();
     const successModal = useRef();
+
+    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         if (profile) {
@@ -225,6 +248,8 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
         const data = {
             address,
             country,
+            countryCode,
+            phoneNo,
             postalCode
         };
 
@@ -235,7 +260,16 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
 
         setSpinnerText('Updating Profile...');
         setLoading(true);
-        updateProfile(data);
+        updateProfile({
+            address,
+            country,
+            postalCode,
+            phoneNumber: {
+                countryCode,
+                telephoneNumber: phoneNo
+
+            }
+        });
     };
 
     const handleGenerateOtp = () => {
@@ -267,6 +301,16 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
             payload: null
         });
     };
+
+    if (stats.residencePermitStatus === NOT_SUBMITTED || stats.idStatus === NOT_SUBMITTED) {
+        return (
+            <div className={classes.noProfile}>
+                <Typography variant="h5" color="primary">No Profile</Typography>
+                <Typography variant="body2" component="p">Kindly verify your identity to create a profile and buy and sell.</Typography>
+                <Button className={classes.button} color="primary" variant="contained" onClick={() => verifyIdentity()}>Verify Identity</Button>
+            </div>
+        );
+    } 
 
     return (
         <>
@@ -354,8 +398,8 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
                                         autoHighlight
                                         disableClearable
                                         getOptionLabel={(option) => {
-                                            setCountryCode(option.phone);
-                                            return option.phone;
+                                            setCountryCode(`+${option.phone}`);
+                                            return `+${option.phone}`;
                                         }}
                                         renderOption={(option) => (
                                             <>
@@ -522,6 +566,7 @@ const PersonalDetails = ({ generateOtp, updateProfile }) => {
 PersonalDetails.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     updateProfile: PropTypes.func.isRequired,
+    verifyIdentity: PropTypes.func.isRequired
 };
 
 export default connect( undefined, { generateOtp, updateProfile } )(PersonalDetails);

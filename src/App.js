@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { createTheme, ThemeProvider } from '@material-ui/core';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 import AdminRoute from './components/common/AdminRoute';
@@ -84,7 +84,7 @@ import {
 
 // import reIssueToken from './utils/reIssueToken';
 
-const theme = createMuiTheme({
+const theme = createTheme({
 	overrides: {
 		MuiButton: {
 		  	root: {

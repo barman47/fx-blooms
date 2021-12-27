@@ -6,6 +6,9 @@ const updateProfile = (data) => {
     data.address = !isEmpty(data.address) ?  data.address : '';
     data.country = !isEmpty(data.country) ?  data.country : '';
     data.postalCode = !isEmpty(data.postalCode) ?  data.postalCode : '';
+    data.phoneNo = !isEmpty(data.phoneNo) ?  data.phoneNo : '';
+    data.countryCode = !isEmpty(data.countryCode) ?  data.countryCode : '';
+    console.log('country code ', data.countryCode);
 
     if (Validator.isEmpty(data.address)) {
         errors.address = 'Your address is required!';
@@ -22,6 +25,14 @@ const updateProfile = (data) => {
         if (Validator.isEmpty(data.postalCode)) {
             errors.postalCode = 'Your postal code is required!';
         }
+    }
+
+    if (Validator.isEmpty(data.countryCode)) {
+        errors.countryCode = 'Country code is required!';
+    }
+
+    if (Validator.isEmpty(data.phoneNo)) {
+        errors.phoneNo = 'Your phone number is required!';
     }
    
     return {
