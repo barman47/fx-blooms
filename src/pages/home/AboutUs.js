@@ -1,4 +1,5 @@
-import { Typography } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import YouTube from 'react-youtube';
 
@@ -48,6 +49,14 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 300
     },
 
+    button: {
+        marginTop: theme.spacing(5),
+
+        [theme.breakpoints.down('sm')]: {
+            width: '100%'
+        }
+    },
+
     video: {
         width: '100%'
     }
@@ -79,6 +88,7 @@ const AboutUs = () => {
                     <Typography variant="h3">What is FXBLOOMS?</Typography>
                     <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>
                     <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
+                    <Button component={Link} to={ABOUT_US} color="primary" variant="contained" className={classes.button}>ABOUT US</Button>
                 </div>    
                 <YouTube className={classes.video} videoId="0gfyjfo7GO0" opts={opts} onReady={onReady} />
             </div>

@@ -20,6 +20,8 @@ import VerifyQrCode from './pages/auth/VerifyQrCode';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import PendingVerification from './pages/auth/PendingVerification';
 
+import AboutUs from './pages/aboutUs/AboutUs';
+import ContactUs from './pages/contactUs/ContactUs';
 import FAQs from './pages/faqs/FAQs';
 import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
@@ -51,6 +53,7 @@ import PageNotFound from './pages/PageNotFound';
 // import { getMe } from './actions/customer';
 
 import { 
+	ABOUT_US,
 	ADMIN_DASHBOARD,
 	ADMIN_HOME,
 	ADMIN_LOGIN,
@@ -75,7 +78,8 @@ import {
 	PRIVACY_POLICY,
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
-	WALLET
+	WALLET,
+	CONTACT_US
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -159,6 +163,8 @@ const [title, setTitle] = useState('');
 						<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
+						<Route path={ABOUT_US} exact component={AboutUs} />
+						<Route path={CONTACT_US} exact component={ContactUs} />
 						<Route path={TERMS} exact component={TermsAndConditions} />
 						<Route path={FAQS} exact component={FAQs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />

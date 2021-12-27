@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
-import { Link as AnimatedLink, animateScroll as scroll } from 'react-scroll';
+import { animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';
 
 import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
@@ -163,16 +163,7 @@ const Footer = () => {
                 </div>
                 <div>
                     <Typography variant="h6">Company</Typography>
-                    <AnimatedLink 
-                        to={ABOUT_US} 
-                        spy={true}
-                        smooth={true}
-                        offset={-70}
-                        duration={500}
-                        className={classes.link}
-                        >
-                            About us
-                    </AnimatedLink>
+                    <Link className={classes.link} to={ABOUT_US} component={RouterLink}>About us</Link>
                     <Link className={classes.link} component={RouterLink} to={PRIVACY_POLICY}>Privacy Policy</Link>
                     <Link className={classes.link} component={RouterLink} to={TERMS}>Terms &amp; Conditions</Link>
                     <Link className={classes.link} component={RouterLink} to={DISCLAIMER}>Disclaimer</Link>

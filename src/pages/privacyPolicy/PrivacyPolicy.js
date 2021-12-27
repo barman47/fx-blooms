@@ -1,4 +1,4 @@
-import { Typography } from '@material-ui/core';
+import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Layout from '../../components/layout';
@@ -8,48 +8,63 @@ import { COLORS } from '../../utils/constants';
 const useStyles = makeStyles(theme => ({
     root: {
         marginTop: theme.spacing(8.1),
-        padding: [[theme.spacing(2), theme.spacing(10), theme.spacing(5), theme.spacing(10)]],
 
         [theme.breakpoints.down('sm')]: {
             marginTop: theme.spacing(7),
             paddingLeft: theme.spacing(2),
             paddingRight: theme.spacing(2)
+        }
+    },
+
+    content: {
+        backgroundColor: COLORS.darkTeal,
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        width: '100vw',
+        height: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+
+        [theme.breakpoints.down('md')]: {
+            height: '50vh'
+        },
+        [theme.breakpoints.down('sm')]: {
+            height: '40vh'
         },
 
-        '& h4': {
-            fontWeight: 500,
-            marginBottom: theme.spacing(10)
+        '& h4:first-child': {
+            color: COLORS.offWhite,
+            fontWeight: 800
+        }
+    },
+
+    container: {
+        marginTop: theme.spacing(75),
+        padding: [[theme.spacing(2), theme.spacing(10), theme.spacing(10), theme.spacing(10)]],
+
+        [theme.breakpoints.down('sm')]: {
+            marginTop: theme.spacing(45),
+            padding: [[theme.spacing(2), theme.spacing(3), theme.spacing(3), theme.spacing(3)]]
+        },
+    },
+
+    item: {
+        marginBottom: theme.spacing(10),
+
+        '& p:first-child': {
+            marginBottom: theme.spacing(5)
         },
 
         '& p': {
             color: COLORS.offBlack,
+            lineHeight: 1.9,
+            marginBottom: theme.spacing(0.5),
             fontSize: theme.spacing(1.8),
             fontWeight: 300,
-            lineHeight: 1.5,
-            marginTop: theme.spacing(2),
             textAlign: 'justify'
-        },
-
-        '& span': {
-            marginLeft: theme.spacing(1)
-        },
-
-        '& ol': {
-            [theme.breakpoints.down('sm')]: {
-                paddingLeft: theme.spacing(4)
-            }
-        },
-
-        '& ul li': {
-            color: COLORS.offBlack,
-            listStyleType: 'disc',
-            fontWeight: 300
-        },
-
-        '& ol li': {
-            color: COLORS.offBlack,
-            fontWeight: 300,
-            marginBottom: theme.spacing(4),
         }
     }
 }));
@@ -58,162 +73,153 @@ const PrivacyPolicy = () => {
     const classes = useStyles();
 
     return (
-        <Layout
-            title="Privacy Policy"
-            description="Security of your data is important to us at FXBLOOMS. Here is our privacy policy."
-        >
-            <section className={classes.root}>
-                <Typography variant="h4">Privacy Policy</Typography>
-                <Typography variant="subtitle1" component="p">
-                    FXBLOOMS OÜ takes the protection of your personal data very seriously. We handle your personal data confidentiality and pursuant to the statutory data protection regulations and this privacy policy. This policy set out on this page is used to inform our app users and website visitors of how their personal data is managed by FXBLOOMS.
-                </Typography>
-                <Typography variant="subtitle1" component="p">
-                    If you choose to use our Service, then you agree to the collection and use of information in relation with this policy. The Personal Information that we collect is used for providing and improving the Service. We will not use or share your information with anyone except as described in this Privacy Policy. Please read it carefully. We would like to point out that data transfer on the Internet (for example when communicating by email) may have security vulnerabilities. It is not possible to provide 100% protection for your data from access by third parties.
-                </Typography>
-                <Typography variant="subtitle1" component="p">
-                    The terms used in this Privacy Policy have the same meanings as in our Terms and Conditions, which is accessible at fxblooms.com, unless otherwise defined in this Privacy Policy.
-                </Typography>
-                <ol>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Who We Are</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            For the purpose of this document, the data controller is FXBLOOMS OÜ (“we”, “our” and “us”), a company incorporated in Estonia with company registration code is 16262446. In case you have any questions regarding this privacy policy or how your personal data is gathered, stored, shared or used, kindly contact our privacy policy team on privacy@fxblooms.com.
+        <Layout title="Privacy Policy">
+            <Box component="section" className={classes.root}>
+                <Box component="header" className={classes.content}>
+                    <Typography variant="h4">Privacy Policy</Typography>
+                </Box>
+                <Box component="section" className={classes.container}>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">Processing of personal data</Typography>
+                        <Typography variant="body2" component="p">
+                            FXBLOOMS OÜ (registry code 16262446), located at Narva mnt 7, 10117 Tallinn, Estonia, email privacy@fxblooms.com (hereinafter referred to as the service provider), processes your personal data in accordance with the requirements of the Personal Data Protection Act of Estonia.
+                            The service provider processes personal information only for providing the service you have ordered. We do not transmit, sell, or disclose your data to third parties without your prior consent or in the cases provided by law.
                         </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">The Reason We Collect Information</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            There are various reasons why we collect, process and store your information. An example is we would like to be sure of the identity of our users or we would like to store your record for audits, regulatory or compliance purposes. Your personal information is needed to ensure  we provide a functional website, content and services.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">The Information We Collect</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            The types of personal information we process ourselves  or through other third party services includes but not limited to your email address, first name, last name, date of birth, telephone number, copies of ID, contact details, cookie identifiers, security details to protect identity, nationality, data usage, as well as the data communicated while using the service and application. This information (both the one you give us about you or others provide to us about you) may be added to any personal information we already hold and we will use it in the ways described in this Data Privacy Notice.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">How We Use The Information Collected About You</Typography>
-                        <br /><br />
-                        We use the information collected.
-                        <br /><br />
-                        <ul>
-                            <li>To facilitate your onboarding process as a user</li>
-                            <li>To provide our product and contract to you based on the obligations in the contract between us and you.</li>
-                            <li>To verify your identity and eligibility for our product and service</li>
-                            <li>To carry out regulatory requirements and compliance obligations.</li>
-                            <li>To inform you about changes in the service we provide.</li>
-                            <li>To verify your identity at ID verification companies or agencies. Note that the third party involved may keep the record of such verification.</li>
-                            <li>To protect our business and other users, this includes but not limited to , prevention of fraud and other crimes, detection of  fraud.</li>
-                            <li>To record or report contractual breach of our terms and agreements.</li>
-                            <li>To facilitate complaints, customer support and service.</li>
-                            <li>For business processes including but not limited to data analysis, evaluation of products, services, and campaigns.</li>
-                            <li>To manage our legitimate interests and protect our reputation.</li>
-                            <li>To comply with regulation both legal and business</li>
-                        </ul>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Duration of Data Storage</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Your information will be collected and stored for as long as required by the purpose they have been collected for. For example, data collected to meet the contractual obligation between us and the users will be retained until such contractual obligation is not valid anymore. Once the retention period is over, all personal data will be deleted.
-                        </Typography>
-                        <Typography variant="subtitle1" component="p">
-                            In a situation where information is provided while reporting an issue with our service, we will keep such information until the issue is resolved and future occurrence is fully prevented. Where marketing or other information are sent to you, the contact details are stored until you opt out by withdrawing your consent or unsubscribing.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Cookies</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Cookies are files with a small amount of data that is commonly used as an anonymous unique identifier. These are sent to your browser from the website that you visit and are stored on your computer’s hard drive.
-                        </Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Our website uses these "cookies" to collect information and to improve our Service. Cookies also assist us in the fight against fraud. You have the option to either accept or refuse these cookies, and know when a cookie is being sent to your computer. If you choose to refuse our cookies, you may not be able to use some portions of our Service.
-                        </Typography>
-                        <Typography variant="subtitle1" component="p">
-                            For more general information on cookies, please read <a href="https://www.privacypolicyonline.com/what-are-cookies/" target="_blank" rel="noreferrer">"What Are Cookies".</a>
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Service Providers</Typography>
-                        <br /><br />
-                        We may employ third-party companies and individuals due to the following reasons:
-                        <br /><br />
-                        <ul>
-                            <li>To facilitate our Service;</li>
-                            <li>To provide the Service on our behalf;</li>
-                            <li>To perform Service-related services; or</li>
-                            <li>To assist us in analyzing how our Service is used.</li>
-                        </ul>
-                        <Typography variant="subtitle1" component="p">
-                            We want to inform our Service users that these third parties have access to your Personal Information. The reason is to perform the tasks assigned to them on our behalf. However, they are obligated not to disclose or use the information for any other purpose.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Security</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            We value your trust in providing us your Personal Information, thus we are striving to use commercially acceptable means of protecting it. But remember that no method of transmission over the internet, or method of electronic storage is 100% secure and reliable, and we cannot guarantee its absolute security.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Links to Other Sites</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Our Service may contain links to other sites. If you click on a third-party link, you will be directed to that site. Note that these external sites are not operated by us. Therefore, we strongly advise you to review the Privacy Policy of these websites. We have no control over, and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Children's Privacy</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Our Services do not address anyone under the age of 13. We do not knowingly collect personal identifiable information from children under 13. In the case we discover that a child under 13 has provided us with personal information, we immediately delete this from our servers. If you are a parent or guardian and you are aware that your child has provided us with personal information, please contact us so that we will be able to do necessary actions.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Protecting and Disclosing your information</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            We only share your personal data with trusted partners, and only as necessary. Examples of partners or individuals we can share your data with include but not limited to banking partners, identity verification companies, payment gateway, hosting services, our attorney or representative (under a Power of Attorney), legal advisors, regulatory bodies, Statutory and regulatory bodies (including central and local government) and law enforcement authorities as well as correspondent banks and other financial institutions. Your personal data will only be shared partners who commit to secure and protect your data.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Why You Should Provide Us Your Data</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            The collection of and storage of your personal data of mutual benefit and done in both your interest and ours. We need your personal data In order to ensure  a functional website, content and services.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Your Information Rights</Typography>
-                        <br /><br />
-                        Collecting and storing of your personal data comes with significant rights on your part, and a lot of responsibility on our side. You have several rights in relation to the collection, usage and storage of your personal data. These rights include:
-                        <br /><br />
-                        <ul>
-                            <li>Right to information,</li>
-                            <li>Right to restriction of processing,</li>
-                            <li>Right to object use of data</li>
-                            <li>Right to data erasure and deletion,</li>
-                            <li>Right to data portability</li>
-                            <li>Right to complain to the relevant supervisory authority</li>
-                            <li>Right to revocation of consent declarations</li>
-                            <li>Right to withdrawal of consent</li>
-                        </ul>
-                        <Typography variant="subtitle1" component="p">
-                            We are obliged to respond to your data enquiry or request without undue delay. We should respond in most cases within 30 days, and if we are not able to, we may extend to 60 days and provide you the reason for such extension. If you make a request electronically, we will, where possible, reply electronically unless you request us otherwise.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Changes to this Policy</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            We may update our Privacy Policy from time to time. Thus, we advise you to review this page periodically for any changes. We will notify you of any changes by posting the new Privacy Policy on this page. These changes are effective immediately, after they are posted on this page.
-                        </Typography>
-                    </li>
-                    <li>
-                        <Typography variant="subtitle2" component="span">Contact Us</Typography>
-                        <Typography variant="subtitle1" component="p">
-                            If you have any questions or suggestions about our Privacy Policy, do not hesitate to contact us.
-                        </Typography>
-                        <Typography variant="subtitle1" component="p">
-                            Last updated: 8th of August 2021
-                        </Typography>
-                    </li>
-                </ol>
-            </section>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">1. Data we collect</Typography>
+                        <Typography variant="body2" component="p">1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider processes the following data:</Typography>
+                        <Typography variant="body2" component="p">1.1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;First name and surname, phone number, email;</Typography>
+                        <Typography variant="body2" component="p">1.1.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date of birth, copies of ID, contact details;</Typography>
+                        <Typography variant="body2" component="p">1.1.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Security details to protect identity, nationality, data usage, as well as the data communicated while using the service and application;</Typography>
+                        <Typography variant="body2" component="p">1.1.4.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User session data, cookies, and IP address.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">2. How do we collect your data?</Typography>
+                        <Typography variant="body2" component="p">2.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You directly provide us with most of the data we collect. We collect and process data when you:</Typography>
+                        <Typography variant="body2" component="p">2.1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register online or place an order for any of our products or services;</Typography>
+                        <Typography variant="body2" component="p">2.1.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voluntarily complete a customer survey or provide feedback on any of our message boards or via email;</Typography>
+                        <Typography variant="body2" component="p">2.1.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use or view our website via your browser's cookies.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">3. Purpose of data processing</Typography>
+                        <Typography variant="body2" component="p">3.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To process payments through payment gateway service provider</Typography>
+                        <Typography variant="body2" component="p">3.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To process orders</Typography>
+                        <Typography variant="body2" component="p">3.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To contact and inform persons involved about exceptional circumstances regarding the order or delivery</Typography>
+                        <Typography variant="body2" component="p">3.4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To issue invoices</Typography>
+                        <Typography variant="body2" component="p">3.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To execute reimbursements</Typography>
+                        <Typography variant="body2" component="p">3.6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To manage and solve order related errors, refunds, and feedback</Typography>
+                        <Typography variant="body2" component="p">3.7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To email you with special offers on other products we think you might like</Typography>
+                        <Typography variant="body2" component="p">3.8&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To make the website more user-friendly and to carry out technical improvements</Typography>
+                        <Typography variant="body2" component="p">3.9&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To facilitate your onboarding process as a user</Typography>
+                        <Typography variant="body2" component="p">3.10&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To provide our product and contract to you based on the obligations in the contract between us and you.</Typography>
+                        <Typography variant="body2" component="p">3.11&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To verify your identity and eligibility for our product and service</Typography>
+                        <Typography variant="body2" component="p">3.12&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To carry out regulatory requirements and compliance obligations.</Typography>
+                        <Typography variant="body2" component="p">3.13&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To inform you about changes in the service we provide.</Typography>
+                        <Typography variant="body2" component="p">3.14&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To verify your identity at ID verification companies or agencies. Note that the third party involved may keep the record of such verification.</Typography>
+                        <Typography variant="body2" component="p">3.15&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To protect our business and other users, including detection and prevention of fraud and other crimes.</Typography>
+                        <Typography variant="body2" component="p">3.16&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To record or report contractual breach of our terms and agreements.</Typography>
+                        <Typography variant="body2" component="p">3.17&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To facilitate complaints, customer support, and service.</Typography>
+                        <Typography variant="body2" component="p">3.18&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For business processes including, but not limited to, data analysis, evaluation of products, services, and campaigns.</Typography>
+                        <Typography variant="body2" component="p">3.19&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To manage our legitimate interests and protect our reputation.</Typography>
+                        <Typography variant="body2" component="p">3.20&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To comply with applicable regulations.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">4. Legal basis</Typography>
+                        <Typography variant="body2" component="p">4.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The data subject has given consent to the processing</Typography>
+                        <Typography variant="body2" component="p">4.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing is necessary for performance of a contract between the two parties</Typography>
+                        <Typography variant="body2" component="p">4.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing is necessary for compliance with a legal obligation</Typography>
+                        <Typography variant="body2" component="p">4.4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing is necessary to protect the data subject's vital interests</Typography>
+                        <Typography variant="body2" component="p">4.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing is necessary for the performance of a task carried out in the public interest or in the exercise of official authority vested in the controller</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">5. How do we store your data</Typography>
+                        <Typography variant="body2" component="p">5.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider securely stores your data at www.fxblooms.com, by FXBLOOMS OÜ (registry code 16262446), located at Narva mnt 7, 10117 Tallinn, Estonia.</Typography>
+                        <Typography variant="body2" component="p">5.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The Service Provider will retain User's personal data for a period of 5 years after termination of customer relationship with the User. Once this time-period has expired, we will delete the User's data by removing and erasing it from the company's database and records.</Typography>
+                        <Typography variant="body2" component="p">5.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accountancy related data (invoices and payment records) shall be retained for 7 years.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">6. Security</Typography>
+                        <Typography variant="body2" component="p">6.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider is the holder and controller of the collected data. The access to customer's personal data is provided only to staff members of the service provider for processing orders and managing order related errors, refunds and feedback while taking the relevant precautions and measures in order to avoid disclosure, unauthorised access, loss and unlawful use of personal data by irrelevant third parties.</Typography>
+                        <Typography variant="body2" component="p">6.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider may and can transmit personal data to relevant third parties to process orders, manage service provider's accountancy operations, verification of User's identity and documents, proportionately to what is necessary to perform the relevant action.</Typography>
+                        <Typography variant="body2" component="p">6.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider transmits the personal data necessary for verification of User's identity and documents to GetID (https://getid.ee) which is a recognized identity verification service provider.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">7. Marketing</Typography>
+                        <Typography variant="body2" component="p">7.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider would like to send you information about products and services of ours that we think you might like. If you have agreed to receive marketing, you may always opt out at a later date.</Typography>
+                        <Typography variant="body2" component="p">7.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You have the right at any time to stop the service provider from contacting you for marketing purposes.</Typography>
+                        <Typography variant="body2" component="p">7.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you no longer wish to be contacted for marketing purposes, please inform us at privacy@fxblooms.com and you will be removed from our mailing list.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">8. What are your data protection rights?</Typography>
+                        <Typography variant="body2" component="p">8.1.1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider would like to make sure you are fully aware of all of your data protection rights. Every user is entitled to the following:</Typography>
+                        <Typography variant="body2" component="p">8.1.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to access - You have the right to request the service provider for copies of your personal data.</Typography>
+                        <Typography variant="body2" component="p">8.1.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to rectification - You have the right to request that the service provider correct any information you believe is inaccurate. You also have the right to request the service provider's owner to complete the information you believe is incomplete.</Typography>
+                        <Typography variant="body2" component="p">8.1.4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to erasure - You have the right to request that the service provider erase your personal data, under certain conditions.</Typography>
+                        <Typography variant="body2" component="p">8.1.5&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to restrict processing - You have the right to request that the service provider restrict the processing of your personal data, under certain conditions.</Typography>
+                        <Typography variant="body2" component="p">8.1.6&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to object to processing - You have the right to object to the service provider's processing of your personal data.</Typography>
+                        <Typography variant="body2" component="p">8.1.7&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The right to data portability - You have the right to request that the service provider's transfers the data that we have collected to another organization, or directly to you, under certain conditions.</Typography>
+                        <Typography variant="body2" component="p">8.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you make a request, we have one month to respond to you. If you would like to exercise any of these rights, please contact us at our email: privacy@fxblooms.com</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">9. Privacy policies of other websites</Typography>
+                        <Typography variant="body2" component="p">9.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider's website contains links to other websites. Our privacy policy applies only to our website, so if you click on a link to another website, you should read their privacy policy.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">10. Privacy policies of other websites</Typography>
+                        <Typography variant="body2" component="p">10.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider keeps its privacy policy under regular review and places any updates on this web page, changes take place immediately after they have been published on the website.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">11. How to contact us?</Typography>
+                        <Typography variant="body2" component="p">11.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you have any questions about the service provider's privacy policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us.</Typography>
+                        <Typography variant="body2" component="p">11.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email us at: privacy@fxblooms.com</Typography>
+                        <Typography variant="body2" component="p">11.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You have the right to have access to your personal data at any time and to have it corrected, closed or deletion, unless otherwise provided by law.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">12. How to contact us?</Typography>
+                        <Typography variant="body2" component="p">12.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complaints and Disputes</Typography>
+                        <Typography variant="body2" component="p">12.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you wish to report a complaint or if you feel that the service provider has not addressed your concern in a satisfactory manner, you may contact the supervisory authority – Estonian Data Protection Inspectorate at info@aki.ee</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">The service provider presumes that the customer has understood and accepted the terms of current "Privacy policy" and "Terms and conditions" before using the website and "User Agreement" before using the services.</Typography>
+                        <Typography variant="body2" component="p">COOKIE POLICY</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">1.  FXBLOOMS OÜ (hereinafter referred as to the service provider) uses cookies on this website.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">2. What are Cookies?</Typography>
+                        <Typography variant="body2" component="p">2.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Cookies are small text files placed on your computer to collect standard internet log information and visitor behavior information. When you visit our website, we may collect information from you automatically through cookies or similar technology. We use the following cookies on our website:</Typography>
+                        <Typography variant="body2" component="p">2.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;session cookies which are temporary and expire once you close your browser (or once your session ends)</Typography>
+                        <Typography variant="body2" component="p">2.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;persistent cookies which are cookies that remain on your hard drive until you erase them or your browser does, depending on the cookie’s expiration date.</Typography>
+                        <Typography variant="body2" component="p">2.4.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;For further information, visit <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies" target="_blank" rel="noreferrer">https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies</a></Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">3. How do we use cookies?</Typography>
+                        <Typography variant="body2" component="p">3.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider uses cookies in a range of ways to improve your experience on our website, including:</Typography>
+                        <Typography variant="body2" component="p">3.1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Collecting anonymous and general statistics about the number of website visitors</Typography>
+                        <Typography variant="body2" component="p">3.1.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Understanding how you use our website</Typography>
+                        <Typography variant="body2" component="p">3.1.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Making the website more user-friendly</Typography>
+                        <Typography variant="body2" component="p">3.1.4.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To carry out technical improvements</Typography>
+                        <Typography variant="body2" component="p">3.1.5.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To enable certain functions of the service</Typography>
+                        <Typography variant="body2" component="p">3.1.6.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To provide analytics</Typography>
+                        <Typography variant="body2" component="p">3.1.7.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;To store your preferences</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">4. What types of cookies do we use?</Typography>
+                        <Typography variant="body2" component="p">4.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;When you use and access the service, we may place a number of cookie files in your web browser. We use both functionality and advertising cookies on the website and different types of cookies to run the website.</Typography>
+                        <Typography variant="body2" component="p">4.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;There are a number of different types of cookies, however, our website uses:</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">4.2.1. Functionality cookies – The service provider uses these cookies so that we recognize you on our website and remember your previously selected preferences. These include what language you prefer and location you are in. These cookies are temporary and expire once you close your browser (or once your session ends).</Typography>
+                        <Typography variant="body2" component="p">4.2.2. Advertising cookies – The service provider owner uses these cookies to collect information about your visit to our website, the content you viewed, the links you followed and information about your browser, device, and your IP address. The service provider may share some limited aspects of this data with third parties for advertising purposes. We may also share online data collected through cookies with our advertising partners. This means that when you visit another website, you may be shown advertising based on your browsing patterns on our website.</Typography>
+                    </Box>
+                    <Box component="div" className={classes.item}>
+                        <Typography variant="body2" component="p">5. How to manage cookies?</Typography>
+                        <Typography variant="body2" component="p">5.1. You can set your browser not to accept cookies, and the above website tells you how to remove cookies from your browser. However, in a few cases, some of our website features may not function as a result.</Typography>
+                    </Box>
+                </Box>
+            </Box>
         </Layout>
     );
 };

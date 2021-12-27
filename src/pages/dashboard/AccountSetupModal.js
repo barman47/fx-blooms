@@ -55,7 +55,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
     const history = useHistory();
 
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
