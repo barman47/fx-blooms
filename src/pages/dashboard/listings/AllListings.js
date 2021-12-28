@@ -27,6 +27,7 @@ import _ from 'lodash';
 import isEmpty from '../../../utils/isEmpty';
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
+import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
 import { SET_LOADING_LISTINGS } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
@@ -63,9 +64,7 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		marginTop: theme.spacing(10),
-
-		paddingLeft: theme.spacing(10),
-		paddingRight: theme.spacing(10),
+		padding: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
@@ -377,7 +376,6 @@ const AllListings = (props) => {
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					{/* <Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography>  */}
 					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
 				</div>
 				{/* <Button
@@ -456,7 +454,7 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = connect(undefined, { getListingsOpenForBid })((props) => {
+const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((props) => {
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
@@ -471,6 +469,13 @@ const Filter = connect(undefined, { getListingsOpenForBid })((props) => {
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
+
+	useEffect(() => {
+		if (currencies.length === 0) {
+			props.getCurrencies();
+		}
+		// eslint-disable-next-line
+	}, []);
 
 	useEffect(() => {
 		setLoading(false);
@@ -625,6 +630,7 @@ const Filter = connect(undefined, { getListingsOpenForBid })((props) => {
 										// onChange={(e) => setRequiredCurrency(e.target.value)}
 									>
 										<MenuItem value="" disabled>Select</MenuItem>
+										<MenuItem value="" disabled>Select</MenuItem>
 										{currencies.length > 0 && currencies.map((currency, index) => (
 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
 										))}
@@ -720,6 +726,7 @@ const Filter = connect(undefined, { getListingsOpenForBid })((props) => {
 });
 
 Filter.propTypes = {
+	getCurrencies: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired
 };
 

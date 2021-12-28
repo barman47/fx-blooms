@@ -213,7 +213,7 @@ const Login = ({ login, logout }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Grid container direction="row" justify="space-between">
+                                <Grid container direction="row" justifyContent="space-between">
                                     <Grid item>
                                         <Typography variant="subtitle2" component="span">Password</Typography>
                                     </Grid>

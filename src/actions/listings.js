@@ -64,7 +64,6 @@ export const getListingsOpenForBid = (query) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
-        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({

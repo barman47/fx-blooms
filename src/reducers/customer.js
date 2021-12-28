@@ -121,6 +121,7 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 profile: { ...state.profile, ...action.payload },
+                ...action.payload,
                 msg: 'Profile updated successfully'
             };
 
