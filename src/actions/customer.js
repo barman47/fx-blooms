@@ -113,7 +113,6 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
-        console.log(res);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
 
         if (isUsernameAvailable) {
@@ -138,8 +137,7 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
         }
 
     } catch (err) {
-        console.log(err.response);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 
@@ -466,8 +464,6 @@ export const updateProfile = (data) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${api}/UpdateProfile`, data);
-        console.log(res);
-        
         return dispatch({
             type: PROFILE_UPDATED,
             payload: res.data.data

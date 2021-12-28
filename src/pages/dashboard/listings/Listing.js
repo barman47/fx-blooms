@@ -201,8 +201,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     };
 
     const toggleBuyEurDrawer = () => {
-        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus !== NOT_SUBMITTED) {
-            console.log('checking id status');
+        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
             return checkIdStatus();
         }
         setOpenBuyEurDrawer(!openBuyEurDrawer);

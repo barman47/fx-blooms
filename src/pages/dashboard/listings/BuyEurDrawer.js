@@ -15,7 +15,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { addBid } from '../../../actions/listings';
-import { SET_LISTING_MSG } from '../../../actions/types';
+import { SET_ACCOUNT, SET_LISTING_MSG } from '../../../actions/types';
+import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -131,7 +132,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
+const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -145,18 +146,26 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
     const [transferAmount, setTransferAmount] = useState('');
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const successModal = useRef();
 
     useEffect(() => {
+        getAccount(listing.sellersAccountId);
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         setOpen(drawerOpen);
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {}
+        });
         if (!drawerOpen) {
             setErrors({});
         }
-    }, [drawerOpen]);
+    }, [dispatch, drawerOpen]);
 
     useEffect(() => {
         if (msg) {
@@ -377,9 +386,10 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
 };
 
 BuyEurDrawer.propTypes = {
+    getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { addBid })(BuyEurDrawer);
+export default connect(undefined, { addBid, getAccount })(BuyEurDrawer);

@@ -8,7 +8,6 @@ const updateProfile = (data) => {
     data.postalCode = !isEmpty(data.postalCode) ?  data.postalCode : '';
     data.phoneNo = !isEmpty(data.phoneNo) ?  data.phoneNo : '';
     data.countryCode = !isEmpty(data.countryCode) ?  data.countryCode : '';
-    console.log('country code ', data.countryCode);
 
     if (Validator.isEmpty(data.address)) {
         errors.address = 'Your address is required!';
