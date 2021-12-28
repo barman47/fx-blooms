@@ -322,7 +322,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
         });
     };
 
-    if (stats.residencePermitStatus === NOT_SUBMITTED || stats.idStatus === NOT_SUBMITTED) {
+    if (stats.residencePermitStatus === NOT_SUBMITTED && stats.idStatus === NOT_SUBMITTED) {
         return (
             <div className={classes.noProfile}>
                 <Typography variant="h5" color="primary">No Profile</Typography>

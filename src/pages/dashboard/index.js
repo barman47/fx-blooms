@@ -186,7 +186,7 @@ const Dashboard = ({ children, title, logout }) => {
             if (!sessionStorage.getItem('checkedIdStatus')) {
                 sessionStorage.setItem('checkedIdStatus', 'true');
                 const { idStatus, residencePermitStatus } = stats;
-                if (residencePermitStatus === NOT_SUBMITTED || idStatus === NOT_SUBMITTED) {
+                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
                     accountSetupModal.current.openModal();
                 }
             }
