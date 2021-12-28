@@ -464,10 +464,12 @@ export const resetPassword = (data) => async (dispatch) => {
 
 export const updateProfile = (data) => async (dispatch) => {
     try {
-        await Promise.all([reIssueCustomerToken(), axios.post(`${api}/UpdateProfile`, data)]);
+        await reIssueCustomerToken();
+        const res = await axios.post(`${api}/UpdateProfile`, data);
+        
         return dispatch({
             type: PROFILE_UPDATED,
-            payload: data
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

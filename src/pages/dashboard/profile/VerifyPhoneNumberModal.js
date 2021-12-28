@@ -103,7 +103,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePhoneNumber, phoneNumber }) => {
+const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePhoneNumber, phoneNumber, code }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -158,21 +158,21 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
         }
     };
 
-    // const moveToNextField = (current, nextField, previousField) => {
-    //     if (nextField === null && current.value) {
-    //         return onSubmit();
-    //     }
+    const moveToNextField = (current, nextField, previousField) => {
+        if (nextField === null && current.value) {
+            return onSubmit();
+        }
 
-    //     if (previousField && current.value.length === 0) {
-    //         return previousField.getElementsByTagName('input')[0].focus();
-    //     }
+        if (previousField && current.value.length === 0) {
+            return previousField.getElementsByTagName('input')[0].focus();
+        }
 
-    //     const input = nextField.getElementsByTagName('input')[0];
+        const input = nextField.getElementsByTagName('input')[0];
 
-    //     if (current.value.length >= current.maxLength) {
-    //         return input.focus();
-    //     }
-    // };
+        if (current.value.length >= current.maxLength) {
+            return input.focus();
+        }
+    };
 
     const onSubmit = (e) => {
         if (e) {
@@ -193,7 +193,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             return setErrors({ msg: 'Invalid Code' });
         }
         
-        const code = `${first}${second}${third}${fourth}${fifth}`;
+        const otp = `${first}${second}${third}${fourth}${fifth}`;
         setErrors({});
         setLoading(true);
         dispatch({
@@ -201,10 +201,13 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             payload: {}
         });
 
-        return validatePhoneNumber({ otp: code, phoneNumber });
+        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: phoneNumber });
     };
 
-    const handleResendOtp = () => generateOtp(phoneNumber);
+    const handleResendOtp = () => generateOtp({
+        countryCode: code,
+        telephoneNumber: phoneNumber
+    });;
 
 	return (
         <>
@@ -243,7 +246,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                             className={classes.input}
                                             value={first}
                                             onChange={(e) => setFirst(e.target.value)}
-                                            // onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
+                                            onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
                                             type="text"
                                             variant="outlined" 
                                             inputProps={{
@@ -259,7 +262,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                             className={classes.input}
                                             value={second}
                                             onChange={(e) => setSecond(e.target.value)}
-                                            // onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
+                                            onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
                                             type="text"
                                             variant="outlined" 
                                             inputProps={{
@@ -276,7 +279,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                             className={classes.input}
                                             value={third}
                                             onChange={(e) => setThird(e.target.value)}
-                                            // onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
+                                            onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
                                             type="text"
                                             variant="outlined" 
                                             inputProps={{
@@ -293,7 +296,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                             className={classes.input}
                                             value={fourth}
                                             onChange={(e) => setFourth(e.target.value)}
-                                            // onKeyUp={(e) => moveToNextField(e.target, fifthField.current, thirdField.current)}
+                                            onKeyUp={(e) => moveToNextField(e.target, fifthField.current, thirdField.current)}
                                             type="text"
                                             variant="outlined" 
                                             inputProps={{
@@ -310,7 +313,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                             className={classes.input}
                                             value={fifth}
                                             onChange={(e) => setFifth(e.target.value)}
-                                            // onKeyUp={(e) => moveToNextField(e.target, null, fourthField.current)}
+                                            onKeyUp={(e) => moveToNextField(e.target, null, fourthField.current)}
                                             type="text"
                                             variant="outlined" 
                                             inputProps={{
@@ -357,6 +360,7 @@ VerifyPhoneNumberModal.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     validatePhoneNumber: PropTypes.func.isRequired,
     isOpen: PropTypes.bool.isRequired,
+    code: PropTypes.bool.isRequired,
     phoneNumber: PropTypes.bool.isRequired
 };
 

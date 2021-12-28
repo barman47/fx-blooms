@@ -60,6 +60,7 @@ const useStyles = makeStyles(theme =>({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: theme.spacing(2),
+        marginTop: theme.spacing(-3),
 
         [theme.breakpoints.down('sm')]: {
             flexDirection: 'column',
@@ -164,6 +165,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     const [editable, setEditable] = useState(false);
 
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [code, setCode] = useState('');
 
     const toast = useRef();
     const successModal = useRef();
@@ -240,16 +242,28 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     //         setCountry(country?.name);
     //     }
     // }, [countryId, stateId]);
+
+    const extractCountryCode = (phoneNumber) => {
+        const countryCodes = countries.map(country => country.phone);
+        const code = countryCodes.find(code => phoneNumber.startsWith(code));
+        const number = phoneNumber.replace(code, '');
+        return {
+            code,
+            number
+        }
+    };
     
     const onSubmit = (e) => {
         e.preventDefault();
         setErrors({});
 
+        const { code, number } = extractCountryCode(phoneNo);
+
         const data = {
             address,
             country,
-            countryCode,
-            phoneNo,
+            countryCode: editable ? countryCode : code,
+            phoneNo: editable ? phoneNo : number,
             postalCode
         };
 
@@ -265,35 +279,41 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
             country,
             postalCode,
             phoneNumber: {
-                countryCode,
-                telephoneNumber: phoneNo
-
+                countryCode: editable ? countryCode : code,
+                telephoneNumber: editable ? phoneNo : number
             }
         });
     };
 
     const handleGenerateOtp = () => {
-        const data = `${countryCode}${phoneNo.substring(1, phoneNo.length)}`;
-        if (Validator.isEmpty(countryCode)) {
-            return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
-        }
+        // const data = `${countryCode}${phoneNo.substring(1, phoneNo.length)}`;
+        // if (Validator.isEmpty(countryCode)) {
+        //     return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
+        // }
 
         // const phoneRegExp =  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
         // if (phoneRegExp.test(data)) {
         //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Number should be be in this format: 08080808080' });
         // }
 
-        if (Validator.isEmpty(data)) {
+        const { code, number } = extractCountryCode(phoneNo);
+
+        if (Validator.isEmpty(number)) {
             return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Phone Number is required!' });
         }
         
         setOpen(!open);
-        setPhoneNumber(data);
-        generateOtp(data);
+        setPhoneNumber(number);
+        setCode(code);
+        generateOtp({
+            countryCode: code,
+            telephoneNumber: number
+        });
     };
 
     const dismissAction = () => {
         setPhoneNumber('');
+        setCode('');
         setEditable(false);
         setOpen(false);
         dispatch({
@@ -325,7 +345,12 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
             }
             {loading && <Spinner text={spinnerText} />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <VerifyPhoneNumberModal isOpen={open} dismissAction={dismissAction} phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
+            <VerifyPhoneNumberModal 
+                isOpen={open} 
+                dismissAction={dismissAction} 
+                phoneNumber={phoneNumber} 
+                code={code}
+            />
             <div className={classes.header}>
                 <div>
                     <Typography variant="h4" color="primary">Account Setup (Profile)</Typography>
@@ -333,9 +358,9 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                     <hr className={classes.hr} />
                 </div>
                 {!isEmpty(profile) && 
-                    <Button variant="outlined" color="primary" onClick={() => {
+                    <Button variant="outlined" color="primary" disabled={editable} onClick={() => {
                         setEditable(true);
-                        setPhoneNumber(phoneNumber.substring(3, phoneNumber.length));
+                        setPhoneNo('');
                     }}>Edit Details</Button>
                 }
             </div>
@@ -427,7 +452,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                                 {profile.phoneNo && !editable ?
                                     <>
-                                        <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{`0${profile.phoneNo.substring(3, profile.phoneNo.length)}`}</Typography>
+                                        <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
                                         <FormHelperText style={{ color: COLORS.red }}>{errors.phoneNo}</FormHelperText>
                                     </>
                                     :
@@ -454,7 +479,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
                                 <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: hasVerifiedPhoeNumber, [classes.unverified]: !hasVerifiedPhoeNumber })}>{ hasVerifiedPhoeNumber ? 'Verified' : 'Unverified' }</Typography>
                             </Grid>
-                            {!hasVerifiedPhoeNumber && 
+                            {!hasVerifiedPhoeNumber && !editable &&
                                 <Grid item xs={6} md={3} style={{ justifySelf: 'center' }}>
                                     <br />
                                     <Button 
