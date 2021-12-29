@@ -360,8 +360,8 @@ VerifyPhoneNumberModal.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     validatePhoneNumber: PropTypes.func.isRequired,
     isOpen: PropTypes.bool.isRequired,
-    code: PropTypes.bool.isRequired,
-    phoneNumber: PropTypes.bool.isRequired
+    code: PropTypes.string.isRequired,
+    phoneNumber: PropTypes.string.isRequired
 };
 
 export default connect( undefined, { generateOtp, validatePhoneNumber } )(VerifyPhoneNumberModal);
