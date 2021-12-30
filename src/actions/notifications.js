@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SET_CUSTOMER_MSG, SET_NOTIFICATIONS, SET_TRANSACTION_TERMS, VERIFIED_PHONE_NUMBER } from './types';
+import { SET_NOTIFICATIONS, SET_TRANSACTION_TERMS, VERIFIED_PHONE_NUMBER } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -21,17 +21,12 @@ export const getNotifications = () => async (dispatch) => {
     }
 };
 
-export const sendTransactionNotification = (transferId, sellerUsername) => async (dispatch) => {
+export const sendTransactionNotification = (transferId) => async (dispatch) => {
     try {
         await Promise.all([
             await reIssueCustomerToken(),
             await axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
         ]);
-        const message = `Hi ${sellerUsername} a notification has been sent to the buyer informing him of your payment.`;
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: message
-        });
     } catch (err) {
         return handleError(err, dispatch);
     }

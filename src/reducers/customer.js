@@ -130,7 +130,7 @@ const customerReducer =  (state = initialState, action) => {
                 ...state,
                 msg: 'Phone number verified successfully',
                 phoneNo: action.payload.phoneNumber,
-                hasVerifiedPhoneNumber: true
+                isPhoneNumberVerified: true
 
             };
 

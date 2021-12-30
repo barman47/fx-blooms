@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LISTING_MSG, SET_LOADING_LISTINGS, SET_MORE_LISTINGS } from './types';
+import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LOADING_LISTINGS, SET_MORE_LISTINGS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { batch } from 'react-redux';
 
@@ -103,12 +103,11 @@ export const getMoreListings = (query) => async (dispatch) => {
 
 export const addBid = (bid) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.post(`${URL}/AddBid`, bid);
-        dispatch({
-            type: SET_LISTING_MSG,
-            payload: 'A notification of your payment has been sent to the seller.'
-        });
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/AddBid`, bid)]);
+        // dispatch({
+        //     type: SET_LISTING_MSG,
+        //     payload: 'A notification of your payment has been sent to the seller.'
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

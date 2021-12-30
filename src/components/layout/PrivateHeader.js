@@ -80,8 +80,9 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.darkGrey,
         cursor: 'pointer',
         fontSize: theme.spacing(1.8),
-        fontWeight: 500,
+        fontWeight: 600,
         textDecoration: 'none',
+        textTransform: 'uppercase',
         transition: '0.3s linear all',
 
         '&:hover': {
@@ -164,7 +165,7 @@ export const PrivateHeader = (props) => {
     }, [location.pathname]);
 
     const protectedRoutes = [
-        { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
+        { url: DASHBOARD_HOME, text: 'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }

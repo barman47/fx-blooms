@@ -12,13 +12,14 @@ import formatNumber from '../../../utils/formatNumber';
 import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
+import { SET_ACCOUNT, SET_CUSTOMER_MSG } from '../../../actions/types';
+
 import extractCountryCode from '../../../utils/extractCountryCode';
+import { DASHBOARD, PROFILE } from '../../../routes';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
-import { DASHBOARD, PROFILE } from '../../../routes';
-import { SET_ACCOUNT, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -123,6 +124,13 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         // eslint-disable-next-line
     }, []);
 
+    // useEffect(() => {
+    //     if (msg) {
+    //         successModal.current.openModal();
+    //         successModal.current.setModalText(msg);
+    //     }
+    // }, [msg]);
+
     useEffect(() => {
         if (!sendEurDrawerOpen) {
             setAmount(0);
@@ -135,14 +143,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         }
     }, [dispatch, sendEurDrawerOpen]);
 
-    const handlePaymentReceived = (id) => {
+    const handlePaymentReceived = (id, buyerUsername) => {
         const data = {
             transactionSessionId: id,
             message: '',
             rating: 0,
             receivedExpectedFunds: true
         };
-        completeTransaction(data);
+        completeTransaction(data, buyerUsername);
     };
 
     const setBuyerAccount = (notification) => {
@@ -211,7 +219,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
 
     const handleButtonAction = (notification) => {
-        const { id, seller } = notification;
+        const { id, buyer, seller } = notification;
+
         if (customerId === seller.customerId) {
             if (seller.hasReceivedPayment) {
                 setBuyerAccount(notification);
@@ -219,12 +228,12 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             } else {
                 // Seller should make payment
                 setBuyerAccount(notification);
-                handlePaymentReceived(id);
+                handlePaymentReceived(id, buyer.userName);
             }
 
         } else {
             // End Transaction
-            handlePaymentReceived(notification.id);
+            handlePaymentReceived(id, buyer.userName);
         }
     };
 
@@ -241,7 +250,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const verifyPhone = () => {
         if (phoneNo) {
             const { code, number } = extractCountryCode(phoneNo);
-            debugger
             generateOtp({
                 countryCode: code,
                 telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
@@ -276,6 +284,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 dismissAction={dismissAction} 
                 phoneNumber={phoneNo || ''} 
             />
+            {/* <SuccessModal ref={successModal} dismissAction={dismissAction} /> */}
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>
                 <Typography variant="body2" component="p">View notifications below</Typography>

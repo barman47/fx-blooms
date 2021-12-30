@@ -453,7 +453,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                                         onChange={(e) => setPhoneNo(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter Phone Number"
+                                        placeholder="e.g. 08080808080"
                                         helperText={errors.phoneNo || 'e.g. 08080808080'}
                                         fullWidth
                                         required

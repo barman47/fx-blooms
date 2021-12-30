@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
@@ -27,7 +27,9 @@ import {
     PAYMENT_NOTIFICATION_BUYER_PAID, 
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
-    PAYMENT_NOTIFICATION_SELLER_PAID 
+    PAYMENT_NOTIFICATION_SELLER_PAID, 
+    SET_CUSTOMER_MSG,
+    SET_LISTING_MSG
 } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
@@ -104,6 +106,11 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('md')]: {
             display: 'block'
         }
+    },
+
+    label: {
+        fontWeight: 600,
+        textTransform: 'uppercase'
     }
 }));
 
@@ -289,36 +296,46 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_BUYER_PAID,
-                                payload: { 
-                                    notification: {
-                                        id,
-                                        isClosed: payload.IsClosed,
-                                        buyer: {
-                                            accountName: buyer.AccountName,
-                                            accountNumber: buyer.AccountNumber,
-                                            amountTransfered: buyer.AmountTransfered,
-                                            bankName: buyer.BankName,
-                                            customerId: buyer.CustomerId,
-                                            hasMadePayment: buyer.HasMadePayment,
-                                            hasReceivedPayment: buyer.HasReceivedPayment,
-                                            userName: buyer.UserName
+                            batch(() => {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_BUYER_PAID,
+                                    payload: { 
+                                        notification: {
+                                            id,
+                                            isClosed: payload.IsClosed,
+                                            buyer: {
+                                                accountName: buyer.AccountName,
+                                                accountNumber: buyer.AccountNumber,
+                                                amountTransfered: buyer.AmountTransfered,
+                                                bankName: buyer.BankName,
+                                                customerId: buyer.CustomerId,
+                                                hasMadePayment: buyer.HasMadePayment,
+                                                hasReceivedPayment: buyer.HasReceivedPayment,
+                                                userName: buyer.UserName
+                                            },
+                                            seller: {
+                                                accountName: seller.AccountName,
+                                                accountNumber: seller.AccountNumber,
+                                                amountTransfered: seller.AmountTransfered,
+                                                bankName: seller.BankName,
+                                                customerId: seller.CustomerId,
+                                                hasMadePayment: seller.HasMadePayment,
+                                                hasReceivedPayment: seller.HasReceivedPayment,
+                                                userName: seller.UserName
+                                            },
+                                            listingId: payload.ListingId,
+                                            bidId: payload.BidId
                                         },
-                                        seller: {
-                                            accountName: seller.AccountName,
-                                            accountNumber: seller.AccountNumber,
-                                            amountTransfered: seller.AmountTransfered,
-                                            bankName: seller.BankName,
-                                            customerId: seller.CustomerId,
-                                            hasMadePayment: seller.HasMadePayment,
-                                            hasReceivedPayment: seller.HasReceivedPayment,
-                                            userName: seller.UserName
-                                        },
-                                        listingId: payload.ListingId,
-                                        bidId: payload.BidId
-                                    },
-                                    customerId
+                                        customerId
+                                    }
+                                });
+
+                                // Show message to buyer only
+                                if (customerId === buyer.CustomerId) {
+                                    dispatch({
+                                        type: SET_LISTING_MSG,
+                                        payload: `${seller.UserName} will confirm and send the EUR equivalent to the account you provided.`
+                                    });
                                 }
                             });
                         }
@@ -335,7 +352,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 payload: { id }
                             });
                             successModal.current.openModal();
-                            successModal.current.setModalText('This transaction has been completed successfully by both the buyer and seller and will be permanently closed.');
+                            successModal.current.setModalText('Congratulations! This transaction is completed. Thanks for using FXBLOOMS.');
                         }
                         break;
 
@@ -345,9 +362,18 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_SELLER_PAID,
-                                payload: { id }
+                            batch(() => {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_SELLER_PAID,
+                                    payload: { id }
+                                });
+                                // Show message to seller only
+                                if (customerId === seller.CustomerId) {
+                                    dispatch({
+                                        type: SET_CUSTOMER_MSG,
+                                        payload: `Thanks for the payment, a notification was sent to ${buyer.UserName}, once he/she confirms this transaction will be considered complete.`
+                                    });
+                                }
                             });
                         }
                         break;
@@ -355,11 +381,21 @@ const Dashboard = ({ children, title, logout }) => {
                     case SELLER_CONFIRMED_PAYMENT:
                         buyer = payload.Transfer.Buyer;
                         seller = payload.Transfer.Seller;
+                        console.log(buyer);
                         id = payload.Transfer.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
-                                payload: { id }
+                            batch(() => {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+                                    payload: { id }
+                                });
+                                // Show message to seller only
+                                if (customerId === seller.CustomerId) {
+                                    dispatch({
+                                        type: SET_CUSTOMER_MSG,
+                                        payload: `Thanks for confirming ${buyer.UserName}'s payment. Please proceed and send the EUR equivalent to the account below. `
+                                    });
+                                }
                             });
                         }
                         break;
@@ -391,11 +427,18 @@ const Dashboard = ({ children, title, logout }) => {
         history.push(`/dashboard${link}`);
     };
 
+    const dismissAction = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+    };
+
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
-            <SuccessModal ref={successModal} />
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -431,6 +474,7 @@ const Dashboard = ({ children, title, logout }) => {
                                     key={index} 
                                     label={item.text} 
                                     icon={item.icon} 
+                                    classes={{ label: classes.label }}
                                 />
                             ))}
                         </BottomNavigation>

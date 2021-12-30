@@ -98,7 +98,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification, sellerUsername }) => {
+const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -133,7 +133,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 
     const handleSendTransactionNotification = () => {
         setLoading(true);
-        sendTransactionNotification(transactionId, sellerUsername);
+        sendTransactionNotification(transactionId);
     };
 
 	return (
@@ -197,8 +197,7 @@ SendEurDrawer.propTypes = {
     toggleDrawer: PropTypes.bool.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
-    transactionId: PropTypes.string.isRequired,
-    sellerUsername: PropTypes.string.isRequired
+    transactionId: PropTypes.string.isRequired
 };
 
 export default connect(undefined, { sendTransactionNotification })(SendEurDrawer);

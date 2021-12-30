@@ -5,13 +5,9 @@ const extractCountryCode = (phoneNumber) => {
     let countryCode = null;
     countryCodes.forEach(code => {
         if (phoneNumber.startsWith(code)) {
-            console.log(`+${code}`);
-            debugger
             countryCode = `+${code}`;
         }
         if (phoneNumber.startsWith(`+${code}` )) {
-            console.log(`+${code}`);
-            debugger
             countryCode = `+${code}`;
         }
     });
