@@ -118,7 +118,7 @@ const Dashboard = ({ children, title, logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, stats, twoFactorEnabled } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
@@ -158,7 +158,7 @@ const Dashboard = ({ children, title, logout }) => {
             });
         }
 
-        if (!hasVerifiedPhoeNumber) {
+        if (!isPhoneNumberVerified) {
             dispatch({
                 type: ADD_NOTIFICATION,
             });

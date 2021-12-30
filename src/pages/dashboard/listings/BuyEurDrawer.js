@@ -37,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(2),
-            width: '80vw'
+            width: '70vw'
         }
     },
 
@@ -268,7 +268,7 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
                     <Grid container direction="row" spacing={1}>
                         <Grid item xs={3} >
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>I want to Buy</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>I want</Typography>
                             <TextField 
                                 value="EUR"
                                 type="text"
@@ -338,46 +338,42 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
                                 required
                             />
                         </Grid>
-                        {!buttonDisabled && !isEmpty(receivingAccount) && !isEmpty(Amount) &&
-                            <>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                                    <section className={classes.accountDetailsContainer}>
-                                        <div>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                                        </div>
-                                        <div className={classes.accountContainer}>
-                                            <section>
-                                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                                            </section>
-                                            <section>
-                                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                                            </section>
-                                        </div>
-                                        <div>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                                        </div>
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                            <section className={classes.accountDetailsContainer}>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                </div>
+                                <div className={classes.accountContainer}>
+                                    <section>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
                                     </section>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Button 
-                                        type="submit"
-                                        variant="contained" 
-                                        color="primary" 
-                                        fullWidth 
-                                        disableFocusRipple
-                                        className={classes.button}
-                                        disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
-                                    >
-                                        {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
-                                    </Button>
-                                </Grid>
-                            </>
-                        }
+                                    <section>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                    </section>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
+                                </div>
+                            </section>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button 
+                                type="submit"
+                                variant="contained" 
+                                color="primary" 
+                                fullWidth 
+                                disableFocusRipple
+                                className={classes.button}
+                                disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
+                            >
+                                {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
+                            </Button>
+                        </Grid>
                     </Grid>
                 </form>
             </Drawer>

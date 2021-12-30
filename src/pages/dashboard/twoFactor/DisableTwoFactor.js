@@ -117,7 +117,6 @@ const DisableTwoFactor = ({ disableTwoFactor }) => {
                 <Typography variant="h6">You already have two factor authentication enabled</Typography>
                 <Typography variant="subtitle1" component="p">Click the button below to disable 2FA.</Typography>
                 <Button variant="outlined" color="primary" className={classes.button} onClick={handleDisable2FA}>Disable 2FA</Button>
-            
             </section>
         </>
     );

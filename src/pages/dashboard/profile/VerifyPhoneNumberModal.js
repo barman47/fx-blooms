@@ -206,8 +206,8 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
 
     const handleResendOtp = () => generateOtp({
         countryCode: code,
-        telephoneNumber: phoneNumber
-    });;
+        telephoneNumber: phoneNumber.charAt(0) === '0' ? phoneNumber.substring(1, phoneNumber.length) : phoneNumber
+    });
 
 	return (
         <>
@@ -238,7 +238,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                     <Grid container className={classes.container}>
                         <Grid item xs={12} className={classes.item}>
                             <Typography variant="h5" color="primary">Verify your phone number</Typography>
-                            <Typography variant="subtitle2" component="span">Enter the six-digit code we sent to your phone number</Typography>
+                            <Typography variant="subtitle2" component="span">Enter the five-digit code we sent to your phone number</Typography>
                             <form onSubmit={onSubmit} noValidate>
                                 <Grid container direction="row" justify="center" spacing={matches ? 2 : 3}>
                                     <Grid item xs={2}>
@@ -360,7 +360,7 @@ VerifyPhoneNumberModal.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     validatePhoneNumber: PropTypes.func.isRequired,
     isOpen: PropTypes.bool.isRequired,
-    code: PropTypes.string.isRequired,
+    code: PropTypes.string,
     phoneNumber: PropTypes.string.isRequired
 };
 

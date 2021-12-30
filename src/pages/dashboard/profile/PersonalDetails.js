@@ -25,6 +25,7 @@ import isEmpty from '../../../utils/isEmpty';
 import { COLORS, ID_STATUS } from '../../../utils/constants'; 
 import countryToFlag from '../../../utils/countryToFlag'; 
 import { countries } from '../../../utils/countries'; 
+import extractCountryCode from '../../../utils/extractCountryCode'; 
 import validateUpdateProfile from '../../../utils/validation/customer/updateProfile';
 
 import VerifyPhoneNumberModal from './VerifyPhoneNumberModal';
@@ -142,7 +143,7 @@ const useStyles = makeStyles(theme =>({
 const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { hasVerifiedPhoeNumber, msg, profile, stats } = useSelector(state => state.customer); 
+    const { isPhoneNumberVerified, msg, profile, stats } = useSelector(state => state.customer); 
     const errorsState = useSelector(state => state.errors); 
 
     const [FirstName, setFirstName] = useState('');
@@ -242,16 +243,6 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     //         setCountry(country?.name);
     //     }
     // }, [countryId, stateId]);
-
-    const extractCountryCode = (phoneNumber) => {
-        const countryCodes = countries.map(country => country.phone);
-        const code = countryCodes.find(code => phoneNumber.startsWith(code));
-        const number = phoneNumber.replace(code, '');
-        return {
-            code,
-            number
-        }
-    };
     
     const onSubmit = (e) => {
         e.preventDefault();
@@ -307,7 +298,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
         setCode(code);
         generateOtp({
             countryCode: code,
-            telephoneNumber: number
+            telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
         });
     };
 
@@ -477,9 +468,9 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                             </Grid>
                             <Grid item xs={6} md={3} xlg={2}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
-                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: hasVerifiedPhoeNumber, [classes.unverified]: !hasVerifiedPhoeNumber })}>{ hasVerifiedPhoeNumber ? 'Verified' : 'Unverified' }</Typography>
+                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: isPhoneNumberVerified, [classes.unverified]: !isPhoneNumberVerified })}>{ isPhoneNumberVerified ? 'Verified' : 'Unverified' }</Typography>
                             </Grid>
-                            {!hasVerifiedPhoeNumber && !editable &&
+                            {!isPhoneNumberVerified && !editable &&
                                 <Grid item xs={6} md={3} style={{ justifySelf: 'center' }}>
                                     <br />
                                     <Button 

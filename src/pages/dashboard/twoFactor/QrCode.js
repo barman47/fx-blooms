@@ -162,39 +162,42 @@ const QrCode = ({ enableTwoFactor, getBarcode, toggleShowVerifyQrCode }) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
                 <div className={classes.content}>
-                    {hasSetup2FA && 
+                    {hasSetup2FA ?
                         <>
+                            <Typography variant="h6" color="primary">You have two factor authentication disabled.</Typography>
+                            <Typography variant="subtitle1" component="p">Click the button below to enable 2FA.</Typography>
                             <Button variant="contained" color="primary" className={classes.button} onClick={handleEnable2FA}>Enable 2FA</Button>
-                            <Typography variant="h6">Can't find FXBLOOMS on your authenticator app?</Typography>
+                        </>
+                        :
+                        <>
+                            <Typography variant="h5">Register FXBLOOMS</Typography>
+                            <Typography variant="subtitle1" component="p">Open the Google authenticator app and scan the QR code below.</Typography>
+                            {barcodeImage && 
+                                <img src={barcodeImage} className={classes.image} alt="QR Code" style={{ alignSelf: 'center' }} />
+                            }
+                            <Typography variant="subtitle1" component="p" className={classes.code}>Or enter the following code manually 
+                                <IconButton
+                                    aria-label="copy code"
+                                    onClick={copyCode}
+                                    color="primary"
+                                >
+                                    <Tooltip title="Copy code" placement="bottom" arrow>
+                                        <ContentCopy />
+                                    </Tooltip>
+                                </IconButton>
+                            </Typography>
+                            <TextField
+                                value={barcode?.manualEntryKey}
+                                variant="outlined"
+                                multiline
+                                rows={4}
+                                fullWidth
+                            />
+                            <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
+                            <Button variant="contained" color="primary" className={classes.button} onClick={toggleShowVerifyQrCode}>Proceed</Button>
+                            {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
                         </>
                     }
-                    
-                    <Typography variant="h5">Register FXBLOOMS</Typography>
-                    <Typography variant="subtitle1" component="p">Open the Google authenticator app and scan the QR code below.</Typography>
-                    {barcodeImage && 
-                        <img src={barcodeImage} className={classes.image} alt="QR Code" style={{ alignSelf: 'center' }} />
-                    }
-                    <Typography variant="subtitle1" component="p" className={classes.code}>Or enter the following code manually 
-                        <IconButton
-                            aria-label="copy code"
-                            onClick={copyCode}
-                            color="primary"
-                        >
-                            <Tooltip title="Copy code" placement="bottom" arrow>
-                                <ContentCopy />
-                            </Tooltip>
-                        </IconButton>
-                    </Typography>
-                    <TextField
-                        value={barcode?.manualEntryKey}
-                        variant="outlined"
-                        multiline
-                        rows={4}
-                        fullWidth
-                    />
-                    <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
-                    <Button variant="contained" color="primary" className={classes.button} onClick={toggleShowVerifyQrCode}>Proceed</Button>
-                    {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
                 </div>
             </Container>
         </>

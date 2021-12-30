@@ -10,7 +10,6 @@ export const getCurrencies = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${API}/Customer/GetCurrencies`);
-        console.log(res);
         const currencies = res.data.data;
         return dispatch({
             type: SET_CURRENCIES,

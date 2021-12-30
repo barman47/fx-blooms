@@ -11,12 +11,14 @@ import formatNumber from '../../../utils/formatNumber';
 
 import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
-import { getNotifications } from '../../../actions/notifications';
+import { getNotifications, generateOtp } from '../../../actions/notifications';
+import extractCountryCode from '../../../utils/extractCountryCode';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
+import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import { DASHBOARD, PROFILE } from '../../../routes';
-import { SET_ACCOUNT } from '../../../actions/types';
+import { SET_ACCOUNT, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -91,16 +93,17 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, handleSetTitle }) => {
+const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId, hasSetup2FA, hasVerifiedPhoeNumber, idVerificationLink, residencePermitUrl, stats } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
+    const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
 
     const { APPROVED } = ID_STATUS;
@@ -111,10 +114,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         }
         handleSetTitle('Notifications');
 
-        if (!residencePermitUrl) {
+        if (!residencePermitUrl && stats.residencePermitStatus !== APPROVED) {
             getResidencePermitLink()
         }
-        if (!residencePermitUrl) {
+        if (!residencePermitUrl && stats.idStatus !== APPROVED) {
             getIdVerificationLink();
         }
         // eslint-disable-next-line
@@ -234,8 +237,28 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
 
     const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });
-    const verifyPhone = () => history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true });
+
+    const verifyPhone = () => {
+        if (phoneNo) {
+            const { code, number } = extractCountryCode(phoneNo);
+            debugger
+            generateOtp({
+                countryCode: code,
+                telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
+            });
+            return setOpen(true);
+        }
+        return history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true })
+    };
     // const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });
+
+    const dismissAction = () => {
+        setOpen(false);
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+    };
 
     return (
         <>
@@ -248,6 +271,11 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                     sellerUsername={sellerUsername}
                 />
             }
+            <VerifyPhoneNumberModal 
+                isOpen={open} 
+                dismissAction={dismissAction} 
+                phoneNumber={phoneNo || ''} 
+            />
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>
                 <Typography variant="body2" component="p">View notifications below</Typography>
@@ -278,7 +306,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                             />
                         }
                         {/* eslint-disable-next-line no-mixed-operators */}
-                        {((stats.idStatus !== APPROVED) || (stats.residencePermitStatus !== APPROVED)) && (
+                        {((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) && (
                             <Notification 
                                 title="Verify Other Government Issued ID"
                                 message="Required to BUY only. Click Verify ID to proceed."
@@ -294,7 +322,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 buttonAction={setup2FA}
                             />
                         }
-                        {!hasVerifiedPhoeNumber && 
+                        {!isPhoneNumberVerified && 
                             <Notification 
                                 title="Verify phone number"
                                 message="Required to receive SMS notifications. Click Verify Phone to proceed."
@@ -325,6 +353,7 @@ Index.propTypes = {
     getNotifications: PropTypes.func.isRequired,
     getIdVerificationLink: PropTypes.func.isRequired,
     getResidencePermitLink: PropTypes.func.isRequired,
+    generateOtp: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications })(Index);
+export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp })(Index);
