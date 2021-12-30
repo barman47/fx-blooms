@@ -179,6 +179,13 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
         setErrors(errorsState);
     }, [errorsState]);
 
+    useEffect(() => {
+        // Automatically select newly added account
+        if (accounts.length > 0 && accounts[0].currency === 'EUR') {
+            setReceivingAccount(accounts[0].bankName);
+        }
+    }, [accounts]);
+
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
         setReceivingAccount('');

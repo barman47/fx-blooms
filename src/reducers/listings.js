@@ -8,7 +8,6 @@ import {
     SET_LOADING_LISTINGS,
     SET_LISTING_MSG
 } from '../actions/types';
-// import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,

@@ -222,6 +222,13 @@ const MakeListing = (props) => {
     // }, []);
 
     useEffect(() => {
+        // Automatically select newly added account
+        if (accounts.length > 0 && accounts[0].currency === 'NGN') {
+            setReceivingAccount(accounts[0].bankName);
+        }
+    }, [accounts]);
+
+    useEffect(() => {
         if (!isEmpty(errors)) {
             toast.current.handleClick();
         }
