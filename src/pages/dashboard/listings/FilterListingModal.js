@@ -238,8 +238,8 @@ const MobileFilterModal = (props) => {
 						{
 						filter === PRICE
 							?
-							<Grid container direction="row" spacing={1}>
-								<Grid item xs={12}>
+							<Grid container direction="row" spacing={2}>
+								<Grid item xs={6}>
 									<Typography variant="subtitle2">I Have</Typography>
 									<FormControl 
 										variant="outlined" 
@@ -263,10 +263,8 @@ const MobileFilterModal = (props) => {
 										<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 									</FormControl>
 								</Grid>
-								<Grid item xs={12}>
+								<Grid item xs={6}>
 									<Typography variant="subtitle2">I want</Typography>
-								</Grid>
-								<Grid item xs={5}>
 									<FormControl 
 										variant="outlined" 
 										error={errors.RequiredCurrency ? true : false } 
@@ -288,7 +286,7 @@ const MobileFilterModal = (props) => {
 										<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
 									</FormControl>
 								</Grid>
-								<Grid item xs={7}>
+								<Grid item xs={12}>
 									<TextField 
 										value={Amount}
 										onChange={(e) => setAmount(e.target.value)}
