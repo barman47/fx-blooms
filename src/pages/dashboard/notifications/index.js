@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -12,7 +12,7 @@ import formatNumber from '../../../utils/formatNumber';
 import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { SET_ACCOUNT, SET_CUSTOMER_MSG } from '../../../actions/types';
+import { SET_ACCOUNT, SET_CUSTOMER_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import { DASHBOARD, PROFILE } from '../../../routes';
@@ -20,6 +20,7 @@ import { DASHBOARD, PROFILE } from '../../../routes';
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -98,7 +99,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [amount, setAmount] = useState(0);
@@ -106,6 +107,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
+
+    const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
     
@@ -124,12 +127,12 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         // eslint-disable-next-line
     }, []);
 
-    // useEffect(() => {
-    //     if (msg) {
-    //         successModal.current.openModal();
-    //         successModal.current.setModalText(msg);
-    //     }
-    // }, [msg]);
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
 
     useEffect(() => {
         if (!sendEurDrawerOpen) {
@@ -172,11 +175,26 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 payload: sellerAccount
             });
         }
+        dispatch({
+            type: SET_NOTIFICATION_MSG,
+            payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
+        });
         
         toggleSendEurDrawer();
     };
 
-    const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
+    const toggleSendEurDrawer = () => {
+        setSendEurDrawerOpen(!sendEurDrawerOpen);
+
+        // clear message if drawer is open and being closed
+        if (sendEurDrawerOpen) {
+            console.log('closing drawer');
+            dispatch({
+                type: SET_NOTIFICATION_MSG,
+                payload: null
+            });
+        }
+    }
 
     const setMessage = (notification) => {
         const { buyer, seller } = notification;
@@ -284,7 +302,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 dismissAction={dismissAction} 
                 phoneNumber={phoneNo || ''} 
             />
-            {/* <SuccessModal ref={successModal} dismissAction={dismissAction} /> */}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>
                 <Typography variant="body2" component="p">View notifications below</Typography>

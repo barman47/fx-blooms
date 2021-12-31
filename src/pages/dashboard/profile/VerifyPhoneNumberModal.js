@@ -21,6 +21,7 @@ import { GET_ERRORS } from '../../../actions/types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
+import extractCountryCode from '../../../utils/extractCountryCode';
 import validateSmsOtp from '../../../utils/validation/customer/smsOtp';
 
 import Toast from '../../../components/common/Toast';
@@ -201,7 +202,9 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             payload: {}
         });
 
-        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: phoneNumber });
+        const { code, number } = extractCountryCode(phoneNumber);
+
+        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: number });
     };
 
     const handleResendOtp = () => generateOtp({

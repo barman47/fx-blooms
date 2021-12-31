@@ -11,14 +11,16 @@ import {
     // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
     SET_SOCKET_CONNECTION_STATUS,
-    UPDATE_NOTIFICATION
+    UPDATE_NOTIFICATION,
+    SET_NOTIFICATION_MSG
 } from '../actions/types';
 
 const initialState = {
     notifications: [],
     unreadNotifications: 0,
     customerCanceled: null,
-    connectionStatus: null
+    connectionStatus: null,
+    msg: null
 };
 
 const notificationsReducer = (state = initialState, action) => {
@@ -129,6 +131,12 @@ const notificationsReducer = (state = initialState, action) => {
                 ...state,
                 unreadNotifications: unreadCount < 0 ? 0 : unreadCount
             }
+
+        case SET_NOTIFICATION_MSG:
+            return {
+                ...state,
+                msg: action.payload
+            };
 
         default:
             return state;

@@ -104,6 +104,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
     
     const { account } = useSelector(state => state.bankAccounts);
     const { msg } = useSelector(state => state.customer);
+    const message = useSelector(state => state.notifications.msg);
     
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -145,7 +146,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
                         <Typography variant="h6" className={classes.header}>Send EUR</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="body1" component="p" className={classes.text}>Check how much you need to send to buyer below and make a transfer to the account details provided below.</Typography>
+                        <Typography variant="body1" component="p" className={classes.text}>{message}</Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>I Will Send</Typography>

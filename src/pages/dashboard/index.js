@@ -371,7 +371,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 if (customerId === seller.CustomerId) {
                                     dispatch({
                                         type: SET_CUSTOMER_MSG,
-                                        payload: `Thanks for the payment, a notification was sent to ${buyer.UserName}, once he/she confirms this transaction will be considered complete.`
+                                        payload: `Thanks for the payment, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
                                     });
                                 }
                             });
@@ -381,23 +381,12 @@ const Dashboard = ({ children, title, logout }) => {
                     case SELLER_CONFIRMED_PAYMENT:
                         buyer = payload.Transfer.Buyer;
                         seller = payload.Transfer.Seller;
-                        console.log(buyer);
                         id = payload.Transfer.Id;
-                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
-                            batch(() => {
-                                dispatch({
-                                    type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
-                                    payload: { id }
-                                });
-                                // Show message to seller only
-                                if (customerId === seller.CustomerId) {
-                                    dispatch({
-                                        type: SET_CUSTOMER_MSG,
-                                        payload: `Thanks for confirming ${buyer.UserName}'s payment. Please proceed and send the EUR equivalent to the account below. `
-                                    });
-                                }
-                            });
-                        }
+                        
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+                            payload: { id }
+                        });
                         break;
 
                     case CANCEL_NEGOTIATION:
