@@ -95,7 +95,7 @@ const MobileFilterModal = (props) => {
 
     const [open, setOpen] = useState(false);
 
-    const { getListingsOpenForBid } = props;
+    const { getListingsOpenForBid, toggleModal } = props;
 
     const closeModal = useCallback(() => {
         setOpen(false);
@@ -195,7 +195,7 @@ const MobileFilterModal = (props) => {
 			aria-describedby="transition-modal-description"
 			className={classes.modal}
 			open={open}
-			onClose={() => setOpen(false)}
+			onClose={toggleModal}
 			closeAfterTransition
 			BackdropComponent={Backdrop}
 			BackdropProps={{

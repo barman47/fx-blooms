@@ -288,6 +288,8 @@ const AllListings = (props) => {
         setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
     };
 
+	const toggleFilterModal = () => setOpen(!open);
+
 	useEffect(() => {
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
@@ -359,7 +361,7 @@ const AllListings = (props) => {
 	return (
 		<>
 			<RiskNoticeModal />
-			<FilterListingModal open={open} />
+			<FilterListingModal open={open} toggleModal={toggleFilterModal} />
 			<Tooltip title="Filter Listings" arrow>
 				<Fab 
 					className={classes.fab} 
