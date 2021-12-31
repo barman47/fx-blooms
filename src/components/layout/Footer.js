@@ -12,7 +12,7 @@ import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
 import { animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';
 
-import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
+import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US, USER_AGREEMENT } from '../../routes';
 import { COLORS } from '../../utils/constants';
 
 import logo from '../../assets/img/logo-white.svg';
@@ -167,7 +167,7 @@ const Footer = () => {
                     <Link className={classes.link} component={RouterLink} to={PRIVACY_POLICY}>Privacy Policy</Link>
                     <Link className={classes.link} component={RouterLink} to={TERMS}>Terms &amp; Conditions</Link>
                     <Link className={classes.link} component={RouterLink} to={DISCLAIMER}>Disclaimer</Link>
-                    <Link className={classes.link} component={RouterLink} to="#!">User Agreement</Link>
+                    <Link className={classes.link} component={RouterLink} to={USER_AGREEMENT}>User Agreement</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>

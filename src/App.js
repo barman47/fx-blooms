@@ -26,6 +26,7 @@ import FAQs from './pages/faqs/FAQs';
 import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
 import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
 import Disclaimer from './pages/disclaimer/Disclaimer';
+import UserAgreement from './pages/userAgreement/UserAgreement';
 
 import Dashboard from './pages/dashboard';
 
@@ -79,7 +80,8 @@ import {
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
 	WALLET,
-	CONTACT_US
+	CONTACT_US,
+	USER_AGREEMENT
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
@@ -169,6 +171,8 @@ const [title, setTitle] = useState('');
 						<Route path={FAQS} exact component={FAQs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
 						<Route path={DISCLAIMER} exact component={Disclaimer} />
+						<Route path={DISCLAIMER} exact component={Disclaimer} />
+						<Route path={USER_AGREEMENT} exact component={UserAgreement} />
 						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />

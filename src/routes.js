@@ -9,6 +9,7 @@ export const FORGOT_PASSWORD = '/user/forgotPassword';
 export const RESET_PASSWORD = '/user/resetPassword';
 export const TERMS = '/termsAndConditions';
 export const PRIVACY_POLICY = '/privacyPolicy';
+export const USER_AGREEMENT = '/userAgreement';
 export const FAQS = '/frequentlyAskedQuestions';
 export const DISCLAIMER = '/disclaimer';
 export const VERIFY_EMAIL = '/user/VerifyEmail';
