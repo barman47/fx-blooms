@@ -33,7 +33,7 @@ import {
 } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
-import { getCustomerInformation, logout } from '../../actions/customer';
+import { logout } from '../../actions/customer';
 import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES, ID_STATUS } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
@@ -120,12 +120,12 @@ const ToastAction = () => {
     );
 };
 
-const Dashboard = ({ children, title, getCustomerInformation, logout }) => {
+const Dashboard = ({ children, title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, profile } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
@@ -184,11 +184,6 @@ const Dashboard = ({ children, title, getCustomerInformation, logout }) => {
                     type: ADD_NOTIFICATION,
                 });
             }
-        }
-
-        if (!profile.firstName) {
-            console.log('Getting profile information');
-            getCustomerInformation()
         }
         // eslint-disable-next-line
     }, []);
@@ -480,9 +475,8 @@ const Dashboard = ({ children, title, getCustomerInformation, logout }) => {
 };
 
 Dashboard.propTypes = {
-    getCustomerInformation: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { getCustomerInformation, logout })(Dashboard);
+export default connect(undefined, { logout })(Dashboard);
