@@ -1,21 +1,20 @@
 import { 
     ADDED_LISTING, 
     DELETED_LISTING,
-    // HIDE_NEGOTIATION_LISTINGS, 
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
-    UPDATED_LISTING, 
     CANCELED_NEGOTIATION,
+    SET_LOADING_LISTINGS,
     SET_LISTING_MSG
 } from '../actions/types';
-// import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
     updatedListing: false,
     listing: {},
     listings: [],
+    loading: false,
     msg: null
 };
 
@@ -40,8 +39,8 @@ const listingsReducer = (state = initialState, action) => {
             };
         
         case DELETED_LISTING:
-            listingId = action.payload.listingId;
-            listingIndex = state.listings.findIndex(listing => listing._id === listingId);
+            listingId = action.payload.id;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
             listingsList = [...state.listings];
             listingsList.splice(listingIndex, 1);
             return {
@@ -70,6 +69,7 @@ const listingsReducer = (state = initialState, action) => {
                 totalItemCount,
                 totalPageCount
             } = action.payload;
+            
             return {
                 ...state,
                 listings: [...state.listings, ...action.payload.listings],
@@ -79,28 +79,6 @@ const listingsReducer = (state = initialState, action) => {
                 totalItemCount,
                 totalPageCount
             };
-
-        case UPDATED_LISTING: 
-        // listing update logic here
-            listingsList = [...state.listings];
-            listing = {...action.payload.listing};
-            listingId = listing.id;
-            listingIndex = listingsList.findIndex(item => item.id === listingId);
-            // updatedListing = { ...listing };
-            listingsList.splice(listingIndex, 1, listing);
-
-            return {
-                ...state,
-                listing,
-                listings: [...listingsList],
-                updatedListing: !state.addedListing,
-                msg: action.payload.msg
-            }; 
-
-        // case HIDE_NEGOTIATION_LISTINGS: 
-        //     return {
-        //         listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
-        //     };
 
         case CANCELED_NEGOTIATION:
             listingsList = [...state.listings];
@@ -116,6 +94,12 @@ const listingsReducer = (state = initialState, action) => {
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
+            };
+
+        case SET_LOADING_LISTINGS:
+            return {
+                ...state,
+                loading: action.payload
             };
 
         case SET_LISTING_MSG:

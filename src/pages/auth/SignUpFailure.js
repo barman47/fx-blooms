@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { 
     Container,
@@ -61,9 +62,9 @@ const SignUpSuccess = (props) => {
         <>
             <Helmet><title>Signup Successful | FXBLOOMS.com</title></Helmet>
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo}>
+                <Link to="/" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </a>
+                </Link>
                 <div className={classes.content}>
                     <Typography variant="h5">Sign Up Failed</Typography>
                     <Typography variant="subtitle1" component="p">Sign up was unsuccessful. Please try again.</Typography>

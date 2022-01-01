@@ -6,18 +6,21 @@ import {
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
     PAYMENT_NOTIFICATION_SELLER_PAID,
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+    ADD_UNREAD_NOTIFICATIONS,
     SUBTRACT_UNREAD_NOTIFICATIONS,
     // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
     SET_SOCKET_CONNECTION_STATUS,
-    UPDATE_NOTIFICATION
+    UPDATE_NOTIFICATION,
+    SET_NOTIFICATION_MSG
 } from '../actions/types';
 
 const initialState = {
     notifications: [],
     unreadNotifications: 0,
     customerCanceled: null,
-    connectionStatus: null
+    connectionStatus: null,
+    msg: null
 };
 
 const notificationsReducer = (state = initialState, action) => {
@@ -31,13 +34,13 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notifications: action.payload,
-                unreadNotifications: action.payload.length
+                unreadNotifications: state.unreadNotifications === 0 ? action.payload.length : state.unreadNotifications + action.payload.length
             }; 
 
         case ADD_NOTIFICATION:
             return {
                 ...state,
-                notifications: [ action.payload, ...state.notifications ],
+                notifications: action.payload ? [ action.payload, ...state.notifications ] : [ ...state.notifications ],
                 unreadNotifications: state.unreadNotifications + 1
             };
 
@@ -77,7 +80,8 @@ const notificationsReducer = (state = initialState, action) => {
             notifications = state.notifications;
             notification = notifications[notificationIndex];
             notification.seller.hasMadePayment = true;
-            notifications.splice(notificationIndex, 1, notification);
+            notifications.splice(notificationIndex, 1);
+            notifications.push(notification);
 
             return {
                 ...state,
@@ -89,7 +93,8 @@ const notificationsReducer = (state = initialState, action) => {
             notifications = state.notifications;
             notification = notifications[notificationIndex];
             notification.seller.hasReceivedPayment = true;
-            notifications.splice(notificationIndex, 1, notification);
+            notifications.splice(notificationIndex, 1);
+            notifications.push(notification);
 
             return {
                 ...state,
@@ -113,12 +118,25 @@ const notificationsReducer = (state = initialState, action) => {
         //         chat
         //     };
 
+        case ADD_UNREAD_NOTIFICATIONS:
+            unreadCount = state.unreadNotifications + action.payload;
+            return {
+                ...state,
+                unreadNotifications: unreadCount
+            }
+
         case SUBTRACT_UNREAD_NOTIFICATIONS:
             unreadCount = state.unreadNotifications - action.payload;
             return {
                 ...state,
                 unreadNotifications: unreadCount < 0 ? 0 : unreadCount
             }
+
+        case SET_NOTIFICATION_MSG:
+            return {
+                ...state,
+                msg: action.payload
+            };
 
         default:
             return state;

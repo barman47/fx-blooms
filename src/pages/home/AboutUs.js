@@ -1,4 +1,5 @@
-import { Grid, Typography } from '@material-ui/core';
+import { Link } from 'react-router-dom';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import YouTube from 'react-youtube';
 
@@ -19,14 +20,26 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    left: {
-        '& h3': {
-            color: COLORS.offWhite,
-            fontWeight: 600,
+    content: {
+        display: 'grid',
+        gap: theme.spacing(5),
+        gridTemplateColumns: '1fr 1fr',
+        alignItems: 'center',
 
-            [theme.breakpoints.down('sm')]: {
-                fontSize: theme.spacing(3.5),
-                textAlign: 'center'
+        [theme.breakpoints.down('md')]: {
+            gridTemplateColumns: '1fr'
+        },
+
+        '& div:first-child': {
+            '& h3': {
+                color: COLORS.offWhite,
+                fontWeight: 600,
+                marginBottom: theme.spacing(5),
+    
+                [theme.breakpoints.down('sm')]: {
+                    fontSize: theme.spacing(3.5),
+                    textAlign: 'center'
+                }
             }
         }
     },
@@ -34,6 +47,14 @@ const useStyles = makeStyles(theme => ({
     text: {
         color: COLORS.offWhite,
         fontWeight: 300
+    },
+
+    button: {
+        marginTop: theme.spacing(5),
+
+        [theme.breakpoints.down('sm')]: {
+            width: '100%'
+        }
     },
 
     video: {
@@ -52,33 +73,26 @@ const AboutUs = () => {
             autoplay: 0,
             color: 'white',
             playsinline: 1
-        },
+        }
     };
 
     const onReady = (e) => {
         // access to player in all event handlers via e.target
         e.target.pauseVideo();
-      }
+    };
 
     return (
-        <Grid container direction="row" spacing={10} className={classes.root} id={ABOUT_US}>
-            <Grid item xs={12} lg={6} className={classes.left}>
-                <Grid container direction="column" spacing={2} justifyContent="center">
-                    <Grid item>
-                        <Typography variant="h3">What is FXBLOOMS?</Typography>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>
-                    </Grid>
-                    <Grid item>
-                        <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
-                    </Grid>
-                </Grid>
-            </Grid>
-            <Grid item xs={12} lg={6}>
-                <YouTube className={classes.video} videoId="71YM28sN0vE" opts={opts} onReady={onReady} />
-            </Grid>
-        </Grid>
+        <section className={classes.root} id={ABOUT_US}>
+            <div className={classes.content}>
+                <div>
+                    <Typography variant="h3">What is FXBLOOMS?</Typography>
+                    <Typography variant="subtitle2" className={classes.text}>FXBLOOMS is a market place for peer-to-peer exchange of currencies.</Typography>
+                    <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
+                    <Button component={Link} to={ABOUT_US} color="primary" variant="contained" className={classes.button}>ABOUT US</Button>
+                </div>    
+                <YouTube className={classes.video} videoId="0gfyjfo7GO0" opts={opts} onReady={onReady} />
+            </div>
+        </section>
     );
 };
 

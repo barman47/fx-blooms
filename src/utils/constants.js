@@ -8,17 +8,11 @@ export const COLORS = {
     lightGrey: '#e2e2e2',
     white: '#ffffff',
     offWhite: '#f8f8f8',
+    darkTeal: '#091d1d',
     lightTeal: '#f6fafa',
     red: '#EB5757',
     darkRed: '#f21c1c'
 };
-
-export const CONFIRMED = 'CONFIRMED';
-export const PENDING = 'PENDING';
-export const REJECTED = 'REJECTED';
-export const ALL_CUSTOMERS = 'ALL_CUSTOMERS';
-export const APPROVED =  'APPROVED';
-export const NOT_SUBMITTED = 'NOT_SUBMITTED';
 
 export const SETUP_2FA = 'SETUP_2FA';
 export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
@@ -32,12 +26,13 @@ export const TRANSITION = '0.3s linear all';
 
 export const LOGOUT = 'logout';
 
-export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
-export const API = 'https://api.fxblooms.com/api'; // Testing branch
-export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
+// export const WALLET_API = 'https://wallet.fxblooms.com/api';
+// export const API = 'https://api.fxblooms.com/api'; // Testing branch
+// export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
-// export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
-// export const API = 'https://positron.fxblooms.com/api'; // Production Branch
+export const WALLET_API = 'https://electron.fxblooms.com/api'; // Production branch
+export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
+export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const SEND_MESSAGE = 'SendMessage';
@@ -47,6 +42,18 @@ export const CHAT_CONNECTION_STATUS = {
     RECONNECTING: 'RECONNECTING',
     RECONNECTED: 'RECONNECTED',
     DISCONNECTED: 'DISCONNECTED'  
+};
+
+export const CUSTOMER_CATEGORY = {
+    CONFIRMED: 'CONFIRMED',
+    PENDING: 'PENDING',
+    REJECTED: 'REJECTED',
+    ALL_CUSTOMERS: 'ALL_CUSTOMERS',
+};
+
+export const ID_STATUS = {
+    APPROVED: 'APPROVED',
+    NOT_SUBMITTED:'NOT_SUBMITTED'
 };
 
 export const NOTIFICATION_TYPES = {

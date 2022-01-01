@@ -15,7 +15,8 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { addBid } from '../../../actions/listings';
-import { SET_LISTING_MSG } from '../../../actions/types';
+import { SET_ACCOUNT, SET_LISTING_MSG } from '../../../actions/types';
+import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -36,7 +37,7 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(2),
-            width: '80vw'
+            width: '70vw'
         }
     },
 
@@ -131,7 +132,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
+const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -145,18 +146,26 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
     const [transferAmount, setTransferAmount] = useState('');
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const successModal = useRef();
 
     useEffect(() => {
+        getAccount(listing.sellersAccountId);
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         setOpen(drawerOpen);
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {}
+        });
         if (!drawerOpen) {
             setErrors({});
         }
-    }, [drawerOpen]);
+    }, [dispatch, drawerOpen]);
 
     useEffect(() => {
         if (msg) {
@@ -169,6 +178,13 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
         setLoading(false);
         setErrors(errorsState);
     }, [errorsState]);
+
+    useEffect(() => {
+        // Automatically select newly added account
+        if (accounts.length > 0 && accounts[0].currency === 'EUR') {
+            setReceivingAccount(accounts[0].bankName);
+        }
+    }, [accounts]);
 
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
@@ -259,7 +275,7 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
                     <Grid container direction="row" spacing={1}>
                         <Grid item xs={3} >
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>I want to Buy</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>I want</Typography>
                             <TextField 
                                 value="EUR"
                                 type="text"
@@ -329,46 +345,42 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
                                 required
                             />
                         </Grid>
-                        {!buttonDisabled && !isEmpty(receivingAccount) && !isEmpty(Amount) &&
-                            <>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                                    <section className={classes.accountDetailsContainer}>
-                                        <div>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                                        </div>
-                                        <div className={classes.accountContainer}>
-                                            <section>
-                                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                                            </section>
-                                            <section>
-                                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                                            </section>
-                                        </div>
-                                        <div>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                                        </div>
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                            <section className={classes.accountDetailsContainer}>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                </div>
+                                <div className={classes.accountContainer}>
+                                    <section>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
                                     </section>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Button 
-                                        type="submit"
-                                        variant="contained" 
-                                        color="primary" 
-                                        fullWidth 
-                                        disableFocusRipple
-                                        className={classes.button}
-                                        disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
-                                    >
-                                        {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
-                                    </Button>
-                                </Grid>
-                            </>
-                        }
+                                    <section>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                    </section>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
+                                </div>
+                            </section>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Button 
+                                type="submit"
+                                variant="contained" 
+                                color="primary" 
+                                fullWidth 
+                                disableFocusRipple
+                                className={classes.button}
+                                disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
+                            >
+                                {loading ? 'One Moment . . .' : `I've Made Payment ${transferAmount && 'of'} ${transferAmount}`}
+                            </Button>
+                        </Grid>
                     </Grid>
                 </form>
             </Drawer>
@@ -377,9 +389,10 @@ const BuyEurDrawer = ({ addBid, listing, toggleDrawer, drawerOpen }) => {
 };
 
 BuyEurDrawer.propTypes = {
+    getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { addBid })(BuyEurDrawer);
+export default connect(undefined, { addBid, getAccount })(BuyEurDrawer);

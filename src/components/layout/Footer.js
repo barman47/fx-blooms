@@ -9,13 +9,14 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
-import { Link as AnimatedLink, animateScroll as scroll } from 'react-scroll';
+import { animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';
 
-import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US } from '../../routes';
+import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP, CONTACT_US, USER_AGREEMENT } from '../../routes';
 import { COLORS } from '../../utils/constants';
 
 import logo from '../../assets/img/logo-white.svg';
+import septemLogo from '../../assets/img/septem-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         gridTemplateColumns: '1fr',
         gap: theme.spacing(4),
-        padding: [[theme.spacing(5), theme.spacing(15)]],
+        padding: [[theme.spacing(5), theme.spacing(10)]],
 
         [theme.breakpoints.down('md')]: {
             alignItems: 'center',
@@ -60,6 +61,7 @@ const useStyles = makeStyles(theme => ({
         },
 
         [theme.breakpoints.down('sm')]: {
+            // justifyContent: 'center',
             gap: theme.spacing(5),
             gridTemplateColumns: '1fr 1fr',
         },
@@ -80,6 +82,9 @@ const useStyles = makeStyles(theme => ({
 
         '& div:first-child': {
             [theme.breakpoints.down('md')]: {
+                gridColumn: '1 / span 5'
+            },
+            [theme.breakpoints.down('sm')]: {
                 gridColumn: '1 / span 2'
             }
         }
@@ -109,10 +114,38 @@ const useStyles = makeStyles(theme => ({
         borderTop: `1px solid ${COLORS.offBlack}`
     },
 
+    copyrightContainer: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+
+        [theme.breakpoints.down('md')]: {
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center'
+        }
+    },
+
     copyright: {
         [theme.breakpoints.down('sm')]: {
             textAlign: 'center'
         }
+    },
+
+    septem: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        [theme.breakpoints.down('md')]: {
+            justifyContent: 'center',
+            marginTop: theme.spacing(2)
+        }
+    },
+
+    septemStacksLogo: {
+        cursor: 'pointer',
+        width: '25%'
     }
 }));
 
@@ -130,35 +163,27 @@ const Footer = () => {
                 </div>
                 <div>
                     <Typography variant="h6">Company</Typography>
-                    <AnimatedLink 
-                        to={ABOUT_US} 
-                        spy={true}
-                        smooth={true}
-                        offset={-70}
-                        duration={500}
-                        className={classes.link}
-                        >
-                            About us
-                    </AnimatedLink>
-                    <a className={classes.link} target="_blank" href={PRIVACY_POLICY} rel="noreferrer">Privacy Policy</a>
-                    <a className={classes.link} target="_blank" href={TERMS}  rel="noreferrer">Terms &amp; Conditions</a>
-                    <a className={classes.link} target="_blank" href={DISCLAIMER}  rel="noreferrer">Disclaimer</a>
+                    <Link className={classes.link} to={ABOUT_US} component={RouterLink}>About us</Link>
+                    <Link className={classes.link} component={RouterLink} to={PRIVACY_POLICY}>Privacy Policy</Link>
+                    <Link className={classes.link} component={RouterLink} to={TERMS}>Terms &amp; Conditions</Link>
+                    <Link className={classes.link} component={RouterLink} to={DISCLAIMER}>Disclaimer</Link>
+                    <Link className={classes.link} component={RouterLink} to={USER_AGREEMENT}>User Agreement</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Users</Typography>
-                    <Link className={classes.link} underline="hover" to={LOGIN} component={RouterLink}>Login</Link>
-                    <Link className={classes.link} underline="hover" to={SIGN_UP} component={RouterLink}>Sign Up</Link>
-                    <Link className={classes.link} underline="hover" to={BLOG} target="_blank" component={RouterLink}>Blog</Link>
+                    <Link className={classes.link} to={LOGIN} component={RouterLink}>Login</Link>
+                    <Link className={classes.link} to={SIGN_UP} component={RouterLink}>Sign Up</Link>
+                    <a className={classes.link} href={BLOG} target="_blank" rel="noreferrer">Blog</a>
                 </div>
                 <div>
                     <Typography variant="h6">Help</Typography>
-                    <a className={classes.link} target="_blank" href={FAQS}  rel="noreferrer">FAQs</a>
-                    <a className={classes.link} target="_blank" href={CONTACT_US}  rel="noreferrer">Contact Us</a>
+                    <Link className={classes.link} to={FAQS} component={RouterLink}>FAQs</Link>
+                    <Link className={classes.link} to={CONTACT_US} component={RouterLink}>Contact Us</Link>
                 </div>
                 <div>
                     <Typography variant="h6">Connect</Typography>
                     <a className={classes.link} href="mailto:hello@fxblooms.com">hello@fxblooms.com</a>
-                    <a className={classes.link} href="tel:+4917647003124">+37 255 6174 40</a>
+                    <a className={classes.link} href="tel:+37255617440">+372 5561 7440</a>
                     <section className={classes.socialContainer}>
                         <Tooltip title="Follow FXBLOOMS on Instagram" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }} arrow>
                             <IconButton 
@@ -204,9 +229,26 @@ const Footer = () => {
                 </div>
             </section>
             <Divider className={classes.divider} />
-            <Typography variant="subtitle2" component="span" className={classes.copyright}>
-                FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
-            </Typography>  
+            <section className={classes.copyrightContainer}>
+                <Typography variant="subtitle2" component="span" className={classes.copyright}>
+                    FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
+                </Typography>  
+                <div className={classes.septem}>
+                    <Typography variant="body2">
+                        Powered by &nbsp;&nbsp;
+                    </Typography>
+                    <Tooltip title="https://septemstacks.com" TransitionComponent={Zoom} TransitionProps={{ timeout: 300 }}>
+                        <img 
+                            src={septemLogo} 
+                            alt="Septem Stacks LLC" 
+                            className={classes.septemStacksLogo}
+                            onClick={() => {
+                                window.open('https://septemstacks.com', '_blank', 'noopener,noreferrer')
+                            }}
+                        />
+                    </Tooltip>
+                </div>
+            </section>
         </footer>
     );
 };

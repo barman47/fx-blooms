@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
+import _ from 'lodash';
 
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
@@ -21,16 +22,19 @@ import {
 import {  HomeMinus, FormatListText, Message } from 'mdi-material-ui';
 import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
 import { 
+    ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
-    PAYMENT_NOTIFICATION_SELLER_PAID 
+    PAYMENT_NOTIFICATION_SELLER_PAID, 
+    SET_CUSTOMER_MSG,
+    SET_LISTING_MSG
 } from '../../actions/types';
 import audioFile from '../../assets/sounds/notification.mp3';
 
 import { logout } from '../../actions/customer';
-import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES, ID_STATUS } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
@@ -102,6 +106,11 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('md')]: {
             display: 'block'
         }
+    },
+
+    label: {
+        fontWeight: 600,
+        textTransform: 'uppercase'
     }
 }));
 
@@ -116,8 +125,9 @@ const Dashboard = ({ children, title, logout }) => {
     const dispatch = useDispatch();
     const history = useHistory();
     
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
     
@@ -136,16 +146,59 @@ const Dashboard = ({ children, title, logout }) => {
     
     const customToast = useRef();
     const successModal = useRef();
+    const accountSetupModal = useRef();
+
+    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        checkTwoFactorStatus();
         checkSession();
         onReconnected();
         onReconnect();
         onClose();
 
         handleSentMessage();
+
+        if (!hasSetup2FA) {
+            dispatch({
+                type: ADD_NOTIFICATION,
+            });
+        }
+
+        if (!isPhoneNumberVerified) {
+            dispatch({
+                type: ADD_NOTIFICATION,
+            });
+        }
+
+        if (!_.isEmpty(stats)) {
+            const { residencePermitStatus, idStatus } = stats;
+            if (residencePermitStatus === NOT_SUBMITTED) {
+                dispatch({
+                    type: ADD_NOTIFICATION,
+                });
+            }
+
+            if (idStatus === NOT_SUBMITTED) {
+                dispatch({
+                    type: ADD_NOTIFICATION,
+                });
+            }
+        }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(stats)) {
+            if (!sessionStorage.getItem('checkedIdStatus')) {
+                sessionStorage.setItem('checkedIdStatus', 'true');
+                const { idStatus, residencePermitStatus } = stats;
+                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
+                    accountSetupModal.current.openModal();
+                }
+            }
+        }
+    }, [NOT_SUBMITTED, stats]);
 
     // useEffect(() => {
     //     setPath(location.pathname);
@@ -158,7 +211,6 @@ const Dashboard = ({ children, title, logout }) => {
                     toast.success('Connected!');
                     setToastAction(null);
                 }
-                
                 break;
 
             case RECONNECTING:
@@ -188,6 +240,13 @@ const Dashboard = ({ children, title, logout }) => {
                 break;
         }
     }, [connectionStatus]);
+
+    // Logout user if he tries to beat 2FA
+    const checkTwoFactorStatus = () => {
+        if (twoFactorEnabled && !authorized) {
+            logout(history);
+        }
+    };
 
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
@@ -237,36 +296,46 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_BUYER_PAID,
-                                payload: { 
-                                    notification: {
-                                        id,
-                                        isClosed: payload.IsClosed,
-                                        buyer: {
-                                            accountName: buyer.AccountName,
-                                            accountNumber: buyer.AccountNumber,
-                                            amountTransfered: buyer.AmountTransfered,
-                                            bankName: buyer.BankName,
-                                            customerId: buyer.CustomerId,
-                                            hasMadePayment: buyer.HasMadePayment,
-                                            hasReceivedPayment: buyer.HasReceivedPayment,
-                                            userName: buyer.UserName
+                            batch(() => {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_BUYER_PAID,
+                                    payload: { 
+                                        notification: {
+                                            id,
+                                            isClosed: payload.IsClosed,
+                                            buyer: {
+                                                accountName: buyer.AccountName,
+                                                accountNumber: buyer.AccountNumber,
+                                                amountTransfered: buyer.AmountTransfered,
+                                                bankName: buyer.BankName,
+                                                customerId: buyer.CustomerId,
+                                                hasMadePayment: buyer.HasMadePayment,
+                                                hasReceivedPayment: buyer.HasReceivedPayment,
+                                                userName: buyer.UserName
+                                            },
+                                            seller: {
+                                                accountName: seller.AccountName,
+                                                accountNumber: seller.AccountNumber,
+                                                amountTransfered: seller.AmountTransfered,
+                                                bankName: seller.BankName,
+                                                customerId: seller.CustomerId,
+                                                hasMadePayment: seller.HasMadePayment,
+                                                hasReceivedPayment: seller.HasReceivedPayment,
+                                                userName: seller.UserName
+                                            },
+                                            listingId: payload.ListingId,
+                                            bidId: payload.BidId
                                         },
-                                        seller: {
-                                            accountName: seller.AccountName,
-                                            accountNumber: seller.AccountNumber,
-                                            amountTransfered: seller.AmountTransfered,
-                                            bankName: seller.BankName,
-                                            customerId: seller.CustomerId,
-                                            hasMadePayment: seller.HasMadePayment,
-                                            hasReceivedPayment: seller.HasReceivedPayment,
-                                            userName: seller.UserName
-                                        },
-                                        listingId: payload.ListingId,
-                                        bidId: payload.BidId
-                                    },
-                                    customerId
+                                        customerId
+                                    }
+                                });
+
+                                // Show message to buyer only
+                                if (customerId === buyer.CustomerId) {
+                                    dispatch({
+                                        type: SET_LISTING_MSG,
+                                        payload: `${seller.UserName} will confirm and send the EUR equivalent to the account you provided.`
+                                    });
                                 }
                             });
                         }
@@ -283,7 +352,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 payload: { id }
                             });
                             successModal.current.openModal();
-                            successModal.current.setModalText('This transaction has been completed successfully by both the buyer and seller and will be permanently closed.');
+                            successModal.current.setModalText('Congratulations! This transaction is completed. Thanks for using FXBLOOMS.');
                         }
                         break;
 
@@ -293,9 +362,18 @@ const Dashboard = ({ children, title, logout }) => {
                         id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_SELLER_PAID,
-                                payload: { id }
+                            batch(() => {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_SELLER_PAID,
+                                    payload: { id }
+                                });
+                                // Show message to seller only
+                                if (customerId === seller.CustomerId) {
+                                    dispatch({
+                                        type: SET_CUSTOMER_MSG,
+                                        payload: `Thanks for the payment, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                    });
+                                }
                             });
                         }
                         break;
@@ -304,12 +382,11 @@ const Dashboard = ({ children, title, logout }) => {
                         buyer = payload.Transfer.Buyer;
                         seller = payload.Transfer.Seller;
                         id = payload.Transfer.Id;
-                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
-                                payload: { id }
-                            });
-                        }
+                        
+                        dispatch({
+                            type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+                            payload: { id }
+                        });
                         break;
 
                     case CANCEL_NEGOTIATION:
@@ -339,11 +416,18 @@ const Dashboard = ({ children, title, logout }) => {
         history.push(`/dashboard${link}`);
     };
 
+    const dismissAction = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+    };
+
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
-            <AccountSetupModal />
-            <SuccessModal ref={successModal} />
+            <AccountSetupModal ref={accountSetupModal} />
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -374,7 +458,13 @@ const Dashboard = ({ children, title, logout }) => {
                             showLabels
                         >
                             {mobileLinks.map((item, index) => (
-                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                                <BottomNavigationAction 
+                                    onClick={() => handleLinkClick(item.url)} 
+                                    key={index} 
+                                    label={item.text} 
+                                    icon={item.icon} 
+                                    classes={{ label: classes.label }}
+                                />
                             ))}
                         </BottomNavigation>
                     </Box>

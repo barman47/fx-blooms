@@ -1,18 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, TextField, Typography, useMediaQuery } from '@material-ui/core'; 
-import { makeStyles, useTheme } from '@material-ui/core/styles'; 
+import { connect, useSelector } from 'react-redux';
+import { Button, Typography } from '@material-ui/core'; 
+import { makeStyles } from '@material-ui/core/styles'; 
 import PropTypes from 'prop-types';
 
 import { disableTwoFactor } from '../../../actions/twoFactor';
 
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import { GET_ERRORS, SET_2FA_MSG } from '../../../actions/types';
-import validateAuthenticatorCode from '../../../utils/validation/customer/authenticator';
 
 import Spinner from '../../../components/common/Spinner';
-import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
@@ -66,32 +63,15 @@ const useStyles = makeStyles(theme => ({
 
 const DisableTwoFactor = ({ disableTwoFactor }) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
-
-    const theme = useTheme();
-    const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
     const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.twoFactor);
-    
-    const [first, setFirst] = useState('');
-    const [second, setSecond] = useState('');
-    const [third, setThird] = useState('');
-    const [fourth, setFourth] = useState('');
-    const [fifth, setFifth] = useState('');
-    const [sixth, setSixth] = useState('');
+
+    const [spinnerText, setSpinnerText] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const toast = useRef();
-    const successModal = useRef();
-    
-    const firstField = useRef();
-    const secondField = useRef();
-    const thirdField = useRef();
-    const fourthField = useRef();
-    const fifthField = useRef();
-    const sixthField = useRef();
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -109,74 +89,16 @@ const DisableTwoFactor = ({ disableTwoFactor }) => {
 
     useEffect(() => {
         if (msg) {
+            console.log('opening modal');
+            setSpinnerText('');
             setLoading(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
         }
     }, [msg]);
 
-    const moveToNextField = (current, nextField, previousField) => {
-        if (nextField === null && current.value) {
-            return onSubmit();
-        }
-
-        if (previousField && current.value.length === 0) {
-            return previousField.getElementsByTagName('input')[0].focus();
-        }
-
-        const input = nextField.getElementsByTagName('input')[0];
-
-        if (current.value.length >= current.maxLength) {
-            return input.focus();
-        }
-    };
-
-    const dismissAction = () => {
-        // batch(() => {
-        //     dispatch({
-        //         type: SET_BARCODE,
-        //         payload: {}
-        //     });
-        //     dispatch({
-        //         type: SET_2FA_MSG,
-        //         payload: null
-        //     });
-        // });
-        dispatch({
-            type: SET_2FA_MSG,
-            payload: null
-        });
-    };
-
-    const onSubmit = (e) => {
-        if (e) {
-            e.preventDefault();
-        }
-
-        setErrors({});
-        
-        const { isValid } = validateAuthenticatorCode({
-            first,
-            second,
-            third,
-            fourth,
-            fifth,
-            sixth
-        });
-
-        if (!isValid) {
-            return setErrors({ msg: 'Invalid Code' });
-        }
-        
-        const code = `${first}${second}${third}${fourth}${fifth}${sixth}`;
-        setErrors({});
+    const handleDisable2FA = () => {
         setLoading(true);
-        dispatch({
-            type: GET_ERRORS,
-            payload: {}
-        });
-
-        return disableTwoFactor(code);
+        setSpinnerText('Disabling 2FA...');
+        disableTwoFactor();
     };
 
     return (
@@ -190,117 +112,11 @@ const DisableTwoFactor = ({ disableTwoFactor }) => {
                     type="error"
                 />
             }
-            {loading && <Spinner />}
-            <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            {loading && <Spinner text={spinnerText} />}
             <section className={classes.root}>
                 <Typography variant="h6">You already have two factor authentication enabled</Typography>
-                <Typography variant="subtitle1" component="p">Enter the 6-digit code displayed on your Google Authenticator app to disable 2FA.</Typography>
-                <form onSubmit={onSubmit} noValidate className={classes.form}>
-                    <Grid container direction="row" spacing={matches ? 1 : 3}>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={first}
-                                onChange={(e) => setFirst(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
-                                type="text"
-                                variant="outlined"                                 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={firstField}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={second}
-                                onChange={(e) => setSecond(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
-                                type="text"
-                                variant="outlined" 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                max={1}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={secondField}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={third}
-                                onChange={(e) => setThird(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
-                                type="text"
-                                variant="outlined" 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                max={1}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={thirdField}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={fourth}
-                                onChange={(e) => setFourth(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, fifthField.current, thirdField.current)}
-                                type="text"
-                                variant="outlined" 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                max={1}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={fourthField}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={fifth}
-                                onChange={(e) => setFifth(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, sixthField.current, fourthField.current)}
-                                type="text"
-                                variant="outlined" 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                max={1}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={fifthField}
-                            />
-                        </Grid>
-                        <Grid item xs={2}>
-                            <TextField
-                                className={classes.input}
-                                value={sixth}
-                                onChange={(e) => setSixth(e.target.value)}
-                                onKeyUp={(e) => moveToNextField(e.target, null, fifthField.current)}
-                                type="text"
-                                variant="outlined" 
-                                inputProps={{
-                                    maxLength: 1
-                                }}
-                                max={1}
-                                required
-                                error={!isEmpty(errors) ? true : false}
-                                ref={sixthField}
-                            />
-                        </Grid>
-                    </Grid>
-                    <Button type="submit" variant="outlined" color="primary" className={classes.button}>Disable 2FA</Button>
-                </form>
+                <Typography variant="subtitle1" component="p">Click the button below to disable 2FA.</Typography>
+                <Button variant="outlined" color="primary" className={classes.button} onClick={handleDisable2FA}>Disable 2FA</Button>
             </section>
         </>
     );

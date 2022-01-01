@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useLocation, useHistory, Link } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -117,9 +117,9 @@ const VerifyEmail = (props) => {
                 />
             }
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo}>
+                <Link to="/" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </a>
+                </Link>
             </Container>
         </>
     );

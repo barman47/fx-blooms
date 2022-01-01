@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
 import { 
     Button, 
     Checkbox,
@@ -25,7 +24,7 @@ import Toast from '../../components/common/Toast';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD, DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION } from '../../routes';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -388,9 +387,9 @@ const CreateAccount = (props) => {
                 <Grid container direction="row">
                     <Grid item xs={12} md={12} lg={5} className={classes.aside}>
                         <div>
-                            <a href="https://fxblooms.com">
+                            <Link to="/">
                                 <img src={logo} className={classes.logo} alt="FX Blooms logo" />
-                            </a>
+                            </Link>
                             <img src={img} className={classes.image} alt="FX Blooms logo" />
                             <Typography variant="subtitle2" component="span" className={classes.text}>Thank you for visiting FXBLOOMS!</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless</Typography>
@@ -401,9 +400,7 @@ const CreateAccount = (props) => {
                         <div className={classes.header}>
                             <Typography variant="h4">Create Account</Typography>
                             <Typography variant="subtitle2" component="span">Complete the form below to create an account.</Typography>
-                            <br /><br /><br />
-                            <Typography variant="subtitle2" component="span" color="primary">1 of 2 (Account details).</Typography>
-                            <br />
+                            <br /><br />
                         </div>
                         <form onSubmit={handleFormSubmit} noValidate>
                             <Grid container direction="row" spacing={2}>
@@ -554,7 +551,7 @@ const CreateAccount = (props) => {
                                     onChange={() => setChecked(!checked)}
                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                 />
-                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <a href="https://fxblooms.com/terms-and-conditions" target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</a></Typography>
+                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</Link></Typography>
 
                                 </Grid>
                                 <Grid item xs={12}>
@@ -570,7 +567,7 @@ const CreateAccount = (props) => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 300 }}>
-                                        Already have an account? <RouterLink to={LOGIN} className={classes.link}>Sign In</RouterLink>
+                                        Already have an account? <Link to={LOGIN} className={classes.link}>Sign In</Link>
                                     </Typography>
                                 </Grid>
                             </Grid>

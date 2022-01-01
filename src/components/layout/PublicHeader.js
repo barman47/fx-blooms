@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
     AppBar, 
@@ -19,8 +19,9 @@ import PropTypes from 'prop-types';
 import MobileNav from './MobileNav';
 
 import logo from '../../assets/img/logo.svg';
-import { COLORS } from '../../utils/constants';
-import { ABOUT_US, CONTACT_US, SIGN_UP, LOGIN, WHY, DASHBOARD, DASHBOARD_HOME } from '../../routes';
+import logoWhite from '../../assets/img/logo-white.svg';
+import { COLORS, SHADOW } from '../../utils/constants';
+import { ABOUT_US, CONTACT_US, HOW_IT_WORKS, SIGN_UP, LOGIN, FAQS, DASHBOARD, DASHBOARD_HOME } from '../../routes';
 import { useTheme } from '@material-ui/styles';
 
 export const HideOnScroll = (props) => {
@@ -47,8 +48,6 @@ HideOnScroll.propTypes = {
 const useStyles = makeStyles(theme => ({
     root: {
         background: 'transparent',
-        // boxShadow: `0px 1px 0px #e5e9f2`,
-        // position: 'absolute',
         width: '100%'
     },
     
@@ -58,6 +57,7 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         gap: theme.spacing(3),
         padding: [[0, theme.spacing(10)]],
+        width: '100%',
 
         [theme.breakpoints.down('lg')]: { 
             padding: 0
@@ -67,8 +67,26 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    scrollingNav: {
+        backgroundColor: COLORS.white,
+        boxShadow: SHADOW
+    },
+
     link: {
         color: COLORS.offWhite,
+        cursor: 'pointer',
+        fontSize: theme.spacing(1.8),
+        fontWeight: 500,
+        textDecoration: 'none',
+        transition: '0.3s linear all',
+
+        '&:hover': {
+            color: theme.palette.primary.main
+        }
+    },
+
+    scrollingLink: {
+        color: theme.palette.primary.main,
         cursor: 'pointer',
         fontSize: theme.spacing(1.8),
         fontWeight: 500,
@@ -106,9 +124,9 @@ const useStyles = makeStyles(theme => ({
     
     button: {
         width: 'initial',
-        [theme.breakpoints.down('lg')]: {
-            fontSize: theme.spacing(1)
-        },
+        // [theme.breakpoints.down('lg')]: {
+        //     fontSize: theme.spacing(1)
+        // },
         [theme.breakpoints.down('md')]: {
             fontSize: 'initial'
         }
@@ -120,6 +138,16 @@ const useStyles = makeStyles(theme => ({
         
         '&:hover': {
             border: `2px solid ${COLORS.offWhite}`,
+            color: COLORS.offWhite,
+        }
+    },
+
+    scrollingLogin: {
+        border: `2px solid ${theme.palette.primary.main}`,
+        color: theme.palette.primary.main,
+        
+        '&:hover': {
+            backgroundColor: theme.palette.primary.main,
             color: COLORS.offWhite,
         }
     },
@@ -146,15 +174,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PublicHeader = (props) => {
-    const history = useHistory();
     const classes = useStyles();
     const theme = useTheme();
+    const location  = useLocation();
 
     const { isAuthenticated } = useSelector(state => state.customer);
     
     const [drawerOpen, setDrawerOpen] = useState(false);
-    // eslint-disable-next-line
-    const [open, setOpen] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState(0);
+    const [open] = useState(false);
     const anchorRef = useRef(null);
     const prevOpen = useRef(open);
 
@@ -163,10 +191,10 @@ export const PublicHeader = (props) => {
     };
 
     const publicRoutes = [
-        { url: WHY, text: 'Home' },
-        { url: WHY, text: 'How it Works' },
+        { url: '/', text: 'Home' },
+        { url: HOW_IT_WORKS, text: 'How it Works' },
         { url: ABOUT_US, text:'About Us' },
-        { url: WHY, text: 'Frequently Asked Questions' },
+        { url: FAQS, text: 'FAQs' },
         { url: CONTACT_US, text:'Contact' }
     ];
 
@@ -178,43 +206,68 @@ export const PublicHeader = (props) => {
         prevOpen.current = open;
     }, [open]);
 
-    // eslint-disable-next-line
-    const handleLogout = (e) => {
-        e.preventDefault();
-        props.logout(history);
+    const handleScroll = () => {
+        const position = window.pageYOffset;
+        setScrollPosition(position);
     };
+
+    useEffect(() => {
+        window.addEventListener('scroll', handleScroll);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, []);
 
     return (
         <HideOnScroll {...props}>
-            <AppBar className={classes.root} elevation={0}>
+            <AppBar className={clsx(classes.root, { [classes.scrollingNav] : scrollPosition > 100 })} elevation={0}>
                 <Toolbar>
                     <section className={classes.nav}>
-                        <a href="https://fxblooms.com">
-                            <img src={logo} alt="FX Blooms Logo" />
-                        </a>
+                        {scrollPosition > 100 ?
+                            <RouterLink to="/">
+                                <img src={logo} alt="FX Blooms Logo" />
+                            </RouterLink>
+                            :
+                            <RouterLink to="/">
+                                <img src={logoWhite} alt="FX Blooms Logo" />
+                            </RouterLink>
+                        }
                         <div className={classes.links}>
                             {isAuthenticated && 
                                 <RouterLink 
                                     to={`${DASHBOARD}${DASHBOARD_HOME}`}  
-                                    className={classes.link}
+                                    className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
                                 >
                                     Dashboard
                                 </RouterLink>
                             }
-                            {publicRoutes.map((link, index) => (
-                                <AnimatedLink 
-                                    key={index}
-                                    to={link.url} 
-                                    activeClass={classes.activeLink} 
-                                    spy={true}
-                                    smooth={true}
-                                    offset={-70}
-                                    duration={500}
-                                    className={classes.link}
-                                >
-                                    {link.text}
-                                </AnimatedLink>
-                            ))}
+                            {publicRoutes.map((link, index) => {
+                                if (location.pathname === '/') {
+                                    return (
+                                        <AnimatedLink 
+                                            key={index}
+                                            to={link.url} 
+                                            activeClass={classes.activeLink} 
+                                            spy={true}
+                                            smooth={true}
+                                            offset={-70}
+                                            duration={500}
+                                            className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
+                                        >
+                                            {link.text}
+                                        </AnimatedLink>
+                                    )
+                                }
+                                return (
+                                    <RouterLink 
+                                        key={index}
+                                        to={link.url} 
+                                        className={clsx({ [classes.link]: scrollPosition < 100, [classes.scrollingLink]: scrollPosition > 100 })}
+                                    >
+                                        {link.text}
+                                    </RouterLink>
+                                );
+                            })}
                         </div>
                         {!isAuthenticated &&
                             <div className={classes.buttonContainer}>
@@ -223,29 +276,29 @@ export const PublicHeader = (props) => {
                                     color="primary" 
                                     to={LOGIN} 
                                     component={RouterLink}
-                                    size="large"
-                                    className={clsx(classes.login, classes.button)}
+                                    size="medium"
+                                    className={clsx(classes.login, classes.button, {[ classes.scrollingLogin ]: scrollPosition > 100 })}
                                 >
-                                    Log In
+                                    LOG IN
                                 </Button>
                                 <Button 
                                     variant="outlined" 
                                     color="primary" 
                                     to={SIGN_UP} 
                                     component={RouterLink}
-                                    size="large"
+                                    size="medium"
                                     className={classes.button}
                                     style={{ backgroundColor: theme.palette.primary.main, color: COLORS.offWhite }}
                                 >
-                                    Get Started
+                                    GET STARTED
                                 </Button>
                             </div>
                         }
                     </section>
                     <div className={classes.mobileNav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
-                        </a>
+                        </RouterLink>
                         <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
                             <MenuIcon />
                         </IconButton>

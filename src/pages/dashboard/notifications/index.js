@@ -1,21 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { decode } from 'html-entities'
+import { decode } from 'html-entities';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
+import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
-import { getNotifications } from '../../../actions/notifications';
+import { getNotifications, generateOtp } from '../../../actions/notifications';
+import { SET_ACCOUNT, SET_CUSTOMER_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
+
+import extractCountryCode from '../../../utils/extractCountryCode';
+import { DASHBOARD, PROFILE } from '../../../routes';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
-import { DASHBOARD, PROFILE } from '../../../routes';
-import { SET_ACCOUNT } from '../../../actions/types';
+import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -90,23 +95,44 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
+const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
-    const { customerId } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
+    const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
+
+    const successModal = useRef();
+
+    const { APPROVED } = ID_STATUS;
     
     useEffect(() => {
-        getNotifications();
+        if (notifications.length === 0) {
+            getNotifications();
+        }
         handleSetTitle('Notifications');
+
+        if (!residencePermitUrl && stats.residencePermitStatus !== APPROVED) {
+            getResidencePermitLink()
+        }
+        if (!residencePermitUrl && stats.idStatus !== APPROVED) {
+            getIdVerificationLink();
+        }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
 
     useEffect(() => {
         if (!sendEurDrawerOpen) {
@@ -120,14 +146,14 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
         }
     }, [dispatch, sendEurDrawerOpen]);
 
-    const handlePaymentReceived = (id) => {
+    const handlePaymentReceived = (id, buyerUsername) => {
         const data = {
             transactionSessionId: id,
             message: '',
             rating: 0,
             receivedExpectedFunds: true
         };
-        completeTransaction(data);
+        completeTransaction(data, buyerUsername);
     };
 
     const setBuyerAccount = (notification) => {
@@ -136,9 +162,9 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
         setSellerUsername(seller.userName);
         
         const sellerAccount = {
-            accounName: seller.accountName,
-            accountNumber: seller.accountNumber,
-            bankName: seller.bankName
+            accounName: buyer.accountName,
+            accountNumber: buyer.accountNumber,
+            bankName: buyer.bankName
         };
 
         if (buyer.hasMadePayment) {
@@ -149,12 +175,26 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                 payload: sellerAccount
             });
         }
+        dispatch({
+            type: SET_NOTIFICATION_MSG,
+            payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
+        });
         
         toggleSendEurDrawer();
     };
 
-    const toggleSendEurDrawer = () => setSendEurDrawerOpen(!sendEurDrawerOpen);
-    const gotoAccountSetup = () => history.push(`${DASHBOARD}${PROFILE}`);
+    const toggleSendEurDrawer = () => {
+        setSendEurDrawerOpen(!sendEurDrawerOpen);
+
+        // clear message if drawer is open and being closed
+        if (sendEurDrawerOpen) {
+            console.log('closing drawer');
+            dispatch({
+                type: SET_NOTIFICATION_MSG,
+                payload: null
+            });
+        }
+    }
 
     const setMessage = (notification) => {
         const { buyer, seller } = notification;
@@ -197,23 +237,53 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
     };
 
     const handleButtonAction = (notification) => {
-        const { id, seller } = notification;
+        const { id, buyer, seller } = notification;
+
         if (customerId === seller.customerId) {
             if (seller.hasReceivedPayment) {
-                console.log('Seller already received payment');
                 setBuyerAccount(notification);
 
             } else {
                 // Seller should make payment
-                console.log('Seller has not acknowledged, acknowledging payment');
                 setBuyerAccount(notification);
-                handlePaymentReceived(id);
+                handlePaymentReceived(id, buyer.userName);
             }
 
         } else {
             // End Transaction
-            handlePaymentReceived(notification.id);
+            handlePaymentReceived(id, buyer.userName);
         }
+    };
+
+    const verifyEuId = () => {
+        window.open(residencePermitUrl);
+    };
+
+    const verifyOtherId = () => {
+        window.open(idVerificationLink);
+    };
+
+    const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });
+
+    const verifyPhone = () => {
+        if (phoneNo) {
+            const { code, number } = extractCountryCode(phoneNo);
+            generateOtp({
+                countryCode: code,
+                telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
+            });
+            return setOpen(true);
+        }
+        return history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true })
+    };
+    // const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });
+
+    const dismissAction = () => {
+        setOpen(false);
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
     };
 
     return (
@@ -227,18 +297,18 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                     sellerUsername={sellerUsername}
                 />
             }
+            <VerifyPhoneNumberModal 
+                isOpen={open} 
+                dismissAction={dismissAction} 
+                phoneNumber={phoneNo || ''} 
+            />
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
-                        <Notification 
-                            title="Account Setup Pending"
-                            message={"You are yet to fully setup your account. Click Set Up Account to proceed."}
-                            buttonText="Set Up Account"
-                            buttonAction={gotoAccountSetup}
-                        />
-                        {notifications.map(notification => {
+                    {notifications.map(notification => {
                             if (hasNotification(notification)) {
                                 return (
                                     <Notification 
@@ -254,6 +324,45 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
                             }
                             return null;
                         })}
+                        {stats.residencePermitStatus !== APPROVED &&
+                            <Notification 
+                                title="Verify your EU Government Issued ID"
+                                message="Required to BUY and SELL. Click Verify ID to proceed."
+                                buttonText="Verify ID"
+                                buttonAction={verifyEuId}
+                            />
+                        }
+                        {/* eslint-disable-next-line no-mixed-operators */}
+                        {((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) && (
+                            <Notification 
+                                title="Verify Other Government Issued ID"
+                                message="Required to BUY only. Click Verify ID to proceed."
+                                buttonText="Verify ID"
+                                buttonAction={verifyOtherId}
+                            />
+                        )}
+                        {!hasSetup2FA &&
+                            <Notification 
+                                title="Set up  2FA"
+                                message="Required to keep your account more secure. Click Setup 2FA to proceed."
+                                buttonText="Setup 2FA"
+                                buttonAction={setup2FA}
+                            />
+                        }
+                        {!isPhoneNumberVerified && 
+                            <Notification 
+                                title="Verify phone number"
+                                message="Required to receive SMS notifications. Click Verify Phone to proceed."
+                                buttonText="Verify Phone"
+                                buttonAction={verifyPhone}
+                            />
+                        }
+                        {/* <Notification 
+                            title="Set PIN"
+                            message="Required for wallet withdrawals.. Click Set PIN to proceed."
+                            buttonText="Set PIN"
+                            buttonAction={setPin}
+                        /> */}
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>
@@ -268,7 +377,10 @@ const Index = ({ completeTransaction, getNotifications, handleSetTitle }) => {
 
 Index.propTypes = {
     completeTransaction: PropTypes.func.isRequired,
-    getNotifications: PropTypes.func.isRequired
+    getNotifications: PropTypes.func.isRequired,
+    getIdVerificationLink: PropTypes.func.isRequired,
+    getResidencePermitLink: PropTypes.func.isRequired,
+    generateOtp: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction, getNotifications })(Index);
+export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp })(Index);

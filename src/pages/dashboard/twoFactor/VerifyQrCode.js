@@ -18,19 +18,16 @@ import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
-import { logout } from '../../../actions/customer';
 import { authorizeTwoFactor, enableTwoFactor } from '../../../actions/twoFactor';
-import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS } from '../../../utils/constants';
 import validateAuthenticatorCode from '../../../utils/validation/customer/authenticator';
 
-import logo from '../../../assets/img/logo.svg';
 import { GET_ERRORS, SET_2FA_MSG, SET_BARCODE } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        paddingTop: theme.spacing(5),
+        marginTop: theme.spacing(-7),
         
         [theme.breakpoints.down('sm')]: {
             paddingTop: theme.spacing(2)
@@ -47,7 +44,7 @@ const useStyles = makeStyles(theme => ({
         margin: [[theme.spacing(5), 'auto', 0, 'auto']],
         padding: theme.spacing(3),
         textAlign: 'center',
-        width: '50%',
+        width: '60%',
 
         [theme.breakpoints.down('md')]: {
             width: '70%'
@@ -56,7 +53,7 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             marginTop: theme.spacing(2),
             padding: theme.spacing(1),
-            width: '95%'
+            width: '99%'
         }
     },
 
@@ -176,12 +173,6 @@ const VerifyQrCode = (props) => {
                 payload: null
             });
         });
-        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
-    };
-
-    const logout = (e) => {
-        e.preventDefault();
-        props.logout(history);
     };
 
     const onSubmit = (e) => {
@@ -234,9 +225,6 @@ const VerifyQrCode = (props) => {
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo} onClick={logout}>
-                    <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </a>
                 <div className={classes.content}>
                     <Typography variant="h5">Verify Google Authenticator</Typography>
                     <Typography variant="subtitle1" component="p">Enter the 6-digit code displayed on your Google Authenticator to make sure everything works.</Typography>
@@ -346,7 +334,7 @@ const VerifyQrCode = (props) => {
                         </Grid>
                         <div className={classes.buttonContainer}>
                             <Button variant="contained" color="primary" className={classes.button} type="submit">Proceed</Button>
-                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>props.logout(history)}>Cancel</Button>
+                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => history.goBack()}>Cancel</Button>
                         </div>
                     </form>
                 </div>
@@ -357,8 +345,7 @@ const VerifyQrCode = (props) => {
 
 VerifyQrCode.propTypes = {
     authorizeTwoFactor: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired,
     enableTwoFactor: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { authorizeTwoFactor, enableTwoFactor, logout })(VerifyQrCode);
+export default connect(undefined, { authorizeTwoFactor, enableTwoFactor })(VerifyQrCode);

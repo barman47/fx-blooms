@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -25,12 +25,13 @@ import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import isEmpty from '../../../utils/isEmpty';
-import { getCurrencies } from '../../../actions/currencies';
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
+import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { SET_LOADING_LISTINGS } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { COLORS, NOT_SUBMITTED, REJECTED } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
@@ -44,6 +45,7 @@ import Wallet from '../wallet/Wallet';
 
 import img from '../../../assets/img/decentralized.svg';
 import { ABOUT_US } from '../../../routes';
+import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
 	fab: {
@@ -62,9 +64,7 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		marginTop: theme.spacing(10),
-
-		paddingLeft: theme.spacing(10),
-		paddingRight: theme.spacing(10),
+		padding: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
@@ -255,11 +255,11 @@ const useStyles = makeStyles(theme => ({
 
 const AllListings = (props) => {
 	const classes = useStyles();
-	// const theme = useTheme();
-    // const matches = useMediaQuery(theme.breakpoints.down('md'));
+	const dispatch = useDispatch();
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const listingsLoading = useSelector(state => state.listings.loading);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
@@ -277,6 +277,9 @@ const AllListings = (props) => {
 	let loadedEvent = useRef();
     const walletInfoModal = useRef();
 
+	const { REJECTED } = CUSTOMER_CATEGORY;
+	const { NOT_SUBMITTED } = ID_STATUS;
+
     const toggleFundDrawer = () => {
         setFundDrawerOpen(!fundDrawerOpen);
     };
@@ -285,12 +288,18 @@ const AllListings = (props) => {
         setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
     };
 
+	const toggleFilterModal = () => setOpen(!open);
+
 	useEffect(() => {
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
 		getCustomerStats();
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
+			dispatch({
+				type: SET_LOADING_LISTINGS,
+				payload: true
+			});
 			getListings();
 		}
 
@@ -316,11 +325,11 @@ const AllListings = (props) => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
             getIdVerificationLink();
         }
-	}, [getIdVerificationLink, idStatus]);
+	}, [getIdVerificationLink, idStatus, NOT_SUBMITTED, REJECTED]);
 
 	useEffect(() => {
 		setDataLength(listings.length);
-	}, [listings]);
+	}, [dispatch, listings]);
 
 	const getListings = () => {
 		// setHideNegotiationListings(false);
@@ -352,7 +361,7 @@ const AllListings = (props) => {
 	return (
 		<>
 			<RiskNoticeModal />
-			<FilterListingModal open={open} />
+			<FilterListingModal open={open} toggleModal={toggleFilterModal} />
 			<Tooltip title="Filter Listings" arrow>
 				<Fab 
 					className={classes.fab} 
@@ -369,7 +378,6 @@ const AllListings = (props) => {
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					{/* <Typography variant="body1" component="p">Hello, <strong>{`${firstName} ${lastName}`}</strong></Typography>  */}
 					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
 				</div>
 				{/* <Button
@@ -435,7 +443,12 @@ const AllListings = (props) => {
 					// height={1000}
 				>
 					<Typography variant="body1" component="p">All Listings</Typography>
-					<Listings />
+					{listingsLoading === true ?
+						<ListingsSkeleton />
+						:
+						<Listings />
+					}
+					
 				</InfiniteScroll>
 				<Filter />
 			</section>
@@ -443,7 +456,7 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((props) => {
+const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((props) => {
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
@@ -618,6 +631,7 @@ const Filter = connect(undefined, { getListingsOpenForBid, getCurrencies })((pro
 										value={RequiredCurrency}
 										// onChange={(e) => setRequiredCurrency(e.target.value)}
 									>
+										<MenuItem value="" disabled>Select</MenuItem>
 										<MenuItem value="" disabled>Select</MenuItem>
 										{currencies.length > 0 && currencies.map((currency, index) => (
 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>

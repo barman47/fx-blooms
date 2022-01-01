@@ -5,13 +5,15 @@ import { Button, CircularProgress, Grid, TextField, Typography } from '@material
 import { makeStyles } from '@material-ui/core/styles';
 import Validator from 'validator';
 
-import { sendMail } from '../../actions/customer';
-import { SET_CUSTOMER_MSG } from '../../actions/types';
+import { sendMail, subscribeToNewsletter } from '../../actions/customer';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import { COLORS } from '../../utils/constants';
 import validateSendEmail from '../../utils/validation/customer/sendMail';
+import isEmpty from '../../utils/isEmpty';
 import { CONTACT_US } from '../../routes';
 
 import SuccessModal from '../../components/common/SuccessModal';
+import Toast from '../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -24,7 +26,17 @@ const useStyles = makeStyles(theme => ({
 
         '& h4': {
             fontWeight: 700,
-            marginBottom: theme.spacing(3)
+            marginBottom: theme.spacing(3),
+
+            [theme.breakpoints.down('sm')]: {
+                textAlign: 'center'
+            }
+        },
+
+        '& h6': {
+            [theme.breakpoints.down('sm')]: {
+                textAlign: 'center'
+            }
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -42,7 +54,12 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('md')]: {
             marginBottom: theme.spacing(10)
-        }
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            marginTop: theme.spacing(-5),
+            marginBottom: theme.spacing(5)
+        },
     },
 
     formHeader: {
@@ -69,11 +86,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Contact = (props) => {
+const Contact = ({ sendMail, subscribeToNewsletter }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
     const { msg } = useSelector(state => state.customer);
+    const errorsState = useSelector(state => state.errors);
 
     const [NewsLetterEmail, setNewsLetterEmail] = useState('');
 
@@ -87,9 +105,25 @@ const Contact = (props) => {
     const [newsLetterLoading, setNewsLetterLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const { sendMail } = props;
-
     const successModal = useRef();
+    const toast = useRef();
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
         if (msg) {
@@ -101,6 +135,8 @@ const Contact = (props) => {
 
     const resetForm = () => {
         setLoading(false);
+        setNewsLetterLoading(false);
+        setNewsLetterEmail('');
         setFullName('');
         setEmailAddress('');
         setPhoneNumber('');
@@ -147,11 +183,20 @@ const Contact = (props) => {
 
         setNewsLetterLoading(true);
         setErrors({});
-        sendMail(NewsLetterEmail);
+        subscribeToNewsletter(NewsLetterEmail);
     };
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <section className={classes.root} id={CONTACT_US}>
                 <Grid container direction="row" spacing={10}>
@@ -254,7 +299,8 @@ const Contact = (props) => {
                                         variant="outlined" 
                                         placeholder="Enter Your Message"
                                         helperText={errors.Message}
-                                        rows={1}
+                                        minRows={2}
+                                        rowsMax={10}
                                         fullWidth
                                         required
                                         multiline
@@ -283,7 +329,8 @@ const Contact = (props) => {
 };
 
 Contact.propTypes = {
-    sendMail: PropTypes.func.isRequired
+    sendMail: PropTypes.func.isRequired,
+    subscribeToNewsletter: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { sendMail })(Contact);
+export default connect(undefined, { sendMail, subscribeToNewsletter })(Contact);

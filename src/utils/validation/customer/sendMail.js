@@ -5,7 +5,6 @@ const sendEmail = (data) => {
     let errors = {};
     data.EmailAddress = !isEmpty(data.EmailAddress) ?  data.EmailAddress : '';
     data.FullName = !isEmpty(data.FullName) ?  data.FullName : '';
-    data.PhoneNumber = !isEmpty(data.PhoneNumber) ?  data.PhoneNumber : '';
     data.Subject = !isEmpty(data.Subject) ?  data.Subject : '';
     data.Message = !isEmpty(data.Message) ?  data.Message : '';
 
@@ -19,13 +18,6 @@ const sendEmail = (data) => {
 
     if (Validator.isEmpty(data.FullName)) {
         errors.FullName = 'Your full name is required!';
-    }
-
-    if (!Validator.isMobilePhone(data.PhoneNumber)) {
-        errors.PhoneNumber = 'Invalid Phone Number!';
-    }
-    if (Validator.isEmpty(data.PhoneNumber)) {
-        errors.PhoneNumber = 'Phone Number is required!';
     }
 
     if (Validator.isEmpty(data.Subject)) {

@@ -13,7 +13,7 @@ import {
 } from '@material-ui/core';
 
 import { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
-import { COLORS, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 
 import AllCustomers from './AllCustomers';
 import NewCustomers from './NewCustomers';
@@ -104,6 +104,8 @@ const Customers = (props) => {
     const { admin } = useSelector(state => state);
     const { confirmed, customers, pending, rejected, count } = useSelector(state => state.customers);
     const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
+
+    const { ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);

@@ -23,23 +23,21 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '50vw',
-        height: '30vh',
+        width: '35vw',
+        height: '25vw',
         boxShadow: SHADOW,
         padding: theme.spacing(5, 10),
 
-        [theme.breakpoints.down('lg')]: {
-            height: '50vh',
-        },
         [theme.breakpoints.down('md')]: {
-            height: '40vh',
-            width: '70vw',
+            height: '50vw',
+            width: '50vw',
         },
+        
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(5, 2),
             height: '40vh',
-            width: '90vw',
-        },
+            width: '90vw'
+        }
     },
 
     item: {

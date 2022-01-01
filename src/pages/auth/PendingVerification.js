@@ -82,9 +82,9 @@ const PendingVerification = () => {
         <>
             <Helmet><title>Pending Verification | FXBLOOMS.com</title></Helmet>
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo}>
+                <RouterLink to="/" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </a>
+                </RouterLink>
                 <div className={classes.content}>
                     <Typography variant="h5">Email Verification Pending</Typography>
                     <Typography variant="subtitle1" component="p">We've sent a message to <span style={{ fontWeight: 500, color: theme.palette.primary.main }}>{location?.state?.email}</span> with a link to activate your account</Typography>

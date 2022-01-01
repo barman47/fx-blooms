@@ -50,6 +50,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     accordion: {
+        alignSelf: 'flex-start',
         border: 'none',
         boxShadow: 'none',
         padding: theme.spacing(2)
@@ -108,7 +109,7 @@ const FAQs = () => {
     const classes = useStyles();
 
     return (
-        <section className={classes.root}>
+        <section className={classes.root} id={FAQS}>
             <Typography variant="h3" className={classes.header}>Frequently Asked Questions</Typography>
             <Typography variant="h6" align="center">We now have an FAQ list that we hope will help you answer some of the more common ones.</Typography>
             <section className={classes.container}>
@@ -137,7 +138,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
-                    <AccordionSummary expandIcon={<ChevronUp />}>
+                    <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
                         <Typography className={classes.heading}>How does the pricing work per transaction?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
@@ -145,7 +146,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
-                    <AccordionSummary expandIcon={<ChevronUp />}>
+                    <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
                         <Typography className={classes.heading}>How long does it take to purchase a currency?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
@@ -153,7 +154,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
-                    <AccordionSummary expandIcon={<ChevronUp />}>
+                    <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
                         <Typography className={classes.heading}>How to sell EUR on FXBLOOMS</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
@@ -170,7 +171,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
-                    <AccordionSummary expandIcon={<ChevronUp />}>
+                    <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
                         <Typography className={classes.heading}>How does it work?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
@@ -182,7 +183,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
-                    <AccordionSummary expandIcon={<ChevronUp />}>
+                    <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
                         <Typography className={classes.heading}>What is the transaction limit?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>

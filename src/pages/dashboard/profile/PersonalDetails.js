@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'; 
-import { useSelector } from 'react-redux'; 
+import { useEffect, useRef, useState } from 'react'; 
+import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
     Button,
     FormControl,
@@ -12,20 +12,56 @@ import {
 } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles } from '@material-ui/core/styles';
-// import PropTypes from 'prop-types';
+import { ChevronRight } from 'mdi-material-ui';
+import PropTypes from 'prop-types';
+import Validator from 'validator';
+import clsx from 'clsx';
+
+import { updateProfile } from '../../../actions/customer'; 
+import { generateOtp } from '../../../actions/notifications';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import isEmpty from '../../../utils/isEmpty'; 
-import { COLORS } from '../../../utils/constants'; 
+import { COLORS, ID_STATUS } from '../../../utils/constants'; 
 import countryToFlag from '../../../utils/countryToFlag'; 
 import { countries } from '../../../utils/countries'; 
+import extractCountryCode from '../../../utils/extractCountryCode'; 
+import validateUpdateProfile from '../../../utils/validation/customer/updateProfile';
+
+import VerifyPhoneNumberModal from './VerifyPhoneNumberModal';
+import Spinner from '../../../components/common/Spinner';
+import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme =>({
+    noProfile: {
+        backgroundColor: COLORS.lightTeal,
+        borderRadius: theme.shape.borderRadius,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginTop: theme.spacing(-3),
+        padding: theme.spacing(5),
+
+        '& h5': {
+            fontWeight: 600,
+            marginBottom: theme.spacing(2)
+        },
+
+        '& p': {
+            color: COLORS.offBlack,
+            marginBottom: theme.spacing(2)
+        },
+    },
+
     header: {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: theme.spacing(2),
+        marginTop: theme.spacing(-3),
 
         [theme.breakpoints.down('sm')]: {
             flexDirection: 'column',
@@ -53,20 +89,10 @@ const useStyles = makeStyles(theme =>({
             fontWeight: 300
         }
     },
-    root: {
-        // backgroundColor: COLORS.lightTeal,
-        // borderRadius: theme.shape.borderRadius,
-        // padding: [[theme.spacing(2), theme.spacing(3)]],
-
-        // [theme.breakpoints.down('md')]: {
-        //     paddingBottom: theme.spacing(4)
-        // }
-    },
 
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        // padding: [[theme.spacing(2), theme.spacing(3)]],
 
         [theme.breakpoints.down('md')]: {
             paddingBottom: theme.spacing(4)
@@ -86,59 +112,109 @@ const useStyles = makeStyles(theme =>({
     },
 
     unverified: {
-        borderRadius: '70px',
-        color: theme.palette.primary.main,
-        backgroundColor: 'rgba(196, 196, 196, 1)',
-        padding: theme.spacing(1, 3)
+        borderBottomLeftRadius: '15px',
+        borderTopLeftRadius: '15px',
+        color: theme.palette.error.main,
+        backgroundColor: theme.palette.primary.main,
+        padding: theme.spacing(1),
+        textAlign: 'center',
+        textTransform: 'uppercase',
+        width: 'initial !important',
+    },
+
+    verified: {
+        borderBottomLeftRadius: '15px',
+        borderTopLeftRadius: '15px',
+        color: COLORS.offWhite,
+        backgroundColor: theme.palette.primary.main,
+        padding: theme.spacing(1, 3),
+        textTransform: 'uppercase',
+    },
+
+    verifyButton: {
+        borderBottomRightRadius: '15px',
+        borderTopRightRadius: '15px',
+        borderRadius: 0,
+        paddingBottom: theme.spacing(1.2),
+        paddingTop: theme.spacing(1.2),
     }
 }));
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     const classes = useStyles();
-    const { profile } = useSelector(state => state.customer); 
+    const dispatch = useDispatch();
+    const { isPhoneNumberVerified, msg, profile, stats } = useSelector(state => state.customer); 
+    const errorsState = useSelector(state => state.errors); 
 
     const [FirstName, setFirstName] = useState('');
     const [LastName, setLastName] = useState('');
     const [Email, setEmail] = useState('');
-    const [Username, setUsername] = useState('');
-    const [PhoneNo, setPhoneNo] = useState('');
-    const [Address, setAddress] = useState('');
-    // eslint-disable-next-line
-    const [CountryCode, setCountryCode] = useState('');
+    const [username, setUsername] = useState('');
+    const [phoneNo, setPhoneNo] = useState('');
+    const [address, setAddress] = useState('');
+    const [countryCode, setCountryCode] = useState('');
     const [country, setCountry] = useState('');
-    const [countryId, setCountryId] = useState('');
-    // eslint-disable-next-line
-    const [city, setCity] = useState('');
-    const [stateId, setStateId] = useState('');
-    // eslint-disable-next-line
-    const [states, setStates] = useState([]);
-    const [PostalCode, setPostalCode] = useState('');
+    const [postalCode, setPostalCode] = useState('');
+    const [spinnerText, setSpinnerText] = useState('');
     // eslint-disable-next-line
     const [Listings, setListings] = useState(0);
     // eslint-disable-next-line
     const [Transactions, setTransactions] = useState(0);
-    
-    // eslint-disable-next-line
+    const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-    // eslint-disable-next-line
     const [editable, setEditable] = useState(false);
+
+    const [phoneNumber, setPhoneNumber] = useState('');
+    const [code, setCode] = useState('');
+
+    const toast = useRef();
+    const successModal = useRef();
+
+    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         if (profile) {
-            const { address, firstName, lastName, email, userName, phoneNo, countryId, stateId, postalCode, numberOfListings, numberOfSuccessfulTransactions } = profile;
+            const { address, firstName, lastName, email, userName, phoneNo, countryId, postalCode, numberOfListings, numberOfSuccessfulTransactions } = profile;
             setFirstName(firstName);
             setLastName(lastName);
             setEmail(email);
             setUsername(userName);
             setPhoneNo(phoneNo);
             setAddress(address);
-            setCountryId(countryId);
-            setStateId(stateId);
+            setCountry(countryId);
             setPostalCode(postalCode);
             setListings(numberOfListings);
             setTransactions(numberOfSuccessfulTransactions);
         }
     }, [profile]);
+
+    useEffect(() => {
+        if (msg) {
+            setSpinnerText('');
+            successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            setLoading(false);
+            setEditable(false);
+        }
+    }, [msg]);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     // Setting states when a country is selected
     // useEffect(() => {
@@ -159,21 +235,113 @@ const PersonalDetails = () => {
     //     }
     // }, [country, countries]);
 
-    useEffect(() => {
-        if (countryId && stateId) {
-            const country = countries.find(country => country.id.toLowerCase() === countryId.toLowerCase());
-            const state = country?.states.find(state => state.id.toLowerCase() === stateId.toLowerCase());
-            setCity(state?.name);
-            setCountry(country?.name);
-        }
-    }, [countryId, stateId]);
+    // useEffect(() => {
+    //     if (countryId && stateId) {
+    //         const country = countries.find(country => country.id.toLowerCase() === countryId.toLowerCase());
+    //         const state = country?.states.find(state => state.id.toLowerCase() === stateId.toLowerCase());
+    //         setCity(state?.name);
+    //         setCountry(country?.name);
+    //     }
+    // }, [countryId, stateId]);
     
     const onSubmit = (e) => {
         e.preventDefault();
+        setErrors({});
+
+        const { code, number } = extractCountryCode(phoneNo);
+
+        const data = {
+            address,
+            country,
+            countryCode: editable ? countryCode : code,
+            phoneNo: editable ? phoneNo : number,
+            postalCode
+        };
+
+        const { errors, isValid } = validateUpdateProfile(data);
+        if (!isValid) {
+            return setErrors({ msg: 'Invalid Profile Information', ...errors });
+        }
+
+        setSpinnerText('Updating Profile...');
+        setLoading(true);
+        updateProfile({
+            address,
+            country,
+            postalCode,
+            phoneNumber: {
+                countryCode: editable ? countryCode : code,
+                telephoneNumber: editable ? phoneNo : number
+            }
+        });
     };
+
+    const handleGenerateOtp = () => {
+        // const data = `${countryCode}${phoneNo.substring(1, phoneNo.length)}`;
+        // if (Validator.isEmpty(countryCode)) {
+        //     return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
+        // }
+
+        // const phoneRegExp =  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+        // if (phoneRegExp.test(data)) {
+        //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Number should be be in this format: 08080808080' });
+        // }
+
+        const { code, number } = extractCountryCode(phoneNo);
+
+        if (Validator.isEmpty(number)) {
+            return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Phone Number is required!' });
+        }
+        
+        setOpen(!open);
+        setPhoneNumber(number);
+        setCode(code);
+        generateOtp({
+            countryCode: code,
+            telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
+        });
+    };
+
+    const dismissAction = () => {
+        setPhoneNumber('');
+        setCode('');
+        setEditable(false);
+        setOpen(false);
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+    };
+
+    if (stats.residencePermitStatus === NOT_SUBMITTED && stats.idStatus === NOT_SUBMITTED) {
+        return (
+            <div className={classes.noProfile}>
+                <Typography variant="h5" color="primary">No Profile</Typography>
+                <Typography variant="body2" component="p">Kindly verify your identity to create a profile and buy and sell.</Typography>
+                <Button className={classes.button} color="primary" variant="contained" onClick={() => verifyIdentity()}>Verify Identity</Button>
+            </div>
+        );
+    } 
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
+            {loading && <Spinner text={spinnerText} />}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <VerifyPhoneNumberModal 
+                isOpen={open} 
+                dismissAction={dismissAction} 
+                phoneNumber={phoneNumber} 
+                code={code}
+            />
             <div className={classes.header}>
                 <div>
                     <Typography variant="h4" color="primary">Account Setup (Profile)</Typography>
@@ -181,7 +349,10 @@ const PersonalDetails = () => {
                     <hr className={classes.hr} />
                 </div>
                 {!isEmpty(profile) && 
-                    <Button variant="outlined" color="primary" onClick={() => setEditable(true)}>Edit Details</Button>
+                    <Button variant="outlined" color="primary" disabled={editable} onClick={() => {
+                        setEditable(true);
+                        setPhoneNo('');
+                    }}>Edit Details</Button>
                 }
             </div>
             <Grid className={classes.root} container direction="column">
@@ -232,10 +403,10 @@ const PersonalDetails = () => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{Username}</Typography>
+                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{username}</Typography>
                             </Grid>
                             {editable &&
-                                <Grid item xs={2}>
+                                <Grid item xs={5} md={2}>
                                     <Typography variant="subtitle2" component="span" className={classes.label}>Country Code</Typography>
                                     <Autocomplete
                                         id="country-select"
@@ -243,8 +414,8 @@ const PersonalDetails = () => {
                                         autoHighlight
                                         disableClearable
                                         getOptionLabel={(option) => {
-                                            setCountryCode(option.phone);
-                                            return option.phone;
+                                            setCountryCode(`+${option.phone}`);
+                                            return `+${option.phone}`;
                                         }}
                                         renderOption={(option) => (
                                             <>
@@ -265,25 +436,28 @@ const PersonalDetails = () => {
                                         )}
                                     />
                                     <FormHelperText id="my-helper-text">e.g. +234</FormHelperText>
-                                    {errors.CountryCode && <FormHelperText error>{errors.CountryCode}</FormHelperText>}
+                                    {errors.countryCode && <FormHelperText error>{errors.countryCode}</FormHelperText>}
                                 </Grid>
                             }
-                            <Grid item xs={10}>
+                            <Grid item xs={7} md={editable ? 3 : 4} lg={4}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                                 {profile.phoneNo && !editable ?
-                                    <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
+                                    <>
+                                        <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
+                                        <FormHelperText style={{ color: COLORS.red }}>{errors.phoneNo}</FormHelperText>
+                                    </>
                                     :
                                     <TextField 
                                         className={classes.info}
-                                        value={PhoneNo}
+                                        value={phoneNo}
                                         onChange={(e) => setPhoneNo(e.target.value)}
                                         type="text"
                                         variant="outlined" 
-                                        placeholder="Enter Phone Number"
-                                        helperText={errors.PhoneNo}
+                                        placeholder="e.g. 08080808080"
+                                        helperText={errors.phoneNo || 'e.g. 08080808080'}
                                         fullWidth
                                         required
-                                        error={errors.PhoneNo ? true : false}
+                                        error={errors.phoneNo ? true : false}
                                     />
                                 }
                                 {/* {showNumber ?
@@ -292,14 +466,25 @@ const PersonalDetails = () => {
                                     <Button color="primary" onClick={handleShowPhoneNumber}>Show</Button>
                                 } */}
                             </Grid>
-                            {/* <Grid item xs={3}>
-                                <br /><br />
-                                <Typography variant="subtitle2" component="span" className={classes.unverified}>Unverified</Typography>
+                            <Grid item xs={6} md={3} xlg={2}>
+                                <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
+                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: isPhoneNumberVerified, [classes.unverified]: !isPhoneNumberVerified })}>{ isPhoneNumberVerified ? 'Verified' : 'Unverified' }</Typography>
                             </Grid>
-                            <Grid item xs={3}>
-                                <br /><br />
-                                <Button variant="text" color="primary" startIcon={<AlertOctagram />}>Verify Now</Button>
-                            </Grid> */}
+                            {!isPhoneNumberVerified && !editable &&
+                                <Grid item xs={6} md={3} style={{ justifySelf: 'center' }}>
+                                    <br />
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        size="medium" 
+                                        endIcon={<ChevronRight />} 
+                                        className={classes.verifyButton}
+                                        onClick={handleGenerateOtp}
+                                    >
+                                        Verify Now
+                                    </Button>
+                                </Grid>
+                            }
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
                                 {profile.address && !editable ?
@@ -307,23 +492,23 @@ const PersonalDetails = () => {
                                     :
                                     <TextField 
                                         className={classes.info}
-                                        value={Address}
+                                        value={address}
                                         onChange={(e) => setAddress(e.target.value)}
                                         type="text"
                                         variant="outlined" 
                                         placeholder="Enter Address"
-                                        helperText={errors.Address}
+                                        helperText={errors.address}
                                         fullWidth
                                         multiline
                                         rows={1}
                                         required
-                                        error={errors.Address ? true : false}
+                                        error={errors.address ? true : false}
                                     />
                                 }
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                                    {profile.countryId ? 
+                                    {profile.countryId && !editable ? 
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.countryId}</Typography>
                                     :
                                         <FormControl 
@@ -336,13 +521,14 @@ const PersonalDetails = () => {
                                             <Select
                                                 labelId="CountryCode"
                                                 className={classes.input}
-                                                value={profile.countryId || country}
+                                                // value={profile.countryId || country}
+                                                value={country}
                                                 onChange={(e) => setCountry(e.target.value)}
                                             
                                             >
                                                 <MenuItem value="">Select Country</MenuItem>
                                                 {countries.map((country, index) => (
-                                                    <MenuItem key={index} value={country.name}>{country.name}</MenuItem>
+                                                    <MenuItem key={index} value={country.label}>{country.label}</MenuItem>
                                                 ))}
                                             </Select>
                                             <FormHelperText>{errors.country}</FormHelperText>
@@ -351,27 +537,30 @@ const PersonalDetails = () => {
                             </Grid>
                             <Grid item xs={12} md={6}>
                                 <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
-                                {profile.postalCode ? 
+                                {profile.postalCode && !editable ? 
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.postalCode}</Typography>
                                     :
-                                    <TextField 
-                                        className={classes.info}
-                                        value={PostalCode}
-                                        onChange={(e) => setPostalCode(e.target.value)}
-                                        type="text"
-                                        variant="outlined" 
-                                        placeholder="Postal Code"
-                                        helperText={errors.PostalCode}
-                                        fullWidth
-                                        required
-                                        disabled
-                                        error={errors.PostalCode ? true : false}
-                                    />
+                                    (country?.toLowerCase() !== 'nigeria' ?
+                                        <TextField 
+                                            className={classes.info}
+                                            value={postalCode}
+                                            onChange={(e) => setPostalCode(e.target.value)}
+                                            type="text"
+                                            variant="outlined" 
+                                            placeholder="Postal Code"
+                                            helperText={errors.postalCode}
+                                            fullWidth
+                                            required
+                                            error={errors.postalCode ? true : false}
+                                        />
+                                        :
+                                        null
+                                    )
                                 }
                             </Grid>
                             {editable && 
                                 <Grid item xs={12}>
-                                    <Button type="submit" variant="contained" color="primary" fullWidth>Save and Continue</Button>
+                                    <Button type="submit" variant="contained" color="primary" fullWidth disabled={loading ? true : false}>Save and Continue</Button>
                                 </Grid>
                             }
                             {/* <Grid item xs={4}>
@@ -390,4 +579,10 @@ const PersonalDetails = () => {
     );
 };
 
-export default PersonalDetails;
+PersonalDetails.propTypes = {
+    generateOtp: PropTypes.func.isRequired,
+    updateProfile: PropTypes.func.isRequired,
+    verifyIdentity: PropTypes.func.isRequired
+};
+
+export default connect( undefined, { generateOtp, updateProfile } )(PersonalDetails);

@@ -30,7 +30,6 @@ import { toggleDrawer } from '../../pages/dashboard/profile';
 import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
-import avatar from '../../assets/img/avatar.jpg';
 import { COLORS } from '../../utils/constants';
 import { DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
 
@@ -81,8 +80,9 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.darkGrey,
         cursor: 'pointer',
         fontSize: theme.spacing(1.8),
-        fontWeight: 500,
+        fontWeight: 600,
         textDecoration: 'none',
+        textTransform: 'uppercase',
         transition: '0.3s linear all',
 
         '&:hover': {
@@ -165,7 +165,7 @@ export const PrivateHeader = (props) => {
     }, [location.pathname]);
 
     const protectedRoutes = [
-        { url: DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
+        { url: DASHBOARD_HOME, text: 'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
@@ -199,7 +199,7 @@ export const PrivateHeader = (props) => {
             anchorRef.current.focus();
         }
         if (prevOpen.current === true && open === false) {
-            mobileDropdown.current.focus();
+            mobileDropdown?.current?.focus();
         }
         prevOpen.current = open;
     }, [open]);
@@ -214,9 +214,9 @@ export const PrivateHeader = (props) => {
             <AppBar className={classes.root} elevation={0}>
                 <Toolbar>
                     <section className={classes.nav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" />
-                        </a>
+                        </RouterLink>
                         <div className={classes.links}>
                             {protectedRoutes.map((link, index) =>(
                                 <Grid item key={index}>
@@ -232,7 +232,7 @@ export const PrivateHeader = (props) => {
                             ))}
                         </div>
                         <div className={classes.avatarContainer}>
-                            <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                            <Avatar alt={`${firstName} ${lastName}`} />
                             <Button
                                 to={`${DASHBOARD}${DASHBOARD_HOME}`}
                                 endIcon={<ChevronDown />}
@@ -270,9 +270,9 @@ export const PrivateHeader = (props) => {
                         </Popper>
                     </section>
                     <div className={classes.mobileNav}>
-                        <a href="https://fxblooms.com">
+                        <RouterLink to="/">
                             <img src={logo} alt="FX Blooms Logo" className={classes.logo} />
-                        </a>
+                        </RouterLink>
                         {isProfilePage ? 
                             <IconButton edge="start" className={classes.menuButton} color="primary" aria-label="menu" onClick={toggleDrawer} >
                                 <MenuIcon />
@@ -285,7 +285,7 @@ export const PrivateHeader = (props) => {
                                 aria-controls={open ? 'mobile-profile-menu' : undefined}
                                 aria-haspopup="true"
                             >
-                                <Avatar alt={`${firstName} ${lastName}`} src={avatar} />
+                                <Avatar alt={`${firstName} ${lastName}`} />
                             </Button>
                         }
                         <Popper open={open} anchorEl={mobileDropdown.current} role={undefined} transition disablePortal>

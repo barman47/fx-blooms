@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -30,10 +30,6 @@ const useStyles = makeStyles(theme =>({
         [theme.breakpoints.down('md')]: {
             gridTemplateColumns: '1fr',
             padding: [[theme.spacing(10), theme.spacing(1), 0, theme.spacing(1)]]
-        },
-
-        [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 0.5)
         }
     },
 
@@ -145,6 +141,7 @@ export const toggleDrawer = () => {
 
 const Profile = (props) => {
     const classes = useStyles();
+    const location = useLocation();
     const { countries, documents } = useSelector(state => state);
     const { customerId, profile } = useSelector(state => state.customer);
     const { accounts } = useSelector(state => state.bankAccounts);
@@ -172,6 +169,19 @@ const Profile = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        const { state } = location;
+        if (state) {
+            if (state.eu || state.otherId) {
+                setValue(3);
+            } else if (state.mfa) {
+                setValue(1);
+            } else if (state.verifyPhone) {
+                setValue(0);
+            }
+        }   
+    }, [location]);
     
     useEffect(() => {
         if (_.isEmpty(profile)) {
@@ -186,7 +196,7 @@ const Profile = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    
+    const verifyIdentity = () => setValue(3);
 
     return (
         <>
@@ -222,7 +232,7 @@ const Profile = (props) => {
                 </div>
                 <div>
                     <TabPanel value={value} index={0}>  
-                        <PersonalDetails />
+                        <PersonalDetails verifyIdentity={verifyIdentity} />
                     </TabPanel>
                     <TabPanel value={value} index={1}>  
                         <TwoFactor />

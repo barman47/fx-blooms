@@ -110,7 +110,6 @@ const Login = ({ login, logout }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            console.log(history);
             return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
         }
         // eslint-disable-next-line
@@ -165,9 +164,9 @@ const Login = ({ login, logout }) => {
             </Helmet>
             {loading && <Spinner />}
             <section className={classes.root}>
-                <a href="https://fxblooms.com">
+                <RouterLink to="/">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
-                </a>
+                </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
                         Welcome back!
@@ -214,7 +213,7 @@ const Login = ({ login, logout }) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Grid container direction="row" justify="space-between">
+                                <Grid container direction="row" justifyContent="space-between">
                                     <Grid item>
                                         <Typography variant="subtitle2" component="span">Password</Typography>
                                     </Grid>

@@ -13,6 +13,8 @@ import {
     SET_ID_VERIFICATION_LINK,
     SET_PERMIT_URL,
     SET_EMAIL,
+    PROFILE_UPDATED,
+    VERIFIED_PHONE_NUMBER,
     RESET_CUSTOMER_SESSION
 } from '../actions/types';
 
@@ -51,7 +53,8 @@ const customerReducer =  (state = initialState, action) => {
         case ENABLED_2FA:
             return {
                 ...state,
-                twoFactorEnabled: true 
+                twoFactorEnabled: true,
+                hasSetup2FA: true
             };
 
         case DISABLED_2FA:
@@ -112,6 +115,23 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 idVerificationLink: action.payload
+            };
+
+        case PROFILE_UPDATED:
+            return {
+                ...state,
+                profile: { ...state.profile, ...action.payload },
+                ...action.payload,
+                msg: 'Profile updated successfully'
+            };
+
+        case VERIFIED_PHONE_NUMBER:
+            return {
+                ...state,
+                msg: 'Phone number verified successfully',
+                phoneNo: action.payload.phoneNumber,
+                isPhoneNumberVerified: true
+
             };
 
         case RESET_CUSTOMER_SESSION:

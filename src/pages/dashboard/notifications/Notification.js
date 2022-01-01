@@ -38,6 +38,7 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         fontSize: theme.spacing(1.3),
+        textTransform: 'uppercase',
         marginTop: theme.spacing(2),
 
         [theme.breakpoints.down('md')]: {
@@ -61,9 +62,7 @@ const Notification = ({ title, message, buttonText, buttonAction, buttonDisabled
             </div>
             {buttonText && buttonAction && 
                 <Button 
-                    underline="none" 
-                    // to={link} 
-                    // component={Link} 
+                    elevation={3}
                     variant="contained" 
                     color="primary" 
                     onClick={buttonAction}

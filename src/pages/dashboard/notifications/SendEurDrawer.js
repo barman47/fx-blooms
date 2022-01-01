@@ -98,12 +98,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification, sellerUsername }) => {
+const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
     const { msg } = useSelector(state => state.customer);
+    const message = useSelector(state => state.notifications.msg);
     
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -133,7 +134,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 
     const handleSendTransactionNotification = () => {
         setLoading(true);
-        sendTransactionNotification(transactionId, sellerUsername);
+        sendTransactionNotification(transactionId);
     };
 
 	return (
@@ -145,18 +146,18 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
                         <Typography variant="h6" className={classes.header}>Send EUR</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="body1" component="p" className={classes.text}>Check how much you need to send to buyer below and make a transfer to the account details provided below.</Typography>
+                        <Typography variant="body1" component="p" className={classes.text}>{message}</Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>I Will Send</Typography>
                         <Typography variant="subtitle1" component="p" className={classes.transferAmount}>&#8364;{formatNumber(amount)}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
                         <section className={classes.accountDetailsContainer}>
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accounName}</Typography>
                             </div>
                             <div className={classes.accountContainer}>
                                 <section>
@@ -197,8 +198,7 @@ SendEurDrawer.propTypes = {
     toggleDrawer: PropTypes.bool.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
-    transactionId: PropTypes.string.isRequired,
-    sellerUsername: PropTypes.string.isRequired
+    transactionId: PropTypes.string.isRequired
 };
 
 export default connect(undefined, { sendTransactionNotification })(SendEurDrawer);

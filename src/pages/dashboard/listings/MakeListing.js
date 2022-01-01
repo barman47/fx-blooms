@@ -27,7 +27,7 @@ import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
 import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
-import { APPROVED, COLORS, NOT_SUBMITTED, PAYMENT_METHODS, PENDING, REJECTED } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
@@ -193,6 +193,9 @@ const MakeListing = (props) => {
     const successModal = useRef();
     const toast = useRef();
 
+    const { APPROVED, NOT_SUBMITTED } = ID_STATUS;
+    const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
+
     useEffect(() => {
         handleSetTitle('Add Listing');
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
@@ -217,6 +220,13 @@ const MakeListing = (props) => {
     //         }
     //     }
     // }, []);
+
+    useEffect(() => {
+        // Automatically select newly added account
+        if (accounts.length > 0 && accounts[0].currency === 'NGN') {
+            setReceivingAccount(accounts[0].bankName);
+        }
+    }, [accounts]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -632,7 +642,7 @@ const MakeListing = (props) => {
                                                 return null;
                                             })}
                                         </Select>
-                                        <FormHelperText>{errors.setReceivingAccount}</FormHelperText>
+                                        <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
                                     </FormControl>
                                     <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                                 </Grid>

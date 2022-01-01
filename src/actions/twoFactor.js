@@ -12,7 +12,6 @@ import {
     SET_AUTH_TOKEN,
     SET_2FA_MSG,
     SET_BARCODE,
-    SET_CURRENT_CUSTOMER,
     TWO_FACTOR_AUTHORIZED
  } from './types';
 
@@ -49,9 +48,9 @@ export const getBarcode = () => async (dispatch) => {
     }
 };
 
-export const disableTwoFactor = (code) => async (dispatch) => {
+export const disableTwoFactor = () => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/Disable?inputCode=${code}`);
+        const res = await axios.post(`${api}/Disable?`);
         batch(() => {
             dispatch({
                 type: DISABLED_2FA,
@@ -67,9 +66,9 @@ export const disableTwoFactor = (code) => async (dispatch) => {
     }
 };
 
-export const enableTwoFactor = (code) => async (dispatch) => {
+export const enableTwoFactor = () => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/Enable?inputCode=${code}`);
+        const res = await axios.post(`${api}/Enable`);
         const { token, message } = res.data.data;
         setAuthToken(token);
         batch(() => {
@@ -83,11 +82,11 @@ export const enableTwoFactor = (code) => async (dispatch) => {
             });
         });
 
-        const customer = await axios.get(`${API}/Customer/CustomerInformation`);
-        dispatch({
-            type: SET_CURRENT_CUSTOMER,
-            payload: customer.data.data
-        });
+        // const customer = await axios.get(`${API}/Customer/CustomerInformation`);
+        // dispatch({
+        //     type: SET_CURRENT_CUSTOMER,
+        //     payload: customer.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

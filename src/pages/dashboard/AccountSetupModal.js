@@ -1,5 +1,5 @@
-import { useState } from 'react';
-// import { useHistory } from 'react-router-dom';
+import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useHistory } from 'react-router-dom';
 import { 
     Backdrop,
 	Button,
@@ -11,6 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS, SHADOW } from '../../utils/constants';
+import { DASHBOARD, PROFILE } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -50,21 +51,26 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AccountSetupModal = () => {
+const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
-    // const history = useHistory();
+    const history = useHistory();
 
     const [open, setOpen] = useState(false);
 
-    // useEffect(() => {
-    //     if (!sessionStorage.getItem(ACCOUNT_SETUP)) {
+    useImperativeHandle(ref, () => ({
+        openModal: () => {
+            setOpen(true);
+        },
 
-    //     }
-    // }, []);
+        closeModal: () => {
+            setOpen(false);
+        }
+    }));
 
-    // const setupAccount = () => {
-    //     sessionStorage.setItem(ACCOUNT_SETUP, true);
-    // };
+    const handleVerifyId = () => {
+        setOpen(false);
+        history.push(`${DASHBOARD}${PROFILE}`, { eu: true });
+    };
 
 	return (
         <Modal
@@ -82,15 +88,21 @@ const AccountSetupModal = () => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <Typography variant="subtitle1">
-                            You are required to complete your account setup and verification in order to be able to use FXBLOOMS
-                        </Typography>
-                        <Button variant="contained" color="primary" onClick={() => setOpen(false)}>Go to Set Up Account</Button>
+                        <Typography variant="h6" color="primary">First, let's verify your Identity</Typography>
+                        <Typography variant="subtitle1">We are required by law to verify users' identity before buying or selling.</Typography>
+                        <Grid container direction="row">
+                            <Grid item xs={6}>
+                                <Button variant="text" size="small" color="secondary" onClick={() => setOpen(false)}>Skip</Button>
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button variant="contained" size="small" color="primary" onClick={handleVerifyId}>Okay, Verify Me</Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Fade>
         </Modal>
 	);
-};
+});
 
 export default AccountSetupModal;

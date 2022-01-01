@@ -1,5 +1,6 @@
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Button, Grid, Link, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
 import listing from '../../assets/img/listing.png';
@@ -49,6 +50,14 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
+        color: COLORS.offWhite,
+        backgroundColor: theme.palette.primary.main,
+        
+        '&:hover': {
+            backgroundColor: theme.palette.primary.main,
+            color: COLORS.offWhite,
+        },
+
         [theme.breakpoints.down('sm')]: {
             width: '100%'
         }
@@ -80,7 +89,7 @@ const Features = () => {
                         <Typography variant="subtitle1" component="p">- Just list, buyers await you.</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        {!isAuthenticated && <Button to={SIGN_UP} component={Link} variant="contained" color="primary" className={classes.button}>GET STARTED</Button>}
+                        {!isAuthenticated && <Button to={SIGN_UP} underline="none" component={Link} variant="contained" className={classes.button}>GET STARTED</Button>}
                     </Grid>
                 </Grid>
             </Grid>

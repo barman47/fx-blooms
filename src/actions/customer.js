@@ -1,16 +1,16 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { CREATE_PROFILE, DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
-import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
+import { DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
+import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
     SETUP_2FA as GOTO_2FA,
     EMAIL_VERIFICATION,
     PROCEED_TO_LOGIN,
     // PROCEED_TO_DASHBOARD,
-    FILL_FORM1,
-    FILL_FORM2,
+    ID_STATUS,
+    FILL_FORM1
 } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -42,6 +42,8 @@ import {
     GET_ERRORS
  } from './types';
 
+ const { APPROVED } = ID_STATUS;
+
 const api = `${API}/Customer`;
 
 export const createCustomer = (customer, history) => async (dispatch) => {
@@ -72,22 +74,25 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 
     switch (nextStep) {
         case FILL_FORM1:
-            await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
-            return dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-            });
-
-        case FILL_FORM2:
-            const email = res.data.data.message[0].split(' ')[0];
-            dispatch({ type: SET_EMAIL, payload: email });
-            return history.push(CREATE_PROFILE, { verifiedEmail: true, email });
+            try {
+                await axios.post(`${api}/CreateProfile`, { Username, EmailAddress, Password });
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+            } catch (err) {
+                return handleError(err, dispatch);
+            }
 
         case EMAIL_VERIFICATION:
-            return dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
-            });
+            try {
+                return dispatch({
+                    type: SET_CUSTOMER_MSG,
+                    payload: 'A verification link has been sent to your email address. Verify your email to proceed.'
+                });
+            } catch (err) {
+                return handleError(err, dispatch);
+            }
 
         case GOTO_2FA:
             setAuthToken(res.data.data.token);
@@ -139,14 +144,19 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
 export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteEmailVerification/externalid/${externalid}/token/${token}`);
+        setAuthToken(res.data.data.token);
         batch(() => {
+            dispatch({
+                type: SET_CURRENT_CUSTOMER,
+                payload: res.data.data
+            });
             dispatch({
                 type: SET_EMAIL,
                 payload: res.data.data.emailAddress
             });
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Your email has been verified successfully. Please proceed to complete your profile.'
+                payload: 'Email successfully verified. Welcome to FXBLOOMS.'
             });
         });
     } catch (err) {
@@ -450,6 +460,19 @@ export const resetPassword = (data) => async (dispatch) => {
     }
 };
 
+export const updateProfile = (data) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${api}/UpdateProfile`, data);
+        return dispatch({
+            type: PROFILE_UPDATED,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const sendMail = (data) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/SendMail`, data);
@@ -517,7 +540,7 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
 export const approveIdCard = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        await axios.post(`${api}/ApproveIDCard`, { customerId, status: 'APPROVED' });
+        await axios.post(`${api}/ApproveIDCard`, { customerId, status: APPROVED });
         dispatch({
             type: ACCEPTED_CUSTOMER_ID
         });
@@ -528,7 +551,7 @@ export const approveIdCard = (customerId) => async (dispatch) => {
 export const approveResidencePermit = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: 'APPROVED' });
+        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: APPROVED });
         dispatch({
             type: ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
         });
@@ -541,4 +564,16 @@ export const logout = (history) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
     return history.push(LOGIN);
+};
+
+export const subscribeToNewsletter = (email) => async (dispatch) => {
+    try {
+        await axios.post(`${API}/Subscription/CreateSubscription`, { email, isCurrentlySubscribed: true });
+        return dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: 'Thanks for subscribing to FXBLOOMS newsletter.'
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
 };

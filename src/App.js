@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core';
+import { createTheme, ThemeProvider } from '@material-ui/core';
 
 import ScrollToTop from './components/layout/ScrollToTop';
 import AdminRoute from './components/common/AdminRoute';
@@ -11,7 +11,6 @@ import Home from './pages/home';
 
 import Login from './pages/auth/Login';
 import CreateAccount from './pages/auth/CreateAccount';
-import CreateProfile from './pages/auth/CreateProfile';
 import SignUpSuccess from './pages/auth/SignUpSuccess';
 import SignUpFailure from './pages/auth/SignUpFailure';
 import ForgotPassword from './pages/auth/ForgotPassword';
@@ -21,10 +20,13 @@ import VerifyQrCode from './pages/auth/VerifyQrCode';
 import VerifyEmail from './pages/auth/VerifyEmail';
 import PendingVerification from './pages/auth/PendingVerification';
 
-import Faqs from './pages/faqs';
-import PrivacyPolicy from './pages/privacyPolicy';
-import TermsAndConditions from './pages/termsAndConditions';
-import Disclaimer from './pages/disclaimer';
+import AboutUs from './pages/aboutUs/AboutUs';
+import ContactUs from './pages/contactUs/ContactUs';
+import FAQs from './pages/faqs/FAQs';
+import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
+import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
+import Disclaimer from './pages/disclaimer/Disclaimer';
+import UserAgreement from './pages/userAgreement/UserAgreement';
 
 import Dashboard from './pages/dashboard';
 
@@ -47,9 +49,12 @@ import AdminHome from './pages/adminDashboard/home/Home';
 import Customers from './pages/adminDashboard/customers/';
 import Customer from './pages/adminDashboard/customer/';
 
+import PageNotFound from './pages/PageNotFound';
+
 // import { getMe } from './actions/customer';
 
 import { 
+	ABOUT_US,
 	ADMIN_DASHBOARD,
 	ADMIN_HOME,
 	ADMIN_LOGIN,
@@ -60,7 +65,6 @@ import {
 	VERIFY_2FA,
 	SIGNUP_SUCCESS,
 	SIGNUP_FAILURE,
-	CREATE_PROFILE, 
 	MAKE_LISTING,
 	NOTIFICATIONS,
 	DASHBOARD,
@@ -75,12 +79,14 @@ import {
 	PRIVACY_POLICY,
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
-	WALLET
+	WALLET,
+	CONTACT_US,
+	USER_AGREEMENT
 } from './routes';
 
 // import reIssueToken from './utils/reIssueToken';
 
-const theme = createMuiTheme({
+const theme = createTheme({
 	overrides: {
 		MuiButton: {
 		  	root: {
@@ -146,8 +152,8 @@ const [title, setTitle] = useState('');
 	return (
 		<ThemeProvider theme={theme}>
 			<Router>
-				<Switch>
-					<ScrollToTop>
+				<ScrollToTop>
+					<Switch>
 						<Route path="/" exact component={Home} />
 						<Route path={LOGIN} exact component={Login} />
 						<Route path={SIGN_UP} exact component={CreateAccount} />
@@ -157,13 +163,16 @@ const [title, setTitle] = useState('');
 						<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
 						<Route path={SETUP_2FA} exact component={QrCode} />
 						<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
-						<Route path={CREATE_PROFILE} exact component={CreateProfile} />
 						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
 						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
+						<Route path={ABOUT_US} exact component={AboutUs} />
+						<Route path={CONTACT_US} exact component={ContactUs} />
 						<Route path={TERMS} exact component={TermsAndConditions} />
-						<Route path={FAQS} exact component={Faqs} />
+						<Route path={FAQS} exact component={FAQs} />
 						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
 						<Route path={DISCLAIMER} exact component={Disclaimer} />
+						<Route path={DISCLAIMER} exact component={Disclaimer} />
+						<Route path={USER_AGREEMENT} exact component={UserAgreement} />
 						<PrivateRoute path={DASHBOARD}>
 							<Dashboard title={title}>
 								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
@@ -182,8 +191,9 @@ const [title, setTitle] = useState('');
 								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 							</AdminDashboard>
 						</AdminRoute>
-					</ScrollToTop>
-				</Switch>
+						<Route component={PageNotFound} exact />
+					</Switch>
+				</ScrollToTop>
 			</Router>
 		</ThemeProvider>
 	);

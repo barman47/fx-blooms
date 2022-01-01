@@ -92,9 +92,9 @@ const SignupSuccess = () => {
         <>
             <Helmet><title>Signup Successful | FXBLOOMS.com</title></Helmet>
             <Container className={classes.root}>
-                <a href="https://fxblooms.com" className={classes.logo}>
+                <RouterLink to="/" className={classes.logo}>
                     <img src={logo} className={classes.logo} alt="FXBLOOMS Logo" />
-                </a>
+                </RouterLink>
                 <div className={classes.content}>
                     <Typography variant="h5">Sign Up Successful</Typography>
                     <Typography variant="subtitle1" component="p">You will now be redirected to the login page in <span className={classes.time}>{timeTillRedirect} seconds</span>. If you are not redirected automatically, use the link below</Typography>
