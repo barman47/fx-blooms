@@ -273,7 +273,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 root: classes.button
                             }}
                         >
-                            Buy EUR
+                            Just Accepted
                         </Button>
                         :
                         listing.customerId === userId ? 

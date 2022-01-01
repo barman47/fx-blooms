@@ -362,10 +362,10 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
                                         <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
                                     </section>
                                 </div>
-                                <div>
+                                {/* <div>
                                     <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
                                     <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                                </div>
+                                </div> */}
                             </section>
                         </Grid>
                         <Grid item xs={12}>
