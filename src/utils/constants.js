@@ -26,13 +26,13 @@ export const TRANSITION = '0.3s linear all';
 
 export const LOGOUT = 'logout';
 
-// export const WALLET_API = 'https://wallet.fxblooms.com/api';
-// export const API = 'https://api.fxblooms.com/api'; // Testing branch
-// export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
+export const WALLET_API = 'https://wallet.fxblooms.com/api';
+export const API = 'https://api.fxblooms.com/api'; // Testing branch
+export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
-export const WALLET_API = 'https://electron.fxblooms.com/api'; // Production branch
-export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
-export const API = 'https://positron.fxblooms.com/api'; // Production Branch
+// export const WALLET_API = 'https://electron.fxblooms.com/api'; // Production branch
+// export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
+// export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const SEND_MESSAGE = 'SendMessage';
