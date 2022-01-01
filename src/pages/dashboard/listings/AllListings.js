@@ -590,7 +590,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 						filter === PRICE
 						?
 						<Grid container direction="row" spacing={1}>
-							<Grid item xs={12}>
+							<Grid item xs={6}>
 								<Typography variant="subtitle2">I Have</Typography>
 								<FormControl 
 									variant="outlined" 
@@ -614,10 +614,8 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 									<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 								</FormControl>
 							</Grid>
-							<Grid item xs={12}>
+							<Grid item xs={6}>
 								<Typography variant="subtitle2">I Want</Typography>
-							</Grid>
-							<Grid item xs={5}>
 								<FormControl 
 									variant="outlined" 
 									error={errors.RequiredCurrency ? true : false } 
@@ -640,7 +638,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 									<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
 								</FormControl>
 							</Grid>
-							<Grid item xs={7}>
+							<Grid item xs={12}>
 								<TextField 
 									value={Amount}
 									onChange={(e) => setAmount(e.target.value)}
