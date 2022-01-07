@@ -104,10 +104,6 @@ export const getMoreListings = (query) => async (dispatch) => {
 export const addBid = (bid) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/AddBid`, bid)]);
-        // dispatch({
-        //     type: SET_LISTING_MSG,
-        //     payload: 'A notification of your payment has been sent to the seller.'
-        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

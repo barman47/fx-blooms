@@ -140,8 +140,8 @@ const customerReducer =  (state = initialState, action) => {
                 resetSession: action.payload
             };
             
-            default:
-                return state;
+        default:
+            return state;
     }
 };
 

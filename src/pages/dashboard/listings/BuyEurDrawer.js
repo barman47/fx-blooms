@@ -2,17 +2,20 @@ import { useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
+    Box,
 	Button,
     Drawer,
     Grid,
     FormControl,
     FormHelperText,
+    IconButton,
     Select,
     MenuItem,
     TextField,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Close } from 'mdi-material-ui';
 
 import { addBid } from '../../../actions/listings';
 import { SET_ACCOUNT, SET_LISTING_MSG } from '../../../actions/types';
@@ -37,7 +40,13 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(2),
-            width: '70vw'
+            width: '90vw'
+        },
+
+        '& header': {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between'
         }
     },
 
@@ -146,6 +155,7 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
     const [transferAmount, setTransferAmount] = useState('');
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
+    const [showSellerAccountDetails, setShowSellerAccountDetails] = useState(false);
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
@@ -232,8 +242,9 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
     };
 
     const dismissSuccessModal = () => {
-        successModal.current.openModal();
-        toggleDrawer();
+        successModal.current.closeModal();
+        setButtonDisabled(true);
+        setShowSellerAccountDetails(true);
         dispatch({
             type: SET_LISTING_MSG,
             payload: null
@@ -269,8 +280,27 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
         <>
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
-            <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={loading ? true : open} onClose={toggleDrawer}>
-                <Typography variant="h6" className={classes.header}>Buy EUR</Typography>
+            <Drawer 
+                ModalProps={{ 
+                    disableBackdropClick: true,
+                    disableEscapeKeyDown: true,
+                }}
+                PaperProps={{ className: classes.drawer }} 
+                anchor="right" 
+                open={loading ? true : open} 
+                onClose={toggleDrawer}
+            >
+                <Box component="header">
+                    <Typography variant="h6" className={classes.header}>Buy EUR</Typography>
+                    <IconButton 
+                        color="primary" 
+                        disableFocusRipple
+                        variant="text"
+                        onClick={toggleDrawer}
+                    >
+                        <Close />
+                    </IconButton>
+                </Box>
                 <Typography variant="body1" component="p" className={classes.text}>Check how much you need to send to seller below and make a transfer to the account details provided below.</Typography>
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
                     <Grid container direction="row" spacing={1}>
@@ -345,29 +375,31 @@ const BuyEurDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen })
                                 required
                             />
                         </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                            <section className={classes.accountDetailsContainer}>
-                                <div>
-                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                                </div>
-                                <div className={classes.accountContainer}>
-                                    <section>
-                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                                    </section>
-                                    <section>
-                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                                    </section>
-                                </div>
-                                {/* <div>
-                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                                </div> */}
-                            </section>
-                        </Grid>
+                        {showSellerAccountDetails &&
+                            <Grid item xs={12}>
+                                <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                                <section className={classes.accountDetailsContainer}>
+                                    <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                    </div>
+                                    <div className={classes.accountContainer}>
+                                        <section>
+                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
+                                        </section>
+                                        <section>
+                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                        </section>
+                                    </div>
+                                    {/* <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
+                                    </div> */}
+                                </section>
+                            </Grid>
+                        }
                         <Grid item xs={12}>
                             <Button 
                                 type="submit"
