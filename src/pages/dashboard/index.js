@@ -334,7 +334,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 if (customerId === buyer.CustomerId) {
                                     dispatch({
                                         type: SET_LISTING_MSG,
-                                        payload: `${seller.UserName} will confirm and send the EUR equivalent to the account you provided.`
+                                        payload: `Bid placed successfully. Kindly make payment to the account details below and ${seller.UserName} will confirm and send the EUR equivalent to the account you provided.`
                                     });
                                 }
                             });
