@@ -155,7 +155,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [transferAmount, setTransferAmount] = useState('');
-    const [reference, setReference] = useState('');
+    // const [reference, setReference] = useState('');
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -376,7 +376,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
                                 <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                             </FormControl>
                         </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span">Payment Reference</Typography>
                             <TextField 
                                 value={reference}
@@ -390,9 +390,9 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
                                 error={errors.reference ? true : false}
                             />
                             <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} className={classes.exchangeAmountContainer}>
-                            <Typography variant="subtitle1" component="p" color="primary">Exchange Amount</Typography>
+                            <Typography variant="subtitle1" component="p" color="primary">Amount to Transfer</Typography>
                             <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>
                         </Grid>
                         <Grid item xs={12}>

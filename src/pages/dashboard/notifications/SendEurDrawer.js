@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -11,12 +11,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import { decode } from 'html-entities';
 
 import { sendTransactionNotification } from '../../../actions/notifications';
-import { SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
-
-import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -100,37 +97,16 @@ const useStyles = makeStyles(theme => ({
 
 const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
-    const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
-    const { msg } = useSelector(state => state.customer);
     const message = useSelector(state => state.notifications.msg);
     
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    
-    const successModal = useRef();
 
     useEffect(() => {
         setOpen(drawerOpen);
     }, [drawerOpen]);
-    
-    useEffect(() => {
-        if (msg) {
-            setLoading(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
-        }
-    }, [msg]);
-
-    const dismissSuccessModal = () => {
-        setLoading(false);
-        toggleDrawer();
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: null
-        });
-    };
 
     const handleSendTransactionNotification = () => {
         setLoading(true);
@@ -139,7 +115,6 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 
 	return (
         <>
-            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={open} onClose={toggleDrawer}>
                 <Grid container direction="row" spacing={3}>
                     <Grid item xs={12}>
