@@ -195,7 +195,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 
 SendEurDrawer.propTypes = {
     amount: PropTypes.number.isRequired,
-    toggleDrawer: PropTypes.bool.isRequired,
+    toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
     transactionId: PropTypes.string.isRequired

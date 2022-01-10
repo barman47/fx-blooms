@@ -1,4 +1,6 @@
 import { 
+    ADDED_BID,
+    REMOVE_BID,
     ADDED_LISTING, 
     DELETED_LISTING,
     SET_LISTINGS, 
@@ -11,6 +13,7 @@ import {
 
 const initialState = {
     addedListing: false,
+    bid: {},
     updatedListing: false,
     listing: {},
     listings: [],
@@ -26,6 +29,18 @@ const listingsReducer = (state = initialState, action) => {
     let updatedListing = {};
 
     switch (action.type) {   
+        case ADDED_BID:
+            return {
+                ...state,
+                bid: action.payload
+            };
+
+        case REMOVE_BID:
+            return {
+                ...state,
+                bid: {}
+            };
+
         case ADDED_LISTING:
             return action.payload ? {
                 ...state,

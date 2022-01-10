@@ -6,6 +6,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ClockOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import moment from 'moment';
+import _ from 'lodash';
 
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
@@ -18,9 +19,11 @@ import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
 
-import BuyEurDrawer from './BuyEurDrawer';
+import BidSuccessModal from './BidSuccessModal';
+import PlaceBidDrawer from './PlaceBidDrawer';
 
 import Toast from '../../../components/common/Toast';
+import TransferNGNDrawer from './TransferNGNDrawer';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -137,14 +140,17 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const errorsState = useSelector(state => state.errors);
     const { stats } = useSelector(state => state.customer);
     const userId = useSelector(state => state.customer.customerId);
+    const { bid } = useSelector(state => state.listings);
 
-    const [openBuyEurDrawer, setOpenBuyEurDrawer] = useState(false);
+    const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
+    const [openTransferNgnDrawer, setopenTransferNgnDrawer] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
     const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
     // const { bids, status, id } = listing;
 
+    const bidSuccessModal = useRef();
     const toast = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
@@ -166,7 +172,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     }, [dispatch, errors]);
 
     useEffect(() => {
-        if (openBuyEurDrawer) {
+        if (openPlaceBidDrawer) {
             getAccount(listing.sellersAccountId);
         } else {
             dispatch({
@@ -174,7 +180,14 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                 payload: {}
             });
         }
-    }, [dispatch, getAccount, listing.sellersAccountId, openBuyEurDrawer]);
+    }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
+
+    useEffect(() => {
+		if (!_.isEmpty(bid)) {
+            setOpenPlaceBidDrawer(false);
+			bidSuccessModal.current.openModal();
+		}
+	}, [bid]);
 
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
@@ -199,14 +212,19 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const closeTooltip = () => {
         setTooltipOpen(false);
     };
-
-    const toggleBuyEurDrawer = () => {
+    
+    const togglePlaceBidDrawer = () => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
             return checkIdStatus();
         }
-        setOpenBuyEurDrawer(!openBuyEurDrawer);
+        setOpenPlaceBidDrawer(!openPlaceBidDrawer);
     };
 
+    const toggleTranserNgnDrawer = () => {
+        bidSuccessModal.current.closeModal();
+        setopenTransferNgnDrawer(!openTransferNgnDrawer);
+    };
+    
     return (
         <>
             {!isEmpty(errors) && 
@@ -216,8 +234,11 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     duration={5000}
                     msg={errors.msg || ''}
                     type="error"
-                />
-            }
+                    />
+                }
+            <BidSuccessModal ref={bidSuccessModal} close={toggleTranserNgnDrawer} />
+            {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
+            {openTransferNgnDrawer && <TransferNGNDrawer drawerOpen={openTransferNgnDrawer} toggleDrawer={toggleTranserNgnDrawer} listing={listing} />}
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
@@ -299,15 +320,14 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            // onClick={() => toggleBuyEurDrawer(listing.sellersAccountId)}
-                            onClick={toggleBuyEurDrawer}
+                            // onClick={() => togglePlaceBidDrawer(listing.sellersAccountId)}
+                            onClick={togglePlaceBidDrawer}
                         >
                             Buy EUR
                         </Button>
                     }
                 </div>
             </section>
-            {openBuyEurDrawer && <BuyEurDrawer drawerOpen={openBuyEurDrawer} toggleDrawer={toggleBuyEurDrawer} listing={listing} />}
         </>
     );
 };
