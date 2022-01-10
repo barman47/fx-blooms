@@ -221,8 +221,8 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     };
 
     const toggleTranserNgnDrawer = () => {
-        bidSuccessModal.current.closeModal();
         setopenTransferNgnDrawer(!openTransferNgnDrawer);
+        bidSuccessModal.current.closeModal();
     };
     
     return (
