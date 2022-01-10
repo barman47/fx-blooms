@@ -65,7 +65,14 @@ const BidSuccessModal = forwardRef((props, ref) => {
 
     const [open, setOpen] = useState(false);
 
-    const { close } = props;
+    const { toggleDrawer } = props;
+
+    const proceed = () => {
+        setOpen(false);
+        setTimeout(() => {
+            toggleDrawer();
+        }, 1000);
+    };
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -97,7 +104,7 @@ const BidSuccessModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <CheckCircleOutline className={classes.icon} />
                         <Typography variant="subtitle1" component="p">Bid Placed Successfully</Typography>
-                        <Button onClick={close} color="primary" variant="contained">Proceed to Transfer NGN</Button>
+                        <Button onClick={proceed} color="primary" variant="contained">Proceed to Transfer NGN</Button>
                     </Grid>
                 </Grid>
             </Fade>
@@ -106,7 +113,7 @@ const BidSuccessModal = forwardRef((props, ref) => {
 });
 
 BidSuccessModal.propTypes = {
-    close: PropTypes.func.isRequired
+    toggleDrawer: PropTypes.func.isRequired
 };
 
 export default BidSuccessModal;

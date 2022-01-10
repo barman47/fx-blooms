@@ -222,7 +222,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 
     const toggleTranserNgnDrawer = () => {
         setopenTransferNgnDrawer(!openTransferNgnDrawer);
-        bidSuccessModal.current.closeModal();
     };
     
     return (
@@ -236,7 +235,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     type="error"
                     />
                 }
-            <BidSuccessModal ref={bidSuccessModal} close={toggleTranserNgnDrawer} />
+            <BidSuccessModal ref={bidSuccessModal} toggleDrawer={toggleTranserNgnDrawer} />
             {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
             {openTransferNgnDrawer && <TransferNGNDrawer drawerOpen={openTransferNgnDrawer} toggleDrawer={toggleTranserNgnDrawer} listing={listing} />}
             <section className={classes.root}>
