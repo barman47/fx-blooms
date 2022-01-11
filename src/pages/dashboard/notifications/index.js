@@ -280,6 +280,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const dismissAction = () => {
         setOpen(false);
+        setSendEurDrawerOpen(false);
         dispatch({
             type: SET_CUSTOMER_MSG,
             payload: null
@@ -308,11 +309,11 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
-                    {notifications.map(notification => {
+                    {notifications.map((notification, index) => {
                             if (hasNotification(notification)) {
                                 return (
                                     <Notification 
-                                        key={notification.id}
+                                        key={index}
                                         title="Credit (Exchange)"
                                         message={setMessage(notification)}
                                         buttonText={buttonDisabled(notification.seller) ? 'Payment Confirmed' : 'Confirm payment'}

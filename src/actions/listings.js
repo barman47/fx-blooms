@@ -3,7 +3,7 @@ import { DASHBOARD, DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
-import { ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LOADING_LISTINGS, SET_MORE_LISTINGS } from './types';
+import { ADDED_BID, ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LOADING_LISTINGS, SET_MORE_LISTINGS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { batch } from 'react-redux';
 
@@ -103,7 +103,23 @@ export const getMoreListings = (query) => async (dispatch) => {
 
 export const addBid = (bid) => async (dispatch) => {
     try {
-        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/AddBid`, bid)]);
+        await reIssueCustomerToken()
+        const res = await axios.post(`${URL}/AddBid`, bid);
+        return dispatch({
+            type: ADDED_BID,
+            payload: {
+                bid: res.data.data,
+                addedBid: true
+            }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const madePayment = (data) => async (dispatch) => {
+    try {
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
     } catch (err) {
         return handleError(err, dispatch);
     }
