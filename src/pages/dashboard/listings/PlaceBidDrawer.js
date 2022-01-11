@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box,
@@ -12,13 +12,17 @@ import {
     Select,
     MenuItem,
     TextField,
+    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { AlertOutline, Close } from 'mdi-material-ui';
+import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
+import _ from 'lodash';
+import toast, { Toaster } from 'react-hot-toast';
+import copy from 'copy-to-clipboard';
 
-import { addBid } from '../../../actions/listings';
-import { SET_ACCOUNT, SET_LISTING_MSG } from '../../../actions/types';
+import { addBid, madePayment } from '../../../actions/listings';
+import { REMOVE_BID, SET_ACCOUNT, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -143,12 +147,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen }) => {
+const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { accounts } = useSelector(state => state.bankAccounts);
-    const { msg } = useSelector(state => state.listings);
+    const { account, accounts } = useSelector(state => state.bankAccounts);
+    const { addedBid, bid, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
     const [Amount, setAmount] = useState('');
@@ -159,6 +163,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [showBid, setShowBid] = useState(true);
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const successModal = useRef();
@@ -245,15 +250,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
         return bank.accountID;
     };
 
-    const dismissSuccessModal = () => {
-        successModal.current.closeModal();
-        setButtonDisabled(true);
-        dispatch({
-            type: SET_LISTING_MSG,
-            payload: null
-        });
-    };
-
     const onSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -279,121 +275,302 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
         });
     };
 
-	return (
+    useEffect(() => {
+        getAccount(listing.sellersAccountId);
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (!_.isEmpty(account)) {
+            setButtonDisabled(false);
+        }
+    }, [account]);
+
+    useEffect(() => {
+        setLoading(false);
+        if (addedBid) {
+            setShowBid(false)
+        }
+    }, [addedBid]);
+
+    useEffect(() => {
+        setOpen(drawerOpen);
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {}
+        });
+        if (!drawerOpen) {
+            setErrors({});
+        }
+    }, [dispatch, drawerOpen]);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
+
+    useEffect(() => {
+        setLoading(false);
+        setErrors(errorsState);
+    }, [errorsState]);
+
+    const dismissSuccessModal = () => {
+        // setButtonDisabled(true);
+        successModal.current.closeModal();
+        setLoading(false);
+        toggleDrawer();
+        batch(() => {
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: null
+            });
+            dispatch({ type: REMOVE_BID});
+            dispatch({
+                type: SET_ACCOUNT,
+                payload: {}
+            });
+        });
+        
+    };
+
+    const handleMadpayment = () => {
+        setLoading(true);
+        madePayment({
+            bidId: bid.id,
+            listingId: listing.id,
+        });
+    };
+
+    const getSellerAccount = () => getAccount(listing.sellersAccountId);
+
+    const returnLastThreeCharacters = (string) => {
+        const startIndex = string.length - 3;
+        const endIndex = string.length;
+        return string.slice(startIndex, endIndex);
+    };
+
+    const handleCopyTransactionId = () => {
+        copy(bid.id);
+        toast.success('Transaction ID Copied!');
+    };
+
+    return (
         <>
-            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
-            <Drawer 
-                ModalProps={{ 
-                    disableBackdropClick: true,
-                    disableEscapeKeyDown: true,
-                }}
-                PaperProps={{ className: classes.drawer }} 
-                anchor="right" 
-                open={loading ? true : open} 
-                onClose={toggleDrawer}
-            >
-                <Box component="header">
-                    <Typography variant="h6" className={classes.header}>Buy EUR - Place a Bid</Typography>
-                    <IconButton 
-                        color="primary" 
-                        disableFocusRipple
-                        variant="text"
-                        onClick={toggleDrawer}
+            {showBid ? 
+                <>
+                    <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+                    {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
+                    <Drawer 
+                        ModalProps={{ 
+                            disableBackdropClick: true,
+                            disableEscapeKeyDown: true,
+                        }}
+                        PaperProps={{ className: classes.drawer }} 
+                        anchor="right" 
+                        open={loading ? true : open} 
+                        onClose={toggleDrawer}
                     >
-                        <Close />
-                    </IconButton>
-                </Box>
-                <Grid container direction="row">
-                    <Grid item xs={5}>
-                        <Typography variant="h6" color="primary">Actions Required</Typography>
-                    </Grid>
-                    <Grid item xs={1}>
-                        <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
-                    </Grid>
-                </Grid>
-                <ol>
-                    <li><Typography variant="body2" component="p">Input the EUR amount you wish to buy</Typography></li>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Click on "Place a Bid"</Typography></li>
-                </ol>
-                <form onSubmit={onSubmit} noValidate>
-                    <Grid container direction="row" spacing={1}>
-                        <Grid item xs={3} >
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>I want</Typography>
-                            <TextField 
-                                value="EUR"
-                                type="text"
-                                variant="outlined" 
-                                disabled
-                                fullWidth
-                                required
-                            />
-                        </Grid>
-                        <Grid item xs={9}>
-                            <br />
-                            <TextField 
-                                style={{ marginTop: '2px' }}
-                                value={Amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Amount"
-                                helperText={errors.Amount}
-                                fullWidth
-                                required
-                                error={errors.Amount ? true : false}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
-                            <FormHelperText className={classes.formHelperText}>Seller rate: NGN{listing.exchangeRate} to 1EUR</FormHelperText>
-                        </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                            <FormControl 
-                                variant="outlined" 
-                                error={errors.receivingAccount ? true : false } 
-                                fullWidth 
-                                required
-                                disabled={loading ? true : false}
+                        <Box component="header">
+                            <Typography variant="h6" className={classes.header}>Buy EUR - Place a Bid</Typography>
+                            <IconButton 
+                                color="primary" 
+                                disableFocusRipple
+                                variant="text"
+                                onClick={toggleDrawer}
                             >
-                                <Select
-                                    labelId="ReceivingAccount"
-                                    value={receivingAccount}
-                                    onChange={(e) => setReceivingAccount(e.target.value)}
-                                >
-                                    <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                    {accounts.map((account) => {
-                                        if (account.currency === 'EUR') {
-                                            return (
-                                                <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                            )
-                                        }
-                                        return null;
-                                    })}
-                                </Select>
-                                <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                                <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                            </FormControl>
+                                <Close />
+                            </IconButton>
+                        </Box>
+                        <Grid container direction="row">
+                            <Grid item xs={5}>
+                                <Typography variant="h6" color="primary">Actions Required</Typography>
+                            </Grid>
+                            <Grid item xs={1}>
+                                <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
+                            </Grid>
                         </Grid>
-                        {/* <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span">Payment Reference</Typography>
-                            <TextField 
-                                value={reference}
-                                placeholder="Enter Payment Reference"
-                                onChange={(e) => setReference(e.target.value)}
-                                disabled={loading ? true : false}
-                                type="text"
+                        <ol>
+                            <li><Typography variant="body2" component="p">Input the EUR amount you wish to buy</Typography></li>
+                            <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
+                            <li><Typography variant="body2" component="p">Click on "Place a Bid"</Typography></li>
+                        </ol>
+                        <form onSubmit={onSubmit} noValidate>
+                            <Grid container direction="row" spacing={1}>
+                                <Grid item xs={3} >
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I want</Typography>
+                                    <TextField 
+                                        value="EUR"
+                                        type="text"
+                                        variant="outlined" 
+                                        disabled
+                                        fullWidth
+                                        required
+                                    />
+                                </Grid>
+                                <Grid item xs={9}>
+                                    <br />
+                                    <TextField 
+                                        style={{ marginTop: '2px' }}
+                                        value={Amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        type="text"
+                                        variant="outlined" 
+                                        placeholder="Enter Amount"
+                                        helperText={errors.Amount}
+                                        fullWidth
+                                        required
+                                        error={errors.Amount ? true : false}
+                                    />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <FormHelperText className={classes.formHelperText}>Seller rate: NGN{listing.exchangeRate} to 1EUR</FormHelperText>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Receiving Account</Typography>
+                                    <FormControl 
+                                        variant="outlined" 
+                                        error={errors.receivingAccount ? true : false } 
+                                        fullWidth 
+                                        required
+                                        disabled={loading ? true : false}
+                                    >
+                                        <Select
+                                            labelId="ReceivingAccount"
+                                            value={receivingAccount}
+                                            onChange={(e) => setReceivingAccount(e.target.value)}
+                                        >
+                                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                            {accounts.map((account) => {
+                                                if (account.currency === 'EUR') {
+                                                    return (
+                                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                                    )
+                                                }
+                                                return null;
+                                            })}
+                                        </Select>
+                                        <FormHelperText>{errors.receivingAccount}</FormHelperText>
+                                        <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                                    </FormControl>
+                                </Grid>
+                                {/* <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Payment Reference</Typography>
+                                    <TextField 
+                                        value={reference}
+                                        placeholder="Enter Payment Reference"
+                                        onChange={(e) => setReference(e.target.value)}
+                                        disabled={loading ? true : false}
+                                        type="text"
+                                        variant="outlined" 
+                                        fullWidth
+                                        required
+                                        error={errors.reference ? true : false}
+                                    />
+                                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                                </Grid> */}
+                                <Grid item xs={12} className={classes.exchangeAmountContainer}>
+                                    <Typography variant="subtitle1" component="p" color="primary">Amount to Transfer</Typography>
+                                    <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Button 
+                                        type="submit"
+                                        variant="contained" 
+                                        color="primary" 
+                                        fullWidth 
+                                        disableFocusRipple
+                                        className={classes.button}
+                                        disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
+                                    >
+                                        {loading ? 'One Moment . . .' : 'Place a Bid'}
+                                    </Button>
+                                </Grid>
+                            </Grid>
+                        </form>
+                    </Drawer>
+                </>
+                :
+                <>
+                    <Toaster />
+                    <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+                    <Drawer 
+                        ModalProps={{ 
+                            disableBackdropClick: true,
+                            disableEscapeKeyDown: true,
+                        }}
+                        PaperProps={{ className: classes.drawer }} 
+                        anchor="right" 
+                        open={loading ? true : open} 
+                        onClose={toggleDrawer}
+                    >
+                        <Box component="header">
+                            <Typography variant="h6" className={classes.header}>Buy EUR - Transfer the NGN</Typography>
+                            {/* <IconButton 
+                                color="primary" 
+                                disableFocusRipple
+                                variant="text"
+                                onClick={toggleDrawer}
+                            >
+                                <Close />
+                            </IconButton> */}
+                        </Box>
+                        <div className={classes.transactionContainer}>
+                            <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
+                            <Typography variant="body2" component="p">
+                                {bid?.id && `...${returnLastThreeCharacters(bid.id)}`}
+                                <IconButton onClick={handleCopyTransactionId} color="primary">
+                                    <Tooltip title="Copy Transaction ID" arrow>
+                                        <ContentCopy />
+                                    </Tooltip>
+                                </IconButton>
+                            </Typography>
+                        </div>
+                        <Grid container direction="row">
+                            <Grid item xs={5}>
+                                <Typography variant="h6" color="primary">Actions Required</Typography>
+                            </Grid>
+                            <Grid item xs={1}>
+                                <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
+                            </Grid>
+                        </Grid>
+                        <ol>
+                            <li><Typography variant="body2" component="p">Transfer the NGN to the {`${listing.listedBy}'s`} account below</Typography></li>
+                            <li><Typography variant="body2" component="p">Click on NGN Payment Made</Typography></li>
+                        </ol>
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                            <Button 
                                 variant="outlined" 
-                                fullWidth
-                                required
-                                error={errors.reference ? true : false}
-                            />
-                            <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                        </Grid> */}
-                        <Grid item xs={12} className={classes.exchangeAmountContainer}>
-                            <Typography variant="subtitle1" component="p" color="primary">Amount to Transfer</Typography>
-                            <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>
+                                color="primary" 
+                                disabled={_.isEmpty(account) ? false : true}
+                                onClick={getSellerAccount}
+                            >
+                                Show Account Details
+                            </Button>
+                            {!_.isEmpty(account) && 
+                                <section className={classes.accountDetailsContainer}>
+                                    <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                    </div>
+                                    <div className={classes.accountContainer}>
+                                        <section>
+                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
+                                        </section>
+                                        <section>
+                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                        </section>
+                                    </div>
+                                    {/* <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
+                                    </div> */}
+                                </section>
+                            }                   
                         </Grid>
                         <Grid item xs={12}>
                             <Button 
@@ -404,22 +581,24 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, toggleDrawer, drawerOpen 
                                 disableFocusRipple
                                 className={classes.button}
                                 disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
+                                onClick={handleMadpayment}
                             >
-                                {loading ? 'One Moment . . .' : 'Place a Bid'}
+                                {loading ? 'One Moment . . .' : 'NGN Payment Made'}
                             </Button>
                         </Grid>
-                    </Grid>
-                </form>
-            </Drawer>
+                    </Drawer>
+                </>
+            }
         </>
-	);
+    );
 };
 
 PlaceBidDrawer.propTypes = {
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
-    listing: PropTypes.object.isRequired
+    listing: PropTypes.object.isRequired,
+    madePayment: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { addBid, getAccount })(PlaceBidDrawer);
+export default connect(undefined, { addBid, getAccount, madePayment })(PlaceBidDrawer);

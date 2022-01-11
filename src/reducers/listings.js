@@ -8,11 +8,13 @@ import {
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_LOADING_LISTINGS,
-    SET_LISTING_MSG
+    SET_LISTING_MSG,
+    TOGGLE_BID_STATUS
 } from '../actions/types';
 
 const initialState = {
     addedListing: false,
+    addedBid: false,
     bid: {},
     updatedListing: false,
     listing: {},
@@ -32,13 +34,20 @@ const listingsReducer = (state = initialState, action) => {
         case ADDED_BID:
             return {
                 ...state,
-                bid: action.payload
+                bid: action.payload.bid,
+                addedBid: action.payload.addedBid
             };
 
         case REMOVE_BID:
             return {
                 ...state,
                 bid: {}
+            };
+
+        case TOGGLE_BID_STATUS:
+            return {
+                ...state,
+                addedBid: !state.addedBid
             };
 
         case ADDED_LISTING:

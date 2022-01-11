@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import { useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
@@ -12,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { CheckCircleOutline } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
+import { TOGGLE_BID_STATUS } from '../../../actions/types';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -62,16 +64,13 @@ const useStyles = makeStyles(theme => ({
 
 const BidSuccessModal = forwardRef((props, ref) => {
 	const classes = useStyles();
+    const dispatch = useDispatch();
 
     const [open, setOpen] = useState(false);
 
-    const { toggleDrawer } = props;
-
-    const proceed = () => {
+    const closeModal = () => {
         setOpen(false);
-        setTimeout(() => {
-            toggleDrawer();
-        }, 1000);
+        dispatch({ type: TOGGLE_BID_STATUS });
     };
 
     useImperativeHandle(ref, () => ({
@@ -104,7 +103,7 @@ const BidSuccessModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <CheckCircleOutline className={classes.icon} />
                         <Typography variant="subtitle1" component="p">Bid Placed Successfully</Typography>
-                        <Button onClick={proceed} color="primary" variant="contained">Proceed to Transfer NGN</Button>
+                        <Button onClick={closeModal} color="primary" variant="contained">Proceed to Transfer NGN</Button>
                     </Grid>
                 </Grid>
             </Fade>

@@ -23,7 +23,6 @@ import BidSuccessModal from './BidSuccessModal';
 import PlaceBidDrawer from './PlaceBidDrawer';
 
 import Toast from '../../../components/common/Toast';
-import TransferNGNDrawer from './TransferNGNDrawer';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -143,7 +142,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const { bid } = useSelector(state => state.listings);
 
     const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
-    const [openTransferNgnDrawer, setopenTransferNgnDrawer] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -184,7 +182,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 
     useEffect(() => {
 		if (!_.isEmpty(bid)) {
-            setOpenPlaceBidDrawer(false);
 			bidSuccessModal.current.openModal();
 		}
 	}, [bid]);
@@ -219,10 +216,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         }
         setOpenPlaceBidDrawer(!openPlaceBidDrawer);
     };
-
-    const toggleTranserNgnDrawer = () => {
-        setopenTransferNgnDrawer(!openTransferNgnDrawer);
-    };
     
     return (
         <>
@@ -235,9 +228,8 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     type="error"
                     />
                 }
-            <BidSuccessModal ref={bidSuccessModal} toggleDrawer={toggleTranserNgnDrawer} />
+            <BidSuccessModal ref={bidSuccessModal} />
             {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
-            {openTransferNgnDrawer && <TransferNGNDrawer drawerOpen={openTransferNgnDrawer} toggleDrawer={toggleTranserNgnDrawer} listing={listing} />}
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">

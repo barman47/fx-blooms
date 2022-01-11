@@ -107,7 +107,10 @@ export const addBid = (bid) => async (dispatch) => {
         const res = await axios.post(`${URL}/AddBid`, bid);
         return dispatch({
             type: ADDED_BID,
-            payload: res.data.data
+            payload: {
+                bid: res.data.data,
+                addedBid: true
+            }
         });
     } catch (err) {
         return handleError(err, dispatch);
