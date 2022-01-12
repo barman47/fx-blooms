@@ -281,12 +281,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     }, []);
 
     useEffect(() => {
-        if (!_.isEmpty(account)) {
-            setButtonDisabled(false);
-        }
-    }, [account]);
-
-    useEffect(() => {
         setLoading(false);
         if (addedBid) {
             setShowBid(false)
