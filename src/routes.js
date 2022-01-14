@@ -20,9 +20,15 @@ export const SIGNUP_SUCCESS = '/user/verificationSuccess';
 export const SIGNUP_FAILURE = '/user/verificationFailure';
 
 export const ADMIN_LOGIN = '/login/admin';
-export const ADMIN_DASHBOARD = '/admin';
-export const ADMIN_HOME = '/home';
-export const CUSTOMERS = '/customers';
+export const ADMIN_DASHBOARD = `/admin`;
+export const ADMIN_HOME = `${ADMIN_DASHBOARD}/home`;
+export const CUSTOMERS = `${ADMIN_DASHBOARD}/customers`;
+export const LISTINGS = `${ADMIN_DASHBOARD}/listings`;
+export const DEPOSITS = `${ADMIN_DASHBOARD}/deposits`;
+export const WITHDRAWALS = `${ADMIN_DASHBOARD}/withdrawals`;
+export const HISTORY = `${ADMIN_DASHBOARD}/history`;
+export const SUPPORT = `${ADMIN_DASHBOARD}/support`;
+export const RISK_PROFILE = `${ADMIN_DASHBOARD}/riskProfile`;
 
 export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = '/home';

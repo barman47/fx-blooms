@@ -1,17 +1,47 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 
 import {
     AppBar,
     Avatar,
+    Button,
+    Box,
+    Drawer,
+    IconButton,
+    InputAdornment,
+    Link,
+    List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
+    Tooltip,
     Toolbar,
-    Typography
+    Typography,
+    TextField
 } from '@material-ui/core';
-import { Account } from 'mdi-material-ui';
+import { 
+    Account,
+    AccountMultiple, 
+    AlertOutline,
+    BagChecked,
+    BellAlertOutline,
+    CogOutline,
+    CurrencyCny,
+    ViewDashboard,
+    ChevronLeft, 
+    ChevronRight,
+    CashMinus,
+    FilterOutline,
+    Headset,
+    History,
+    Magnify,
+    Sort
+} from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -19,12 +49,22 @@ import { getStats, logout } from '../../actions/admin';
 import { COLORS, LOGOUT } from '../../utils/constants';
 
 import SessionModal from './SessionModal';
+import { 
+    ADMIN_DASHBOARD, 
+    CUSTOMERS,
+    LISTINGS,
+    DEPOSITS,
+    WITHDRAWALS,
+    HISTORY,
+    SUPPORT,
+    RISK_PROFILE 
+} from '../../routes';
+
+const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: COLORS.white,
-        paddingLeft: theme.spacing(15),
-        paddingRight: theme.spacing(15),
 
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(5),
@@ -34,60 +74,164 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
-        }
-    },
-
-    gridContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        width: '100%'
-    },
-
-    logo: {
-        [theme.breakpoints.down('sm')]: {
-            width: '40%'
         }
     },
 
     content: {
-        marginTop: theme.spacing(10),
-        paddingLeft: theme.spacing(15),
-        paddingRight: theme.spacing(15),
-
-        [theme.breakpoints.down('md')]: {
-            paddingLeft: theme.spacing(5),
-            paddingRight: theme.spacing(5),
-        },
+        border: '1px solid red',
+        flexGrow: 1,
+        marginLeft: theme.spacing(9) + 1,
+        marginTop: theme.spacing(5),
+        zIndex: '997',
+        width: `calc(100% - ${theme.spacing(9) + 1}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
 
         [theme.breakpoints.down('sm')]: {
-            paddingLeft: theme.spacing(1),
-            paddingRight: theme.spacing(1),
+            marginLeft: '0 !important',
+            height: '100vh !important',
+            width: '100% !important'
+        }
+    },
+
+    contentShift: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+    },
+
+    appBar: {
+        backgroundColor: '#ffffff',
+        borderBottom: `1px solid ${COLORS.borderColor}`,
+        zIndex: 999,
+        marginLeft: theme.spacing(9) + 1,
+        width: `calc(100% - ${theme.spacing(7) + 1}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.leavingScreen,
+        }),
+
+        [theme.breakpoints.down('sm')]: {
+            marginLeft: '0 !important',
+            width: '100% !important'
+        }
+    },
+
+    appBarShift: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+          easing: theme.transitions.easing.sharp,
+          duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+
+    appBarContent: {
+        border: '1px solid red',
+        display: 'grid',
+        gridTemplateColumns: '4fr 0.9fr',
+        alignItems: 'center',
+    },
+
+    formContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
+
+    searchField: {
+        paddingBottom: theme.spacing(0.1),
+        paddingTop: theme.spacing(0.1)
+    },
+
+    headerLinks: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 0.5fr 0.5fr',
+        listStyleType: 'none',
+        alignItems: 'center',
+        gap: theme.spacing(1),
+
+        '& li': {
+            textAlign: 'center'
         }
     },
 
     avatarContainer: {
+        alignSelf: 'stretch',
+        borderLeft: `1px solid ${COLORS.borderColor}`,
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        padding: theme.spacing(0, 1)
+    },
 
-        '& div:first-child': {
-            marginRight: theme.spacing(2)
+    adminName: {
+        color: COLORS.grey,
+        fontWeight: 500
+    },
+
+    drawer: {
+        width: drawerWidth,
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        [theme.breakpoints.down('md')]: {
+            display: 'none'
         }
     },
 
-    name: {
-        color: COLORS.offBlack,
-        fontSize: theme.spacing(2),
-        textAlign: 'right'
+    drawerOpen: {
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
     },
 
-    email: {
-        color: COLORS.grey,
-        fontSize: theme.spacing(1.7),
-        fontWeight: 300,
-        lineHeight: 0.8,
-        textAlign: 'right'
+    drawerClose: {
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        overflowX: 'hidden',
+        width: theme.spacing(7) + 1,
+        [theme.breakpoints.up('sm')]: {
+            width: theme.spacing(9) + 1,
+        },
+    },
+
+    logo: {
+        width: '100%'
+    },
+
+    toolbar: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        // padding: theme.spacing(2, 1),
+        padding: [[theme.spacing(2), theme.spacing(2), 0, theme.spacing(2)]],
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    },
+
+    link: {
+        border: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        color: theme.palette.primary.main
+    },
+
+    links: {
+        marginTop: theme.spacing(4.5)
+    },
+
+    linkItem: {
+        backgroundColor: `${COLORS.lightTeal} !important`,
+        marginBottom: theme.spacing(2)
+    },
+
+    icon: {
+        color: theme.palette.primary.main
     }
 }));
 
@@ -96,11 +240,31 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
     const history = useHistory();
     const { admin } = useSelector(state => state);
 
+    const [searchText, setSearchText] = useState('');
+    const [open, setOpen] = useState(true);
+    // eslint-disable-next-line
+    const [path, setPath] = useState('');
+
+    const links = [
+        { url : ADMIN_DASHBOARD, text:'Dashboard', icon: <ViewDashboard /> },
+        { url : CUSTOMERS, text:'Users', icon: <AccountMultiple /> },
+        { url : LISTINGS, text:'Listings', icon: <CurrencyCny /> },
+        { url : DEPOSITS, text:'Deposits', icon: <BagChecked /> },
+        { url : WITHDRAWALS, text:'Withdrawals', icon: <CashMinus /> },
+        { url : HISTORY, text:'History', icon: <History /> },
+        { url : SUPPORT, text:'Support', icon: <Headset /> },
+        { url : RISK_PROFILE, text:'Risk Profile', icon: <AlertOutline /> },
+    ];
+
     useEffect(() => {
         checkSession();
         getStats();
         // eslint-disable-next-line
     }, []);
+
+    const toggleDrawer = () => {
+        setOpen(!open);
+    };
 
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
@@ -109,35 +273,141 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
         }
     };
 
+    const handleLinkClick = (link) => {
+        history.push(`${ADMIN_DASHBOARD}${link}`);
+    };
+
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <SessionModal />
-            <AppBar 
-                position="fixed"
-                elevation={0}
-                classes={{ root: classes.root}}
-                // className={clsx(classes.appBar, {
-                //     [classes.appBarShift]: open
-                // })}
-            >
-                <Toolbar style={{ padding: 0 }}>
-                    <section className={classes.gridContainer}>
-                        <img src={logo} alt="FXBLOOMS Logo" className={classes.logo} />
-                        <div className={classes.avatarContainer}>
-                            <div>
-                                <Typography variant="h6" className={classes.name}>{`${admin.firstName} ${admin.lastName}`}</Typography>
-                                <Typography variant="subtitle2" className={classes.email}>{admin.email}</Typography>
-                            </div>
+            <section className={classes.root}>
+                <AppBar position="fixed" color="transparent" elevation={0} className={clsx(classes.appBar, {
+                    [classes.appBarShift]: open,
+                })}>
+                    <Toolbar className={classes.appBarContent}>
+                        <Box component="div" className={classes.formContainer}>
+                            <form>
+                                <TextField 
+                                    className={classes.searchField}
+                                    type="text"
+                                    variant="outlined"
+                                    placeholder="Search . . ."
+                                    value={searchText}
+                                    onChange={(e) => setSearchText(e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Magnify />
+                                            </InputAdornment>
+                                        )
+                                    }}
+                                />
+                            </form>
+                            <Box component="div">
+                                <ul className={classes.headerLinks}>
+                                    <li>
+                                        <Button
+                                            variant="text"
+                                            startIcon={<Sort />}
+                                        >
+                                            Sort
+                                        </Button>
+                                    </li>
+                                    <li>
+                                        <Button
+                                            variant="text"
+                                            startIcon={<FilterOutline />}
+                                        >
+                                            Filter
+                                        </Button>
+                                    </li>
+                                    <li><IconButton color="primary"><BellAlertOutline /></IconButton></li>
+                                    <li><IconButton color="primary"><CogOutline /></IconButton></li>
+                                </ul>
+                            </Box>
+                        </Box>
+                        <Box component="div" className={classes.avatarContainer}>
                             <Avatar>
                                 <Account />
                             </Avatar>
-                        </div>
-                    </section>
-                </Toolbar>
-            </AppBar>
-            <section className={classes.content}>
-                {children}
+                            &nbsp;&nbsp;
+                            <Typography variant="body2" component="span" className={classes.adminName}>{`${admin.firstName} ${admin.lastName}`}</Typography>
+                        </Box>
+                    </Toolbar>
+                </AppBar>
+                <Drawer 
+                    variant="permanent"
+                    className={clsx(classes.drawer, {
+                        [classes.drawerOpen]: open,
+                        [classes.drawerClose]: !open
+                    })}
+                    classes={{
+                        paper: clsx({
+                            [classes.drawerOpen]: open,
+                            [classes.drawerClose]: !open,
+                        }),
+                    }}
+                >
+                    <div className={classes.toolbar}>
+                        {open && 
+                            <Link to="/">
+                                <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
+                            </Link>
+                        }
+                        <IconButton onClick={toggleDrawer}>
+                            {!open ?
+                                <Tooltip title="Expand Navigation" placement="top" arrow>
+                                    <ChevronRight />
+                                </Tooltip>
+                                :
+                                <Tooltip title="Collapse Navigation" placement="top" arrow>
+                                    <ChevronLeft />
+                                </Tooltip>
+                            }
+                        </IconButton>
+                    </div> 
+                    <List className={classes.links}>
+                        {links.map((link, index) => (
+                            <ListItem 
+                                className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
+                                key={index} 
+                                button 
+                                disableRipple
+                                onClick={() => handleLinkClick(link.url)}
+                                // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
+                            >
+                                <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
+                                    {link.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={link.text} />
+                            </ListItem>
+                        ))}
+                    </List>
+                </Drawer>
+                <div className={clsx(classes.content, {
+                    [classes.contentShift]: open})}
+                >
+                    {children}
+                </div>
+                {/* {showBottomNavigation && 
+                    <Box
+                        boxShadow={5}
+                        className={classes.bottomBar}
+                    >
+                        <BottomNavigation
+                            value={value}
+                            onChange={(event, newValue) => {
+                                setValue(newValue)
+                            }}
+                            showLabels
+                        >
+                            {mobileLinks.map((item, index) => (
+                                <BottomNavigationAction onClick={() => handleLinkClick(item.url)} key={index} label={item.text} icon={item.icon} />
+                            ))}
+                        </BottomNavigation>
+                    </Box>
+                } */}
             </section>
         </>
     );

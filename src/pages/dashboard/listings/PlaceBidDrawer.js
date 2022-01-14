@@ -27,6 +27,7 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
+import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 import validateAddBid from '../../../utils/validation/listing/addBid';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
@@ -56,6 +57,13 @@ const useStyles = makeStyles(theme => ({
 
     header: {
         color: theme.palette.primary.main,
+    },
+
+    transactionContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
 
     text: {
@@ -339,12 +347,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     const getSellerAccount = () => getAccount(listing.sellersAccountId);
 
-    const returnLastThreeCharacters = (string) => {
-        const startIndex = string.length - 3;
-        const endIndex = string.length;
-        return string.slice(startIndex, endIndex);
-    };
-
     const handleCopyTransactionId = () => {
         copy(bid.id);
         toast.success('Transaction ID Copied!');
@@ -513,7 +515,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                         <div className={classes.transactionContainer}>
                             <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
                             <Typography variant="body2" component="p">
-                                {bid?.id && `...${returnLastThreeCharacters(bid.id)}`}
+                                {bid?.id && `. . . ${returnLastThreeCharacters(bid.id)}`}
                                 <IconButton onClick={handleCopyTransactionId} color="primary">
                                     <Tooltip title="Copy Transaction ID" arrow>
                                         <ContentCopy />

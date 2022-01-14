@@ -188,7 +188,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
         // clear message if drawer is open and being closed
         if (sendEurDrawerOpen) {
-            console.log('closing drawer');
             dispatch({
                 type: SET_NOTIFICATION_MSG,
                 payload: null
