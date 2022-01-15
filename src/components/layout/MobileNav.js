@@ -17,7 +17,7 @@ import { COLORS } from '../../utils/constants';
 
 import ListItemLink from './ListItemLink';
 
-import { CONTACT_US, FAQS, SIGN_UP, LOGIN, ABOUT_US, HOW_IT_WORKS, DASHBOARD, DASHBOARD_HOME } from '../../routes';
+import { CONTACT_US, FAQS, SIGN_UP, LOGIN, ABOUT_US, HOW_IT_WORKS, DASHBOARD_HOME } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
