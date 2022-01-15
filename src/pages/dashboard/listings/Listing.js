@@ -16,7 +16,7 @@ import isEmpty from '../../../utils/isEmpty';
 import { getAccount } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
+import { PROFILE, USER_DETAILS } from '../../../routes';
 
 import PlaceBidDrawer from './PlaceBidDrawer';
 
@@ -223,7 +223,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     <Typography variant="body2" component="p">
                         Listed by:&nbsp;
                         <RouterLink 
-                            to={`${DASHBOARD}${USER_DETAILS}`} 
+                            to={USER_DETAILS} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
                             >
                                 <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
