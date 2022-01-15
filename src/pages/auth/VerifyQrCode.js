@@ -20,7 +20,7 @@ import Toast from '../../components/common/Toast';
 
 import { logout } from '../../actions/customer';
 import { authorizeTwoFactor, enableTwoFactor } from '../../actions/twoFactor';
-import { DASHBOARD, DASHBOARD_HOME } from '../../routes';
+import { DASHBOARD_HOME } from '../../routes';
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
 import validateAuthenticatorCode from '../../utils/validation/customer/authenticator';
@@ -176,7 +176,7 @@ const VerifyQrCode = (props) => {
                 payload: null
             });
         });
-        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        return history.push(DASHBOARD_HOME);
     };
 
     const logout = (e) => {

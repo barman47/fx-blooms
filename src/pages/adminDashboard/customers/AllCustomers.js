@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import { getCustomers } from '../../../actions/customer';
-import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
+import { CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
@@ -67,7 +67,7 @@ const AllCustomers = ({ getCustomers, handleSetTitle }) => {
             payload: customer
         });
         handleSetTitle('User Details');
-        history.push(`${ADMIN_DASHBOARD}${CUSTOMERS}/${customer.id}`);
+        history.push(`${CUSTOMERS}/${customer.id}`);
     };
 
     return (

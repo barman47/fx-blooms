@@ -95,7 +95,7 @@ const notificationsReducer = (state = initialState, action) => {
             notification.seller.hasReceivedPayment = true;
             notifications.splice(notificationIndex, 1);
             notifications.push(notification);
-
+            
             return {
                 ...state,
                 notifications: [...notifications]

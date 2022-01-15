@@ -11,6 +11,7 @@ import { addBid } from '../../../actions/listings';
 import { GET_ERRORS, SET_LISTING } from '../../../actions/types';
 
 import IDVerificationModal from '../listings/IDVerificationModal';
+import BidSuccessModal from './BidSuccessModal';
 import PendingIdModal from './PendingIdModal';
 import Listing from './Listing';
 
@@ -48,11 +49,12 @@ const Listings = ({ addBid }) => {
     const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
     const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
-    const { listings } = useSelector(state => state.listings);
+    const { addedBid, listings } = useSelector(state => state.listings);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const bidSuccessModal = useRef();
     const idVerificationModal = useRef();
 
     useEffect(() => {
@@ -64,6 +66,12 @@ const Listings = ({ addBid }) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    useEffect(() => {
+		if (addedBid) {
+			bidSuccessModal.current.openModal();
+		}
+	}, [addedBid]);
 
     const checkIdStatus = () => {
         switch (idStatus) {
@@ -120,6 +128,7 @@ const Listings = ({ addBid }) => {
 
     return (
         <>
+            <BidSuccessModal ref={bidSuccessModal} />
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             {listings.length > 0 ? 

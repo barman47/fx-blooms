@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import { API } from '../utils/constants';
-import { ADMIN_DASHBOARD, ADMIN_HOME, ADMIN_LOGIN } from '../routes';
+import { ADMIN_HOME, ADMIN_LOGIN } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueAdminToken from '../utils/reIssueAdminToken';
 import setAuthToken from '../utils/setAuthToken';
@@ -18,7 +18,7 @@ export const login = (data, history) => async (dispatch) => {
             type: SET_CURRENT_ADMIN,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
-        history.push(`${ADMIN_DASHBOARD}${ADMIN_HOME}`);
+        history.push(ADMIN_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

@@ -15,7 +15,7 @@ import { getNotifications, generateOtp } from '../../../actions/notifications';
 import { SET_ACCOUNT, SET_CUSTOMER_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
-import { DASHBOARD, PROFILE } from '../../../routes';
+import { PROFILE } from '../../../routes';
 
 import Notification from './Notification';
 import SendEurDrawer from './SendEurDrawer';
@@ -188,7 +188,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
         // clear message if drawer is open and being closed
         if (sendEurDrawerOpen) {
-            console.log('closing drawer');
             dispatch({
                 type: SET_NOTIFICATION_MSG,
                 payload: null
@@ -263,7 +262,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         window.open(idVerificationLink);
     };
 
-    const setup2FA = () => history.push(`${DASHBOARD}${PROFILE}`, { mfa: true });
+    const setup2FA = () => history.push(PROFILE, { mfa: true });
 
     const verifyPhone = () => {
         if (phoneNo) {
@@ -274,7 +273,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             });
             return setOpen(true);
         }
-        return history.push(`${DASHBOARD}${PROFILE}`, { verifyPhone: true })
+        return history.push(PROFILE, { verifyPhone: true })
     };
     // const setPin = () => history.push(`${DASHBOARD}${PROFILE}`, { setPin: true });
 

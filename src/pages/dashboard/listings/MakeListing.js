@@ -30,7 +30,7 @@ import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/typ
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import { DASHBOARD, DASHBOARD_HOME } from '../../../routes';
+import { DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
@@ -394,7 +394,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
-            history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+            history.push(DASHBOARD_HOME);
         }
     };
 

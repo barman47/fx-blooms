@@ -6,7 +6,6 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ClockOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import moment from 'moment';
-import _ from 'lodash';
 
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
@@ -19,7 +18,6 @@ import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { DASHBOARD, PROFILE, USER_DETAILS } from '../../../routes';
 
-import BidSuccessModal from './BidSuccessModal';
 import PlaceBidDrawer from './PlaceBidDrawer';
 
 import Toast from '../../../components/common/Toast';
@@ -139,16 +137,13 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const errorsState = useSelector(state => state.errors);
     const { stats } = useSelector(state => state.customer);
     const userId = useSelector(state => state.customer.customerId);
-    const { bid } = useSelector(state => state.listings);
 
     const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
     const [tooltipOpen, setTooltipOpen] = useState(false);
     const [errors, setErrors] = useState({});
 
     const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
-    // const { bids, status, id } = listing;
 
-    const bidSuccessModal = useRef();
     const toast = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
@@ -180,19 +175,13 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         }
     }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
 
-    useEffect(() => {
-		if (!_.isEmpty(bid)) {
-			bidSuccessModal.current.openModal();
-		}
-	}, [bid]);
-
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
+            return history.push(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return history.push(`${DASHBOARD}${PROFILE}`);
+        return history.push(PROFILE);
     };
 
     const handleDeleteListing = () => {
@@ -226,9 +215,8 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     duration={5000}
                     msg={errors.msg || ''}
                     type="error"
-                    />
-                }
-            <BidSuccessModal ref={bidSuccessModal} />
+                />
+            }
             {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
             <section className={classes.root}>
                 <header>

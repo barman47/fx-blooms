@@ -11,7 +11,7 @@ import {
 } from '@material-ui/core';
 
 import { COLORS } from '../../../utils/constants';
-import { ADMIN_DASHBOARD, CUSTOMERS } from '../../../routes';
+import { CUSTOMERS } from '../../../routes';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -72,7 +72,7 @@ const Home = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const goToDashboard = () => history.push(`${ADMIN_DASHBOARD}${CUSTOMERS}`);
+    const goToDashboard = () => history.push(`${CUSTOMERS}`);
 
     return (
         <>
@@ -84,7 +84,7 @@ const Home = (props) => {
                 <Grid item xs={12} md={6} lg={5} className={classes.content}>
                     <div onClick={goToDashboard}>
                         {/* <Typography variant="subtitle2" component="span" color="primary"> */}
-                            <Link to={`${ADMIN_DASHBOARD}${CUSTOMERS}`} component={RouterLink} underline="none" color="primary">
+                            <Link to={CUSTOMERS} component={RouterLink} underline="none" color="primary">
                                 Customers
                             </Link>
                         {/* </Typography> */}
