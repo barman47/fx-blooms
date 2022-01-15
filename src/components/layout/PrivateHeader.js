@@ -31,7 +31,7 @@ import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
-import { DASHBOARD, DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
+import { DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
 
 export const HideOnScroll = (props) => {
     const { children, direction } = props;
@@ -221,7 +221,7 @@ export const PrivateHeader = (props) => {
                             {protectedRoutes.map((link, index) =>(
                                 <Grid item key={index}>
                                     <Link
-                                        to={`${DASHBOARD}${link.url}`}
+                                        to={link.url}
                                         component={RouterLink}
                                         className={clsx(classes.link, { [classes.activeLink]: location.pathname.includes(link.url) })}
                                         underline="none"
@@ -234,7 +234,7 @@ export const PrivateHeader = (props) => {
                         <div className={classes.avatarContainer}>
                             <Avatar alt={`${firstName} ${lastName}`} />
                             <Button
-                                to={`${DASHBOARD}${DASHBOARD_HOME}`}
+                                to={DASHBOARD_HOME}
                                 endIcon={<ChevronDown />}
                                 classes={{ root: classes.avatarButton }}
                                 ref={anchorRef}
@@ -255,9 +255,9 @@ export const PrivateHeader = (props) => {
                                         <ClickAwayListener onClickAway={handleMenuClose}>
                                             <MenuList autoFocusItem={open} id="profile-menu" onKeyDown={handleListKeyDown}>
                                                 <MenuItem
-                                                    onClick={(e) => handleMenuClose(e, `${DASHBOARD}${PROFILE}`)}
+                                                    onClick={(e) => handleMenuClose(e, PROFILE)}
                                                 >
-                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>Settings</RouterLink>
+                                                    <RouterLink to={PROFILE} className={classes.link}>Settings</RouterLink>
                                                 </MenuItem>
                                                 <MenuItem>
                                                     <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
@@ -298,9 +298,9 @@ export const PrivateHeader = (props) => {
                                         <ClickAwayListener onClickAway={handleMenuClose}>
                                             <MenuList autoFocusItem={open} id="mobile-profile-menu" onKeyDown={handleListKeyDown}>
                                                 <MenuItem
-                                                    onClick={(e) => handleMenuClose(e, `${DASHBOARD}${PROFILE}`)}
+                                                    onClick={(e) => handleMenuClose(e, PROFILE)}
                                                 >
-                                                    <RouterLink to={`${DASHBOARD}${PROFILE}`} className={classes.link}>Settings</RouterLink>
+                                                    <RouterLink to={PROFILE} className={classes.link}>Settings</RouterLink>
                                                 </MenuItem>
                                                 <MenuItem>
                                                     <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>

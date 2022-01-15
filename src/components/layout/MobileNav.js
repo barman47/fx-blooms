@@ -105,7 +105,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                         <ListItemText primary="Home" />
                     </ListItemLink>
                     {isAuthenticated === true ? 
-                        <ListItemLink button divider to={`${DASHBOARD}${DASHBOARD_HOME}`}>
+                        <ListItemLink button divider to={DASHBOARD_HOME}>
                             <ListItemIcon>
                                 <FormatListText className={classes.listings} />
                             </ListItemIcon>
