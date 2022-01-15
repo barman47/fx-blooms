@@ -24,7 +24,7 @@ import Toast from '../../components/common/Toast';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD, DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -200,7 +200,7 @@ const CreateAccount = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+            return history.push(DASHBOARD_HOME);
         }
 
         return () => {

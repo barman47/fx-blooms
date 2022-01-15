@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DASHBOARD, DASHBOARD_HOME } from '../routes';
+import { DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
@@ -133,7 +133,7 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
             type: CANCELED_NEGOTIATION,
             payload: res.data.data
         });
-        history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        history.push(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

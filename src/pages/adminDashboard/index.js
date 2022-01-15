@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
@@ -24,6 +24,7 @@ import {
     Typography,
     TextField
 } from '@material-ui/core';
+
 import { 
     Account,
     AccountMultiple, 
@@ -43,14 +44,14 @@ import {
     Sort
 } from 'mdi-material-ui';
 
-import logo from '../../assets/img/logo.svg';
+import logo from '../../assets/img/logo-white.svg';
 
 import { getStats, logout } from '../../actions/admin';
 import { COLORS, LOGOUT } from '../../utils/constants';
 
 import SessionModal from './SessionModal';
 import { 
-    ADMIN_DASHBOARD, 
+    ADMIN_HOME,
     CUSTOMERS,
     LISTINGS,
     DEPOSITS,
@@ -173,12 +174,20 @@ const useStyles = makeStyles((theme) => ({
     },
 
     drawer: {
-        width: drawerWidth,
         flexShrink: 0,
         whiteSpace: 'nowrap',
+        width: drawerWidth,
+        
         [theme.breakpoints.down('md')]: {
             display: 'none'
         }
+    },
+    
+    paper: {
+        backgroundColor: theme.palette.primary.main,
+        borderTopRightRadius: '40px',
+        boxSizing: 'border-box',
+        paddingRight: theme.spacing(2),
     },
 
     drawerOpen: {
@@ -205,20 +214,26 @@ const useStyles = makeStyles((theme) => ({
         width: '100%'
     },
 
+    collapseIcon: {
+        color: COLORS.offWhite
+    },
+    
+    expandIcon: {
+        color: COLORS.offWhite
+    },
+
     toolbar: {
         display: 'flex',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        // padding: theme.spacing(2, 1),
         padding: [[theme.spacing(2), theme.spacing(2), 0, theme.spacing(2)]],
         // necessary for content to be below app bar
         ...theme.mixins.toolbar,
     },
 
-    link: {
-        border: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        color: theme.palette.primary.main
+    collapsedToolbar: {
+        justifyContent: 'center',
     },
 
     links: {
@@ -226,18 +241,29 @@ const useStyles = makeStyles((theme) => ({
     },
 
     linkItem: {
-        backgroundColor: `${COLORS.lightTeal} !important`,
-        marginBottom: theme.spacing(2)
+        borderBottomRightRadius: theme.shape.borderRadius,
+        borderTopRightRadius: theme.shape.borderRadius,
+        color: COLORS.offWhite,
+        marginBottom: theme.spacing(1),
+
+        '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.58)'
+        }
+    },
+
+    activeLink: {
+        backgroundColor: 'rgba(255, 255, 255, 0.58)'
     },
 
     icon: {
-        color: theme.palette.primary.main
+        color: COLORS.offWhite
     }
 }));
 
 const AdminDashboard = ({ children, title, getStats, logout }) => {
     const classes = useStyles();
     const history = useHistory();
+    const location = useLocation();
     const { admin } = useSelector(state => state);
 
     const [searchText, setSearchText] = useState('');
@@ -246,7 +272,7 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
     const [path, setPath] = useState('');
 
     const links = [
-        { url : ADMIN_DASHBOARD, text:'Dashboard', icon: <ViewDashboard /> },
+        { url : ADMIN_HOME, text:'Dashboard', icon: <ViewDashboard /> },
         { url : CUSTOMERS, text:'Users', icon: <AccountMultiple /> },
         { url : LISTINGS, text:'Listings', icon: <CurrencyCny /> },
         { url : DEPOSITS, text:'Deposits', icon: <BagChecked /> },
@@ -262,6 +288,10 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        setPath(location.pathname);
+    }, [location.pathname]);
+
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -274,7 +304,7 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        history.push(`${ADMIN_DASHBOARD}${link}`);
+        history.push(link);
     };
 
     return (
@@ -343,13 +373,13 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
                         [classes.drawerClose]: !open
                     })}
                     classes={{
-                        paper: clsx({
+                        paper: clsx(classes.paper, {
                             [classes.drawerOpen]: open,
                             [classes.drawerClose]: !open,
                         }),
                     }}
                 >
-                    <div className={classes.toolbar}>
+                    <div className={clsx(classes.toolbar, {[classes.collapsedToolbar]: !open})}>
                         {open && 
                             <Link to="/">
                                 <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
@@ -358,11 +388,11 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
                         <IconButton onClick={toggleDrawer}>
                             {!open ?
                                 <Tooltip title="Expand Navigation" placement="top" arrow>
-                                    <ChevronRight />
+                                    <ChevronRight className={classes.expandIcon} />
                                 </Tooltip>
                                 :
                                 <Tooltip title="Collapse Navigation" placement="top" arrow>
-                                    <ChevronLeft />
+                                    <ChevronLeft className={classes.collapseIcon} />
                                 </Tooltip>
                             }
                         </IconButton>
@@ -370,17 +400,17 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
                     <List className={classes.links}>
                         {links.map((link, index) => (
                             <ListItem 
-                                className={clsx({ [classes.link]: path.includes(`${link.url}`) }, classes.linkItem)} 
+                                className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
                                 key={index} 
                                 button 
                                 disableRipple
                                 onClick={() => handleLinkClick(link.url)}
                                 // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
                             >
-                                <ListItemIcon className={clsx({ [classes.icon]: path.includes(`${link.url}`) })} >
+                                <ListItemIcon className={classes.icon}>
                                     {link.icon}
                                 </ListItemIcon>
-                                <ListItemText primary={link.text} />
+                                {open && <ListItemText primary={link.text} />}
                             </ListItem>
                         ))}
                     </List>

@@ -413,7 +413,7 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        history.push(`/dashboard${link}`);
+        history.push(link);
     };
 
     const dismissAction = () => {

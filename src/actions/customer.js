@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { DASHBOARD, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
+import { DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
 import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
@@ -186,7 +186,7 @@ export const login = (data, history) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: res.data.data
         });
-        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        return history.push(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

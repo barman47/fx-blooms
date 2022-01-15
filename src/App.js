@@ -179,20 +179,20 @@ const [title, setTitle] = useState('');
 							<Route path={USER_AGREEMENT} exact component={UserAgreement} />
 							<PrivateRoute path={DASHBOARD}>
 								<Dashboard title={title}>
-									<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${DASHBOARD}${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${DASHBOARD}${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
 								</Dashboard>
 							</PrivateRoute>
 							<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
 							<AdminRoute path={ADMIN_DASHBOARD}>
 								<AdminDashboard title={title}>
-									<AdminRoute path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 								</AdminDashboard>
 							</AdminRoute>
 							<Route component={PageNotFound} exact />

@@ -179,9 +179,9 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return history.push(`${DASHBOARD}${USER_DETAILS}/${sellerId}`, { sellerId });
+            return history.push(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return history.push(`${DASHBOARD}${PROFILE}`);
+        return history.push(PROFILE);
     };
 
     const handleDeleteListing = () => {
