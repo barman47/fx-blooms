@@ -4,7 +4,7 @@ import { batch } from 'react-redux';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import setAuthToken from '../utils/setAuthToken';
-import { DASHBOARD, DASHBOARD_HOME } from '../routes';
+import { DASHBOARD_HOME } from '../routes';
 
 import { 
     DISABLED_2FA,
@@ -30,7 +30,7 @@ export const authorizeTwoFactor = ({ code, profileId }, history) => async (dispa
             dispatch({ type: TWO_FACTOR_AUTHORIZED });
         });
         
-        return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+        return history.push(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

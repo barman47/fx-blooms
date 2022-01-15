@@ -1,57 +1,6 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core';
-
-import ScrollToTop from './components/layout/ScrollToTop';
-import AdminRoute from './components/common/AdminRoute';
-import PrivateRoute from './components/common/PrivateRoute';
-
-import Home from './pages/home';
-// import Landing from './pages/landing/Landing';
-
-import Login from './pages/auth/Login';
-import CreateAccount from './pages/auth/CreateAccount';
-import SignUpSuccess from './pages/auth/SignUpSuccess';
-import SignUpFailure from './pages/auth/SignUpFailure';
-import ForgotPassword from './pages/auth/ForgotPassword';
-import ResetPassword from './pages/auth/ResetPassword';
-import QrCode from './pages/auth/QrCode';
-import VerifyQrCode from './pages/auth/VerifyQrCode';
-import VerifyEmail from './pages/auth/VerifyEmail';
-import PendingVerification from './pages/auth/PendingVerification';
-
-import AboutUs from './pages/aboutUs/AboutUs';
-import ContactUs from './pages/contactUs/ContactUs';
-import FAQs from './pages/faqs/FAQs';
-import PrivacyPolicy from './pages/privacyPolicy/PrivacyPolicy';
-import TermsAndConditions from './pages/termsAndConditions/TermsAndConditions';
-import Disclaimer from './pages/disclaimer/Disclaimer';
-import UserAgreement from './pages/userAgreement/UserAgreement';
-
-import Dashboard from './pages/dashboard';
-
-import AllListings from './pages/dashboard/listings/AllListings';
-import MakeListing from './pages/dashboard/listings/MakeListing';
-import UserDetails from './pages/dashboard/listings/UserDetails';
-
-import Profile from './pages/dashboard/profile';
-
-import Notifications from './pages/dashboard/notifications';
-
-import Wallet from './pages/dashboard/wallet';
-
-// import setAuthToken from './utils/setAuthToken';
-// import isTokenExpired from './utils/tokenExpired';
-
-import AdminLogin from './pages/auth/AdminLogin';
-import AdminDashboard from './pages/adminDashboard';
-import AdminHome from './pages/adminDashboard/home/Home';
-import Customers from './pages/adminDashboard/customers/';
-import Customer from './pages/adminDashboard/customer/';
-
-import PageNotFound from './pages/PageNotFound';
-
-// import { getMe } from './actions/customer';
 
 import { 
 	ABOUT_US,
@@ -83,6 +32,60 @@ import {
 	CONTACT_US,
 	USER_AGREEMENT
 } from './routes';
+
+import FallBack from './components/common/FallBack';
+
+const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
+const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
+const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
+
+const Home = lazy(() => import('./pages/home'));
+// import Landing from './pages/landing/Landing';
+
+const Login = lazy(() => import('./pages/auth/Login'));
+const CreateAccount = lazy(() => import('./pages/auth/CreateAccount'));
+const SignUpSuccess = lazy(() => import('./pages/auth/SignUpSuccess'));
+const SignUpFailure = lazy(() => import('./pages/auth/SignUpFailure'));
+const ForgotPassword = lazy(() => import('./pages/auth/ForgotPassword'));
+const ResetPassword = lazy(() => import('./pages/auth/ResetPassword'));
+const QrCode = lazy(() => import('./pages/auth/QrCode'));
+const VerifyQrCode = lazy(() => import('./pages/auth/VerifyQrCode'));
+const VerifyEmail = lazy(() => import('./pages/auth/VerifyEmail'));
+const PendingVerification = lazy(() => import('./pages/auth/PendingVerification'));
+
+const AboutUs = lazy(() => import('./pages/aboutUs/AboutUs'));
+const ContactUs = lazy(() => import('./pages/contactUs/ContactUs'));
+const FAQs = lazy(() => import('./pages/faqs/FAQs'));
+const PrivacyPolicy = lazy(() => import('./pages/privacyPolicy/PrivacyPolicy'));
+const TermsAndConditions = lazy(() => import('./pages/termsAndConditions/TermsAndConditions'));
+const Disclaimer = lazy(() => import('./pages/disclaimer/Disclaimer'));
+const UserAgreement = lazy(() => import('./pages/userAgreement/UserAgreement'));
+
+const Dashboard = lazy(() => import('./pages/dashboard'));
+
+const AllListings = lazy(() => import('./pages/dashboard/listings/AllListings'));
+const MakeListing = lazy(() => import('./pages/dashboard/listings/MakeListing'));
+const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'));
+
+const Profile = lazy(() => import('./pages/dashboard/profile'));
+
+const Notifications = lazy(() => import('./pages/dashboard/notifications'));
+
+const Wallet = lazy(() => import('./pages/dashboard/wallet'));
+
+// import setAuthToken from './utils/setAuthToken';
+// import isTokenExpired from './utils/tokenExpired';
+
+const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
+const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
+const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
+const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
+const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
+
+const PageNotFound = lazy(() => import('./pages/PageNotFound'));
+
+
+// import { getMe } from './actions/customer';
 
 // import reIssueToken from './utils/reIssueToken';
 
@@ -152,48 +155,50 @@ const [title, setTitle] = useState('');
 	return (
 		<ThemeProvider theme={theme}>
 			<Router>
-				<ScrollToTop>
-					<Switch>
-						<Route path="/" exact component={Home} />
-						<Route path={LOGIN} exact component={Login} />
-						<Route path={SIGN_UP} exact component={CreateAccount} />
-						<Route path={PENDING_VERIFICATION} exact component={PendingVerification} />
-						<Route path={VERIFY_EMAIL} exact component={VerifyEmail} />
-						<Route path={SIGNUP_SUCCESS} exact component={SignUpSuccess} />
-						<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
-						<Route path={SETUP_2FA} exact component={QrCode} />
-						<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
-						<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
-						<Route path={RESET_PASSWORD} exact component={ResetPassword} />
-						<Route path={ABOUT_US} exact component={AboutUs} />
-						<Route path={CONTACT_US} exact component={ContactUs} />
-						<Route path={TERMS} exact component={TermsAndConditions} />
-						<Route path={FAQS} exact component={FAQs} />
-						<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
-						<Route path={DISCLAIMER} exact component={Disclaimer} />
-						<Route path={DISCLAIMER} exact component={Disclaimer} />
-						<Route path={USER_AGREEMENT} exact component={UserAgreement} />
-						<PrivateRoute path={DASHBOARD}>
-							<Dashboard title={title}>
-								<PrivateRoute path={`${DASHBOARD}${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
-								<PrivateRoute path={`${DASHBOARD}${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
-							</Dashboard>
-						</PrivateRoute>
-						<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
-						<AdminRoute path={ADMIN_DASHBOARD}>
-							<AdminDashboard title={title}>
-								<AdminRoute path={`${ADMIN_DASHBOARD}${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
-								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
-								<AdminRoute path={`${ADMIN_DASHBOARD}${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
-							</AdminDashboard>
-						</AdminRoute>
-						<Route component={PageNotFound} exact />
-					</Switch>
-				</ScrollToTop>
+				<Suspense fallback={<FallBack />}>
+					<ScrollToTop>
+						<Switch>
+							<Route path="/" exact component={Home} />
+							<Route path={LOGIN} exact component={Login} />
+							<Route path={SIGN_UP} exact component={CreateAccount} />
+							<Route path={PENDING_VERIFICATION} exact component={PendingVerification} />
+							<Route path={VERIFY_EMAIL} exact component={VerifyEmail} />
+							<Route path={SIGNUP_SUCCESS} exact component={SignUpSuccess} />
+							<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
+							<Route path={SETUP_2FA} exact component={QrCode} />
+							<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
+							<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
+							<Route path={RESET_PASSWORD} exact component={ResetPassword} />
+							<Route path={ABOUT_US} exact component={AboutUs} />
+							<Route path={CONTACT_US} exact component={ContactUs} />
+							<Route path={TERMS} exact component={TermsAndConditions} />
+							<Route path={FAQS} exact component={FAQs} />
+							<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
+							<Route path={DISCLAIMER} exact component={Disclaimer} />
+							<Route path={DISCLAIMER} exact component={Disclaimer} />
+							<Route path={USER_AGREEMENT} exact component={UserAgreement} />
+							<PrivateRoute path={DASHBOARD}>
+								<Dashboard title={title}>
+									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
+								</Dashboard>
+							</PrivateRoute>
+							<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
+							<AdminRoute path={ADMIN_DASHBOARD}>
+								<AdminDashboard title={title}>
+									<AdminRoute path={`${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
+								</AdminDashboard>
+							</AdminRoute>
+							<Route component={PageNotFound} exact />
+						</Switch>
+					</ScrollToTop>
+				</Suspense>
 			</Router>
 		</ThemeProvider>
 	);

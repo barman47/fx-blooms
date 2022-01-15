@@ -5,15 +5,21 @@ import {
 	Button,
     Drawer,
     Grid,
+    IconButton,
+    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { ContentCopy } from 'mdi-material-ui';
 import { decode } from 'html-entities';
+import copy from 'copy-to-clipboard';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { sendTransactionNotification } from '../../../actions/notifications';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
+import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -33,6 +39,13 @@ const useStyles = makeStyles(theme => ({
 
     header: {
         color: theme.palette.primary.main,
+    },
+
+    transactionContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
 
     text: {
@@ -108,6 +121,11 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
         setOpen(drawerOpen);
     }, [drawerOpen]);
 
+    const handleCopyTransactionId = () => {
+        copy(transactionId);
+        toast.success('Transaction ID Copied!');
+    };
+
     const handleSendTransactionNotification = () => {
         setLoading(true);
         sendTransactionNotification(transactionId);
@@ -115,10 +133,27 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 
 	return (
         <>
-            <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={open} onClose={toggleDrawer}>
+            <Toaster />
+            <Drawer 
+                PaperProps={{ className: classes.drawer }} 
+                anchor="right" 
+                open={open} 
+                onClose={toggleDrawer}
+            >
                 <Grid container direction="row" spacing={3}>
                     <Grid item xs={12}>
                         <Typography variant="h6" className={classes.header}>Send EUR</Typography>
+                    </Grid>
+                    <Grid item xs={12} className={classes.transactionContainer}>
+                        <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
+                        <Typography variant="body2" component="p">
+                            {`. . . ${returnLastThreeCharacters(transactionId)}`}
+                            <IconButton onClick={handleCopyTransactionId} color="primary">
+                                <Tooltip title="Copy Transaction ID" arrow>
+                                    <ContentCopy />
+                                </Tooltip>
+                            </IconButton>
+                        </Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="body1" component="p" className={classes.text}>{message}</Typography>

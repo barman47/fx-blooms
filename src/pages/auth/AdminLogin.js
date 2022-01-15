@@ -14,7 +14,7 @@ import { GET_ERRORS } from '../../actions/types';
 
 import isEmpty from '../../utils/isEmpty';
 import { COLORS } from '../../utils/constants';
-import { ADMIN_DASHBOARD, ADMIN_HOME } from '../../routes';
+import { ADMIN_HOME } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -100,7 +100,7 @@ const AdminLogin = (props) => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            return history.push(`${ADMIN_DASHBOARD}${ADMIN_HOME}`);
+            return history.push(`${ADMIN_HOME}`);
 
         }
         // eslint-disable-next-line
@@ -182,7 +182,7 @@ const AdminLogin = (props) => {
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Grid container direction="row" justify="space-between">
+                                <Grid container direction="row" justifyContent="space-between">
                                     <Grid item>
                                         <Typography variant="subtitle2" component="span">Password</Typography>
                                     </Grid>

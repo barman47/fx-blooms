@@ -24,7 +24,7 @@ import { login, logout } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { DASHBOARD, DASHBOARD_HOME, FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../routes';
+import { DASHBOARD_HOME, FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../routes';
 
 import validateLogin from '../../utils/validation/customer/login';
 
@@ -110,7 +110,7 @@ const Login = ({ login, logout }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            return history.push(`${DASHBOARD}${DASHBOARD_HOME}`);
+            return history.push(DASHBOARD_HOME);
         }
         // eslint-disable-next-line
     }, []);
