@@ -579,7 +579,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                 disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
                                 onClick={handleMadpayment}
                             >
-                                {loading ? 'One Moment . . .' : 'NGN Payment Made'}
+                                {loading ? 'One Moment . . .' : `${formatNumber(bid.bidAmount.amount * listing.exchangeRate, 2)} NGN Payment Made`}
                             </Button>
                         </Grid>
                     </Drawer>

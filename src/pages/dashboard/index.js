@@ -39,6 +39,7 @@ import SignalRService from '../../utils/SignalRController';
 
 import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
 import SuccessModal from '../../components/common/SuccessModal';
+import TransactionCompleteModal from './TransactionCompleteModal';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
 
@@ -144,9 +145,10 @@ const Dashboard = ({ children, title, logout }) => {
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
     ];
     
+    const accountSetupModal = useRef();
     const customToast = useRef();
     const successModal = useRef();
-    const accountSetupModal = useRef();
+    const transactionCompleteModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
 
@@ -351,8 +353,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
                                 payload: { id }
                             });
-                            successModal.current.openModal();
-                            successModal.current.setModalText('Congratulations! This transaction is completed. Thanks for using FXBLOOMS.');
+                            transactionCompleteModal.current.openModal();
                         }
                         break;
 
@@ -428,6 +429,7 @@ const Dashboard = ({ children, title, logout }) => {
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <TransactionCompleteModal ref={transactionCompleteModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
