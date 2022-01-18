@@ -467,7 +467,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                     <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
                                 </Grid> */}
                                 <Grid item xs={12} className={classes.exchangeAmountContainer}>
-                                    <Typography variant="subtitle1" component="p" color="primary">Amount to Transfer</Typography>
+                                    <Typography variant="subtitle1" component="p" color="primary">NGN Amount to Transfer</Typography>
                                     <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
