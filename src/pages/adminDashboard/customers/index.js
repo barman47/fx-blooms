@@ -7,15 +7,30 @@ import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import {
+    Box,
     Button,
     Grid,
     Typography
 } from '@material-ui/core';
 
-import { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers } from '../../../actions/customer';
+import { 
+    getCustomers, 
+    getMoreCustomers, 
+    getNewCustomers, 
+    getMoreNewCustomers, 
+    getRejectedCustomers, 
+    getMoreRejectedCustomers, 
+    getSuspendedCustomers,
+    getMoreSuspendedCustomers,
+    getVerifiedCustomers, 
+    getMoreVerifiedCustomers, 
+    getCustomersWithoutProfile,
+    getMoreCustomersWithoutProfile
+} from '../../../actions/customer';
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 
 import AllCustomers from './AllCustomers';
+import NoProfileCustomers from './NoProfileCustomers';
 import NewCustomers from './NewCustomers';
 import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
@@ -35,22 +50,39 @@ const useStyles = makeStyles((theme) => ({
     },
 
     filterContainer: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(5, 1fr)',
+        gap: theme.spacing(4),
         marginTop: theme.spacing(2)
     },
 
     filter: {
         backgroundColor: COLORS.lightTeal,
+        border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: [[theme.spacing(3), theme.spacing(2)]]
+        padding: theme.spacing(1),
+
+        '& span:first-child': {
+            fontWeight: 600,
+            color: theme.palette.primary.main
+        },
+
+        '& span:last-child': {
+            color: theme.palette.primary.main,
+            fontWeight: 600
+        }
     },
 
     active: {
-        border: `1px solid ${theme.palette.primary.main}`,
-        color: theme.palette.primary.main,
+        backgroundColor: theme.palette.primary.main,
+        
+        '& span': {
+            color: `${COLORS.offWhite} !important`,
+        }
     },
 
     table: {
@@ -103,15 +135,36 @@ const Customers = (props) => {
 
     const { admin } = useSelector(state => state);
     const { confirmed, customers, pending, rejected, count } = useSelector(state => state.customers);
-    const { totalCustomersAwaitingApproval, totalApprovedCustomers, totalCustomers, totalRejectedCustomers } = useSelector(state => state.stats);
+    const { 
+        // totalCustomersAwaitingApproval, 
+        totalApprovedCustomers, 
+        totalCustomers, 
+        totalRejectedCustomers,
+        totalSuspendedCustomers,
+        totalCustomersWithNoProfile 
+    } = useSelector(state => state.stats);
 
-    const { ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
+    const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED_CUSTOMERS } = CUSTOMER_CATEGORY;
 
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState(PENDING);
+    const [filter, setFilter] = useState(NO_PROFILE);
 
-    const { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getVerifiedCustomers, getMoreVerifiedCustomers, getRejectedCustomers, getMoreRejectedCustomers, handleSetTitle } = props;
+    const { 
+        getCustomers, 
+        getMoreCustomers, 
+        getNewCustomers, 
+        getCustomersWithoutProfile,
+        getMoreCustomersWithoutProfile,
+        getSuspendedCustomers,
+        getMoreSuspendedCustomers,
+        getMoreNewCustomers, 
+        getVerifiedCustomers, 
+        getMoreVerifiedCustomers, 
+        getRejectedCustomers, 
+        getMoreRejectedCustomers, 
+        handleSetTitle 
+    } = props;
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -154,7 +207,20 @@ const Customers = (props) => {
                     pageNumber: 1,
                     pageSize: 25
                 });
-                // }
+                break;
+
+            case SUSPENDED_CUSTOMERS:
+                getSuspendedCustomers({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
+                break;
+
+            case NO_PROFILE:
+                getCustomersWithoutProfile({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
                 break;
 
             default:
@@ -190,6 +256,20 @@ const Customers = (props) => {
                         pageNumber: rejected.currentPageNumber + 1
                     });
                 }
+                break;
+
+                case SUSPENDED_CUSTOMERS:
+                    getMoreSuspendedCustomers({
+                        pageNumber: 1,
+                        pageSize: 25
+                    });
+                    break;
+
+            case NO_PROFILE:
+                getMoreCustomersWithoutProfile({
+                    pageNumber: 1,
+                    pageSize: 25
+                });
                 break;
             
             case ALL_CUSTOMERS:
@@ -296,32 +376,28 @@ const Customers = (props) => {
                         <Typography variant="body1" className={classes.link} onClick={downloadRecords}>Download Records</Typography>
                     </Grid>
                 </Grid>
-                <Grid container direction="row" spacing={5} className={classes.filterContainer}>
-                    <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === PENDING && classes.active)} onClick={() => handleSetFilter(PENDING)}>
-                            <Typography variant="subtitle2" component="span">New</Typography>
-                            <Typography variant="subtitle2" component="span">{totalCustomersAwaitingApproval}</Typography>
-                        </div>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => handleSetFilter(CONFIRMED)}>
-                            <Typography variant="subtitle2" component="span">Verified</Typography>
-                            <Typography variant="subtitle2" component="span">{totalApprovedCustomers}</Typography>
-                        </div>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === REJECTED && classes.active)} onClick={() => handleSetFilter(REJECTED)}>
-                            <Typography variant="subtitle2" component="span">Rejected</Typography>
-                            <Typography variant="subtitle2" component="span">{totalRejectedCustomers}</Typography>
-                        </div>
-                    </Grid>
-                    <Grid item xs={6} md={3}>
-                        <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
-                            <Typography variant="subtitle2" component="span">All</Typography>
-                            <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
-                        </div>
-                    </Grid>
-                </Grid>
+                <Box component="section" className={classes.filterContainer}>
+                    <div className={clsx(classes.filter, filter === NO_PROFILE && classes.active)} onClick={() => handleSetFilter(NO_PROFILE)}>
+                        <Typography variant="subtitle2" component="span">No Profile</Typography>
+                        <Typography variant="subtitle2" component="span">{totalCustomersWithNoProfile}</Typography>
+                    </div>
+                    <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => handleSetFilter(CONFIRMED)}>
+                        <Typography variant="subtitle2" component="span">Verified</Typography>
+                        <Typography variant="subtitle2" component="span">{totalApprovedCustomers}</Typography>
+                    </div>
+                    <div className={clsx(classes.filter, filter === REJECTED && classes.active)} onClick={() => handleSetFilter(REJECTED)}>
+                        <Typography variant="subtitle2" component="span">Rejected</Typography>
+                        <Typography variant="subtitle2" component="span">{totalRejectedCustomers}</Typography>
+                    </div>
+                    <div className={clsx(classes.filter, filter === SUSPENDED_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(SUSPENDED_CUSTOMERS)}>
+                        <Typography variant="subtitle2" component="span">Suspended</Typography>
+                        <Typography variant="subtitle2" component="span">{totalSuspendedCustomers}</Typography>
+                    </div>
+                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
+                        <Typography variant="subtitle2" component="span">All</Typography>
+                        <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
+                    </div>
+                </Box>
                 <section className={classes.table}>
                     <header>
                         <Typography variant="subtitle2" component="span">#</Typography>
@@ -333,6 +409,7 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span"></Typography>
                     </header>
                     <main className={classes.content}>
+                        {filter === NO_PROFILE && <NoProfileCustomers handleSetTitle={handleSetTitle} />}
                         {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
                         {filter === CONFIRMED && <VerifiedCustomers handleSetTitle={handleSetTitle} />}
                         {filter === REJECTED && <RejectedCustomers handleSetTitle={handleSetTitle} />}
@@ -354,6 +431,8 @@ const Customers = (props) => {
 
 Customers.propTypes = {
     getCustomers: PropTypes.func.isRequired,
+    getCustomersWithoutProfile: PropTypes.func.isRequired,
+    getSuspendedCustomers: PropTypes.func.isRequired,
     getMoreCustomers: PropTypes.func.isRequired,
     getNewCustomers: PropTypes.func.isRequired,
     getMoreNewCustomers: PropTypes.func.isRequired,
@@ -364,4 +443,17 @@ Customers.propTypes = {
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCustomers, getMoreCustomers, getNewCustomers, getMoreNewCustomers, getRejectedCustomers, getMoreRejectedCustomers, getVerifiedCustomers, getMoreVerifiedCustomers })(Customers);
+export default connect(undefined, { 
+    getCustomers, 
+    getMoreCustomers, 
+    getCustomersWithoutProfile, 
+    getMoreCustomersWithoutProfile, 
+    getSuspendedCustomers,
+    getMoreSuspendedCustomers, 
+    getNewCustomers, 
+    getMoreNewCustomers, 
+    getRejectedCustomers, 
+    getMoreRejectedCustomers, 
+    getVerifiedCustomers, 
+    getMoreVerifiedCustomers 
+})(Customers);

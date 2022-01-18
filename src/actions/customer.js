@@ -26,6 +26,10 @@ import {
     SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
     SET_MORE_REJECTED_CUSTOMERS,
+    SET_SUSPENDED_CUSTOMERS,
+    SET_MORE_SUSPENDED_CUSTOMERS,
+    SET_CUSTOMERS_WITHOUT_PROFILE,
+    SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER_STATS,
     SET_CUSTOMER,
@@ -177,9 +181,13 @@ export const getIdVerificationLink = () => async (dispatch) => {
     }
 };
 
-export const login = (data, history) => async (dispatch) => {
+export const login = (data, history, userLocation) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/login`, data);
+        const res = await axios.post(`${api}/login`, data, {
+            headers: {
+                'Location': JSON.stringify(userLocation)
+            }
+        });
         const {  token } = res.data.data;
         setAuthToken(token);
         dispatch({
@@ -368,6 +376,62 @@ export const getMoreVerifiedCustomers = (query) => async(dispatch) => {
         const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
         return dispatch({
             type: SET_MORE_CONFIRMED_CUSTOMERS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomersWithoutProfile = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
+        return dispatch({
+            type: SET_CUSTOMERS_WITHOUT_PROFILE,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreCustomersWithoutProfile = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
+        return dispatch({
+            type: SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getSuspendedCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/GetSuspendedCustomers`, query);
+        return dispatch({
+            type: SET_SUSPENDED_CUSTOMERS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getMoreSuspendedCustomers = (query) => async(dispatch) => {
+    try {
+        // Issue admin token
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/GetSuspendedCustomers`, query);
+        return dispatch({
+            type: SET_MORE_SUSPENDED_CUSTOMERS,
             payload: res.data.data
         });
     } catch (err) {

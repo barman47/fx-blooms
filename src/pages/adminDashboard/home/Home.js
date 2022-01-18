@@ -1,69 +1,88 @@
 import { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+// import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Link as RouterLink } from 'react-router-dom';
+// import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
+    Box,
     Grid,
-    Link,
+    // Link,
     Typography
 } from '@material-ui/core';
 
-import { COLORS } from '../../../utils/constants';
-import { CUSTOMERS } from '../../../routes';
+// import { COLORS } from '../../../utils/constants';
+// import { CUSTOMERS } from '../../../routes';
 
 const useStyles = makeStyles((theme) => ({
     root: {
         marginTop: theme.spacing(5),
-    },
-
-    header: {
-        '& h5': {
-            fontWeight: 600,
-
-            [theme.breakpoints.down('md')]: {
-                fontSize: theme.spacing(2.5)
-            }
-        },
-
-        '& span': {
-            fontWeight: 300
-        }
-    },
-
-    name: {
-        fontSize: theme.spacing(2),
-        textAlign: 'right'
-    },
-
-    email: {
-        color: COLORS.grey,
-        fontSize: theme.spacing(1.7),
-        fontWeight: 300,
-        lineHeight: 0.8,
-        textAlign: 'right'
+        padding: theme.spacing(0, 3)
     },
 
     content: {
-        '& div': {
-            backgroundColor: COLORS.lightTeal,
-            borderRadius: theme.shape.borderRadius,
-            cursor: 'pointer',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            height: theme.spacing(25),
-            padding: [[theme.spacing(2)]]
-        }
-    }
+        display: 'grid',
+        gridTemplateColumns: 'repeat(3, 1fr)',
+        gap: theme.spacing(5)
+    },
+
+    stats: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: theme.spacing(10)
+    },
+
+    statsHeader: {
+        fontWeight: 700,
+        marginBottom: theme.spacing(1)
+    },
+
+    userAcquisitions: {
+        backgroundColor: '#FBEDFF',
+        border: `2px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        height: theme.spacing(35),
+        padding: theme.spacing(2)
+    },
+
+    listingsBreakdown: {
+        backgroundColor: '#FBEDFF',
+        border: `2px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        height: theme.spacing(35),
+        padding: theme.spacing(2)
+    },
+
+    contentItem: {
+        border: `2px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        height: theme.spacing(30),
+        padding: theme.spacing(2)
+    },
+
+    userActivities: {
+        border: `2px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        height: theme.spacing(35),
+        padding: theme.spacing(2)
+    },
+
+    recentTransactions: {
+        border: `2px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        height: theme.spacing(35),
+        padding: theme.spacing(2)
+    },
 }));
 
 const Home = (props) => {
     const classes = useStyles();
-    const history = useHistory();
+    // const history = useHistory();
 
-    const { totalCustomers } = useSelector(state => state.stats);
+    const { totalCustomers, totalListings } = useSelector(state => state.stats);
 
     const { handleSetTitle } = props;
 
@@ -72,28 +91,66 @@ const Home = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    const goToDashboard = () => history.push(`${CUSTOMERS}`);
+    // const goToDashboard = () => history.push(`${CUSTOMERS}`);
 
     return (
         <>
-            <Grid container direction="column" spacing={10} className={classes.root}>
-                <Grid item xs={12} md={6} lg={5} className={classes.header}>
-                    <Typography variant="h5">Welcome to FXBLOOMS Admin</Typography>
-                    <Typography variant="subtitle2" component="span">What would you like to do today?</Typography>
+            <Grid container direction="row" spacing={3} className={classes.root}>
+                <Grid item xs={12} className={classes.stats}>
+                    <Box component="div" className={classes.userAcquisitions}>
+                        <Typography variant="subtitle2" component="span" color="primary">Listings Breakdown</Typography>
+                    </Box>
+                    <Box component="div" className={classes.listingsBreakdown}>
+                        <Typography variant="subtitle2" component="span" color="primary">User Acquisitions</Typography>
+                    </Box>
                 </Grid>
-                <Grid item xs={12} md={6} lg={5} className={classes.content}>
-                    <div onClick={goToDashboard}>
-                        {/* <Typography variant="subtitle2" component="span" color="primary"> */}
-                            <Link to={CUSTOMERS} component={RouterLink} underline="none" color="primary">
-                                Customers
-                            </Link>
-                        {/* </Typography> */}
-                        <section>
-                            <Typography variant="h2" component="span">{totalCustomers}</Typography>
-                            <br />
-                            <Typography variant="subtitle2" component="span">Total</Typography>
-                        </section>
-                    </div>
+                <Grid item xs={12} className={classes.content}>
+                    <Box component="div" className={classes.contentItem}>
+                        <Typography variant="subtitle2" component="span" color="primary">Users</Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalCustomers}</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem}>
+                        <Typography variant="subtitle2" component="span" color="primary">Active Users</Typography>
+                        <Typography variant="h5" color="primary" className={classes.statsHeader}>200,000 (95%)</Typography>
+                    </Box>
+                    <Box component="div" className={classes.contentItem}>
+                        <Typography variant="subtitle2" component="span" color="primary">Support Board</Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
+                        <Typography variant="subtitle2" component="span" color="primary">Listings</Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalListings}</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
+                        <Typography variant="subtitle2" component="span" color="primary">Volume</Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>EUR 354,000</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
+                        <Typography variant="subtitle2" component="span" color="primary">AML Board</Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
+                            
+                        </Box>
+                    </Box>
+                </Grid>
+                <Grid item xs={12} className={classes.stats}>
+                    <Box component="div" className={classes.userActivities}>
+                        <Typography variant="subtitle2" component="span" color="primary">User Activities</Typography>
+                    </Box>
+                    <Box component="div" className={classes.recentTransactions}>
+                        <Typography variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
+                    </Box>
                 </Grid>
             </Grid>
         </>
