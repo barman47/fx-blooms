@@ -9,7 +9,8 @@ import {
     CANCELED_NEGOTIATION,
     SET_LOADING_LISTINGS,
     SET_LISTING_MSG,
-    TOGGLE_BID_STATUS
+    TOGGLE_BID_STATUS,
+    REMOVE_EXPIRED_LISTING
 } from '../actions/types';
 
 const initialState = {
@@ -130,6 +131,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 msg: action.payload
+            };
+
+        case REMOVE_EXPIRED_LISTING:
+            return {
+                ...state,
+                listings: state.listings.filter(listing => listing.id !== action.payload)
             };
 
         default:
