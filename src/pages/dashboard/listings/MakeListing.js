@@ -20,7 +20,7 @@ import { FormatListText } from 'mdi-material-ui';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
-import EditListingItem from './EditListingItem';
+import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
@@ -487,7 +487,7 @@ const MakeListing = (props) => {
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={1}>
                                 <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
+                                    <br />
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.AvailableCurrency ? true : false } 
@@ -511,7 +511,7 @@ const MakeListing = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <br />
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
                                     <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                         <TextField
                                             value={ExchangeAmount}
@@ -532,7 +532,7 @@ const MakeListing = (props) => {
                                     </Tooltip>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Currency</Typography>
+                                    <br />
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.RequiredCurrency ? true : false } 
@@ -576,7 +576,7 @@ const MakeListing = (props) => {
                                     </Tooltip>
                                 </Grid>
                                 <Grid item xs={4}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
+                                    <br />
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.AvailableCurrency ? true : false } 
@@ -600,7 +600,7 @@ const MakeListing = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <br />
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
                                     <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
                                         <TextField
                                             value={MinExchangeAmount}
@@ -720,7 +720,7 @@ const MakeListing = (props) => {
                                 <Typography variant="h6">Previous Listings</Typography>
                                 <Divider />
                                 <br />
-                                {previousListings.map(item => (<EditListingItem key={item.id} listing={item} />))}
+                                {previousListings.map(item => (<PreviousListingItem key={item.id} listing={item} />))}
                             </div>
                         }
                     </Grid>

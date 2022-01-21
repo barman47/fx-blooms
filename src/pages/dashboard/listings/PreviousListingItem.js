@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const EditListingItem = ({ deleteListing, listing }) => {
+const PreviousListingItem = ({ deleteListing, listing }) => {
     const classes = useStyles();
 
     const handleDeleteListing = () => {
@@ -83,12 +83,10 @@ const EditListingItem = ({ deleteListing, listing }) => {
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                     {`${getCurrencySymbol(listing?.amountNeeded?.currencyType)}${formatNumber(listing?.exchangeRate)} to ${getCurrencySymbol(listing?.amountAvailable?.currencyType)} 1`}
                 </Typography>
-                {/* {listing.bank &&  */}
-                    <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
-                        {listing.bank}
-                    </Typography>
-                {/* } */}
+                <Typography variant="subtitle2" component="span">
+                    <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying from</span>
+                    {listing.bank.toUpperCase()}
+                </Typography>
                 <section>
                     <Tooltip title="Delete Listing" aria-label="Delete Listing" arrow style={{ marginLeft: '10px' }}>
                         <DeleteForever 
@@ -102,9 +100,9 @@ const EditListingItem = ({ deleteListing, listing }) => {
     );
 };
 
-EditListingItem.propTypes = {
+PreviousListingItem.propTypes = {
     deleteListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired
 };
 
-export default connect(undefined, { deleteListing })(EditListingItem);
+export default connect(undefined, { deleteListing })(PreviousListingItem);

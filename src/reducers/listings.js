@@ -9,9 +9,12 @@ import {
     CANCELED_NEGOTIATION,
     SET_LOADING_LISTINGS,
     SET_LISTING_MSG,
+    HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
     REMOVE_EXPIRED_LISTING
 } from '../actions/types';
+
+import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
@@ -84,6 +87,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 listings,
                 ...rest
+            };
+
+        case HIDE_NEGOTIATION_LISTINGS:
+            return {
+                ...state,
+                listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
             };
 
         case SET_MORE_LISTINGS: 

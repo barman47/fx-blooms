@@ -1,6 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
 import { useDispatch } from 'react-redux';
-import PropTypes from 'prop-types';
 import { 
     Backdrop,
 	Button,
@@ -110,9 +109,5 @@ const BidSuccessModal = forwardRef((props, ref) => {
         </Modal>
 	);
 });
-
-BidSuccessModal.propTypes = {
-    toggleDrawer: PropTypes.func.isRequired
-};
 
 export default BidSuccessModal;

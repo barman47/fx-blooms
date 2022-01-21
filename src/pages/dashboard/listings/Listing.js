@@ -288,7 +288,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
-                        {bank}
+                        {bank.toUpperCase()}
                     </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 

@@ -505,14 +505,16 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 	}, [getListingsOpenForBid]);
 
 	useEffect(() => {
-		if (hideNegotiationListings) {
+		if (hideNegotiationListings === false) {
 			handleClearFilter();
 		}
 	}, [handleClearFilter, hideNegotiationListings]);
 
 	const hideListingsInNegotiation = () => {
-		dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 		setHideNegotiationListings(!hideNegotiationListings);
+		if (!hideNegotiationListings) {
+			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
+		}
 	};
 
 	const onSubmit = (e) => {
