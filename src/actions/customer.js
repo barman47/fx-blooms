@@ -388,6 +388,7 @@ export const getCustomersWithoutProfile = (query) => async(dispatch) => {
         // Issue admin token
         await reIssueAdminToken();
         const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
+        console.log(res);
         return dispatch({
             type: SET_CUSTOMERS_WITHOUT_PROFILE,
             payload: res.data.data
