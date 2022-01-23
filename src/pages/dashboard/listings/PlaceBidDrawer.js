@@ -113,6 +113,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gridTemplateColumns: '1fr',
+        marginTop: theme.spacing(2),
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('sm')]: {
@@ -176,10 +177,12 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     const successModal = useRef();
 
-    useEffect(() => {
-        getAccount(listing.sellersAccountId);
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     if (isEmpty(account)) {
+    //         getAccount(listing.sellersAccountId);
+    //     }
+    //     // eslint-disable-next-line
+    // }, []);
 
     useEffect(() => {
         setOpen(drawerOpen);
@@ -282,11 +285,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
             accountId: getAccountId(receivingAccount)
         });
     };
-
-    useEffect(() => {
-        getAccount(listing.sellersAccountId);
-        // eslint-disable-next-line
-    }, []);
 
     useEffect(() => {
         setLoading(false);
