@@ -185,7 +185,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 
     useEffect(() => {
         if (openPlaceBidDrawer) {
-            // getAccount(listing.sellersAccountId);
+            getAccount(listing.sellersAccountId);
         } else {
             dispatch({
                 type: SET_ACCOUNT,

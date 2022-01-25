@@ -177,12 +177,12 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     const successModal = useRef();
 
-    // useEffect(() => {
-    //     if (isEmpty(account)) {
-    //         getAccount(listing.sellersAccountId);
-    //     }
-    //     // eslint-disable-next-line
-    // }, []);
+    useEffect(() => {
+        if (isEmpty(account)) {
+            getAccount(listing.sellersAccountId);
+        }
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         setOpen(drawerOpen);
