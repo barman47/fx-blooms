@@ -11,10 +11,9 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { DotsHorizontal } from 'mdi-material-ui';
-import TextClamp from 'react-string-clamp';
 
-import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
-import { getCustomers } from '../../../actions/customer';
+import { getSuspendedCustomers } from '../../../actions/customer';
+import { SET_CUSTOMER } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
@@ -55,29 +54,23 @@ const useStyles = makeStyles(theme => ({
     customerLink: {
         color: `${theme.palette.primary.main}`,
         cursor: 'pointer'
-    }
+    },
 }));
 
-const AllCustomers = ({ getCustomers, handleClick }) => {
+const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const customers = useSelector(state => state.customers?.customers?.items);
+    const newCustomers = useSelector(state => state.customers?.pending?.items);
 
     useEffect(() => {
-        // handleSetTitle('All Customers');
-        getCustomers({
-            pageNumber: 1,
-            pageSize: 25
-        });
-        // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            dispatch({ type: CLEAR_ALL_CUSTOMERS });
-        };
-
+        // handleSetTitle('New Customers');
+        // if (!newCustomers) {
+            getSuspendedCustomers({
+                pageNumber: 1,
+                pageSize: 25
+            });
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -91,17 +84,17 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
 
     return (
         <>
-            {customers && customers.map((customer) => (
+            {newCustomers && newCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell clalocssName={classes.item}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span" className={classes.text}>{customer.customerStatus}</Typography></TableCell>
-                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span" className={classes.text}>{customer?.riskProfile}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{customer.email}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{customer.userName}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
                         <IconButton 
                             variant="text" 
@@ -121,9 +114,9 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
     );
 };
 
-AllCustomers.propTypes = {
-    getCustomers: PropTypes.func.isRequired,
+SuspendedCustomers.propTypes = {
+    getSuspendedCustomers: PropTypes.func.isRequired,
     handleClick: PropTypes.func.isRequired
 };
 
-export default connect(undefined , { getCustomers })(AllCustomers);
+export default connect(undefined, { getSuspendedCustomers })(SuspendedCustomers);

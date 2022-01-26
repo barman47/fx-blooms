@@ -4,9 +4,11 @@ import clsx from 'clsx';
 import { 
     Backdrop,
 	Button,
+	Checkbox,
 	CircularProgress,
     Fade,
 	FormControl,
+	FormControlLabel,
 	FormHelperText,
 	Grid,
 	MenuItem,
@@ -18,10 +20,12 @@ import {
 import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { getListingsOpenForBid } from '../../../actions/listings';
-import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
+import { HIDE_NEGOTIATION_LISTINGS } from '../../../actions/types';
 
+import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 import { COLORS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
+import { useDispatch } from 'react-redux';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -92,33 +96,33 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const MobileFilterModal = (props) => {
-
-    const [open, setOpen] = useState(false);
-
-    const { getListingsOpenForBid, toggleModal } = props;
-
-    const closeModal = useCallback(() => {
-        setOpen(false);
-    }, []);
-
-    const PRICE = 'PRICE';
-	const RATING = 'RATING';
-	
-    const classes = useStyles();
+	const classes = useStyles();
+	const dispatch = useDispatch();
 	const theme = useTheme();
 	
 	const { listings } = useSelector(state => state.listings);
 	const { currencies } = useSelector(state => state);
 
+    const { getListingsOpenForBid, toggleModal } = props;
+	
+    const PRICE = 'PRICE';
+	const RATING = 'RATING';
+	
+	
 	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
 	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
-
+	
 	const [SellerRating, setSellerRating] = useState(0);
-
+	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [errors, setErrors] = useState({});
+	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
+
+	const closeModal = useCallback(() => {
+		setOpen(false);
+    }, []);
 
     useEffect(() => {
         setLoading(false);
@@ -138,6 +142,23 @@ const MobileFilterModal = (props) => {
 		setErrors({});
 
 		getListingsOpenForBid();
+	};
+
+	const hideListingsInNegotiation = () => {
+		if (!hideNegotiationListings) {
+			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
+		} else {
+			getListingsOpenForBid({
+				pageNumber: 0,
+				pageSize: 15,
+				currencyNeeded: 'EUR',
+				currencyAvailable: 'NGN',
+				minimumExchangeAmount: 0,
+				useCurrencyFilter: false
+			});	
+		}
+		setHideNegotiationListings(!hideNegotiationListings);
+		toggleModal();
 	};
 
     const onSubmit = (e) => {
@@ -311,6 +332,19 @@ const MobileFilterModal = (props) => {
 										{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 									</Button>
 								</Grid>
+								<Grid item xs={12}>
+									<FormControlLabel
+										style={{ color: theme.palette.primary.main }}
+										control={
+											<Checkbox
+												checked={hideNegotiationListings}
+												onChange={hideListingsInNegotiation}
+												color="primary"
+											/>
+										}
+										label="Hide Unavailable Listings"
+									/>
+								</Grid>
 							</Grid>
 							:
 							<Grid container direction="row" spacing={2}>
@@ -334,6 +368,19 @@ const MobileFilterModal = (props) => {
 									>
 										{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 									</Button>
+								</Grid>
+								<Grid item xs={12}>
+									<FormControlLabel
+										style={{ color: theme.palette.primary.main }}
+										control={
+											<Checkbox
+												checked={hideNegotiationListings}
+												onChange={hideListingsInNegotiation}
+												color="primary"
+											/>
+										}
+										label="Hide Unavailable Listings"
+									/>
 								</Grid>
 							</Grid>
 						}

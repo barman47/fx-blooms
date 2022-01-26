@@ -38,6 +38,7 @@ import FallBack from './components/common/FallBack';
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
 const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
+// const Private404 = lazy(() => import('./components/common/Private404'));
 
 const Home = lazy(() => import('./pages/home'));
 // import Landing from './pages/landing/Landing';
@@ -193,6 +194,7 @@ const [title, setTitle] = useState('');
 									<AdminRoute path={`${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
+									{/* <AdminRoute exact component={() => <Private404 handleSetTitle={handleSetTitle} />} /> */}
 								</AdminDashboard>
 							</AdminRoute>
 							<Route component={PageNotFound} exact />

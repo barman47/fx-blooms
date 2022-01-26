@@ -1,11 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Tooltip, Typography } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ClockOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 import { getCustomer, getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
@@ -14,7 +12,7 @@ import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { getAccount } from '../../../actions/bankAccounts';
-import { GET_ERRORS, SET_ACCOUNT } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { PROFILE, USER_DETAILS } from '../../../routes';
 
@@ -139,14 +137,35 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const userId = useSelector(state => state.customer.customerId);
 
     const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
-    const [tooltipOpen, setTooltipOpen] = useState(false);
+    const [expired, setExpired] = useState(false);
+    const [timerHours, setTimerHours] = useState('0');
+    const [timerMinutes, setTimerMinutes] = useState('0');
+    const [timerSeconds, setTimerSeconds] = useState('0');
     const [errors, setErrors] = useState({});
 
     const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
 
     const toast = useRef();
+    const interval = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
+
+    useEffect(() => {
+        startExpiryTimer();
+        return () => {
+            clearInterval(interval.current);
+        };
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
+        if (expired) {
+            dispatch({
+                type: REMOVE_EXPIRED_LISTING,
+                payload: listing.id
+            });
+        }
+    }, [dispatch, expired, listing.id]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -175,6 +194,30 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         }
     }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
 
+    const startExpiryTimer = () => {
+        const countDownDate = new Date(dateCreated).getTime() + 345600000; // number of milliseconds in 4 days
+        interval.current = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = countDownDate - now;
+
+            const hours = Math.floor((distance / (1000*60*60)));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            if (distance < 0) {
+                clearInterval(interval.current);
+                setExpired(true);
+                setTimerHours('00');
+                setTimerMinutes('00');
+                setTimerSeconds('00');
+            } else {
+                setTimerHours(hours < 10 ? `0${hours}` : hours);
+                setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
+                setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
+            }
+        }, 1000);
+    };
+
     const handleSetCustomer = (e, sellerId) => {
         e.preventDefault();
         if (userId !== customerId) {
@@ -189,14 +232,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         if (confirm) {
             deleteListing(id);
         }
-    };
-
-    const openTooltip = () => {
-        setTooltipOpen(true);
-    };
-
-    const closeTooltip = () => {
-        setTooltipOpen(false);
     };
     
     const togglePlaceBidDrawer = () => {
@@ -226,15 +261,11 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                             to={USER_DETAILS} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
                             >
-                                <span style={{ color: theme.palette.primary.main }}>{userId === customerId ? 'Me' : listedBy}</span>
+                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy}</span>
                         </RouterLink>
                     </Typography>
                     <section className={classes.timestamp}>
-                        <Tooltip title={moment(new Date(dateCreated)).format('Do MMM, h:mm a')} aria-label="Date Posted" open={tooltipOpen} onOpen={openTooltip} onClose={closeTooltip} arrow>
-                            <ClockOutline style={{ fontSize: theme.spacing(2), color: COLORS.darkGrey, cursor: 'pointer', }} />
-                        </Tooltip>
-                        &nbsp;&nbsp;
-                        <Typography variant="subtitle2" component="span" onMouseEnter={openTooltip} onMouseLeave={closeTooltip}>{moment(new Date(dateCreated)).fromNow()}</Typography>
+                        <Typography variant="subtitle2" component="span">Expires in: &nbsp;&nbsp;&nbsp;<span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{timerHours}:{timerMinutes}:{timerSeconds}</span></Typography>
                     </section>
                     {/* <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography> */}
                 </header>
@@ -257,7 +288,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
-                        {bank}
+                        {bank.toUpperCase()}
                     </Typography>
                     {listing.status === LISTING_STATUS.negotiation ?
                         <Button 

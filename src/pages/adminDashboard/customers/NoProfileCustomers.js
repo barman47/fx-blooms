@@ -13,8 +13,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { DotsHorizontal } from 'mdi-material-ui';
 import TextClamp from 'react-string-clamp';
 
-import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
-import { getCustomers } from '../../../actions/customer';
+import { getCustomersWithoutProfile } from '../../../actions/customer';
+import { SET_CUSTOMER } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
@@ -55,29 +55,21 @@ const useStyles = makeStyles(theme => ({
     customerLink: {
         color: `${theme.palette.primary.main}`,
         cursor: 'pointer'
-    }
+    },
 }));
 
-const AllCustomers = ({ getCustomers, handleClick }) => {
+const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const customers = useSelector(state => state.customers?.customers?.items);
+    const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
 
     useEffect(() => {
-        // handleSetTitle('All Customers');
-        getCustomers({
+        // handleSetTitle('Verified Customers');
+        getCustomersWithoutProfile({
             pageNumber: 1,
             pageSize: 25
         });
-        // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            dispatch({ type: CLEAR_ALL_CUSTOMERS });
-        };
-
         // eslint-disable-next-line
     }, []);
 
@@ -91,14 +83,14 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
 
     return (
         <>
-            {customers && customers.map((customer) => (
+            {noProfileCustomers && noProfileCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell clalocssName={classes.item}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.firstName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.lastName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
                     <TableCell className={classes.item}><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span" className={classes.text}>{customer.customerStatus}</Typography></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span" className={classes.text}>{customer?.riskProfile}</Typography></TableCell>
@@ -109,7 +101,7 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
                             className={classes.button} 
                             aria-controls="customer-menu" 
                             aria-haspopup="true" 
-                            onClick={(e) => handleButtonClick(customer, e)}
+                            onClick={(e) => handleButtonClick(customer, e)} 
                             disableRipple
                         >
                             <DotsHorizontal />
@@ -121,9 +113,9 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
     );
 };
 
-AllCustomers.propTypes = {
-    getCustomers: PropTypes.func.isRequired,
+NoProfileCustomers.propTypes = {
+    getCustomersWithoutProfile: PropTypes.func.isRequired,
     handleClick: PropTypes.func.isRequired
 };
 
-export default connect(undefined , { getCustomers })(AllCustomers);
+export default connect(undefined, { getCustomersWithoutProfile })(NoProfileCustomers);

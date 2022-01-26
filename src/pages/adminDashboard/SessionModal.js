@@ -110,6 +110,7 @@ const SessionModal = ({ logout }) => {
     }, [inactiveTime]);
 
     const handleLogin = useCallback(() => {
+        sessionStorage.removeItem(LOGOUT);
         setOpen(false);
         logout(history);
     }, [history, logout]);

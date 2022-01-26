@@ -1,13 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
 	Button,
+	Checkbox,
 	CircularProgress,
 	Fab,
 	FormControl,
+	FormControlLabel,
 	FormHelperText,
 	Grid,
 	Link,
@@ -29,7 +31,7 @@ import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
-import { SET_LOADING_LISTINGS } from '../../../actions/types';
+import { HIDE_NEGOTIATION_LISTINGS, SET_LOADING_LISTINGS } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -267,7 +269,6 @@ const AllListings = (props) => {
 	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
 
 	const [dataLength, setDataLength] = useState(0);
-	// const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [open, setOpen] = useState(false);
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
@@ -332,7 +333,6 @@ const AllListings = (props) => {
 	}, [dispatch, listings]);
 
 	const getListings = () => {
-		// setHideNegotiationListings(false);
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 10,
@@ -456,10 +456,11 @@ const AllListings = (props) => {
 	);
 }
 
-const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((props) => {
+const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ getCurrencies, getListingsOpenForBid }) => {
 	const PRICE = 'PRICE';
 	const RATING = 'RATING';
 	const classes = useStyles();
+	const dispatch = useDispatch();
 	const theme = useTheme();
 	const { currencies, listings } = useSelector(state => state);
 
@@ -468,13 +469,14 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 	const [Amount, setAmount] = useState('');
 
 	const [SellerRating, setSellerRating] = useState(0);
+	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [errors, setErrors] = useState({});
 	const [loading, setLoading] = useState(false);
 	const [filter, setFilter] = useState(PRICE);
 
 	useEffect(() => {
 		if (currencies.length === 0) {
-			props.getCurrencies();
+			getCurrencies();
 		}
 		// eslint-disable-next-line
 	}, []);
@@ -483,7 +485,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 		setLoading(false);
 	}, [listings]);
 
-	const handleClearFilter = () => {
+	const handleClearFilter = useCallback(() => {
 		setFilter(PRICE);
 		setAvailableCurrency('');
 		setRequiredCurrency('');
@@ -492,7 +494,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 		setErrors({});
 		setLoading(false);
 
-		props.getListingsOpenForBid({
+		getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
 			currencyNeeded: 'EUR',
@@ -500,6 +502,19 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
 		});
+	}, [getListingsOpenForBid]);
+
+	useEffect(() => {
+		if (hideNegotiationListings === false) {
+			handleClearFilter();
+		}
+	}, [handleClearFilter, hideNegotiationListings]);
+
+	const hideListingsInNegotiation = () => {
+		setHideNegotiationListings(!hideNegotiationListings);
+		if (!hideNegotiationListings) {
+			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
+		}
 	};
 
 	const onSubmit = (e) => {
@@ -513,7 +528,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 
 			setErrors({});
 			setLoading(true);
-			props.getListingsOpenForBid({
+			getListingsOpenForBid({
 				pageNumber: 1,
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
@@ -538,7 +553,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 
 			setErrors({});
 			setLoading(true);
-			props.getListingsOpenForBid({
+			getListingsOpenForBid({
 				pageNumber: 1,
 				pageSize: 15,
 				currencyAvailable: AvailableCurrency,
@@ -663,6 +678,19 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 								</Button>
 							</Grid>
+							<Grid item xs={12}>
+								<FormControlLabel
+									style={{ color: theme.palette.primary.main }}
+									control={
+										<Checkbox
+											checked={hideNegotiationListings}
+											onChange={hideListingsInNegotiation}
+											color="primary"
+										/>
+									}
+									label="Hide Unavailable Listings"
+								/>
+							</Grid>
 						</Grid>
 						:
 						<Grid container direction="row" spacing={2}>
@@ -709,6 +737,19 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })((pro
 								>
 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
 								</Button>
+							</Grid>
+							<Grid item xs={12}>
+								<FormControlLabel
+									style={{ color: theme.palette.primary.main }}
+									control={
+										<Checkbox
+											checked={hideNegotiationListings}
+											onChange={hideListingsInNegotiation}
+											color="primary"
+										/>
+									}
+									label="Hide Unavailable Listings"
+								/>
 							</Grid>
 						</Grid>
 					}

@@ -168,7 +168,7 @@ export const PrivateHeader = (props) => {
         { url: DASHBOARD_HOME, text: 'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circle" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
     ];
 
     const handleToggle = () => {

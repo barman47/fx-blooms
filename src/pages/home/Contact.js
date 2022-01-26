@@ -300,7 +300,7 @@ const Contact = ({ sendMail, subscribeToNewsletter }) => {
                                         placeholder="Enter Your Message"
                                         helperText={errors.Message}
                                         minRows={2}
-                                        rowsMax={10}
+                                        maxRows={10}
                                         fullWidth
                                         required
                                         multiline
