@@ -342,8 +342,8 @@ const ContactUs = ({ sendMail }) => {
                                     variant="outlined" 
                                     placeholder="Enter Your Message"
                                     helperText={errors.Message}
-                                    rows={2}
-                                    rowsMax={10}
+                                    minRows={2}
+                                    maxRows={10}
                                     fullWidth
                                     required
                                     multiline

@@ -21,6 +21,7 @@ import PropTypes from 'prop-types';
 import Spinner from '../../components/common/Spinner';
 
 import { login, logout } from '../../actions/customer';
+import { getMyLocation } from '../../actions/myLocation';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
@@ -92,13 +93,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = ({ login, logout }) => {
+const Login = ({ getMyLocation, login, logout }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
     const errorsState = useSelector(state => state.errors);
-    const { customer } = useSelector(state => state);
+    const { customer, myLocation } = useSelector(state => state);
 
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
@@ -112,6 +113,7 @@ const Login = ({ login, logout }) => {
         if (customer.isAuthenticated) {
             return history.push(DASHBOARD_HOME);
         }
+        getLocation();
         // eslint-disable-next-line
     }, []);
 
@@ -134,6 +136,12 @@ const Login = ({ login, logout }) => {
         }
     }, [customer, history, loading]);
 
+    const getLocation = () => {
+        if (!myLocation) {
+            getMyLocation();
+        }
+    };
+
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -153,7 +161,7 @@ const Login = ({ login, logout }) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        login(data, history);
+        login(data, history, myLocation);
     };   
 
     return (
@@ -281,8 +289,9 @@ const Login = ({ login, logout }) => {
 };
 
 Login.propTypes = {
+    getMyLocation: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { login, logout })(Login);
+export default connect(undefined, { getMyLocation, login, logout })(Login);

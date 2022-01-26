@@ -16,6 +16,7 @@ import statsReducer from './stats';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
 import walletsReducer from './wallets';
+import locationReducer from './myLocation';
 
 const appReducer = combineReducers({
     admin: adminReducer,
@@ -31,7 +32,8 @@ const appReducer = combineReducers({
     stats: statsReducer,
     subscription: subscriptionReducer,
     twoFactor: twoFactorReducer,
-    wallets: walletsReducer
+    wallets: walletsReducer,
+    myLocation: locationReducer
 });
 
 const rootReducer = (state, action) => {

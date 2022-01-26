@@ -79,10 +79,10 @@ const useStyles = makeStyles((theme) => ({
     },
 
     content: {
-        border: '1px solid red',
+        // border: '1px solid red',
         flexGrow: 1,
         marginLeft: theme.spacing(9) + 1,
-        marginTop: theme.spacing(5),
+        marginTop: theme.spacing(12),
         zIndex: '997',
         width: `calc(100% - ${theme.spacing(9) + 1}px)`,
         transition: theme.transitions.create(['width', 'margin'], {
@@ -129,7 +129,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     appBarContent: {
-        border: '1px solid red',
+        // border: '1px solid red',
         display: 'grid',
         gridTemplateColumns: '4fr 0.9fr',
         alignItems: 'center',

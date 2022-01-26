@@ -10,6 +10,10 @@ import {
     SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
     SET_MORE_REJECTED_CUSTOMERS,
+    SET_SUSPENDED_CUSTOMERS,
+    SET_MORE_SUSPENDED_CUSTOMERS,
+    SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
+    SET_CUSTOMERS_WITHOUT_PROFILE,
     SET_ALL_CUSTOMERS,
     CLEAR_ALL_CUSTOMERS,
     SET_ID_CHECK_DATA,
@@ -28,8 +32,10 @@ const initialState = {
     profileCheckData: null,
     customers: {},
     confirmed: {},
+    noProfile: {},
     pending: {},
     rejected: {},
+    suspended: {},
     msg: null
 };
 
@@ -94,6 +100,62 @@ const customersReducer = (state = initialState, action) => {
                 ...state,
                 confirmed: {
                     items: [...state.confirmed.items, ...action.payload.items],
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_CUSTOMERS_WITHOUT_PROFILE:
+            return {
+                ...state,
+                noProfile: {
+                    items: action.payload.items,
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_MORE_CUSTOMERS_WITHOUT_PROFILE:
+            return {
+                ...state,
+                noProfile: {
+                    items: [...state.noProfile.items, ...action.payload.items],
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_SUSPENDED_CUSTOMERS:
+            return {
+                ...state,
+                suspended: {
+                    items: action.payload.items,
+                    totalItemCount: action.payload.totalItemCount,
+                    totalPageCount: action.payload.totalPageCount,
+                    currentPageSize: action.payload.currentPageSize,
+                    currentPageNumber: action.payload.currentPageNumber,
+                    hasNext: action.payload.hasNext,
+                    hasPrevious: action.payload.hasPrevious,
+                }
+            };
+
+        case SET_MORE_SUSPENDED_CUSTOMERS:
+            return {
+                ...state,
+                suspended: {
+                    items: [...state.suspended.items, ...action.payload.items],
                     totalItemCount: action.payload.totalItemCount,
                     totalPageCount: action.payload.totalPageCount,
                     currentPageSize: action.payload.currentPageSize,

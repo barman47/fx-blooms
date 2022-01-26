@@ -113,6 +113,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gridTemplateColumns: '1fr',
+        marginTop: theme.spacing(2),
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('sm')]: {
@@ -177,7 +178,9 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     const successModal = useRef();
 
     useEffect(() => {
-        getAccount(listing.sellersAccountId);
+        if (isEmpty(account)) {
+            getAccount(listing.sellersAccountId);
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -282,11 +285,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
             accountId: getAccountId(receivingAccount)
         });
     };
-
-    useEffect(() => {
-        getAccount(listing.sellersAccountId);
-        // eslint-disable-next-line
-    }, []);
 
     useEffect(() => {
         setLoading(false);
@@ -467,7 +465,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                     <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
                                 </Grid> */}
                                 <Grid item xs={12} className={classes.exchangeAmountContainer}>
-                                    <Typography variant="subtitle1" component="p" color="primary">Amount to Transfer</Typography>
+                                    <Typography variant="subtitle1" component="p" color="primary">NGN Amount to Transfer</Typography>
                                     <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -579,7 +577,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                 disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
                                 onClick={handleMadpayment}
                             >
-                                {loading ? 'One Moment . . .' : 'NGN Payment Made'}
+                                {loading ? 'One Moment . . .' : `${formatNumber(bid.bidAmount.amount * listing.exchangeRate, 2)} NGN Payment Made`}
                             </Button>
                         </Grid>
                     </Drawer>
