@@ -200,7 +200,7 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
                                     </Tooltip> */}
                                     <Tooltip title="Share via Twitter" arrow>
                                         <TwitterShareButton
-                                            via='fxblooms1'
+                                            via={` ${message}`}
                                             url={URL}
                                             hashtags={hashtags}
                                         >

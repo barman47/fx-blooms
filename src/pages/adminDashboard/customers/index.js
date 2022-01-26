@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -8,8 +9,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import {
     Box,
-    Button,
+    Divider,
     Grid,
+    Menu,
+    MenuItem,
     Paper,
     Table,
     TableBody,
@@ -23,29 +26,23 @@ import {
 
 import { 
     getCustomers, 
-    getMoreCustomers, 
     getNewCustomers, 
-    getMoreNewCustomers, 
     getRejectedCustomers, 
-    getMoreRejectedCustomers, 
     getSuspendedCustomers,
-    getMoreSuspendedCustomers,
     getVerifiedCustomers, 
-    getMoreVerifiedCustomers, 
-    getCustomersWithoutProfile,
-    getMoreCustomersWithoutProfile
+    getCustomersWithoutProfile
 } from '../../../actions/customer';
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+import { CUSTOMERS } from '../../../routes';
 
 import AllCustomers from './AllCustomers';
 import NoProfileCustomers from './NoProfileCustomers';
-import NewCustomers from './NewCustomers';
+import SuspendedCustomers from './SuspendedCustomers';
 import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        border: '1px solid red',
         padding: theme.spacing(3)
     },
 
@@ -95,56 +92,46 @@ const useStyles = makeStyles((theme) => ({
     },
 
     table: {
-        maxHeight: 440,
-        overflowX: 'hidden',
-        // backgroundColor: COLORS.lightTeal,
-        // marginTop: theme.spacing(3),
-
-        // '& header': {
-            
-            
-        //     '& span': {
-        //         color: theme.palette.primary.main,
-        //         fontWeight: 600,
-        //         padding: theme.spacing(1),
-
-        //         [theme.breakpoints.down('md')]: {
-        //             fontSize: theme.spacing(1.5)
-        //         },
-
-        //         [theme.breakpoints.down('sm')]: {
-        //             fontSize: theme.spacing(1)
-        //         },
-        //     }
-        // }
+        borderTop: `1px solid ${theme.palette.primary.main}`,
+        borderLeft: `1px solid ${theme.palette.primary.main}`,
+        borderRight: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        borderBottomLeftRadius: 0,
+        borderBottomRightRadius: 0,
+        maxHeight: '50vh',
+        backgroundColor: COLORS.lightTeal,
+        marginTop: theme.spacing(3)
     },
 
     tableHeader: {
-        border: '1px solid red',
-        backgroundColor: COLORS.white,
         display: 'grid',
         gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
-        // width: '100%',
-        // alignItems: 'center',
-        // marginBottom: theme.spacing(3),
     },
 
     content: {
         display: 'grid',
-        gridTemplateColumns: '1fr',
-        rowGap: theme.spacing(1)
+        gridTemplateColumns: '1fr'
     },
-
-    
 
     customerLink: {
         color: `${theme.palette.primary.main}`,
         cursor: 'pointer'
     },
 
-    button: {
-        marginTop: theme.spacing(1),
-        marginBottom: theme.spacing(1)
+    pagination: {
+        backgroundColor: COLORS.lightTeal,
+        borderBottom: `1px solid ${theme.palette.primary.main}`,
+        borderLeft: `1px solid ${theme.palette.primary.main}`,
+        borderRight: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        borderTopLeftRadius: '0px',
+        borderTopRightRadius: '0px',
+    },
+
+    menu: {
+        backgroundColor: COLORS.lightTeal,
+        border: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius
     }
 }));
 
@@ -154,52 +141,41 @@ const columns = [
     {
       id: 'lastName',
       label: 'Last Name',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'email',
       label: 'Email Address',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'username',
       label: 'Username',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'status',
       label: 'Status',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'riskProfile',
       label: 'Risk Profile',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'actions',
       label: 'Actions',
-      minWidth: 170,
-    //   align: 'right',
       format: (value) => value.toLocaleString('en-US'),
     }
 ];
 
 const Customers = (props) => {
     const classes = useStyles();
+    const history = useHistory();
 
     const { admin } = useSelector(state => state);
-    const { confirmed, customers, noProfile, pending, rejected, suspended, count } = useSelector(state => state.customers);
+    const { confirmed, customer, customers, noProfile, pending, rejected, suspended, count } = useSelector(state => state.customers);
     const { 
         // totalCustomersAwaitingApproval, 
         totalApprovedCustomers, 
@@ -212,25 +188,29 @@ const Customers = (props) => {
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED_CUSTOMERS } = CUSTOMER_CATEGORY;
     
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(15);
+    const [rowsPerPage, setRowsPerPage] = useState(25);
     const [customerCount, setCustomerCount] = useState(0);
     const [error, setError] = useState('');
+    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState(NO_PROFILE);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleClick = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
     const { 
         getCustomers, 
-        getMoreCustomers, 
         getNewCustomers, 
         getCustomersWithoutProfile,
-        getMoreCustomersWithoutProfile,
         getSuspendedCustomers,
-        getMoreSuspendedCustomers,
-        getMoreNewCustomers, 
         getVerifiedCustomers, 
-        getMoreVerifiedCustomers, 
         getRejectedCustomers, 
-        getMoreRejectedCustomers, 
         handleSetTitle 
     } = props;
 
@@ -245,6 +225,47 @@ const Customers = (props) => {
     useEffect(() => {
         setLoading(false);
     }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items]);
+
+    const getCount = useCallback(() => {
+        switch (filter) {
+            case CONFIRMED:
+                setCustomerCount(confirmed.totalItemCount);
+                break;
+
+            case PENDING:
+                setCustomerCount(pending.totalItemCount);
+                break;
+
+            case REJECTED:
+                setCustomerCount(rejected.totalItemCount);
+                break;
+
+                case SUSPENDED_CUSTOMERS:
+                    setCustomerCount(suspended.totalItemCount);
+                    break;
+
+            case NO_PROFILE:
+                setCustomerCount(noProfile.totalItemCount);
+                break;
+            
+            case ALL_CUSTOMERS:
+                setCustomerCount(customers.totalItemCount);
+                break;
+
+            default:
+                setCustomerCount(0);
+                break;
+        }
+    }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED_CUSTOMERS, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
+
+    useEffect(() => {
+        getCount();
+    }, [filter, getCount]);
+
+    useEffect(() => {
+        getMore();
+        // eslint-disable-next-line
+    }, [page]);
 
     const handleChangePage = (event, newPage) => {
         console.log(newPage);
@@ -312,8 +333,8 @@ const Customers = (props) => {
         switch (filter) {
             case CONFIRMED:
                 if (confirmed.hasNext) {
-                    getMoreVerifiedCustomers({
-                        pageSize: 25,
+                    getVerifiedCustomers({
+                        pageSize: rowsPerPage,
                         pageNumber: confirmed.currentPageNumber + 1
                     });
                 }
@@ -321,8 +342,8 @@ const Customers = (props) => {
 
             case PENDING:
                 if (pending.hasNext) {
-                    getMoreNewCustomers({
-                        pageSize: 25,
+                    getNewCustomers({
+                        pageSize: rowsPerPage,
                         pageNumber: pending.currentPageNumber + 1
                     });
                 }
@@ -330,31 +351,31 @@ const Customers = (props) => {
 
             case REJECTED:
                 if (rejected.hasNext) {
-                    getMoreRejectedCustomers({
-                        pageSize: 25,
+                    getRejectedCustomers({
+                        pageSize: rowsPerPage,
                         pageNumber: rejected.currentPageNumber + 1
                     });
                 }
                 break;
 
                 case SUSPENDED_CUSTOMERS:
-                    getMoreSuspendedCustomers({
-                        pageSize: 25,
+                    getSuspendedCustomers({
+                        pageSize: rowsPerPage,
                         pageNumber: suspended.currentPageNumber + 1
                     });
                     break;
 
             case NO_PROFILE:
-                getMoreCustomersWithoutProfile({
-                    pageSize: 25,
+                getCustomersWithoutProfile({
+                    pageSize: rowsPerPage,
                     pageNumber: noProfile.currentPageNumber + 1
                 });
                 break;
             
             case ALL_CUSTOMERS:
                 if (customers.hasNext) {
-                    getMoreCustomers({
-                        pageSize: 25,
+                    getCustomers({
+                        pageSize: rowsPerPage,
                         pageNumber: customers.currentPageNumber + 1
                     });
                 }
@@ -362,38 +383,6 @@ const Customers = (props) => {
 
             default:
                 setLoading(false);
-                break;
-        }
-    };
-
-    const getCount = () => {
-        switch (filter) {
-            case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount);
-                break;
-
-            case PENDING:
-                setCustomerCount(pending.totalItemCount);
-                break;
-
-            case REJECTED:
-                setCustomerCount(rejected.totalItemCount);
-                break;
-
-                case SUSPENDED_CUSTOMERS:
-                    setCustomerCount(suspended.totalItemCount);
-                    break;
-
-            case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount);
-                break;
-            
-            case ALL_CUSTOMERS:
-                setCustomerCount(customers.totalItemCount);
-                break;
-
-            default:
-                setCustomerCount(0);
                 break;
         }
     };
@@ -461,6 +450,30 @@ const Customers = (props) => {
         FileSaver.saveAs(usersData, `FXBLOOMS Customers - ${new Date().toISOString()}${fileExtension}`);
     };
 
+    const viewDetails = () => {
+        handleClose();
+        // handleSetTitle('User Details');
+        history.push(`${CUSTOMERS}/${customer.id}`);
+    };
+
+    const editProfile = () => {
+        handleClose();
+        history.push(`${CUSTOMERS}/${customer.id}`);
+    };
+
+    const contact = () => {
+        handleClose();
+    };
+
+    const suspend = () => {
+        handleClose();
+    };
+
+    const changeRiskProfile = () => {
+        handleClose();
+    };
+
+
     return (
         <>
             {error && 
@@ -518,7 +531,7 @@ const Customers = (props) => {
                                         <TableCell
                                             key={column.id}
                                             align={column.align}
-                                            style={{ minWidth: column.minWidth }}
+                                            style={{ background: 'transparent', minWidth: column.minWidth, fontWeight: 'bold',  }}
                                         >
                                             {column.label}
                                         </TableCell>
@@ -526,25 +539,11 @@ const Customers = (props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody className={classes.content}>
-                                {filter === NO_PROFILE && <NoProfileCustomers handleSetTitle={handleSetTitle} />}
-                                {filter === PENDING && <NewCustomers handleSetTitle={handleSetTitle} />}
-                                {filter === CONFIRMED && <VerifiedCustomers handleSetTitle={handleSetTitle} />}
-                                {filter === REJECTED && <RejectedCustomers handleSetTitle={handleSetTitle} />}
-                                {filter === ALL_CUSTOMERS && <AllCustomers handleSetTitle={handleSetTitle} />}
-                                <Button 
-                                    color="primary" 
-                                    className={classes.button} 
-                                    onClick={getMore}
-                                    disabled={
-                                        (filter === PENDING && !pending.hasNext) || 
-                                        (filter === CONFIRMED && !confirmed.hasNext) || 
-                                        (filter === REJECTED && !rejected.hasNext) || 
-                                        (filter === ALL_CUSTOMERS && !customers.hasNext) || 
-                                        (filter === NO_PROFILE && !noProfile.hasNext) || 
-                                        (loading) ? true : false}
-                                >
-                                    {loading ? 'Please Wait . . . ' : 'Load More'}
-                                </Button>
+                                {filter === NO_PROFILE && <NoProfileCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === SUSPENDED_CUSTOMERS && <SuspendedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === CONFIRMED && <VerifiedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === REJECTED && <RejectedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === ALL_CUSTOMERS && <AllCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -561,6 +560,24 @@ const Customers = (props) => {
                         }}
                     />
                 </Paper>
+                <Menu
+                    id="customer-menu"
+                    anchorEl={anchorEl}
+                    keepMounted
+                    open={Boolean(anchorEl)}
+                    onClose={handleClose}
+                    classes={{ paper: classes.menu }}
+                >
+                    <MenuItem onClick={viewDetails}>View Details</MenuItem>
+                    <Divider />
+                    <MenuItem onClick={editProfile}>Edit Profile</MenuItem>
+                    <Divider />
+                    <MenuItem onClick={contact}>Contact</MenuItem>
+                    <Divider />
+                    <MenuItem onClick={suspend}>Suspend</MenuItem>
+                    <Divider />
+                    <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
+                </Menu>
             </section>
         </>
     );
@@ -570,27 +587,17 @@ Customers.propTypes = {
     getCustomers: PropTypes.func.isRequired,
     getCustomersWithoutProfile: PropTypes.func.isRequired,
     getSuspendedCustomers: PropTypes.func.isRequired,
-    getMoreCustomers: PropTypes.func.isRequired,
     getNewCustomers: PropTypes.func.isRequired,
-    getMoreNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
-    getMoreRejectedCustomers: PropTypes.func.isRequired,
     getVerifiedCustomers: PropTypes.func.isRequired,
-    getMoreVerifiedCustomers: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { 
     getCustomers, 
-    getMoreCustomers, 
     getCustomersWithoutProfile, 
-    getMoreCustomersWithoutProfile, 
     getSuspendedCustomers,
-    getMoreSuspendedCustomers, 
     getNewCustomers, 
-    getMoreNewCustomers, 
     getRejectedCustomers, 
-    getMoreRejectedCustomers, 
-    getVerifiedCustomers, 
-    getMoreVerifiedCustomers 
+    getVerifiedCustomers 
 })(Customers);

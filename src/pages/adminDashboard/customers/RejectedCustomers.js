@@ -1,35 +1,55 @@
 import { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { IconButton, Typography } from '@material-ui/core';
+import { 
+    Checkbox,
+    FormControlLabel,
+    IconButton, 
+    TableCell, 
+    TableRow, 
+    Typography 
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { DotsHorizontal } from 'mdi-material-ui';
+import TextClamp from 'react-string-clamp';
 
 import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
-import { CUSTOMERS } from '../../../routes';
 import { COLORS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     customer: {
-        backgroundColor: COLORS.white,
+        background: 'transparent',
         display: 'grid',
         gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
+        alignItems: 'center',
 
-        '& span': {
-            color: COLORS.offBlack,
-            fontWeight: 400,
-            padding: theme.spacing(1),
-
-            [theme.breakpoints.down('md')]: {
-                fontSize: theme.spacing(1.2)
-            },
-
-            [theme.breakpoints.down('md')]: {
-                fontSize: theme.spacing(0.7)
-            }
+        '&:last-child': {
+            borderBottom: 'none'
         }
+    },
+
+    text: {
+        color: COLORS.offBlack,
+        fontWeight: 400,
+        padding: theme.spacing(1),
+
+        [theme.breakpoints.down('md')]: {
+            fontSize: theme.spacing(1.2)
+        },
+
+        [theme.breakpoints.down('md')]: {
+            fontSize: theme.spacing(0.7)
+        }
+    },
+
+    item: {
+        border: 'none',
+        marginBottom: 0
+    },
+    
+    button: {
+        justifySelf: 'center'
     },
 
     customerLink: {
@@ -38,10 +58,9 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const RejectedCustomers = ({ getNewCustomers, handleSetTitle }) => {
+const RejectedCustomers = ({ getNewCustomers, handleClick }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
 
     const rejectedCustomers = useSelector(state => state.customers.rejected.items);
 
@@ -56,37 +75,49 @@ const RejectedCustomers = ({ getNewCustomers, handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
-    const handleViewCustomer = (customer) => {
+    const handleButtonClick = (customer, e) => {
         dispatch({
             type: SET_CUSTOMER,
             payload: customer
         });
-        handleSetTitle('User Details');
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        handleClick(e);
     };
 
     return (
         <>
-            {rejectedCustomers && rejectedCustomers.map((customer, index) => (
-                <div key={customer.id} className={classes.customer}>
-                    <Typography variant="subtitle2" component="span">{index + 1}.</Typography>
-                    <Typography variant="subtitle2" component="span">{`${customer.firstName ? customer.firstName : ''} ${customer.lastName ? customer.lastName : ''}`}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer.phoneNo}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer.email}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer.userName}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography>
-                    <Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography>
-                    <IconButton variant="text" size="small" className={classes.button}>
-                        <DotsHorizontal />
-                    </IconButton>
-                </div>
+            {rejectedCustomers && rejectedCustomers.map((customer) => (
+                <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
+                    <TableCell className={classes.item}>
+                        <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
+                    </TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
+                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
+                    <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
+                        <IconButton 
+                            variant="text" 
+                            size="small" 
+                            className={classes.button} 
+                            aria-controls="customer-menu" 
+                            aria-haspopup="true" 
+                            onClick={(e) => handleButtonClick(customer, e)}
+                            disableRipple
+                        >
+                            <DotsHorizontal />
+                        </IconButton>
+                    </TableCell>
+                </TableRow>
             ))}
         </>
     );
 };
 
 RejectedCustomers.propTypes = {
-    getNewCustomers: PropTypes.func.isRequired
+    getNewCustomers: PropTypes.func.isRequired,
+    handleClick: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getNewCustomers })(RejectedCustomers);
