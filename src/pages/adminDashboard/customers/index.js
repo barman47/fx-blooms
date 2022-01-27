@@ -43,7 +43,7 @@ import VerifiedCustomers from './VerifiedCustomers';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        padding: theme.spacing(3)
+        padding: theme.spacing(0, 3)
     },
 
     title: {
@@ -59,7 +59,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
         gap: theme.spacing(4),
-        marginTop: theme.spacing(2)
+        marginTop: theme.spacing(1)
     },
 
     filter: {
@@ -268,7 +268,6 @@ const Customers = (props) => {
     }, [page]);
 
     const handleChangePage = (event, newPage) => {
-        console.log(newPage);
         setPage(newPage);
     };
 
@@ -458,7 +457,7 @@ const Customers = (props) => {
 
     const editProfile = () => {
         handleClose();
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        history.push(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
     };
 
     const contact = () => {
