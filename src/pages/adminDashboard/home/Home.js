@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
-// import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-// import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
@@ -12,7 +11,7 @@ import {
 } from '@material-ui/core';
 
 // import { COLORS } from '../../../utils/constants';
-// import { CUSTOMERS } from '../../../routes';
+import { CUSTOMERS, LISTINGS } from '../../../routes';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -56,6 +55,7 @@ const useStyles = makeStyles((theme) => ({
     contentItem: {
         border: `2px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
+        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -80,7 +80,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = (props) => {
     const classes = useStyles();
-    // const history = useHistory();
+    const history = useHistory();
 
     const { totalCustomers, totalListings } = useSelector(state => state.stats);
 
@@ -105,7 +105,7 @@ const Home = (props) => {
                     </Box>
                 </Grid>
                 <Grid item xs={12} className={classes.content}>
-                    <Box component="div" className={classes.contentItem}>
+                    <Box component="div" className={classes.contentItem} onClick={() => history.push(CUSTOMERS)}>
                         <Typography variant="subtitle2" component="span" color="primary">Users</Typography>
                         <Box component="div">
                             <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalCustomers}</Typography>
@@ -122,7 +122,7 @@ const Home = (props) => {
                             <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
                         </Box>
                     </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
+                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }} onClick={() => history.push(LISTINGS)}>
                         <Typography variant="subtitle2" component="span" color="primary">Listings</Typography>
                         <Box component="div">
                             <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalListings}</Typography>

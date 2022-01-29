@@ -1,11 +1,16 @@
-import { SET_MY_LOCATION } from '../actions/types';
+import { SET_MY_IP } from '../actions/types';
 
-const initialState = null;
+const initialState = {
+    ip: null
+};
 
 const errorsReducer = (state = initialState, action) => {
     switch (action.type) {      
-        case SET_MY_LOCATION:
-            return action.payload;
+        case SET_MY_IP:
+            return {
+                ...state,
+                ip: action.payload
+            };
 
         default:
             return state;

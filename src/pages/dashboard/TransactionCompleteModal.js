@@ -100,12 +100,14 @@ const TelegramShare = () => {
     const classes = useStyles();
 
     return (
-        <TelegramShareButton
-            url={URL}
-            title={message}
-        >
-            <TelegramIcon  className={classes.button} />
-        </TelegramShareButton>
+        <Tooltip title="Share via Telegram" arrow>
+            <TelegramShareButton
+                url={URL}
+                title={message}
+            >
+                <TelegramIcon  className={classes.button} />
+            </TelegramShareButton>
+        </Tooltip>
     );
 };
 
@@ -113,12 +115,14 @@ const WhatsappShare = () => {
     const classes = useStyles();
 
     return (
-        <WhatsappShareButton
-            url={URL}
-            title={message}
-        >
-            <WhatsappIcon  className={classes.button} />
-        </WhatsappShareButton>
+        <Tooltip title="Share via Whatsapp" arrow>
+            <WhatsappShareButton
+                url={URL}
+                title={message}
+            >
+                <WhatsappIcon  className={classes.button} />
+            </WhatsappShareButton>
+        </Tooltip>
     );
 };
 
@@ -191,13 +195,6 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
                                             <FacebookIcon  className={classes.button} />
                                         </FacebookShareButton>
                                     </Tooltip>
-                                    {/* <Tooltip title="Share via Instagram" arrow>
-                                        <InstapaperShareButton
-                                            url={URL}
-                                        >
-                                            <InstapaperIcon  className={classes.button} />
-                                        </InstapaperShareButton>
-                                    </Tooltip> */}
                                     <Tooltip title="Share via Twitter" arrow>
                                         <TwitterShareButton
                                             via={` ${message}`}
@@ -207,12 +204,8 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
                                             <TwitterIcon  className={classes.button} />
                                         </TwitterShareButton>
                                     </Tooltip>
-                                    <Tooltip title="Share via Telegram" arrow>
-                                        <TelegramShare />
-                                    </Tooltip>
-                                    <Tooltip title="Share via Whatsapp" arrow>
-                                        <WhatsappShare />
-                                    </Tooltip>
+                                    <TelegramShare />
+                                    <WhatsappShare />
                                 </>
                             }
                         </Box>
