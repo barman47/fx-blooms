@@ -7,7 +7,7 @@ import { DeleteForever } from 'mdi-material-ui';
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import { deleteListing } from '../../../actions/listings';
-import { COLORS, SHADOW } from '../../../utils/constants';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -92,6 +92,7 @@ const PreviousListingItem = ({ deleteListing, listing }) => {
                         <DeleteForever 
                             className={classes.deleteButton}
                             onClick={handleDeleteListing} 
+                            disabled={listing.status === LISTING_STATUS.negotiation}
                         />
                     </Tooltip>
                 </section>
