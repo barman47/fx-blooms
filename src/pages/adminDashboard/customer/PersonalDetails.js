@@ -94,8 +94,10 @@ const PersonalDetails = () => {
     const [remark, setRemark] = useState(customer.remark);
     const [email, setEmail] = useState(customer.email);
 
+    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
+    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {

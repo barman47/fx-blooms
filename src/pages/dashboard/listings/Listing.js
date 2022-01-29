@@ -317,6 +317,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 root: classes.deleteButton
                             }}
                             onClick={handleDeleteListing}
+                            disabled={listing.status === LISTING_STATUS.negotiation}
                         >
                             Delete
                         </Button>

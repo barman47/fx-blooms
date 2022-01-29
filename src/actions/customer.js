@@ -471,10 +471,11 @@ export const setCustomerStatus = ({ customerID, status, currentStatus }) => asyn
         await reIssueAdminToken();
         const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
         const msg = res.data.data;
-        return dispatch({
+        dispatch({
             type: SET_CUSTOMER_STATUS,
             payload: { customerID, status, currentStatus, msg }
         });
+        return await axios.get(`${API}/admin/GetAppStatistics`);
     } catch (err) {
         return handleError(err, dispatch);
     }

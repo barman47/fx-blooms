@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 import clsx from 'clsx';
@@ -30,8 +30,11 @@ import {
     getRejectedCustomers, 
     getSuspendedCustomers,
     getVerifiedCustomers, 
-    getCustomersWithoutProfile
+    getCustomersWithoutProfile,
+    setCustomerStatus
 } from '../../../actions/customer';
+import { CLEAR_CUSTOMER_STATUS_MSG, SET_CUSTOMER } from '../../../actions/types';
+
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { CUSTOMERS } from '../../../routes';
 
@@ -40,6 +43,7 @@ import NoProfileCustomers from './NoProfileCustomers';
 import SuspendedCustomers from './SuspendedCustomers';
 import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -172,10 +176,11 @@ const columns = [
 
 const Customers = (props) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const history = useHistory();
 
     const { admin } = useSelector(state => state);
-    const { confirmed, customer, customers, noProfile, pending, rejected, suspended, count } = useSelector(state => state.customers);
+    const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended, count } = useSelector(state => state.customers);
     const { 
         // totalCustomersAwaitingApproval, 
         totalApprovedCustomers, 
@@ -185,7 +190,7 @@ const Customers = (props) => {
         totalCustomersWithNoProfile 
     } = useSelector(state => state.stats);
 
-    const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED_CUSTOMERS } = CUSTOMER_CATEGORY;
+    const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
     
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(25);
@@ -211,8 +216,11 @@ const Customers = (props) => {
         getSuspendedCustomers,
         getVerifiedCustomers, 
         getRejectedCustomers, 
+        setCustomerStatus,
         handleSetTitle 
     } = props;
+
+    const successModal = useRef();
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -225,6 +233,26 @@ const Customers = (props) => {
     useEffect(() => {
         setLoading(false);
     }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items]);
+
+    useEffect(() => {
+        if (msg && customer) {
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [customer, msg]);
+
+    const dismissAction = () => {
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER,
+                payload: {}
+            });
+            dispatch({
+                type: CLEAR_CUSTOMER_STATUS_MSG
+            });
+        });
+    };
 
     const getCount = useCallback(() => {
         switch (filter) {
@@ -240,7 +268,7 @@ const Customers = (props) => {
                 setCustomerCount(rejected.totalItemCount);
                 break;
 
-                case SUSPENDED_CUSTOMERS:
+                case SUSPENDED:
                     setCustomerCount(suspended.totalItemCount);
                     break;
 
@@ -256,7 +284,7 @@ const Customers = (props) => {
                 setCustomerCount(0);
                 break;
         }
-    }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED_CUSTOMERS, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
+    }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
 
     useEffect(() => {
         getCount();
@@ -308,7 +336,7 @@ const Customers = (props) => {
                 });
                 break;
 
-            case SUSPENDED_CUSTOMERS:
+            case SUSPENDED:
                 getSuspendedCustomers({
                     pageNumber: 1,
                     pageSize: 25
@@ -357,7 +385,7 @@ const Customers = (props) => {
                 }
                 break;
 
-                case SUSPENDED_CUSTOMERS:
+                case SUSPENDED:
                     getSuspendedCustomers({
                         pageSize: rowsPerPage,
                         pageNumber: suspended.currentPageNumber + 1
@@ -466,6 +494,11 @@ const Customers = (props) => {
 
     const suspend = () => {
         handleClose();
+        setCustomerStatus({
+            customerID: customer.id,
+            status: SUSPENDED,
+            currentStatus: customer.customerStatus
+        });
     };
 
     const changeRiskProfile = () => {
@@ -490,6 +523,7 @@ const Customers = (props) => {
                     {error}
                 </Alert>
             }
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <Grid container direction="row" justify="space-between">
                     <Grid item>
@@ -512,7 +546,7 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span">Rejected</Typography>
                         <Typography variant="subtitle2" component="span">{totalRejectedCustomers}</Typography>
                     </div>
-                    <div className={clsx(classes.filter, filter === SUSPENDED_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(SUSPENDED_CUSTOMERS)}>
+                    <div className={clsx(classes.filter, filter === SUSPENDED && classes.active)} onClick={() => handleSetFilter(SUSPENDED)}>
                         <Typography variant="subtitle2" component="span">Suspended</Typography>
                         <Typography variant="subtitle2" component="span">{totalSuspendedCustomers}</Typography>
                     </div>
@@ -539,7 +573,7 @@ const Customers = (props) => {
                             </TableHead>
                             <TableBody className={classes.content}>
                                 {filter === NO_PROFILE && <NoProfileCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === SUSPENDED_CUSTOMERS && <SuspendedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === SUSPENDED && <SuspendedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
                                 {filter === CONFIRMED && <VerifiedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
                                 {filter === REJECTED && <RejectedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
                                 {filter === ALL_CUSTOMERS && <AllCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
@@ -589,6 +623,7 @@ Customers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
     getVerifiedCustomers: PropTypes.func.isRequired,
+    setCustomerStatus: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
@@ -598,5 +633,6 @@ export default connect(undefined, {
     getSuspendedCustomers,
     getNewCustomers, 
     getRejectedCustomers, 
-    getVerifiedCustomers 
+    getVerifiedCustomers,
+    setCustomerStatus 
 })(Customers);
