@@ -24,7 +24,7 @@ import Toast from '../../components/common/Toast';
 import { registerCustomer } from '../../actions/customer';
 
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, TERMS } from '../../routes';
+import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, PRIVACY_POLICY, TERMS, USER_AGREEMENT } from '../../routes';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 import  {
     COLORS,
@@ -551,8 +551,7 @@ const CreateAccount = (props) => {
                                     onChange={() => setChecked(!checked)}
                                     inputProps={{ 'aria-label': 'primary checkbox' }}
                                 />
-                                    <Typography variant="subtitle2" component="span">I agree to terms and conditions <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>terms and conditions</Link></Typography>
-
+                                    <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Button 

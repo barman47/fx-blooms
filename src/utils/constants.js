@@ -53,6 +53,14 @@ export const CUSTOMER_CATEGORY = {
     ALL_CUSTOMERS: 'ALL CUSTOMERS',
 };
 
+export const USER_DETAILS = {
+    PERSONAL_DETAILS: 'Personal Details',
+    ID_DETAILS: 'ID Details',
+    TWO_FACTOR: '2FA',
+    TRANSACTION_DETAILS: 'Transaction Details',
+    WALLET_DETAILS: 'Wallet Details',
+};
+
 export const ID_STATUS = {
     APPROVED: 'APPROVED',
     NOT_SUBMITTED:'NOT_SUBMITTED'

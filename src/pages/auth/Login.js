@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
 
-import { login, logout } from '../../actions/customer';
+import { login } from '../../actions/customer';
 import { getMyLocation } from '../../actions/myLocation';
 import { GET_ERRORS } from '../../actions/types';
 
@@ -93,7 +93,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = ({ getMyLocation, login, logout }) => {
+const Login = ({ getMyLocation, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -137,7 +137,7 @@ const Login = ({ getMyLocation, login, logout }) => {
     }, [customer, history, loading]);
 
     const getLocation = () => {
-        if (!myLocation) {
+        if (!myLocation.ip) {
             getMyLocation();
         }
     };
@@ -290,8 +290,7 @@ const Login = ({ getMyLocation, login, logout }) => {
 
 Login.propTypes = {
     getMyLocation: PropTypes.func.isRequired,
-    login: PropTypes.func.isRequired,
-    logout: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getMyLocation, login, logout })(Login);
+export default connect(undefined, { getMyLocation, login })(Login);

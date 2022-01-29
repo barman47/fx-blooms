@@ -33,7 +33,6 @@ const Index = () => {
     };
 
     const toggleShowVerifyQrCode = () => {
-        console.log('toggling showVerifyQrCode');
         setShowVerifyQrCode(!showVerifyQrCode)
     };
 
