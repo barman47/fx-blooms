@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -64,16 +63,16 @@ const VerifiedCustomers = ({ getNewCustomers, handleClick }) => {
 
     const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
 
-    useEffect(() => {
-        // handleSetTitle('Verified Customers');
-        // if (!verifiedCustomers) {
-            getNewCustomers({
-                pageNumber: 1,
-                pageSize: 25
-            });
-        // }
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('Verified Customers');
+    //     // if (!verifiedCustomers) {
+    //         getNewCustomers({
+    //             pageNumber: 1,
+    //             pageSize: 25
+    //         });
+    //     // }
+    //     // eslint-disable-next-line
+    // }, []);
 
     const handleButtonClick = (customer, e) => {
         dispatch({

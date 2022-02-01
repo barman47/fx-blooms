@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -63,16 +62,16 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
 
     const newCustomers = useSelector(state => state.customers?.pending?.items);
 
-    useEffect(() => {
-        // handleSetTitle('New Customers');
-        // if (!newCustomers) {
-            getSuspendedCustomers({
-                pageNumber: 1,
-                pageSize: 25
-            });
-        // }
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('New Customers');
+    //     // if (!newCustomers) {
+    //         getSuspendedCustomers({
+    //             pageNumber: 1,
+    //             pageSize: 25
+    //         });
+    //     // }
+    //     // eslint-disable-next-line
+    // }, []);
 
     const handleButtonClick = (customer, e) => {
         dispatch({

@@ -386,6 +386,7 @@ export const getMoreVerifiedCustomers = (query) => async(dispatch) => {
 export const getCustomersWithoutProfile = (query) => async(dispatch) => {
     try {
         // Issue admin token
+        debugger
         await reIssueAdminToken();
         const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
         return dispatch({
@@ -553,7 +554,7 @@ export const sendMail = (data) => async (dispatch) => {
 export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`,);
+        const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
         const customerData = {
             firstName: data.application.fields.$values[1].content,

@@ -216,6 +216,18 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
         }
     }, [dispatch, errorsState, errors]);
 
+    // Set country code and phone number when edit button is clicked
+    useEffect(() => {
+        if (editable && !isEmpty(profile.phoneNo)) {
+            countries.forEach(country => {
+                if (profile.phoneNo.startsWith(country.phone)) {
+                    setCountryCode(`+${country.phone}`);
+                    setPhoneNo(profile.phoneNo.slice(country.phone.length));
+                }
+            });
+        }
+    }, [editable, profile.phoneNo]);
+
     // Setting states when a country is selected
     // useEffect(() => {
     //     if (!isEmpty(country)) {
@@ -248,7 +260,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
         e.preventDefault();
         setErrors({});
 
-        const { code, number } = extractCountryCode(phoneNo);
+        const { code, number } = extractCountryCode(profile.phoneNo ? profile.phoneNo:  `${countryCode}${phoneNo}`);
 
         const data = {
             address,
@@ -277,17 +289,7 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
     };
 
     const handleGenerateOtp = () => {
-        // const data = `${countryCode}${phoneNo.substring(1, phoneNo.length)}`;
-        // if (Validator.isEmpty(countryCode)) {
-        //     return setErrors({ msg: 'Invalid Phone Number!', countryCode: 'Country code is required!' });
-        // }
-
-        // const phoneRegExp =  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-        // if (phoneRegExp.test(data)) {
-        //     return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Number should be be in this format: 08080808080' });
-        // }
-
-        const { code, number } = extractCountryCode(phoneNo);
+        const { code, number } = extractCountryCode(countryCode && phoneNo ? `${countryCode}${phoneNo}` : phoneNo);
 
         if (Validator.isEmpty(number)) {
             return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Phone Number is required!' });

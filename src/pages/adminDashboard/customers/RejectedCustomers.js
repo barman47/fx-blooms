@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -64,16 +63,16 @@ const RejectedCustomers = ({ getNewCustomers, handleClick }) => {
 
     const rejectedCustomers = useSelector(state => state.customers.rejected.items);
 
-    useEffect(() => {
-        // handleSetTitle('Rejected Customers');
-        // if (!rejectedCustomers) {
-            getNewCustomers({
-                pageNumber: 1,
-                pageSize: 25
-            });
-        // }
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('Rejected Customers');
+    //     // if (!rejectedCustomers) {
+    //         getNewCustomers({
+    //             pageNumber: 1,
+    //             pageSize: 25
+    //         });
+    //     // }
+    //     // eslint-disable-next-line
+    // }, []);
 
     const handleButtonClick = (customer, e) => {
         dispatch({

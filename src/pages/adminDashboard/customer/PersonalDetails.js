@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom'; 
 import { useSelector } from 'react-redux'; 
 import { 
+    Avatar,
     Box, 
     Button,
     FormControlLabel,
@@ -11,7 +12,8 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { COLORS } from '../../../utils/constants'; 
+import { COLORS } from '../../../utils/constants';
+import avatar from '../../../assets/img/avatar.jpg';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -69,7 +71,13 @@ const useStyles = makeStyles(theme =>({
     saveRemarkButton: {
         alignSelf: 'flex-end',
         marginTop: theme.spacing(2)
-    }
+    },
+
+    avatar: {
+        borderRadius: theme.shape.borderRadius,
+        width: theme.spacing(25),
+        height: theme.spacing(25),
+    },
 }));
 
 const PersonalDetails = () => {
@@ -78,21 +86,21 @@ const PersonalDetails = () => {
 
     const { customer } = useSelector(state => state.customers);
 
-    const [firstName, setFirstName] = useState(customer.firstName);
-    const [middleName, setMiddleName] = useState(customer.middleName);
-    const [lastName, setLastName] = useState(customer.lastName);
-    const [userName, setUserName] = useState(customer.userName);
+    const [firstName] = useState(customer.firstName);
+    const [middleName] = useState(customer.middleName);
+    const [lastName] = useState(customer.lastName);
+    const [userName] = useState(customer.userName);
     const [occupation, setOccupation] = useState(customer.occupation);
-    const [dateOfBirth, setDateOfBirth] = useState(customer.dateOfBirth);
+    const [dateOfBirth] = useState(customer.dateOfBirth);
     const [address, setAddress] = useState(customer.address);
-    const [postalCode, setPostalCode] = useState(customer.postalCode);
-    const [city, setCity] = useState(customer.city);
-    const [country, setCountry] = useState(customer.countryId);
-    const [nationality, setNationality] = useState(customer.nationality);
+    const [postalCode] = useState(customer.postalCode);
+    const [city] = useState(customer.city);
+    const [country] = useState(customer.countryId);
+    const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
     const [remark, setRemark] = useState(customer.remark);
-    const [email, setEmail] = useState(customer.email);
+    const [email] = useState(customer.email);
 
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -125,60 +133,15 @@ const PersonalDetails = () => {
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={firstName || ''}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter First Name"
-                                helperText={errors.firstName}
-                                fullWidth
-                                required
-                                error={errors.firstName ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{firstName}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{firstName}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={lastName || ''}
-                                onChange={(e) => setLastName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Last Name"
-                                helperText={errors.lastName}
-                                fullWidth
-                                required
-                                error={errors.lastName ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{lastName}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{lastName}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={userName || ''}
-                                onChange={(e) => setUserName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Username"
-                                helperText={errors.userName}
-                                fullWidth
-                                required
-                                error={errors.userName ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{userName}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{userName}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Occupation</Typography>
@@ -220,22 +183,7 @@ const PersonalDetails = () => {
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={postalCode || ''}
-                                onChange={(e) => setPostalCode(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Postal Code"
-                                helperText={errors.postalCode}
-                                fullWidth
-                                required
-                                error={errors.postalCode ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{postalCode}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{postalCode}</Typography>    
                     </Box>
                 </Box>
                 <Box component="div" className={classes.box}>
@@ -271,102 +219,27 @@ const PersonalDetails = () => {
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Middle Names</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={middleName || ''}
-                                onChange={(e) => setMiddleName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Middle Name"
-                                helperText={errors.middleName}
-                                fullWidth
-                                required
-                                error={errors.middleName ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{middleName}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{middleName}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={dateOfBirth || ''}
-                                onChange={(e) => setDateOfBirth(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Date of Birth"
-                                helperText={errors.dateOfBirth}
-                                fullWidth
-                                required
-                                error={errors.dateOfBirth ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{dateOfBirth}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{dateOfBirth}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Email</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={email || ''}
-                                onChange={(e) => setEmail(e.target.value)}
-                                type="email"
-                                variant="outlined" 
-                                placeholder="Enter Email Address"
-                                helperText={errors.email}
-                                fullWidth
-                                required
-                                error={errors.email ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{email}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{email}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Nationality</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={nationality || ''}
-                                onChange={(e) => setNationality(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Nationality"
-                                helperText={errors.nationality}
-                                fullWidth
-                                required
-                                error={errors.nationality ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{nationality}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{nationality}</Typography>    
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>City</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={city || ''}
-                                onChange={(e) => setCity(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Email City"
-                                helperText={errors.city}
-                                fullWidth
-                                required
-                                error={errors.city ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{city}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{city}</Typography>    
                     </Box>
                 </Box>
                 <Box component="div" className={classes.box}>
-                    <img src="" alt="" />
+                    <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
                         {editable ? 
@@ -411,22 +284,7 @@ const PersonalDetails = () => {
                     </Box>
                     <Box component="div">
                         <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={country || ''}
-                                onChange={(e) => setCountry(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Country"
-                                helperText={errors.country}
-                                fullWidth
-                                required
-                                error={errors.country ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{country}</Typography>    
-                        }
+                        <Typography variant="subtitle2" className={classes.info}>{country}</Typography>    
                     </Box>
                 </Box>
             </form>

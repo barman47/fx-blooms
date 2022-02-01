@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -64,14 +63,14 @@ const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick }) => {
 
     const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
 
-    useEffect(() => {
-        // handleSetTitle('Verified Customers');
-        getCustomersWithoutProfile({
-            pageNumber: 1,
-            pageSize: 25
-        });
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('Verified Customers');
+    //     getCustomersWithoutProfile({
+    //         pageNumber: 1,
+    //         pageSize: 25
+    //     });
+    //     // eslint-disable-next-line
+    // }, []);
 
     const handleButtonClick = (customer, e) => {
         dispatch({

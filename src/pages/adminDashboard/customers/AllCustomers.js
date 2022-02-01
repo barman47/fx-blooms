@@ -64,14 +64,14 @@ const AllCustomers = ({ getCustomers, handleClick }) => {
 
     const customers = useSelector(state => state.customers?.customers?.items);
 
-    useEffect(() => {
-        // handleSetTitle('All Customers');
-        getCustomers({
-            pageNumber: 1,
-            pageSize: 25
-        });
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('All Customers');
+    //     getCustomers({
+    //         pageNumber: 1,
+    //         pageSize: 25
+    //     });
+    //     // eslint-disable-next-line
+    // }, []);
 
     useEffect(() => {
         return () => {
