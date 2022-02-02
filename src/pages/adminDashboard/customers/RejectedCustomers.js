@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const RejectedCustomers = ({ getNewCustomers, handleClick }) => {
+const RejectedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -89,10 +89,10 @@ const RejectedCustomers = ({ getNewCustomers, handleClick }) => {
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}><TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
@@ -116,7 +116,8 @@ const RejectedCustomers = ({ getNewCustomers, handleClick }) => {
 
 RejectedCustomers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired,
-    handleClick: PropTypes.func.isRequired
+    handleClick: PropTypes.func.isRequired,
+    viewCustomerprofile: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getNewCustomers })(RejectedCustomers);

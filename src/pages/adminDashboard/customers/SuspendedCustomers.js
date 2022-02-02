@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
+const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -88,10 +88,10 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{customer.email}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{customer.userName}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.email}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.userName}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
@@ -115,7 +115,8 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
 
 SuspendedCustomers.propTypes = {
     getSuspendedCustomers: PropTypes.func.isRequired,
-    handleClick: PropTypes.func.isRequired
+    handleClick: PropTypes.func.isRequired,
+    viewCustomerProfile: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getSuspendedCustomers })(SuspendedCustomers);

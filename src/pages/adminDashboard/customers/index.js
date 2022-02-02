@@ -510,6 +510,14 @@ const Customers = (props) => {
         handleClose();
     };
 
+    const viewCustomerProfile = (customer) => {
+        dispatch({
+            type: SET_CUSTOMER,
+            payload: customer
+        });
+        history.push(`${CUSTOMERS}/${customer.id}`);
+    }
+
 
     return (
         <>
@@ -577,11 +585,40 @@ const Customers = (props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody className={classes.content}>
-                                {filter === NO_PROFILE && <NoProfileCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === SUSPENDED && <SuspendedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === CONFIRMED && <VerifiedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === REJECTED && <RejectedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === ALL_CUSTOMERS && <AllCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === NO_PROFILE && 
+                                    <NoProfileCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile} 
+                                    />
+                                }
+                                {filter === SUSPENDED && 
+                                    <SuspendedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === CONFIRMED && 
+                                    <VerifiedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === REJECTED && 
+                                    <RejectedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === ALL_CUSTOMERS && 
+                                    <AllCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                    />
+                                }
                             </TableBody>
                         </Table>
                     </TableContainer>

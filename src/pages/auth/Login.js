@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
     Collapse,
+    Divider,
     Grid, 
     IconButton,
     InputAdornment,
@@ -16,11 +17,12 @@ import {
 import Alert from '@material-ui/lab/Alert';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
+import toast, { Toaster } from 'react-hot-toast';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
 
-import { login } from '../../actions/customer';
+import { externalLogin, login } from '../../actions/customer';
 import { getMyLocation } from '../../actions/myLocation';
 import { GET_ERRORS } from '../../actions/types';
 
@@ -30,6 +32,8 @@ import { DASHBOARD_HOME, FORGOT_PASSWORD, SIGN_UP, VERIFY_2FA } from '../../rout
 import validateLogin from '../../utils/validation/customer/login';
 
 import logo from '../../assets/img/logo.svg';
+
+import GoogleLogin from './GoogleLogin';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -67,6 +71,7 @@ const useStyles = makeStyles(theme => ({
     form: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
+        marginBottom: theme.spacing(5),
         marginTop: theme.spacing(5),
         padding: [[theme.spacing(8), theme.spacing(5)]],
 
@@ -80,8 +85,15 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(5)
     },
 
+    orContainer: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 0.1fr 1fr',
+        alignItems: 'center',
+        columnGap: theme.spacing(2)
+    },
+
     button: {
-        marginBottom: theme.spacing(5)
+        marginBottom: theme.spacing(2)
     },
 
     link: {
@@ -93,7 +105,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = ({ getMyLocation, login }) => {
+const Login = ({ externalLogin, getMyLocation, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
@@ -145,6 +157,25 @@ const Login = ({ getMyLocation, login }) => {
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
+      
+    const handleSocialLoginFailure = (err) => {
+        toast.error('Login Failed')
+        console.log(err.message);
+        console.error(err);
+    };
+
+    const handleNoInternet = () => toast.error('No internet connection');
+
+    const handleGoogleLoginSuccess = (res) => {
+        const { _token, _provider } = res;
+        toast.success('Login Successful');
+        setLoading(true);
+        const data = {
+            provider: _provider,
+            idToken: _token.idToken
+        };
+        externalLogin(data, history, myLocation);
+    };
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -171,6 +202,7 @@ const Login = ({ getMyLocation, login }) => {
                 <meta name="description" content="Thanks for joining FXBLOOMS. Trust and security are our cornerstones. Log in to enjoy unbeatable rates and service." />
             </Helmet>
             {loading && <Spinner />}
+            <Toaster />
             <section className={classes.root}>
                 <RouterLink to="/">
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" />
@@ -204,7 +236,7 @@ const Login = ({ getMyLocation, login }) => {
                         </Collapse>
                     }
                     <form onSubmit={handleFormSubmit} className={classes.form} noValidate>
-                        <Grid container direction="column">
+                        <Grid container direction="row">
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Username</Typography>
                                 <TextField 
@@ -275,6 +307,23 @@ const Login = ({ getMyLocation, login }) => {
                                     Sign In
                                 </Button>
                             </Grid>
+                            <Grid item xs={12} className={classes.orContainer}>
+                                <Divider />
+                                <Typography variant="h6">OR</Typography>
+                                <Divider />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <GoogleLogin
+                                    disabled
+                                    provider="google"
+                                    appId={process.env.REACT_APP_GOOGLE_APP_ID}
+                                    onLoginSuccess={handleGoogleLoginSuccess}
+                                    onLoginFailure={handleSocialLoginFailure}
+                                    onInternetFailure={handleNoInternet}
+                                >
+                                    <Typography variant="subtitle2" component="span">Sign in with Google</Typography>
+                                </GoogleLogin>
+                            </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300 }}>
                                     Don't have an account? <RouterLink to={SIGN_UP} className={classes.link}>Sign Up</RouterLink>
@@ -290,7 +339,8 @@ const Login = ({ getMyLocation, login }) => {
 
 Login.propTypes = {
     getMyLocation: PropTypes.func.isRequired,
-    login: PropTypes.func.isRequired
+    login: PropTypes.func.isRequired,
+    externalLogin: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getMyLocation, login })(Login);
+export default connect(undefined, { externalLogin, getMyLocation, login })(Login);

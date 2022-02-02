@@ -5,6 +5,7 @@ export const HOW_IT_WORKS = 'howItWorks';
 export const CONTACT_US = '/contactUs';
 export const SIGN_UP = '/user/signUp';
 export const LOGIN = '/user/login';
+export const ADD_USERNAME = '/user/addUsername';
 export const FORGOT_PASSWORD = '/user/forgotPassword';
 export const RESET_PASSWORD = '/user/resetPassword';
 export const TERMS = '/termsAndConditions';

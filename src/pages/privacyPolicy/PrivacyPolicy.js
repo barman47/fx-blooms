@@ -82,7 +82,7 @@ const PrivacyPolicy = () => {
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">Processing of personal data</Typography>
                         <Typography variant="body2" component="p">
-                            FXBLOOMS OÜ (registry code 16262446), located at Narva mnt 7, 10117 Tallinn, Estonia, email privacy@fxblooms.com (hereinafter referred to as the service provider), processes your personal data in accordance with the requirements of the Personal Data Protection Act of Estonia.
+                            FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia, email privacy@fxblooms.com (hereinafter referred to as the service provider), processes your personal data in accordance with the requirements of the Personal Data Protection Act of Estonia.
                             The service provider processes personal information only for providing the service you have ordered. We do not transmit, sell, or disclose your data to third parties without your prior consent or in the cases provided by law.
                         </Typography>
                     </Box>
@@ -97,8 +97,8 @@ const PrivacyPolicy = () => {
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">2. How do we collect your data?</Typography>
                         <Typography variant="body2" component="p">2.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You directly provide us with most of the data we collect. We collect and process data when you:</Typography>
-                        <Typography variant="body2" component="p">2.1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Register online or place an order for any of our products or services;</Typography>
-                        <Typography variant="body2" component="p">2.1.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Voluntarily complete a customer survey or provide feedback on any of our message boards or via email;</Typography>
+                        <Typography variant="body2" component="p">2.1.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You onboard and/or login as a user.</Typography>
+                        <Typography variant="body2" component="p">2.1.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You choose to link your account with a third party account e.g. Google account.</Typography>
                         <Typography variant="body2" component="p">2.1.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Use or view our website via your browser's cookies.</Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
@@ -134,7 +134,7 @@ const PrivacyPolicy = () => {
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">5. How do we store your data</Typography>
-                        <Typography variant="body2" component="p">5.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider securely stores your data at www.fxblooms.com, by FXBLOOMS OÜ (registry code 16262446), located at Narva mnt 7, 10117 Tallinn, Estonia.</Typography>
+                        <Typography variant="body2" component="p">5.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider securely stores your data at www.fxblooms.com, by FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia.</Typography>
                         <Typography variant="body2" component="p">5.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The Service Provider will retain User's personal data for a period of 5 years after termination of customer relationship with the User. Once this time-period has expired, we will delete the User's data by removing and erasing it from the company's database and records.</Typography>
                         <Typography variant="body2" component="p">5.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accountancy related data (invoices and payment records) shall be retained for 7 years.</Typography>
                     </Box>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'; 
-import { batch, connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box, 
@@ -12,7 +12,7 @@ import clsx from 'clsx';
 
 import { COLORS, ID_STATUS } from '../../../utils/constants';
 import { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
-import { GET_ERRORS, SET_ID_CHECK_DATA, CLEAR_CUSTOMER_STATUS_MSG, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
+import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
@@ -125,22 +125,10 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
             getResidencePermitValidationResponse(customer.id);
         }
 
-        return () => {
-            batch(() => {
-                dispatch({
-                    type: GET_ERRORS,
-                    payload: {}
-                });
-                dispatch({
-                    type: SET_ID_CHECK_DATA,
-                    payload: null
-                });
-                dispatch({
-                    type: SET_PROFILE_CHECK_DATA,
-                    payload: null
-                });
-            });
-        };
+        dispatch({
+            type: GET_ERRORS,
+            payload: {}
+        });
         // eslint-disable-next-line
     }, []);
 

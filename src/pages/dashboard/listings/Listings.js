@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
@@ -44,7 +43,6 @@ const Listings = ({ addBid }) => {
     const classes = useStyles();
 
     const dispatch = useDispatch();
-    const history = useHistory();
 
     const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
@@ -115,7 +113,7 @@ const Listings = ({ addBid }) => {
                 currencyType: listing.minExchangeAmount.currencyType,
                 amount: listing.minExchangeAmount.amount
             }
-        }, history);
+        });
     };
 
     const dismissAction = () => {

@@ -37,6 +37,20 @@ export const getStats = () => async (dispatch) => {
     }
 };
 
+export const updateCustomerProfile = (data) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/UpdateCustomerProfile`, data);
+        console.log(res);
+        // return dispatch({
+        //     type: SET_STATS,
+        //     payload: res.data.data
+        // });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const logout = (history) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
