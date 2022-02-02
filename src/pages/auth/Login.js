@@ -18,6 +18,7 @@ import Alert from '@material-ui/lab/Alert';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import toast, { Toaster } from 'react-hot-toast';
+// import { GoogleLoginButton } from 'react-social-login-buttons';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
@@ -33,7 +34,8 @@ import validateLogin from '../../utils/validation/customer/login';
 
 import logo from '../../assets/img/logo.svg';
 
-import GoogleLogin from './GoogleLogin';
+// import GoogleLogin from './GoogleLogin';
+import { GoogleLogin } from 'react-google-login';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -94,6 +96,10 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         marginBottom: theme.spacing(2)
+    },
+
+    googleButton: {
+        width: '100%'
     },
 
     link: {
@@ -164,15 +170,16 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         console.error(err);
     };
 
-    const handleNoInternet = () => toast.error('No internet connection');
+    // const handleNoInternet = () => toast.error('No internet connection');
 
     const handleGoogleLoginSuccess = (res) => {
-        const { _token, _provider } = res;
+        console.log(res);
+        const { tokenId } = res;
         toast.success('Login Successful');
         setLoading(true);
         const data = {
-            provider: _provider,
-            idToken: _token.idToken
+            provider: 'google',
+            idToken: tokenId
         };
         externalLogin(data, history, myLocation);
     };
@@ -314,15 +321,13 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
                             </Grid>
                             <Grid item xs={12}>
                                 <GoogleLogin
-                                    disabled
-                                    provider="google"
-                                    appId={process.env.REACT_APP_GOOGLE_APP_ID}
-                                    onLoginSuccess={handleGoogleLoginSuccess}
-                                    onLoginFailure={handleSocialLoginFailure}
-                                    onInternetFailure={handleNoInternet}
-                                >
-                                    <Typography variant="subtitle2" component="span">Sign in with Google</Typography>
-                                </GoogleLogin>
+                                    clientId={process.env.REACT_APP_GOOGLE_APP_ID}
+                                    className={classes.googleButton}
+                                    buttonText="Sign in with Google"
+                                    onSuccess={handleGoogleLoginSuccess}
+                                    onFailure={handleSocialLoginFailure}
+                                    cookiePolicy={'single_host_origin'}
+                                />    
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300 }}>
