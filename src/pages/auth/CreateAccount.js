@@ -19,6 +19,7 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import customToast, { Toaster } from 'react-hot-toast';
 import clsx from 'clsx';
+import { GoogleLogin } from 'react-google-login';
 
 import Spinner from '../../components/common/Spinner';
 import SuccessModal from '../../components/common/SuccessModal';
@@ -42,8 +43,6 @@ import validateSignUp from '../../utils/validation/customer/createAccount';
 
 import logo from '../../assets/img/logo.svg';
 import img from '../../assets/img/sign-up.svg';
-
-import GoogleLogin from './GoogleLogin';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -179,7 +178,11 @@ const useStyles = makeStyles(theme => ({
         color: '#a6a6a6 !important',
         boxShadow: 'none !important',
         pointerEvents: 'none !important'
-    }
+    },
+
+    googleButton: {
+        width: '100%'
+    },
 }));
 
 const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
@@ -367,23 +370,21 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
     };
       
     const handleSocialLoginFailure = (err) => {
-        customToast.error('Login Failed');
+        customToast.error('Authentication Failed');
         console.log(err.message);
         console.error(err);
     };
 
     const handleGoogleLoginSuccess = (res) => {
-        const { _token, _provider } = res;
-        customToast.success('Login Successful');
+        const { tokenId } = res;
+        customToast.success('Authentication Successful');
         setLoading(true);
         const data = {
-            provider: _provider,
-            idToken: _token.idToken
+            provider: 'google',
+            idToken: tokenId
         };
         externalLogin(data, history, myLocation);
     };
-
-    const handleNoInternet = () => customToast.error('No internet connection');
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -613,15 +614,13 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <GoogleLogin
-                                        provider="google"
-                                        appId={process.env.REACT_APP_GOOGLE_APP_ID}
-                                        onLoginSuccess={handleGoogleLoginSuccess}
-                                        onLoginFailure={handleSocialLoginFailure}
-                                        onInternetFailure={handleNoInternet}
-                                        className={clsx({ [classes.disabledButton]: !checked })}
-                                    >
-                                        <Typography variant="subtitle2" component="span">Sign up with Google</Typography>
-                                    </GoogleLogin>
+                                        clientId={process.env.REACT_APP_GOOGLE_APP_ID}
+                                        className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
+                                        buttonText="Sign up with Google"
+                                        onSuccess={handleGoogleLoginSuccess}
+                                        onFailure={handleSocialLoginFailure}
+                                        cookiePolicy={'single_host_origin'}
+                                    />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Checkbox

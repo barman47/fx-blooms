@@ -18,7 +18,7 @@ import Alert from '@material-ui/lab/Alert';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import toast, { Toaster } from 'react-hot-toast';
-// import { GoogleLoginButton } from 'react-social-login-buttons';
+import { GoogleLogin } from 'react-google-login';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';
@@ -34,8 +34,6 @@ import validateLogin from '../../utils/validation/customer/login';
 
 import logo from '../../assets/img/logo.svg';
 
-// import GoogleLogin from './GoogleLogin';
-import { GoogleLogin } from 'react-google-login';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -165,15 +163,11 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
     };
       
     const handleSocialLoginFailure = (err) => {
-        toast.error('Login Failed')
         console.log(err.message);
         console.error(err);
     };
 
-    // const handleNoInternet = () => toast.error('No internet connection');
-
     const handleGoogleLoginSuccess = (res) => {
-        console.log(res);
         const { tokenId } = res;
         toast.success('Login Successful');
         setLoading(true);
