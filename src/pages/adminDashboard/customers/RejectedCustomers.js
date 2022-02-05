@@ -117,7 +117,7 @@ const RejectedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }
 RejectedCustomers.propTypes = {
     getNewCustomers: PropTypes.func.isRequired,
     handleClick: PropTypes.func.isRequired,
-    viewCustomerprofile: PropTypes.func.isRequired
+    viewCustomerProfile: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getNewCustomers })(RejectedCustomers);

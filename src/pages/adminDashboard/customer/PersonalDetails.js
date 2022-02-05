@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'; 
+import { useEffect, useRef, useState } from 'react'; 
 import { useLocation } from 'react-router-dom'; 
-import { connect, useSelector } from 'react-redux'; 
+import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
     Avatar,
     Box, 
@@ -14,13 +14,15 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
 import { updateCustomerProfile } from '../../../actions/admin';
-import { getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
+import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
+import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
 import avatar from '../../../assets/img/avatar.jpg';
 
 import Spinner from '../../../components/common/Spinner';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -64,6 +66,12 @@ const useStyles = makeStyles(theme =>({
         
     },
 
+    statusButtonContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+
     button: {
         fontWeight: 600,
     },
@@ -86,11 +94,12 @@ const useStyles = makeStyles(theme =>({
     },
 }));
 
-const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse, updateCustomerProfile }) => {
+const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const location = useLocation();
 
-    const { customer, idCheckData, profileCheckData } = useSelector(state => state.customers);
+    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
 
     const [firstName] = useState(customer.firstName);
     const [middleName] = useState(customer.middleName);
@@ -107,11 +116,16 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
     const [remark, setRemark] = useState(customer.remark);
     const [email] = useState(customer.email);
+    const [status, setStatus] = useState(customer.customerStatus);
 
     const [loadingText, setLoadingText] = useState('');
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
     const [loading, setLoading] = useState(false);
+    
+    const successModal = useRef();
+
+    const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
 
     useEffect(() => {
         if (!idCheckData) {
@@ -132,8 +146,54 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         }
     }, [location]);
 
+    useEffect(() => {
+        const { customerStatus } = customer;
+        // const { address, occupation, riskProfile, remark, status } = customer;
+
+        // setAddress(address);
+        setStatus(customerStatus);
+        // setOccupation(occupation);
+        // setRiskProfile(riskProfile);
+        // setRemark(remark);
+    
+    }, [customer]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            setEditable(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
+
+    const suspendCustomer = () => {
+        setLoadingText('Suspending Customer...');
+        setLoading(true);
+        setCustomerStatus({
+            customerID: customer.id,
+            newStatus: SUSPENDED,
+            currentStatus: status
+        });
+    };
+
+    const confirmCustomer = () => {
+        setLoadingText('Confirming Customer...');
+        setLoading(true);
+        setCustomerStatus({
+            customerID: customer.id,
+            newStatus: CONFIRMED,
+            currentStatus: status
+        });
+    };
+
+    const dismissAction = () => {
+        dispatch({
+            type: CLEAR_CUSTOMER_STATUS_MSG
+        });
+    };
+
     const onSubmit = (e) => {
-        alert('Submit Clicked');
         e.preventDefault();
         setErrors({});
         setLoadingText('');
@@ -155,7 +215,6 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         if (!isValid) {
             return setErrors({ msg: 'Invalid customer data', ...errors });
         }
-        console.log('Updating Customer From Component');
         setLoadingText('Updating Customer . . .');
         setLoading(true);
         setErrors({});
@@ -165,6 +224,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     return (
         <>
             {loading && <Spinner text={loadingText} />}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
                     <Box component="div" className={classes.box}>
@@ -175,6 +235,43 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                 label="Personal Details"
                                 labelPlacement="start"
                             />
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="h6">User Status</Typography>
+                            {status === CONFIRMED ? (
+                                <Box component="div" className={classes.statusButtonContainer}>
+                                    <Typography variant="h5" color="primary" style={{ fontWeight: 600 }}>{status}</Typography> 
+                                    {(status === CONFIRMED || status === NO_PROFILE) &&
+                                        <Button 
+                                            variant="contained" 
+                                            color="error" 
+                                            size="small" 
+                                            disableRipple 
+                                            disableFocusRipple 
+                                            disableTouchRipple
+                                            onClick={suspendCustomer}
+                                        >
+                                            Suspend Customer
+                                        </Button>
+                                    }
+                                </Box>
+                                )
+                                :
+                                <Box component="div" className={classes.statusButtonContainer}>
+                                    <Typography variant="h5" color="error" style={{ fontWeight: 600 }}>{status}</Typography>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        size="small" 
+                                        disableRipple 
+                                        disableFocusRipple 
+                                        disableTouchRipple
+                                        onClick={confirmCustomer}
+                                    >
+                                        Confirm Customer
+                                    </Button> 
+                                </Box>
+                            }
                         </Box>
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
@@ -263,6 +360,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                 SAVE
                             </Button>
                         </Box>
+                        <br />
+                        <br />
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Middle Names</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{middleName}</Typography>    
@@ -360,7 +459,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 PersonalDetails.propTypes = {
     getIdCardValidationResponse: PropTypes.func.isRequired,
     getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    setCustomerStatus: PropTypes.func.isRequired,
     updateCustomerProfile: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, updateCustomerProfile })(PersonalDetails);
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile })(PersonalDetails);

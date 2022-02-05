@@ -5,7 +5,7 @@ import { ADMIN_HOME, ADMIN_LOGIN } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueAdminToken from '../utils/reIssueAdminToken';
 import setAuthToken from '../utils/setAuthToken';
-import { RESET_STORE, SET_CURRENT_ADMIN, SET_STATS } from './types';
+import { RESET_STORE, SET_CURRENT_ADMIN, SET_STATS, UPDATED_CUSTOMER } from './types';
 
 const api = `${API}/Admin`;
 
@@ -41,11 +41,10 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.post(`${api}/UpdateCustomerProfile`, data);
-        console.log(res);
-        // return dispatch({
-        //     type: SET_STATS,
-        //     payload: res.data.data
-        // });
+        return dispatch({
+            type: UPDATED_CUSTOMER,
+            payload: res.data.data
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

@@ -33,6 +33,7 @@ import {
     getCustomersWithoutProfile,
     setCustomerStatus
 } from '../../../actions/customer';
+import { getStats } from '../../../actions/admin';
 import { CLEAR_CUSTOMER_STATUS_MSG, SET_CUSTOMER } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
@@ -217,6 +218,7 @@ const Customers = (props) => {
         getSuspendedCustomers,
         getVerifiedCustomers, 
         getRejectedCustomers, 
+        getStats,
         setCustomerStatus,
         handleSetTitle 
     } = props;
@@ -235,8 +237,9 @@ const Customers = (props) => {
     }, []);
 
     useEffect(() => {
+        getStats();
         setLoading(false);
-    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items]);
+    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items, getStats]);
 
     useEffect(() => {
         if (msg && customer) {
@@ -501,8 +504,8 @@ const Customers = (props) => {
         handleClose();
         setCustomerStatus({
             customerID: customer.id,
-            status: SUSPENDED,
-            currentStatus: customer.customerStatus
+            newStatus: SUSPENDED,
+            currentStatus: filter
         });
     };
 
@@ -616,7 +619,8 @@ const Customers = (props) => {
                                 {filter === ALL_CUSTOMERS && 
                                     <AllCustomers 
                                         handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle} 
+                                        handleSetTitle={handleSetTitle}
+                                        viewCustomerProfile={viewCustomerProfile}
                                     />
                                 }
                             </TableBody>
@@ -649,7 +653,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend}>Suspend</MenuItem>
+                    <MenuItem onClick={suspend} disabled={filter === SUSPENDED || filter === REJECTED}>Suspend</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -662,6 +666,7 @@ Customers.propTypes = {
     getCustomers: PropTypes.func.isRequired,
     getCustomersWithoutProfile: PropTypes.func.isRequired,
     getSuspendedCustomers: PropTypes.func.isRequired,
+    getStats: PropTypes.func.isRequired,
     getNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
     getVerifiedCustomers: PropTypes.func.isRequired,
@@ -676,5 +681,6 @@ export default connect(undefined, {
     getNewCustomers, 
     getRejectedCustomers, 
     getVerifiedCustomers,
+    getStats,
     setCustomerStatus 
 })(Customers);

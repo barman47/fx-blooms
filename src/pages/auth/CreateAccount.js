@@ -597,6 +597,15 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
+                                    <Checkbox
+                                        color="primary"
+                                        checked={checked}
+                                        onChange={() => setChecked(!checked)}
+                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                    />
+                                    <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <Button 
                                         variant="contained" 
                                         color="primary"
@@ -621,15 +630,6 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
                                         onFailure={handleSocialLoginFailure}
                                         cookiePolicy={'single_host_origin'}
                                     />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Checkbox
-                                        color="primary"
-                                        checked={checked}
-                                        onChange={() => setChecked(!checked)}
-                                        inputProps={{ 'aria-label': 'primary checkbox' }}
-                                    />
-                                    <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 300 }}>

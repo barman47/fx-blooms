@@ -60,11 +60,11 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const newCustomers = useSelector(state => state.customers?.pending?.items);
+    const suspendedCustomers = useSelector(state => state.customers?.suspended?.items);
 
     // useEffect(() => {
     //     // handleSetTitle('New Customers');
-    //     // if (!newCustomers) {
+    //     // if (!suspendedCustomers) {
     //         getSuspendedCustomers({
     //             pageNumber: 1,
     //             pageSize: 25
@@ -83,7 +83,7 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
 
     return (
         <>
-            {newCustomers && newCustomers.map((customer) => (
+            {suspendedCustomers && suspendedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    

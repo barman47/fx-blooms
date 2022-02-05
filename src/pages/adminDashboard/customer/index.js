@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useHistory, useLocation } from 'react-router-dom';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
-import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
+import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import { COLORS, USER_DETAILS } from '../../../utils/constants';
 
 import Spinner from '../../../components/common/Spinner';
@@ -28,7 +28,7 @@ const useStyles = makeStyles(theme =>({
 
     tabContainer: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
+        gridTemplateColumns: 'repeat(4, 1fr)',
         gap: theme.spacing(4),
         marginTop: theme.spacing(2)
     },
@@ -41,6 +41,7 @@ const useStyles = makeStyles(theme =>({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         padding: theme.spacing(1),
 
         '& span:first-child': {
@@ -106,25 +107,34 @@ const useStyles = makeStyles(theme =>({
     },
 }));
 
-const Customer = (props) => {
+const Customer = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
     const { customer, msg } = useSelector(state => state.customers);
 
-    const { PERSONAL_DETAILS, ID_DETAILS, TWO_FACTOR, TRANSACTION_DETAILS, WALLET_DETAILS } = USER_DETAILS;
+    const { PERSONAL_DETAILS, ID_DETAILS, AUTHENTICATION, TRANSACTION_DETAILS } = USER_DETAILS;
 
     const [tab, setTab] = useState(PERSONAL_DETAILS);
     const [loading, setLoading] = useState(false);
 
     const successModal = useRef();
 
-    const { getStats } = props;
-
     useEffect(() => {
-        return () => dispatch({ 
-            type: SET_CUSTOMER,
-            payload: {}
+        return () => batch(() => {
+            dispatch({ 
+                type: SET_CUSTOMER,
+                payload: {}
+            })
+            dispatch({ 
+                type: SET_ID_CHECK_DATA,
+                payload: null
+            })
+            dispatch({ 
+                type: SET_PROFILE_CHECK_DATA,
+                payload: null
+            })
         });
         // eslint-disable-next-line
     }, []);
@@ -140,20 +150,21 @@ const Customer = (props) => {
     // }, [dispatch, errorsState]);
 
     useEffect(() => {
-        if (msg && customer) {
+        if ((msg && customer) && location.pathname.split('/').length === 3) { //Only run on the customer page
             setLoading(false);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
-    }, [customer, dispatch, msg]);
+    }, [customer, dispatch, location.pathname, msg]);
 
     const dismissAction = () => {
-        getStats();
-        dispatch({
-            type: CLEAR_CUSTOMER_STATUS_MSG
-        });
+        if (location.pathname.split('/').length === 3) { //Only run on the customer page
+            dispatch({
+                type: CLEAR_CUSTOMER_STATUS_MSG
+            });
 
-        history.goBack();
+            history.goBack();
+        }
     };
 
     return (
@@ -169,14 +180,11 @@ const Customer = (props) => {
                     <div className={clsx(classes.tab, tab === ID_DETAILS && classes.active)} onClick={() => setTab(ID_DETAILS)}>
                         <Typography variant="subtitle2" component="span">{ID_DETAILS}</Typography>
                     </div>
-                    <div className={clsx(classes.tab, tab === TWO_FACTOR && classes.active)} onClick={() => setTab(TWO_FACTOR)}>
-                        <Typography variant="subtitle2" component="span">{TWO_FACTOR}</Typography>
+                    <div className={clsx(classes.tab, tab === AUTHENTICATION && classes.active)} onClick={() => setTab(AUTHENTICATION)}>
+                        <Typography variant="subtitle2" component="span">{AUTHENTICATION}</Typography>
                     </div>
                     <div className={clsx(classes.tab, tab === TRANSACTION_DETAILS && classes.active)} onClick={() => setTab(TRANSACTION_DETAILS)}>
                         <Typography variant="subtitle2" component="span">{TRANSACTION_DETAILS}</Typography>
-                    </div>
-                    <div className={clsx(classes.tab, tab === WALLET_DETAILS && classes.active)} onClick={() => setTab(WALLET_DETAILS)}>
-                        <Typography variant="subtitle2" component="span">{WALLET_DETAILS}</Typography>
                     </div>
                 </Box>
                 <Box component="section" className={classes.container}>
@@ -189,6 +197,6 @@ const Customer = (props) => {
             </section>
         </>
     );
-}
+};
 
 export default Customer;

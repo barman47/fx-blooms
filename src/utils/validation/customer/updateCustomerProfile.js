@@ -8,9 +8,6 @@ const updateCustomerProfile = (data) => {
     data.country = !isEmpty(data.country) ?  data.country : '';
     data.postalCode = !isEmpty(data.postalCode) ?  data.postalCode : '';
 
-    if (!Validator.isMobilePhone(data.phoneNumber)) {
-        errors.phoneNumber = 'Invalid Phone Number!';
-    }
     if (Validator.isEmpty(data.phoneNumber)) {
         errors.phoneNumber = 'Customer Phone Number is required!';
     }

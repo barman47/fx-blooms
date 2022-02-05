@@ -118,6 +118,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
 
     useEffect(() => {
         if (!idCheckData) {
+            console.log('Getting ID card data');
             getIdCardValidationResponse(customer.id);
         }
 
@@ -206,7 +207,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         {profileCheckData?.status && profileCheckData?.status.toUpperCase() === APPROVED ? 
                                             <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, classes.errorButton)}>{profileCheckData?.status}</Button>
                                             :
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: profileCheckData?.status.toUpperCase() !== APPROVED })}>{profileCheckData?.status}</Button>
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: profileCheckData?.status?.toUpperCase() !== APPROVED })}>{profileCheckData?.status}</Button>
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
@@ -218,7 +219,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         </Box>
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Date of Expiry</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>20-12-2023</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.expiryDate}</Typography>
                                         </Box>
                                     </Box>
                                     <Box component="div">
@@ -237,11 +238,11 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>Residence Permit</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.documentNumber}</Typography>
                                         </Box>
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>NGA</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.dateOfIssue}</Typography>
                                         </Box>
                                     </Box>
                                 </Box>
@@ -264,7 +265,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         {idCheckData?.status && idCheckData?.status.toUpperCase() === APPROVED ? 
                                             <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple color="primary" className={clsx(classes.infoButton, classes.erroButton)}>{idCheckData?.status}</Button>
                                             :
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: idCheckData?.status.toUpperCase() !== APPROVED })}>{idCheckData?.status}</Button>
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: idCheckData?.status?.toUpperCase() !== APPROVED })}>{idCheckData?.status}</Button>
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
@@ -295,11 +296,11 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentType}</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentNumber}</Typography>
                                         </Box>
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>NGA</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.dateOfIssue}</Typography>
                                         </Box>
                                     </Box>
                                 </Box>

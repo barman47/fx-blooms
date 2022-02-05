@@ -73,7 +73,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         marginBottom: theme.spacing(5),
         marginTop: theme.spacing(5),
-        padding: [[theme.spacing(8), theme.spacing(5)]],
+        padding: [[theme.spacing(3), theme.spacing(5)]],
 
         [theme.breakpoints.down('sm')]: {
             padding: [[theme.spacing(4), theme.spacing(2)]]
@@ -102,6 +102,7 @@ const useStyles = makeStyles(theme => ({
 
     link: {
         color: theme.palette.primary.main,
+        marginTop: theme.spacing(2),
         textDecoration: 'none',
         '&:hover': {
             textDecoration: 'none'
@@ -324,7 +325,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
                                 />    
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300 }}>
+                                <Typography variant="subtitle1" component="p" align="center" style={{ fontWeight: 300, marginTop: theme.spacing(2) }}>
                                     Don't have an account? <RouterLink to={SIGN_UP} className={classes.link}>Sign Up</RouterLink>
                                 </Typography>
                             </Grid>
