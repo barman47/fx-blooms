@@ -612,8 +612,7 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
             payload: customerData
         });
     } catch (err) {
-        console.error(err);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 

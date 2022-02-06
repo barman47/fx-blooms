@@ -20,7 +20,7 @@ import {
     useScrollTrigger 
 } from '@material-ui/core';
 
-import { ChevronDown, FormatListText, HomeMinus, Menu as MenuIcon, Message } from 'mdi-material-ui';
+import { Account, FormatListText, HomeMinus, Menu as MenuIcon, Message } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
@@ -230,20 +230,23 @@ export const PrivateHeader = (props) => {
                                     </Link>
                                 </Grid>
                             ))}
+                            <Grid item>
+                                <Link
+                                    to="#!"
+                                    // component={RouterLink}
+                                    className={classes.link}
+                                    underline="none"
+                                    ref={anchorRef}
+                                    onClick={handleToggle}
+                                    aria-controls={open ? 'profile-menu' : undefined}
+                                    aria-haspopup="true"
+                                >
+                                    <span className={classes.linkIcon}><Account /></span>&nbsp;&nbsp;&nbsp;Account
+                                </Link>
+                            </Grid>
                         </div>
                         <div className={classes.avatarContainer}>
                             <Avatar alt={`${firstName} ${lastName}`} />
-                            <Button
-                                to={DASHBOARD_HOME}
-                                endIcon={<ChevronDown />}
-                                classes={{ root: classes.avatarButton }}
-                                ref={anchorRef}
-                                onClick={handleToggle}
-                                aria-controls={open ? 'profile-menu' : undefined}
-                                aria-haspopup="true"
-                            >
-                                Account
-                            </Button>
                         </div>
                         <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
                             {({ TransitionProps, placement }) => (
