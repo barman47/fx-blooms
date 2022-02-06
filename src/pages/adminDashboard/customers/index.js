@@ -33,6 +33,7 @@ import {
     getCustomersWithoutProfile,
     setCustomerStatus
 } from '../../../actions/customer';
+import { getStats } from '../../../actions/admin';
 import { CLEAR_CUSTOMER_STATUS_MSG, SET_CUSTOMER } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
@@ -44,6 +45,7 @@ import SuspendedCustomers from './SuspendedCustomers';
 import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
 import SuccessModal from '../../../components/common/SuccessModal';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -180,7 +182,7 @@ const Customers = (props) => {
     const history = useHistory();
 
     const { admin } = useSelector(state => state);
-    const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended, count } = useSelector(state => state.customers);
+    const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended } = useSelector(state => state.customers);
     const { 
         // totalCustomersAwaitingApproval, 
         totalApprovedCustomers, 
@@ -216,6 +218,7 @@ const Customers = (props) => {
         getSuspendedCustomers,
         getVerifiedCustomers, 
         getRejectedCustomers, 
+        getStats,
         setCustomerStatus,
         handleSetTitle 
     } = props;
@@ -224,15 +227,19 @@ const Customers = (props) => {
 
     useEffect(() => {
         handleSetTitle('Customers');
-        if (count === 0) {
-            getNewCustomers();
+        if (isEmpty(noProfile)) {
+            getCustomersWithoutProfile({
+                pageNumber: 1,
+                pageSize: rowsPerPage
+            });
         }
         // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
+        getStats();
         setLoading(false);
-    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items]);
+    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items, getStats]);
 
     useEffect(() => {
         if (msg && customer) {
@@ -257,27 +264,27 @@ const Customers = (props) => {
     const getCount = useCallback(() => {
         switch (filter) {
             case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount);
+                setCustomerCount(confirmed.totalItemCount || 0);
                 break;
 
             case PENDING:
-                setCustomerCount(pending.totalItemCount);
+                setCustomerCount(pending.totalItemCount || 0);
                 break;
 
             case REJECTED:
-                setCustomerCount(rejected.totalItemCount);
+                setCustomerCount(rejected.totalItemCount || 0);
                 break;
 
-                case SUSPENDED:
-                    setCustomerCount(suspended.totalItemCount);
-                    break;
+            case SUSPENDED:
+                setCustomerCount(suspended.totalItemCount || 0);
+                break;
 
             case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount);
+                setCustomerCount(noProfile.totalItemCount || 0);
                 break;
             
             case ALL_CUSTOMERS:
-                setCustomerCount(customers.totalItemCount);
+                setCustomerCount(customers.totalItemCount || 0);
                 break;
 
             default:
@@ -286,76 +293,7 @@ const Customers = (props) => {
         }
     }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
 
-    useEffect(() => {
-        getCount();
-    }, [filter, getCount]);
-
-    useEffect(() => {
-        getMore();
-        // eslint-disable-next-line
-    }, [page]);
-
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
-
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(0);
-    };
-
-
-    const handleSetFilter = (filter) => {
-        setFilter(filter);
-        switch (filter) {
-            case CONFIRMED:
-                getVerifiedCustomers({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            case PENDING:
-                getNewCustomers({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            case REJECTED:
-                getRejectedCustomers({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            case ALL_CUSTOMERS:
-                getCustomers({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            case SUSPENDED:
-                getSuspendedCustomers({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            case NO_PROFILE:
-                getCustomersWithoutProfile({
-                    pageNumber: 1,
-                    pageSize: 25
-                });
-                break;
-
-            default:
-                break;
-        }  
-    };
-
-    const getMore = () => {
+    const getMore = useCallback(() => {
         setLoading(true);
         switch (filter) {
             case CONFIRMED:
@@ -412,6 +350,76 @@ const Customers = (props) => {
                 setLoading(false);
                 break;
         }
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.currentPageNumber, confirmed.hasNext, customers.currentPageNumber, customers.hasNext, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, noProfile.currentPageNumber, pending.currentPageNumber, pending.hasNext, rejected.currentPageNumber, rejected.hasNext, rowsPerPage, suspended.currentPageNumber]);
+
+    useEffect(() => {
+        getCount();
+    }, [filter, getCount]);
+
+    useEffect(() => {
+        if (page > 0) {
+            getMore();
+        }
+    }, [getMore, page]);
+
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(+event.target.value);
+        setPage(0);
+    };
+
+
+    const handleSetFilter = (filter) => {
+        setFilter(filter);
+        switch (filter) {
+            case CONFIRMED:
+                getVerifiedCustomers({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            case PENDING:
+                getNewCustomers({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            case REJECTED:
+                getRejectedCustomers({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            case ALL_CUSTOMERS:
+                getCustomers({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            case SUSPENDED:
+                getSuspendedCustomers({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            case NO_PROFILE:
+                getCustomersWithoutProfile({
+                    pageNumber: 1,
+                    pageSize: rowsPerPage
+                });
+                break;
+
+            default:
+                break;
+        }  
     };
 
     const downloadRecords = () => {
@@ -496,14 +504,22 @@ const Customers = (props) => {
         handleClose();
         setCustomerStatus({
             customerID: customer.id,
-            status: SUSPENDED,
-            currentStatus: customer.customerStatus
+            newStatus: SUSPENDED,
+            currentStatus: filter
         });
     };
 
     const changeRiskProfile = () => {
         handleClose();
     };
+
+    const viewCustomerProfile = (customer) => {
+        dispatch({
+            type: SET_CUSTOMER,
+            payload: customer
+        });
+        history.push(`${CUSTOMERS}/${customer.id}`);
+    }
 
 
     return (
@@ -525,7 +541,7 @@ const Customers = (props) => {
             }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
-                <Grid container direction="row" justify="space-between">
+                <Grid container direction="row" justifyContent="space-between">
                     <Grid item>
                         <Typography variant="body1" className={classes.title}>Customers</Typography>
                     </Grid>
@@ -572,11 +588,41 @@ const Customers = (props) => {
                                 </TableRow>
                             </TableHead>
                             <TableBody className={classes.content}>
-                                {filter === NO_PROFILE && <NoProfileCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === SUSPENDED && <SuspendedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === CONFIRMED && <VerifiedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === REJECTED && <RejectedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                                {filter === ALL_CUSTOMERS && <AllCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
+                                {filter === NO_PROFILE && 
+                                    <NoProfileCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile} 
+                                    />
+                                }
+                                {filter === SUSPENDED && 
+                                    <SuspendedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === CONFIRMED && 
+                                    <VerifiedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === REJECTED && 
+                                    <RejectedCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle} 
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
+                                {filter === ALL_CUSTOMERS && 
+                                    <AllCustomers 
+                                        handleClick={handleClick} 
+                                        handleSetTitle={handleSetTitle}
+                                        viewCustomerProfile={viewCustomerProfile}
+                                    />
+                                }
                             </TableBody>
                         </Table>
                     </TableContainer>
@@ -607,7 +653,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend}>Suspend</MenuItem>
+                    <MenuItem onClick={suspend} disabled={filter === SUSPENDED || filter === REJECTED}>Suspend</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -620,6 +666,7 @@ Customers.propTypes = {
     getCustomers: PropTypes.func.isRequired,
     getCustomersWithoutProfile: PropTypes.func.isRequired,
     getSuspendedCustomers: PropTypes.func.isRequired,
+    getStats: PropTypes.func.isRequired,
     getNewCustomers: PropTypes.func.isRequired,
     getRejectedCustomers: PropTypes.func.isRequired,
     getVerifiedCustomers: PropTypes.func.isRequired,
@@ -634,5 +681,6 @@ export default connect(undefined, {
     getNewCustomers, 
     getRejectedCustomers, 
     getVerifiedCustomers,
+    getStats,
     setCustomerStatus 
 })(Customers);

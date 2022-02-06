@@ -21,7 +21,6 @@ import { GET_ERRORS } from '../../../actions/types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import extractCountryCode from '../../../utils/extractCountryCode';
 import validateSmsOtp from '../../../utils/validation/customer/smsOtp';
 
 import Toast from '../../../components/common/Toast';
@@ -202,9 +201,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             payload: {}
         });
 
-        const { code, number } = extractCountryCode(phoneNumber);
-
-        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: number });
+        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: phoneNumber });
     };
 
     const handleResendOtp = () => generateOtp({
@@ -243,7 +240,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                             <Typography variant="h5" color="primary">Verify your phone number</Typography>
                             <Typography variant="subtitle2" component="span">Enter the five-digit code we sent to your phone number</Typography>
                             <form onSubmit={onSubmit} noValidate>
-                                <Grid container direction="row" justify="center" spacing={matches ? 2 : 3}>
+                                <Grid container direction="row" justifyContent="center" spacing={matches ? 2 : 3}>
                                     <Grid item xs={2}>
                                         <TextField
                                             className={classes.input}

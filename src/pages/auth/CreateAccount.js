@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
     Checkbox,
+    Divider,
     Grid, 
     IconButton, 
     InputAdornment, 
@@ -16,12 +17,16 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
+import customToast, { Toaster } from 'react-hot-toast';
+import clsx from 'clsx';
+import { GoogleLogin } from 'react-google-login';
 
 import Spinner from '../../components/common/Spinner';
 import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
-import { registerCustomer } from '../../actions/customer';
+import { externalLogin, registerCustomer } from '../../actions/customer';
+import { getMyLocation } from '../../actions/myLocation';
 
 import isEmpty from '../../utils/isEmpty';
 import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, PRIVACY_POLICY, TERMS, USER_AGREEMENT } from '../../routes';
@@ -42,18 +47,17 @@ import img from '../../assets/img/sign-up.svg';
 const useStyles = makeStyles(theme => ({
     root: {
         paddingBottom: theme.spacing(10),
-    },
 
+        [theme.breakpoints.down('sm')]: {
+            paddingBottom: theme.spacing(1)
+        }
+    },
+    
     aside: {
         backgroundColor: COLORS.lightTeal,
-        height: '100vh',
         padding: [[theme.spacing(4), theme.spacing(8)]],
             
         [theme.breakpoints.down('md')]: {
-            height: '70vh'
-        },
-
-        [theme.breakpoints.down('sm')]: {
             display: 'none'
         }
     },
@@ -80,8 +84,6 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-evenly',
-        height: '100vh',
-        paddingTop: theme.spacing(5),
         paddingLeft: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
@@ -99,7 +101,11 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& h4': {
-            marginTop: theme.spacing(5)
+            marginTop: theme.spacing(3),
+
+            [theme.breakpoints.down('sm')]: {
+                marginTop: theme.spacing(1)
+            }
         },
 
         '& span': {
@@ -158,10 +164,28 @@ const useStyles = makeStyles(theme => ({
         position: 'absolute',
         top: 0,
         width: '90%'
-    }
+    },
+
+    orContainer: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 0.1fr 1fr',
+        alignItems: 'center',
+        columnGap: theme.spacing(2)
+    },
+
+    disabledButton: {
+        backgroundColor: '#e0e0e0 !important',
+        color: '#a6a6a6 !important',
+        boxShadow: 'none !important',
+        pointerEvents: 'none !important'
+    },
+
+    googleButton: {
+        width: '100%'
+    },
 }));
 
-const CreateAccount = (props) => {
+const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -169,6 +193,7 @@ const CreateAccount = (props) => {
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
+    const { myLocation } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setEmail] = useState('');
@@ -202,6 +227,8 @@ const CreateAccount = (props) => {
         if (isAuthenticated && authorized) {
             return history.push(DASHBOARD_HOME);
         }
+        
+        getLocation();
 
         return () => {
             dispatch({
@@ -315,6 +342,13 @@ const CreateAccount = (props) => {
         }
     }, [Password, strengthChecker, timeout]);
 
+
+    const getLocation = () => {
+        if (!myLocation.ip) {
+            getMyLocation();
+        }
+    };
+
     const copyUsername = (username) => {
         setUsername(username);
     };
@@ -333,6 +367,23 @@ const CreateAccount = (props) => {
             payload: null
         });
         return history.push(PENDING_VERIFICATION, { email: Email });
+    };
+      
+    const handleSocialLoginFailure = (err) => {
+        customToast.error('Authentication Failed');
+        console.log(err.message);
+        console.error(err);
+    };
+
+    const handleGoogleLoginSuccess = (res) => {
+        const { tokenId } = res;
+        customToast.success('Authentication Successful');
+        setLoading(true);
+        const data = {
+            provider: 'google',
+            idToken: tokenId
+        };
+        externalLogin(data, history, myLocation);
     };
 
     const handleFormSubmit = (e) => {
@@ -359,7 +410,7 @@ const CreateAccount = (props) => {
         setLoading(true);
         setErrors({});
         dispatch({ type: GET_ERRORS, payload: {} });
-        props.registerCustomer({
+        registerCustomer({
             EmailAddress: data.Email.trim(),
             Username,
             Password
@@ -372,6 +423,7 @@ const CreateAccount = (props) => {
                 <title>Create Account | FXBLOOMS.com</title>
                 <meta name="description" content="FXBLOOMS is fully committed to making currency exchange more accessible, secure and seamless. Create an account to enjoy our superb service." />
             </Helmet>
+            <Toaster />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {loading && <Spinner text="One moment . . ." />}
             {!isEmpty(errors) && 
@@ -545,12 +597,12 @@ const CreateAccount = (props) => {
                                     />
                                 </Grid>
                                 <Grid item xs={12}>
-                                <Checkbox
-                                    color="primary"
-                                    checked={checked}
-                                    onChange={() => setChecked(!checked)}
-                                    inputProps={{ 'aria-label': 'primary checkbox' }}
-                                />
+                                    <Checkbox
+                                        color="primary"
+                                        checked={checked}
+                                        onChange={() => setChecked(!checked)}
+                                        inputProps={{ 'aria-label': 'primary checkbox' }}
+                                    />
                                     <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
@@ -561,8 +613,23 @@ const CreateAccount = (props) => {
                                         fullWidth
                                         disabled={checked ? false : true}
                                     >
-                                        Proceed
+                                        Create an Account
                                     </Button>
+                                </Grid>
+                                <Grid item xs={12} className={classes.orContainer}>
+                                    <Divider />
+                                    <Typography variant="h6">OR</Typography>
+                                    <Divider />
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <GoogleLogin
+                                        clientId={process.env.REACT_APP_GOOGLE_APP_ID}
+                                        className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
+                                        buttonText="Sign up with Google"
+                                        onSuccess={handleGoogleLoginSuccess}
+                                        onFailure={handleSocialLoginFailure}
+                                        cookiePolicy={'single_host_origin'}
+                                    />
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle1" component="p" style={{ fontWeight: 300 }}>
@@ -579,7 +646,9 @@ const CreateAccount = (props) => {
 };
 
 CreateAccount.propTypes = {
+    externalLogin: PropTypes.func.isRequired,
+    getMyLocation: PropTypes.func.isRequired,
     registerCustomer: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { registerCustomer })(CreateAccount);
+export default connect(undefined, { externalLogin, getMyLocation, registerCustomer })(CreateAccount);

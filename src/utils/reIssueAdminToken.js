@@ -1,9 +1,10 @@
 import axios from 'axios';
+
 import { API } from './constants';
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
 import { AUTH_TOKEN } from './constants';
-import { RESET_ADMIN_SESSION, SET_AUTH_TOKEN } from '../actions/types';
+import { RESET_ADMIN_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
 import { ADMIN_LOGIN } from '../routes';
 
 const reIssueAdminToken = () => {
@@ -27,6 +28,9 @@ const reIssueAdminToken = () => {
             resolve('Reissued token');
         } catch (err) {
             console.error(err);
+            // console.log(err.response)
+            setAuthToken(null);
+            store.dispatch({ type: RESET_STORE });
             window.location.href = ADMIN_LOGIN;
         }
     }); 

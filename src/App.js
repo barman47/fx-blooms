@@ -30,7 +30,8 @@ import {
 	PENDING_VERIFICATION,
 	WALLET,
 	CONTACT_US,
-	USER_AGREEMENT
+	USER_AGREEMENT,
+	ADD_USERNAME
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -43,6 +44,7 @@ const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
 const Home = lazy(() => import('./pages/home'));
 // import Landing from './pages/landing/Landing';
 
+const AddUsername = lazy(() => import('./pages/auth/AddUsername'));
 const Login = lazy(() => import('./pages/auth/Login'));
 const CreateAccount = lazy(() => import('./pages/auth/CreateAccount'));
 const SignUpSuccess = lazy(() => import('./pages/auth/SignUpSuccess'));
@@ -105,7 +107,7 @@ const theme = createTheme({
 	
 	palette: {
 		primary: {
-			// light: '#df3c3a',
+			// light: '#338080',
 			main: '#1e6262',
 			// dark: '#990300'
 		},
@@ -135,9 +137,10 @@ const theme = createTheme({
 	}
 });
 
-function App(props) {
-// 	const history = useHistory();
-const [title, setTitle] = useState('');
+function App() {
+	// 	const history = useHistory();
+	const [title, setTitle] = useState('');
+
 
 
 	// useEffect(() => {
@@ -160,6 +163,7 @@ const [title, setTitle] = useState('');
 					<ScrollToTop>
 						<Switch>
 							<Route path="/" exact component={Home} />
+							<Route path={ADD_USERNAME} exact component={AddUsername} />
 							<Route path={LOGIN} exact component={Login} />
 							<Route path={SIGN_UP} exact component={CreateAccount} />
 							<Route path={PENDING_VERIFICATION} exact component={PendingVerification} />

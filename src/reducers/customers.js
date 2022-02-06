@@ -19,12 +19,13 @@ import {
     SET_ID_CHECK_DATA,
     SET_PROFILE_CHECK_DATA,
     ACCEPTED_CUSTOMER_ID,
-    ACCEPTED_CUSTOMER_RESIDENCE_PERMIT
+    ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
+    UPDATED_CUSTOMER
 } from '../actions/types';
 
 import { CUSTOMER_CATEGORY } from '../utils/constants';
 
-const { CONFIRMED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
+const { CONFIRMED, PENDING, REJECTED, NO_PROFILE, SUSPENDED, ALL_CUSTOMERS } = CUSTOMER_CATEGORY;
 
 const initialState = {
     customer: {},
@@ -43,7 +44,6 @@ const customersReducer = (state = initialState, action) => {
     let customers = [];
     let customerId;
     let customerIndex;
-    let status;
     let updatedCustomer = {};
 
     switch (action.type) {
@@ -246,49 +246,83 @@ const customersReducer = (state = initialState, action) => {
             };
 
         case SET_CUSTOMER_STATUS:
-            switch (action.payload.currentStatus) {
+            const { customerID, newStatus, currentStatus } = action.payload; 
+
+            switch (currentStatus) {
                 case CONFIRMED:
                     customers = [...state.confirmed.items];
-                    status = action.payload.status;
-                    customerId = action.payload.customerID;
-                    customerIndex = customers.findIndex(customer => customer.id === customerId);
-                    updatedCustomer = { ...state.customer, customerStatus: status };
-                    customers.splice(customerIndex, 1, updatedCustomer);
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1); // remove the customer from verified list
                     
                     return {
                         ...state,
-                        // customer: { ...updatedCustomer },
-                        // confirmed: { ...state.confirmed, items: customers },
+                        customer: updatedCustomer,
+                        confirmed: { ...state.confirmed, items: customers },
                         msg: action.payload.msg
                     };
 
                 case PENDING:
                     customers = [...state.pending.items];
-                    status = action.payload.status;
-                    customerId = action.payload.customerID;
-                    customerIndex = customers.findIndex(customer => customer.id === customerId);
-                    updatedCustomer = { ...state.customer, customerStatus: status };
-                    customers.splice(customerIndex, 1, updatedCustomer);
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1); // remove customer from pending list
                     
                     return {
                         ...state,
-                        // customer: { ...updatedCustomer },
-                        // pending: { ...state.pending, items: customers},
+                        customer: updatedCustomer,
+                        pending: { ...state.pending, items: customers},
+                        msg: action.payload.msg
+                    };
+
+                case NO_PROFILE:
+                    customers = [...state.noProfile.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1); // remove customer from no-profile list
+                    
+                    return {
+                        ...state,
+                        customer: updatedCustomer,
+                        noProfile: { ...state.noProfile, items: customers },
                         msg: action.payload.msg
                     };
 
                 case REJECTED:
                     customers = [...state.rejected.items];
-                    status = action.payload.status;
-                    customerId = action.payload.customerID;
-                    customerIndex = customers.findIndex(customer => customer.id === customerId);
-                    updatedCustomer = { ...state.customer, customerStatus: status };
-                    customers.splice(customerIndex, 1, updatedCustomer);
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1); // remove customer from rejected list
                     
                     return {
                         ...state,
-                        // customer: { ...updatedCustomer },
-                        // rejected: { ...state.rejected, items: customers },
+                        customer: updatedCustomer,
+                        rejected: { ...state.rejected, items: customers },
+                        msg: action.payload.msg
+                    };
+                case SUSPENDED:
+                    customers = [...state.suspended.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1); // remove customer from suspended list
+                    
+                    return {
+                        ...state,
+                        customer: updatedCustomer,
+                        suspended: { ...state.suspended, items: customers },
+                        msg: action.payload.msg
+                    };
+
+                case ALL_CUSTOMERS:
+                    customers = [...state.customers.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerID);
+                    updatedCustomer = { ...state.customer, customerStatus: newStatus };
+                    customers.splice(customerIndex, 1, updatedCustomer); // Update all customers array
+                    
+                    return {
+                        ...state,
+                        customer: updatedCustomer,
+                        customers: { ...state.customers, items: customers },
                         msg: action.payload.msg
                     };
 
@@ -309,6 +343,87 @@ const customersReducer = (state = initialState, action) => {
                 ...state,
                 msg: 'Customer residencen permit has been verified'
             };
+
+        case UPDATED_CUSTOMER:
+            updatedCustomer = action.payload;
+            customerId = updatedCustomer.id;
+
+            switch (updatedCustomer.customerStatus) {
+                case CONFIRMED:
+                    customers = [...state.confirmed.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        confirmed: { ...state.confirmed, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+
+                case PENDING:
+                    customers = [...state.pending.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        pending: { ...state.pending, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+
+                case REJECTED:
+                    customers = [...state.rejected.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        rejected: { ...state.rejected, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+
+                case NO_PROFILE:
+                    customers = [...state.noProfile.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        noProfile: { ...state.noProfile, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+
+                case SUSPENDED:
+                    customers = [...state.suspended.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        suspended: { ...state.suspended, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+
+                case ALL_CUSTOMERS:
+                    customers = [...state.customers.items];
+                    customerIndex = customers.findIndex(customer => customer.id === customerId);
+                    customers.splice(customerIndex, 1, updatedCustomer);
+
+                    return {
+                        ...state,
+                        customers: { ...state.customers, items: customers },
+                        customer: { ...updatedCustomer },
+                        msg: 'Customer profile updated successfully'
+                    };
+                
+                default:
+                    return state;
+            }
 
         case CLEAR_CUSTOMER_STATUS_MSG:
             return {

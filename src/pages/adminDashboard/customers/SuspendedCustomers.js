@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -57,22 +56,22 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
+const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const newCustomers = useSelector(state => state.customers?.pending?.items);
+    const suspendedCustomers = useSelector(state => state.customers?.suspended?.items);
 
-    useEffect(() => {
-        // handleSetTitle('New Customers');
-        // if (!newCustomers) {
-            getSuspendedCustomers({
-                pageNumber: 1,
-                pageSize: 25
-            });
-        // }
-        // eslint-disable-next-line
-    }, []);
+    // useEffect(() => {
+    //     // handleSetTitle('New Customers');
+    //     // if (!suspendedCustomers) {
+    //         getSuspendedCustomers({
+    //             pageNumber: 1,
+    //             pageSize: 25
+    //         });
+    //     // }
+    //     // eslint-disable-next-line
+    // }, []);
 
     const handleButtonClick = (customer, e) => {
         dispatch({
@@ -84,15 +83,15 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
 
     return (
         <>
-            {newCustomers && newCustomers.map((customer) => (
+            {suspendedCustomers && suspendedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{customer.email}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span">{customer.userName}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.email}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.userName}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
@@ -116,7 +115,8 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick }) => {
 
 SuspendedCustomers.propTypes = {
     getSuspendedCustomers: PropTypes.func.isRequired,
-    handleClick: PropTypes.func.isRequired
+    handleClick: PropTypes.func.isRequired,
+    viewCustomerProfile: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getSuspendedCustomers })(SuspendedCustomers);

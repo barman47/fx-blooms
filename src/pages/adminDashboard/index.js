@@ -44,7 +44,7 @@ import {
     Sort
 } from 'mdi-material-ui';
 
-import logo from '../../assets/img/logo-white.svg';
+import logo from '../../assets/img/logowhite.svg';
 
 import { getStats, logout } from '../../actions/admin';
 import { COLORS, LOGOUT } from '../../utils/constants';
@@ -236,6 +236,13 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'center',
     },
 
+    admin: {
+        color: COLORS.offWhite,
+        position: 'relative',
+        top: -30,
+        left: 53
+    },
+
     links: {
         marginTop: theme.spacing(4.5)
     },
@@ -397,6 +404,7 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
                             }
                         </IconButton>
                     </div> 
+                    <Typography variant="body2" component="span" className={classes.admin}>Admin</Typography>
                     <List className={classes.links}>
                         {links.map((link, index) => (
                             <ListItem 

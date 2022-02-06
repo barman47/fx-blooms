@@ -86,7 +86,7 @@ const TermsAndConditions = () => {
                     <Box component="div" className={classes.item}>
                         <Typography variant="h6">General</Typography>
                         <Typography variant="body2" component="p">
-                            The owner of this website (hereinafter the Website) is FXBLOOMS OÜ (registry code 16262446), address Narva mnt 7, 10117 Tallinn, Estonia (hereinafter the Owner). The purpose of the following provisions in these terms and conditions (hereinafter the Terms and Conditions) is to govern the use of the Website for persons that may come here as visitors, potential users and/or customers, partners or have any other type of interest in exchanging currencies (hereinafter the User).
+                            The owner of this website (hereinafter the Website) is FXBLOOMS OÜ (registry code 16262446), address Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia (hereinafter the Owner). The purpose of the following provisions in these terms and conditions (hereinafter the Terms and Conditions) is to govern the use of the Website for persons that may come here as visitors, potential users and/or customers, partners or have any other type of interest in exchanging currencies (hereinafter the User).
                         </Typography>
                         <Typography variant="body2" component="p">
                             In the context of the Terms and Conditions, the following terms "We," "Us," or "Our," refer to the Owner.
