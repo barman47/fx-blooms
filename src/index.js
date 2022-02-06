@@ -2,11 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
+import LogRocket from 'logrocket';
 import './index.css';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { persistor, store } from './store';
+
+LogRocket.init('720xki/fxblooms');
 
 ReactDOM.render(
 	<React.StrictMode>

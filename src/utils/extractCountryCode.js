@@ -12,11 +12,11 @@ const extractCountryCode = (phoneNumber) => {
         }
     });
     
-    const number = phoneNumber.replace(countryCode, '');
+    const number = phoneNumber.slice(countryCode.length);
     
     return {
         code: countryCode,
-        number
+        number: number.startsWith('0') ? number.replace('0', '') : number
     }
 };
 

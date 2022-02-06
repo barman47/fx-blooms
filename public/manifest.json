@@ -69,8 +69,99 @@
           "purpose": "maskable"
         }
     ],
-  "start_url": ".",
-  "display": "standalone",
-  "theme_color": "#1e6262",
-  "background_color": "#ffffff"
+	"shortcuts" : [
+		{
+		  	"name": "Sign in",
+		  	"url": "/user/signUp",
+      		"icons": [
+				{
+				"src": "favicon-96.png",
+				"sizes": "96x96",
+				"type": "image/png",
+				"purpose": "any"
+				}
+      		]
+		},
+		{
+			"name": "Log in",
+			"url": "/user/login",
+			"icons": [
+				{
+				"src": "favicon-96.png",
+				"sizes": "96x96",
+				"type": "image/png",
+				"purpose": "any"
+				}
+      		]
+		},
+		{
+			"name": "About",
+			"url": "/aboutUs",
+			"description": "Learn about FXBLOOMS",
+			"icons": [
+				{
+					"src": "favicon-96.png",
+					"sizes": "96x96",
+					"type": "image/png",
+					"purpose": "any"
+				}
+      		]
+		},
+		{
+			"name": "Contact",
+			"url": "/contactUs",
+			"description": "Contact us",
+			"icons": [
+				{
+					"src": "favicon-96.png",
+					"sizes": "96x96",
+					"type": "image/png",
+					"purpose": "any"
+				}
+			]
+		},
+		{
+			"name": "Privacy Policy",
+			"url": "/privacyPolicy",
+			"description": "Learn about our privacy policy",
+			"icons": [
+				{
+					"src": "favicon-96.png",
+					"sizes": "96x96",
+					"type": "image/png",
+					"purpose": "any"
+				}
+      		]
+		},
+		{
+			"name": "Terms of Service",
+			"url": "/termsOfService",
+			"description": "Learn about our terms of service",
+			"icons": [
+				{
+					"src": "favicon-96.png",
+					"sizes": "96x96",
+					"type": "image/png",
+					"purpose": "any"
+				}
+			]
+		},
+		{
+			"name": "FAQ",
+			"url": "/faq",
+			"description": "Learn about our frequently asked questions",
+			"icons": [
+				{
+					"src": "favicon-96.png",
+					"sizes": "96x96",
+					"type": "image/png",
+					"purpose": "any"
+				}
+			]
+		}
+	],
+  	"start_url": ".",
+  	"display": "standalone",
+  	"theme_color": "#1e6262",
+  	"background_color": "#ffffff"
 }

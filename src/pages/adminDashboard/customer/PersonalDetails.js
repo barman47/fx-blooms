@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'; 
+import { useEffect, useRef, useState } from 'react'; 
 import { useLocation } from 'react-router-dom'; 
-import { useSelector } from 'react-redux'; 
+import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
+    Avatar,
     Box, 
     Button,
     FormControlLabel,
@@ -10,8 +11,18 @@ import {
     TextField
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 
-import { COLORS } from '../../../utils/constants'; 
+import { updateCustomerProfile } from '../../../actions/admin';
+import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
+import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
+
+import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
+import avatar from '../../../assets/img/avatar.jpg';
+
+import Spinner from '../../../components/common/Spinner';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -39,8 +50,7 @@ const useStyles = makeStyles(theme =>({
     },
 
     label: {
-        color: COLORS.offBlack,
-        // fontWeight: 300
+        color: COLORS.offBlack
     },
 
     info: {
@@ -56,6 +66,12 @@ const useStyles = makeStyles(theme =>({
         
     },
 
+    statusButtonContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+
     button: {
         fontWeight: 600,
     },
@@ -69,36 +85,59 @@ const useStyles = makeStyles(theme =>({
     saveRemarkButton: {
         alignSelf: 'flex-end',
         marginTop: theme.spacing(2)
-    }
+    },
+
+    avatar: {
+        borderRadius: theme.shape.borderRadius,
+        width: theme.spacing(25),
+        height: theme.spacing(25),
+    },
 }));
 
-const PersonalDetails = () => {
+const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const location = useLocation();
 
-    const { customer } = useSelector(state => state.customers);
+    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
 
-    const [firstName, setFirstName] = useState(customer.firstName);
-    const [middleName, setMiddleName] = useState(customer.middleName);
-    const [lastName, setLastName] = useState(customer.lastName);
-    const [userName, setUserName] = useState(customer.userName);
+    const [firstName] = useState(customer.firstName);
+    const [middleName] = useState(customer.middleName);
+    const [lastName] = useState(customer.lastName);
+    const [userName] = useState(customer.userName);
     const [occupation, setOccupation] = useState(customer.occupation);
-    const [dateOfBirth, setDateOfBirth] = useState(customer.dateOfBirth);
+    const [dateOfBirth] = useState(idCheckData?.dateOfBirth || profileCheckData?.dateOfBirth);
     const [address, setAddress] = useState(customer.address);
-    const [postalCode, setPostalCode] = useState(customer.postalCode);
-    const [city, setCity] = useState(customer.city);
-    const [country, setCountry] = useState(customer.countryId);
-    const [nationality, setNationality] = useState(customer.nationality);
+    const [postalCode] = useState(customer.postalCode);
+    const [city] = useState(customer.city);
+    const [country] = useState(customer.countryId);
+    const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
     const [remark, setRemark] = useState(customer.remark);
-    const [email, setEmail] = useState(customer.email);
+    const [email] = useState(customer.email);
+    const [status, setStatus] = useState(customer.customerStatus);
 
-    // eslint-disable-next-line
+    const [loadingText, setLoadingText] = useState('');
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
+    
+    const successModal = useRef();
+
+    const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
+
+    useEffect(() => {
+        if (!idCheckData) {
+            getIdCardValidationResponse(customer.id);
+        }
+
+        if (!profileCheckData) {
+            getResidencePermitValidationResponse(customer.id);
+        }
+
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         const { state } = location;
@@ -107,349 +146,321 @@ const PersonalDetails = () => {
         }
     }, [location]);
 
+    useEffect(() => {
+        const { customerStatus } = customer;
+        // const { address, occupation, riskProfile, remark, status } = customer;
+
+        // setAddress(address);
+        setStatus(customerStatus);
+        // setOccupation(occupation);
+        // setRiskProfile(riskProfile);
+        // setRemark(remark);
+    
+    }, [customer]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            setEditable(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [msg]);
+
+    const suspendCustomer = () => {
+        setLoadingText('Suspending Customer...');
+        setLoading(true);
+        setCustomerStatus({
+            customerID: customer.id,
+            newStatus: SUSPENDED,
+            currentStatus: status
+        });
+    };
+
+    const confirmCustomer = () => {
+        setLoadingText('Confirming Customer...');
+        setLoading(true);
+        setCustomerStatus({
+            customerID: customer.id,
+            newStatus: CONFIRMED,
+            currentStatus: status
+        });
+    };
+
+    const dismissAction = () => {
+        dispatch({
+            type: CLEAR_CUSTOMER_STATUS_MSG
+        });
+    };
+
     const onSubmit = (e) => {
         e.preventDefault();
+        setErrors({});
+        setLoadingText('');
+
+        const data = {
+            customerId: customer.id,
+            firstName: firstName,
+            lastName: lastName,
+            otherName: middleName,
+            phoneNumber: phoneNumber,
+            country: country,
+            address: address,
+            postalCode: postalCode,
+            occupation: occupation,
+            risk: riskProfile
+        };
+
+        const { errors, isValid } = validateUpdateCustomerProfile(data);
+        if (!isValid) {
+            return setErrors({ msg: 'Invalid customer data', ...errors });
+        }
+        setLoadingText('Updating Customer . . .');
+        setLoading(true);
+        setErrors({});
+        updateCustomerProfile(data);
     };
 
     return (
-        <Box component="section" className={classes.root}>
-            <form onSubmit={onSubmit} noValidate className={classes.form}>
-                <Box component="div" className={classes.box}>
-                    <Box component="header">
-                        <FormControlLabel
-                            value="top"
-                            control={<Switch color="primary" />}
-                            label="Personal Details"
-                            labelPlacement="start"
-                        />
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={firstName || ''}
-                                onChange={(e) => setFirstName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter First Name"
-                                helperText={errors.firstName}
-                                fullWidth
-                                required
-                                error={errors.firstName ? true : false}
+        <>
+            {loading && <Spinner text={loadingText} />}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <Box component="section" className={classes.root}>
+                <form onSubmit={onSubmit} noValidate className={classes.form}>
+                    <Box component="div" className={classes.box}>
+                        <Box component="header">
+                            <FormControlLabel
+                                value="top"
+                                control={<Switch color="primary" />}
+                                label="Personal Details"
+                                labelPlacement="start"
                             />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="h6">User Status</Typography>
+                            {status === CONFIRMED ? (
+                                <Box component="div" className={classes.statusButtonContainer}>
+                                    <Typography variant="h5" color="primary" style={{ fontWeight: 600 }}>{status}</Typography> 
+                                    {(status === CONFIRMED || status === NO_PROFILE) &&
+                                        <Button 
+                                            variant="contained" 
+                                            color="error" 
+                                            size="small" 
+                                            disableRipple 
+                                            disableFocusRipple 
+                                            disableTouchRipple
+                                            onClick={suspendCustomer}
+                                        >
+                                            Suspend Customer
+                                        </Button>
+                                    }
+                                </Box>
+                                )
+                                :
+                                <Box component="div" className={classes.statusButtonContainer}>
+                                    <Typography variant="h5" color="error" style={{ fontWeight: 600 }}>{status}</Typography>
+                                    <Button 
+                                        variant="contained" 
+                                        color="primary" 
+                                        size="small" 
+                                        disableRipple 
+                                        disableFocusRipple 
+                                        disableTouchRipple
+                                        onClick={confirmCustomer}
+                                    >
+                                        Confirm Customer
+                                    </Button> 
+                                </Box>
+                            }
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{firstName}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={lastName || ''}
-                                onChange={(e) => setLastName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Last Name"
-                                helperText={errors.lastName}
-                                fullWidth
-                                required
-                                error={errors.lastName ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{lastName}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={userName || ''}
-                                onChange={(e) => setUserName(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Username"
-                                helperText={errors.userName}
-                                fullWidth
-                                required
-                                error={errors.userName ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{userName}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Occupation</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={occupation || ''}
-                                onChange={(e) => setOccupation(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Occupation"
-                                helperText={errors.occupation}
-                                fullWidth
-                                required
-                                error={errors.occupation ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{occupation}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={address || ''}
-                                onChange={(e) => setAddress(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Address"
-                                helperText={errors.address}
-                                fullWidth
-                                required
-                                error={errors.address ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{address}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={postalCode || ''}
-                                onChange={(e) => setPostalCode(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Postal Code"
-                                helperText={errors.postalCode}
-                                fullWidth
-                                required
-                                error={errors.postalCode ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Occupation</Typography>
+                            {editable ? 
+                                <TextField 
+                                    className={classes.input}
+                                    value={occupation || ''}
+                                    onChange={(e) => setOccupation(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Occupation"
+                                    helperText={errors.occupation}
+                                    fullWidth
+                                    required
+                                    error={errors.occupation ? true : false}
+                                />
+                                :
+                                <Typography variant="subtitle2" className={classes.info}>{occupation}</Typography>    
+                            }
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
+                            {editable ? 
+                                <TextField 
+                                    className={classes.input}
+                                    value={address || ''}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Address"
+                                    helperText={errors.address}
+                                    fullWidth
+                                    required
+                                    error={errors.address ? true : false}
+                                />
+                                :
+                                <Typography variant="subtitle2" className={classes.info}>{address}</Typography>    
+                            }
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{postalCode}</Typography>    
-                        }
+                        </Box>
                     </Box>
-                </Box>
-                <Box component="div" className={classes.box}>
-                    <Box component="div" className={classes.buttonContainer}>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            size="small" 
-                            className={classes.button}
-                            disabled={loading}
-                        >
-                            CONTACT
-                        </Button>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            size="small" 
-                            className={classes.button}
-                            onClick={() =>setEditable(true)}
-                            disabled={loading || editable ? true : false}
-                        >
-                            EDIT
-                        </Button>
-                        <Button 
-                            variant="outlined" 
-                            color="primary" 
-                            size="small" 
-                            className={classes.button}
-                            disabled={loading || !editable ? true : false}
-                        >
-                            SAVE
-                        </Button>
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Middle Names</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={middleName || ''}
-                                onChange={(e) => setMiddleName(e.target.value)}
-                                type="text"
+                    <Box component="div" className={classes.box}>
+                        <Box component="div" className={classes.buttonContainer}>
+                            <Button 
                                 variant="outlined" 
-                                placeholder="Enter Middle Name"
-                                helperText={errors.middleName}
-                                fullWidth
-                                required
-                                error={errors.middleName ? true : false}
-                            />
-                            :
+                                color="primary" 
+                                size="small" 
+                                className={classes.button}
+                                disabled={loading}
+                            >
+                                CONTACT
+                            </Button>
+                            <Button 
+                                variant="outlined" 
+                                color="primary" 
+                                size="small" 
+                                className={classes.button}
+                                onClick={() =>setEditable(true)}
+                                disabled={loading || editable ? true : false}
+                            >
+                                EDIT
+                            </Button>
+                            <Button 
+                                variant="outlined" 
+                                color="primary" 
+                                size="small" 
+                                className={classes.button}
+                                disabled={loading || !editable ? true : false}
+                                onClick={onSubmit}
+                            >
+                                SAVE
+                            </Button>
+                        </Box>
+                        <br />
+                        <br />
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Middle Names</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{middleName}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={dateOfBirth || ''}
-                                onChange={(e) => setDateOfBirth(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Date of Birth"
-                                helperText={errors.dateOfBirth}
-                                fullWidth
-                                required
-                                error={errors.dateOfBirth ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{dateOfBirth}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Email</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={email || ''}
-                                onChange={(e) => setEmail(e.target.value)}
-                                type="email"
-                                variant="outlined" 
-                                placeholder="Enter Email Address"
-                                helperText={errors.email}
-                                fullWidth
-                                required
-                                error={errors.email ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Email</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{email}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Nationality</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={nationality || ''}
-                                onChange={(e) => setNationality(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Nationality"
-                                helperText={errors.nationality}
-                                fullWidth
-                                required
-                                error={errors.nationality ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Nationality</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{nationality}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>City</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={city || ''}
-                                onChange={(e) => setCity(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Email City"
-                                helperText={errors.city}
-                                fullWidth
-                                required
-                                error={errors.city ? true : false}
-                            />
-                            :
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>City</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{city}</Typography>    
-                        }
+                        </Box>
                     </Box>
-                </Box>
-                <Box component="div" className={classes.box}>
-                    <img src="" alt="" />
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={phoneNumber || ''}
-                                onChange={(e) => setPhoneNumber(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Phone Number"
-                                helperText={errors.phoneNumber}
-                                fullWidth
-                                required
-                                error={errors.phoneNumber ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{phoneNumber}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Client Since</Typography>
-                        <Typography variant="subtitle2" className={classes.info}>{customer?.email}</Typography>    
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={riskProfile || ''}
-                                onChange={(e) => setRiskProfile(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Risk Profile"
-                                helperText={errors.riskProfile}
-                                fullWidth
-                                required
-                                error={errors.riskProfile ? true : false}
-                            />
-                            :
-                            <Typography variant="subtitle2" className={classes.info}>{riskProfile}</Typography>    
-                        }
-                    </Box>
-                    <Box component="div">
-                        <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                        {editable ? 
-                            <TextField 
-                                className={classes.input}
-                                value={country || ''}
-                                onChange={(e) => setCountry(e.target.value)}
-                                type="text"
-                                variant="outlined" 
-                                placeholder="Enter Country"
-                                helperText={errors.country}
-                                fullWidth
-                                required
-                                error={errors.country ? true : false}
-                            />
-                            :
+                    <Box component="div" className={classes.box}>
+                        <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
+                            {editable ? 
+                                <TextField 
+                                    className={classes.input}
+                                    value={phoneNumber || ''}
+                                    onChange={(e) => setPhoneNumber(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Phone Number"
+                                    helperText={errors.phoneNumber}
+                                    fullWidth
+                                    required
+                                    error={errors.phoneNumber ? true : false}
+                                />
+                                :
+                                <Typography variant="subtitle2" className={classes.info}>{phoneNumber}</Typography>    
+                            }
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Client Since</Typography>
+                            <Typography variant="subtitle2" className={classes.info}>{customer?.email}</Typography>    
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
+                            {editable ? 
+                                <TextField 
+                                    className={classes.input}
+                                    value={riskProfile || ''}
+                                    onChange={(e) => setRiskProfile(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Risk Profile"
+                                    helperText={errors.riskProfile}
+                                    fullWidth
+                                    required
+                                    error={errors.riskProfile ? true : false}
+                                />
+                                :
+                                <Typography variant="subtitle2" className={classes.info}>{riskProfile}</Typography>    
+                            }
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
                             <Typography variant="subtitle2" className={classes.info}>{country}</Typography>    
-                        }
+                        </Box>
                     </Box>
-                </Box>
-            </form>
-            <form className={classes.remarkContainer}>
-                <Typography variant="subtitle2" className={classes.info}>Remark</Typography>
-                <TextField 
-                    className={classes.input}
-                    value={remark || ''}
-                    onChange={(e) => setRemark(e.target.value)}
-                    type="text"
-                    multiline
-                    minRows={3}
-                    variant="outlined" 
-                    placeholder="Add new remark"
-                    helperText={errors.remark}
-                    fullWidth
-                    required
-                    error={errors.remark ? true : false}
-                />
-                <Button variant="outlined" type="submit" color="primary" className={classes.saveRemarkButton}>Save</Button>
-            </form>
-        </Box>
+                </form>
+                <form className={classes.remarkContainer} noValidate>
+                    <Typography variant="subtitle2" className={classes.info}>Remark</Typography>
+                    <TextField 
+                        className={classes.input}
+                        value={remark || ''}
+                        onChange={(e) => setRemark(e.target.value)}
+                        type="text"
+                        multiline
+                        minRows={3}
+                        variant="outlined" 
+                        placeholder="Add new remark"
+                        helperText={errors.remark}
+                        fullWidth
+                        required
+                        error={errors.remark ? true : false}
+                    />
+                    <Button variant="outlined" type="submit" color="primary" className={classes.saveRemarkButton}>Save</Button>
+                </form>
+            </Box>
+        </>
     );
 };
 
-export default PersonalDetails;
+PersonalDetails.propTypes = {
+    getIdCardValidationResponse: PropTypes.func.isRequired,
+    getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    setCustomerStatus: PropTypes.func.isRequired,
+    updateCustomerProfile: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile })(PersonalDetails);

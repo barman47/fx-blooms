@@ -1,11 +1,13 @@
 import { useRef } from 'react';
 import { 
     Backdrop,
-    CircularProgress,
+    // CircularProgress,
     Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+
+import img from '../../assets/img/loader.svg';
 
 const useStyles = makeStyles((theme) => ({
     backdrop: {
@@ -23,7 +25,8 @@ const Spinner = ({ text }) => {
     return (
         <div>
             <Backdrop ref={spinner} className={classes.backdrop} open={true}>
-                <CircularProgress color="inherit" />
+                {/* <CircularProgress color="inherit" /> */}
+                <img src={img} alt="Spinner" />
                 <Typography variant="h5" className={classes.text}>
                     {text}
                 </Typography>

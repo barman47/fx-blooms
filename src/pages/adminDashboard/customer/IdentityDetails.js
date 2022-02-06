@@ -1,33 +1,32 @@
 import { useEffect, useRef, useState } from 'react'; 
-import { batch, connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box, 
     Button,
-    Grid,
-    Tab,
-    Tabs,
+    Divider,
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import clsx from 'clsx';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, ID_STATUS } from '../../../utils/constants';
 import { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
-import { GET_ERRORS, SET_ID_CHECK_DATA, CLEAR_CUSTOMER_STATUS_MSG, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
+import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
-import ImagePreviewModal from '../../../components/common/ImagePreviewModal';
+import { IdCard } from 'mdi-material-ui';
 
 const useStyles = makeStyles(theme =>({
     root: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
         marginTop: theme.spacing(3),
-        padding: [[theme.spacing(2), theme.spacing(3)]],
+        padding: [[theme.spacing(2), theme.spacing(5)]],
         height: '100%',
 
         [theme.breakpoints.down('md')]: {
@@ -35,67 +34,72 @@ const useStyles = makeStyles(theme =>({
         }
     },
 
-    header: {
-        color: theme.palette.primary.main,
-        display: 'flex',
-        flexDirection: 'row',
-        fontWeight: 500,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: theme.spacing(1)
+    content: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 0.2fr 1fr'
+    },
+
+    detail: {
+        marginBottom: theme.spacing(2),
+
+        '& h6:first-child': {
+            margin: theme.spacing(2, 0)
+        }
+    },
+
+    details: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        marginTop: theme.spacing(2),
+
+        '& p:first-child': {
+            color: COLORS.offBlack,
+            fontWeight: 300
+        },
+
+        '& p:last-child': {
+            color: theme.palette.primary.main
+        }
+    },
+
+    button: {
+        marginBottom: theme.spacing(2)
+    },
+
+    infoButton: {
+        cursor: 'auto',
+        marginBottom: theme.spacing(2),
+
+        '&:hover': {
+            backgroundColor: 'transparent'
+        }
+    },
+
+    errorButton: {
+        color: theme.palette.error.main
     },
 
     label: {
         fontWeight: 300
     },
 
-    info: {
-        fontWeight: 600
+    divider: {
+        backgroundColor: theme.palette.primary.main,
+        width: theme.spacing(0.5)
     },
 
-    photograph: {
-        borderRadius: theme.shape.borderRadius,
-        width: '100%'
+    noDocument: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center'
     },
 
-    idCard: {
-        borderRadius: theme.shape.borderRadius,
-        width: '100%'
+    noDocumentIcon: {
+        color: theme.palette.primary.main,
+        fontSize: theme.spacing(10)
     }
 }));
-
-function TabPanel(props) {
-    const { children, value, index, ...other } = props;
-  
-    return (
-        <div
-            role="tabpanel"
-            hidden={value !== index}
-            id={`simple-tabpanel-${index}`}
-            aria-labelledby={`simple-tab-${index}`}
-            {...other}
-        >
-            {value === index && (
-                <Box sx={{ p: 3 }}>
-                    <Typography>{children}</Typography>
-                </Box>
-            )}
-        </div>
-    );
-}
-  
-TabPanel.propTypes = {
-    children: PropTypes.node,
-    index: PropTypes.number.isRequired,
-    value: PropTypes.number.isRequired,
-};
-
-function a11yProps(index) {
-    return {
-      id: `simple-tab-${index}`,
-      'aria-controls': `simple-tabpanel-${index}`,
-    };
-}
 
 const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
@@ -104,36 +108,28 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
     const errorsState = useSelector(state => state.errors);
     
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);
-    const [modalImage, setModalImage] = useState('');
-    const [alt, setAlt] = useState('');
-    const [value, setValue] = useState(0);
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
     const toast = useRef();
     const successModal = useRef();
 
-    useEffect(() => {
-        getIdCardValidationResponse(customer.id);
-        getResidencePermitValidationResponse(customer.id);
+    const { APPROVED } = ID_STATUS;
 
-        return () => {
-            batch(() => {
-                dispatch({
-                    type: GET_ERRORS,
-                    payload: {}
-                });
-                dispatch({
-                    type: SET_ID_CHECK_DATA,
-                    payload: null
-                });
-                dispatch({
-                    type: SET_PROFILE_CHECK_DATA,
-                    payload: null
-                });
-            });
-        };
+    useEffect(() => {
+        if (!idCheckData) {
+            console.log('Getting ID card data');
+            getIdCardValidationResponse(customer.id);
+        }
+
+        if (!profileCheckData) {
+            getResidencePermitValidationResponse(customer.id);
+        }
+
+        dispatch({
+            type: GET_ERRORS,
+            payload: {}
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -159,21 +155,17 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
         });
     };
 
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
+    // const handleCloseModal = () => {
+    //     setModalImage('');
+    //     setAlt('');
+    //     setOpen(false);
+    // };
 
-    const handleCloseModal = () => {
-        setModalImage('');
-        setAlt('');
-        setOpen(false);
-    };
-
-    const handleModalOpen = (img, alt) => {
-        setModalImage(img);
-        setAlt(alt);
-        setOpen(true);
-    };
+    // const handleModalOpen = (img, alt) => {
+    //     setModalImage(img);
+    //     setAlt(alt);
+    //     setOpen(true);
+    // };
 
     const handleApproveId = () => {
         setLoading(true);
@@ -202,160 +194,127 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
             }
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            <ImagePreviewModal handleCloseModal={handleCloseModal} open={open} alt={alt} img={modalImage} />
-            <Grid className={classes.root} container direction="column">
-                {/* <Grid item>
-                    <Box className={classes.header}>
-                        <Typography variant="subtitle2">Identity Details</Typography>
+            <Box component="section" className={classes.root}>
+                <Typography variant="h6" color="primary">ID Details</Typography>
+                <Box component="section" className={classes.content}>
+                    <Box component="div" className={classes.detail}>
+                        <Typography variant="h6">SELL and BUY</Typography>
+                        {profileCheckData ?
+                            <>
+                                <Typography variant="subtitle2" component="p">Status</Typography>
+                                <Box component="div" className={classes.details}>
+                                    <Box component="div">
+                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() === APPROVED ? 
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, classes.errorButton)}>{profileCheckData?.status}</Button>
+                                            :
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: profileCheckData?.status?.toUpperCase() !== APPROVED })}>{profileCheckData?.status}</Button>
+                                        }
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.documentType}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Issue Country</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.issueCountry}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Expiry</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.expiryDate}</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box component="div">
+                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() !== APPROVED &&
+                                            <Button 
+                                                variant="outlined" 
+                                                disableFocusRipple 
+                                                disableTouchRipple 
+                                                disableRipple 
+                                                color="primary" 
+                                                className={classes.button}
+                                                onClick={handleApproveResidencePermit}
+                                            >
+                                                Approve ID
+                                            </Button>
+                                        }
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.documentNumber}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.dateOfIssue}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </>
+                            :
+                            <Box component="div" className={classes.noDocument}>
+                                <IdCard className={classes.noDocumentIcon} />
+                                <Typography variant="h6" color="primary">No Document Submited</Typography>
+                            </Box>
+                        }
                     </Box>
-                </Grid>
-                <Divider />
-                <br /> */}
-                <Grid item>
-                    <Box sx={{ width: '100%' }}>
-                        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-                            <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" indicatorColor="primary" textColor="primary">
-                                <Tab 
-                                    disableRipple 
-                                    disableFocusRipple 
-                                    label="ID Check" 
-                                    {...a11yProps(0)} 
-                                    onClick={() => {
-                                        getIdCardValidationResponse(customer.id);
-                                    }} 
-                                />
-                                <Tab 
-                                    disableRipple 
-                                    disableFocusRipple 
-                                    label="Profile Check" 
-                                    {...a11yProps(1)} 
-                                    onClick={() => {
-                                        getResidencePermitValidationResponse(customer.id);
-                                    }} 
-                                />
-                            </Tabs>
-                        </Box>
-                        <TabPanel value={value} index={0}>
-                            <Button variant="outlined" color="primary" onClick={handleApproveId}>Approve ID</Button>
-                            {idCheckData ? 
-                                <Grid container direction="row" spacing={3}>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Type</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.documentType}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Document Number</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.documentNumber}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.firstName}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.lastName}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Gender</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.gender}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.dateOfBirth}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Issuing Country</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.issueCountry}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Expiry</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.dateOfBirth}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Issue</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.dateOfIssue}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Status</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{idCheckData?.status}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Front</Typography>
-                                        <br />
-                                        <img src={idCheckData?.idFront} alt="ID Front" className={classes.idCard} onMouseEnter={() => handleModalOpen(idCheckData?.idFront, 'ID Card Front')} />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Back</Typography>
-                                        <br />
-                                        <img src={idCheckData?.idBack} alt="ID Back"  className={classes.idCard} onMouseEnter={() => handleModalOpen(idCheckData?.idBack, 'ID Card Back')} />
-                                    </Grid>
-                                </Grid>
-                                :
-                                <Typography variant="h6">{errorsState.msg || errorsState.message}</Typography>
-                            }
-                        </TabPanel>
-                        <TabPanel value={value} index={1}>
-                            <Button variant="outlined" color="primary" onClick={handleApproveResidencePermit}>Approve Residence Permit</Button>
-                            {profileCheckData ? 
-                                <Grid container direction="row" spacing={3}>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Type</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.documentType}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Document Number</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.documentNumber}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.firstName}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.lastName}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Gender</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.gender}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.dateOfBirth}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Issuing Country</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.issueCountry}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Expiry</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.expiryDate}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Date of Issue</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.issueDate}</Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>Status</Typography>
-                                        <Typography variant="subtitle2" className={classes.info}>{profileCheckData?.status}</Typography>
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Front</Typography>
-                                        <br />
-                                        <img src={profileCheckData?.idFront} alt="ID Front" className={classes.idCard} onMouseEnter={() => handleModalOpen(profileCheckData?.idFront, 'ID Card Front')} />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <Typography variant="subtitle2" component="span" className={classes.label}>ID Card Back</Typography>
-                                        <br />
-                                        <img src={profileCheckData?.idBack} alt="ID Back"  className={classes.idCard} onMouseEnter={() => handleModalOpen(profileCheckData?.idBack, 'ID Card Back')} />
-                                    </Grid>
-                                </Grid>
-                                :
-                                <Typography variant="h6">{errorsState.msg || errorsState.message}</Typography>
-                            }
-                        </TabPanel>
-                    </Box>
-                </Grid>
-            </Grid>
+                    <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} />       
+                    <Box component="div" className={classes.detail}>
+                        <Typography variant="h6">BUY Only</Typography>
+                        {idCheckData ? 
+                            <>
+                                <Typography variant="subtitle2" component="p">Status</Typography>
+                                <Box component="div" className={classes.details}>
+                                    <Box component="div">
+                                        {idCheckData?.status && idCheckData?.status.toUpperCase() === APPROVED ? 
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple color="primary" className={clsx(classes.infoButton, classes.erroButton)}>{idCheckData?.status}</Button>
+                                            :
+                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: idCheckData?.status?.toUpperCase() !== APPROVED })}>{idCheckData?.status}</Button>
+                                        }
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentType}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Issue Country</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.issueCountry}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Expiry</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>20-12-2023</Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box component="div">
+                                        {idCheckData?.status && idCheckData?.status.toUpperCase() !== APPROVED &&
+                                            <Button 
+                                                variant="outlined" 
+                                                disableFocusRipple 
+                                                disableTouchRipple 
+                                                disableRipple 
+                                                color="primary" 
+                                                className={classes.button}
+                                                onClick={handleApproveId}
+                                            >
+                                                Approve ID
+                                            </Button>
+                                        }
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentNumber}</Typography>
+                                        </Box>
+                                        <Box component="div" className={classes.detail}>
+                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
+                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.dateOfIssue}</Typography>
+                                        </Box>
+                                    </Box>
+                                </Box>
+                            </>
+                            :
+                            <Box component="div" className={classes.noDocument}>
+                                <IdCard className={classes.noDocumentIcon} />
+                                <Typography variant="h6" color="primary">No Document Submited</Typography>
+                            </Box>
+                        }
+                        
+                    </Box>     
+                </Box>
+            </Box>
         </>
     );
 };

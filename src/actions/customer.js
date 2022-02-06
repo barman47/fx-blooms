@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
+import { ADD_USERNAME, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
 import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
     API,
@@ -183,11 +183,46 @@ export const getIdVerificationLink = () => async (dispatch) => {
 
 export const login = (data, history, userLocation) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/login`, data, {
+        const res = await axios.post(`${api}/Login`, data, {
             headers: {
                 'Location': JSON.stringify(userLocation)
             }
         });
+        const {  token } = res.data.data;
+        setAuthToken(token);
+        dispatch({
+            type: SET_CURRENT_CUSTOMER,
+            payload: res.data.data
+        });
+        return history.push(DASHBOARD_HOME);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const externalLogin = (data, history, userLocation) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/ExternalLogin`, data, {
+            headers: {
+                'Location': JSON.stringify(userLocation)
+            }
+        });
+        const { authResponse, isLinkedToProfile } = res.data.data;
+        setAuthToken(authResponse.token);
+        dispatch({
+            type: SET_CURRENT_CUSTOMER,
+            payload: authResponse
+        });
+        
+        return isLinkedToProfile ?  history.push(DASHBOARD_HOME) : history.push(ADD_USERNAME, { addUsername: true });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const addUsername = (username, history) => async (dispatch) => {
+    try {
+        const res = await axios.post(`${api}/AddUserName`, { username });
         const {  token } = res.data.data;
         setAuthToken(token);
         dispatch({
@@ -465,15 +500,15 @@ export const reportSeller = (message) => async(dispatch) => {
     }
 };
 
-export const setCustomerStatus = ({ customerID, status, currentStatus }) => async (dispatch) => {
+export const setCustomerStatus = ({ customerID, newStatus, currentStatus }) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
-        const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${status}`);
+        const res = await axios.post(`${api}/CustomerStatus?customerID=${customerID}&status=${newStatus}`);
         const msg = res.data.data;
         dispatch({
             type: SET_CUSTOMER_STATUS,
-            payload: { customerID, status, currentStatus, msg }
+            payload: { customerID, newStatus, currentStatus, msg }
         });
         return await axios.get(`${API}/admin/GetAppStatistics`);
     } catch (err) {
@@ -553,17 +588,22 @@ export const sendMail = (data) => async (dispatch) => {
 export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`,);
+        const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
+        console.log('data ', data)
         const customerData = {
-            firstName: data.application.fields.$values[1].content,
-            lastName: data.application.fields.$values[2].content,
-            dateOfBirth: data.application.fields.$values[3].content,
+            documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
+            expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
+            dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
+            dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
+            lastName: data.servicesResults.docCheck.extracted.ocr.$values[4].content,
+            firstName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+            middleName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+            documentType: data.servicesResults.docCheck.extracted.ocr.$values[16].content,
+            issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[17].content,
 
-            idFront:  data.application.documents.$values[0].files.$values[0].uri,
-            idBack: data.application.documents.$values[0].files.$values[1].uri,
-            issueCountry: data.application.documents.$values[0].issuingCountry,
-            documentType: data.application.documents.$values[0].documentType,
+            idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+            idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
 
             status: data.overallResult.status
         };
@@ -579,17 +619,20 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
 export const getResidencePermitValidationResponse = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`,);
+        const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
         const customerData = {
-            firstName: data.application.fields.$values[1].content,
-            lastName: data.application.fields.$values[2].content,
-            dateOfBirth: data.application.fields.$values[3].content,
+            documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
+            expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
+            dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
+            dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
+            lastName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+            firstName: data.servicesResults.docCheck.extracted.ocr.$values[6].content,
+            documentType: data.servicesResults.docCheck.extracted.ocr.$values[22].content,
+            issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[23].content,
 
-            idFront:  data.application.documents.$values[0].files.$values[0].uri,
-            idBack: data.application.documents.$values[0].files.$values[1].uri,
-            issueCountry: data.application.documents.$values[0].issuingCountry,
-            documentType: data.application.documents.$values[0].documentType,
+            idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+            idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
 
             status: data.overallResult.status
         };
@@ -602,23 +645,36 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
     }
 };
 
-export const approveIdCard = (customerId) => async (dispatch) => {
+export const approveIdCard = (customerId, currentStatus) => async (dispatch) => {
     try {
-        await reIssueAdminToken();
-        await axios.post(`${api}/ApproveIDCard`, { customerId, status: APPROVED });
+        await Promise.all([
+            await reIssueAdminToken(),
+            await axios.post(`${api}/ApproveIDCard`, { customerId, status: APPROVED })
+        ]);
         dispatch({
-            type: ACCEPTED_CUSTOMER_ID
+            type: ACCEPTED_CUSTOMER_ID,
+            payload: {
+                customerId,
+                currentStatus
+            }
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
-export const approveResidencePermit = (customerId) => async (dispatch) => {
+
+export const approveResidencePermit = (customerId, currentStatus) => async (dispatch) => {
     try {
-        await reIssueAdminToken();
-        await axios.post(`${api}/ApproveResidencePermit`, { customerId, status: APPROVED });
+        await Promise.all([
+            reIssueAdminToken(),
+            axios.post(`${api}/ApproveResidencePermit`, { customerId, status: APPROVED })
+        ]);
         dispatch({
             type: ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
+            payload: {
+                customerId,
+                currentStatus
+            }
         });
     } catch (err) {
         return handleError(err, dispatch);

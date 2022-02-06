@@ -56,9 +56,8 @@ export const CUSTOMER_CATEGORY = {
 export const USER_DETAILS = {
     PERSONAL_DETAILS: 'Personal Details',
     ID_DETAILS: 'ID Details',
-    TWO_FACTOR: '2FA',
-    TRANSACTION_DETAILS: 'Transaction Details',
-    WALLET_DETAILS: 'Wallet Details',
+    AUTHENTICATION: 'AUTHENTICATION',
+    TRANSACTION_DETAILS: 'Transaction Details'
 };
 
 export const ID_STATUS = {

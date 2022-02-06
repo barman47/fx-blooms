@@ -89,7 +89,6 @@ const DisableTwoFactor = ({ disableTwoFactor }) => {
 
     useEffect(() => {
         if (msg) {
-            console.log('opening modal');
             setSpinnerText('');
             setLoading(false);
         }
