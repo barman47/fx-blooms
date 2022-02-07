@@ -233,7 +233,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                 setErrors({  Amount: `Amount must be less than or equal to the listing amount (EUR ${formatNumber(listing.amountAvailable.amount)})` });
                 setTransferAmount('');
             } else {
-                setButtonDisabled(false);
                 setErrors({});
             }
         }
@@ -250,6 +249,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     useEffect(() => {
         if (Amount && receivingAccount) {
+            console.log('enabling button line 256');
             setButtonDisabled(false);
         }
     }, [Amount, receivingAccount]);
