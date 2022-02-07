@@ -1,10 +1,10 @@
-import { Link } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Button, List, ListItem, ListItemText, Typography } from '@material-ui/core';
+import { Link as RouterLink } from 'react-router-dom';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Link, List, ListItem, ListItemText, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { ChevronUp } from 'mdi-material-ui';
 
 import { COLORS } from '../../utils/constants';
-import { FAQS } from '../../routes';
+import { FAQS, SIGN_UP } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -81,7 +81,8 @@ const useStyles = makeStyles(theme => ({
 
         'ul li': {
             color: 'red',
-            fontWeight: '300 !important'
+            fontWeight: '300 !important',
+            marginBottom: theme.spacing(1)
         }
     },
 
@@ -119,22 +120,16 @@ const FAQs = () => {
                     </AccordionSummary>
                     <AccordionDetails className={classes.content}>
                         <Typography className={classes.text}>Here are the steps required to get an account.</Typography>
-                        <Typography className={classes.text}>Click on <Typography className={classes.strong}>Get Started</Typography></Typography>
+                        <Typography className={classes.text}>Click on <br /><Link to={SIGN_UP} component={RouterLink} className={classes.strong}>Get Started</Link></Typography>
                         <List component="ol">
                             <ListItem>
-                                <ListItemText primary="1. Provide your profile details" />
+                                <ListItemText primary="1. Provide your profile details - email, username and password" />
                             </ListItem>
                             <ListItem>
                                 <ListItemText primary="2. Verify your email address" />
                             </ListItem>
-                            <ListItem>
-                                <ListItemText primary="3. Provide your personal details" />
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="4. Set up 2-factor authentication" />
-                            </ListItem>
                         </List>
-                        <Typography className={classes.text}>Welcome to FXBLOOMS.</Typography>
+                        <Typography className={classes.strong}>Viola! Welcome to FXBLOOMS.</Typography>
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
@@ -150,22 +145,23 @@ const FAQs = () => {
                         <Typography className={classes.heading}>How long does it take to purchase a currency?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
-                        <Typography className={classes.text}>As long as you have a buyer willing to accept your *ask* rate or your desired rate and amount align with a seller’s listing, then the speed of the transaction depends on you and the other party. But in most cases 10 to 15 minutes.</Typography>
+                        <Typography className={classes.text}>As long as you have a willing accept your *ask* rate and amount, you will get the NGN in the account provided in less than 5 minutes. And as a seller, the speed of getting the equivalent EUR depends on the seller's transfer method, your receiving bank and how fast the seller sends the money.</Typography>
+                        <Typography className={classes.text}>We know speed of exchange is important to you, and we are tirelessly working on processes and products to expedite the exchange process. We envision exchanges with a click of a button.</Typography>
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
                     <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                        <Typography className={classes.heading}>How to sell EUR on FXBLOOMS</Typography>
+                        <Typography className={classes.heading}>How to SELL on FXBLOOMS</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
                         <Typography className={classes.text}>After signing up and completing the identity verification you are ready to sell EUR on the FXBLOOMS platform.</Typography>
                         <ul>
-                            <li>Post the EUR you want to sell on the Make A Listing page input the total amount you want to sell, the rate you desire and the smallest amount you can transact then submit. This process allows a buyer to see your listing among others sellers listing.</li>
-                            <li>A buyer is then able to contact you through the FXBLOOMS chatbox.</li>
-                            <li>Confirm the amount the Buyer wants (if applicable)</li>
-                            <li>Provide the buyer the NGN account you want credited</li>
-                            <li>confirm his payment, you proceed to</li>
-                            <li>Ask for the buyer's EUR account and transfer the agreed amount to it.</li>
+                            <li>Post the EUR you want to sell on the Make A Listing page input the total amount you want to sell, the rate you desire and the NGN receiving account. This process allows a buyer to see your listing among others sellers listing.</li>
+                            <li>A buyer is then able to place a bid by clicking on BUY EUR.</li>
+                            <li>Successful bid allows the buyer to see the account to send the NGN to (as provided by you).</li>
+                            <li>Once the buyer sends the NGN, a notification is sent to you.</li>
+                            <li>You confirming the NGN payment gives you access to the account to send EUR to (as provided by the buyer).</li>
+                            <li>The buyer confirms receiving the EUR, and the transaction is considered complete.</li>
                         </ul>
                         <Typography className={classes.strong}>PLEASE DO NOT TRANSFER MONEY TO BUYER UNTIL YOU CONFIRM THE NGN IN YOUR ACCOUNT.</Typography>
                     </AccordionDetails>
@@ -175,11 +171,10 @@ const FAQs = () => {
                         <Typography className={classes.heading}>How does it work?</Typography>
                     </AccordionSummary>
                     <AccordionDetails className={classes.details}>
-                        <Typography className={classes.text}>To sell, you'd need to provide a valid resident's permit. To buy, you'd need to provide a valid international passport. Once your document is verified, you can start using FXBLOOMS.</Typography>
-                        <Typography className={classes.text}>To Sell: You need to <Typography className={classes.strong}>make a listing</Typography>  with your prefered <Typography className={classes.strong}>rate</Typography>. Your listing amount and rate will be posted on the dashboard where other users (buyers and sellers) can see what you’re offering. An interested buyer will contact you.</Typography>
-                        <Typography className={classes.text}>To buy: Simply contact a seller with a favourable rate.</Typography>
-                        <Typography className={classes.text}>The communication happens in our Chatbox, where you can exchange account details and other information.</Typography>
-                        <Typography className={classes.strong}>Please note: We strongly advise a buyer to send their money first, and a seller should only send his after he or she has confirmed payment in his or her  account.</Typography>
+                        <Typography className={classes.text}>Only registered and verified users can BUY and SELL on the FXBLOOMS platform.</Typography>
+                        <Typography className={classes.text}><Typography className={classes.strong}>To Sell:</Typography> You need to post the amount, a desired rate and a receiving account. Your posting will be added to other seller’s listings on the dashboard for willing buyers to see. An interested buyer can then accept your offer and send you the NGN, confirming the NGN payment in the APP will give you access to the account provided by the buyer, then you proceed and send the EUR to it.</Typography>
+                        <Typography className={classes.text}><Typography className={classes.strong}>To buy:</Typography> Simply accept a seller listing by clicking on BUY EUR, then you input the amount you want to buy, your receiving account and place a bid. A successful bid will show you the seller’s receiving account, then transfer the NGN equivalent and the seller will be notified. Once the seller confirms receiving the NGN, he/she then transfers the EUR equivalent to the account you provided.</Typography>
+                        <Typography className={classes.strong}>Please note: We strongly advise the seller to confirm the NGN payment on his banking APP, before sending the EUR equivalent. </Typography>
                     </AccordionDetails>
                 </Accordion>
                 <Accordion className={classes.accordion}>
@@ -191,7 +186,7 @@ const FAQs = () => {
                     </AccordionDetails>
                 </Accordion>
             </section>
-            <Button to={FAQS} component={Link} variant="contained" color="primary" className={classes.button}>GO TO FAQs</Button>
+            <Button to={FAQS} component={RouterLink} variant="contained" color="primary" className={classes.button}>GO TO FAQs</Button>
         </section>
     );
 };

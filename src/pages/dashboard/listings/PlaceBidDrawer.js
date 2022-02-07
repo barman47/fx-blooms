@@ -222,7 +222,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     // Prevent user from entering invalid amounts
     useEffect(() => {
         if (Amount) {
-             if (Number(Amount) < Number(listing.minExchangeAmount.amount) && Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
+             if (Number(Amount) < Number(listing.minExchangeAmount.amount) || Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
                 // Prevent user from entering amount less than minimum exchange amount
                 setButtonDisabled(true);
                 setErrors({ Amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
@@ -233,7 +233,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                 setErrors({  Amount: `Amount must be less than or equal to the listing amount (EUR ${formatNumber(listing.amountAvailable.amount)})` });
                 setTransferAmount('');
             } else {
-                setButtonDisabled(false);
                 setErrors({});
             }
         }
