@@ -102,7 +102,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
 
     const [firstName] = useState(customer.firstName);
-    const [middleName] = useState(customer.middleName);
+    const [middleName] = useState(customer.otherName);
     const [lastName] = useState(customer.lastName);
     const [userName] = useState(customer.userName);
     const [occupation, setOccupation] = useState(customer.occupation);
@@ -243,8 +243,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                     <Typography variant="h5" color="primary" style={{ fontWeight: 600 }}>{status}</Typography> 
                                     {(status === CONFIRMED || status === NO_PROFILE) &&
                                         <Button 
-                                            variant="contained" 
-                                            color="error" 
+                                            variant="outlined" 
+                                            color="secondary" 
                                             size="small" 
                                             disableRipple 
                                             disableFocusRipple 

@@ -20,7 +20,7 @@ import {
 	DASHBOARD_HOME, 
 	DISCLAIMER,
 	USER_DETAILS,
-	PROFILE,
+	ACCOUNT,
 	FORGOT_PASSWORD,
 	RESET_PASSWORD,
 	TERMS,
@@ -187,7 +187,7 @@ function App() {
 									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${PROFILE}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${ACCOUNT}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
 								</Dashboard>
