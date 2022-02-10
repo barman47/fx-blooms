@@ -14,7 +14,7 @@ import isEmpty from '../../../utils/isEmpty';
 import { getAccount } from '../../../actions/bankAccounts';
 import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { PROFILE, USER_DETAILS } from '../../../routes';
+import { ACCOUNT, USER_DETAILS } from '../../../routes';
 
 import PlaceBidDrawer from './PlaceBidDrawer';
 
@@ -224,7 +224,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             getSeller(sellerId);
             return history.push(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return history.push(PROFILE);
+        return history.push(ACCOUNT);
     };
 
     const handleDeleteListing = () => {

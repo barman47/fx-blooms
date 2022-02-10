@@ -168,7 +168,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [transferAmount, setTransferAmount] = useState('');
-    // const [reference, setReference] = useState('');
+    const [reference, setReference] = useState('');
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -222,7 +222,8 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     // Prevent user from entering invalid amounts
     useEffect(() => {
         if (Amount) {
-             if (Number(Amount) < Number(listing.minExchangeAmount.amount) || Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
+             if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
+            //  if (Number(Amount) < Number(listing.minExchangeAmount.amount) || Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
                 // Prevent user from entering amount less than minimum exchange amount
                 setButtonDisabled(true);
                 setErrors({ Amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
@@ -281,7 +282,8 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                 amount: Number(Amount)
             },
             listingId: listing.id,
-            accountId: getAccountId(receivingAccount)
+            accountId: getAccountId(receivingAccount),
+            reference
         });
     };
 
@@ -448,8 +450,8 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                         <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                                     </FormControl>
                                 </Grid>
-                                {/* <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">Payment Reference</Typography>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
                                     <TextField 
                                         value={reference}
                                         placeholder="Enter Payment Reference"
@@ -458,11 +460,9 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                         type="text"
                                         variant="outlined" 
                                         fullWidth
-                                        required
-                                        error={errors.reference ? true : false}
                                     />
                                     <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                                </Grid> */}
+                                </Grid>
                                 <Grid item xs={12} className={classes.exchangeAmountContainer}>
                                     <Typography variant="subtitle1" component="p" color="primary">NGN Amount to Transfer</Typography>
                                     <Typography variant="subtitle1" component="p" color="primary">{transferAmount}</Typography>

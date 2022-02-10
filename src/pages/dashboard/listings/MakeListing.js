@@ -182,6 +182,7 @@ const MakeListing = (props) => {
     const [ListingFee, setListingFee] = useState('');
 
     const [Bank, setBank] = useState('');
+    const [reference, setReference] = useState('');
 
     const [previousListings, setPreviousListings] = useState([]);
 
@@ -446,7 +447,8 @@ const MakeListing = (props) => {
                 Amount: parseFloat(MinExchangeAmount)
             },
             Bank,
-            accountID: getAccountId(ReceivingAccount)
+            accountID: getAccountId(ReceivingAccount),
+            reference
         };
 
         addListing(listing);
@@ -668,6 +670,19 @@ const MakeListing = (props) => {
                                         </Select>
                                         <FormHelperText>{errors.Bank}</FormHelperText>
                                     </FormControl>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                                    <TextField 
+                                        value={reference}
+                                        placeholder="Enter Payment Reference"
+                                        onChange={(e) => setReference(e.target.value)}
+                                        disabled={loading ? true : false}
+                                        type="text"
+                                        variant="outlined" 
+                                        fullWidth
+                                    />
+                                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
                                 </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I will receive</Typography>

@@ -37,5 +37,5 @@ export const MAKE_LISTING = `${DASHBOARD}/listings/create`;
 export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
 export const WALLET = `${DASHBOARD}/wallet`;
-export const PROFILE = `${DASHBOARD}/profile`;
+export const ACCOUNT = `${DASHBOARD}/account`;
 export const LOGOUT = '/logout';

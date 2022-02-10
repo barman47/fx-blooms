@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Box, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Account, BagChecked, CardAccountDetailsOutline, LockOutline } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, LockOutline, Logout } from 'mdi-material-ui';
 
 import { getCountries } from '../../../actions/countries'; 
-import { getCustomerInformation } from '../../../actions/customer'; 
+import { getCustomerInformation, logout } from '../../../actions/customer'; 
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getDocuments } from '../../../actions/documents'; 
 
@@ -140,13 +140,15 @@ export const toggleDrawer = () => {
 };
 
 const Profile = (props) => {
+    const history = useHistory();
+
     const classes = useStyles();
     const location = useLocation();
     const { countries, documents } = useSelector(state => state);
     const { customerId, profile } = useSelector(state => state.customer);
     const { accounts } = useSelector(state => state.bankAccounts);
 
-    const { getAccounts, getDocuments, getCountries, getCustomerInformation, handleSetTitle } = props;
+    const { getAccounts, getDocuments, getCountries, getCustomerInformation, handleSetTitle, logout } = props;
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [value, setValue] = useState(0);
@@ -228,6 +230,17 @@ const Profile = (props) => {
                                 disableFocusRipple
                             />    
                         ))}
+                        <LinkTab 
+                            label={
+                                <>
+                                    <Logout />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Logout</Typography>
+                                </>
+                            } 
+                            disableRipple
+                            disableFocusRipple
+                            onClick={() => logout(history)}
+                        />
                     </Tabs>
                 </div>
                 <div>
@@ -255,7 +268,8 @@ Profile.propTypes = {
     getCountries: PropTypes.func.isRequired,
     getCustomerInformation: PropTypes.func.isRequired,
     getDocuments: PropTypes.func.isRequired,
-    handleSetTitle: PropTypes.func.isRequired
+    handleSetTitle: PropTypes.func.isRequired,
+    logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccounts, getCountries, getCustomerInformation, getDocuments })(Profile);
+export default connect(undefined, { getAccounts, getCountries, getCustomerInformation, getDocuments, logout })(Profile);

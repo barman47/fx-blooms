@@ -31,7 +31,7 @@ import { logout } from '../../actions/customer';
 
 import logo from '../../assets/img/logo.svg';
 import { COLORS } from '../../utils/constants';
-import { DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, PROFILE } from '../../routes';
+import { DASHBOARD_HOME, MAKE_LISTING, NOTIFICATIONS, ACCOUNT } from '../../routes';
 
 export const HideOnScroll = (props) => {
     const { children, direction } = props;
@@ -157,7 +157,7 @@ export const PrivateHeader = (props) => {
     const prevOpen = useRef(open);
 
     useEffect(() => {
-        if (location.pathname.includes(PROFILE)) {
+        if (location.pathname.includes(ACCOUNT)) {
             setIsprofilePage(true);
         } else {
             setIsprofilePage(false);
@@ -168,7 +168,8 @@ export const PrivateHeader = (props) => {
         { url: DASHBOARD_HOME, text: 'Dashboard', icon: <HomeMinus /> },
         { url: MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> },
+        { url: ACCOUNT, text:'Account', icon: <Account /> }
     ];
 
     const handleToggle = () => {
@@ -230,20 +231,6 @@ export const PrivateHeader = (props) => {
                                     </Link>
                                 </Grid>
                             ))}
-                            <Grid item>
-                                <Link
-                                    to="#!"
-                                    // component={RouterLink}
-                                    className={classes.link}
-                                    underline="none"
-                                    ref={anchorRef}
-                                    onClick={handleToggle}
-                                    aria-controls={open ? 'profile-menu' : undefined}
-                                    aria-haspopup="true"
-                                >
-                                    <span className={classes.linkIcon}><Account /></span>&nbsp;&nbsp;&nbsp;Account
-                                </Link>
-                            </Grid>
                         </div>
                         <div className={classes.avatarContainer}>
                             <Avatar alt={`${firstName} ${lastName}`} />
@@ -258,9 +245,9 @@ export const PrivateHeader = (props) => {
                                         <ClickAwayListener onClickAway={handleMenuClose}>
                                             <MenuList autoFocusItem={open} id="profile-menu" onKeyDown={handleListKeyDown}>
                                                 <MenuItem
-                                                    onClick={(e) => handleMenuClose(e, PROFILE)}
+                                                    onClick={(e) => handleMenuClose(e, ACCOUNT)}
                                                 >
-                                                    <RouterLink to={PROFILE} className={classes.link}>Settings</RouterLink>
+                                                    <RouterLink to={ACCOUNT} className={classes.link}>Settings</RouterLink>
                                                 </MenuItem>
                                                 <MenuItem>
                                                     <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
@@ -291,29 +278,6 @@ export const PrivateHeader = (props) => {
                                 <Avatar alt={`${firstName} ${lastName}`} />
                             </Button>
                         }
-                        <Popper open={open} anchorEl={mobileDropdown.current} role={undefined} transition disablePortal>
-                            {({ TransitionProps, placement }) => (
-                                <Grow
-                                    {...TransitionProps}
-                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                                >
-                                    <Paper>
-                                        <ClickAwayListener onClickAway={handleMenuClose}>
-                                            <MenuList autoFocusItem={open} id="mobile-profile-menu" onKeyDown={handleListKeyDown}>
-                                                <MenuItem
-                                                    onClick={(e) => handleMenuClose(e, PROFILE)}
-                                                >
-                                                    <RouterLink to={PROFILE} className={classes.link}>Settings</RouterLink>
-                                                </MenuItem>
-                                                <MenuItem>
-                                                    <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
-                                                </MenuItem>
-                                            </MenuList>
-                                        </ClickAwayListener>
-                                    </Paper>
-                                </Grow>
-                            )}
-                        </Popper>
                     </div>
                 </Toolbar>
             </AppBar>

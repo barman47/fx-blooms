@@ -11,7 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS, SHADOW } from '../../utils/constants';
-import { PROFILE } from '../../routes';
+import { ACCOUNT } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -69,7 +69,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 
     const handleVerifyId = () => {
         setOpen(false);
-        history.push(PROFILE, { eu: true });
+        history.push(ACCOUNT, { eu: true });
     };
 
 	return (
