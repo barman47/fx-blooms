@@ -8,13 +8,13 @@ import {
 	Checkbox,
 	CircularProgress,
 	Fab,
-	FormControl,
+	// FormControl,
 	FormControlLabel,
-	FormHelperText,
+	// FormHelperText,
 	Grid,
 	Link,
-	MenuItem,
-	Select,
+	// MenuItem,
+	// Select,
 	Paper,
 	TextField,
 	Tooltip,
@@ -242,6 +242,10 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
+	label: {
+		fontSize: theme.spacing(1.5)
+	},
+
 	disabledButton: {
 		backgroundColor: '#d8dcdc',
 		color: '#aoa3a3'
@@ -464,7 +468,9 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 	const theme = useTheme();
 	const { currencies, listings } = useSelector(state => state);
 
+	// eslint-disable-next-line
 	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
+	// eslint-disable-next-line
 	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
 
@@ -487,8 +493,8 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 
 	const handleClearFilter = useCallback(() => {
 		setFilter(PRICE);
-		setAvailableCurrency('');
-		setRequiredCurrency('');
+		setAvailableCurrency('NGN');
+		setRequiredCurrency('EUR');
 		setAmount('');
 		setSellerRating('');
 		setErrors({});
@@ -531,8 +537,8 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 			getListingsOpenForBid({
 				pageNumber: 1,
 				pageSize: 15,
-				currencyAvailable: AvailableCurrency,
-				currencyNeeded: RequiredCurrency,
+				currencyAvailable: 'NGN',
+				currencyNeeded: 'EUR',
 				amount: Number(Amount),
 				useCurrencyFilter: false,
 				useRatingFilter: true,
@@ -541,8 +547,8 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 		} else {
 			// Get rating by star
 			const priceFilter = {
-				AvailableCurrency,
-				RequiredCurrency,
+				AvailableCurrency: 'NGN',
+				RequiredCurrency: 'EUR',
 				Amount
 			};
 			const { errors, isValid } = validatePriceFilter(priceFilter);
@@ -556,8 +562,8 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 			getListingsOpenForBid({
 				pageNumber: 1,
 				pageSize: 15,
-				currencyAvailable: AvailableCurrency,
-				currencyNeeded: RequiredCurrency,
+				currencyAvailable: 'NGN',
+				currencyNeeded: 'EUR',
 				amount: Number(Amount),
 				useCurrencyFilter: true,
 				useRatingFilter: false,
@@ -591,23 +597,36 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 						>
 							Amount
 						</Button>
-						{/* <Button 
+						<Button 
 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
 							variant="contained" 
 							color="primary" 
 							size="small"
+							disabled
 						>
 							Completion Rate
-					</Button> */}
+					</Button>
 				</header>
 				<form onSubmit={onSubmit} noValidate>
 					{
 						filter === PRICE
 						?
 						<Grid container direction="row" spacing={1}>
-							<Grid item xs={6}>
-								<Typography variant="subtitle2">I Have</Typography>
-								<FormControl 
+							<Grid item xs={12}>
+								<Typography variant="subtitle2" className={classes.label}>Exchange Amount</Typography>
+								<TextField 
+									value="NGN"
+									// onChange={(e) => setAmount(e.target.value)}
+									type="text"
+									variant="outlined" 
+									// placeholder="Enter Amount"
+									helperText={errors.AvailableCurrency}
+									fullWidth
+									required
+									error={errors.AvailableCurrency ? true : false}
+									disabled
+								/>
+								{/* <FormControl 
 									variant="outlined" 
 									error={errors.AvailableCurrency ? true : false } 
 									fullWidth 
@@ -627,11 +646,23 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 										))}
 									</Select>
 									<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-								</FormControl>
+								</FormControl> */}
 							</Grid>
-							<Grid item xs={6}>
-								<Typography variant="subtitle2">I Want</Typography>
-								<FormControl 
+							<Grid item xs={5}>
+								<Typography variant="subtitle2" className={classes.label}>Expected Amount</Typography>
+								<TextField 
+									value="EUR"
+									// onChange={(e) => setAmount(e.target.value)}
+									type="text"
+									variant="outlined" 
+									placeholder="Enter Amount"
+									helperText={errors.RequiredCurrency}
+									fullWidth
+									required
+									error={errors.RequiredCurrency ? true : false}
+									disabled
+								/>
+								{/* <FormControl 
 									variant="outlined" 
 									error={errors.RequiredCurrency ? true : false } 
 									fullWidth 
@@ -651,9 +682,10 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 										))}
 									</Select>
 									<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
-								</FormControl>
+								</FormControl> */}
 							</Grid>
-							<Grid item xs={12}>
+							<Grid item xs={7}>
+								<br />
 								<TextField 
 									value={Amount}
 									onChange={(e) => setAmount(e.target.value)}
