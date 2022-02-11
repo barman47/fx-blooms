@@ -215,6 +215,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         if (!isValid) {
             return setErrors({ msg: 'Invalid customer data', ...errors });
         }
+        alert('Updating customer')
         setLoadingText('Updating Customer . . .');
         setLoading(true);
         setErrors({});
@@ -356,6 +357,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                 className={classes.button}
                                 disabled={loading || !editable ? true : false}
                                 onClick={onSubmit}
+                                type="submit"
                             >
                                 SAVE
                             </Button>
