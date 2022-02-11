@@ -81,12 +81,6 @@ export const enableTwoFactor = () => async (dispatch) => {
                 payload: message
             });
         });
-
-        // const customer = await axios.get(`${API}/Customer/CustomerInformation`);
-        // dispatch({
-        //     type: SET_CURRENT_CUSTOMER,
-        //     payload: customer.data.data
-        // });
     } catch (err) {
         return handleError(err, dispatch);
     }
