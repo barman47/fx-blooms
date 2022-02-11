@@ -5,7 +5,11 @@ import {
     Avatar,
     Box, 
     Button,
+    FormControl,
     FormControlLabel,
+    FormHelperText,
+    MenuItem,
+    Select,
     Switch,
     Typography, 
     TextField
@@ -19,10 +23,12 @@ import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
+import isEmpty from '../../../utils/isEmpty';
 import avatar from '../../../assets/img/avatar.jpg';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -100,6 +106,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const location = useLocation();
 
     const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    const errorsState = useSelector(state => state.errors);
 
     const [firstName] = useState(customer.firstName);
     const [middleName] = useState(customer.otherName);
@@ -124,8 +131,10 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [loading, setLoading] = useState(false);
     
     const successModal = useRef();
+    const toast = useRef();
 
     const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
+    const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];;
 
     useEffect(() => {
         if (!idCheckData) {
@@ -145,6 +154,13 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             setEditable(true);
         }
     }, [location]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setLoading(false);
+            toast.current.handleClick();
+        }
+    }, [errorsState, errors]);
 
     useEffect(() => {
         const { customerStatus } = customer;
@@ -215,16 +231,35 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         if (!isValid) {
             return setErrors({ msg: 'Invalid customer data', ...errors });
         }
-        alert('Updating customer')
         setLoadingText('Updating Customer . . .');
         setLoading(true);
         setErrors({});
         updateCustomerProfile(data);
     };
 
+    const saveRemark = (e) => {
+        e.preventDefault();
+        setErrors({});
+        setLoadingText('');
+
+        setLoadingText('Saving Remark . . .');
+        setLoading(true);
+        setErrors({});
+        updateCustomerProfile({ remark });
+    };
+
     return (
         <>
             {loading && <Spinner text={loadingText} />}
+            {!isEmpty(errorsState) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errorsState.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
@@ -413,18 +448,26 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
                             {editable ? 
-                                <TextField 
-                                    className={classes.input}
-                                    value={riskProfile || ''}
-                                    onChange={(e) => setRiskProfile(e.target.value)}
-                                    type="text"
+                                <FormControl 
                                     variant="outlined" 
-                                    placeholder="Enter Risk Profile"
-                                    helperText={errors.riskProfile}
-                                    fullWidth
+                                    error={errors.riskProfile ? true : false } 
+                                    fullWidth 
                                     required
-                                    error={errors.riskProfile ? true : false}
-                                />
+                                    disabled={loading ? true : false}
+                                >
+                                    <Select
+                                        labelId="riskProfile"
+                                        value={riskProfile}
+                                        onChange={(e) => setRiskProfile(e.target.value)}
+                                    
+                                    >
+                                        <MenuItem value="" disabled selected>Select Risk Profile</MenuItem>
+                                        {RISK_PROFILES.map((item, index) => (
+                                            <MenuItem key={index} value={item}>{item}</MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormHelperText>{errors.riskProfile}</FormHelperText>
+                                </FormControl>
                                 :
                                 <Typography variant="subtitle2" className={classes.info}>{riskProfile}</Typography>    
                             }
@@ -451,7 +494,16 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         required
                         error={errors.remark ? true : false}
                     />
-                    <Button variant="outlined" type="submit" color="primary" className={classes.saveRemarkButton}>Save</Button>
+                    <Button 
+                        variant="outlined" 
+                        type="submit" 
+                        color="primary" 
+                        onClick={saveRemark} 
+                        className={classes.saveRemarkButton}
+                        disabled={loading || !editable ? true : false}
+                    >
+                        Save
+                    </Button>
                 </form>
             </Box>
         </>

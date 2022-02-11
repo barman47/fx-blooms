@@ -590,7 +590,6 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
-        console.log('data ', data)
         const customerData = {
             documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
             expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,

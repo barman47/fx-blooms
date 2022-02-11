@@ -186,8 +186,9 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         backgroundColor: theme.palette.primary.main,
         borderTopRightRadius: '40px',
+        overflowX: 'hidden',
         boxSizing: 'border-box',
-        paddingRight: theme.spacing(2),
+        paddingRight: theme.spacing(2)
     },
 
     drawerOpen: {
