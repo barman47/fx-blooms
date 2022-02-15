@@ -5,7 +5,15 @@ import { ADMIN_HOME, ADMIN_LOGIN } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueAdminToken from '../utils/reIssueAdminToken';
 import setAuthToken from '../utils/setAuthToken';
-import { RESET_STORE, SET_CURRENT_ADMIN, SET_STATS, UPDATED_CUSTOMER } from './types';
+import { 
+    RESET_STORE, 
+    SET_CURRENT_ADMIN, 
+    SET_CUSTOMER_COUNT, 
+    SET_LISTING_COUNT,
+    SET_TRANSACTION_VOLUME,
+    SET_STATS, 
+    UPDATED_CUSTOMER 
+} from './types';
 
 const api = `${API}/Admin`;
 
@@ -32,6 +40,59 @@ export const getStats = () => async (dispatch) => {
             type: SET_STATS,
             payload: res.data.data
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCustomerCount = (timeframe) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/GetCustomerCount?timeframe=${timeframe}`);
+        return dispatch({
+            type: SET_CUSTOMER_COUNT,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getListingCount = (timeframe) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/GetListingCount?timeframe=${timeframe}`);
+        return dispatch({
+            type: SET_LISTING_COUNT,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getTransactionVolume = (timeframe) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/GetTransactionVolume?timeframe=${timeframe}`);
+        return dispatch({
+            type: SET_TRANSACTION_VOLUME,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const searchForCustomer = (timeframe) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/SearchForCustomer?timeframe=${timeframe}`);
+        console.log('searched customer ', res);
+        // return dispatch({
+        //     type: SET_TRANSACTION_VOLUME,
+        //     payload: res.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }
