@@ -153,7 +153,7 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
         }
 
         await navigator.share(shareData);
-        toast.success('Shared successfully');
+        toast.success('Thanks for telling others about us');
     };
 
 	return (
