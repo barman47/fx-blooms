@@ -20,6 +20,9 @@ import {
     SET_PROFILE_CHECK_DATA,
     ACCEPTED_CUSTOMER_ID,
     ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
+    SET_PAGE_NUMBER,
+    SET_PAGE_SIZE,
+    SET_CATEGORY,
     UPDATED_CUSTOMER
 } from '../actions/types';
 
@@ -28,6 +31,9 @@ import { CUSTOMER_CATEGORY } from '../utils/constants';
 const { CONFIRMED, PENDING, REJECTED, NO_PROFILE, SUSPENDED, ALL_CUSTOMERS } = CUSTOMER_CATEGORY;
 
 const initialState = {
+    pageNumber: null,
+    pageSize: null,
+    category: null,
     customer: {},
     idCheckData: null,
     profileCheckData: null,
@@ -423,7 +429,25 @@ const customersReducer = (state = initialState, action) => {
                 
                 default:
                     return state;
-            }
+            };
+
+        case SET_PAGE_NUMBER:
+            return {
+                ...state,
+                pageNumber: action.payload
+            };
+
+        case SET_PAGE_SIZE:
+            return {
+                ...state,
+                pageSize: action.payload
+            };
+
+        case SET_CATEGORY:
+            return {
+                ...state,
+                category: action.payload
+            };
 
         case CLEAR_CUSTOMER_STATUS_MSG:
             return {

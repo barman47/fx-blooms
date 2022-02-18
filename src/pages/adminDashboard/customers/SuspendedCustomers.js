@@ -88,10 +88,10 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.email}</Typography></TableCell>
-                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}>{customer.userName}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}>{`${customer.firstName ? customer.firstName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}>{`${customer.lastName ? customer.lastName : ''}`}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}>{customer.email}</Typography></TableCell>
+                    <TableCell><Typography variant="subtitle2" component="span" style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}>{customer.userName}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
                     <TableCell><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>

@@ -16,6 +16,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { updateCustomerProfile } from '../../../actions/admin';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
@@ -121,7 +122,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
-    const [remark, setRemark] = useState(customer.remark);
+    const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
     const [status, setStatus] = useState(customer.customerStatus);
 
@@ -163,11 +164,13 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     }, [errorsState, errors]);
 
     useEffect(() => {
+        setEditable(false);
         const { customerStatus } = customer;
         // const { address, occupation, riskProfile, remark, status } = customer;
 
         // setAddress(address);
         setStatus(customerStatus);
+        setRemarks('')
         // setOccupation(occupation);
         // setRiskProfile(riskProfile);
         // setRemark(remark);
@@ -242,10 +245,24 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         setErrors({});
         setLoadingText('');
 
+        const data = {
+            customerId: customer.id,
+            firstName: firstName,
+            lastName: lastName,
+            otherName: middleName,
+            phoneNumber: '',
+            country: '',
+            address: '',
+            postalCode: '',
+            occupation: '',
+            risk: '',
+            remarks
+        };
+
         setLoadingText('Saving Remark . . .');
         setLoading(true);
         setErrors({});
-        updateCustomerProfile({ remark });
+        updateCustomerProfile(data);
     };
 
     return (
@@ -443,7 +460,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         </Box>
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Client Since</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{customer?.email}</Typography>    
+                            <Typography variant="subtitle2" className={classes.info}>{moment(customer?.createdOn).format('DD.MM.YYYY')}</Typography>    
                         </Box>
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
@@ -480,19 +497,22 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                 </form>
                 <form className={classes.remarkContainer} noValidate>
                     <Typography variant="subtitle2" className={classes.info}>Remark</Typography>
+                    <br />
+                    {customer.remarks}
+                    <br /><br />
                     <TextField 
                         className={classes.input}
-                        value={remark || ''}
-                        onChange={(e) => setRemark(e.target.value)}
+                        value={remarks || ''}
+                        onChange={(e) => setRemarks(e.target.value)}
                         type="text"
                         multiline
                         minRows={3}
                         variant="outlined" 
                         placeholder="Add new remark"
-                        helperText={errors.remark}
+                        helperText={errors.remarks}
                         fullWidth
                         required
-                        error={errors.remark ? true : false}
+                        error={errors.remarks ? true : false}
                     />
                     <Button 
                         variant="outlined" 

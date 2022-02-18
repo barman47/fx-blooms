@@ -518,9 +518,11 @@ export const setCustomerStatus = ({ customerID, newStatus, currentStatus }) => a
 
 export const setHidePhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/ShowPhoneNumber/status/false`);
-        dispatch({ type: HIDE_PHONE_NUMBER });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/ShowPhoneNumber/status/false`)
+        ]);
+        return dispatch({ type: HIDE_PHONE_NUMBER });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -528,9 +530,11 @@ export const setHidePhoneNumber = () => async (dispatch) => {
 
 export const setShowPhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/ShowPhoneNumber/status/true`);
-        dispatch({ type: SHOW_PHONE_NUMBER });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/ShowPhoneNumber/status/true`)
+        ]);
+        return dispatch({ type: SHOW_PHONE_NUMBER });
     } catch (err) {
         return handleError(err, dispatch);
     }

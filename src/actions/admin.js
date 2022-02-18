@@ -10,6 +10,7 @@ import {
     SET_CURRENT_ADMIN, 
     SET_CUSTOMER_COUNT, 
     SET_LISTING_COUNT,
+    SET_CUSTOMERS,
     SET_TRANSACTION_VOLUME,
     SET_STATS, 
     UPDATED_CUSTOMER 
@@ -84,15 +85,14 @@ export const getTransactionVolume = (timeframe) => async (dispatch) => {
     }
 };
 
-export const searchForCustomer = (timeframe) => async (dispatch) => {
+export const searchForCustomer = ({searchText, pageNumber, pageSize}) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.get(`${api}/SearchForCustomer?timeframe=${timeframe}`);
-        console.log('searched customer ', res);
-        // return dispatch({
-        //     type: SET_TRANSACTION_VOLUME,
-        //     payload: res.data.data
-        // });
+        const res = await axios.get(`${api}/SearchForCustomer?KeyWord=${searchText}&PageNumber=${pageNumber}&PageSize=${pageSize}`);
+        dispatch({
+            type: SET_CUSTOMERS,
+            payload: res.data.data
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

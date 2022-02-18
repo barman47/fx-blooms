@@ -70,6 +70,10 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(30),
         padding: theme.spacing(2)
     },
+    
+    disabled: {
+        pointerEvents: 'none'
+    },
 
     dropDownContainer: {
         display: 'flex',
@@ -149,7 +153,6 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     useEffect(() => {
         // if (changed) {
             if (volumeFilter && (transactionVolume !== undefined) && changed) {
-            console.log('Showing filter value ', transactionVolume);
             setLoadingTransactionVolume(false);
             setVolume(transactionVolume);
             dispatch({
@@ -160,11 +163,9 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     // Show listing from filter value
     useEffect(() => {
-        console.log('listings changed ', listingFilter);
         // if (changed) {
             if (listingFilter && (listingCount !== undefined) && changed) {
             setLoadingListingCount(false);
-            console.log('Showing filter value ', listingCount);
             setListings(listingCount);
             dispatch({
                 type: TOGGLE_STATS_CHANGE_STATUS
@@ -176,7 +177,6 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     useEffect(() => {
         // if (changed) {
             if (usersFilter && (customerCount !== undefined) && changed) {
-                console.log('Showing filter value ', customerCount);
                 setLoadingCustomerCount(false);
             setUsers(customerCount);
             dispatch({
@@ -305,7 +305,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     }, [handleVolumeFilter, volumeFilter]);
 
     const gotoCustomersPage = (e) => {
-        if (e.target.name !== 'usersFilter') {
+        if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
             history.push(CUSTOMERS);
         }
     };
