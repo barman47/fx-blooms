@@ -107,6 +107,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
+    const [countryCode, setCountryCode] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
 
     const successModal = useRef();
 
@@ -271,6 +273,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 countryCode: code,
                 telephoneNumber: number.charAt(0) === '0' ? number.substring(1, number.length) : number
             });
+            setCountryCode(code);
+            setPhoneNumber(number);
             return setOpen(true);
         }
         return history.push(ACCOUNT, { verifyPhone: true })
@@ -297,11 +301,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                     sellerUsername={sellerUsername}
                 />
             }
-            <VerifyPhoneNumberModal 
-                isOpen={open} 
-                dismissAction={dismissAction} 
-                phoneNumber={phoneNo || ''} 
-            />
+            {open && 
+                <VerifyPhoneNumberModal 
+                    isOpen={open} 
+                    dismissAction={dismissAction} 
+                    phoneNumber={phoneNumber}
+                    countryCode={countryCode}
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <section className={classes.root}>
                 <Typography variant="h6">Notifications</Typography>

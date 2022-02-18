@@ -119,27 +119,20 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             gap: theme.spacing(1)
         },
+
+        '& div': {
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            alignItems: 'center',
+            gap: theme.spacing(2)
+            // justifyContent: 'space-between'
+        }
     },
 
     accountDetailsHeader: {
         color: COLORS.offBlack,
         fontWeight: 600,
         fontSize: theme.spacing(1.7),
-    },
-
-    accountContainer: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-
-        [theme.breakpoints.down('sm')]: {
-            gridTemplateColumns: '1fr',
-        },
-
-        '& section': {
-            bodrder: '1px solid red',
-            display: 'flex',
-            flexDirection: 'column'
-        }
     },
 
     accountDetailsText: {
@@ -548,20 +541,19 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
                                         <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
                                     </div>
-                                    <div className={classes.accountContainer}>
-                                        <section>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                                        </section>
-                                        <section>
-                                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                                        </section>
+                                    {/* <div className={classes.accountContainer}> */}
+                                    <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
                                     </div>
-                                    {/* <div>
+                                    <div>
+                                        <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                    </div>
+                                    <div>
                                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                                    </div> */}
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference}</Typography>
+                                    </div>
                                 </section>
                             }                   
                         </Grid>

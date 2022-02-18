@@ -156,7 +156,7 @@ const UserDetails = (props) => {
                             <Typography variant="subtitle2" component="span" className={classes.title}>Last Login</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.title}>Rating</Typography>
                             <Typography variant="subtitle2" component="span" className={classes.text}>{seller?.lastLogin}</Typography>
-                            <Rating name=""seller-rating  value={seller?.rating} precision={0.5} readOnly className={classes.rating} />
+                            <Rating name=""seller-rating  value={seller?.rating || 0} precision={0.5} readOnly className={classes.rating} />
                         </div>
                     </Grid>
                     {sellerId !== customer.customerId &&

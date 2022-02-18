@@ -87,7 +87,8 @@ const customerReducer =  (state = initialState, action) => {
             
             return {
                 ...state,
-                profile
+                profile,
+                msg: 'Now other users can not see your telephone number'
             };
             
         case SHOW_PHONE_NUMBER:
@@ -96,7 +97,8 @@ const customerReducer =  (state = initialState, action) => {
 
             return {
                 ...state,
-                profile
+                profile,
+                msg: 'Now other users can see your telephone number'
             };
 
         case SET_RESIDENCE_PERMIT:

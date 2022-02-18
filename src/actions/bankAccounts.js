@@ -61,7 +61,6 @@ export const getAccount = (accountId) => async (dispatch) => {
             payload: res.data
         });
     } catch (err) {
-        console.error();
         return handleError(err, dispatch);
     }
 }

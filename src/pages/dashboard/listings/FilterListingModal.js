@@ -54,14 +54,7 @@ const useStyles = makeStyles(theme => ({
 				gridTemplateColumns: '1fr 1fr',
 				columnGap: theme.spacing(10),
 				marginBottom: theme.spacing(4),
-				alignItems: 'center',
-
-				'& span': {
-					cursor: 'pointer',
-					'&:hover': {
-						textDecoration: 'underline'
-					}
-				}
+				alignItems: 'center'
 			}
 		}
 	},
@@ -80,6 +73,10 @@ const useStyles = makeStyles(theme => ({
 		'&:hover': {
 			textDecoration: 'none !important'
 		}
+	},
+
+	label: {
+		fontSize: theme.spacing(1)
 	},
 
 	disabledButton: {
@@ -234,8 +231,8 @@ const MobileFilterModal = (props) => {
 								component="span" 
 								color="primary"
 								onClick={handleClearFilter}
-								>
-									Clear
+							>
+								Clear
 							</Typography>
 							<Button 
 								className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
@@ -246,22 +243,23 @@ const MobileFilterModal = (props) => {
 							>
 								Amount
 							</Button>
-							{/* <Button 
+							<Button 
 								className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
 								variant="contained" 
 								color="primary" 
 								size="small"
 								onClick={() => setFilter(RATING)}
+								disabled
 							>
 								Rating
-							</Button> */}
+							</Button>
 						</header>
 						{
 						filter === PRICE
 							?
 							<Grid container direction="row" spacing={2}>
-								<Grid item xs={6}>
-									<Typography variant="subtitle2">I Have</Typography>
+								<Grid item xs={12}>
+									<Typography variant="subtitle2" className={classes.label}>Exchange Amount</Typography>
 									<FormControl 
 										variant="outlined" 
 										error={errors.AvailableCurrency ? true : false } 
@@ -284,8 +282,8 @@ const MobileFilterModal = (props) => {
 										<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
 									</FormControl>
 								</Grid>
-								<Grid item xs={6}>
-									<Typography variant="subtitle2">I want</Typography>
+								<Grid item xs={5}>
+									<Typography variant="subtitle2" className={classes.label}>Expected Amount</Typography>
 									<FormControl 
 										variant="outlined" 
 										error={errors.RequiredCurrency ? true : false } 
@@ -307,7 +305,7 @@ const MobileFilterModal = (props) => {
 										<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
 									</FormControl>
 								</Grid>
-								<Grid item xs={12}>
+								<Grid item xs={7}>
 									<TextField 
 										value={Amount}
 										onChange={(e) => setAmount(e.target.value)}
@@ -319,6 +317,7 @@ const MobileFilterModal = (props) => {
 										required
 										error={errors.Amount ? true : false}
 										disabled={loading ? true : false}
+										style={{ marginTop: theme.spacing(1.5) }}
 									/>
 								</Grid>
 								<Grid item xs={12}>

@@ -5,13 +5,18 @@ import {
     Avatar,
     Box, 
     Button,
+    FormControl,
     FormControlLabel,
+    FormHelperText,
+    MenuItem,
+    Select,
     Switch,
     Typography, 
     TextField
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { updateCustomerProfile } from '../../../actions/admin';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
@@ -19,10 +24,12 @@ import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
+import isEmpty from '../../../utils/isEmpty';
 import avatar from '../../../assets/img/avatar.jpg';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -100,6 +107,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const location = useLocation();
 
     const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    const errorsState = useSelector(state => state.errors);
 
     const [firstName] = useState(customer.firstName);
     const [middleName] = useState(customer.otherName);
@@ -114,7 +122,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
-    const [remark, setRemark] = useState(customer.remark);
+    const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
     const [status, setStatus] = useState(customer.customerStatus);
 
@@ -124,8 +132,10 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [loading, setLoading] = useState(false);
     
     const successModal = useRef();
+    const toast = useRef();
 
     const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
+    const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];;
 
     useEffect(() => {
         if (!idCheckData) {
@@ -147,11 +157,20 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     }, [location]);
 
     useEffect(() => {
+        if (errorsState?.msg) {
+            setLoading(false);
+            toast.current.handleClick();
+        }
+    }, [errorsState, errors]);
+
+    useEffect(() => {
+        setEditable(false);
         const { customerStatus } = customer;
         // const { address, occupation, riskProfile, remark, status } = customer;
 
         // setAddress(address);
         setStatus(customerStatus);
+        setRemarks('')
         // setOccupation(occupation);
         // setRiskProfile(riskProfile);
         // setRemark(remark);
@@ -221,9 +240,43 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         updateCustomerProfile(data);
     };
 
+    const saveRemark = (e) => {
+        e.preventDefault();
+        setErrors({});
+        setLoadingText('');
+
+        const data = {
+            customerId: customer.id,
+            firstName: firstName,
+            lastName: lastName,
+            otherName: middleName,
+            phoneNumber: '',
+            country: '',
+            address: '',
+            postalCode: '',
+            occupation: '',
+            risk: '',
+            remarks
+        };
+
+        setLoadingText('Saving Remark . . .');
+        setLoading(true);
+        setErrors({});
+        updateCustomerProfile(data);
+    };
+
     return (
         <>
             {loading && <Spinner text={loadingText} />}
+            {!isEmpty(errorsState) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errorsState.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
@@ -356,6 +409,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                 className={classes.button}
                                 disabled={loading || !editable ? true : false}
                                 onClick={onSubmit}
+                                type="submit"
                             >
                                 SAVE
                             </Button>
@@ -406,23 +460,31 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         </Box>
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Client Since</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{customer?.email}</Typography>    
+                            <Typography variant="subtitle2" className={classes.info}>{moment(customer?.createdOn).format('DD.MM.YYYY')}</Typography>    
                         </Box>
                         <Box component="div">
                             <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
                             {editable ? 
-                                <TextField 
-                                    className={classes.input}
-                                    value={riskProfile || ''}
-                                    onChange={(e) => setRiskProfile(e.target.value)}
-                                    type="text"
+                                <FormControl 
                                     variant="outlined" 
-                                    placeholder="Enter Risk Profile"
-                                    helperText={errors.riskProfile}
-                                    fullWidth
+                                    error={errors.riskProfile ? true : false } 
+                                    fullWidth 
                                     required
-                                    error={errors.riskProfile ? true : false}
-                                />
+                                    disabled={loading ? true : false}
+                                >
+                                    <Select
+                                        labelId="riskProfile"
+                                        value={riskProfile}
+                                        onChange={(e) => setRiskProfile(e.target.value)}
+                                    
+                                    >
+                                        <MenuItem value="" disabled selected>Select Risk Profile</MenuItem>
+                                        {RISK_PROFILES.map((item, index) => (
+                                            <MenuItem key={index} value={item}>{item}</MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormHelperText>{errors.riskProfile}</FormHelperText>
+                                </FormControl>
                                 :
                                 <Typography variant="subtitle2" className={classes.info}>{riskProfile}</Typography>    
                             }
@@ -435,21 +497,33 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                 </form>
                 <form className={classes.remarkContainer} noValidate>
                     <Typography variant="subtitle2" className={classes.info}>Remark</Typography>
+                    <br />
+                    {customer.remarks}
+                    <br /><br />
                     <TextField 
                         className={classes.input}
-                        value={remark || ''}
-                        onChange={(e) => setRemark(e.target.value)}
+                        value={remarks || ''}
+                        onChange={(e) => setRemarks(e.target.value)}
                         type="text"
                         multiline
                         minRows={3}
                         variant="outlined" 
                         placeholder="Add new remark"
-                        helperText={errors.remark}
+                        helperText={errors.remarks}
                         fullWidth
                         required
-                        error={errors.remark ? true : false}
+                        error={errors.remarks ? true : false}
                     />
-                    <Button variant="outlined" type="submit" color="primary" className={classes.saveRemarkButton}>Save</Button>
+                    <Button 
+                        variant="outlined" 
+                        type="submit" 
+                        color="primary" 
+                        onClick={saveRemark} 
+                        className={classes.saveRemarkButton}
+                        disabled={loading || !editable ? true : false}
+                    >
+                        Save
+                    </Button>
                 </form>
             </Box>
         </>

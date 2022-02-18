@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react'; 
 import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
+    Box,
     Button,
+    Chip,
     FormControl,
     FormHelperText,
     Grid,
@@ -15,9 +17,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ChevronRight } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import Validator from 'validator';
-import clsx from 'clsx';
 
-import { updateProfile } from '../../../actions/customer'; 
+import { setHidePhoneNumber, setShowPhoneNumber, updateProfile } from '../../../actions/customer'; 
 import { generateOtp } from '../../../actions/notifications';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
@@ -111,36 +112,23 @@ const useStyles = makeStyles(theme =>({
         fontWeight: 600
     },
 
-    unverified: {
-        borderBottomLeftRadius: '15px',
-        borderTopLeftRadius: '15px',
-        color: theme.palette.error.main,
-        backgroundColor: theme.palette.primary.main,
-        padding: theme.spacing(1),
-        textAlign: 'center',
-        textTransform: 'uppercase',
-        width: 'initial !important',
-    },
-
-    verified: {
-        borderBottomLeftRadius: '15px',
-        borderTopLeftRadius: '15px',
-        color: COLORS.offWhite,
-        backgroundColor: theme.palette.primary.main,
-        padding: theme.spacing(1, 3),
-        textTransform: 'uppercase',
+    verificationButtonContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        [theme.breakpoints.down('sm')]: {
+            justifyContent: 'space-between'
+        }
     },
 
     verifyButton: {
-        borderBottomRightRadius: '15px',
-        borderTopRightRadius: '15px',
-        borderRadius: 0,
-        paddingBottom: theme.spacing(1.2),
-        paddingTop: theme.spacing(1.2),
+        marginLeft: theme.spacing(3),
+        [theme.breakpoints.down('sm')]: {
+            marginLeft: 0
+        }
     }
 }));
 
-const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
+const PersonalDetails = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile, verifyIdentity }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { isPhoneNumberVerified, msg, profile, stats } = useSelector(state => state.customer); 
@@ -325,6 +313,12 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
         );
     } 
 
+    const togglePhoneNumber = () => {
+        profile.showPhoneNumber ? setHidePhoneNumber() : setShowPhoneNumber();
+        setLoading(true);
+        setSpinnerText('One Moment . . .');
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -338,12 +332,14 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
             }
             {loading && <Spinner text={spinnerText} />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <VerifyPhoneNumberModal 
-                isOpen={open} 
-                dismissAction={dismissAction} 
-                phoneNumber={phoneNumber} 
-                code={code}
-            />
+            {open && 
+                <VerifyPhoneNumberModal 
+                    isOpen={open} 
+                    dismissAction={dismissAction} 
+                    phoneNumber={phoneNumber} 
+                    countryCode={code}
+                />
+            }
             <div className={classes.header}>
                 <div>
                     <Typography variant="h4" color="primary">Account Setup (Profile)</Typography>
@@ -441,8 +437,22 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                                     {errors.countryCode && <FormHelperText error>{errors.countryCode}</FormHelperText>}
                                 </Grid>
                             }
-                            <Grid item xs={7} md={editable ? 3 : 4} lg={4}>
-                                <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
+                            <Grid item xs={12} md={editable ? 3 : 4} lg={6}>
+                                <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number &nbsp; &nbsp;
+                                    {!editable && 
+                                        <>
+                                            <strong>{profile.showPhoneNumber ? 'Showing' : 'Hidden'}</strong>&nbsp; &nbsp;
+                                            <Button
+                                                variant="outlined"
+                                                color="primary"
+                                                disabled={loading}
+                                                onClick={togglePhoneNumber}
+                                            >
+                                                {profile.showPhoneNumber ? 'Hide' : 'Show'}
+                                            </Button>
+                                        </>
+                                    }
+                                </Typography>
                                 {profile.phoneNo && !editable ?
                                     <>
                                         <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={classes.label}>{profile.phoneNo}</Typography>
@@ -462,29 +472,28 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
                                         error={errors.phoneNo ? true : false}
                                     />
                                 }
-                                {/* {showNumber ?
-                                    <Button color="primary" onClick={handleHidePhoneNumber}>Hide</Button>
-                                    :
-                                    <Button color="primary" onClick={handleShowPhoneNumber}>Show</Button>
-                                } */}
                             </Grid>
-                            <Grid item xs={6} md={3} xlg={2}>
-                                <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
-                                <Typography variant="subtitle1" component="p" style={{ fontWeight: 500 }} className={clsx({ [classes.verified]: isPhoneNumberVerified, [classes.unverified]: !isPhoneNumberVerified })}>{ isPhoneNumberVerified ? 'Verified' : 'Unverified' }</Typography>
-                            </Grid>
-                            {!isPhoneNumberVerified && !editable &&
-                                <Grid item xs={6} md={3} style={{ justifySelf: 'center' }}>
-                                    <br />
-                                    <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        size="medium" 
-                                        endIcon={<ChevronRight />} 
-                                        className={classes.verifyButton}
-                                        onClick={handleGenerateOtp}
-                                    >
-                                        Verify Now
-                                    </Button>
+                            {!editable && 
+                                <Grid item xs={12} md={6}>
+                                    <Typography variant="subtitle2" component="span" className={classes.label}>Verification Status</Typography>
+                                    <Box component="div" className={classes.verificationButtonContainer}>
+                                        <Chip  
+                                            label={isPhoneNumberVerified ? 'Verified' : 'Unverified'}
+                                            color={isPhoneNumberVerified ? 'primary' : 'secondary'}
+                                        />
+                                        {!isPhoneNumberVerified &&
+                                            <Button 
+                                                variant="contained" 
+                                                color="primary" 
+                                                size="small" 
+                                                endIcon={<ChevronRight />} 
+                                                className={classes.verifyButton}
+                                                onClick={handleGenerateOtp}
+                                            >
+                                                Verify Now
+                                            </Button>
+                                        }
+                                    </Box>
                                 </Grid>
                             }
                             <Grid item xs={12}>
@@ -583,8 +592,10 @@ const PersonalDetails = ({ generateOtp, updateProfile, verifyIdentity }) => {
 
 PersonalDetails.propTypes = {
     generateOtp: PropTypes.func.isRequired,
+    setHidePhoneNumber: PropTypes.func.isRequired,
+    setShowPhoneNumber: PropTypes.func.isRequired,
     updateProfile: PropTypes.func.isRequired,
     verifyIdentity: PropTypes.func.isRequired
 };
 
-export default connect( undefined, { generateOtp, updateProfile } )(PersonalDetails);
+export default connect( undefined, { generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile } )(PersonalDetails);

@@ -118,7 +118,6 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
 
     useEffect(() => {
         if (!idCheckData) {
-            console.log('Getting ID card data');
             getIdCardValidationResponse(customer.id);
         }
 
