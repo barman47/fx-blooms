@@ -277,7 +277,8 @@ const PersonalDetails = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, 
     };
 
     const handleGenerateOtp = () => {
-        const { code, number } = extractCountryCode(countryCode && phoneNo ? `${countryCode}${phoneNo}` : phoneNo);
+        const { code, number } = extractCountryCode(phoneNo);
+        // const { code, number } = extractCountryCode(countryCode && phoneNo ? `${countryCode}${phoneNo}` : phoneNo);
 
         if (Validator.isEmpty(number)) {
             return setErrors({ msg: 'Invalid Phone Number!', phoneNo: 'Phone Number is required!' });
