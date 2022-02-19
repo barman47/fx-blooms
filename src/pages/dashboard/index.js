@@ -110,6 +110,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     label: {
+        fontSize: '9px !important',
         fontWeight: 300,
         textTransform: 'uppercase'
     }
@@ -143,7 +144,7 @@ const Dashboard = ({ children, title, logout }) => {
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> },
-        { url: ACCOUNT, text:'Settings', icon: <Account /> }
+        { url: ACCOUNT, text:'Account', icon: <Account /> }
     ];
     
     const accountSetupModal = useRef();
@@ -467,7 +468,7 @@ const Dashboard = ({ children, title, logout }) => {
                                     label={item.text} 
                                     value={item.text} 
                                     icon={item.icon} 
-                                    classes={{ label: classes.label }}
+                                    classes={{ label: classes.label, selected: classes.label }}
                                 />
                             ))}
                         </BottomNavigation>
