@@ -3,16 +3,18 @@ import { countries } from './countries';
 const extractCountryCode = (phoneNumber) => {
     const countryCodes = countries.map(country => country.phone);
     let countryCode = null;
+    let number = null;
     countryCodes.forEach(code => {
         if (phoneNumber.startsWith(code)) {
             countryCode = `+${code}`;
+            number = phoneNumber.slice(code.length);
         }
         if (phoneNumber.startsWith(`+${code}` )) {
             countryCode = `+${code}`;
+            number = phoneNumber.slice(`+${code.length}`);
         }
     });
     
-    const number = phoneNumber.slice(countryCode.length);
     
     return {
         code: countryCode,

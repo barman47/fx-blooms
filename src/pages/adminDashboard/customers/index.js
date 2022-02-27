@@ -357,7 +357,6 @@ const Customers = (props) => {
             
     //         case ALL_CUSTOMERS:
     //             if (customers.hasNext) {
-    //                 debugger
     //                 getCustomers({
     //                     pageSize: rowsPerPage,
     //                     pageNumber: customers.currentPageNumber + 1

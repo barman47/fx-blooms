@@ -1,20 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { 
     AppBar, 
     Avatar, 
     Badge, 
-    ClickAwayListener,
     Button, 
     Grid, 
-    Grow,
     IconButton, 
     Link, 
-    MenuList, 
-    MenuItem, 
-    Paper,
-    Popper,
     Slide, 
     Toolbar, 
     useScrollTrigger 
@@ -142,7 +136,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export const PrivateHeader = (props) => {
-    const history = useHistory();
     const location = useLocation();
     const classes = useStyles();
     
@@ -152,9 +145,7 @@ export const PrivateHeader = (props) => {
     const [open, setOpen] = useState(false);
     const [isProfilePage, setIsprofilePage] = useState(false);
 
-    const anchorRef = useRef(null);
     const mobileDropdown = useRef(null);
-    const prevOpen = useRef(open);
 
     useEffect(() => {
         if (location.pathname.includes(ACCOUNT)) {
@@ -174,41 +165,7 @@ export const PrivateHeader = (props) => {
 
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
-    };
-
-    const handleMenuClose = (event) => {
-        if (anchorRef.current && anchorRef.current.contains(event.target)) {
-            return;
-        }
-        if (mobileDropdown.current && mobileDropdown.current.contains(event.target)) {
-            return;
-        }
-
-        setOpen(false);
-    };
-
-    function handleListKeyDown(event) {
-        if (event.key === 'Tab') {
-            event.preventDefault();
-            setOpen(false);
-        }
-    }
-
-    // return focus to the button when we transitioned from !open -> open
-    useEffect(() => {
-        if (prevOpen.current === true && open === false) {
-            anchorRef.current.focus();
-        }
-        if (prevOpen.current === true && open === false) {
-            mobileDropdown?.current?.focus();
-        }
-        prevOpen.current = open;
-    }, [open]);
-
-    const handleLogout = (e) => {
-        e.preventDefault();
-        props.logout(history);
-    };
+    };;
 
     return (
         <HideOnScroll {...props}>
@@ -235,29 +192,6 @@ export const PrivateHeader = (props) => {
                         <div className={classes.avatarContainer}>
                             <Avatar alt={`${firstName} ${lastName}`} />
                         </div>
-                        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
-                            {({ TransitionProps, placement }) => (
-                                <Grow
-                                    {...TransitionProps}
-                                    style={{ transformOrigin: placement === 'bottom' ? 'center top' : 'center bottom' }}
-                                >
-                                    <Paper>
-                                        <ClickAwayListener onClickAway={handleMenuClose}>
-                                            <MenuList autoFocusItem={open} id="profile-menu" onKeyDown={handleListKeyDown}>
-                                                <MenuItem
-                                                    onClick={(e) => handleMenuClose(e, ACCOUNT)}
-                                                >
-                                                    <RouterLink to={ACCOUNT} className={classes.link}>Settings</RouterLink>
-                                                </MenuItem>
-                                                <MenuItem>
-                                                    <RouterLink to="#!" onClick={handleLogout} className={classes.link}>Log out</RouterLink>
-                                                </MenuItem>
-                                            </MenuList>
-                                        </ClickAwayListener>
-                                    </Paper>
-                                </Grow>
-                            )}
-                        </Popper>
                     </section>
                     <div className={classes.mobileNav}>
                         <RouterLink to="/">

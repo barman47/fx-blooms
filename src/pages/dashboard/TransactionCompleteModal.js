@@ -23,6 +23,7 @@ import {
     WhatsappShareButton,
     WhatsappIcon
 } from 'react-share';
+import toast, { Toaster } from 'react-hot-toast';
 
 import { COLORS, SHADOW } from '../../utils/constants';
 
@@ -81,8 +82,9 @@ const useStyles = makeStyles(theme => ({
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
+            justifyContent: 'flex-start',
+            width: '100%',
         }
-        // width: '100%',
     },
 
     button: {
@@ -146,74 +148,77 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
     const share = async () => {
         const shareData = {
             title: 'FXBLOOMS',
-            text: {message},
+            text: message,
             url: URL,
         }
 
         await navigator.share(shareData);
+        toast.success('Thanks for telling others about us');
     };
 
 	return (
-        <Modal
-            aria-labelledby="transition-modal-title"
-            aria-describedby="transition-modal-description"
-            className={classes.modal}
-            open={open}
-            disableBackdropClick
-            disableEscapeKeyDown
-            onClose={() => setOpen(false)}
-            closeAfterTransition
-            BackdropComponent={Backdrop}
-            BackdropProps={{
-                timeout: 500,
-            }}
-        >
-            <Fade in={open}>
-                <Grid container className={classes.container}>
-                    <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
-                        <Typography variant="subtitle1" component="p">Your transaction is now completed, thanks for using FXBLOOMS.</Typography>
-                        <Typography variant="subtitle1" component="p">Kindly tell others about your experience.</Typography>
-                        <Box component="div" className={classes.shareContainer}>
-                            {matches ? 
-                                <>
-                                    <Tooltip title="Share via LinkedIn" arrow>
+        <>
+            <Toaster />
+            <Modal
+                aria-labelledby="transition-modal-title"
+                aria-describedby="transition-modal-description"
+                className={classes.modal}
+                open={open}
+                disableBackdropClick
+                disableEscapeKeyDown
+                onClose={() => setOpen(false)}
+                closeAfterTransition
+                BackdropComponent={Backdrop}
+                BackdropProps={{
+                    timeout: 500,
+                }}
+            >
+                <Fade in={open}>
+                    <Grid container className={classes.container}>
+                        <Grid item xs={12} className={classes.item}>
+                            <CheckboxMarkedCircle className={classes.icon} />
+                            <Typography variant="subtitle1" component="p">Your transaction is now completed, thanks for using FXBLOOMS.</Typography>
+                            <Typography variant="subtitle1" component="p">Kindly tell others about your experience.</Typography>
+                            <Box component="div" className={classes.shareContainer}>
+                                {matches ? 
+                                    <>
                                         <IconButton onClick={share}>
                                             <ShareVariant />
                                         </IconButton>
-                                    </Tooltip>
-                                    <Typography variant="subtitle1" component="p">Share with friends</Typography>
-                                </>
-                                :
-                                <>
-                                    <Tooltip title="Share via Facebook" arrow>
-                                        <FacebookShareButton
-                                            url={URL}
-                                            quote={message}
-                                            hashtag={hashtags}
-                                        >
-                                            <FacebookIcon  className={classes.button} />
-                                        </FacebookShareButton>
-                                    </Tooltip>
-                                    <Tooltip title="Share via Twitter" arrow>
-                                        <TwitterShareButton
-                                            via={` ${message}`}
-                                            url={URL}
-                                            hashtags={hashtags}
-                                        >
-                                            <TwitterIcon  className={classes.button} />
-                                        </TwitterShareButton>
-                                    </Tooltip>
-                                    <TelegramShare />
-                                    <WhatsappShare />
-                                </>
-                            }
-                        </Box>
-                        <Button variant="contained" onClick={() => setOpen(false)} color="primary" fullWidth>Close</Button>
+                                        <Typography variant="subtitle1" component="p">Share with friends</Typography>
+                                    
+                                    </>
+                                    :
+                                    <>
+                                        <Tooltip title="Share via Facebook" arrow>
+                                            <FacebookShareButton
+                                                url={URL}
+                                                quote={message}
+                                                hashtag={hashtags}
+                                            >
+                                                <FacebookIcon  className={classes.button} />
+                                            </FacebookShareButton>
+                                        </Tooltip>
+                                        <Tooltip title="Share via Twitter" arrow>
+                                            <TwitterShareButton
+                                                via={` ${message}`}
+                                                url={URL}
+                                                hashtags={hashtags}
+                                            >
+                                                <TwitterIcon  className={classes.button} />
+                                            </TwitterShareButton>
+                                        </Tooltip>
+                                        <TelegramShare />
+                                        <WhatsappShare />
+                                    </>
+                                }
+                            </Box>
+                            <Button variant="contained" onClick={() => setOpen(false)} color="primary" fullWidth>Close</Button>
+                        </Grid>
                     </Grid>
-                </Grid>
-            </Fade>
-        </Modal>
+                </Fade>
+            </Modal>
+        </>
 	);
 });
 
