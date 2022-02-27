@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -46,10 +46,13 @@ import {
 
 import logo from '../../assets/img/logowhite.svg';
 
-import { getStats, logout } from '../../actions/admin';
-import { COLORS, LOGOUT } from '../../utils/constants';
+import { getStats, logout, searchForCustomer } from '../../actions/admin';
+import { COLORS, CUSTOMER_CATEGORY, LOGOUT } from '../../utils/constants';
+import isEmpty from '../../utils/isEmpty';
 
 import SessionModal from './SessionModal';
+import Spinner from '../../components/common/Spinner';
+
 import { 
     ADMIN_HOME,
     CUSTOMERS,
@@ -60,6 +63,7 @@ import {
     SUPPORT,
     RISK_PROFILE 
 } from '../../routes';
+import { SET_CATEGORY } from '../../actions/types';
 
 const drawerWidth = 240;
 
@@ -186,8 +190,9 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         backgroundColor: theme.palette.primary.main,
         borderTopRightRadius: '40px',
+        overflowX: 'hidden',
         boxSizing: 'border-box',
-        paddingRight: theme.spacing(2),
+        paddingRight: theme.spacing(2)
     },
 
     drawerOpen: {
@@ -267,16 +272,19 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getStats, logout }) => {
+const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const history = useHistory();
     const location = useLocation();
-    const { admin } = useSelector(state => state);
+    const { admin, customers } = useSelector(state => state);
+    const { category, pageSize } = useSelector(state => state.customers);
 
     const [searchText, setSearchText] = useState('');
-    const [open, setOpen] = useState(true);
-    // eslint-disable-next-line
     const [path, setPath] = useState('');
+    const [open, setOpen] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
 
     const links = [
         { url : ADMIN_HOME, text:'Dashboard', icon: <ViewDashboard /> },
@@ -286,7 +294,7 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
         { url : WITHDRAWALS, text:'Withdrawals', icon: <CashMinus /> },
         { url : HISTORY, text:'History', icon: <History /> },
         { url : SUPPORT, text:'Support', icon: <Headset /> },
-        { url : RISK_PROFILE, text:'Risk Profile', icon: <AlertOutline /> },
+        { url : RISK_PROFILE, text:'Risk Profile', icon: <AlertOutline /> }
     ];
 
     useEffect(() => {
@@ -297,7 +305,18 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
 
     useEffect(() => {
         setPath(location.pathname);
-    }, [location.pathname]);
+        // Hide search field on a page that isn't the customers page
+        if (location.pathname !== CUSTOMERS) {
+            dispatch({
+                type: SET_CATEGORY,
+                payload: null
+            });
+        }
+    }, [dispatch, location.pathname]);
+
+    useEffect(() => {
+        setLoading(false);
+    }, [customers]);
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -314,33 +333,47 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
         history.push(link);
     };
 
+    const handleSearch = (e) => {
+        e.preventDefault();
+        if (isEmpty(searchText)) {
+            return setErrors({ searchText: 'Please enter a search term' });
+        }
+        setLoading(true);
+        searchForCustomer({ searchText, pageNumber: 0, pageSize });
+    };
+
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <SessionModal />
+            {loading && <Spinner text="Searching . . ." />}
             <section className={classes.root}>
                 <AppBar position="fixed" color="transparent" elevation={0} className={clsx(classes.appBar, {
                     [classes.appBarShift]: open,
                 })}>
                     <Toolbar className={classes.appBarContent}>
                         <Box component="div" className={classes.formContainer}>
-                            <form>
-                                <TextField 
-                                    className={classes.searchField}
-                                    type="text"
-                                    variant="outlined"
-                                    placeholder="Search . . ."
-                                    value={searchText}
-                                    onChange={(e) => setSearchText(e.target.value)}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <Magnify />
-                                            </InputAdornment>
-                                        )
-                                    }}
-                                />
-                            </form>
+                            {(path === CUSTOMERS) && (category === CUSTOMER_CATEGORY.ALL_CUSTOMERS) &&
+                                <form noValidate onSubmit={handleSearch}>
+                                    <TextField 
+                                        className={classes.searchField}
+                                        type="text"
+                                        variant="outlined"
+                                        placeholder="Search . . ."
+                                        value={searchText}
+                                        onChange={(e) => setSearchText(e.target.value)}
+                                        helperText={errors.searchText}
+                                        error={errors.searchText ? true : false}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Magnify />
+                                                </InputAdornment>
+                                            )
+                                        }}
+                                    />
+                                </form>
+                            }
                             <Box component="div">
                                 <ul className={classes.headerLinks}>
                                     <li>
@@ -454,7 +487,8 @@ const AdminDashboard = ({ children, title, getStats, logout }) => {
 AdminDashboard.propTypes = {
     title: PropTypes.string.isRequired,
     getStats: PropTypes.func.isRequired,
+    searchForCustomer: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getStats, logout })(AdminDashboard);
+export default connect(undefined, { getStats, searchForCustomer, logout })(AdminDashboard);

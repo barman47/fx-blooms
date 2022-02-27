@@ -19,8 +19,8 @@ import {
     BottomNavigationAction
 } from '@material-ui/core';
 
-import {  HomeMinus, FormatListText, Message } from 'mdi-material-ui';
-import { MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
+import { Account, HomeMinus, FormatListText, Message } from 'mdi-material-ui';
+import { ACCOUNT, MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
 import { 
     ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
@@ -110,7 +110,8 @@ const useStyles = makeStyles((theme) => ({
     },
 
     label: {
-        fontWeight: 600,
+        fontSize: '9px !important',
+        fontWeight: 300,
         textTransform: 'uppercase'
     }
 }));
@@ -142,7 +143,8 @@ const Dashboard = ({ children, title, logout }) => {
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
         // { url: WALLET, text:'Wallet', icon: <Wallet /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> },
+        { url: ACCOUNT, text:'Account', icon: <Account /> }
     ];
     
     const accountSetupModal = useRef();
@@ -457,15 +459,16 @@ const Dashboard = ({ children, title, logout }) => {
                             onChange={(event, newValue) => {
                                 setValue(newValue)
                             }}
-                            showLabels
                         >
                             {mobileLinks.map((item, index) => (
                                 <BottomNavigationAction 
                                     onClick={() => handleLinkClick(item.url)} 
                                     key={index} 
+                                    // label={location.pathname.includes(item.url) && item.text}
                                     label={item.text} 
+                                    value={item.text} 
                                     icon={item.icon} 
-                                    classes={{ label: classes.label }}
+                                    classes={{ label: classes.label, selected: classes.label }}
                                 />
                             ))}
                         </BottomNavigation>

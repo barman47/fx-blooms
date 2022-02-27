@@ -611,7 +611,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 					{
 						filter === PRICE
 						?
-						<Grid container direction="row" spacing={1}>
+						<Grid container direction="row" spacing={2}>
 							<Grid item xs={12}>
 								<Typography variant="subtitle2" className={classes.label}>Exchange Amount</Typography>
 								<TextField 
@@ -685,7 +685,6 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 								</FormControl> */}
 							</Grid>
 							<Grid item xs={7}>
-								<br />
 								<TextField 
 									value={Amount}
 									onChange={(e) => setAmount(e.target.value)}
@@ -697,6 +696,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 									required
 									error={errors.Amount ? true : false}
 									disabled={loading ? true : false}
+									style={{ marginTop: theme.spacing(2.2) }}
 								/>
 							</Grid>
 							<Grid item xs={12}>

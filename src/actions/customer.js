@@ -518,9 +518,11 @@ export const setCustomerStatus = ({ customerID, newStatus, currentStatus }) => a
 
 export const setHidePhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/ShowPhoneNumber/status/false`);
-        dispatch({ type: HIDE_PHONE_NUMBER });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/ShowPhoneNumber/status/false`)
+        ]);
+        return dispatch({ type: HIDE_PHONE_NUMBER });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -528,9 +530,11 @@ export const setHidePhoneNumber = () => async (dispatch) => {
 
 export const setShowPhoneNumber = () => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        await axios.post(`${api}/ShowPhoneNumber/status/true`);
-        dispatch({ type: SHOW_PHONE_NUMBER });
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/ShowPhoneNumber/status/true`)
+        ]);
+        return dispatch({ type: SHOW_PHONE_NUMBER });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -590,7 +594,6 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
-        console.log('data ', data)
         const customerData = {
             documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
             expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,

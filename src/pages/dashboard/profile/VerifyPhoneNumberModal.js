@@ -103,7 +103,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePhoneNumber, phoneNumber, code }) => {
+const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePhoneNumber, phoneNumber, countryCode }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -118,6 +118,8 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
     const [fifth, setFifth] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [resendable, setResendable] = useState(false);
+    const [timeToResend, setTimeToResend] = useState(60);
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
@@ -129,9 +131,26 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
     const fifthField = useRef();
     
     const toast = useRef();
+    const resendTimer = useRef();
+
+    useEffect(() => {
+        startResendTimer();
+
+        return () => {
+            clearInterval(resendTimer.current);
+            resendTimer.current = undefined;
+        };
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         setOpen(isOpen);
+        if (!isOpen) {
+            // When modal closes, reset all fields
+            setTimeToResend(60);
+            setResendable(false);
+            setErrors({});
+        }
     }, [isOpen]);
 
     useEffect(() => {
@@ -139,6 +158,14 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             toast.current.handleClick();
         }
     }, [errors]);
+
+    useEffect(() => {
+        if (timeToResend === 0) {
+            setResendable(true);
+            clearInterval(resendTimer.current);
+            resendTimer.current = undefined;
+        }
+    }, [timeToResend]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -150,6 +177,14 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    const startResendTimer = () => {
+        if (!resendTimer.current) {
+            resendTimer.current = setInterval(() => {
+                setTimeToResend(timeToResend => timeToResend - 1);
+            },1000);
+        }
+    };
 
     const closeModal = () => {
         setOpen(false);
@@ -201,13 +236,18 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
             payload: {}
         });
 
-        return validatePhoneNumber({ otp, countryCode: code, telephoneNumber: phoneNumber });
+        return validatePhoneNumber({ otp, countryCode, telephoneNumber: phoneNumber });
     };
 
-    const handleResendOtp = () => generateOtp({
-        countryCode: code,
-        telephoneNumber: phoneNumber.charAt(0) === '0' ? phoneNumber.substring(1, phoneNumber.length) : phoneNumber
-    });
+    const handleResendOtp = () => {
+        generateOtp({
+            countryCode,
+            telephoneNumber: phoneNumber.charAt(0) === '0' ? phoneNumber.substring(1, phoneNumber.length) : phoneNumber
+        });
+        setResendable(false);
+        setTimeToResend(60);
+        startResendTimer();
+    };
 
 	return (
         <>
@@ -326,7 +366,9 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                                         />
                                     </Grid>
                                     <Grid item xs={12}>
-                                        <Typography variant="subtitle2" component="p">Didn't receive the code? <Button variant="text" color="primary" onClick={handleResendOtp}>Resend</Button></Typography>
+                                        <Typography variant="subtitle2" component="p">Didn't receive the code? &nbsp;
+                                            <Button variant="text" color="primary" onClick={handleResendOtp} disabled={!resendable}>Resend {resendable && 'Code'}</Button>{!resendable && `in ${timeToResend}s`}  
+                                        </Typography>
                                     </Grid>
                                     <Grid item xs={12}>
                                         <div className={classes.buttonContainer}>
@@ -360,7 +402,7 @@ VerifyPhoneNumberModal.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     validatePhoneNumber: PropTypes.func.isRequired,
     isOpen: PropTypes.bool.isRequired,
-    code: PropTypes.string,
+    countryCode: PropTypes.string,
     phoneNumber: PropTypes.string.isRequired
 };
 

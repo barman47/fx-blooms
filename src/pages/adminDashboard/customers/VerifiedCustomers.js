@@ -89,10 +89,10 @@ const VerifiedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)}><TextClamp text={customer.firstName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)} ><TextClamp text={customer.lastName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)} ><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={(e) => viewCustomerProfile(customer)} ><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}><TextClamp text={customer.firstName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.lastName} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
+                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
                     <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
                     <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>

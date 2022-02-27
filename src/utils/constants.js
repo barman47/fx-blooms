@@ -37,6 +37,21 @@ export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing br
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const SEND_MESSAGE = 'SendMessage';
 
+export const ADMIN_FILTERS = {
+    TWENTY_FOUR_HOURS: 'Past 24 Hours',
+    SEVEN_DAYS: 'Past 7 Days',
+    THIRTY_DAYS: 'Past 30 Days',
+    THREE_MONTHS: 'Past 3 Months',
+    ALL: 'All'
+};
+// export const ADMIN_FILTERS = [
+//     'Past 24 Hours',
+//     'Past 7 Days',
+//     'Past 30 Days',
+//     'Past 3 Months',
+//     'All'
+// ];
+
 export const CHAT_CONNECTION_STATUS = {
     CONNECTED: 'CONNECTED',
     RECONNECTING: 'RECONNECTING',

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Box,
+    CircularProgress,
     FormControl,
     Grid,
     MenuItem,
@@ -12,8 +13,13 @@ import {
     Typography
 } from '@material-ui/core';
 
+import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
+import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
+
 // import { COLORS } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
+import { ADMIN_FILTERS } from '../../../utils/constants';
+import { useCallback } from 'react';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,6 +70,10 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(30),
         padding: theme.spacing(2)
     },
+    
+    disabled: {
+        pointerEvents: 'none'
+    },
 
     dropDownContainer: {
         display: 'flex',
@@ -92,17 +102,31 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(35),
         padding: theme.spacing(2)
     },
+
+    filterLoaderContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
+    }
 }));
 
-const Home = ({ handleSetTitle }) => {
+const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const history = useHistory();
 
-    const { totalCustomers, totalListings } = useSelector(state => state.stats);
+    const { changed, customerCount, listingCount, totalCustomers, totalListings, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
+    const [listings, setListings] = useState(0);
     const [usersFilter, setUsersFilter] = useState('');
+    const [users, setUsers] = useState(0);
     const [volumeFilter, setVolumeFilter] = useState('');
+    const [volume, setVolume] = useState(0);
+    const [loadingCustomerCount, setLoadingCustomerCount] = useState(false);
+    const [loadingListingCount, setLoadingListingCount] = useState(false);
+    const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
+
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
@@ -111,10 +135,177 @@ const Home = ({ handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
+    // Show total listing count when no filter is selected
+    useEffect(() => {
+        if (totalListings && !listingFilter) {
+            setListings(totalListings);
+        }
+    }, [totalListings, listingFilter]);
+
+    // Show total customer count when no filter is selected
+    useEffect(() => {
+        if (totalCustomers && !usersFilter) {
+            setUsers(totalCustomers);
+        }
+    }, [totalCustomers, usersFilter]);
+
+    // Show volume from filter value
+    useEffect(() => {
+        // if (changed) {
+            if (volumeFilter && (transactionVolume !== undefined) && changed) {
+            setLoadingTransactionVolume(false);
+            setVolume(transactionVolume);
+            dispatch({
+                type: TOGGLE_STATS_CHANGE_STATUS
+            });
+        }
+    }, [changed, volumeFilter, transactionVolume, dispatch]);
+
+    // Show listing from filter value
+    useEffect(() => {
+        // if (changed) {
+            if (listingFilter && (listingCount !== undefined) && changed) {
+            setLoadingListingCount(false);
+            setListings(listingCount);
+            dispatch({
+                type: TOGGLE_STATS_CHANGE_STATUS
+            });
+        }
+    }, [changed, listingFilter, listingCount, dispatch]);
+
+    // Show customer count from filter value
+    useEffect(() => {
+        // if (changed) {
+            if (usersFilter && (customerCount !== undefined) && changed) {
+                setLoadingCustomerCount(false);
+            setUsers(customerCount);
+            dispatch({
+                type: TOGGLE_STATS_CHANGE_STATUS
+            });
+        }
+    }, [changed, usersFilter, customerCount, dispatch]);
+
     // const goToDashboard = () => history.push(`${CUSTOMERS}`);
 
+    const handleListingsFilter = useCallback((timeframe) => {
+        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+        switch (timeframe) {
+            case TWENTY_FOUR_HOURS:
+                getListingCount('1');
+                setLoadingListingCount(true);
+                break;
+
+            case SEVEN_DAYS:
+                getListingCount('7');
+                setLoadingListingCount(true);
+                break;
+
+            case THIRTY_DAYS:
+                getListingCount('30');
+                setLoadingListingCount(true);
+                break;
+
+            case THREE_MONTHS:
+                getListingCount('90');
+                setLoadingListingCount(true);
+                break;
+
+            case ALL:
+                setListings(totalListings);
+                break;
+            
+            default:
+                break;
+        }
+    }, [getListingCount, totalListings]);
+    
+    const handleUsersFilter = useCallback((timeframe) => {
+        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+        switch (timeframe) {
+            case TWENTY_FOUR_HOURS:
+                getCustomerCount('1');
+                setLoadingCustomerCount(true);
+                break;
+
+            case SEVEN_DAYS:
+                getCustomerCount('7');
+                setLoadingCustomerCount(true);
+                break;
+
+            case THIRTY_DAYS:
+                getCustomerCount('30');
+                setLoadingCustomerCount(true);
+                break;
+
+            case THREE_MONTHS:
+                getCustomerCount('90');
+                setLoadingCustomerCount(true);
+                break;
+
+            case ALL:
+                setUsers(totalCustomers);
+                break;
+            
+            default:
+                break;
+        }
+    }, [getCustomerCount, totalCustomers]);
+    
+    const handleVolumeFilter = useCallback((timeframe) => {
+        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+        switch (timeframe) {
+            case TWENTY_FOUR_HOURS:
+                getTransactionVolume('1');
+                setLoadingTransactionVolume(true);
+                break;
+
+            case SEVEN_DAYS:
+                getTransactionVolume('7');
+                setLoadingTransactionVolume(true);
+                break;
+
+            case THIRTY_DAYS:
+                getTransactionVolume('30');
+                setLoadingTransactionVolume(true);
+                break;
+
+            case THREE_MONTHS:
+                getTransactionVolume('90');
+                setLoadingTransactionVolume(true);
+                break;
+
+            case ALL:
+                setVolume('N/A');
+                break;
+            
+            default:
+                break;
+        }
+    }, [getTransactionVolume]);
+
+    // Get user count when user filter changes
+    useEffect(() => {
+        if (usersFilter) {
+            handleUsersFilter(usersFilter)
+        }
+    }, [handleUsersFilter, usersFilter]);
+
+    // Get listing count when listing filter changes
+    useEffect(() => {
+        if (listingFilter) {
+            handleListingsFilter(listingFilter)
+        }
+    }, [handleListingsFilter, listingFilter]);
+
+    // Get volume count when volume filter changes
+    useEffect(() => {
+        if (volumeFilter) {
+            handleVolumeFilter(volumeFilter)
+        }
+    }, [handleVolumeFilter, volumeFilter]);
+
     const gotoCustomersPage = (e) => {
-        if (e.target.name !== 'usersFilter') {
+        if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
             history.push(CUSTOMERS);
         }
     };
@@ -150,19 +341,36 @@ const Home = ({ handleSetTitle }) => {
                                     classes={{ select: classes.select }}
                                     inputProps={{ 'aria-label': 'Select Users Filter' }}
                                     name="usersFilter"
+                                    disabled={loadingCustomerCount}
                                 >
                                     <MenuItem value="" disabled>Select Users Filter</MenuItem>
-                                    <MenuItem value="Past 24 Hours">Past 24 Hours</MenuItem>
-                                    <MenuItem value="Past 7 Days">Past 7 Days</MenuItem>
-                                    <MenuItem value="Past 30 Days">Past 30 Days</MenuItem>
-                                    <MenuItem value="Past 3 Months">Past 3 Months</MenuItem>
-                                    <MenuItem value="All">All</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
                                 </Select>
                                 {/* <FormHelperText>Select Users Filter</FormHelperText> */}
                             </FormControl>
                         </Box>
                         <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalCustomers}</Typography>
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingCustomerCount ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    users
+                                }
+                            </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
                         </Box>
                     </Box>
@@ -189,19 +397,36 @@ const Home = ({ handleSetTitle }) => {
                                     classes={{ select: classes.select }}
                                     inputProps={{ 'aria-label': 'Select Listing Filter' }}
                                     name="listingFilter"
+                                    disabled={loadingListingCount}
                                 >
                                     <MenuItem value="" disabled>Select Listing Filter</MenuItem>
-                                    <MenuItem value="Past 24 Hours">Past 24 Hours</MenuItem>
-                                    <MenuItem value="Past 7 Days">Past 7 Days</MenuItem>
-                                    <MenuItem value="Past 30 Days">Past 30 Days</MenuItem>
-                                    <MenuItem value="Past 3 Months">Past 3 Months</MenuItem>
-                                    <MenuItem value="All">All</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
                                 </Select>
                                 {/* <FormHelperText>Select Listing Filter</FormHelperText> */}
                             </FormControl>
                         </Box>
                         <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>{totalListings}</Typography>
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingListingCount ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    listings
+                                }
+                            </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
                         </Box>
                     </Box>
@@ -217,20 +442,37 @@ const Home = ({ handleSetTitle }) => {
                                     displayEmpty
                                     classes={{ select: classes.select }}
                                     inputProps={{ 'aria-label': 'Select Volume Filter' }}
-                                    name="volumneFilter"
+                                    name="volumeFilter"
+                                    disabled={loadingTransactionVolume}
                                 >
                                     <MenuItem value="" disabled>Select Volume Filter</MenuItem>
-                                    <MenuItem value="Past 24 Hours">Past 24 Hours</MenuItem>
-                                    <MenuItem value="Past 7 Days">Past 7 Days</MenuItem>
-                                    <MenuItem value="Past 30 Days">Past 30 Days</MenuItem>
-                                    <MenuItem value="Past 3 Months">Past 3 Months</MenuItem>
-                                    <MenuItem value="All">All</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
                                 </Select>
                                 {/* <FormHelperText>Select Volume Filter</FormHelperText> */}
                             </FormControl>
                         </Box>
                         <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>EUR 354,000</Typography>
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingTransactionVolume ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    `EUR ${volume}`
+                                }
+                            </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
                         </Box>
                     </Box>
@@ -256,7 +498,11 @@ const Home = ({ handleSetTitle }) => {
 }
 
 Home.propTypes = {
-    handleSetTitle:PropTypes.func.isRequired
+    getCustomerCount: PropTypes.func.isRequired,
+    getListingCount: PropTypes.func.isRequired, 
+    getTransactionVolume: PropTypes.func.isRequired, 
+    searchForCustomer: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
-export default Home;
+export default connect(undefined , { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer })(Home);

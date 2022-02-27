@@ -34,7 +34,7 @@ import {
     setCustomerStatus
 } from '../../../actions/customer';
 import { getStats } from '../../../actions/admin';
-import { CLEAR_CUSTOMER_STATUS_MSG, SET_CUSTOMER } from '../../../actions/types';
+import { CLEAR_CUSTOMER_STATUS_MSG, SET_CATEGORY, SET_CUSTOMER, SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { CUSTOMERS } from '../../../routes';
@@ -193,9 +193,11 @@ const Customers = (props) => {
     } = useSelector(state => state.stats);
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
+
+    const pages = [10, 25, 100]
     
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(25);
+    const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     const [customerCount, setCustomerCount] = useState(0);
     const [error, setError] = useState('');
     // eslint-disable-next-line
@@ -235,6 +237,22 @@ const Customers = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    // Set page number for search when page number changes
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_NUMBER,
+            payload: page
+        });
+    }, [dispatch, page]);
+
+    // Set page size for search when page size changes
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_SIZE,
+            payload: rowsPerPage
+        });
+    }, [dispatch, rowsPerPage]);
 
     useEffect(() => {
         getStats();
@@ -293,74 +311,132 @@ const Customers = (props) => {
         }
     }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
 
-    const getMore = useCallback(() => {
+    // const getMore = useCallback(() => {
+    //     setLoading(true);
+    //     switch (filter) {
+    //         case CONFIRMED:
+    //             if (confirmed.hasNext) {
+    //                 getVerifiedCustomers({
+    //                     pageSize: rowsPerPage,
+    //                     pageNumber: confirmed.currentPageNumber + 1
+    //                 });
+    //             }
+    //             break;
+
+    //         case PENDING:
+    //             if (pending.hasNext) {
+    //                 getNewCustomers({
+    //                     pageSize: rowsPerPage,
+    //                     pageNumber: pending.currentPageNumber + 1
+    //                 });
+    //             }
+    //             break;
+
+    //         case REJECTED:
+    //             if (rejected.hasNext) {
+    //                 getRejectedCustomers({
+    //                     pageSize: rowsPerPage,
+    //                     pageNumber: rejected.currentPageNumber + 1
+    //                 });
+    //             }
+    //             break;
+
+    //             case SUSPENDED:
+    //                 getSuspendedCustomers({
+    //                     pageSize: rowsPerPage,
+    //                     pageNumber: suspended.currentPageNumber + 1
+    //                 });
+    //                 break;
+
+    //         case NO_PROFILE:
+    //             getCustomersWithoutProfile({
+    //                 pageSize: rowsPerPage,
+    //                 pageNumber: noProfile.currentPageNumber + 1
+    //             });
+    //             break;
+            
+    //         case ALL_CUSTOMERS:
+    //             if (customers.hasNext) {
+    //                 getCustomers({
+    //                     pageSize: rowsPerPage,
+    //                     pageNumber: customers.currentPageNumber + 1
+    //                 });
+    //             }
+    //             break;
+
+    //         default:
+    //             setLoading(false);
+    //             break;
+    //     }
+    // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.currentPageNumber, confirmed.hasNext, customers.currentPageNumber, customers.hasNext, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, noProfile.currentPageNumber, pending.currentPageNumber, pending.hasNext, rejected.currentPageNumber, rejected.hasNext, rowsPerPage, suspended.currentPageNumber]);
+    
+    const fetchCustomers = useCallback(() => {
         setLoading(true);
         switch (filter) {
             case CONFIRMED:
-                if (confirmed.hasNext) {
-                    getVerifiedCustomers({
-                        pageSize: rowsPerPage,
-                        pageNumber: confirmed.currentPageNumber + 1
-                    });
-                }
+                getVerifiedCustomers({
+                    pageSize: rowsPerPage,
+                    pageNumber: page
+                });
                 break;
 
             case PENDING:
-                if (pending.hasNext) {
-                    getNewCustomers({
-                        pageSize: rowsPerPage,
-                        pageNumber: pending.currentPageNumber + 1
-                    });
-                }
+                getNewCustomers({
+                    pageSize: rowsPerPage,
+                    pageNumber: page
+                });
                 break;
 
             case REJECTED:
-                if (rejected.hasNext) {
-                    getRejectedCustomers({
-                        pageSize: rowsPerPage,
-                        pageNumber: rejected.currentPageNumber + 1
-                    });
-                }
+                getRejectedCustomers({
+                    pageSize: rowsPerPage,
+                    pageNumber: page
+                });
                 break;
 
-                case SUSPENDED:
-                    getSuspendedCustomers({
-                        pageSize: rowsPerPage,
-                        pageNumber: suspended.currentPageNumber + 1
-                    });
-                    break;
+            case SUSPENDED:
+                getSuspendedCustomers({
+                    pageSize: rowsPerPage,
+                    pageNumber: page
+                });
+                break;
 
             case NO_PROFILE:
                 getCustomersWithoutProfile({
                     pageSize: rowsPerPage,
-                    pageNumber: noProfile.currentPageNumber + 1
+                    pageNumber: page
                 });
                 break;
             
             case ALL_CUSTOMERS:
-                if (customers.hasNext) {
-                    getCustomers({
-                        pageSize: rowsPerPage,
-                        pageNumber: customers.currentPageNumber + 1
-                    });
-                }
+                getCustomers({
+                    pageSize: rowsPerPage,
+                    pageNumber: page
+                });
                 break;
 
             default:
-                setLoading(false);
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.currentPageNumber, confirmed.hasNext, customers.currentPageNumber, customers.hasNext, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, noProfile.currentPageNumber, pending.currentPageNumber, pending.hasNext, rejected.currentPageNumber, rejected.hasNext, rowsPerPage, suspended.currentPageNumber]);
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page]);
+
+    // Get customers when page number changes
+    useEffect(() => {
+        if (page > 0) {
+            fetchCustomers();
+        }
+    }, [fetchCustomers, page]);
 
     useEffect(() => {
         getCount();
     }, [filter, getCount]);
 
+    // Get customers whenever rows per page changes
     useEffect(() => {
-        if (page > 0) {
-            getMore();
+        if (rowsPerPage > 0) {
+            fetchCustomers();
         }
-    }, [getMore, page]);
+    }, [fetchCustomers, rowsPerPage]);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -368,12 +444,17 @@ const Customers = (props) => {
 
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(+event.target.value);
-        setPage(0);
+        setPage(1);
     };
 
 
     const handleSetFilter = (filter) => {
         setFilter(filter);
+        setRowsPerPage(pages[0]);
+        dispatch({
+            type: SET_CATEGORY,
+            payload: filter
+        });
         switch (filter) {
             case CONFIRMED:
                 getVerifiedCustomers({
@@ -627,7 +708,7 @@ const Customers = (props) => {
                         </Table>
                     </TableContainer>
                     <TablePagination
-                        rowsPerPageOptions={[10, 25, 100]}
+                        rowsPerPageOptions={pages}
                         component="div"
                         count={customerCount}
                         rowsPerPage={rowsPerPage}

@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
     Divider,
@@ -6,15 +9,15 @@ import {
     Tabs,
     Typography
 } from '@material-ui/core';
-import { Account, BagChecked, CardAccountDetailsOutline, LockOutline } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, LockOutline, Logout } from 'mdi-material-ui';
 
+import { logout } from '../../actions/customer';
 import { COLORS } from '../../utils/constants';
 
 import { a11yProps, LinkTab, handleChange } from '../../pages/dashboard/profile';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
-        // backgroundColor: theme.palette.primary.main,
         display: 'flex',
         flexDirection: 'column',
         paddingTop: theme.spacing(5),
@@ -55,8 +58,9 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen }) => {
+const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
     const classes = useStyles();
+    const history = useHistory();
 
     const [value, setValue] = useState(0);
 
@@ -146,18 +150,20 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen }) => {
                                 setValue(3);
                             }}
                         />
-                        {/* <LinkTab 
+                        <LinkTab 
                             label={
-                                <>
-                                    <KeyVariant className={classes.icon} />&nbsp;&nbsp;&nbsp;
-                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Set PIN</Typography>
-                                </>
+                                <div className={classes.tab}>
+                                    <Logout className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Logout</Typography>
+                                </div>
                             } 
-                            {...a11yProps(3)} 
-                            classes={{ selected: classes.selectedTab }}
+                            {...a11yProps(4)} 
                             disableRipple
                             disableFocusRipple
-                        /> */}
+                            onClick={() => {
+                                logout(history);
+                            }}
+                        />
                     </Tabs>
                 </div>
             </section>
@@ -165,4 +171,8 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen }) => {
     );
 }
 
-export default AccountSettingsDrawer;
+AccountSettingsDrawer.propTypes = {
+    logout: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { logout })(AccountSettingsDrawer);
