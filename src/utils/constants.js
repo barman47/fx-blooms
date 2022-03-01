@@ -44,13 +44,6 @@ export const ADMIN_FILTERS = {
     THREE_MONTHS: 'Past 3 Months',
     ALL: 'All'
 };
-// export const ADMIN_FILTERS = [
-//     'Past 24 Hours',
-//     'Past 7 Days',
-//     'Past 30 Days',
-//     'Past 3 Months',
-//     'All'
-// ];
 
 export const CHAT_CONNECTION_STATUS = {
     CONNECTED: 'CONNECTED',
