@@ -163,10 +163,11 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         setTransactionId(notification.id);
         setSellerUsername(seller.userName);
         
-        const sellerAccount = {
+        const buyerAccount = {
             accounName: buyer.accountName,
             accountNumber: buyer.accountNumber,
-            bankName: buyer.bankName
+            bankName: buyer.bankName,
+            reference: buyer.transferReference
         };
 
         if (buyer.hasMadePayment) {
@@ -174,7 +175,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setAmount(Number(seller.amountTransfered));
             dispatch({
                 type: SET_ACCOUNT,
-                payload: sellerAccount
+                payload: buyerAccount
             });
         }
         dispatch({
@@ -243,7 +244,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         if (customerId === seller.customerId) {
             if (seller.hasReceivedPayment) {
                 setBuyerAccount(notification);
-
             } else {
                 // Seller should make payment
                 setBuyerAccount(notification);

@@ -421,6 +421,7 @@ const MakeListing = (props) => {
         };
 
         const { errors, isValid } = validateAddListing(data);
+        
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid listing data' });
         }

@@ -71,7 +71,7 @@
     ],
 	"shortcuts" : [
 		{
-		  	"name": "Sign in",
+		  	"name": "Sign up",
 		  	"url": "/user/signUp",
       		"icons": [
 				{
@@ -134,8 +134,8 @@
       		]
 		},
 		{
-			"name": "Terms of Service",
-			"url": "/termsOfService",
+			"name": "Terms & Conditions",
+			"url": "/termsAndConditions",
 			"description": "Learn about our terms of service",
 			"icons": [
 				{
@@ -147,8 +147,8 @@
 			]
 		},
 		{
-			"name": "FAQ",
-			"url": "/faq",
+			"name": "FAQs",
+			"url": "/frequentlyAskedQuestions",
 			"description": "Learn about our frequently asked questions",
 			"icons": [
 				{

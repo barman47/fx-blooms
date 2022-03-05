@@ -684,10 +684,10 @@ export const approveResidencePermit = (customerId, currentStatus) => async (disp
     }
 };
 
-export const logout = (history) => dispatch => {
+export const logout = (history, msg) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return history.push(LOGIN);
+    return history.push(LOGIN, { msg });
 };
 
 export const subscribeToNewsletter = (email) => async (dispatch) => {

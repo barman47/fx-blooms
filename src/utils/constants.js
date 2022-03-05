@@ -83,7 +83,7 @@ export const NOTIFICATION_TYPES = {
 };
 
 export const NETWORK_ERROR = 'Network Error';
-export const AUTH_TOKEN = 'FXBloomsAuthToken'
+export const AUTH_TOKEN = 'FXBloomsAuthToken';
 
 export const ONE_UPPERCASE_LETTER = new RegExp(/(?=.*?[A-Z])/);
 export const ONE_LOWERCASE_LETTER = new RegExp(/(?=.*?[a-z])/);
