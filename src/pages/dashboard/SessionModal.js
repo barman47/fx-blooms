@@ -74,8 +74,7 @@ const SessionModal = ({ logout }) => {
     let sessionTimer = useRef();
     let logoutTimer = useRef();
 
-    // const timeoutDuration = 300; //300 seconds: 5 minutes
-    const timeoutDuration = 10; //300 seconds: 5 minutes
+    const timeoutDuration = 300; //300 seconds: 5 minutes
 
     const resetSessionTimer = useCallback(() => {
         setOpen(false);

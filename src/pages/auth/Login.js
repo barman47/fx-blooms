@@ -131,7 +131,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         if (customer.isAuthenticated) {
             return history.push(DASHBOARD_HOME);
         }
-        if (location.state.msg) {
+        if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
         }
         getLocation();
