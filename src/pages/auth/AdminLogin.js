@@ -103,8 +103,9 @@ const AdminLogin = (props) => {
         if (isAuthenticated) {
             return history.push(`${ADMIN_HOME}`);
         }
-        if (location.state.msg) {
+        if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
+            history.replace(location.pathname, {});
         }
         // eslint-disable-next-line
     }, []);

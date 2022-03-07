@@ -212,7 +212,6 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     const resumeTransaction = () => {
         for (const bid of listing.bids) {
-            console.log(bid);
             if (bid.status === 'IN_PROGRESS' && bid.customerId === customerId) {
                 setShowBid(false);
                 setCurrentBid(bid);

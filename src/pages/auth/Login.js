@@ -133,6 +133,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
+            history.replace(location.pathname, {});
         }
         getLocation();
         // eslint-disable-next-line

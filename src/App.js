@@ -76,9 +76,6 @@ const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
 
-// import setAuthToken from './utils/setAuthToken';
-// import isTokenExpired from './utils/tokenExpired';
-
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
 const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
@@ -86,11 +83,6 @@ const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
-
-
-// import { getMe } from './actions/customer';
-
-// import reIssueToken from './utils/reIssueToken';
 
 const theme = createTheme({
 	overrides: {
@@ -137,22 +129,8 @@ const theme = createTheme({
 	}
 });
 
-function App() {
-	// 	const history = useHistory();
+const App = () => {
 	const [title, setTitle] = useState('');
-
-
-
-	// useEffect(() => {
-	// 	// isTokenExpired();
-	// 	if (localStorage.FXBloomsAuthToken) {
-	// 		// const token = isTokenExpired(localStorage.FXBloomsAuthToken);
-	// 		// // Set auth token header auth
-	// 		// setAuthToken(localStorage.FXBloomsAuthToken);
-	// 		// props.getMe(history);
-	// 	}
-	// 	// eslint-disable-next-line
-	// }, []);
 
 	const handleSetTitle = (title) => setTitle(title);
 
@@ -210,9 +188,4 @@ function App() {
 	);
 }
 
-// App.propTypes = {
-// 	getMe: PropTypes.func.isRequired
-// };
-
 export default App;
-// export default connect(undefined, { getMe })(App);

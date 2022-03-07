@@ -47,7 +47,8 @@ const handleError =  (err, dispatch) => {
     if (err?.response?.status === 500) {
         return dispatch({
             type: GET_ERRORS,
-            payload: err.response.data
+            payload: {  msg: 'Something went wrong. Please try again later.' }
+            // payload: err.response.data
         }); 
     }
 
