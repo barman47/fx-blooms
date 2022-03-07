@@ -45,6 +45,7 @@ import {
     SET_EMAIL,
     GET_ERRORS
  } from './types';
+import extractIdDetails from '../utils/extractIdDetails';
 
  const { APPROVED } = ID_STATUS;
 
@@ -595,22 +596,31 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
         const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
         console.log('id card ', data);
-        const customerData = {
-            documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
-            expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
-            dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
-            dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
-            lastName: data.servicesResults.docCheck.extracted.ocr.$values[4].content,
-            firstName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
-            middleName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
-            documentType: data.servicesResults.docCheck.extracted.ocr.$values[16].content,
-            issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[17].content,
+        const customerData = extractIdDetails(data.servicesResults.docCheck.extracted.ocr.$values,
+            {
+                idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+                idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
+                status: data.overallResult.status
+            }
+        );
+        
+        // const customerData = {
+        //     documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
+        //     expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
+        //     dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
+        //     dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
+        //     lastName: data.servicesResults.docCheck.extracted.ocr.$values[4].content,
+        //     firstName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+        //     middleName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+        //     documentType: data.servicesResults.docCheck.extracted.ocr.$values[16].content,
+        //     issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[17].content,
 
-            idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
-            idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
+        //     idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+        //     idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
 
-            status: data.overallResult.status
-        };
+        //     status: data.overallResult.status
+        // };
+        console.log('customerData', customerData);
         dispatch({
             type: SET_ID_CHECK_DATA,
             payload: customerData
@@ -626,21 +636,29 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
         const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
         console.log('residence permit ', data);
-        const customerData = {
-            documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
-            expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
-            dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
-            dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
-            lastName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
-            firstName: data.servicesResults.docCheck.extracted.ocr.$values[6].content,
-            documentType: data.servicesResults.docCheck.extracted.ocr.$values[22].content,
-            issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[23].content,
+        const customerData = extractIdDetails(data.servicesResults.docCheck.extracted.ocr.$values,
+            {
+                idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+                idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
+                status: data.overallResult.status
+            }
+        );
+        console.log('customerData', customerData);
+        // const customerData = {
+        //     documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
+        //     expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,
+        //     dateOfIssue: data.servicesResults.docCheck.extracted.ocr.$values[2].content,
+        //     dateOfBirth: data.servicesResults.docCheck.extracted.ocr.$values[3].content,
+        //     lastName: data.servicesResults.docCheck.extracted.ocr.$values[5].content,
+        //     firstName: data.servicesResults.docCheck.extracted.ocr.$values[6].content,
+        //     documentType: data.servicesResults.docCheck.extracted.ocr.$values[22].content,
+        //     issueCountry: data.servicesResults.docCheck.extracted.ocr.$values[23].content,
 
-            idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
-            idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
+        //     idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
+        //     idBack: data.servicesResults.docCheck.extracted.images.$values[1].content,
 
-            status: data.overallResult.status
-        };
+        //     status: data.overallResult.status
+        // };
         dispatch({
             type: SET_PROFILE_CHECK_DATA,
             payload: customerData

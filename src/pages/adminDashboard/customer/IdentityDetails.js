@@ -39,14 +39,6 @@ const useStyles = makeStyles(theme =>({
         gridTemplateColumns: '1fr 0.2fr 1fr'
     },
 
-    detail: {
-        marginBottom: theme.spacing(2),
-
-        '& h6:first-child': {
-            margin: theme.spacing(2, 0)
-        }
-    },
-
     details: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
@@ -59,6 +51,14 @@ const useStyles = makeStyles(theme =>({
 
         '& p:last-child': {
             color: theme.palette.primary.main
+        }
+    },
+
+    detail: {
+        marginBottom: theme.spacing(2),
+
+        '& h6:first-child': {
+            margin: theme.spacing(2, 0)
         }
     },
 
@@ -222,7 +222,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         </Box>
                                     </Box>
                                     <Box component="div">
-                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() !== APPROVED &&
+                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() !== APPROVED ?
                                             <Button 
                                                 variant="outlined" 
                                                 disableFocusRipple 
@@ -234,6 +234,10 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                             >
                                                 Approve ID
                                             </Button>
+                                            :
+                                            <>
+                                                <br /><br />
+                                            </>
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
@@ -280,7 +284,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                         </Box>
                                     </Box>
                                     <Box component="div">
-                                        {idCheckData?.status && idCheckData?.status.toUpperCase() !== APPROVED &&
+                                        {idCheckData?.status && idCheckData?.status.toUpperCase() !== APPROVED ?
                                             <Button 
                                                 variant="outlined" 
                                                 disableFocusRipple 
@@ -292,6 +296,10 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                                             >
                                                 Approve ID
                                             </Button>
+                                            :
+                                            <>
+                                                <br /><br />
+                                            </>
                                         }
                                         <Box component="div" className={classes.detail}>
                                             <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>

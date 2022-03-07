@@ -26,16 +26,27 @@ export const TRANSITION = '0.3s linear all';
 
 export const LOGOUT = 'logout';
 
-export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
-export const API = 'https://api.fxblooms.com/api'; // Testing branch
-export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
+// export const WALLET_API = 'https://wallet.fxblooms.com/api'; // Testing branch
+// export const API = 'https://api.fxblooms.com/api'; // Testing branch
+// export const HUB_URL = 'https://api.fxblooms.com/notificationhub'; // Testing branch
 
-// export const WALLET_API = 'https://electron.fxblooms.com/api'; // Production branch
-// export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
-// export const API = 'https://positron.fxblooms.com/api'; // Production Branch
+export const WALLET_API = 'https://electron.fxblooms.com/api'; // Production branch
+export const HUB_URL = 'wss://positron.fxblooms.com/notificationhub'; // Production branch
+export const API = 'https://positron.fxblooms.com/api'; // Production Branch
 
 export const RECEIVE_NOTIFICATION = 'ReceiveNotification';
 export const SEND_MESSAGE = 'SendMessage';
+
+export const ID_FIELDS = {
+    DATE_OF_BIRTH: 'Date of birth',
+    FIRST_NAME: 'First name',
+    LAST_NAME: 'Last name',
+    EXPIRY_DATE: 'Date of expiry',
+    ISSUE_DATE: 'Date of issue',
+    DOCUMENT_NUMBER: 'Document number',
+    DOCUMENT_TYPE: 'Document type',
+    ISSUE_COUNTRY: 'Issue country'
+};
 
 export const ADMIN_FILTERS = {
     TWENTY_FOUR_HOURS: 'Past 24 Hours',
