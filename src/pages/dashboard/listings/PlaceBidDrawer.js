@@ -366,8 +366,8 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                     {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
                     <Drawer 
                         ModalProps={{ 
-                            disableBackdropClick: true,
-                            disableEscapeKeyDown: true,
+                            disableBackdropClick: false,
+                            disableEscapeKeyDown: false,
                         }}
                         PaperProps={{ className: classes.drawer }} 
                         anchor="right" 

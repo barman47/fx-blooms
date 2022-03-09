@@ -4,6 +4,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import clsx from 'clsx';
 import { 
+	Box,
 	Button,
 	Checkbox,
 	CircularProgress,
@@ -26,7 +27,6 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
-import isEmpty from '../../../utils/isEmpty';
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
@@ -34,6 +34,8 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { HIDE_NEGOTIATION_LISTINGS, SET_LOADING_LISTINGS } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
+import formatNumber from '../../../utils/formatNumber';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
@@ -180,53 +182,56 @@ const useStyles = makeStyles(theme => ({
 		marginTop: theme.spacing(5)
 	},
 
+	listingHeader: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between'
+	},
+
 	filter: {
 		marginTop: theme.spacing(4),
 
-		'& header': {
-			display: 'flex',
-			flexDirection: 'row',
-			justifyContent: 'space-between',
-			marginBottom: theme.spacing(3),
-			paddingTop: theme.spacing(1),
+		// '& header': {
+		// 	display: 'flex',
+		// 	flexDirection: 'row',
+		// 	justifyContent: 'space-between',
+		// 	marginBottom: theme.spacing(3),
+		// 	paddingTop: theme.spacing(1),
 
-			[theme.breakpoints.down('md')]: {
-				display: 'none'
-			}
-		}
+		// 	[theme.breakpoints.down('md')]: {
+		// 		display: 'none'
+		// 	}
+		// }
 	},
 
 	filterContainer: {
 		backgroundColor: COLORS.lightTeal,
 		borderRadius: theme.shape.borderRadius,
-		padding: [[theme.spacing(4), theme.spacing(2)]],
+		padding: [[theme.spacing(2), theme.spacing(2), theme.spacing(4), theme.spacing(2)]],
 		height: 'initial',
 		alignSelf: 'flex-start',
+		marginTop: theme.spacing(6.5),
 		position: 'sticky',
 
 		[theme.breakpoints.down('md')]: {
 			display: 'none'
 		},
 
-		'& header': {
-			display: 'grid',
-			gridTemplateColumns: '1.2fr 2fr',
-			alignItems: 'center',
-			columnGap: theme.spacing(1),
-			marginBottom: theme.spacing(4),
+		'& header:first-child': {
+			display: 'flex',
+			flexDirection: 'row',
+			justifyContent: 'space-between',
+			marginBottom: theme.spacing(3),
 			padding: 0,
-		},
-
-		'& form': {
-			'& header': {
-				display: 'grid',
-				gridTemplateColumns: '1fr 1fr',
-				columnGap: theme.spacing(1),
-				rowGap: theme.spacing(2),
-				marginBottom: theme.spacing(4),
-				alignItems: 'center'
-			}
 		}
+	},
+
+	filterButtonContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		marginBottom: theme.spacing(3),
+		padding: 0,
 	},
 
 	clear: {
@@ -264,7 +269,7 @@ const AllListings = (props) => {
 	const dispatch = useDispatch();
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, currentPageNumber, hasNext, recommendedRate } = useSelector(state => state.listings);
 	const listingsLoading = useSelector(state => state.listings.loading);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
@@ -344,7 +349,7 @@ const AllListings = (props) => {
 			currencyAvailable: 'EUR',
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
-		});
+		}, true);
 	};
 
 	const getMore = () => {
@@ -446,7 +451,12 @@ const AllListings = (props) => {
 					scrollableTarget="scrollableParent"
 					// height={1000}
 				>
-					<Typography variant="body1" component="p">All Listings</Typography>
+					<Box component="div" className={classes.listingHeader}>
+						<Typography variant="body1" component="p">All Listings</Typography>
+						{recommendedRate && 
+							<Typography variant="body1" component="p">Recomended Rate: <span style={{ color: COLORS.red }}>NGN{formatNumber(recommendedRate, 2)}</span></Typography>
+						}
+					</Box>
 					{listingsLoading === true ?
 						<ListingsSkeleton />
 						:
@@ -574,20 +584,20 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 
 	return (
 		<section className={classes.filter}>
-			<header>
-				<Typography variant="subtitle2" component="span">Filter</Typography>
-				<Typography 
-					className={classes.clear}
-					variant="subtitle2" 
-					component="span" 
-					color="primary"
-					onClick={handleClearFilter}
-					>
-						Clear
-				</Typography>
-			</header>
 			<div className={classes.filterContainer}>
-				<header>
+				<Box component="header">
+					<Typography variant="subtitle2" component="span">Filter</Typography>
+					<Typography 
+						className={classes.clear}
+						variant="subtitle2" 
+						component="span" 
+						color="primary"
+						onClick={handleClearFilter}
+						>
+							Clear
+					</Typography>
+				</Box>
+				<Box component="div" className={classes.filterButtonContainer}>
 					<Button 
 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
 							variant="contained" 
@@ -606,7 +616,7 @@ const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ g
 						>
 							Completion Rate
 					</Button>
-				</header>
+				</Box>
 				<form onSubmit={onSubmit} noValidate>
 					{
 						filter === PRICE

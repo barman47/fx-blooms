@@ -159,7 +159,7 @@ const MakeListing = (props) => {
     const { currencies } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { addedListing, listings, msg } = useSelector(state => state.listings);
+    const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
 
     const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
 
@@ -577,6 +577,7 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
+                                    {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>NGN{formatNumber(recommendedRate, 2)}</span></FormHelperText>}
                                 </Grid>
                                 <Grid item xs={4}>
                                     <br />

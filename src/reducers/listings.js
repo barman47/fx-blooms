@@ -11,6 +11,7 @@ import {
     SET_LISTING_MSG,
     HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
+    SET_RECOMMENDED_RATE,
     REMOVE_EXPIRED_LISTING
 } from '../actions/types';
 
@@ -24,7 +25,8 @@ const initialState = {
     listing: {},
     listings: [],
     loading: false,
-    msg: null
+    msg: null,
+    recommendedRate: null
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -85,6 +87,7 @@ const listingsReducer = (state = initialState, action) => {
         case SET_LISTINGS: 
             const { listings, ...rest } = action.payload;
             return {
+                ...state,
                 listings,
                 ...rest
             };
@@ -146,6 +149,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 listings: state.listings.filter(listing => listing.id !== action.payload)
+            };
+
+        case SET_RECOMMENDED_RATE:
+            return {
+                ...state,
+                recommendedRate: action.payload
             };
 
         default:
