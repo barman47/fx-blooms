@@ -31,7 +31,8 @@ import {
 	WALLET,
 	CONTACT_US,
 	USER_AGREEMENT,
-	ADD_USERNAME
+	ADD_USERNAME,
+	EDIT_LISTING
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -67,6 +68,7 @@ const UserAgreement = lazy(() => import('./pages/userAgreement/UserAgreement'));
 const Dashboard = lazy(() => import('./pages/dashboard'));
 
 const AllListings = lazy(() => import('./pages/dashboard/listings/AllListings'));
+const EditListing = lazy(() => import('./pages/dashboard/listings/EditListing'));
 const MakeListing = lazy(() => import('./pages/dashboard/listings/MakeListing'));
 const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'));
 
@@ -163,6 +165,7 @@ const App = () => {
 							<PrivateRoute path={DASHBOARD}>
 								<Dashboard title={title}>
 									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${ACCOUNT}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />

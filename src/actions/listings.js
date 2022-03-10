@@ -12,7 +12,8 @@ import {
     SET_LISTINGS, 
     SET_LOADING_LISTINGS, 
     SET_MORE_LISTINGS,
-    SET_RECOMMENDED_RATE 
+    SET_RECOMMENDED_RATE,
+    UPDATED_LISTING 
 } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { batch } from 'react-redux';
@@ -48,6 +49,19 @@ export const addListing = (listing) => async (dispatch) => {
         return dispatch({
             type: ADDED_LISTING,
             payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const updateListing = (listing) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.patch(`${URL}/UpdateList`, listing);
+        return dispatch({
+            type: UPDATED_LISTING,
+            payload: { listing: res.data.data, msg: 'Your listing has been updated successfully' }
         });
     } catch (err) {
         return handleError(err, dispatch);

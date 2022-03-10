@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Typography } from '@material-ui/core';
+import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -12,9 +12,9 @@ import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import isEmpty from '../../../utils/isEmpty';
 import { getAccount } from '../../../actions/bankAccounts';
-import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT, SET_LISTING } from '../../../actions/types';
 import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { ACCOUNT, USER_DETAILS } from '../../../routes';
+import { ACCOUNT, EDIT_LISTING, USER_DETAILS } from '../../../routes';
 
 import PlaceBidDrawer from './PlaceBidDrawer';
 
@@ -51,41 +51,6 @@ const useStyles = makeStyles(theme => ({
                     textDecoration: 'none'
                 }
             }
-        },
-        
-        '& div': {
-            backgroundColor: COLORS.lightTeal,
-            display: 'grid',
-            gridTemplateColumns: 'repeat(6, 1fr)',
-            // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-            // alignItems: 'center',
-            gap: theme.spacing(1),
-            padding: [[theme.spacing(4), theme.spacing(3)]],
-
-            [theme.breakpoints.down('lg')]: {
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                // gridTemplateColumns: '0.5fr 0.5fr 0.6fr 0.8fr 0.8fr 0.5fr',
-                gap: theme.spacing(1),
-                // padding: theme.spacing(1),
-                padding: [[theme.spacing(3), theme.spacing(3)]]
-            },
-
-            [theme.breakpoints.down('sm')]: {
-                padding: theme.spacing(1),
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                rowGap: theme.spacing(2)
-            },
-
-            '& span': {
-                fontSize: theme.spacing(1.4),
-                // fontSize: theme.spacing(1.4),
-
-                [theme.breakpoints.down('lg')]: {
-                    // fontSize: theme.spacing(1.2)
-                    fontSize: theme.spacing(1.5)
-                },
-            }
         }
 	},
 
@@ -102,6 +67,35 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    listingContent: {
+        backgroundColor: COLORS.lightTeal,
+        display: 'grid',
+        gridTemplateColumns: 'repeat(6, 1fr)',
+        gap: theme.spacing(1),
+        padding: [[theme.spacing(4), theme.spacing(3)]],
+
+        [theme.breakpoints.down('lg')]: {
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: theme.spacing(1),
+            padding: [[theme.spacing(3), theme.spacing(3)]]
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            rowGap: theme.spacing(2)
+        },
+
+        '& span': {
+            fontSize: theme.spacing(1.4),
+
+            [theme.breakpoints.down('lg')]: {
+                fontSize: theme.spacing(1.5)
+            }
+        }
+    },
+
     button: {
         alignSelf: 'center',
         color: COLORS.offWhite,
@@ -111,17 +105,13 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    deleteButton: {
-        alignSelf: 'center',
-        color: COLORS.offWhite,
-        backgroundColor: COLORS.red,
+    buttons: {
+        alignSelf: 'center'
+    },
 
+    buttonGroup: {
         [theme.breakpoints.down('sm')]: {
             gridColumn: '1 / span 2'
-        },
-        
-        '&:hover': {
-            backgroundColor: `${COLORS.darkRed} !important`
         }
     }
 }));
@@ -144,6 +134,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     const [errors, setErrors] = useState({});
 
     const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
+    const { finalized, negotiation } = LISTING_STATUS;
 
     const toast = useRef();
     const interval = useRef();
@@ -195,7 +186,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
     }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date(dateCreated).getTime() + 345600000; // number of milliseconds in 4 days
+        const countDownDate = new Date(dateCreated).getTime() + 259_200_000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -233,6 +224,14 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             deleteListing(id);
         }
     };
+
+    const handleEditListing = (listing) => {
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
+        return history.push(EDIT_LISTING);
+    };
     
     const togglePlaceBidDrawer = () => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
@@ -269,7 +268,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     </section>
                     {/* <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography> */}
                 </header>
-                <div>
+                <Box component="div" className={classes.listingContent}>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You receive</span>
                         {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
@@ -290,7 +289,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
                         {bank.toUpperCase()}
                     </Typography>
-                    {listing.status === LISTING_STATUS.negotiation ?
+                    {listing.status === finalized ?
                         <Button 
                             disabled
                             to="#!"
@@ -308,19 +307,35 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                         </Button>
                         :
                         listing.customerId === userId ? 
-                        <Button 
-                            variant="contained" 
-                            size="large"
-                            disableElevation
-                            classes={{ 
-                                contained: classes.deleteButton,
-                                root: classes.deleteButton
-                            }}
-                            onClick={handleDeleteListing}
-                            disabled={listing.status === LISTING_STATUS.negotiation}
+                        <ButtonGroup 
+                            className={classes.buttonGroup}
+                            variant="outlined" 
+                            aria-label="contained primary button group" 
+                            disableElevation 
+                            disableFocusRipple
+                            fullWidth
                         >
-                            Delete
-                        </Button>
+                            <Button 
+                                className={classes.buttons}
+                                color="primary"
+                                size="medium"
+                                disableElevation
+                                onClick={() => handleEditListing(listing)}
+                                disabled={listing.status === negotiation || listing.status  === finalized}
+                            >
+                                Edit
+                            </Button>
+                            <Button 
+                                className={classes.buttons}
+                                color="secondary"
+                                size="medium"
+                                disableElevation
+                                onClick={handleDeleteListing}
+                                disabled={listing.status === negotiation || listing.status  === finalized}
+                            >
+                                Delete
+                            </Button>
+                        </ButtonGroup>
                         :
                         <Button
                             variant="contained" 
@@ -337,7 +352,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                             Buy EUR
                         </Button>
                     }
-                </div>
+                </Box>
             </section>
         </>
     );

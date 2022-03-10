@@ -35,6 +35,7 @@ export const ADDED_BID = 'ADDED_BID';
 export const REMOVE_BID = 'REMOVE_BID';
 export const TOGGLE_BID_STATUS = 'TOGGLE_BID_STATUS';
 export const ADDED_LISTING = 'ADDED_LISTING';
+export const UPDATED_LISTING = 'UPDATED_LISTING';
 export const DELETED_LISTING = 'DELETED_LISTING';
 export const SET_LISTING = 'SET_LISTING';
 export const SET_LISTINGS = 'SET_LISTINGS';

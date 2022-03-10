@@ -12,13 +12,15 @@ import {
     HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
     SET_RECOMMENDED_RATE,
-    REMOVE_EXPIRED_LISTING
+    REMOVE_EXPIRED_LISTING,
+    UPDATED_LISTING
 } from '../actions/types';
 
 import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
+    editedListing: false,
     addedBid: false,
     bid: {},
     updatedListing: false,
@@ -65,6 +67,17 @@ const listingsReducer = (state = initialState, action) => {
             } : {
                 ...state,
                 addedListing: !state.addedListing,
+                msg: null
+            };
+
+        case UPDATED_LISTING:
+            return action.payload ? {
+                ...state,
+                editedListing: !state.editedListing,
+                msg: action.payload.msg ? action.payload.msg : null
+            } : {
+                ...state,
+                editedListing: !state.editedListing,
                 msg: null
             };
         

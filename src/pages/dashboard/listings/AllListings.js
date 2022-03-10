@@ -35,7 +35,6 @@ import { HIDE_NEGOTIATION_LISTINGS, SET_LOADING_LISTINGS } from '../../../action
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import formatNumber from '../../../utils/formatNumber';
 import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import FilterListingModal from './FilterListingModal';
@@ -454,7 +453,7 @@ const AllListings = (props) => {
 					<Box component="div" className={classes.listingHeader}>
 						<Typography variant="body1" component="p">All Listings</Typography>
 						{recommendedRate && 
-							<Typography variant="body1" component="p">Recomended Rate: <span style={{ color: COLORS.red }}>NGN{formatNumber(recommendedRate, 2)}</span></Typography>
+							<Typography variant="body1" component="p">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></Typography>
 						}
 					</Box>
 					{listingsLoading === true ?
