@@ -18,7 +18,7 @@ import {
 } from '@material-ui/core';
 // import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -46,6 +46,7 @@ import FundWalletDrawer from '../wallet/FundWalletDrawer';
 import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
+import NewNotification from '../notifications/NewNotification';
 // import RiskNoticeModal from './RiskNoticeModal';
 
 // import img from '../../../assets/img/decentralized.svg';
@@ -68,9 +69,8 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	header: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
+		display: 'grid',
+		gridTemplateColumns: '1fr 1fr',
 		marginBottom: theme.spacing(5),
 		marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
@@ -79,10 +79,12 @@ const useStyles = makeStyles(theme => ({
 			display: 'grid',
 			gridTemplateColumns: '1fr',
 			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5)
+			paddingRight: theme.spacing(5),
+			gap: theme.spacing(1)
 		},
 
 		[theme.breakpoints.down('sm')]: {
+			marginBottom: '0',
 			paddingLeft: theme.spacing(2),
 			paddingRight: theme.spacing(2)
 		},
@@ -140,8 +142,14 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
+	walletToggleContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		marginRight: theme.spacing(7)
+	},
+
 	walletToggle: {
-		alignSelf: 'flex-end',
 		color: theme.palette.primary.main,
 
 		[theme.breakpoints.down('md')]: {
@@ -539,19 +547,33 @@ const AllListings = (props) => {
 					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
 					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
 				</div>
-				<Button
-					variant="text"
-					size="small"
-					startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
-					classes={{
-						root: classes.walletToggle
-					}}
-					onClick={() => setShowWallets(!showWallets)}
-				>
-					{showWallets ? 'Hide Wallets' : 'Show Wallets'}
-				</Button>
+				<div>
+					<NewNotification 
+						title="Set up  2FA"
+						message="Required to keep your account more secure. Click Setup 2FA to proceed."
+						buttonText="Setup 2FA"
+						buttonAction={() => {}}
+						icon={<Camera />}
+						iconBackgroundColor="#F79410"
+						iconColor="white"
+					/>
+				</div>
+				
 			</section>
 			<Box component="section" className={classes.root}>
+				<Box component="div" className={classes.walletToggleContainer}>
+					<Button
+						variant="text"
+						size="small"
+						startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
+						classes={{
+							root: classes.walletToggle
+						}}
+						onClick={() => setShowWallets(!showWallets)}
+						>
+						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
+					</Button>
+				</Box>
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
 						<section className={classes.wallets}>
