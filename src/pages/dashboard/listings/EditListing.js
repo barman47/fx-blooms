@@ -23,15 +23,15 @@ import Toast from '../../../components/common/Toast';
 import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
-import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
-import { addListing } from '../../../actions/listings';
-import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
+import { getCurrencies } from '../../../actions/currencies';
+import { addListing, updateListing } from '../../../actions/listings';
+import { UPDATED_LISTING, GET_ERRORS, SET_LISTING } from '../../../actions/types';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD_HOME } from '../../../routes';
-import validateAddListing from '../../../utils/validation/listing/add';
+import validateEditListing from '../../../utils/validation/listing/edit';
 import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
@@ -150,7 +150,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const MakeListing = (props) => {
+const EditListing = (props) => {
     const classes = useStyles();
     const history = useHistory();
     const dispatch = useDispatch();
@@ -160,9 +160,9 @@ const MakeListing = (props) => {
     const { currencies } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
+    const { editedListing, listing, listings, msg, recommendedRate } = useSelector(state => state.listings);
 
-    const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
+    const { getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle, updateListing } = props;
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
@@ -199,7 +199,8 @@ const MakeListing = (props) => {
     const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
     useEffect(() => {
-        handleSetTitle('Add Listing');
+        handleSetTitle('Edit Listing');
+
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             getResidencePermitLink();
         }
@@ -211,17 +212,15 @@ const MakeListing = (props) => {
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
-        
+
+        return () => {
+            dispatch({
+                type: SET_LISTING,
+                payload: {}
+            });
+        };
         // eslint-disable-next-line
     }, []);
-
-    // useEffect(() => {
-    //     if (residencePermitStatus) {
-    //         if (residencePermitStatus !== APPROVED) {
-    //             return checkResidencePermitStatus();
-    //         }
-    //     }
-    // }, []);
 
     useEffect(() => {
         // Automatically select newly added account
@@ -267,12 +266,12 @@ const MakeListing = (props) => {
     }, [customerId, listings]);
 
     useEffect(() => {
-        if (addedListing && msg) {
+        if (editedListing && msg) {
             resetForm();
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
-    }, [addedListing, dispatch, msg]);
+    }, [editedListing, dispatch, msg]);
 
     useEffect(() => {
         if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
@@ -293,6 +292,36 @@ const MakeListing = (props) => {
             setReceiptAmount(`NGN ${formatNumber(Number(ExchangeAmount) * Number(ExchangeRate), 2)}`);
         }
     }, [ExchangeAmount, ExchangeRate]);
+
+    // Prefill input fields
+    useEffect(() => {
+        if (!isEmpty(listing)) {
+            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank } = listing;
+
+            setAvailableCurrency(amountAvailable?.currencyType);
+            setExchangeAmount(amountAvailable?.amount);
+            setRequiredCurrency(amountNeeded?.currencyType);
+            setExchangeRate(exchangeRate);
+            setMinExchangeAmount(minExchangeAmount?.amount);
+            handlePrefillBank(bank);
+        }
+    }, [customerId, listing.id, listing, listings]);
+
+    // Show all listings belonging to user except the current on
+    useEffect(() => {
+        if (listings.length > 0) {
+            setPreviousListings(listings.filter(item => item.customerId === customerId && item.id !== listing.id));
+        }
+    }, [customerId, listing.id, listings]);
+
+    const handlePrefillBank = (bank) => {
+        for (let paymentMethod of PAYMENT_METHODS) {
+            if (bank.toLowerCase() === paymentMethod.toLowerCase()) {
+                setBank(paymentMethod);
+                break;
+            }
+        }
+    };
 
     // Set Listing Fee
     // useEffect(() => {
@@ -389,13 +418,9 @@ const MakeListing = (props) => {
 
     const dismissSuccessModal = () => {
         dispatch({
-            type: SET_LISTING_MSG,
-            payload: null
+            type: UPDATED_LISTING
         });
-        if (addedListing) {
-            dispatch({
-                type: ADDED_LISTING
-            });
+        if (editedListing) {
             history.push(DASHBOARD_HOME);
         }
     };
@@ -421,23 +446,19 @@ const MakeListing = (props) => {
             Bank
         };
 
-        const { errors, isValid } = validateAddListing(data);
-        
+        const { errors, isValid } = validateEditListing(data);
         if (!isValid) {
-            return setErrors({ ...errors, msg: 'Invalid listing data' });
+            return setErrors({ ...errors, msg: 'Invalid data' });
         }
 
         if (residencePermitStatus !== APPROVED) {
             return checkResidencePermitStatus();
         }
 
-        // if (customer.profile.listings >= 2) { // and there is no account number
-        //     return setOpenAccountModal(true);
-        // }
-
         setErrors({});
         setLoading(true);
-        const listing = {
+        const listingItem = {
+            listingId: listing.id,
             currencyNeeded: RequiredCurrency,
             ExchangeRate: parseFloat(ExchangeRate),
             AmountAvailable: {
@@ -453,7 +474,8 @@ const MakeListing = (props) => {
             reference
         };
 
-        addListing(listing);
+        setLoading(true);
+        updateListing(listingItem);
     };
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
@@ -481,8 +503,8 @@ const MakeListing = (props) => {
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
-                        <Typography variant="h6">Make a Listing</Typography>
-                        <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
+                        <Typography variant="h6">Edit Listing</Typography>
+                        <Typography variant="subtitle1" component="span">Modify your current listing</Typography>
                     </div>
                     {/* <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography> */}
                 </header>
@@ -748,11 +770,12 @@ const MakeListing = (props) => {
     );
 };
 
-MakeListing.propTypes = {
+EditListing.propTypes = {
     addListing: PropTypes.func.isRequired,
-    getCurrencies: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired
+    getCurrencies: PropTypes.func.isRequired,
+    getResidencePermitLink: PropTypes.func.isRequired,
+    updateListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink })(MakeListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink, updateListing })(EditListing);

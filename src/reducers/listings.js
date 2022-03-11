@@ -11,20 +11,24 @@ import {
     SET_LISTING_MSG,
     HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
-    REMOVE_EXPIRED_LISTING
+    SET_RECOMMENDED_RATE,
+    REMOVE_EXPIRED_LISTING,
+    UPDATED_LISTING
 } from '../actions/types';
 
 import { LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
+    editedListing: false,
     addedBid: false,
     bid: {},
     updatedListing: false,
     listing: {},
     listings: [],
     loading: false,
-    msg: null
+    msg: null,
+    recommendedRate: null
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -65,6 +69,17 @@ const listingsReducer = (state = initialState, action) => {
                 addedListing: !state.addedListing,
                 msg: null
             };
+
+        case UPDATED_LISTING:
+            return action.payload ? {
+                ...state,
+                editedListing: !state.editedListing,
+                msg: action.payload.msg ? action.payload.msg : null
+            } : {
+                ...state,
+                editedListing: !state.editedListing,
+                msg: null
+            };
         
         case DELETED_LISTING:
             listingId = action.payload.id;
@@ -85,6 +100,7 @@ const listingsReducer = (state = initialState, action) => {
         case SET_LISTINGS: 
             const { listings, ...rest } = action.payload;
             return {
+                ...state,
                 listings,
                 ...rest
             };
@@ -146,6 +162,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 listings: state.listings.filter(listing => listing.id !== action.payload)
+            };
+
+        case SET_RECOMMENDED_RATE:
+            return {
+                ...state,
+                recommendedRate: action.payload
             };
 
         default:

@@ -155,6 +155,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
 
     const { account, accounts } = useSelector(state => state.bankAccounts);
     const { addedBid, bid, msg } = useSelector(state => state.listings);
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
 
     const [Amount, setAmount] = useState('');
@@ -166,11 +167,13 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [showBid, setShowBid] = useState(true);
+    const [currentBid, setCurrentBid] = useState({});
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
     const successModal = useRef();
 
     useEffect(() => {
+        resumeTransaction();
         if (isEmpty(account)) {
             getAccount(listing.sellersAccountId);
         }
@@ -206,6 +209,17 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
             setReceivingAccount(accounts[0].bankName);
         }
     }, [accounts]);
+
+    const resumeTransaction = () => {
+        for (const bid of listing.bids) {
+            if (bid.status === 'IN_PROGRESS' && bid.customerId === customerId) {
+                setShowBid(false);
+                setCurrentBid(bid);
+                setButtonDisabled(false);
+                break;
+            }
+        }
+    };
 
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
@@ -332,7 +346,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     const handleMadpayment = () => {
         setLoading(true);
         madePayment({
-            bidId: bid.id,
+            bidId: bid ? bid.id : currentBid.id,
             listingId: listing.id,
         });
     };
@@ -352,8 +366,8 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                     {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
                     <Drawer 
                         ModalProps={{ 
-                            disableBackdropClick: true,
-                            disableEscapeKeyDown: true,
+                            disableBackdropClick: false,
+                            disableEscapeKeyDown: false,
                         }}
                         PaperProps={{ className: classes.drawer }} 
                         anchor="right" 
@@ -552,7 +566,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                     </div>
                                     <div>
                                         <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference}</Typography>
+                                        <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
                                     </div>
                                 </section>
                             }                   
@@ -568,7 +582,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                                 disabled={loading || buttonDisabled || !isEmpty(errors) ? true : false}
                                 onClick={handleMadpayment}
                             >
-                                {loading ? 'One Moment . . .' : `${formatNumber(bid.bidAmount.amount * listing.exchangeRate, 2)} NGN Payment Made`}
+                                {loading ? 'One Moment . . .' : `${formatNumber((bid?.bidAmount?.amount * listing?.exchangeRate) || (currentBid?.bidAmount?.amount * listing?.exchangeRate), 2)} NGN Payment Made`}
                             </Button>
                         </Grid>
                     </Drawer>

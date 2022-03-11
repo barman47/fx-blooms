@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -16,10 +16,9 @@ import {
 import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
 
-// import { COLORS } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
-import { useCallback } from 'react';
+import formatNumber from '../../../utils/formatNumber';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -115,7 +114,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { changed, customerCount, listingCount, totalCustomers, totalListings, transactionVolume } = useSelector(state => state.stats);
+    const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
@@ -148,6 +147,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
             setUsers(totalCustomers);
         }
     }, [totalCustomers, usersFilter]);
+
+    // Show total volume count when no filter is selected
+    useEffect(() => {
+        if (totalEuroTransfered && !volumeFilter) {
+            setVolume(totalEuroTransfered);
+        }
+    }, [totalEuroTransfered, volumeFilter]);
 
     // Show volume from filter value
     useEffect(() => {
@@ -275,13 +281,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 break;
 
             case ALL:
-                setVolume('N/A');
+                setVolume(totalEuroTransfered);
                 break;
             
             default:
                 break;
         }
-    }, [getTransactionVolume]);
+    }, [getTransactionVolume, totalEuroTransfered]);
 
     // Get user count when user filter changes
     useEffect(() => {
@@ -368,7 +374,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    users
+                                    formatNumber(users)
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
@@ -424,7 +430,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    listings
+                                    formatNumber(listings)
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
@@ -470,7 +476,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    `EUR ${volume}`
+                                    `EUR ${formatNumber(volume)}`
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>

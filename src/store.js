@@ -12,7 +12,7 @@ const persistConfig = {
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
-const composeEnhancers = composeWithDevTools({ trace: true, traceLimit: 25 });  // ENable tracing in devtools
+const composeEnhancers = composeWithDevTools({ trace: true, traceLimit: 25 });  // Enable tracing in devtools
 
 const initialState = {};
 

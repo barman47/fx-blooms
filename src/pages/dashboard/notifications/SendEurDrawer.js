@@ -179,10 +179,10 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
                                     <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
                                 </section>
                             </div>
-                            {/* <div>
+                            <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>Hello FXBLOOMS money</Typography>
-                            </div> */}
+                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.reference ? account.reference : 'N/A'}</Typography>
+                            </div>
                         </section>
                     </Grid>
                     <Grid item xs={12}>

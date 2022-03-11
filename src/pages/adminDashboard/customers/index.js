@@ -238,6 +238,13 @@ const Customers = (props) => {
         // eslint-disable-next-line
     }, []);
 
+    // Reset page number when filter changes
+    useEffect(() => {
+        if (filter) {
+            setPage(0);
+        }
+    }, [filter]);
+
     // Set page number for search when page number changes
     useEffect(() => {
         dispatch({

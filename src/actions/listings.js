@@ -2,8 +2,19 @@ import axios from 'axios';
 import { DASHBOARD_HOME } from '../routes';
 
 import { API } from '../utils/constants';
+import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
-import { ADDED_BID, ADDED_LISTING, CANCELED_NEGOTIATION, DELETED_LISTING, SET_LISTINGS, SET_LOADING_LISTINGS, SET_MORE_LISTINGS } from './types';
+import { 
+    ADDED_BID, 
+    ADDED_LISTING, 
+    CANCELED_NEGOTIATION, 
+    DELETED_LISTING, 
+    SET_LISTINGS, 
+    SET_LOADING_LISTINGS, 
+    SET_MORE_LISTINGS,
+    SET_RECOMMENDED_RATE,
+    UPDATED_LISTING 
+} from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { batch } from 'react-redux';
 
@@ -44,6 +55,19 @@ export const addListing = (listing) => async (dispatch) => {
     }
 };
 
+export const updateListing = (listing) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.patch(`${URL}/UpdateList`, listing);
+        return dispatch({
+            type: UPDATED_LISTING,
+            payload: { listing: res.data.data, msg: 'Your listing has been updated successfully' }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const deleteListing = (listingId) => async (dispatch) => {
     try {
         await Promise.all([
@@ -60,7 +84,7 @@ export const deleteListing = (listingId) => async (dispatch) => {
     }
 };
 
-export const getListingsOpenForBid = (query) => async (dispatch) => {
+export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
@@ -74,9 +98,16 @@ export const getListingsOpenForBid = (query) => async (dispatch) => {
                 type: SET_LOADING_LISTINGS,
                 payload: false
             });
+            if (setRecommendedRate) {
+                dispatch({
+                    type: SET_RECOMMENDED_RATE,
+                    payload: getRecommendedRate(items)
+                });
+            }
         });
     } catch (err) {
-        return handleError(err, dispatch);
+        console.error(err);
+        // return handleError(err, dispatch);
     }
 };
 
