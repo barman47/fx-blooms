@@ -6,6 +6,7 @@ const editBankAccount = (data) => {
     data.accountName = !isEmpty(data.accountName) ?  data.accountName : '';
     data.accountNumber = !isEmpty(data.accountNumber) ?  data.accountNumber : '';
     data.bankName = !isEmpty(data.bankName) ?  data.bankName : '';
+    data.nickName = !isEmpty(data.nickName) ?  data.nickName : '';
 
     if (Validator.isEmpty(data.accountName)) {
         errors.accountName = 'Account name is required!';
@@ -13,6 +14,10 @@ const editBankAccount = (data) => {
 
     if (Validator.isEmpty(data.accountNumber)) {
         errors.accountNumber = 'Account number is required!';
+    }
+
+    if (Validator.isEmpty(data.nickName)) {
+        errors.nickName = 'Account alias is required!';
     }
 
     if (Validator.isEmpty(data.bankName)) {

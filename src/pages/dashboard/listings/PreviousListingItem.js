@@ -110,7 +110,7 @@ const PreviousListingItem = ({ deleteListing, listing }) => {
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                    {`${getCurrencySymbol(listing?.minExchangeAmount?.currencyType)}${formatNumber(listing?.minExchangeAmount?.amount)}`}
+                    {listing?.minExchangeAmount?.amount ? `${listing?.minExchangeAmount?.currencyType}${formatNumber(listing?.minExchangeAmount?.amount)}` : `${listing?.amountAvailable?.currencyType}${formatNumber(listing?.amountAvailable?.amount)}`}
                 </Typography>
                 <Typography variant="subtitle2" component="span">
                     <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>

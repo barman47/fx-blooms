@@ -71,7 +71,7 @@ const useStyles = makeStyles(theme => ({
 	header: {
 		display: 'grid',
 		gridTemplateColumns: '1fr 1fr',
-		marginBottom: theme.spacing(5),
+		marginBottom: theme.spacing(2),
 		marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
 
@@ -110,7 +110,7 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '1fr',
 		flexDirection: 'column',
-		gap: theme.spacing(5),
+		// gap: theme.spacing(1),
 		paddingLeft: theme.spacing(5),
 		paddingRight: theme.spacing(5),
 		margin: '0 auto',
@@ -135,7 +135,7 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		margin: '0 auto',
-		width: '80%',
+		width: '100%',
 
 		[theme.breakpoints.down('md')]: {
 			width: '100%'
@@ -167,6 +167,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		marginBottom: theme.spacing(1),
+		marginTop: theme.spacing(1),
 
 		[theme.breakpoints.down('sm')]: {
 			display: 'grid',
@@ -258,7 +259,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingContainer: {
-		marginTop: theme.spacing(5)
+		marginTop: theme.spacing(1)
 	},
 
 	// filter: {

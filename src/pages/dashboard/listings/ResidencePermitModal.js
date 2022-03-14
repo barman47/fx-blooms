@@ -72,7 +72,7 @@ const ResidencePermitModal = ({ url, open, handleCloseModal }) => {
                         <Typography variamt="h6">
                             To ensure utmost security on our platform, all first time SELLERS of EUR are required to verify their EU issued ID.
                         </Typography>
-                        <strong>N.B We only accept EU Resident Permit.</strong>
+                        <strong>N.B We only accept EU Issued ID.</strong>
                         <Link 
                             underline="none"
                             component={Button}

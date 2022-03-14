@@ -229,11 +229,13 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     // Prevent user from entering invalid amounts
     useEffect(() => {
         if (Amount) {
-             if (Number(Amount) < Number(listing.minExchangeAmount.amount)) {
-            //  if (Number(Amount) < Number(listing.minExchangeAmount.amount) || Number(listing.amountAvailable.amount) > Number(listing.minExchangeAmount.amount)) {
+            const minimumAmount = Number(listing?.minExchangeAmount?.amount) || Number(listing.amountAvailable.amount);
+            
+             if (Number(Amount) < minimumAmount) {
+            //  if (Number(Amount) < minimumAmount || Number(listing.amountAvailable.amount) > minimumAmount) {
                 // Prevent user from entering amount less than minimum exchange amount
                 setButtonDisabled(true);
-                setErrors({ Amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(listing.minExchangeAmount.amount)})` });
+                setErrors({ Amount: `Amount must be greater than or equal to the minimum exchange amount (EUR ${formatNumber(minimumAmount)})` });
                 setTransferAmount('');
             } else if (Number(Amount) > Number(listing.amountAvailable.amount)) {
                 // Prevent user from entering amount greater than amount available
@@ -244,7 +246,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
                 setErrors({});
             }
         }
-    }, [listing.amountAvailable.amount, listing.minExchangeAmount.amount, Amount]);
+    }, [listing?.amountAvailable?.amount, listing?.minExchangeAmount?.amount, Amount]);
 
     // Set transfer amount when user enters amount he wants to buy
     useEffect(() => {
@@ -346,7 +348,7 @@ const PlaceBidDrawer = ({ addBid, getAccount, listing, madePayment, toggleDrawer
     const handleMadpayment = () => {
         setLoading(true);
         madePayment({
-            bidId: bid ? bid.id : currentBid.id,
+            bidId: !isEmpty(bid) ? bid.id : currentBid.id,
             listingId: listing.id,
         });
     };

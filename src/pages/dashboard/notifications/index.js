@@ -4,6 +4,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Key, PhoneCheck, Passport } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 
 import { COLORS, ID_STATUS } from '../../../utils/constants';
@@ -337,6 +338,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 message="Required to BUY and SELL. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyEuId}
+                                icon={<Passport />}
+						        iconBackgroundColor="#000100"
                             />
                         }
                         {/* eslint-disable-next-line no-mixed-operators */}
@@ -346,22 +349,28 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 message="Required to BUY only. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyOtherId}
+                                icon={<Passport />}
+						        iconBackgroundColor="#000100"
                             />
                         )}
                         {!hasSetup2FA &&
                             <Notification 
-                                title="Set up  2FA"
-                                message="Required to keep your account more secure. Click Setup 2FA to proceed."
+                                title="Set up 2FA"
+                                message="Add extra layer of Security"
                                 buttonText="Setup 2FA"
                                 buttonAction={setup2FA}
+						        icon={<Key />}
+						        iconBackgroundColor="#000100"
                             />
                         }
                         {!isPhoneNumberVerified && 
                             <Notification 
-                                title="Verify phone number"
+                            title="Verify phone number"
                                 message="Required to receive SMS notifications. Click Verify Phone to proceed."
                                 buttonText="Verify Phone"
                                 buttonAction={verifyPhone}
+                                icon={<PhoneCheck />}
+						        iconBackgroundColor="#2893EB"
                             />
                         }
                         {/* <Notification 

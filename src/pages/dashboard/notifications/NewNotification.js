@@ -5,9 +5,11 @@ import PropTypes from 'prop-types';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        display: 'grid',
-        gridTemplateColumns: '2fr 0.5fr 0.1fr',
+        display: 'flex',
+        flexDirection: 'row',
         justifyContent: 'space-between',
+        // display: 'grid',
+        // gridTemplateColumns: '2fr 0.5fr 0.1fr',
         alignItems: 'center',
         padding: theme.spacing(1)
     },
@@ -21,13 +23,18 @@ const useStyles = makeStyles(theme => ({
     text: {
         marginLeft: theme.spacing(2), 
 
+        '& p': {
+            margin: '0 !important'
+        },
+
         '& p:first-child': {
             color: theme.palette.primary.main,
             fontWeight: 600,
-            marginBottom: theme.spacing(1),
+            // marginBottom: theme.spacing(1),s
         },
 
         '& p:last-child': {
+            fontSize: theme.spacing(1.5),
             fontWeight: 300,
             [theme.breakpoints.down('sm')]: {
                 fontSize: theme.spacing(1.1)
@@ -36,9 +43,13 @@ const useStyles = makeStyles(theme => ({
     },
 
     button: {
-        fontSize: theme.spacing(1.3),
+        alignSelf: 'center',
+        fontSize: theme.spacing(1),
         textTransform: 'uppercase',
-        marginTop: theme.spacing(2),
+        // marginRight: theme.spacing(2),
+        padding: theme.spacing(1),
+        // width: '60%',
+        // marginTop: theme.spacing(2),
 
         [theme.breakpoints.down('md')]: {
             justifySelf: 'flex-start'
@@ -96,6 +107,10 @@ Notification.propTypes = {
     iconBackgroundColor: PropTypes.string.isRequired,
     icon: PropTypes.elementType.isRequired
     // link: PropTypes.string
+};
+
+Notification.defaultProps = {
+    iconColor: '#ffffff'
 };
 
 export default Notification;

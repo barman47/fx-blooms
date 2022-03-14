@@ -283,7 +283,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                        {`${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}`}
+                        {minExchangeAmount?.amount ? `${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}` : `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>

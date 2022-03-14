@@ -13,21 +13,12 @@ const useStyles = makeStyles(theme =>({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gap: theme.spacing(1),
-        gridTemplateColumns: '1.3fr 1.3fr 1.3fr 0.7fr 0.5fr 0.1fr',
-        // alignItems: 'center',
+        gridTemplateColumns: '1.3fr 1.3fr 1.3fr 1.3fr 0.7fr 0.5fr 0.1fr',
         padding: [[theme.spacing(2), 0, theme.spacing(2), theme.spacing(2)]],
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(1)
         },
-        // [theme.breakpoints.down('sm')]: {
-        //     gridTemplateColumns: '1fr 1r',
-        //     // alignItems: 'flex-start',
-        //     // gap: theme.spacing(0.5),
-        //     // height: 'initial',
-        //     // padding: [[theme.spacing(0.5), 0, theme.spacing(0.5), theme.spacing(0.5)]],
-        //     // width: '100%'
-        // },
 
         '& small': {
             fontWeight: 300,
@@ -52,15 +43,6 @@ const useStyles = makeStyles(theme =>({
         }
     },
 
-    // item: {
-    //     [theme.breakpoints.down('sm')]: {
-    //         display: 'flex',
-    //         justifyContent: 'space-between',
-    //         flexDirection: 'row',
-    //         padding: theme.spacing(0, 2)
-    //     }
-    // },
-
     iconContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -81,7 +63,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccount = ({ bankName, accountName, accountNumber, currency, handleDeleteAccount, handleEditAccount }) => {
+const BankAccount = ({ bankName, accountName, accountNumber, currency, alias, handleDeleteAccount, handleEditAccount }) => {
     const classes = useStyles();
 
     return (
@@ -98,6 +80,10 @@ const BankAccount = ({ bankName, accountName, accountNumber, currency, handleDel
                 <div className={classes.item}>
                     <Typography variant="subtitle2" component="small">{currency === 'NGN' ? 'Account Number' : 'IBAN'}</Typography>
                     <Typography variant="subtitle1" component="p">{accountNumber}</Typography>
+                </div>
+                <div className={classes.item}>
+                    <Typography variant="subtitle2" component="small">Alias</Typography>
+                    <Typography variant="subtitle1" component="p">{alias || 'N/A'}</Typography>
                 </div>
                 <div className={classes.item}>
                     <Typography variant="subtitle2" component="small">Currency</Typography>
@@ -126,6 +112,7 @@ BankAccount.propTypes = {
     accountName: PropTypes.string.isRequired,
     accountNumber: PropTypes.string.isRequired,
     currency: PropTypes.string.isRequired,
+    alias: PropTypes.string.isRequired,
     handleDeleteAccount: PropTypes.func.isRequired
 };
 

@@ -26,7 +26,7 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, updateListing } from '../../../actions/listings';
-import { UPDATED_LISTING, GET_ERRORS, SET_LISTING } from '../../../actions/types';
+import { UPDATED_LISTING, GET_ERRORS } from '../../../actions/types';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -212,13 +212,6 @@ const EditListing = (props) => {
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
-
-        return () => {
-            dispatch({
-                type: SET_LISTING,
-                payload: {}
-            });
-        };
         // eslint-disable-next-line
     }, []);
 
@@ -296,13 +289,14 @@ const EditListing = (props) => {
     // Prefill input fields
     useEffect(() => {
         if (!isEmpty(listing)) {
-            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank } = listing;
+            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank, reference } = listing;
 
             setAvailableCurrency(amountAvailable?.currencyType);
             setExchangeAmount(amountAvailable?.amount);
             setRequiredCurrency(amountNeeded?.currencyType);
             setExchangeRate(exchangeRate);
-            setMinExchangeAmount(minExchangeAmount?.amount);
+            setMinExchangeAmount(minExchangeAmount?.amount || '');
+            setReference(reference || '');
             handlePrefillBank(bank);
         }
     }, [customerId, listing.id, listing, listings]);
@@ -467,7 +461,7 @@ const EditListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: parseFloat(MinExchangeAmount)
+                Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),

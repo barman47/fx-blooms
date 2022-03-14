@@ -226,7 +226,7 @@ const MakeListing = (props) => {
     useEffect(() => {
         // Automatically select newly added account
         if (accounts.length > 0 && accounts[0].currency === 'NGN') {
-            setReceivingAccount(accounts[0].bankName);
+            setReceivingAccount(accounts[0].nicKName);
         }
     }, [accounts]);
 
@@ -401,7 +401,7 @@ const MakeListing = (props) => {
     };
 
     const getAccountId = (account) => {
-        const bank = accounts.find(item => item.bankName === account);
+        const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
         return bank.accountID;
     };
 
@@ -446,7 +446,7 @@ const MakeListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: parseFloat(MinExchangeAmount)
+                Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),
@@ -641,7 +641,7 @@ const MakeListing = (props) => {
                                             {accounts.map((account) => {
                                                 if (account.currency === 'NGN') {
                                                     return (
-                                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
                                                     )
                                                 }
                                                 return null;
