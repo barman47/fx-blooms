@@ -75,6 +75,11 @@ export const USER_DETAILS = {
     TRANSACTION_DETAILS: 'Transaction Details'
 };
 
+export const LISTING_DETAILS = {
+    ALL_LISTINGS: 'ALL LISTINGS',
+    ALL_TRANSACTIONS: 'ALL TRANSACTIONS',
+};
+
 export const ID_STATUS = {
     APPROVED: 'APPROVED',
     NOT_SUBMITTED:'NOT_SUBMITTED'
@@ -115,3 +120,4 @@ export const PAYMENT_METHODS = [
     'Other Banks (with instant)',
     'Other Banks (without instant)',
 ];
+

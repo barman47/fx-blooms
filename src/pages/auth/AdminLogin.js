@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useHistory} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
+import { Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@material-ui/core';
+import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -95,6 +96,7 @@ const AdminLogin = (props) => {
 
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const toast = useRef();
 
@@ -122,6 +124,10 @@ const AdminLogin = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    const toggleShowPassword = () => {
+        setShowPassword(!showPassword);
+    };
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
@@ -196,13 +202,33 @@ const AdminLogin = (props) => {
                                     className={classes.input}
                                     value={Password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    type="password"
+                                    type={showPassword ? 'text': 'password'}
                                     variant="outlined" 
                                     placeholder="Enter Password"
                                     helperText={errors.Password || errors.message}
                                     fullWidth
                                     required
                                     error={errors.Password  || errors.message ? true : false}
+                                    InputProps={{
+                                        endAdornment: (
+                                            <InputAdornment position="end">
+                                                <IconButton
+                                                    aria-label="toggle password visibility"
+                                                    onClick={toggleShowPassword}
+                                                >
+                                                    {showPassword ? 
+                                                        <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOutline />
+                                                        </Tooltip>
+                                                            : 
+                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip>
+                                                     }
+                                                </IconButton>
+                                            </InputAdornment>
+                                        )
+                                    }}
                                 />
                             </Grid>
                             <Grid item xs={12}>

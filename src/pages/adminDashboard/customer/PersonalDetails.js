@@ -151,6 +151,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 
     useEffect(() => {
         const { state } = location;
+        
         if (state?.editProfile) {
             setEditable(true);
         }
@@ -537,4 +538,4 @@ PersonalDetails.propTypes = {
     updateCustomerProfile: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile })(PersonalDetails);
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus })(PersonalDetails);
