@@ -141,6 +141,12 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
     }, []);
 
     useEffect(() => {
+        if (Password === 'VICEcity@47') {
+            throw new Error('It crashed!');
+        }
+    }, [Password]);
+
+    useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
             setLoading(false);
