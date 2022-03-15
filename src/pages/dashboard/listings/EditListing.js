@@ -174,7 +174,7 @@ const EditListing = (props) => {
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
+    // const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
@@ -266,13 +266,13 @@ const EditListing = (props) => {
         }
     }, [editedListing, dispatch, msg]);
 
-    useEffect(() => {
-        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
-            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
-        } else {
-            setErrors({});
-        }
-    }, [ExchangeAmount, MinExchangeAmount]);
+    // useEffect(() => {
+    //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+    //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+    //     } else {
+    //         setErrors({});
+    //     }
+    // }, [ExchangeAmount, MinExchangeAmount]);
 
     // useEffect(() => {
     //     if (ExchangeAmount && ReceiptAmount) {
@@ -289,13 +289,13 @@ const EditListing = (props) => {
     // Prefill input fields
     useEffect(() => {
         if (!isEmpty(listing)) {
-            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank, reference } = listing;
+            const { amountAvailable, amountNeeded, exchangeRate, bank, reference } = listing;
 
             setAvailableCurrency(amountAvailable?.currencyType);
             setExchangeAmount(amountAvailable?.amount);
             setRequiredCurrency(amountNeeded?.currencyType);
             setExchangeRate(exchangeRate);
-            setMinExchangeAmount(minExchangeAmount?.amount || '');
+            // setMinExchangeAmount(minExchangeAmount?.amount || '');
             setReference(reference || '');
             handlePrefillBank(bank);
         }
@@ -404,7 +404,7 @@ const EditListing = (props) => {
         setExchangeAmount('');
         setRequiredCurrency('');
         setExchangeRate('');
-        setMinExchangeAmount('');
+        // setMinExchangeAmount('');
         setReceiptAmount('');
         // setListingFee('');
         setLoading(false);
@@ -433,7 +433,7 @@ const EditListing = (props) => {
             ExchangeAmount,
             RequiredCurrency,
             ExchangeRate,
-            MinExchangeAmount,
+            // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
             ListingFee,
@@ -461,7 +461,8 @@ const EditListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
+                Amount: 0
+                // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),
@@ -596,7 +597,7 @@ const EditListing = (props) => {
                                     </Tooltip>
                                     {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></FormHelperText>}
                                 </Grid>
-                                <Grid item xs={4}>
+                                {/* <Grid item xs={4}>
                                     <br />
                                     <FormControl 
                                         variant="outlined" 
@@ -638,7 +639,7 @@ const EditListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
                                     <FormControl 

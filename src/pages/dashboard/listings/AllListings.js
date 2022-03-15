@@ -18,7 +18,8 @@ import {
 } from '@material-ui/core';
 // import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { FilterOutline } from 'mdi-material-ui';
+// import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -34,7 +35,7 @@ import {
 	SET_LOADING_LISTINGS 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
+import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -46,7 +47,7 @@ import FundWalletDrawer from '../wallet/FundWalletDrawer';
 import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
-import NewNotification from '../notifications/NewNotification';
+// import NewNotification from '../notifications/NewNotification';
 // import RiskNoticeModal from './RiskNoticeModal';
 
 // import img from '../../../assets/img/decentralized.svg';
@@ -89,12 +90,12 @@ const useStyles = makeStyles(theme => ({
 			paddingRight: theme.spacing(2)
 		},
 
-		'& div:first-child': {
-			'& p:last-child': {
-				marginTop: theme.spacing(2),
-				color: COLORS.grey
-			}
-		}
+		// '& div:first-child': {
+		// 	'& p:last-child': {
+		// 		marginTop: theme.spacing(2),
+		// 		color: COLORS.grey
+		// 	}
+		// }
 	},
 
 	root: {
@@ -355,7 +356,7 @@ const AllListings = (props) => {
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
 	// eslint-disable-next-line
-	const [showWallets, setShowWallets] = useState(true);
+	const [showWallets, setShowWallets] = useState(false);
 
 	let loadedEvent = useRef();
     const walletInfoModal = useRef();
@@ -546,9 +547,9 @@ const AllListings = (props) => {
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
+					{/* <Typography variant="body1" component="p">What would you like to do today?</Typography>  */}
 				</div>
-				<div>
+				{/* <div>
 					<NewNotification 
 						title="Set up  2FA"
 						message="Required to keep your account more secure. Click Setup 2FA to proceed."
@@ -558,11 +559,11 @@ const AllListings = (props) => {
 						iconBackgroundColor="#F79410"
 						iconColor="white"
 					/>
-				</div>
+				</div> */}
 				
 			</section>
 			<Box component="section" className={classes.root}>
-				<Box component="div" className={classes.walletToggleContainer}>
+				{/* <Box component="div" className={classes.walletToggleContainer}>
 					<Button
 						variant="text"
 						size="small"
@@ -574,7 +575,7 @@ const AllListings = (props) => {
 						>
 						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
 					</Button>
-				</Box>
+				</Box> */}
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
 						<section className={classes.wallets}>
@@ -674,7 +675,7 @@ const AllListings = (props) => {
 									error={errors.Amount ? true : false}
 									disabled={listingsLoading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start">EUR</InputAdornment>,
+										startAdornment: <InputAdornment position="start" color="primary">EUR | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
 											<Button
 												variant="contained"

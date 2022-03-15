@@ -5,20 +5,14 @@ import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
-import { getCustomer, getSeller } from '../../../actions/customer';
+import { getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import isEmpty from '../../../utils/isEmpty';
-import { getAccount } from '../../../actions/bankAccounts';
-import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT, SET_LISTING } from '../../../actions/types';
-import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { ACCOUNT, EDIT_LISTING, USER_DETAILS } from '../../../routes';
-
-import PlaceBidDrawer from './PlaceBidDrawer';
-
-import Toast from '../../../components/common/Toast';
+import { REMOVE_EXPIRED_LISTING } from '../../../actions/types';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { ACCOUNT, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -116,30 +110,23 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller }) => {
+const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const history = useHistory();
 
-    const errorsState = useSelector(state => state.errors);
-    const { stats } = useSelector(state => state.customer);
     const userId = useSelector(state => state.customer.customerId);
 
-    const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
     const [expired, setExpired] = useState(false);
     const [timerHours, setTimerHours] = useState('0');
     const [timerMinutes, setTimerMinutes] = useState('0');
     const [timerSeconds, setTimerSeconds] = useState('0');
-    const [errors, setErrors] = useState({});
 
     const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
     const { finalized, negotiation } = LISTING_STATUS;
 
-    const toast = useRef();
     const interval = useRef();
-
-    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         startExpiryTimer();
@@ -157,33 +144,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             });
         }
     }, [dispatch, expired, listing.id]);
-
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setErrors({ msg: errorsState.msg });
-        }
-    }, [errorsState]);
-
-    useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-            dispatch({
-                type: GET_ERRORS,
-                payload: {}
-            });
-        }
-    }, [dispatch, errors]);
-
-    useEffect(() => {
-        if (openPlaceBidDrawer) {
-            getAccount(listing.sellersAccountId);
-        } else {
-            dispatch({
-                type: SET_ACCOUNT,
-                payload: {}
-            });
-        }
-    }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
 
     const startExpiryTimer = () => {
         const countDownDate = new Date(dateCreated).getTime() + 259_200_000; // number of milliseconds in 3 days
@@ -224,34 +184,9 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             deleteListing(id);
         }
     };
-
-    const handleEditListing = (listing) => {
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        return history.push(EDIT_LISTING);
-    };
-    
-    const togglePlaceBidDrawer = () => {
-        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
-            return checkIdStatus();
-        }
-        setOpenPlaceBidDrawer(!openPlaceBidDrawer);
-    };
     
     return (
         <>
-            {!isEmpty(errors) && 
-                <Toast 
-                    ref={toast}
-                    title="ERROR"
-                    duration={5000}
-                    msg={errors.msg || ''}
-                    type="error"
-                />
-            }
-            {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
@@ -346,8 +281,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            // onClick={() => togglePlaceBidDrawer(listing.sellersAccountId)}
-                            onClick={togglePlaceBidDrawer}
+                            onClick={() => handleAddBid(listing)}
                         >
                             Buy EUR
                         </Button>
@@ -359,12 +293,10 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 };
 
 Listing.propTypes = {
-    checkIdStatus: PropTypes.func.isRequired,
-    getAccount: PropTypes.func.isRequired,
-    getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
+    handleEditListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
     deleteListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { deleteListing, getAccount, getCustomer, getSeller })(Listing);
+export default connect(undefined, { deleteListing, getSeller })(Listing);

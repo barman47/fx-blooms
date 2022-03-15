@@ -174,7 +174,7 @@ const MakeListing = (props) => {
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
+    // const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
@@ -274,13 +274,13 @@ const MakeListing = (props) => {
         }
     }, [addedListing, dispatch, msg]);
 
-    useEffect(() => {
-        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
-            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
-        } else {
-            setErrors({});
-        }
-    }, [ExchangeAmount, MinExchangeAmount]);
+    // useEffect(() => {
+    //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+    //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+    //     } else {
+    //         setErrors({});
+    //     }
+    // }, [ExchangeAmount, MinExchangeAmount]);
 
     // useEffect(() => {
     //     if (ExchangeAmount && ReceiptAmount) {
@@ -381,7 +381,7 @@ const MakeListing = (props) => {
         setExchangeAmount('');
         setRequiredCurrency('');
         setExchangeRate('');
-        setMinExchangeAmount('');
+        // setMinExchangeAmount('');
         setReceiptAmount('');
         // setListingFee('');
         setLoading(false);
@@ -414,7 +414,7 @@ const MakeListing = (props) => {
             ExchangeAmount,
             RequiredCurrency,
             ExchangeRate,
-            MinExchangeAmount,
+            // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
             ListingFee,
@@ -446,7 +446,8 @@ const MakeListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
+                Amount: 0
+                // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),
@@ -580,7 +581,7 @@ const MakeListing = (props) => {
                                     </Tooltip>
                                     {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></FormHelperText>}
                                 </Grid>
-                                <Grid item xs={4}>
+                                {/* <Grid item xs={4}>
                                     <br />
                                     <FormControl 
                                         variant="outlined" 
@@ -622,7 +623,7 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
                                     <FormControl 

@@ -1,8 +1,8 @@
 import { 
     ADDED_BID,
-    REMOVE_BID,
     ADDED_LISTING, 
     DELETED_LISTING,
+    SET_BID,
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
@@ -46,10 +46,10 @@ const listingsReducer = (state = initialState, action) => {
                 addedBid: action.payload.addedBid
             };
 
-        case REMOVE_BID:
+        case SET_BID:
             return {
                 ...state,
-                bid: {}
+                bid: action.payload
             };
 
         case TOGGLE_BID_STATUS:

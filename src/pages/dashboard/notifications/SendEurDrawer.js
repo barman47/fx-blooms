@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -16,10 +16,14 @@ import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
 import { sendTransactionNotification } from '../../../actions/notifications';
+import { GET_ERRORS } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+import isEmpty from '../../../utils/isEmpty';
+
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -110,16 +114,39 @@ const useStyles = makeStyles(theme => ({
 
 const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
+    const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
     const message = useSelector(state => state.notifications.msg);
+    const errorsState = useSelector(state => state.errors);
     
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const toastRef = useRef();
 
     useEffect(() => {
         setOpen(drawerOpen);
     }, [drawerOpen]);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toastRef.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+            toggleDrawer();
+        }
+    }, [dispatch, errorsState, errors, toggleDrawer]);
 
     const handleCopyTransactionId = () => {
         copy(transactionId);
@@ -134,6 +161,15 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 	return (
         <>
             <Toaster />
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toastRef}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <Drawer 
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
