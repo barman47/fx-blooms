@@ -4,7 +4,8 @@ import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import './index.css';
 import App from './App';
-import ErrorBoundary from './components/common/ErrorBoundary';
+import { ErrorBoundary } from 'react-error-boundary';
+import { ErrorFallback } from './components/common/ErrorBoundary';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { persistor, store } from './store';
@@ -13,7 +14,7 @@ ReactDOM.render(
 	<React.StrictMode>
 		<Provider store={store}>
 			<PersistGate loading={null} persistor={persistor}>
-				<ErrorBoundary>
+				<ErrorBoundary FallbackComponent={ErrorFallback}>
 					<App />
 				</ErrorBoundary>
 			</PersistGate>

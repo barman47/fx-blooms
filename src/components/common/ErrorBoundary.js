@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const ErrorPage = () => {
+export const ErrorFallback = () => {
     const classes = useStyles();
 
     return (
@@ -114,7 +114,7 @@ class ErrorBoundary extends Component {
 
     render () {
         if (this.state.hasError) {
-            return <ErrorPage />
+            return <ErrorFallback />
         }
         return this.props.children;
     }
