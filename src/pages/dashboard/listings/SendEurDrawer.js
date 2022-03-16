@@ -148,7 +148,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SendEurDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) => {
+const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -275,7 +275,7 @@ const SendEurDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
     const getSellerAccount = () => getAccount(listing.sellersAccountId);
 
     const getAccountId = (account) => {
-        const bank = accounts.find(item => item.bankName === account);
+        const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
         return bank.accountID;
     };
 
@@ -427,11 +427,11 @@ const SendEurDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
     );
 };
 
-SendEurDrawer.propTypes = {
+SendNgnDrawer.propTypes = {
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     madePayment: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccount, madePayment })(SendEurDrawer);
+export default connect(undefined, { getAccount, madePayment })(SendNgnDrawer);

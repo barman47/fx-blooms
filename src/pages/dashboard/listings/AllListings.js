@@ -493,6 +493,7 @@ const AllListings = (props) => {
 	const hideListingsInNegotiation = () => {
 		setHideNegotiationListings(!hideNegotiationListings);
 		if (!hideNegotiationListings) {
+			console.log('Hiding unavailable listings');
 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 		}
 	};

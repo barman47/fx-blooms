@@ -108,7 +108,7 @@ const listingsReducer = (state = initialState, action) => {
         case HIDE_NEGOTIATION_LISTINGS:
             return {
                 ...state,
-                listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
+                listings: state.listings.filter(listing => listing.status === LISTING_STATUS.open)
             };
 
         case SET_MORE_LISTINGS: 
