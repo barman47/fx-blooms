@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory} from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, Link, TextField, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -86,6 +86,7 @@ const AdminLogin = (props) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
 
     const { isAuthenticated } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
@@ -101,7 +102,10 @@ const AdminLogin = (props) => {
     useEffect(() => {
         if (isAuthenticated) {
             return history.push(`${ADMIN_HOME}`);
-
+        }
+        if (location.state?.msg) {
+            setErrors({ msg: location.state.msg });
+            history.replace(location.pathname, {});
         }
         // eslint-disable-next-line
     }, []);

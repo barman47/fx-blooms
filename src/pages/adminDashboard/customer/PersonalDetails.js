@@ -321,7 +321,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                                         disableTouchRipple
                                         onClick={confirmCustomer}
                                     >
-                                        Confirm Customer
+                                        Unsuspend Customer
                                     </Button> 
                                 </Box>
                             }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory} from 'react-router-dom';
+import { Link as RouterLink, useHistory, useLocation} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -104,6 +104,7 @@ const useStyles = makeStyles(theme => ({
         color: theme.palette.primary.main,
         marginTop: theme.spacing(2),
         textDecoration: 'none',
+        
         '&:hover': {
             textDecoration: 'none'
         }
@@ -115,6 +116,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
+    const location = useLocation();
     const errorsState = useSelector(state => state.errors);
     const { customer, myLocation } = useSelector(state => state);
 
@@ -129,6 +131,10 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
     useEffect(() => {
         if (customer.isAuthenticated) {
             return history.push(DASHBOARD_HOME);
+        }
+        if (location.state?.msg) {
+            setErrors({ msg: location.state.msg });
+            history.replace(location.pathname, {});
         }
         getLocation();
         // eslint-disable-next-line

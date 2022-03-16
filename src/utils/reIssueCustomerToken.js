@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { createBrowserHistory } from 'history';
 
 import { API } from './constants';
 import { store } from '../store';
@@ -10,6 +11,7 @@ import { LOGIN } from '../routes';
 const reIssueCustomerToken = () => {
     return new Promise(async(resolve, reject) => {
         try {
+            // Redirect to login page
             const res = await axios.get(`${API}/Customer/ReIssueToken`, {
                 headers: {
                     'Authorization': 'Bearer',
@@ -31,7 +33,7 @@ const reIssueCustomerToken = () => {
             // console.log(err.response)
             setAuthToken(null);
             store.dispatch({ type: RESET_STORE });
-            window.location.href = LOGIN;
+            createBrowserHistory().push(LOGIN, { msg: 'Your session has expired' });
         }
     }); 
 };

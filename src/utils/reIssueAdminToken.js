@@ -1,3 +1,4 @@
+import { createBrowserHistory } from 'history';
 import axios from 'axios';
 
 import { API } from './constants';
@@ -31,7 +32,7 @@ const reIssueAdminToken = () => {
             // console.log(err.response)
             setAuthToken(null);
             store.dispatch({ type: RESET_STORE });
-            window.location.href = ADMIN_LOGIN;
+            createBrowserHistory().push(ADMIN_LOGIN, { msg: 'Your session has expired' });
         }
     }); 
 };
