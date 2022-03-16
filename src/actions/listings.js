@@ -10,6 +10,7 @@ import {
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
     GET_ERRORS,
+    SET_AS_ACCEPTED,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LOADING_LISTINGS, 
@@ -179,8 +180,11 @@ export const addBid = (bid, listing) => async (dispatch) => {
 
 export const madePayment = (data) => async (dispatch) => {
     try {
-        console.log(data);
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
+        return dispatch({
+            type: SET_AS_ACCEPTED,
+            payload: data.listingId
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

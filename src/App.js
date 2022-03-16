@@ -106,6 +106,10 @@ const theme = createTheme({
 			// dark: '#990300'
 		},
 
+		secondary: {
+			main: '#EB5757'
+		},
+
 		text: {
 			// primary: '#f8f8f8',
 			// secondary: '#f8f8f8'

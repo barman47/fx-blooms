@@ -64,12 +64,12 @@ const useStyles = makeStyles(theme => ({
     listingContent: {
         backgroundColor: COLORS.lightTeal,
         display: 'grid',
-        gridTemplateColumns: 'repeat(6, 1fr)',
+        gridTemplateColumns: 'repeat(5, 1fr)',
         gap: theme.spacing(1),
         padding: [[theme.spacing(4), theme.spacing(3)]],
 
         [theme.breakpoints.down('lg')]: {
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: 'repeat(5, 1fr)',
             gap: theme.spacing(1),
             padding: [[theme.spacing(3), theme.spacing(3)]]
         },
@@ -118,12 +118,12 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
 
     const userId = useSelector(state => state.customer.customerId);
 
-    const [expired, setExpired] = useState(false);
+    const [expired] = useState(false);
     const [timerHours, setTimerHours] = useState('0');
     const [timerMinutes, setTimerMinutes] = useState('0');
     const [timerSeconds, setTimerSeconds] = useState('0');
 
-    const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
+    const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
     const { finalized, negotiation } = LISTING_STATUS;
 
     const interval = useRef();
@@ -157,7 +157,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
 
             if (distance <= 0) {
                 clearInterval(interval.current);
-                setExpired(true);
+                // setExpired(true);
                 setTimerHours('00');
                 setTimerMinutes('00');
                 setTimerSeconds('00');
@@ -195,7 +195,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             to={USER_DETAILS} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
                             >
-                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy}</span>
+                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy.toLowerCase()}</span>
                         </RouterLink>
                     </Typography>
                     <section className={classes.timestamp}>
@@ -205,20 +205,24 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                 </header>
                 <Box component="div" className={classes.listingContent}>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You receive</span>
-                        {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I will receive</span>
+                        {userId === customerId ? 
+                            `${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`
+                            : 
+                            `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`
+                        }
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You send</span>
-                        {`${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I will send</span>
+                        {userId === customerId ? 
+                            `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`
+                            : 
+                            `${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`
+                        }
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
-                    </Typography>
-                    <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                        {minExchangeAmount?.amount ? `${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}` : `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
@@ -238,13 +242,13 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 root: classes.button
                             }}
                         >
-                            Just Accepted
+                            Accepted
                         </Button>
                         :
                         listing.customerId === userId ? 
                         <ButtonGroup 
                             className={classes.buttonGroup}
-                            variant="outlined" 
+                            variant="contained" 
                             aria-label="contained primary button group" 
                             disableElevation 
                             disableFocusRipple
@@ -253,7 +257,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             <Button 
                                 className={classes.buttons}
                                 color="primary"
-                                size="medium"
+                                size="large"
                                 disableElevation
                                 onClick={() => handleEditListing(listing)}
                                 disabled={listing.status === negotiation || listing.status  === finalized}
@@ -263,7 +267,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             <Button 
                                 className={classes.buttons}
                                 color="secondary"
-                                size="medium"
+                                size="large"
                                 disableElevation
                                 onClick={handleDeleteListing}
                                 disabled={listing.status === negotiation || listing.status  === finalized}

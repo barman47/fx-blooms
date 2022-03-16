@@ -13,7 +13,7 @@ import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_BID_STATUS } from '../../../ac
 
 import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
-import SendEurDrawer from './SendEurDrawer';
+import BuyerPaymentDrawer from './BuyerPaymentDrawer';
 import Listing from './Listing';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
@@ -56,7 +56,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
     const { addedBid, listings, msg } = useSelector(state => state.listings);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
-    const [openSendEurDrawer, setOpenSendEurDrawer] = useState(false);
+    const [openBuyerPaymentDrawer, setOpenSendEurDrawer] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -102,9 +102,9 @@ const Listings = ({ addBid, checkListingEditable }) => {
         }
     }, [idStatus, showPendingIdModal]);
 
-    const toggleSendEurDrawer = useCallback(() => {
-        setOpenSendEurDrawer(!openSendEurDrawer);
-    }, [openSendEurDrawer]);
+    const toggleBuyerPaymentDrawer = useCallback(() => {
+        setOpenSendEurDrawer(!openBuyerPaymentDrawer);
+    }, [openBuyerPaymentDrawer]);
 
     useEffect(() => {
         if (msg) {
@@ -115,15 +115,15 @@ const Listings = ({ addBid, checkListingEditable }) => {
     useEffect(() => {
         if (addedBid) {
             setLoading(false);
-            toggleSendEurDrawer();
+            toggleBuyerPaymentDrawer();
             dispatch({
                 type: TOGGLE_BID_STATUS
             });
         }
-    }, [addedBid, dispatch, toggleSendEurDrawer]);
+    }, [addedBid, dispatch, toggleBuyerPaymentDrawer]);
 
     // useEffect(() => {
-    //     if (openSendEurDrawer) {
+    //     if (openBuyerPaymentDrawer) {
     //         getAccount(listing.sellersAccountId);
     //     } else {
     //         dispatch({
@@ -131,7 +131,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
     //             payload: {}
     //         });
     //     }
-    // }, [dispatch, getAccount, listing.sellersAccountId, openSendEurDrawer]);
+    // }, [dispatch, getAccount, listing.sellersAccountId, openBuyerPaymentDrawer]);
 
     const verifyUserId = () => {
         idVerificationModal.current.openModal();
@@ -164,7 +164,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
                 type: SET_LISTING,
                 payload: listing
             });
-            return toggleSendEurDrawer();
+            return toggleBuyerPaymentDrawer();
         }
 
         setLoading(true);
@@ -202,7 +202,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
                 />
             }
             {loading && <Spinner />}
-            {openSendEurDrawer && <SendEurDrawer drawerOpen={openSendEurDrawer} toggleDrawer={toggleSendEurDrawer} />}
+            {openBuyerPaymentDrawer && <BuyerPaymentDrawer drawerOpen={openBuyerPaymentDrawer} toggleDrawer={toggleBuyerPaymentDrawer} />}
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             {listings.length > 0 ? 

@@ -643,9 +643,8 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup className={classes.buttonGroup}>
+							<ButtonGroup disableElevation variant="contained" className={classes.buttonGroup}>
 								<Button
-									variant="outlined"
 									color="primary"
 									size="small"
 									disableRipple
@@ -654,13 +653,13 @@ const AllListings = (props) => {
 									BUY EUR
 								</Button>
 								<Button
-									variant="contained"
-									color="secondary"
+									color="primary"
 									size="small"
 									disableRipple
 									disableFocusRipple
+									disabled
 								>
-									SELL EUR
+									BUY NGN
 								</Button>
 							</ButtonGroup>
 							<form onSubmit={handleFilter}>

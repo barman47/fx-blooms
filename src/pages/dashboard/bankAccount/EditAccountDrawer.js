@@ -62,6 +62,7 @@ const EditAccountDrawer = ({ editAccount, toggleDrawer, drawerOpen }) => {
     const [bankName, setBankName] = useState('');
     const [accountNumber, setAccountNumber] = useState('');
     const [accountName, setAccountName] = useState('');
+    // const [nickName, setNickName] = useState('');
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [errors, setErrors] = useState({});
@@ -98,7 +99,8 @@ const EditAccountDrawer = ({ editAccount, toggleDrawer, drawerOpen }) => {
         const data = {
             bankName,
             accountName,
-            accountNumber
+            accountNumber,
+            // nickName
             // currency:
         };
 
@@ -168,6 +170,22 @@ const EditAccountDrawer = ({ editAccount, toggleDrawer, drawerOpen }) => {
                                 disabled={loading ? true : false}
                             />
                         </Grid>
+                        {/* <Grid item xs={12}>
+                            <Typography variant="subtitle2" component="span">Account Alias</Typography>
+                            <TextField 
+                                className={classes.input}
+                                value={nickName}
+                                onChange={(e) => setNickName(e.target.value)}
+                                type="text"
+                                variant="outlined" 
+                                placeholder="Enter Account Alias"
+                                helperText={errors.nickName || 'An alias to identify your account'}
+                                fullWidth
+                                required
+                                error={errors.nickName ? true : false}
+                                disabled={loading ? true : false}
+                            />
+                        </Grid> */}
                         <Grid item xs={12}>
                             <Button 
                                 type="submit" 

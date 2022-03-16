@@ -19,7 +19,7 @@ import extractCountryCode from '../../../utils/extractCountryCode';
 import { ACCOUNT } from '../../../routes';
 
 import Notification from './Notification';
-import SendEurDrawer from './SendEurDrawer';
+import SellerPaymentDrawer from './SellerPaymentDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 
@@ -105,7 +105,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
-    const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
+    const [sellerPaymentDrawerOpen, setSellerPaymentDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
     const [countryCode, setCountryCode] = useState('');
@@ -138,7 +138,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }, [msg]);
 
     useEffect(() => {
-        if (!sendEurDrawerOpen) {
+        if (!sellerPaymentDrawerOpen) {
             setAmount(0);
             setTransactionId(null);
             setSellerUsername('');
@@ -147,7 +147,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 payload: {}
             });
         }
-    }, [dispatch, sendEurDrawerOpen]);
+    }, [dispatch, sellerPaymentDrawerOpen]);
 
     const handlePaymentReceived = (id, buyerUsername) => {
         const data = {
@@ -185,14 +185,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
         });
         
-        toggleSendEurDrawer();
+        toggleSellerPaymentDrawer();
     };
 
-    const toggleSendEurDrawer = () => {
-        setSendEurDrawerOpen(!sendEurDrawerOpen);
+    const toggleSellerPaymentDrawer = () => {
+        setSellerPaymentDrawerOpen(!sellerPaymentDrawerOpen);
 
         // clear message if drawer is open and being closed
-        if (sendEurDrawerOpen) {
+        if (sellerPaymentDrawerOpen) {
             dispatch({
                 type: SET_NOTIFICATION_MSG,
                 payload: null
@@ -285,7 +285,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const dismissAction = () => {
         setOpen(false);
-        setSendEurDrawerOpen(false);
+        setSellerPaymentDrawerOpen(false);
         dispatch({
             type: SET_CUSTOMER_MSG,
             payload: null
@@ -294,10 +294,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     return (
         <>
-            {sendEurDrawerOpen && 
-                <SendEurDrawer 
-                    toggleDrawer={toggleSendEurDrawer} 
-                    drawerOpen={sendEurDrawerOpen} 
+            {sellerPaymentDrawerOpen && 
+                <SellerPaymentDrawer 
+                    toggleDrawer={toggleSellerPaymentDrawer} 
+                    drawerOpen={sellerPaymentDrawerOpen} 
                     amount={amount} 
                     transactionId={transactionId}
                     sellerUsername={sellerUsername}

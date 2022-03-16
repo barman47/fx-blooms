@@ -16,6 +16,7 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Alert from '@material-ui/lab/Alert';
 import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
 import _ from 'lodash';
 import toast, { Toaster } from 'react-hot-toast';
@@ -148,7 +149,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) => {
+const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -331,7 +332,7 @@ const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
                 </Grid>
                 <ol>
                     <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Transfer the NGN to the {`${listing.listedBy}'s`} account below</Typography></li>
+                    <li><Typography variant="body2" component="p">Transfer the NGN to the {`${listing.listedBy.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on NGN Payment Made</Typography></li>
                 </ol>
                 <Grid item xs={12}>
@@ -350,7 +351,6 @@ const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
                                 <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
                             </div>
-                            {/* <div className={classes.accountContainer}> */}
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
                                 <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
@@ -409,6 +409,7 @@ const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
                     <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
                 </Grid>
                 <Grid item xs={12}>
+                    {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
                     <Button 
                         type="submit"
                         variant="contained" 
@@ -419,7 +420,7 @@ const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
                         disabled={loading || buttonDisabled || !isEmpty(errors)  || isEmpty(account) ? true : false}
                         onClick={handleMadepayment}
                     >
-                        {loading ? 'One Moment . . .' : `${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} NGN Payment Made`}
+                        {loading ? 'One Moment . . .' : `NGN${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}
                     </Button>
                 </Grid>
             </Drawer>
@@ -427,11 +428,11 @@ const SendNgnDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) =>
     );
 };
 
-SendNgnDrawer.propTypes = {
+BuyerPaymentDrawer.propTypes = {
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     madePayment: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccount, madePayment })(SendNgnDrawer);
+export default connect(undefined, { getAccount, madePayment })(BuyerPaymentDrawer);

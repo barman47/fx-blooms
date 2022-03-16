@@ -7,6 +7,7 @@ import {
     SET_MORE_LISTINGS,
     SET_LISTING,
     CANCELED_NEGOTIATION,
+    SET_AS_ACCEPTED,
     SET_LOADING_LISTINGS,
     SET_LISTING_MSG,
     HIDE_NEGOTIATION_LISTINGS,
@@ -50,6 +51,17 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 bid: action.payload
+            };
+
+        case SET_AS_ACCEPTED:
+            listingId = action.payload;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingsList = [...state.listings];
+            listing = { ...state.listings[listingIndex], status: LISTING_STATUS.negotiation };
+            listingsList.splice(listingIndex, 1, listing);
+            return {
+                ...state,
+                listings: [...listingsList]
             };
 
         case TOGGLE_BID_STATUS:
