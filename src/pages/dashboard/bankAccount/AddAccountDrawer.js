@@ -27,7 +27,6 @@ const useStyles = makeStyles(theme => ({
     drawer: {
         padding: theme.spacing(4),
         width: '35vw',
-
         [theme.breakpoints.down('md')]: {
             width: '50vw'
         },
@@ -60,11 +59,15 @@ const useStyles = makeStyles(theme => ({
         textTransform: 'capitalize'
     },
 
-        progress: {
+    progress: {
         color: COLORS.darkGrey,
         position: 'relative',
         top: '5px'
-    }
+    },
+
+    button: {
+        marginBottom: theme.spacing(4)
+    }    
 }));
 
 function TabPanel(props) {
@@ -114,6 +117,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
     const [BankName, setBankName] = useState('');
     const [AccountNumber, setAccountNumber] = useState('');
     const [AccountName, setAccountName] = useState(`${firstName} ${lastName}`);
+    const [nickName, setNickName] = useState('');
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
@@ -216,6 +220,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
         const data = {
             BankName,
             AccountName,
+            nickName,
             AccountNumber,
             Currency: handleSetCurrency(),
             CustomerId: customerId
@@ -267,7 +272,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                 </Tabs>
                 <TabPanel value={value} index={ngn && eur ? 0 : ngn && !eur ? 0 : 1}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
-                        <Grid container direction="column" spacing={matches ? 3 : 2}>
+                        <Grid container direction="column" spacing={matches ? 3 : 1}>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Add your NGN receiving account</Typography>
                             </Grid>
@@ -320,6 +325,22 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <Typography variant="subtitle2" component="span">Account Alias</Typography>
+                                <TextField 
+                                    className={classes.input}
+                                    value={nickName}
+                                    onChange={(e) => setNickName(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Account Alias"
+                                    helperText={errors.nickName || 'An alias to identify your account'}
+                                    fullWidth
+                                    required
+                                    error={errors.nickName ? true : false}
+                                    disabled={loading ? true : false}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
                                 <Button 
                                     type="submit" 
                                     variant="contained" 
@@ -327,6 +348,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                     fullWidth 
                                     disableFocusRipple
                                     disabled={loading ? true : false}
+                                    className={classes.button}
                                 >
                                     {loading ? <span>Adding Account. . .&nbsp;&nbsp;&nbsp;<CircularProgress size={20} className={classes.progress} /></span> : 'Add Account'}
                                 </Button>            
@@ -336,7 +358,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                 </TabPanel>
                 <TabPanel value={value} index={ngn && eur ? 1 : !ngn && eur ? 0 : 1}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
-                        <Grid container direction="column" spacing={matches ? 3 : 2}>
+                        <Grid container direction="column" spacing={matches ? 3 : 1}>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Add your EUR receiving account</Typography>
                             </Grid>
@@ -389,6 +411,22 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                 />
                             </Grid>
                             <Grid item xs={12}>
+                                <Typography variant="subtitle2" component="span">Account Alias</Typography>
+                                <TextField 
+                                    className={classes.input}
+                                    value={nickName}
+                                    onChange={(e) => setNickName(e.target.value)}
+                                    type="text"
+                                    variant="outlined" 
+                                    placeholder="Enter Account Alias"
+                                    helperText={errors.nickName || 'An alias to identify your account'}
+                                    fullWidth
+                                    required
+                                    error={errors.nickName ? true : false}
+                                    disabled={loading ? true : false}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
                                 <Button 
                                     type="submit" 
                                     variant="contained" 
@@ -396,6 +434,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn }) =>
                                     fullWidth 
                                     disableFocusRipple
                                     disabled={loading ? true : false}
+                                    className={classes.button}
                                 >
                                     {loading ? <span>Adding Account. . .&nbsp;&nbsp;&nbsp;<CircularProgress size={20} className={classes.progress} /></span> : 'Add Account'}
                                 </Button>            

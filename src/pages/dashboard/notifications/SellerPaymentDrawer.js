@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -10,16 +10,20 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ContentCopy } from 'mdi-material-ui';
+import { Close, ContentCopy } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
 import { sendTransactionNotification } from '../../../actions/notifications';
+import { GET_ERRORS } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+import isEmpty from '../../../utils/isEmpty';
+
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -39,6 +43,10 @@ const useStyles = makeStyles(theme => ({
 
     header: {
         color: theme.palette.primary.main,
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between'
     },
 
     transactionContainer: {
@@ -108,18 +116,41 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
+const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
+    const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
     const message = useSelector(state => state.notifications.msg);
+    const errorsState = useSelector(state => state.errors);
     
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const toastRef = useRef();
 
     useEffect(() => {
         setOpen(drawerOpen);
     }, [drawerOpen]);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toastRef.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+            toggleDrawer();
+        }
+    }, [dispatch, errorsState, errors, toggleDrawer]);
 
     const handleCopyTransactionId = () => {
         copy(transactionId);
@@ -134,6 +165,15 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 	return (
         <>
             <Toaster />
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toastRef}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <Drawer 
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
@@ -141,8 +181,16 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
                 onClose={toggleDrawer}
             >
                 <Grid container direction="row" spacing={3}>
-                    <Grid item xs={12}>
+                    <Grid item xs={12} className={classes.header}>
                         <Typography variant="h6" className={classes.header}>Send EUR</Typography>
+                        <IconButton 
+                            color="primary" 
+                            disableFocusRipple
+                            variant="text"
+                            onClick={toggleDrawer}
+                        >
+                            <Close />
+                        </IconButton>
                     </Grid>
                     <Grid item xs={12} className={classes.transactionContainer}>
                         <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
@@ -203,7 +251,7 @@ const SendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTr
 	);
 };
 
-SendEurDrawer.propTypes = {
+SellerPaymentDrawer.propTypes = {
     amount: PropTypes.number.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
@@ -211,4 +259,4 @@ SendEurDrawer.propTypes = {
     transactionId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { sendTransactionNotification })(SendEurDrawer);
+export default connect(undefined, { sendTransactionNotification })(SellerPaymentDrawer);

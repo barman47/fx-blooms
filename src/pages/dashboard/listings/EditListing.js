@@ -26,7 +26,7 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, updateListing } from '../../../actions/listings';
-import { UPDATED_LISTING, GET_ERRORS, SET_LISTING } from '../../../actions/types';
+import { UPDATED_LISTING, GET_ERRORS } from '../../../actions/types';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -174,7 +174,7 @@ const EditListing = (props) => {
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
+    // const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
@@ -212,13 +212,6 @@ const EditListing = (props) => {
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
-
-        return () => {
-            dispatch({
-                type: SET_LISTING,
-                payload: {}
-            });
-        };
         // eslint-disable-next-line
     }, []);
 
@@ -273,13 +266,13 @@ const EditListing = (props) => {
         }
     }, [editedListing, dispatch, msg]);
 
-    useEffect(() => {
-        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
-            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
-        } else {
-            setErrors({});
-        }
-    }, [ExchangeAmount, MinExchangeAmount]);
+    // useEffect(() => {
+    //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+    //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+    //     } else {
+    //         setErrors({});
+    //     }
+    // }, [ExchangeAmount, MinExchangeAmount]);
 
     // useEffect(() => {
     //     if (ExchangeAmount && ReceiptAmount) {
@@ -296,13 +289,14 @@ const EditListing = (props) => {
     // Prefill input fields
     useEffect(() => {
         if (!isEmpty(listing)) {
-            const { amountAvailable, amountNeeded, minExchangeAmount, exchangeRate, bank } = listing;
+            const { amountAvailable, amountNeeded, exchangeRate, bank, reference } = listing;
 
             setAvailableCurrency(amountAvailable?.currencyType);
             setExchangeAmount(amountAvailable?.amount);
             setRequiredCurrency(amountNeeded?.currencyType);
             setExchangeRate(exchangeRate);
-            setMinExchangeAmount(minExchangeAmount?.amount);
+            // setMinExchangeAmount(minExchangeAmount?.amount || '');
+            setReference(reference || '');
             handlePrefillBank(bank);
         }
     }, [customerId, listing.id, listing, listings]);
@@ -410,7 +404,7 @@ const EditListing = (props) => {
         setExchangeAmount('');
         setRequiredCurrency('');
         setExchangeRate('');
-        setMinExchangeAmount('');
+        // setMinExchangeAmount('');
         setReceiptAmount('');
         // setListingFee('');
         setLoading(false);
@@ -439,7 +433,7 @@ const EditListing = (props) => {
             ExchangeAmount,
             RequiredCurrency,
             ExchangeRate,
-            MinExchangeAmount,
+            // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
             ListingFee,
@@ -467,7 +461,8 @@ const EditListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: parseFloat(MinExchangeAmount)
+                Amount: 0
+                // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),
@@ -602,7 +597,7 @@ const EditListing = (props) => {
                                     </Tooltip>
                                     {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></FormHelperText>}
                                 </Grid>
-                                <Grid item xs={4}>
+                                {/* <Grid item xs={4}>
                                     <br />
                                     <FormControl 
                                         variant="outlined" 
@@ -644,7 +639,7 @@ const EditListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
                                     <FormControl 

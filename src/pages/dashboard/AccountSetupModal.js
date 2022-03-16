@@ -89,7 +89,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
                         <Typography variant="h6" color="primary">First, let's verify your Identity</Typography>
-                        <Typography variant="subtitle1">We are required by law to verify users' identity before buying or selling.</Typography>
+                        <Typography variant="subtitle1">All users are required to verify their  identity in order to buy or sell on FXBLOOMS.</Typography>
                         <Grid container direction="row">
                             <Grid item xs={6}>
                                 <Button variant="text" size="small" color="secondary" onClick={() => setOpen(false)}>Skip</Button>

@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme =>({
         marginTop: theme.spacing(-2),
 
         [theme.breakpoints.down('sm')]: {
-            marginTop: 0
+            marginTop: theme.spacing(-4),
         }
     },
 
@@ -166,6 +166,7 @@ const BankAccounts = ({ deleteAccount }) => {
                             accountName={account.accountName}
                             accountNumber={account.accountNumber}
                             currency={account.currency}
+                            alias={account.nicKName || ''}
                             handleDeleteAccount={() => handleDeleteAccount(account.accountID)}
                             handleEditAccount={() => handleEditAccount(account)}
                         />

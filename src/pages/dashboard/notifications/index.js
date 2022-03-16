@@ -4,6 +4,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { Key, PhoneCheck, Passport } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 
 import { COLORS, ID_STATUS } from '../../../utils/constants';
@@ -18,7 +19,7 @@ import extractCountryCode from '../../../utils/extractCountryCode';
 import { ACCOUNT } from '../../../routes';
 
 import Notification from './Notification';
-import SendEurDrawer from './SendEurDrawer';
+import SellerPaymentDrawer from './SellerPaymentDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 
@@ -104,7 +105,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
-    const [sendEurDrawerOpen, setSendEurDrawerOpen] = useState(false);
+    const [sellerPaymentDrawerOpen, setSellerPaymentDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
     const [countryCode, setCountryCode] = useState('');
@@ -137,7 +138,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }, [msg]);
 
     useEffect(() => {
-        if (!sendEurDrawerOpen) {
+        if (!sellerPaymentDrawerOpen) {
             setAmount(0);
             setTransactionId(null);
             setSellerUsername('');
@@ -146,7 +147,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 payload: {}
             });
         }
-    }, [dispatch, sendEurDrawerOpen]);
+    }, [dispatch, sellerPaymentDrawerOpen]);
 
     const handlePaymentReceived = (id, buyerUsername) => {
         const data = {
@@ -160,6 +161,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const setBuyerAccount = (notification) => {
         const { buyer, seller } = notification;
+        debugger
         setTransactionId(notification.id);
         setSellerUsername(seller.userName);
         
@@ -183,14 +185,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
         });
         
-        toggleSendEurDrawer();
+        toggleSellerPaymentDrawer();
     };
 
-    const toggleSendEurDrawer = () => {
-        setSendEurDrawerOpen(!sendEurDrawerOpen);
+    const toggleSellerPaymentDrawer = () => {
+        setSellerPaymentDrawerOpen(!sellerPaymentDrawerOpen);
 
         // clear message if drawer is open and being closed
-        if (sendEurDrawerOpen) {
+        if (sellerPaymentDrawerOpen) {
             dispatch({
                 type: SET_NOTIFICATION_MSG,
                 payload: null
@@ -283,7 +285,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const dismissAction = () => {
         setOpen(false);
-        setSendEurDrawerOpen(false);
+        setSellerPaymentDrawerOpen(false);
         dispatch({
             type: SET_CUSTOMER_MSG,
             payload: null
@@ -292,10 +294,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     return (
         <>
-            {sendEurDrawerOpen && 
-                <SendEurDrawer 
-                    toggleDrawer={toggleSendEurDrawer} 
-                    drawerOpen={sendEurDrawerOpen} 
+            {sellerPaymentDrawerOpen && 
+                <SellerPaymentDrawer 
+                    toggleDrawer={toggleSellerPaymentDrawer} 
+                    drawerOpen={sellerPaymentDrawerOpen} 
                     amount={amount} 
                     transactionId={transactionId}
                     sellerUsername={sellerUsername}
@@ -337,6 +339,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 message="Required to BUY and SELL. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyEuId}
+                                icon={<Passport />}
+						        iconBackgroundColor="#000100"
                             />
                         }
                         {/* eslint-disable-next-line no-mixed-operators */}
@@ -346,22 +350,28 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 message="Required to BUY only. Click Verify ID to proceed."
                                 buttonText="Verify ID"
                                 buttonAction={verifyOtherId}
+                                icon={<Passport />}
+						        iconBackgroundColor="#000100"
                             />
                         )}
                         {!hasSetup2FA &&
                             <Notification 
-                                title="Set up  2FA"
-                                message="Required to keep your account more secure. Click Setup 2FA to proceed."
+                                title="Set up 2FA"
+                                message="Add extra layer of Security"
                                 buttonText="Setup 2FA"
                                 buttonAction={setup2FA}
+						        icon={<Key />}
+						        iconBackgroundColor="#000100"
                             />
                         }
                         {!isPhoneNumberVerified && 
                             <Notification 
-                                title="Verify phone number"
+                            title="Verify phone number"
                                 message="Required to receive SMS notifications. Click Verify Phone to proceed."
                                 buttonText="Verify Phone"
                                 buttonAction={verifyPhone}
+                                icon={<PhoneCheck />}
+						        iconBackgroundColor="#2893EB"
                             />
                         }
                         {/* <Notification 

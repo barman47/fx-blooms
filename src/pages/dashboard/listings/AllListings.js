@@ -18,7 +18,8 @@ import {
 } from '@material-ui/core';
 // import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { FilterOutline } from 'mdi-material-ui';
+// import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -34,7 +35,7 @@ import {
 	SET_LOADING_LISTINGS 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
-import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
+import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -46,6 +47,7 @@ import FundWalletDrawer from '../wallet/FundWalletDrawer';
 import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
+// import NewNotification from '../notifications/NewNotification';
 // import RiskNoticeModal from './RiskNoticeModal';
 
 // import img from '../../../assets/img/decentralized.svg';
@@ -68,10 +70,9 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	header: {
-		display: 'flex',
-		flexDirection: 'row',
-		justifyContent: 'space-between',
-		marginBottom: theme.spacing(5),
+		display: 'grid',
+		gridTemplateColumns: '1fr 1fr',
+		marginBottom: theme.spacing(2),
 		marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
 
@@ -79,20 +80,22 @@ const useStyles = makeStyles(theme => ({
 			display: 'grid',
 			gridTemplateColumns: '1fr',
 			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5)
+			paddingRight: theme.spacing(5),
+			gap: theme.spacing(1)
 		},
 
 		[theme.breakpoints.down('sm')]: {
+			marginBottom: '0',
 			paddingLeft: theme.spacing(2),
 			paddingRight: theme.spacing(2)
 		},
 
-		'& div:first-child': {
-			'& p:last-child': {
-				marginTop: theme.spacing(2),
-				color: COLORS.grey
-			}
-		}
+		// '& div:first-child': {
+		// 	'& p:last-child': {
+		// 		marginTop: theme.spacing(2),
+		// 		color: COLORS.grey
+		// 	}
+		// }
 	},
 
 	root: {
@@ -108,7 +111,7 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '1fr',
 		flexDirection: 'column',
-		gap: theme.spacing(5),
+		// gap: theme.spacing(1),
 		paddingLeft: theme.spacing(5),
 		paddingRight: theme.spacing(5),
 		margin: '0 auto',
@@ -133,15 +136,21 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		margin: '0 auto',
-		width: '80%',
+		width: '100%',
 
 		[theme.breakpoints.down('md')]: {
 			width: '100%'
 		}
 	},
 
+	walletToggleContainer: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'flex-end',
+		marginRight: theme.spacing(7)
+	},
+
 	walletToggle: {
-		alignSelf: 'flex-end',
 		color: theme.palette.primary.main,
 
 		[theme.breakpoints.down('md')]: {
@@ -159,6 +168,7 @@ const useStyles = makeStyles(theme => ({
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		marginBottom: theme.spacing(1),
+		marginTop: theme.spacing(1),
 
 		[theme.breakpoints.down('sm')]: {
 			display: 'grid',
@@ -250,7 +260,7 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingContainer: {
-		marginTop: theme.spacing(5)
+		marginTop: theme.spacing(1)
 	},
 
 	// filter: {
@@ -346,7 +356,7 @@ const AllListings = (props) => {
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
 	// eslint-disable-next-line
-	const [showWallets, setShowWallets] = useState(true);
+	const [showWallets, setShowWallets] = useState(false);
 
 	let loadedEvent = useRef();
     const walletInfoModal = useRef();
@@ -483,6 +493,7 @@ const AllListings = (props) => {
 	const hideListingsInNegotiation = () => {
 		setHideNegotiationListings(!hideNegotiationListings);
 		if (!hideNegotiationListings) {
+			console.log('Hiding unavailable listings');
 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 		}
 	};
@@ -537,21 +548,35 @@ const AllListings = (props) => {
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					<Typography variant="body1" component="p">What would you like to do today?</Typography> 
+					{/* <Typography variant="body1" component="p">What would you like to do today?</Typography>  */}
 				</div>
-				<Button
-					variant="text"
-					size="small"
-					startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
-					classes={{
-						root: classes.walletToggle
-					}}
-					onClick={() => setShowWallets(!showWallets)}
-				>
-					{showWallets ? 'Hide Wallets' : 'Show Wallets'}
-				</Button>
+				{/* <div>
+					<NewNotification 
+						title="Set up  2FA"
+						message="Required to keep your account more secure. Click Setup 2FA to proceed."
+						buttonText="Setup 2FA"
+						buttonAction={() => {}}
+						icon={<Camera />}
+						iconBackgroundColor="#F79410"
+						iconColor="white"
+					/>
+				</div> */}
+				
 			</section>
 			<Box component="section" className={classes.root}>
+				{/* <Box component="div" className={classes.walletToggleContainer}>
+					<Button
+						variant="text"
+						size="small"
+						startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
+						classes={{
+							root: classes.walletToggle
+						}}
+						onClick={() => setShowWallets(!showWallets)}
+						>
+						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
+					</Button>
+				</Box> */}
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
 						<section className={classes.wallets}>
@@ -618,9 +643,8 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup className={classes.buttonGroup}>
+							<ButtonGroup disableElevation variant="contained" className={classes.buttonGroup}>
 								<Button
-									variant="outlined"
 									color="primary"
 									size="small"
 									disableRipple
@@ -629,13 +653,13 @@ const AllListings = (props) => {
 									BUY EUR
 								</Button>
 								<Button
-									variant="contained"
-									color="secondary"
+									color="primary"
 									size="small"
 									disableRipple
 									disableFocusRipple
+									disabled
 								>
-									SELL EUR
+									BUY NGN
 								</Button>
 							</ButtonGroup>
 							<form onSubmit={handleFilter}>
@@ -651,7 +675,7 @@ const AllListings = (props) => {
 									error={errors.Amount ? true : false}
 									disabled={listingsLoading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start">EUR</InputAdornment>,
+										startAdornment: <InputAdornment position="start" color="primary">EUR | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
 											<Button
 												variant="contained"

@@ -11,7 +11,7 @@ const getLastFinalizedListing = (listings) => {
             recommendedListing = listings[i];
         }
     }
-    return recommendedListing.exchangeRate - 2;
+    return recommendedListing.exchangeRate;
 };
 
 const getRecommendedRate = (listings) => {

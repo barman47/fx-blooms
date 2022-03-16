@@ -5,20 +5,14 @@ import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
-import { getCustomer, getSeller } from '../../../actions/customer';
+import { getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import isEmpty from '../../../utils/isEmpty';
-import { getAccount } from '../../../actions/bankAccounts';
-import { GET_ERRORS, REMOVE_EXPIRED_LISTING, SET_ACCOUNT, SET_LISTING } from '../../../actions/types';
-import { COLORS, ID_STATUS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { ACCOUNT, EDIT_LISTING, USER_DETAILS } from '../../../routes';
-
-import PlaceBidDrawer from './PlaceBidDrawer';
-
-import Toast from '../../../components/common/Toast';
+import { REMOVE_EXPIRED_LISTING } from '../../../actions/types';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { ACCOUNT, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -70,12 +64,12 @@ const useStyles = makeStyles(theme => ({
     listingContent: {
         backgroundColor: COLORS.lightTeal,
         display: 'grid',
-        gridTemplateColumns: 'repeat(6, 1fr)',
+        gridTemplateColumns: 'repeat(5, 1fr)',
         gap: theme.spacing(1),
         padding: [[theme.spacing(4), theme.spacing(3)]],
 
         [theme.breakpoints.down('lg')]: {
-            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateColumns: 'repeat(5, 1fr)',
             gap: theme.spacing(1),
             padding: [[theme.spacing(3), theme.spacing(3)]]
         },
@@ -116,30 +110,23 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller }) => {
+const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const history = useHistory();
 
-    const errorsState = useSelector(state => state.errors);
-    const { stats } = useSelector(state => state.customer);
     const userId = useSelector(state => state.customer.customerId);
 
-    const [openPlaceBidDrawer, setOpenPlaceBidDrawer] = useState(false);
-    const [expired, setExpired] = useState(false);
+    const [expired] = useState(false);
     const [timerHours, setTimerHours] = useState('0');
     const [timerMinutes, setTimerMinutes] = useState('0');
     const [timerSeconds, setTimerSeconds] = useState('0');
-    const [errors, setErrors] = useState({});
 
-    const { id, amountAvailable, amountNeeded, bank, minExchangeAmount, exchangeRate, listedBy, customerId, dateCreated } = listing;
+    const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
     const { finalized, negotiation } = LISTING_STATUS;
 
-    const toast = useRef();
     const interval = useRef();
-
-    const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
         startExpiryTimer();
@@ -158,33 +145,6 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
         }
     }, [dispatch, expired, listing.id]);
 
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setErrors({ msg: errorsState.msg });
-        }
-    }, [errorsState]);
-
-    useEffect(() => {
-        if (!isEmpty(errors)) {
-            toast.current.handleClick();
-            dispatch({
-                type: GET_ERRORS,
-                payload: {}
-            });
-        }
-    }, [dispatch, errors]);
-
-    useEffect(() => {
-        if (openPlaceBidDrawer) {
-            getAccount(listing.sellersAccountId);
-        } else {
-            dispatch({
-                type: SET_ACCOUNT,
-                payload: {}
-            });
-        }
-    }, [dispatch, getAccount, listing.sellersAccountId, openPlaceBidDrawer]);
-
     const startExpiryTimer = () => {
         const countDownDate = new Date(dateCreated).getTime() + 259_200_000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
@@ -195,9 +155,9 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            if (distance < 0) {
+            if (distance <= 0) {
                 clearInterval(interval.current);
-                setExpired(true);
+                // setExpired(true);
                 setTimerHours('00');
                 setTimerMinutes('00');
                 setTimerSeconds('00');
@@ -224,34 +184,9 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
             deleteListing(id);
         }
     };
-
-    const handleEditListing = (listing) => {
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-        return history.push(EDIT_LISTING);
-    };
-    
-    const togglePlaceBidDrawer = () => {
-        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
-            return checkIdStatus();
-        }
-        setOpenPlaceBidDrawer(!openPlaceBidDrawer);
-    };
     
     return (
         <>
-            {!isEmpty(errors) && 
-                <Toast 
-                    ref={toast}
-                    title="ERROR"
-                    duration={5000}
-                    msg={errors.msg || ''}
-                    type="error"
-                />
-            }
-            {openPlaceBidDrawer && <PlaceBidDrawer drawerOpen={openPlaceBidDrawer} toggleDrawer={togglePlaceBidDrawer} listing={listing} />}
             <section className={classes.root}>
                 <header>
                     <Typography variant="body2" component="p">
@@ -260,7 +195,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                             to={USER_DETAILS} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
                             >
-                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy}</span>
+                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy.toLowerCase()}</span>
                         </RouterLink>
                     </Typography>
                     <section className={classes.timestamp}>
@@ -270,20 +205,24 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                 </header>
                 <Box component="div" className={classes.listingContent}>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You receive</span>
-                        {`${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I will receive</span>
+                        {userId === customerId ? 
+                            `${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`
+                            : 
+                            `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`
+                        }
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>You send</span>
-                        {`${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`}
+                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>I will send</span>
+                        {userId === customerId ? 
+                            `${amountAvailable?.currencyType}${formatNumber(amountAvailable?.amount)}`
+                            : 
+                            `${amountNeeded?.currencyType}${formatNumber(amountNeeded?.amount)}`
+                        }
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
-                    </Typography>
-                    <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Minimum Amount</span>
-                        {`${minExchangeAmount?.currencyType}${formatNumber(minExchangeAmount?.amount)}`}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
@@ -303,13 +242,13 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 root: classes.button
                             }}
                         >
-                            Just Accepted
+                            Accepted
                         </Button>
                         :
                         listing.customerId === userId ? 
                         <ButtonGroup 
                             className={classes.buttonGroup}
-                            variant="outlined" 
+                            variant="contained" 
                             aria-label="contained primary button group" 
                             disableElevation 
                             disableFocusRipple
@@ -318,7 +257,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                             <Button 
                                 className={classes.buttons}
                                 color="primary"
-                                size="medium"
+                                size="large"
                                 disableElevation
                                 onClick={() => handleEditListing(listing)}
                                 disabled={listing.status === negotiation || listing.status  === finalized}
@@ -328,7 +267,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                             <Button 
                                 className={classes.buttons}
                                 color="secondary"
-                                size="medium"
+                                size="large"
                                 disableElevation
                                 onClick={handleDeleteListing}
                                 disabled={listing.status === negotiation || listing.status  === finalized}
@@ -346,8 +285,7 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
                                 contained: classes.button,
                                 root: classes.button
                             }}
-                            // onClick={() => togglePlaceBidDrawer(listing.sellersAccountId)}
-                            onClick={togglePlaceBidDrawer}
+                            onClick={() => handleAddBid(listing)}
                         >
                             Buy EUR
                         </Button>
@@ -359,12 +297,10 @@ const Listing = ({ checkIdStatus, deleteListing, listing, getAccount, getSeller 
 };
 
 Listing.propTypes = {
-    checkIdStatus: PropTypes.func.isRequired,
-    getAccount: PropTypes.func.isRequired,
-    getCustomer: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
+    handleEditListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
     deleteListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { deleteListing, getAccount, getCustomer, getSeller })(Listing);
+export default connect(undefined, { deleteListing, getSeller })(Listing);

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { DASHBOARD_HOME } from '../routes';
+import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
 import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
@@ -9,6 +9,9 @@ import {
     ADDED_LISTING, 
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
+    GET_ERRORS,
+    SET_AS_ACCEPTED,
+    SET_LISTING, 
     SET_LISTINGS, 
     SET_LOADING_LISTINGS, 
     SET_MORE_LISTINGS,
@@ -49,6 +52,27 @@ export const addListing = (listing) => async (dispatch) => {
         return dispatch({
             type: ADDED_LISTING,
             payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const checkListingEditable = (listing, history) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/Editable/${listing.id}`);
+        const editable = res.data.data;
+        if (editable) {
+            dispatch({
+                type: SET_LISTING,
+                payload: listing
+            });
+            return history.push(EDIT_LISTING);
+        }
+        return dispatch({
+            type: GET_ERRORS,
+            payload: { msg: 'You can not edit an accepted offer.' }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -132,16 +156,22 @@ export const getMoreListings = (query) => async (dispatch) => {
     }
 };
 
-export const addBid = (bid) => async (dispatch) => {
+export const addBid = (bid, listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AddBid`, bid);
-        return dispatch({
-            type: ADDED_BID,
-            payload: {
-                bid: res.data.data,
-                addedBid: true
-            }
+        return batch(() => {
+            dispatch({
+                type: SET_LISTING,
+                payload: listing
+            });
+            dispatch({
+                type: ADDED_BID,
+                payload: {
+                    bid: res.data.data,
+                    addedBid: true
+                }
+            })
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -151,6 +181,10 @@ export const addBid = (bid) => async (dispatch) => {
 export const madePayment = (data) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
+        return dispatch({
+            type: SET_AS_ACCEPTED,
+            payload: data.listingId
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

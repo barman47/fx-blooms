@@ -295,9 +295,11 @@ const Dashboard = ({ children, title, logout }) => {
                 
                 switch (type) {
                     case BUYER_MADE_PAYMENT:
-                        buyer = payload.Buyer;
-                        seller = payload.Seller;
-                        id = payload.Id;
+                        buyer = payload.Data.Buyer;
+                        seller = payload.Data.Seller;
+                        // buyer = payload.Buyer;
+                        // seller = payload.Seller;
+                        id = payload.Data.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
                             batch(() => {
@@ -315,7 +317,8 @@ const Dashboard = ({ children, title, logout }) => {
                                                 customerId: buyer.CustomerId,
                                                 hasMadePayment: buyer.HasMadePayment,
                                                 hasReceivedPayment: buyer.HasReceivedPayment,
-                                                userName: buyer.UserName
+                                                userName: buyer.UserName,
+                                                transferReference: buyer.TransferReference
                                             },
                                             seller: {
                                                 accountName: seller.AccountName,
@@ -325,7 +328,8 @@ const Dashboard = ({ children, title, logout }) => {
                                                 customerId: seller.CustomerId,
                                                 hasMadePayment: seller.HasMadePayment,
                                                 hasReceivedPayment: seller.HasReceivedPayment,
-                                                userName: seller.UserName
+                                                userName: seller.UserName,
+                                                transferReference: seller.TransferReference
                                             },
                                             listingId: payload.ListingId,
                                             bidId: payload.BidId
@@ -394,7 +398,7 @@ const Dashboard = ({ children, title, logout }) => {
 
                     case CANCEL_NEGOTIATION:
                         // playAudioNotifcation(customerId, response.Sender);
-
+                        
                         if (customerId === payload.Buyer || customerId === payload.Seller) {
                             if (senderId !== customerId) {
                                 dispatch({ 

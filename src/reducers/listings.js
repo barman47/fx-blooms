@@ -1,12 +1,13 @@
 import { 
     ADDED_BID,
-    REMOVE_BID,
     ADDED_LISTING, 
     DELETED_LISTING,
+    SET_BID,
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_LISTING,
     CANCELED_NEGOTIATION,
+    SET_AS_ACCEPTED,
     SET_LOADING_LISTINGS,
     SET_LISTING_MSG,
     HIDE_NEGOTIATION_LISTINGS,
@@ -46,10 +47,21 @@ const listingsReducer = (state = initialState, action) => {
                 addedBid: action.payload.addedBid
             };
 
-        case REMOVE_BID:
+        case SET_BID:
             return {
                 ...state,
-                bid: {}
+                bid: action.payload
+            };
+
+        case SET_AS_ACCEPTED:
+            listingId = action.payload;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingsList = [...state.listings];
+            listing = { ...state.listings[listingIndex], status: LISTING_STATUS.negotiation };
+            listingsList.splice(listingIndex, 1, listing);
+            return {
+                ...state,
+                listings: [...listingsList]
             };
 
         case TOGGLE_BID_STATUS:
@@ -108,7 +120,7 @@ const listingsReducer = (state = initialState, action) => {
         case HIDE_NEGOTIATION_LISTINGS:
             return {
                 ...state,
-                listings: state.listings.filter(listing => listing.status !== LISTING_STATUS.negotiation)
+                listings: state.listings.filter(listing => listing.status === LISTING_STATUS.open)
             };
 
         case SET_MORE_LISTINGS: 
