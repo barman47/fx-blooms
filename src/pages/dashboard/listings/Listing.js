@@ -124,7 +124,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     const [timerSeconds, setTimerSeconds] = useState('0');
 
     const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
-    const { finalized, negotiation } = LISTING_STATUS;
+    const { open } = LISTING_STATUS;
 
     const interval = useRef();
 
@@ -228,7 +228,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
                         {bank.toUpperCase()}
                     </Typography>
-                    {listing.status === finalized ?
+                    {listing.status !== open ?
                         <Button 
                             disabled
                             to="#!"
@@ -260,7 +260,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 size="large"
                                 disableElevation
                                 onClick={() => handleEditListing(listing)}
-                                disabled={listing.status === negotiation || listing.status  === finalized}
+                                disabled={listing.status !== open}
                             >
                                 Edit
                             </Button>
@@ -270,7 +270,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 size="large"
                                 disableElevation
                                 onClick={handleDeleteListing}
-                                disabled={listing.status === negotiation || listing.status  === finalized}
+                                disabled={listing.status !== open}
                             >
                                 Delete
                             </Button>
