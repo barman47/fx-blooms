@@ -18,7 +18,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { updateCustomerProfile } from '../../../actions/admin';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
@@ -151,6 +150,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 
     useEffect(() => {
         const { state } = location;
+        
         if (state?.editProfile) {
             setEditable(true);
         }
@@ -537,4 +537,4 @@ PersonalDetails.propTypes = {
     updateCustomerProfile: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile })(PersonalDetails);
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus })(PersonalDetails);
