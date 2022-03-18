@@ -57,11 +57,12 @@ const useStyles = makeStyles(theme => ({
     
     nav: {
         display: 'grid',
-        gridTemplateColumns: '1fr 4fr 1fr',
+        gridTemplateColumns: '1fr 2fr',
         alignItems: 'center',
-        gap: theme.spacing(3),
+        gap: theme.spacing(5),
         padding: [[0, theme.spacing(10)]],
-
+        width: '100%',
+        
         [theme.breakpoints.down('lg')]: { 
             padding: 0
         },
@@ -83,7 +84,7 @@ const useStyles = makeStyles(theme => ({
             color: theme.palette.primary.main
         }
     },
-
+    
     activeLink: {
         color: theme.palette.primary.main
     },
@@ -92,14 +93,12 @@ const useStyles = makeStyles(theme => ({
         position: 'relative',
         top: 5
     },
-
+    
     links: {
-        justifySelf: 'center',
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-evenly',
-        width: '100%'
+        justifyContent: 'space-between'
     },    
 
     menuButton: {
@@ -189,9 +188,9 @@ export const PrivateHeader = (props) => {
                                 </Grid>
                             ))}
                         </div>
-                        <div className={classes.avatarContainer}>
+                        {/* <div className={classes.avatarContainer}>
                             <Avatar alt={`${firstName} ${lastName}`} />
-                        </div>
+                        </div> */}
                     </section>
                     <div className={classes.mobileNav}>
                         <RouterLink to="/">

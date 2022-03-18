@@ -45,6 +45,7 @@ const useStyles = makeStyles(theme => ({
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
+            marginTop: theme.spacing(5),
             
             [theme.breakpoints.down('sm')]: {
                 flexDirection: 'column'
@@ -159,7 +160,7 @@ const MakeListing = (props) => {
     const { currencies } = useSelector(state => state);
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { addedListing, listings, msg } = useSelector(state => state.listings);
+    const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
 
     const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
 
@@ -173,7 +174,7 @@ const MakeListing = (props) => {
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
     const [ExchangeRate, setExchangeRate] = useState('');
 
-    const [MinExchangeAmount, setMinExchangeAmount] = useState('');
+    // const [MinExchangeAmount, setMinExchangeAmount] = useState('');
 
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
@@ -225,7 +226,7 @@ const MakeListing = (props) => {
     useEffect(() => {
         // Automatically select newly added account
         if (accounts.length > 0 && accounts[0].currency === 'NGN') {
-            setReceivingAccount(accounts[0].bankName);
+            setReceivingAccount(accounts[0].nicKName);
         }
     }, [accounts]);
 
@@ -273,13 +274,13 @@ const MakeListing = (props) => {
         }
     }, [addedListing, dispatch, msg]);
 
-    useEffect(() => {
-        if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
-            setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
-        } else {
-            setErrors({});
-        }
-    }, [ExchangeAmount, MinExchangeAmount]);
+    // useEffect(() => {
+    //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
+    //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
+    //     } else {
+    //         setErrors({});
+    //     }
+    // }, [ExchangeAmount, MinExchangeAmount]);
 
     // useEffect(() => {
     //     if (ExchangeAmount && ReceiptAmount) {
@@ -380,7 +381,7 @@ const MakeListing = (props) => {
         setExchangeAmount('');
         setRequiredCurrency('');
         setExchangeRate('');
-        setMinExchangeAmount('');
+        // setMinExchangeAmount('');
         setReceiptAmount('');
         // setListingFee('');
         setLoading(false);
@@ -400,7 +401,7 @@ const MakeListing = (props) => {
     };
 
     const getAccountId = (account) => {
-        const bank = accounts.find(item => item.bankName === account);
+        const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
         return bank.accountID;
     };
 
@@ -413,7 +414,7 @@ const MakeListing = (props) => {
             ExchangeAmount,
             RequiredCurrency,
             ExchangeRate,
-            MinExchangeAmount,
+            // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
             ListingFee,
@@ -421,6 +422,7 @@ const MakeListing = (props) => {
         };
 
         const { errors, isValid } = validateAddListing(data);
+        
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid listing data' });
         }
@@ -444,7 +446,8 @@ const MakeListing = (props) => {
             },
             MinExchangeAmount: {
                 CurrencyType: AvailableCurrency,
-                Amount: parseFloat(MinExchangeAmount)
+                Amount: 0
+                // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
             accountID: getAccountId(ReceivingAccount),
@@ -576,8 +579,9 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
+                                    {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></FormHelperText>}
                                 </Grid>
-                                <Grid item xs={4}>
+                                {/* <Grid item xs={4}>
                                     <br />
                                     <FormControl 
                                         variant="outlined" 
@@ -619,7 +623,7 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                </Grid>
+                                </Grid> */}
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
                                     <FormControl 
@@ -638,7 +642,7 @@ const MakeListing = (props) => {
                                             {accounts.map((account) => {
                                                 if (account.currency === 'NGN') {
                                                     return (
-                                                        <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
                                                     )
                                                 }
                                                 return null;

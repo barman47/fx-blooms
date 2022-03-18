@@ -1,6 +1,6 @@
 {
   "name": "fx-blooms",
-  "version": "0.1.0",
+  "version": "2.1.0",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.4",
@@ -19,6 +19,7 @@
     "numbro": "^2.3.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-error-boundary": "^3.1.4",
     "react-google-login": "^5.2.2",
     "react-helmet": "^6.1.0",
     "react-hot-toast": "^2.1.0",

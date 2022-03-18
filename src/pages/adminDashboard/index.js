@@ -47,6 +47,7 @@ import {
 import logo from '../../assets/img/logowhite.svg';
 
 import { getStats, logout, searchForCustomer } from '../../actions/admin';
+import { getCustomers } from '../../actions/customer';
 import { COLORS, CUSTOMER_CATEGORY, LOGOUT } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
 
@@ -272,7 +273,7 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }) => {
+const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCustomer, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
@@ -282,6 +283,7 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
 
     const [searchText, setSearchText] = useState('');
     const [path, setPath] = useState('');
+    const [loadingText, setLoadingText] = useState('One Moment . . .');
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -302,6 +304,15 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
         getStats();
         // eslint-disable-next-line
     }, []);
+
+    // Get customers when serach field is cleared
+    useEffect(() => {
+        if (isEmpty(searchText)) {
+            setLoading(true);
+            setLoadingText('One Moment . . .');
+            getCustomers({ pageNumber: 0, pageSize });
+        }
+    }, [getCustomers, pageSize, searchText]);
 
     useEffect(() => {
         setPath(location.pathname);
@@ -339,6 +350,7 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
             return setErrors({ searchText: 'Please enter a search term' });
         }
         setLoading(true);
+        setLoadingText('Searching . . .');
         searchForCustomer({ searchText, pageNumber: 0, pageSize });
     };
 
@@ -346,7 +358,7 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <SessionModal />
-            {loading && <Spinner text="Searching . . ." />}
+            {loading && <Spinner text={loadingText} />}
             <section className={classes.root}>
                 <AppBar position="fixed" color="transparent" elevation={0} className={clsx(classes.appBar, {
                     [classes.appBarShift]: open,
@@ -437,7 +449,7 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
                             }
                         </IconButton>
                     </div> 
-                    <Typography variant="body2" component="span" className={classes.admin}>Admin</Typography>
+                    {open && <Typography variant="body2" component="span" className={classes.admin}>Admin</Typography>}
                     <List className={classes.links}>
                         {links.map((link, index) => (
                             <ListItem 
@@ -486,9 +498,10 @@ const AdminDashboard = ({ children, title, getStats, searchForCustomer, logout }
 
 AdminDashboard.propTypes = {
     title: PropTypes.string.isRequired,
+    getCustomers: PropTypes.func.isRequired,
     getStats: PropTypes.func.isRequired,
     searchForCustomer: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getStats, searchForCustomer, logout })(AdminDashboard);
+export default connect(undefined, { getCustomers, getStats, searchForCustomer, logout })(AdminDashboard);
