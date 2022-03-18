@@ -190,6 +190,14 @@ export const madePayment = (data) => async (dispatch) => {
     }
 };
 
+export const cancelBid = (bidIds) => async (dispatch) => {
+    try {
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
     try {
         await reIssueCustomerToken();

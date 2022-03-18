@@ -5,7 +5,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { Box, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Account, BagChecked, CardAccountDetailsOutline, LockOutline, Logout } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, History, LockOutline, Logout } from 'mdi-material-ui';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation, logout } from '../../../actions/customer'; 
@@ -15,6 +15,7 @@ import { getDocuments } from '../../../actions/documents';
 import { COLORS } from '../../../utils/constants'; 
 
 import BankAccounts from '../bankAccount/BankAccounts';
+import Transactions from '../transactions';
 import PersonalDetails from './PersonalDetails';
 import IDVerification from './IDVerification';
 import TwoFactor from '../twoFactor';
@@ -160,6 +161,7 @@ const Profile = (props) => {
         { icon: <Account className={classes.icon} />, text: 'Profile' },
         { icon: <LockOutline className={classes.icon} />, text: 'Authentication' },
         { icon: <BagChecked className={classes.icon} />, text: 'Bank Account' },
+        { icon: <History className={classes.icon} />, text: 'Transaction History' },
         { icon: <CardAccountDetailsOutline className={classes.icon} />, text: 'ID Verification' },
         // { icon: <KeyVariant className={classes.icon} />, text: 'Set PIN' },
     ];
@@ -254,6 +256,9 @@ const Profile = (props) => {
                         <BankAccounts />
                     </TabPanel>
                     <TabPanel value={value} index={3}>  
+                        <Transactions />
+                    </TabPanel>
+                    <TabPanel value={value} index={4}>  
                         <IDVerification />
                     </TabPanel>
                 </div>

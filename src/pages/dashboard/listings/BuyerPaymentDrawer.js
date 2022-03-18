@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { 
     Box,
 	Button,
+    Collapse,
     Drawer,
     Grid,
     FormControl,
@@ -22,8 +23,8 @@ import _ from 'lodash';
 import toast, { Toaster } from 'react-hot-toast';
 import copy from 'copy-to-clipboard';
 
-import { madePayment } from '../../../actions/listings';
-import { SET_ACCOUNT, SET_BID, SET_LISTING_MSG } from '../../../actions/types';
+import { cancelBid, madePayment } from '../../../actions/listings';
+import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -31,6 +32,7 @@ import isEmpty from '../../../utils/isEmpty';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
+import CircularProgressWithLabel from '../../../components/common/CircularProgressWithLabel';
 import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
@@ -149,28 +151,42 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen }) => {
+const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
     const { account, accounts } = useSelector(state => state.bankAccounts);
+    const { firstName } = useSelector(state => state.customer);
     const { bid, listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [reference, setReference] = useState('');
+
+    const [timerMinutes, setTimerMinutes] = useState('00');
+    const [timerSeconds, setTimerSeconds] = useState('00');
+    const [timerValue, setTimerValue] = useState(100);
+
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [buttonDisabled, setButtonDisabled] = useState(true);
 
+    const FIVE_MINUTES = 300000; // 5 minutes in milliseconds
+
+    const interval = useRef();
     const successModal = useRef();
 
     useEffect(() => {
+        startExpiryTimer();
         if (isEmpty(account) && !isEmpty(listing)) {
             getAccount(listing.sellersAccountId);
         }
+
+        return () => {
+            clearInterval(interval.current);
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -204,6 +220,32 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
             setReceivingAccount(accounts[0].bankName);
         }
     }, [accounts]);
+
+    const getBidIds = (bids) => {
+        const bidIds = [];
+        bids.forEach(bid => bidIds.push(bid.id));
+        return bidIds;
+    };
+
+    const expireListing = () => {
+        clearInterval(interval.current);
+        toggleDrawer();
+        batch(() => {
+            dispatch({
+                type: SET_BID,
+                payload: {}
+            });
+            dispatch({
+                type: SET_LISTING,
+                payload: {}
+            });
+            dispatch({
+                type: MAKE_LISTING_OPEN,
+                payload: listing.id
+            });
+        });
+        cancelBid(getBidIds(listing.bids));
+    };
 
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
@@ -240,6 +282,29 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
         setLoading(false);
         setErrors(errorsState);
     }, [errorsState]);
+
+    const startExpiryTimer = () => {
+        const countDownTime = new Date(bid.datePlaced).getTime() + (FIVE_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        interval.current = setInterval(() => {
+            const now = new Date().getTime();
+            const distance = countDownTime - now;
+
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            if (minutes === 0 && seconds === 0) {
+                clearInterval(interval.current);
+                setTimerMinutes('00');
+                setTimerSeconds('00');
+                setTimerValue(0);
+                expireListing();
+            } else {
+                setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
+                setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
+                setTimerValue(Math.floor(distance / FIVE_MINUTES * 100));
+            }
+        }, 1000);
+    };
 
     const dismissSuccessModal = () => {
         // setButtonDisabled(true);
@@ -298,6 +363,7 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
                 open={loading ? true : open} 
+                // open={true} 
                 onClose={toggleDrawer}
             >
                 <Box component="header">
@@ -332,7 +398,7 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
                 </Grid>
                 <ol>
                     <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Transfer the NGN to the {`${listing.listedBy.toLowerCase()}'s`} account below</Typography></li>
+                    <li><Typography variant="body2" component="p">Transfer the NGN to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on NGN Payment Made</Typography></li>
                 </ol>
                 <Grid item xs={12}>
@@ -345,7 +411,7 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
                     >
                         Show Account Details
                     </Button>
-                    {!_.isEmpty(account) && 
+                    <Collapse in={!_.isEmpty(account)}>
                         <section className={classes.accountDetailsContainer}>
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
@@ -364,7 +430,7 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
                                 <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
                             </div>
                         </section>
-                    }                   
+                    </Collapse>              
                 </Grid>
                 <Grid item xs={12}>
                     <Typography variant="subtitle2" component="span">Receiving Account</Typography>
@@ -408,6 +474,17 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
                     />
                     <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
                 </Grid>
+                <Typography variant="subtitle2" component="span" color="primary">Payment Countdown</Typography>
+                <Typography variant="subtitle2" component="span" color="textSecondary">{firstName} will send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within 5 mins</Typography>
+                <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
+                    <CircularProgressWithLabel 
+                        variant="determinate" 
+                        size={100}
+                        value={timerValue} 
+                        minutes={timerMinutes.toString()} 
+                        seconds={timerSeconds.toString()} 
+                    />
+                </Grid>
                 <Grid item xs={12}>
                     {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
                     <Button 
@@ -429,10 +506,11 @@ const BuyerPaymentDrawer = ({ getAccount, madePayment, toggleDrawer, drawerOpen 
 };
 
 BuyerPaymentDrawer.propTypes = {
+    cancelBid: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     madePayment: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccount, madePayment })(BuyerPaymentDrawer);
+export default connect(undefined, { cancelBid, getAccount, madePayment })(BuyerPaymentDrawer);

@@ -14,10 +14,11 @@ import {
     TOGGLE_BID_STATUS,
     SET_RECOMMENDED_RATE,
     REMOVE_EXPIRED_LISTING,
+    MAKE_LISTING_OPEN,
     UPDATED_LISTING
 } from '../actions/types';
 
-import { LISTING_STATUS } from '../utils/constants';
+import { BID_STATUS, LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
     addedListing: false,
@@ -180,6 +181,19 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 recommendedRate: action.payload
+            };
+
+        case MAKE_LISTING_OPEN:
+            listingId = action.payload;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingsList = [...state.listings];
+            listing = listingsList[listingIndex];
+            const { status, bids, ...others } = listing;
+            const listingBids = bids.map(bid => ({ ...bid, status: BID_STATUS.CANCELED })); 
+            listingsList.splice(listingIndex, 1, { ...others, bids: listingBids, status: LISTING_STATUS.open });
+            return {
+                ...state,
+                listings: [...listingsList]
             };
 
         default:

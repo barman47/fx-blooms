@@ -105,6 +105,12 @@ export const EIGHT_CHARACTERS = new RegExp(/.{8,}/);
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
 export const ATTACHMENT_LIMIT = 3000000; // 3 Megabytes
 
+export const BID_STATUS = {
+    IN_PROGRES: 'IN_PROGRESS',
+    CANCELED: 'CANCELED',
+    COMPLETED: 'COMPLETED',
+};
+
 export const LISTING_STATUS = {
     open: 'OPEN',
     removed: 'REMOVED',
