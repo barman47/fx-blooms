@@ -9,6 +9,7 @@ import {
 	ADMIN_LOGIN,
 	CUSTOMERS,
 	LOGIN, 
+	DEPOSITS,
 	SIGN_UP, 
 	SETUP_2FA,
 	VERIFY_2FA,
@@ -85,6 +86,7 @@ const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
 const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
 const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
 const Listings = lazy(() => import('./pages/adminDashboard/listings/'));
+const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
@@ -200,6 +202,7 @@ function App() {
 									<AdminRoute path={`${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${LISTINGS}`} exact component={() => <Listings handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${DEPOSITS}`} exact component={() => <Deposits handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 									{/* <AdminRoute exact component={() => <Private404 handleSetTitle={handleSetTitle} />} /> */}
 								</AdminDashboard>

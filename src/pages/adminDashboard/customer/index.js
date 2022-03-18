@@ -13,6 +13,7 @@ import SuccessModal from '../../../components/common/SuccessModal';
 import PersonalDetails from './PersonalDetails';
 import IdentityDetails from './IdentityDetails';
 import AuthenticationDetails from './AuthenticationDetails';
+import TransactionDetails from './TransactionDetails';
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -192,9 +193,7 @@ const Customer = () => {
                     {tab === PERSONAL_DETAILS && <PersonalDetails  />}
                     {tab === ID_DETAILS && <IdentityDetails />}
                     {tab === AUTHENTICATION && <AuthenticationDetails />}
-                    {/*{tab === TWO_FACTOR && <VerifiedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                    {tab === TRANSACTION_DETAILS && <RejectedCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />}
-                    {tab === WALLET_DETAILS && <AllCustomers handleClick={handleClick} handleSetTitle={handleSetTitle} />} */}
+                    {tab === TRANSACTION_DETAILS && <TransactionDetails />}
                 </Box>
             </section>
         </>

@@ -1,16 +1,18 @@
-import { useEffect, useRef, useState, useLayoutEffect } from 'react'; 
+import { useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box, 
     Button,
     Divider,
-    Typography 
+    Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import { DotsHorizontal } from 'mdi-material-ui';
+import clsx from 'clsx';
 
 import { COLORS } from '../../../utils/constants';
-import { getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
+import { getIdCardValidationResponse, getResidencePermitValidationResponse, getCustomer } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 
@@ -27,13 +29,14 @@ const useStyles = makeStyles(theme =>({
         height: '100%',
 
         [theme.breakpoints.down('md')]: {
-            paddingBottom: theme.spacing(4)
+            paddingBottom: theme.spacing(7)
         }
     },
 
     content: {
         display: 'grid',
-        gridTemplateColumns: '1fr 0.2fr 1fr'
+      marginTop: theme.spacing(15),
+      gridTemplateColumns: '1fr 0.2fr 1fr'
     },
 
     detail: {
@@ -71,6 +74,14 @@ const useStyles = makeStyles(theme =>({
       }
     },
 
+    authTrue: {
+      color: 'green !important',
+    },
+
+    authFalse: {
+      color: 'grey !important',
+    },
+
     btnLeft: {
       '& span': {
         gap: theme.spacing(3),
@@ -94,6 +105,20 @@ const AuthenticationDetails = () => {
 
     const toast = useRef();
     const successModal = useRef();
+
+    const handleAuthClass = useCallback((detail) => clsx({
+      // [classes.authFalse]: !customer[detail],
+      [classes.authTrue]: customer[detail],
+    }), [customer, classes.authTrue])
+
+    const hasSetup2FAInactive = useMemo(() => clsx({
+      [classes.authFalse]: customer.twoFactorEnabled,
+    }), [customer, classes.authFalse])
+
+    const hasSetup2FASetup = useMemo(() => clsx({
+      [classes.authFalse]: customer.twoFactorEnabled,
+      [classes.authTrue]: customer.hasSetUpTwoFactor,
+    }), [customer, classes.authFalse, classes.authTrue])
 
     useLayoutEffect(() => {
       
@@ -127,6 +152,10 @@ const AuthenticationDetails = () => {
         }
     }, [dispatch, msg]);
 
+    useEffect(() => {
+      dispatch(getCustomer(customer.id))
+    }, [dispatch, customer])
+
     const dismissSuccessModal = () => {
         dispatch({
             type: CLEAR_CUSTOMER_STATUS_MSG,
@@ -153,27 +182,27 @@ const AuthenticationDetails = () => {
                     <Box component="div" className={classes.detail}>
                         <Typography color="primary" variant="h6">2FA</Typography>
                           <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Google Authenticator &nbsp; &nbsp; &nbsp; ...</Button>
+                            <Button className={classes.btnLeft} variant="outlined">Google Authenticator &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
                             <Button className={classes.btn} variant="outlined">
-                              <Typography variant="span" component="span">SETUP</Typography>
-                              <Typography variant="span" component="span">ACTIVE</Typography>
-                              <Typography variant="span" component="span">INACTIVE</Typography>
+                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
+                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
+                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
                             </Button>
                           </div>
                           <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">SMS OTP &nbsp; &nbsp; &nbsp; ...</Button>
+                            <Button className={classes.btnLeft} variant="outlined">SMS OTP &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
                             <Button className={classes.btn} variant="outlined">
-                              <Typography variant="span" component="span">SETUP</Typography>
-                              <Typography variant="span" component="span">ACTIVE</Typography>
-                              <Typography variant="span" component="span">INACTIVE</Typography>
+                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
+                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
+                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
                             </Button>
                           </div>
                           <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">EMAIL OTP &nbsp; &nbsp; &nbsp; ...</Button>
+                            <Button className={classes.btnLeft} variant="outlined">EMAIL OTP &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
                             <Button className={classes.btn} variant="outlined">
-                              <Typography variant="span" component="span">SETUP</Typography>
-                              <Typography variant="span" component="span">ACTIVE</Typography>
-                              <Typography variant="span" component="span">INACTIVE</Typography>
+                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
+                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
+                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
                             </Button>
                           </div>
                     </Box>
@@ -182,17 +211,24 @@ const AuthenticationDetails = () => {
                       <Box component="div" className={classes.detail}>
                         <Typography color="primary" variant="h6">VERIFICATION</Typography>
                           <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Phone Number &nbsp; &nbsp; &nbsp; ...</Button>
+                            <Button className={classes.btnLeft} variant="outlined">Phone Number &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
                             <Button className={classes.btn} variant="outlined">
-                              <Typography variant="span" component="span">PROVIDED</Typography>
-                              <Typography variant="span" component="span">VERIFIED</Typography>
+                              <Typography className={handleAuthClass('phoneNo')} variant="span" component="span">PROVIDED</Typography>
+                              <Typography className={handleAuthClass('isPhoneNumberVerified')} variant="span" component="span">VERIFIED</Typography>
                             </Button>
                           </div>
                           <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Address &nbsp; &nbsp; &nbsp; ...</Button>
+                            <Button className={classes.btnLeft} variant="outlined">Address &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
                             <Button className={classes.btn} variant="outlined">
-                              <Typography variant="span" component="span">PROVIDED</Typography>
-                              <Typography variant="span" component="span">VERIFIED</Typography>
+                              <Typography className={handleAuthClass('address')} variant="span" component="span">PROVIDED</Typography>
+                              <Typography className={handleAuthClass('residentialPermitVerificationResponse')} variant="span" component="span">VERIFIED</Typography>
+                            </Button>
+                          </div>
+                          <div className={classes.btnGroup}>
+                            <Button className={classes.btnLeft} variant="outlined">Email &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
+                            <Button className={classes.btn} variant="outlined">
+                              <Typography className={handleAuthClass('email')} variant="span" component="span">PROVIDED</Typography>
+                              <Typography className={handleAuthClass('isEmailVerified')} variant="span" component="span">VERIFIED</Typography>
                             </Button>
                           </div>
                     </Box>
@@ -205,7 +241,8 @@ const AuthenticationDetails = () => {
 
 AuthenticationDetails.propTypes = {
     getIdCardValidationResponse: PropTypes.func.isRequired,
-    getResidencePermitValidationResponse: PropTypes.func.isRequired
+    getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    getCustomer: PropTypes.func.isRequired,
 };
 
 export default AuthenticationDetails;

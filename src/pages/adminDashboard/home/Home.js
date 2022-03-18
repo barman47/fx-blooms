@@ -20,7 +20,6 @@ import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
 import { useCallback } from 'react';
-import Logger from '../../../components/common/logger'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -116,10 +115,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { changed, customerCount, listingCount, totalCustomers, totalListings, transactionVolume } = useSelector((state) => {
-        Logger('sttas', state)
-        return state.stats
-    });
+    const { changed, customerCount, listingCount, totalCustomers, totalListings, transactionVolume } = useSelector((state) => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
@@ -137,7 +133,6 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     useEffect(() => {
         handleSetTitle('Admin Home');
         // eslint-disable-next-line
-        Logger('USERS', users)
     }, []);
 
     // Show total listing count when no filter is selected

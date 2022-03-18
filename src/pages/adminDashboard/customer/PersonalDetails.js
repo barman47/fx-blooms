@@ -18,7 +18,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
-import { updateCustomerProfile } from '../../../actions/admin';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
