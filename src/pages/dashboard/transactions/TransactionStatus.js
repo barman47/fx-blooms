@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
+    Button,
     Divider,
     Step,
     Stepper,
     StepContent,
     StepLabel,
     Tooltip,
-	Typography 
+	Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ContentCopy } from 'mdi-material-ui';
+import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+
+import { SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -32,28 +36,11 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& header': {
-            backgroundColor: COLORS.lightTeal,
             display: 'flex',
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(5)
-        },
-
-        '& h6:last-child': {
-            marginRight: theme.spacing(5),
-            marginTop: theme.spacing(2),
-            textAlign: 'right',
-            textDecoration: 'underline',
-
-            [theme.breakpoints.down('sm')]: {
-                marginRight: theme.spacing(1),
-            },
-
-            '& a': {
-                color: 'inherit',
-                fontWeight: 600
-            }
+            marginTop: theme.spacing(3)
         }
     },
 
@@ -104,19 +91,38 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             margin: 0,
         },
+    },
+
+    contact: {
+        marginRight: theme.spacing(5),
+        marginTop: theme.spacing(2),
+        textAlign: 'right',
+        textDecoration: 'underline',
+
+        [theme.breakpoints.down('sm')]: {
+            marginRight: theme.spacing(1),
+        },
+
+        '& a': {
+            color: 'inherit',
+            fontWeight: 600
+        }
     }
 }));
 
 const TransactionStatus = ({ handleSetTitle }) => {
 	const classes = useStyles();
+	const dispatch = useDispatch();
+    const history = useHistory();
 
     const { customerId } = useSelector(state => state.customer);
     const { transaction } = useSelector(state => state.notifications);
 
     const [trackerText, setTrackerText] = useState('');
-    const [customer, setCustomerr] = useState({});
+    const [customer, setCustomer] = useState({});
     const [recepient, setRecepient] = useState({});
     const [isBuyer, setIsBuyer] = useState(false);
+    const [completed, setCompleted] = useState(false);
     const [transactionSteps, setTransactionSteps] = useState([]);
     const [activeStep, setActiveStep] = useState(0);
 
@@ -126,17 +132,26 @@ const TransactionStatus = ({ handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
+    // useEffect(() => {
+    //     return () => {
+    //         dispatch({
+    //             type: SET_TRANSACTION,
+    //             payload: {}
+    //         });
+    //     };
+    // }, []);
+
     // Set the current step to the 5th one - Exception
-    useEffect(() => {
-        if (activeStep === 3 && transactionSteps.length === 5) {
-            setActiveStep(4);
-        }
-    }, [activeStep, transactionSteps.length]);
+    // useEffect(() => {
+    //     if (activeStep === 3 && transactionSteps.length === 5) {
+    //         setActiveStep(4);
+    //     }
+    // }, [activeStep, transactionSteps.length]);
 
     const getActiveStep = (buyer, seller) => {
         if (buyer.hasMadePayment) {
             setActiveStep(0);
-            if (isBuyer) {
+            if (buyer.customerId === customerId) {
                 setTrackerText(`Awaiting ${seller.userName}'s Confirmation`);
             } else {
                 setTrackerText(`Awaiting your Confirmation`);
@@ -154,16 +169,17 @@ const TransactionStatus = ({ handleSetTitle }) => {
 
         if (seller.hasMadePayment) {
             setActiveStep(2);
-            if (isBuyer) {
-                setTrackerText(`Awaiting your confirmation`);
+            if (seller.customerId === customerId) {
+                setTrackerText(`${buyer.userName}'s is awaiting your Payment`);
             } else {
-                setTrackerText(`Awaiting ${seller.userName}'s confirmation`);
+                setTrackerText(`Awaiting ${seller.userName}'s payment`);
             }
         }
 
         if (seller.hasMadePayment && buyer.hasReceivedPayment) {
             setActiveStep(3);
             setTrackerText(`Transaction Completed`);
+            setCompleted(true);
         }
     };
 
@@ -174,12 +190,12 @@ const TransactionStatus = ({ handleSetTitle }) => {
         if (customerId === buyer.customerId) { // Customer is buyer
             setIsBuyer(true);
             setRecepient(seller);
-            setCustomerr(buyer);
+            setCustomer(buyer);
             setTransactionSteps([
-                `You accepted offer`, 
-                `${seller.userName} to transfer NGN${formatNumber(seller.amountTransfered, 2)} within 00:30:00`, 
-                'You confirm NGN payment', 
-                `${seller.userName} confirms the NGN payment - Transaction Completed`
+                `You transfer NGN${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `${seller.userName} to confirm the NGN payment`, 
+                `${seller.userName} to transfer EUR to you`,
+                `You to confirm - Transaction Completed`
             ]);
             // setTransactionSteps([
             //     `You accepted EUR${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
@@ -191,13 +207,12 @@ const TransactionStatus = ({ handleSetTitle }) => {
 
         if (customerId === seller.customerId) { // Customer is seller
             setRecepient(buyer);
-            setCustomerr(seller);
+            setCustomer(seller);
             setTransactionSteps([
-                `${buyer.userName} accepted offer`, 
-                `You are to transfer NGN${formatNumber(seller.amountTransfered, 2)} within 00:30:00`, 
-                `${buyer.userName} confirmed NGN payment`, 
-                `${buyer.userName} transfers the EUR to you`, 
-                `You confirm NGN payment - Transaction Completed`
+                `${buyer.userName} to transfer NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
+                `You confirm NGN payment`, 
+                `You transfer the equivalent EUR to ${buyer.userName}`,
+                `${buyer.userName} confirmed the EUR - Transaction Completed`
             ]);
             // return setTransactionSteps([
             //     `You transfer EUR${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName}`, 
@@ -232,18 +247,36 @@ const TransactionStatus = ({ handleSetTitle }) => {
         toast.success('Transaction ID Copied!');
     };
 
+    const handleBackButtonClick = () => {
+        dispatch({
+            type: SET_TRANSACTION,
+            payload: {}
+        });
+        return history.back();
+    };
+
 	return (    
         <>
             <Toaster />
             <Box component="section" className={classes.root}>
-                <Typography variant="h6" className={classes.title} color="primary">Transaction Status - Buy EUR</Typography>
+                <Box component="header">
+                    <Button 
+                        color="primary" 
+                        variant="outlined" 
+                        onClick={handleBackButtonClick}
+                        startIcon={<ArrowLeft />}
+                    >
+                        Back
+                    </Button>
+                    <Typography variant="h6" className={classes.title} color="primary">Transaction Status - Buy EUR</Typography>
+                </Box>
                 <Box component="section">
                     <Typography variant="h6" className={classes.title} color="primary">Transaction Details</Typography>
                     <Box component="div" className={classes.transactionDetails}>
                         <Box component="section">
                             <Typography variant="body2" component="p">Transaction ID</Typography>
                             <Box className={classes.transactionIdContainer}>
-                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction.id)}`}</Typography>
+                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}`}</Typography>
                                 &nbsp;&nbsp;
                                 <Tooltip title="Copy Transaction ID" arrow>
                                     <ContentCopy onClick={handleCopyTransactionId} color="primary" style={{ cursor: 'pointer' }} />
@@ -273,7 +306,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Transfer Status</Typography>
-                            <Typography variant="body2" component="p">Completed</Typography>
+                            <Typography variant="body2" component="p" >{completed ? 'Completed' : 'In Progress'}</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>
@@ -290,7 +323,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         </Stepper>
                     </Box>
                 </Box>
-                <Typography variant="h6" color="primary">Having issues?&nbsp; 
+                <Typography variant="h6" color="primary" className={classes.contact}>Having issues?&nbsp; 
                     <a className={classes.link} href="mailto:support@fxblooms.com">Contact us</a>
                 </Typography>
             </Box>
