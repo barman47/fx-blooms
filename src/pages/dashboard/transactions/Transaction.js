@@ -1,19 +1,23 @@
 import { useEffect, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 // import moment from 'moment';
 
+import { SET_TRANSACTION } from '../../../actions/types';
+
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
-import { useSelector } from 'react-redux';
-
+import { TRANSACTION_STATUS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.lightTeal,
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
+        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -46,6 +50,8 @@ const useStyles = makeStyles(theme => ({
 
 const Transaction = ({ transaction }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const history = useHistory();
     const { customerId } = useSelector(state => state.customer);
 
     const [amount, setAmount] = useState(0);
@@ -113,8 +119,17 @@ const Transaction = ({ transaction }) => {
         }
     };
 
+    const gotoTransaction = () => {
+        // Put transaction in state
+        dispatch({
+            type: SET_TRANSACTION,
+            payload: transaction
+        });
+        return history.push(TRANSACTION_STATUS);
+    };
+
     return (
-        <Box component="section" className={classes.root}>
+        <Box component="section" className={classes.root} onClick={gotoTransaction}>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Date</Typography>
                 {/* <Typography variant="body1" component="p" className={classes.text}>{moment().format()}</Typography> */}

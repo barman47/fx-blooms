@@ -115,39 +115,44 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
     }, []);
 
     return (
-        <Box component="section" className={classes.root}>
-            <Typography variant="h6">Transaction History</Typography>
-            <Typography variant="body2" component="p">Here are your recent transactions</Typography>
-            <Box component="section">
-                <Box component="div" className={classes.filterContainer}>
-                    <FormControl 
-                        variant="outlined" 
-                        // error={errors.ReceivingAccount ? true : false } 
-                        fullWidth 
-                        required
-                        disabled={loading ? true : false}
-                    >
-                        <Select
-                            labelId="Currency"
-                            value={currency}
-                            onChange={(e) => setCurrency(e.target.value)}
+        <>
+            <Box component="section" className={classes.root}>
+                <Typography variant="h6">Transaction History</Typography>
+                <Typography variant="body2" component="p">Here are your recent transactions</Typography>
+                <Box component="section">
+                    <Box component="div" className={classes.filterContainer}>
+                        <FormControl 
+                            variant="outlined" 
+                            // error={errors.ReceivingAccount ? true : false } 
+                            fullWidth 
+                            required
+                            disabled={loading ? true : false}
                         >
-                            <MenuItem value="ALL" selected>ALL</MenuItem>
-                            {currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
-                        </Select>
-                    </FormControl>
-                    <FormControlLabel
-                        control={<IOSSwitch checked={showReceived} onChange={() => setShowReceived(!showReceived)} />}
-                        label={showReceived ? 'Received' : 'Sent'}
-                    />
+                            <Select
+                                labelId="Currency"
+                                value={currency}
+                                onChange={(e) => setCurrency(e.target.value)}
+                            >
+                                <MenuItem value="ALL" selected>ALL</MenuItem>
+                                {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
+                            </Select>
+                        </FormControl>
+                        <FormControlLabel
+                            control={<IOSSwitch checked={showReceived} onChange={() => setShowReceived(!showReceived)} />}
+                            label={showReceived ? 'Received' : 'Sent'}
+                        />
+                    </Box>
+                </Box>
+                <Box component="section" className={classes.transactions}>
+                    {notifications.map(transaction => (
+                        <Transaction 
+                            key={transaction.id} 
+                            transaction={transaction} 
+                        />
+                    ))}
                 </Box>
             </Box>
-            <Box component="section" className={classes.transactions}>
-                {notifications.map(transaction => (
-                    <Transaction key={transaction.id} transaction={transaction} />
-                ))}
-            </Box>
-        </Box>
+        </>
     );
 };
 
