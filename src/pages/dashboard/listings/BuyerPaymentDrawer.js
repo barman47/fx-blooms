@@ -171,7 +171,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [buttonDisabled, setButtonDisabled] = useState(true);
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     const FIVE_MINUTES = 300000; // 5 minutes in milliseconds
 
