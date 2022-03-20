@@ -259,6 +259,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 color="primary"
                                 size="large"
                                 disableElevation
+                                disableFocusRipple
+                                disableRipple
                                 onClick={() => handleEditListing(listing)}
                                 disabled={listing.status !== open}
                             >
@@ -269,6 +271,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 color="secondary"
                                 size="large"
                                 disableElevation
+                                disableFocusRipple
+                                disableRipple
                                 onClick={handleDeleteListing}
                                 disabled={listing.status !== open}
                             >
@@ -281,6 +285,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             size="large" 
                             color="primary"
                             disableElevation
+                            disableFocusRipple
+                            disableRipple
                             classes={{ 
                                 contained: classes.button,
                                 root: classes.button
