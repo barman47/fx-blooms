@@ -33,7 +33,8 @@ import {
 	CONTACT_US,
 	USER_AGREEMENT,
 	ADD_USERNAME,
-	LISTINGS
+	LISTINGS,
+	EDIT_LISTING
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -69,6 +70,7 @@ const UserAgreement = lazy(() => import('./pages/userAgreement/UserAgreement'));
 const Dashboard = lazy(() => import('./pages/dashboard'));
 
 const AllListings = lazy(() => import('./pages/dashboard/listings/AllListings'));
+const EditListing = lazy(() => import('./pages/dashboard/listings/EditListing'));
 const MakeListing = lazy(() => import('./pages/dashboard/listings/MakeListing'));
 const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'));
 
@@ -77,9 +79,6 @@ const Profile = lazy(() => import('./pages/dashboard/profile'));
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
-
-// import setAuthToken from './utils/setAuthToken';
-// import isTokenExpired from './utils/tokenExpired';
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
@@ -90,11 +89,6 @@ const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
-
-
-// import { getMe } from './actions/customer';
-
-// import reIssueToken from './utils/reIssueToken';
 
 const theme = createTheme({
 	overrides: {
@@ -114,6 +108,10 @@ const theme = createTheme({
 			// light: '#338080',
 			main: '#1e6262',
 			// dark: '#990300'
+		},
+
+		secondary: {
+			main: '#EB5757'
 		},
 
 		text: {
@@ -141,22 +139,8 @@ const theme = createTheme({
 	}
 });
 
-function App() {
-	// 	const history = useHistory();
+const App = () => {
 	const [title, setTitle] = useState('');
-
-
-
-	// useEffect(() => {
-	// 	// isTokenExpired();
-	// 	if (localStorage.FXBloomsAuthToken) {
-	// 		// const token = isTokenExpired(localStorage.FXBloomsAuthToken);
-	// 		// // Set auth token header auth
-	// 		// setAuthToken(localStorage.FXBloomsAuthToken);
-	// 		// props.getMe(history);
-	// 	}
-	// 	// eslint-disable-next-line
-	// }, []);
 
 	const handleSetTitle = (title) => setTitle(title);
 
@@ -189,6 +173,7 @@ function App() {
 							<PrivateRoute path={DASHBOARD}>
 								<Dashboard title={title}>
 									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${ACCOUNT}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
@@ -216,9 +201,4 @@ function App() {
 	);
 }
 
-// App.propTypes = {
-// 	getMe: PropTypes.func.isRequired
-// };
-
 export default App;
-// export default connect(undefined, { getMe })(App);

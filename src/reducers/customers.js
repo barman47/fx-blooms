@@ -31,8 +31,8 @@ import { CUSTOMER_CATEGORY } from '../utils/constants';
 const { CONFIRMED, PENDING, REJECTED, NO_PROFILE, SUSPENDED, ALL_CUSTOMERS } = CUSTOMER_CATEGORY;
 
 const initialState = {
-    pageNumber: null,
-    pageSize: null,
+    pageNumber: 0, // to match the default value on the pagination
+    pageSize: 10, // to match the default value on the pagination
     category: null,
     customer: {},
     idCheckData: null,

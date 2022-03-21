@@ -1,20 +1,21 @@
 import { countries } from './countries'; 
 
 const extractCountryCode = (phoneNumber) => {
+    const phoneNo = phoneNumber.startsWith('+') ? phoneNumber.substring(1) : phoneNumber;
     const countryCodes = countries.map(country => country.phone);
     let countryCode = null;
     let number = null;
+
     countryCodes.forEach(code => {
-        if (phoneNumber.startsWith(code)) {
+        if (phoneNo.startsWith(code)) {
             countryCode = `+${code}`;
-            number = phoneNumber.slice(code.length);
+            number = phoneNo.slice(code.length);
         }
-        if (phoneNumber.startsWith(`+${code}` )) {
+        if (phoneNo.startsWith(`+${code}` )) {
             countryCode = `+${code}`;
-            number = phoneNumber.slice(`+${code.length}`);
+            number = phoneNo.slice(`+${code.length}`);
         }
     });
-    
     
     return {
         code: countryCode,

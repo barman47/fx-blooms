@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -29,8 +29,9 @@ import {
 import { olimpicMedals as data } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
-import { useCallback } from 'react';
+// import { useCallback } from 'react';
 // import { CalendarTodayIcon } from '@material-ui/icons';
+import formatNumber from '../../../utils/formatNumber';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -210,7 +211,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         alignItems: 'center',
 
-        '& span': {
+        '& h6': {
             color: '#006400'
         }
     },
@@ -222,7 +223,7 @@ const useStyles = makeStyles((theme) => ({
         flexBasis: '70%',
         alignItems: 'center',
         
-        '& span': {
+        '& > h6:first-child': {
             border: `1px solid green`,
             borderRadius: '50%',
             height: '25px',
@@ -251,7 +252,7 @@ const useStyles = makeStyles((theme) => ({
         flexBasis: '70%',
         alignItems: 'center',
         
-        '& span': {
+        '& > h6:first-child': {
             border: `1px solid red`,
             borderRadius: '50%',
             height: '25px',
@@ -290,7 +291,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const dispatch = useDispatch();
     const history = useHistory();
 
-    const { changed, customerCount, listingCount, totalCustomers, totalListings, transactionVolume } = useSelector((state) => state.stats);
+    const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
@@ -323,6 +324,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
             setUsers(totalCustomers);
         }
     }, [totalCustomers, usersFilter]);
+
+    // Show total volume count when no filter is selected
+    useEffect(() => {
+        if (totalEuroTransfered && !volumeFilter) {
+            setVolume(totalEuroTransfered);
+        }
+    }, [totalEuroTransfered, volumeFilter]);
 
     // Show volume from filter value
     useEffect(() => {
@@ -450,13 +458,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 break;
 
             case ALL:
-                setVolume('N/A');
+                setVolume(totalEuroTransfered);
                 break;
             
             default:
                 break;
         }
-    }, [getTransactionVolume]);
+    }, [getTransactionVolume, totalEuroTransfered]);
 
     // Get user count when user filter changes
     useEffect(() => {
@@ -607,7 +615,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    users
+                                    formatNumber(users)
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
@@ -664,7 +672,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    listings
+                                    formatNumber(listings)
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
@@ -710,7 +718,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         />
                                     </Box>
                                     : 
-                                    `EUR ${volume}`
+                                    `EUR ${formatNumber(volume)}`
                                 }
                             </Typography>
                             <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
@@ -793,24 +801,24 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                 </Typography>
                                 <div className={classes.recentBody}>
                                     <Typography className={classes.recentRow} component="div" variant="body1">
-                                        <Typography variant="subtitle">&#43;</Typography>
+                                        <Typography variant="subtitle1">&#43;</Typography>
                                         <Typography className={classes.recentCell} variant="body1">
                                             Listing
                                             <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
                                         </Typography>
                                     </Typography>
-                                    <Typography variant="subtitle">&#43; &#163; 2,000</Typography>
+                                    <Typography variant="subtitle2">&#43; &#163; 2,000</Typography>
                                 </div>
 
                                 <div className={classes.recentBody}>
                                     <Typography className={classes.recentRow_2} component="div" variant="body1">
-                                        <Typography variant="subtitle">&#8722;</Typography>
+                                        <Typography variant="subtitle1">&#8722;</Typography>
                                         <Typography variant="body1">
                                             Purchase
                                             <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
                                         </Typography>
                                     </Typography>
-                                    <Typography className={classes.recentCells} variant="subtitle">&#8722; &#163; 5,000</Typography>
+                                    <Typography className={classes.recentCells} variant="subtitle2">&#8722; &#163; 5,000</Typography>
                                 </div>
                             </div>
 
@@ -820,24 +828,24 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                 </Typography>
                                 <div className={classes.recentBody}>
                                     <Typography className={classes.recentRow} component="div" variant="body1">
-                                        <Typography variant="subtitle">&#43;</Typography>
+                                        <Typography variant="subtitle1">&#43;</Typography>
                                         <Typography className={classes.recentCell} variant="body1">
                                             Listing
                                             <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
                                         </Typography>
                                     </Typography>
-                                    <Typography variant="subtitle">&#43; &#163; 2,000</Typography>
+                                    <Typography variant="subtitle2">&#43; &#163; 2,000</Typography>
                                 </div>
 
                                 <div className={classes.recentBody}>
                                     <Typography className={classes.recentRow_2} component="div" variant="body1">
-                                        <Typography variant="subtitle">&#8722;</Typography>
+                                        <Typography variant="subtitle1">&#8722;</Typography>
                                         <Typography variant="body1">
                                             Purchase
                                             <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
                                         </Typography>
                                     </Typography>
-                                    <Typography className={classes.recentCells} variant="subtitle">&#8722; &#163; 5,000</Typography>
+                                    <Typography className={classes.recentCells} variant="subtitle2">&#8722; &#163; 5,000</Typography>
                                 </div>
                             </div>
                        </div>

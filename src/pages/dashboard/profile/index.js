@@ -3,9 +3,9 @@ import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { Box, Tab, Tabs, Typography } from '@material-ui/core';
+import { Badge, Box, Tab, Tabs, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Account, BagChecked, CardAccountDetailsOutline, LockOutline, Logout } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, History, LockOutline, Logout } from 'mdi-material-ui';
 
 import { getCountries } from '../../../actions/countries'; 
 import { getCustomerInformation, logout } from '../../../actions/customer'; 
@@ -15,6 +15,7 @@ import { getDocuments } from '../../../actions/documents';
 import { COLORS } from '../../../utils/constants'; 
 
 import BankAccounts from '../bankAccount/BankAccounts';
+import Transactions from '../transactions';
 import PersonalDetails from './PersonalDetails';
 import IDVerification from './IDVerification';
 import TwoFactor from '../twoFactor';
@@ -24,7 +25,7 @@ const useStyles = makeStyles(theme =>({
     root: {
         display: 'grid',
         gridTemplateColumns: '1fr 4fr',
-        padding: [[theme.spacing(15), theme.spacing(10), 0, theme.spacing(10)]],
+        padding: [[theme.spacing(15), theme.spacing(5), 0, theme.spacing(5)]],
         gap: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
@@ -160,6 +161,7 @@ const Profile = (props) => {
         { icon: <Account className={classes.icon} />, text: 'Profile' },
         { icon: <LockOutline className={classes.icon} />, text: 'Authentication' },
         { icon: <BagChecked className={classes.icon} />, text: 'Bank Account' },
+        // { icon: <Badge color="secondary" badgeContent="New"><History className={classes.icon} /></Badge>, text: 'Transaction History' },
         { icon: <CardAccountDetailsOutline className={classes.icon} />, text: 'ID Verification' },
         // { icon: <KeyVariant className={classes.icon} />, text: 'Set PIN' },
     ];
@@ -232,6 +234,18 @@ const Profile = (props) => {
                         ))}
                         <LinkTab 
                             label={
+                                <Badge color="secondary" badgeContent="New">
+                                    <History />&nbsp;&nbsp;&nbsp;
+                                    <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Transaction History</Typography>
+                                </Badge>
+                            } 
+                            {...a11yProps(4)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                        />  
+                        <LinkTab 
+                            label={
                                 <>
                                     <Logout />&nbsp;&nbsp;&nbsp;
                                     <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Logout</Typography>
@@ -255,6 +269,9 @@ const Profile = (props) => {
                     </TabPanel>
                     <TabPanel value={value} index={3}>  
                         <IDVerification />
+                    </TabPanel>
+                    <TabPanel value={value} index={4}>  
+                        <Transactions />
                     </TabPanel>
                 </div>
             </section>

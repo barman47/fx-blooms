@@ -6,7 +6,6 @@ const addBankAccount = (data) => {
     data.AccountName = !isEmpty(data.AccountName) ?  data.AccountName : '';
     data.AccountNumber = !isEmpty(data.AccountNumber) ?  data.AccountNumber : '';
     data.BankName = !isEmpty(data.BankName) ?  data.BankName : '';
-    data.Currency = !isEmpty(data.Currency) ?  data.Currency : '';
 
     if (Validator.isEmpty(data.AccountName)) {
         errors.AccountName = 'Account name is required!';
