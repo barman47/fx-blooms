@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { FormatListText } from 'mdi-material-ui';
 
-import { COLORS, ID_STATUS } from '../../../utils/constants';
+import { BID_STATUS, COLORS, ID_STATUS, LISTING_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { addBid, checkListingEditable } from '../../../actions/listings';
 import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_BID_STATUS } from '../../../actions/types';
@@ -19,6 +19,7 @@ import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
 const { APPROVED, NOT_SUBMITTED, PENDING, REJECTED } = ID_STATUS;
+const { open } = LISTING_STATUS;
 
 const useStyles = makeStyles(theme => ({
     noListingContent: {
@@ -62,6 +63,8 @@ const Listings = ({ addBid, checkListingEditable }) => {
 
     const idVerificationModal = useRef();
     const toast = useRef();
+
+    const { IN_PROGRES } = BID_STATUS;
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -137,44 +140,43 @@ const Listings = ({ addBid, checkListingEditable }) => {
         idVerificationModal.current.openModal();
     };
 
-    const shouldResumeTransaction = (bids) => {
-        let resume = false;
-        for (const bid of bids) {
-            if (bid.status === 'IN_PROGRESS' && bid.customerId === customerId) {
-                console.log('Setting bid');
-                dispatch({
-                    type: SET_BID,
-                    payload: bid
-                });
-                resume = true;
-                break;
-            }
-        }
-        return resume;
-    };
-
     const handleAddBid = (listing) => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
             return checkIdStatus();
         }
 
-        const shouldResume = shouldResumeTransaction(listing.bids);
-        if (shouldResume){
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-            return toggleBuyerPaymentDrawer();
+        if (listing.status === open) {
+            setLoading(true);
+            return addBid({
+                listingId: listing.id,
+                amount: {
+                    currencyType: listing.amountAvailable.currencyType,
+                    amount: listing.amountAvailable.amount
+                }
+            }, listing);
         }
 
-        setLoading(true);
-        addBid({
-            listingId: listing.id,
-            amount: {
-                currencyType: listing.amountAvailable.currencyType,
-                amount: listing.amountAvailable.amount
+        let activeBid = true;
+        for (let listingBid of listing.bids) {
+            if (listingBid.customerId === customerId && listingBid.status === IN_PROGRES) {
+                activeBid = false;
+                batch(() => {
+                    dispatch({
+                        type: SET_BID,
+                        payload: listingBid
+                    });
+                    dispatch({
+                        type: SET_LISTING,
+                        payload: listing
+                    });
+                });
+                return setOpenSendEurDrawer(true);
             }
-        }, listing);
+        }
+
+        if (activeBid) {
+            return setErrors({ msg: 'This listing is currently in negotiation' });
+        }
     };
 
     const dismissAction = () => {

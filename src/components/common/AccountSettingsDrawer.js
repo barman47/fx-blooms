@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import {
+    Badge,
     Divider,
     Drawer,
     Tabs,
     Typography
 } from '@material-ui/core';
-import { Account, BagChecked, CardAccountDetailsOutline, LockOutline, Logout } from 'mdi-material-ui';
+import { Account, BagChecked, CardAccountDetailsOutline, History, LockOutline, Logout } from 'mdi-material-ui';
 
 import { logout } from '../../actions/customer';
 import { COLORS } from '../../utils/constants';
@@ -21,7 +22,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'column',
         paddingTop: theme.spacing(5),
-        width: '60%',
+        width: '70%',
 
         '& .MuiTab-wrapper': {
             
@@ -153,11 +154,28 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                         <LinkTab 
                             label={
                                 <div className={classes.tab}>
+                                    <Badge color="secondary" badgeContent="New">
+                                        <History className={classes.icon} />&nbsp;&nbsp;&nbsp;
+                                        <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Transaction History</Typography>
+                                    </Badge>
+                                </div>
+                            } 
+                            {...a11yProps(4)} 
+                            classes={{ selected: classes.selectedTab }}
+                            disableRipple
+                            disableFocusRipple
+                            onClick={() => {
+                                setValue(4);
+                            }}
+                        />
+                        <LinkTab 
+                            label={
+                                <div className={classes.tab}>
                                     <Logout className={classes.icon} />&nbsp;&nbsp;&nbsp;
                                     <Typography variant="subtitle1" component="p" className={classes.tabLabel}>Logout</Typography>
                                 </div>
                             } 
-                            {...a11yProps(4)} 
+                            {...a11yProps(5)} 
                             disableRipple
                             disableFocusRipple
                             onClick={() => {

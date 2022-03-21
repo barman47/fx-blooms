@@ -120,11 +120,11 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
 
     const [expired] = useState(false);
     const [timerHours, setTimerHours] = useState('0');
-    const [timerMinutes, setTimerMinutes] = useState('0');
-    const [timerSeconds, setTimerSeconds] = useState('0');
+    const [timerMinutes, setTimerMinutes] = useState('00');
+    const [timerSeconds, setTimerSeconds] = useState('00');
 
     const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
-    const { open } = LISTING_STATUS;
+    const { finalized, open } = LISTING_STATUS;
 
     const interval = useRef();
 
@@ -146,7 +146,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date(dateCreated).getTime() + 259_200_000; // number of milliseconds in 3 days
+        const countDownDate = new Date(dateCreated).getTime() + 259200000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -195,7 +195,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             to={USER_DETAILS} 
                             onClick={(e) =>handleSetCustomer(e, customerId)}
                             >
-                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy.toLowerCase()}</span>
+                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy?.toLowerCase()}</span>
                         </RouterLink>
                     </Typography>
                     <section className={classes.timestamp}>
@@ -226,9 +226,9 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
-                        {bank.toUpperCase()}
+                        {bank?.toUpperCase()}
                     </Typography>
-                    {listing.status !== open ?
+                    {listing.status === finalized ?
                         <Button 
                             disabled
                             to="#!"
@@ -259,6 +259,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 color="primary"
                                 size="large"
                                 disableElevation
+                                disableFocusRipple
+                                disableRipple
                                 onClick={() => handleEditListing(listing)}
                                 disabled={listing.status !== open}
                             >
@@ -269,6 +271,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                                 color="secondary"
                                 size="large"
                                 disableElevation
+                                disableFocusRipple
+                                disableRipple
                                 onClick={handleDeleteListing}
                                 disabled={listing.status !== open}
                             >
@@ -281,6 +285,8 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                             size="large" 
                             color="primary"
                             disableElevation
+                            disableFocusRipple
+                            disableRipple
                             classes={{ 
                                 contained: classes.button,
                                 root: classes.button

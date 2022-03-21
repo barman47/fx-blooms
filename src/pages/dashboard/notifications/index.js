@@ -161,7 +161,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const setBuyerAccount = (notification) => {
         const { buyer, seller } = notification;
-        debugger
         setTransactionId(notification.id);
         setSellerUsername(seller.userName);
         

@@ -160,18 +160,14 @@ export const addBid = (bid, listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AddBid`, bid);
-        return batch(() => {
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-            dispatch({
-                type: ADDED_BID,
-                payload: {
-                    bid: res.data.data,
-                    addedBid: true
-                }
-            })
+        console.log('add bid ', res);
+        dispatch({
+            type: ADDED_BID,
+            payload: {
+                bid: res.data.data,
+                listing,
+                addedBid: true
+            }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -185,6 +181,14 @@ export const madePayment = (data) => async (dispatch) => {
             type: SET_AS_ACCEPTED,
             payload: data.listingId
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const cancelBid = (bidIds) => async (dispatch) => {
+    try {
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
     } catch (err) {
         return handleError(err, dispatch);
     }

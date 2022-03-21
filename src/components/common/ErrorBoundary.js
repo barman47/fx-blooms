@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink } from 'react-router-dom';
+import { BrowserRouter, Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Grid, Typography, makeStyles, } from '@material-ui/core';
 
 import { CONTACT_US } from '../../routes';
@@ -50,7 +50,7 @@ export const ErrorFallback = () => {
     const classes = useStyles();
 
     return (
-        <>
+        <BrowserRouter>
             <Helmet>
                 <title>Error | FXBLOOMS.com</title>
             </Helmet>
@@ -63,7 +63,7 @@ export const ErrorFallback = () => {
                     <Grid item xs={12}>
                         <Typography variant="body2" component="p" align="center">Sorry this link is broken, kindly try again or contact support.</Typography>
                     </Grid>
-                    <Grid xs={12}>
+                    <Grid item xs={12}>
                         <Box component="div" className={classes.buttonContainer}>
                             <Button
                                 variant="contained"
@@ -91,7 +91,7 @@ export const ErrorFallback = () => {
                     </Grid>
                 </Grid>
             </Box>
-        </>
+        </BrowserRouter>
     );
 };
 
@@ -105,6 +105,7 @@ class ErrorBoundary extends Component {
 
     static getDerivedStateFromError(error) {
         // Update state so the next render will show the fallback UI.
+        console.log(error);
         return { hasError: true };
     }
 

@@ -7,6 +7,7 @@ import {
     SET_CUSTOMER_STATS, 
     SET_CUSTOMER_PROFILE,
     SET_CUSTOMER_MSG,
+    SET_CUSTOMER,
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
     SET_RESIDENCE_PERMIT,
@@ -67,6 +68,12 @@ const customerReducer =  (state = initialState, action) => {
             return {
                 ...state,
                 email: action.payload
+            };
+
+        case SET_CUSTOMER:
+            return {
+                ...state,
+                customer: action.payload
             };
 
         case SET_CUSTOMER_STATS:

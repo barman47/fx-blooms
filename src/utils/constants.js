@@ -79,6 +79,11 @@ export const USER_DETAILS = {
     TRANSACTION_DETAILS: 'Transaction Details'
 };
 
+export const LISTING_DETAILS = {
+    ALL_LISTINGS: 'ALL LISTINGS',
+    ALL_TRANSACTIONS: 'ALL TRANSACTIONS',
+};
+
 export const ID_STATUS = {
     APPROVED: 'APPROVED',
     NOT_SUBMITTED:'NOT_SUBMITTED'
@@ -105,6 +110,12 @@ export const EIGHT_CHARACTERS = new RegExp(/.{8,}/);
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
 export const ATTACHMENT_LIMIT = 3000000; // 3 Megabytes
 
+export const BID_STATUS = {
+    IN_PROGRES: 'IN_PROGRESS',
+    CANCELED: 'CANCELED',
+    COMPLETED: 'COMPLETED',
+};
+
 export const LISTING_STATUS = {
     open: 'OPEN',
     removed: 'REMOVED',
@@ -119,3 +130,36 @@ export const PAYMENT_METHODS = [
     'Other Banks (with instant)',
     'Other Banks (without instant)',
 ];
+
+export const olimpicMedals = [{
+    country: 'USA',
+    gold: 36,
+    silver: 38,
+    bronze: 36,
+  }, {
+    country: 'China',
+    gold: 51,
+    silver: 21,
+    bronze: 28,
+  }, {
+    country: 'Russia',
+    gold: 23,
+    silver: 21,
+    bronze: 28,
+  }, {
+    country: 'Britain',
+    gold: 19,
+    silver: 13,
+    bronze: 15,
+  }, {
+    country: 'Australia',
+    gold: 14,
+    silver: 15,
+    bronze: 17,
+  }, {
+    country: 'Germany',
+    gold: 16,
+    silver: 10,
+    bronze: 15,
+  }];
+

@@ -8,17 +8,14 @@ import {
 	ButtonGroup,
 	Checkbox,
 	Collapse,
-	Fab,
 	FormControlLabel,
 	InputAdornment,
 	TextField,
-	Tooltip,
 	Typography,
 	// useMediaQuery 
 } from '@material-ui/core';
 // import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { FilterOutline } from 'mdi-material-ui';
 // import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import _ from 'lodash';
 
@@ -39,7 +36,6 @@ import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
-import FilterListingModal from './FilterListingModal';
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
 import WalletInfoModal from '../wallet/WalletInfoModal';
@@ -58,17 +54,6 @@ import GBPFlag from '../../../assets/img/GBP-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
-	fab: {
-		display: 'none',
-		[theme.breakpoints.down('md')]: {
-			display: 'block',
-			position: 'fixed',
-			bottom: 60,
-			right: 10,
-			zIndex: 1
-		}
-	},
-
 	header: {
 		display: 'grid',
 		gridTemplateColumns: '1fr 1fr',
@@ -178,7 +163,7 @@ const useStyles = makeStyles(theme => ({
 
 		[theme.breakpoints.down('sm')]: {
 			display: 'grid',
-			gridTemplateColumns: '1fr',
+			gridTemplateColumns: '1fr 1fr',
 			alignItems: 'center',
 		},
 
@@ -352,7 +337,6 @@ const AllListings = (props) => {
 	const [errors, setErrors] = useState({});
 
 	const [dataLength, setDataLength] = useState(0);
-	const [open, setOpen] = useState(false);
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
 	// eslint-disable-next-line
@@ -371,8 +355,6 @@ const AllListings = (props) => {
     const toggleWithdrawalDrawer = () => {
         setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
     };
-
-	const toggleFilterModal = () => setOpen(!open);
 
 	useEffect(() => {
 		loadedEvent.current = getListings;
@@ -498,10 +480,6 @@ const AllListings = (props) => {
 		}
 	};
 
-	const handleOpenModal = () => {
-		setOpen(true);
-	};
-
 	const handleFilter = (e) => {
 		e.preventDefault();
 		setErrors({});
@@ -531,17 +509,6 @@ const AllListings = (props) => {
 	return (
 		<>
 			<RiskNoticeModal />
-			<FilterListingModal open={open} toggleModal={toggleFilterModal} />
-			<Tooltip title="Filter Listings" arrow>
-				<Fab 
-					className={classes.fab} 
-					color="primary" 
-					aria-label="filter listings"
-					onClick={handleOpenModal}
-				>
-					<FilterOutline />
-				</Fab>
-			</Tooltip>
 			{fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
             {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
             <WalletInfoModal ref={walletInfoModal} />
