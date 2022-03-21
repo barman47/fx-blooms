@@ -8,6 +8,7 @@ import {
     CircularProgress,
     FormControl,
     Grid,
+    // Paper,
     MenuItem,
     Select,
     Typography
@@ -15,11 +16,21 @@ import {
 
 import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
+import { Stack, Animation } from '@devexpress/dx-react-chart';
+import {
+    Chart,
+    ArgumentAxis,
+    ValueAxis,
+    BarSeries,
+    Title,
+    Legend,
+  } from '@devexpress/dx-react-chart-material-ui';
 
-// import { COLORS } from '../../../utils/constants';
+import { olimpicMedals as data } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
 import { useCallback } from 'react';
+// import { CalendarTodayIcon } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -48,15 +59,15 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: '#FBEDFF',
         border: `2px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
-        height: theme.spacing(35),
+        height: theme.spacing(50),
         padding: theme.spacing(2)
     },
 
     listingsBreakdown: {
-        backgroundColor: '#FBEDFF',
+        backgroundColor: '#FCF8F3',
         border: `2px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
-        height: theme.spacing(35),
+        height: theme.spacing(50),
         padding: theme.spacing(2)
     },
 
@@ -100,15 +111,179 @@ const useStyles = makeStyles((theme) => ({
         border: `2px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
         height: theme.spacing(35),
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
+
+        display: 'flex',
+        flexDirection: 'column',
     },
 
     filterLoaderContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center'
+    },
+
+    chart: {
+        height: '375px !important'
+    },
+
+    userActivitiesHeader: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        color: theme.palette.primary.main,
+
+        marginTop: theme.spacing(3),
+
+        '& h6': {
+            flexBasis: '70%',
+            marginLeft: theme.spacing(3),
+            fontWeight: '600',
+            fontSize: '1rem'
+        }
+    },
+
+    subActivitiesHeader: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexBasis: '30%',
+        
+        '& p': {
+            fontWeight: '600',
+            fontSize: '1rem'
+        }
+    },
+
+    userActivitiesBody: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        color: theme.palette.primary.main,
+
+        marginTop: theme.spacing(2),
+
+        '& h6': {
+            flexBasis: '70%',
+            marginLeft: theme.spacing(3),
+            fontSize: '1rem'
+        }
+    },
+
+    subActivitiesBody: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-around',
+        flexBasis: '30%',
+        
+        '& p': {
+            fontSize: '1rem'
+        }
+    },
+
+    recentHeader: {
+        display: 'flex',
+        justifyContent: 'space-between',
+    },
+
+    recentContent: {
+        display: 'flex',
+        flexDirection: 'column',
+    },
+
+    recentTable: {
+        display: 'flex',
+        flexDirection: 'column',
+        color: 'grey',
+        marginTop: theme.spacing(1.7),
+        gap: '5px',
+
+        '& h6': {
+            fontWeight: '600',
+        }
+    },
+
+    recentBody: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        '& span': {
+            color: '#006400'
+        }
+    },
+
+    recentRow: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: '10px',
+        flexBasis: '70%',
+        alignItems: 'center',
+        
+        '& span': {
+            border: `1px solid green`,
+            borderRadius: '50%',
+            height: '25px',
+            width: '25px',
+            color: 'green',
+            textAlign: 'center'
+        },
+
+        '& p': {
+            color: 'black',
+            fontWeight: 'bold',
+            fontSize: theme.spacing(1.8)
+        },
+
+        '& h6': {
+            fontWeight: 'bold',
+            fontSize: theme.spacing(1.5),
+            color: 'grey'
+        }
+    },
+
+    recentRow_2: {
+        display: 'flex',
+        flexDirection: 'row',
+        gap: '10px',
+        flexBasis: '70%',
+        alignItems: 'center',
+        
+        '& span': {
+            border: `1px solid red`,
+            borderRadius: '50%',
+            height: '25px',
+            width: '25px',
+            color: 'red',
+            textAlign: 'center'
+        },
+
+        '& p': {
+            color: 'black',
+            fontWeight: 'bold',
+            fontSize: theme.spacing(1.8)
+        },
+
+        '& h6': {
+            fontWeight: 'bold',
+            fontSize: theme.spacing(1.5),
+            color: 'grey'
+        }
+    },
+
+    recentCells: {
+        color: 'red !important',
     }
 }));
+
+const Root = props => (
+    <Legend.Root {...props} sx={{ display: 'flex', margin: 'auto', flexDirection: 'row' }} />
+  );
+  const Label = props => (
+    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap' }} />
+  );
 
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
@@ -322,9 +497,73 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.userAcquisitions}>
                         <Typography variant="subtitle2" component="span" color="primary">Listings Breakdown</Typography>
+                        {/* <Paper className={classes.chart}> */}
+                            <Chart
+                                className={classes.chart}
+                                data={data}
+                                >
+                                <ArgumentAxis />
+                                <ValueAxis />
+
+                                <BarSeries
+                                    name="Gold Medals"
+                                    valueField="gold"
+                                    argumentField="country"
+                                    color="#ffd700"
+                                />
+                                <BarSeries
+                                    name="Silver Medals"
+                                    valueField="silver"
+                                    argumentField="country"
+                                    color="#c0c0c0"
+                                />
+                                <BarSeries
+                                    name="Bronze Medals"
+                                    valueField="bronze"
+                                    argumentField="country"
+                                    color="#cd7f32"
+                                />
+                                <Animation />
+                                <Legend position="bottom" rootComponent={Root} labelComponent={Label} />
+                                <Title text="Olimpic Medals in 2008" />
+                                <Stack />
+                            </Chart>
+                        {/* </Paper> */}
                     </Box>
                     <Box component="div" className={classes.listingsBreakdown}>
                         <Typography variant="subtitle2" component="span" color="primary">User Acquisitions</Typography>
+                        {/* <Paper className={classes.chart}> */}
+                                <Chart
+                                    className={classes.chart}
+                                    data={data}
+                                    >
+                                    <ArgumentAxis />
+                                    <ValueAxis />
+
+                                    <BarSeries
+                                        name="Gold Medals"
+                                        valueField="gold"
+                                        argumentField="country"
+                                        color="#ffd700"
+                                    />
+                                    <BarSeries
+                                        name="Silver Medals"
+                                        valueField="silver"
+                                        argumentField="country"
+                                        color="#c0c0c0"
+                                    />
+                                    <BarSeries
+                                        name="Bronze Medals"
+                                        valueField="bronze"
+                                        argumentField="country"
+                                        color="#cd7f32"
+                                    />
+                                    <Animation />
+                                    <Legend position="bottom" rootComponent={Root} labelComponent={Label} />
+                                    <Title text="Olimpic Medals in 2008" />
+                                    <Stack />
+                                </Chart>
+                            {/* </Paper> */}
                     </Box>
                 </Grid>
                 <Grid item xs={12} className={classes.content}>
@@ -382,6 +621,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                         <Typography variant="subtitle2" component="span" color="primary">Support Board</Typography>
                         <Box component="div">
                             <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
+                            
                         </Box>
                     </Box>
                     <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }} onClick={gotoListingsPage}>
@@ -481,15 +721,127 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                         <Box component="div">
                             <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
                             
+                            
                         </Box>
                     </Box>
                 </Grid>
                 <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.userActivities}>
                         <Typography variant="subtitle2" component="span" color="primary">User Activities</Typography>
+                        <div className={classes.userActivitiesHeader}>
+                            <Typography  variant="subtitle2">
+                                Category
+                            </Typography>
+                            <div className={classes.subActivitiesHeader} compoennt="div" variant="subtitle2">
+                                <Typography>Nos</Typography>
+                                <Typography>&#37;</Typography>
+                            </div>
+                        </div>
+
+                        <div className={classes.userActivitiesBody}>
+                            <Typography  variant="subtitle2">
+                                No profile
+                            </Typography>
+                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
+                                <Typography>344</Typography>
+                                <Typography>5%</Typography>
+                            </div>
+                        </div>
+
+                        <div className={classes.userActivitiesBody}>
+                            <Typography  variant="subtitle2">
+                                Not signed in in the last 30days
+                            </Typography>
+                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
+                                <Typography>325</Typography>
+                                <Typography>50%</Typography>
+                            </div>
+                        </div>
+
+                        <div className={classes.userActivitiesBody}>
+                            <Typography  variant="subtitle2">
+                                Have transact in the last 30days
+                            </Typography>
+                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
+                                <Typography>200</Typography>
+                                <Typography>20%</Typography>
+                            </div>
+                        </div>
+
+                        <div className={classes.userActivitiesBody}>
+                            <Typography  variant="subtitle2">
+                                No listing in the last 30days
+                            </Typography>
+                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
+                                <Typography>650</Typography>
+                                <Typography>5%</Typography>
+                            </div>
+                        </div>
                     </Box>
                     <Box component="div" className={classes.recentTransactions}>
-                        <Typography variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
+                        <div className={classes.recentHeader}>
+                            <Typography variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">
+                                {/* <CalendarTodayIcon /> */}
+                                23-30 March 2022
+                                </Typography>
+                        </div>
+                       <div className={classes.recentContent}>
+                            <div className={classes.recentTable}>
+                                <Typography variant="subtitle2">
+                                    NEWEST
+                                </Typography>
+                                <div className={classes.recentBody}>
+                                    <Typography className={classes.recentRow} component="div" variant="body1">
+                                        <Typography variant="subtitle">&#43;</Typography>
+                                        <Typography className={classes.recentCell} variant="body1">
+                                            Listing
+                                            <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
+                                        </Typography>
+                                    </Typography>
+                                    <Typography variant="subtitle">&#43; &#163; 2,000</Typography>
+                                </div>
+
+                                <div className={classes.recentBody}>
+                                    <Typography className={classes.recentRow_2} component="div" variant="body1">
+                                        <Typography variant="subtitle">&#8722;</Typography>
+                                        <Typography variant="body1">
+                                            Purchase
+                                            <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
+                                        </Typography>
+                                    </Typography>
+                                    <Typography className={classes.recentCells} variant="subtitle">&#8722; &#163; 5,000</Typography>
+                                </div>
+                            </div>
+
+                            <div className={classes.recentTable}>
+                                <Typography variant="subtitle2">
+                                    YESTERDAY
+                                </Typography>
+                                <div className={classes.recentBody}>
+                                    <Typography className={classes.recentRow} component="div" variant="body1">
+                                        <Typography variant="subtitle">&#43;</Typography>
+                                        <Typography className={classes.recentCell} variant="body1">
+                                            Listing
+                                            <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
+                                        </Typography>
+                                    </Typography>
+                                    <Typography variant="subtitle">&#43; &#163; 2,000</Typography>
+                                </div>
+
+                                <div className={classes.recentBody}>
+                                    <Typography className={classes.recentRow_2} component="div" variant="body1">
+                                        <Typography variant="subtitle">&#8722;</Typography>
+                                        <Typography variant="body1">
+                                            Purchase
+                                            <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
+                                        </Typography>
+                                    </Typography>
+                                    <Typography className={classes.recentCells} variant="subtitle">&#8722; &#163; 5,000</Typography>
+                                </div>
+                            </div>
+                       </div>
+                                                
                     </Box>
                 </Grid>
             </Grid>

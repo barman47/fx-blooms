@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme =>({
         height: '100%',
 
         [theme.breakpoints.down('md')]: {
-            paddingBottom: theme.spacing(7)
+            paddingBottom: theme.spacing(4)
         }
     },
 
