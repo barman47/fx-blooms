@@ -333,7 +333,7 @@ const AllListings = (props) => {
 	// eslint-disable-next-line
 	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
-
+	const [timeOfDay, setTimeOfDay] = useState('');
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [errors, setErrors] = useState({});
 
@@ -358,6 +358,7 @@ const AllListings = (props) => {
     };
 
 	useEffect(() => {
+		greet();
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
 		getCustomerStats();
@@ -537,6 +538,19 @@ const AllListings = (props) => {
 		// });
 	}
 
+	const greet = () => {
+        const time = new Date();
+        const hour = time.getHours();
+
+        if (hour < 12) {
+            setTimeOfDay('morning');
+        } else if (hour >= 12 && hour < 16) {
+            setTimeOfDay('afternoon');
+        } else {
+            setTimeOfDay('evening');
+        }
+    };
+
 	return (
 		<>
 			<RiskNoticeModal />
@@ -545,7 +559,7 @@ const AllListings = (props) => {
             <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
-					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
+					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
 					{/* <Typography variant="body1" component="p">What would you like to do today?</Typography>  */}
 				</div>
 				{/* <div>
