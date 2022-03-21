@@ -4,12 +4,13 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
+import { decode } from 'html-entities';
 
 import { getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
-import getCurrencySymbol from '../../../utils/getCurrencySymbol';
+// import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import { REMOVE_EXPIRED_LISTING } from '../../../actions/types';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { ACCOUNT, USER_DETAILS } from '../../../routes';
@@ -222,11 +223,16 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
-                        {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`}
+                        {`NGN${formatNumber(exchangeRate, 2)} to ${decode('&#8364;')}1`}
+                        {/* {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`} */}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
-                        <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
-                        {bank?.toUpperCase()}
+                        {amountAvailable?.currencyType === 'EUR' && 
+                            <>
+                                <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
+                                {bank?.toUpperCase()}
+                            </>
+                        }
                     </Typography>
                     {listing.status === finalized ?
                         <Button 
