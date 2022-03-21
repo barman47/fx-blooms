@@ -42,10 +42,21 @@ const listingsReducer = (state = initialState, action) => {
 
     switch (action.type) {   
         case ADDED_BID:
+            listingId = action.payload.listing.id;
+            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingsList = [...state.listings];
+            listing = { 
+                ...action.payload.listing, 
+                status: LISTING_STATUS.negotiation, 
+                bids: [...action.payload.listing.bids, action.payload.bid] 
+            };
+            listingsList.splice(listingIndex, 1, listing);
             return {
                 ...state,
                 bid: action.payload.bid,
-                addedBid: action.payload.addedBid
+                addedBid: action.payload.addedBid,
+                listing,
+                listings: listingsList
             };
 
         case SET_BID:

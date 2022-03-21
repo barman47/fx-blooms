@@ -2,14 +2,17 @@ import { useEffect, useState } from 'react';
 import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
+    Box,
 	Button,
     CircularProgress,
     Grid,
+    IconButton,
     Drawer,
     TextField,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Close } from 'mdi-material-ui';
 
 import { editAccount } from '../../../actions/bankAccounts';
 
@@ -28,6 +31,13 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(2),
             width: '80vw'
+        },
+
+        '& header': {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center'
         }
     },
 
@@ -118,7 +128,12 @@ const EditAccountDrawer = ({ editAccount, toggleDrawer, drawerOpen }) => {
 	return (
         <>
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={loading ? true : open} onClose={toggleDrawer}>
-                <Typography variant="h6" className={classes.header}>Edit Account</Typography>
+                <Box component="header">
+                    <Typography variant="h6" className={classes.header}>Edit Account</Typography>
+                    <IconButton color="primary" onClick={toggleDrawer}>
+                        <Close />
+                    </IconButton>
+                </Box>
                 <Typography variant="subtitle2" component="small" className={classes.info}>Please note that you will only be paid via a linked account number.</Typography>
                 <form className={classes.form} onSubmit={onSubmit} noValidate>
                     <Grid container direction="column" spacing={matches ? 3 : 2}>

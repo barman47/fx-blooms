@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,7 +9,7 @@ import { FormatListText } from 'mdi-material-ui';
 import { BID_STATUS, COLORS, ID_STATUS, LISTING_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 import { addBid, checkListingEditable } from '../../../actions/listings';
-import { GET_ERRORS, SET_BID, TOGGLE_BID_STATUS } from '../../../actions/types';
+import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_BID_STATUS } from '../../../actions/types';
 
 import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
@@ -160,9 +160,15 @@ const Listings = ({ addBid, checkListingEditable }) => {
         for (let listingBid of listing.bids) {
             if (listingBid.customerId === customerId && listingBid.status === IN_PROGRES) {
                 activeBid = false;
-                dispatch({
-                    type: SET_BID,
-                    payload: listingBid
+                batch(() => {
+                    dispatch({
+                        type: SET_BID,
+                        payload: listingBid
+                    });
+                    dispatch({
+                        type: SET_LISTING,
+                        payload: listing
+                    });
                 });
                 return setOpenSendEurDrawer(true);
             }
