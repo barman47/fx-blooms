@@ -1,4 +1,5 @@
 import { 
+    SET_REQUIRED_CURRENCY,
     ADDED_BID,
     ADDED_LISTING, 
     DELETED_LISTING,
@@ -21,6 +22,8 @@ import {
 import { BID_STATUS, LISTING_STATUS } from '../utils/constants';
 
 const initialState = {
+    availableCurrency: 'NGN',
+    requiredCurrency: 'EUR',
     addedListing: false,
     editedListing: false,
     addedBid: false,
@@ -41,6 +44,13 @@ const listingsReducer = (state = initialState, action) => {
     let updatedListing = {};
 
     switch (action.type) {   
+        case SET_REQUIRED_CURRENCY:
+            return {
+                ...state,
+                availableCurrency: action.payload.availableCurrency,
+                requiredCurrency: action.payload.requiredCurrency  
+            };
+
         case ADDED_BID:
             listingId = action.payload.listing.id;
             listingIndex = state.listings.findIndex(listing => listing.id === listingId);

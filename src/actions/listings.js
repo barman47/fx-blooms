@@ -130,8 +130,7 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
             }
         });
     } catch (err) {
-        console.error(err);
-        // return handleError(err, dispatch);
+        return handleError(err, dispatch);
     }
 };
 
@@ -160,7 +159,6 @@ export const addBid = (bid, listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AddBid`, bid);
-        console.log('add bid ', res);
         dispatch({
             type: ADDED_BID,
             payload: {

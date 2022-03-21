@@ -29,7 +29,8 @@ import {
 	ACTIVATE_USD_WALLET,
 	ACTIVATE_GPB_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
-	SET_LOADING_LISTINGS 
+	SET_LOADING_LISTINGS,
+	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
@@ -318,7 +319,7 @@ const AllListings = (props) => {
 	const theme = useTheme();
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const listingsLoading = useSelector(state => state.listings.loading);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
@@ -406,13 +407,13 @@ const AllListings = (props) => {
 			getListingsOpenForBid({
 				pageNumber: 0,
 				pageSize: 15,
-				currencyNeeded: 'EUR',
-				currencyAvailable: 'NGN',
+				currencyNeeded: requiredCurrency,
+				currencyAvailable: availableCurrency,
 				minimumExchangeAmount: 0,
 				useCurrencyFilter: false
 			});
 		}
-	}, [Amount, dispatch, getListingsOpenForBid]);
+	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 
 	useEffect(() => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
@@ -428,8 +429,8 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 10,
-			currencyNeeded: 'NGN',
-			currencyAvailable: 'EUR',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
 		}, true);
@@ -439,18 +440,25 @@ const AllListings = (props) => {
 		getMoreListings({
 			pageNumber: currentPageNumber + 1,
 			pageSize: 10,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
 		});	
 	};
 
 	const handleClearFilter = useCallback(() => {
-		setAvailableCurrency('NGN');
-		setRequiredCurrency('EUR');
+		// setAvailableCurrency('NGN');
+		// setRequiredCurrency('EUR');
 		setAmount('');
 		setErrors({});
+		// dispatch({
+		// 	type: SET_REQUIRED_CURRENCY,
+		// 	payload: {
+		// 		availableCurrency: 'NGN',
+		// 		requiredCurrency: 'EUR'
+		// 	}
+		// });
 		dispatch({
 			type: SET_LOADING_LISTINGS,
 			payload: true
@@ -459,12 +467,12 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: false
 		});
-	}, [dispatch, getListingsOpenForBid]);
+	}, [dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 
 	useEffect(() => {
 		if (hideNegotiationListings === false) {
@@ -475,7 +483,6 @@ const AllListings = (props) => {
 	const hideListingsInNegotiation = () => {
 		setHideNegotiationListings(!hideNegotiationListings);
 		if (!hideNegotiationListings) {
-			console.log('Hiding unavailable listings');
 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 		}
 	};
@@ -486,7 +493,7 @@ const AllListings = (props) => {
 
 
 		if (isEmpty(Amount)) {
-			return setErrors({ msg: 'Invalid Serach', Amount: 'Please enter an amount' });
+			return setErrors({ msg: 'Invalid Search', Amount: 'Please enter an amount' });
 		}
 
 		setErrors({});
@@ -497,14 +504,38 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 15,
-			currencyAvailable: 'NGN',
-			currencyNeeded: 'EUR',
+			currencyAvailable: availableCurrency,
+			currencyNeeded: requiredCurrency,
 			amount: Number(Amount),
 			useCurrencyFilter: true,
 			useRatingFilter: false,
 			sellerRating: 0
 		});
 	};
+
+	const setCurrency = (available, required) => {
+		// dispatch({
+		// 	type: SET_LOADING_LISTINGS,
+		// 	payload: true
+		// });
+		dispatch({
+			type: SET_REQUIRED_CURRENCY,
+			payload: {
+				availableCurrency: available,
+				requiredCurrency: required  
+			}
+		});
+		// getListingsOpenForBid({
+		// 	pageNumber: 1,
+		// 	pageSize: 15,
+		// 	currencyAvailable: available,
+		// 	currencyNeeded: required,
+		// 	amount: Number(Amount),
+		// 	useCurrencyFilter: true,
+		// 	useRatingFilter: false,
+		// 	sellerRating: 0
+		// });
+	}
 
 	return (
 		<>
@@ -610,12 +641,15 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation variant="contained" className={classes.buttonGroup}>
+							<ButtonGroup disableElevation className={classes.buttonGroup}>
 								<Button
 									color="primary"
 									size="small"
 									disableRipple
 									disableFocusRipple
+									onClick={() => setCurrency('NGN', 'EUR')}
+									variant={requiredCurrency === 'EUR' ? 'contained' : 'outlined'}
+									// disabled={requiredCurrency === 'NGN'}
 								>
 									BUY EUR
 								</Button>
@@ -624,7 +658,9 @@ const AllListings = (props) => {
 									size="small"
 									disableRipple
 									disableFocusRipple
-									disabled
+									onClick={() => setCurrency('EUR', 'NGN')}
+									variant={requiredCurrency === 'NGN' ? 'contained' : 'outlined'}
+									// disabled={requiredCurrency === 'EUR'}
 								>
 									BUY NGN
 								</Button>
@@ -642,7 +678,7 @@ const AllListings = (props) => {
 									error={errors.Amount ? true : false}
 									disabled={listingsLoading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start" color="primary">EUR | </InputAdornment>,
+										startAdornment: <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
 											<Button
 												variant="contained"
@@ -676,357 +712,12 @@ const AllListings = (props) => {
 							:
 							<Listings />
 						}
-						
 					</InfiniteScroll>
-					{/* <Filter /> */}
 				</section>
 			</Box>
 		</>
 	);
 }
-
-// const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ getCurrencies, getListingsOpenForBid }) => {
-// 	const PRICE = 'PRICE';
-// 	const RATING = 'RATING';
-// 	const classes = useStyles();
-// 	const dispatch = useDispatch();
-// 	const theme = useTheme();
-// 	const { currencies, listings } = useSelector(state => state);
-
-// 	// eslint-disable-next-line
-// 	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
-// 	// eslint-disable-next-line
-// 	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
-// 	const [Amount, setAmount] = useState('');
-
-// 	const [SellerRating, setSellerRating] = useState(0);
-// 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
-// 	const [errors, setErrors] = useState({});
-// 	const [loading, setLoading] = useState(false);
-// 	const [filter, setFilter] = useState(PRICE);
-
-// 	useEffect(() => {
-// 		if (currencies.length === 0) {
-// 			getCurrencies();
-// 		}
-// 		// eslint-disable-next-line
-// 	}, []);
-
-// 	useEffect(() => {
-// 		setLoading(false);
-// 	}, [listings]);
-
-// 	const handleClearFilter = useCallback(() => {
-// 		setFilter(PRICE);
-// 		setAvailableCurrency('NGN');
-// 		setRequiredCurrency('EUR');
-// 		setAmount('');
-// 		setSellerRating('');
-// 		setErrors({});
-// 		setLoading(false);
-
-// 		getListingsOpenForBid({
-// 			pageNumber: 0,
-// 			pageSize: 15,
-// 			currencyNeeded: 'EUR',
-// 			currencyAvailable: 'NGN',
-// 			minimumExchangeAmount: 0,
-// 			useCurrencyFilter: false
-// 		});
-// 	}, [getListingsOpenForBid]);
-
-// 	useEffect(() => {
-// 		if (hideNegotiationListings === false) {
-// 			handleClearFilter();
-// 		}
-// 	}, [handleClearFilter, hideNegotiationListings]);
-
-// 	const hideListingsInNegotiation = () => {
-// 		setHideNegotiationListings(!hideNegotiationListings);
-// 		if (!hideNegotiationListings) {
-// 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
-// 		}
-// 	};
-
-// 	const onSubmit = (e) => {
-// 		e.preventDefault();
-// 		setErrors({});
-
-// 		if (filter === RATING) {
-// 			if (isEmpty(SellerRating)) {
-// 				return setErrors({ msg: 'Invalid Filter', SellerRating: 'Seller rating is required!' });
-// 			}
-
-// 			setErrors({});
-// 			setLoading(true);
-// 			getListingsOpenForBid({
-// 				pageNumber: 1,
-// 				pageSize: 15,
-// 				currencyAvailable: 'NGN',
-// 				currencyNeeded: 'EUR',
-// 				amount: Number(Amount),
-// 				useCurrencyFilter: false,
-// 				useRatingFilter: true,
-// 				sellerRating: parseInt(SellerRating)
-// 			});
-// 		} else {
-// 			// Get rating by star
-// 			const priceFilter = {
-// 				AvailableCurrency: 'NGN',
-// 				RequiredCurrency: 'EUR',
-// 				Amount
-// 			};
-// 			const { errors, isValid } = validatePriceFilter(priceFilter);
-
-// 			if (!isValid) {
-// 				return setErrors({ msg: 'Invalid Filter', ...errors });
-// 			}
-
-// 			setErrors({});
-// 			setLoading(true);
-// 			getListingsOpenForBid({
-// 				pageNumber: 1,
-// 				pageSize: 15,
-// 				currencyAvailable: 'NGN',
-// 				currencyNeeded: 'EUR',
-// 				amount: Number(Amount),
-// 				useCurrencyFilter: true,
-// 				useRatingFilter: false,
-// 				sellerRating: 0
-// 			});
-// 		}
-// 	};
-
-// 	return (
-// 		<section className={classes.filter}>
-// 			<div className={classes.filterContainer}>
-// 				<Box component="header">
-// 					<Typography variant="subtitle2" component="span">Filter</Typography>
-// 					<Typography 
-// 						className={classes.clear}
-// 						variant="subtitle2" 
-// 						component="span" 
-// 						color="primary"
-// 						onClick={handleClearFilter}
-// 						>
-// 							Clear
-// 					</Typography>
-// 				</Box>
-// 				<Box component="div" className={classes.filterButtonContainer}>
-// 					<Button 
-// 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
-// 							variant="contained" 
-// 							color="primary" 
-// 							size="small"
-// 							onClick={() => setFilter(PRICE)}
-// 						>
-// 							Amount
-// 						</Button>
-// 						<Button 
-// 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
-// 							variant="contained" 
-// 							color="primary" 
-// 							size="small"
-// 							disabled
-// 						>
-// 							Completion Rate
-// 					</Button>
-// 				</Box>
-// 				<form onSubmit={onSubmit} noValidate>
-// 					{
-// 						filter === PRICE
-// 						?
-// 						<Grid container direction="row" spacing={2}>
-// 							<Grid item xs={12}>
-// 								<Typography variant="subtitle2" className={classes.label}>Exchange Amount</Typography>
-// 								<TextField 
-// 									value="NGN"
-// 									// onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									// placeholder="Enter Amount"
-// 									helperText={errors.AvailableCurrency}
-// 									fullWidth
-// 									required
-// 									error={errors.AvailableCurrency ? true : false}
-// 									disabled
-// 								/>
-// 								{/* <FormControl 
-// 									variant="outlined" 
-// 									error={errors.AvailableCurrency ? true : false } 
-// 									fullWidth 
-// 									required
-// 									disabled
-// 									// disabled={loading ? true : false}
-// 								>
-// 									<Select
-// 										labelId="AvailableCurrency"
-// 										value={AvailableCurrency}
-// 										// onChange={(e) => setAvailableCurrency(e.target.value)}
-									
-// 									>
-// 										<MenuItem value="">Select Currency</MenuItem>
-// 										{currencies.length > 0 && currencies.map((currency, index) => (
-// 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
-// 										))}
-// 									</Select>
-// 									<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-// 								</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={5}>
-// 								<Typography variant="subtitle2" className={classes.label}>Expected Amount</Typography>
-// 								<TextField 
-// 									value="EUR"
-// 									// onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									placeholder="Enter Amount"
-// 									helperText={errors.RequiredCurrency}
-// 									fullWidth
-// 									required
-// 									error={errors.RequiredCurrency ? true : false}
-// 									disabled
-// 								/>
-// 								{/* <FormControl 
-// 									variant="outlined" 
-// 									error={errors.RequiredCurrency ? true : false } 
-// 									fullWidth 
-// 									required
-// 									disabled
-// 									// disabled={loading ? true : false}
-// 								>
-// 									<Select
-// 										labelId="RequiredCurrency"
-// 										value={RequiredCurrency}
-// 										// onChange={(e) => setRequiredCurrency(e.target.value)}
-// 									>
-// 										<MenuItem value="" disabled>Select</MenuItem>
-// 										<MenuItem value="" disabled>Select</MenuItem>
-// 										{currencies.length > 0 && currencies.map((currency, index) => (
-// 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
-// 										))}
-// 									</Select>
-// 									<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
-// 								</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={7}>
-// 								<TextField 
-// 									value={Amount}
-// 									onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									placeholder="Enter Amount"
-// 									helperText={errors.Amount}
-// 									fullWidth
-// 									required
-// 									error={errors.Amount ? true : false}
-// 									disabled={loading ? true : false}
-// 									style={{ marginTop: theme.spacing(2.2) }}
-// 								/>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<Button 
-// 									type="submit" 
-// 									variant="contained" 
-// 									color="primary"
-// 									fullWidth
-// 									disabled={loading ? true : false}
-// 								>
-// 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-// 								</Button>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<FormControlLabel
-// 									style={{ color: theme.palette.primary.main }}
-// 									control={
-// 										<Checkbox
-// 											checked={hideNegotiationListings}
-// 											onChange={hideListingsInNegotiation}
-// 											color="primary"
-// 										/>
-// 									}
-// 									label="Hide Unavailable Listings"
-// 								/>
-// 							</Grid>
-// 						</Grid>
-// 						:
-// 						<Grid container direction="row" spacing={2}>
-// 							<Grid item xs={12}>
-// 								<Rating 
-// 									color="primary" 
-// 									name="seller-rating"  
-// 									style={{ color: theme.palette.primary.main }}
-// 									value={SellerRating}
-// 									onChange={(e) => setSellerRating(e.target.value)}
-// 									disabled={loading ? true : false}
-// 								/>
-// 								{/* <Typography variant="subtitle2">Number of Stars</Typography> */}
-// 									{/* <FormControl 
-// 										variant="outlined" 
-// 										error={errors.SellerRating ? true : false } 
-// 										fullWidth 
-// 										required
-// 										disabled={loading ? true : false}
-// 									>
-// 										<Select
-// 											labelId="SellerRating"
-// 											value={SellerRating}
-// 											onChange={(e) => setSellerRating(e.target.value)}
-										
-// 										>
-// 											<MenuItem value="">Select Number of Stars</MenuItem>
-// 											<MenuItem value="1">1</MenuItem>
-// 											<MenuItem value="2">2</MenuItem>
-// 											<MenuItem value="3">3</MenuItem>
-// 											<MenuItem value="4">4</MenuItem>
-// 											<MenuItem value="5">5</MenuItem>
-// 										</Select>
-// 										<FormHelperText>{errors.SellerRating}</FormHelperText>
-// 									</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<Button 
-// 									type="submit" 
-// 									variant="contained" 
-// 									color="primary"
-// 									fullWidth
-// 									disabled={loading ? true : false}
-// 								>
-// 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-// 								</Button>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<FormControlLabel
-// 									style={{ color: theme.palette.primary.main }}
-// 									control={
-// 										<Checkbox
-// 											checked={hideNegotiationListings}
-// 											onChange={hideListingsInNegotiation}
-// 											color="primary"
-// 										/>
-// 									}
-// 									label="Hide Unavailable Listings"
-// 								/>
-// 							</Grid>
-// 						</Grid>
-// 					}
-// 				</form>
-// 				{/* <Link 
-// 					to="#!" 
-// 					component={RouterLink}
-// 					className={classes.buyerPopup}
-// 				>
-// 					Buyer Account Details Popup
-// 				</Link> */}
-// 			</div>
-// 		</section>
-// 	);
-// });
-
-// Filter.propTypes = {
-// 	getCurrencies: PropTypes.func.isRequired,
-// 	getListingsOpenForBid: PropTypes.func.isRequired
-// };
 
 AllListings.propTypes = {
 	getAccounts: PropTypes.func.isRequired,
