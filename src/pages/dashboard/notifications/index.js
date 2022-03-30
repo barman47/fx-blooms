@@ -7,19 +7,20 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Key, PhoneCheck, Passport } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 
-import { COLORS, ID_STATUS } from '../../../utils/constants';
+import { COLORS, ID_STATUS, NOTIFICATION_TYPES } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
 import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { SET_ACCOUNT, SET_CUSTOMER_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
+import { SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import { ACCOUNT } from '../../../routes';
 
 import Notification from './Notification';
-import SellerPaymentDrawer from './SellerPaymentDrawer';
+import SellerSendEurDrawer from './SellerSendEurDrawer';
+import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 
@@ -105,7 +106,8 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
-    const [sellerPaymentDrawerOpen, setSellerPaymentDrawerOpen] = useState(false);
+    const [sellerSendEurDrawerOpen, setSellerPaymentDrawerOpen] = useState(false);
+    const [openSellerSendNgnDrawer, setOpenBuyerPaymentDrawer] = useState(false);
     const [open, setOpen] = useState(false);
     const [transactionId, setTransactionId] = useState(null);
     const [countryCode, setCountryCode] = useState('');
@@ -114,11 +116,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
+    const { BUYER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
     
     useEffect(() => {
-        if (notifications.length === 0) {
-            getNotifications();
-        }
+        getNotifications(false);
         handleSetTitle('Notifications');
 
         if (!residencePermitUrl && stats.residencePermitStatus !== APPROVED) {
@@ -138,7 +139,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }, [msg]);
 
     useEffect(() => {
-        if (!sellerPaymentDrawerOpen) {
+        if (!sellerSendEurDrawerOpen) {
             setAmount(0);
             setTransactionId(null);
             setSellerUsername('');
@@ -147,7 +148,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 payload: {}
             });
         }
-    }, [dispatch, sellerPaymentDrawerOpen]);
+    }, [dispatch, sellerSendEurDrawerOpen]);
 
     const handlePaymentReceived = (id, buyerUsername) => {
         const data = {
@@ -184,14 +185,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
         });
         
-        toggleSellerPaymentDrawer();
+        toggleSellerSendEurDrawer();
     };
 
-    const toggleSellerPaymentDrawer = () => {
-        setSellerPaymentDrawerOpen(!sellerPaymentDrawerOpen);
+    const toggleSellerSendEurDrawer = () => {
+        setSellerPaymentDrawerOpen(!sellerSendEurDrawerOpen);
 
         // clear message if drawer is open and being closed
-        if (sellerPaymentDrawerOpen) {
+        if (sellerSendEurDrawerOpen) {
             dispatch({
                 type: SET_NOTIFICATION_MSG,
                 payload: null
@@ -200,60 +201,83 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }
 
     const setMessage = (notification) => {
-        const { buyer, seller } = notification;
-        const isBuyer = customerId === buyer.customerId ? true : false;
-        const isSeller = customerId === seller.customerId ? true : false;
+        const { Buyer, Seller } = notification;
+        const isBuyer = customerId === Buyer.CustomerId ? true : false;
+        const isSeller = customerId === Seller.CustomerId ? true : false;
+        
+        console.log('buyer ', isBuyer);
+        console.log('seller ', isSeller);
+
 
         let message;
 
-        if (isSeller && buyer.hasMadePayment) {
-            message=`${buyer.userName} has made a payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(buyer.amountTransfered)} to your ${seller.bankName} account | ${seller.accountNumber}`;
+        if (isSeller && Buyer.HasMadePayment) {
+            console.log('Setting message');
+            message = `${Buyer.UserName} has made a payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(Buyer.AmountTransfered)} to your ${Seller.BankName} account | ${Seller.AccountNumber}`;
+
         }
 
-        if (isBuyer && seller.hasMadePayment) {
-            message=`${seller.userName} has made a payment of ${decode('&#8364;', { level: 'html5' })}${formatNumber(seller.amountTransfered)} to your ${buyer.bankName} account | ${buyer.accountNumber}`;
+        if (isBuyer && Seller.HasMadePayment) {
+            console.log('Setting message');
+            message = `${Seller.UserName} has made a payment of ${decode('&#8364;', { level: 'html5' })}${formatNumber(Seller.AmountTransfered)} to your ${Buyer.BankName} account | ${Buyer.AccountNumber}`;
+
         }
         return message;
     };
 
     const hasNotification = (notification) => {
-        const { buyer, seller } = notification;
-        const isBuyer = customerId === buyer.customerId ? true : false;
-        const isSeller = customerId === seller.customerId ? true : false;
+        const { Buyer, Seller } = notification;
+        const isBuyer = customerId === Buyer?.customerId ? true : false;
+        const isSeller = customerId === Seller?.customerId ? true : false;
         let result = false;
 
-        if (isBuyer && seller.hasMadePayment) {
+        if (isBuyer && Seller.hasMadePayment) {
             result = true;
         }
-        if (isSeller && buyer.hasMadePayment) {
+        if (isSeller && Buyer.hasMadePayment) {
             result = true;
         }
         return result;
     };
 
     const buttonDisabled = (seller) => {
-        const isSeller = customerId === seller.customerId ? true : false;
+        const isSeller = customerId === seller.CustomerId ? true : false;
 
-        if (isSeller && seller.hasReceivedPayment && seller.hasMadePayment) {
+        if (isSeller && seller.HasReceivedPayment && seller.HasMadePayment) {
             return true;
         }
     };
 
-    const handleButtonAction = (notification) => {
-        const { id, buyer, seller } = notification;
+    const offerAcceptedButtonDisabled = (seller) => {
+        const isSeller = customerId === seller.CustomerId ? true : false;
 
-        if (customerId === seller.customerId) {
-            if (seller.hasReceivedPayment) {
+        if (isSeller && seller.HasMadePayment) {
+            return true;
+        }
+    };
+
+    const setOfferAcceptedMessage = (bid) => {
+        const { BidAmount, Seller } = bid;
+        const message = `someone has accepted your offer. Please proceed and transfer NGN${formatNumber(BidAmount.Amount, 2)} the account provided.`;
+        // const message = `${Seller.UserName} has accepted your offer. Please proceed and transfer NGN${formatNumber(BidAmount.Amount, 2)} the account provided.`;
+        return message
+    };
+
+    const handleButtonAction = (notification, id) => {
+        const { Buyer, Seller } = notification;
+
+        if (customerId === Seller.CustomerId) {
+            if (Seller.hasReceivedPayment) {
                 setBuyerAccount(notification);
             } else {
                 // Seller should make payment
                 setBuyerAccount(notification);
-                handlePaymentReceived(id, buyer.userName);
+                handlePaymentReceived(id, Buyer.UserName);
             }
 
         } else {
             // End Transaction
-            handlePaymentReceived(id, buyer.userName);
+            handlePaymentReceived(id, Buyer.UserName);
         }
     };
 
@@ -282,6 +306,18 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
     // const setPin = () => history.push(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
 
+    const toggleSellerSendNgnDrawer = () => {
+        setOpenBuyerPaymentDrawer(!openSellerSendNgnDrawer);
+    };
+
+    const handleBuyerPayment = (bid) => {
+        dispatch({
+            type: SET_BID,
+            payload: bid
+        });
+        toggleSellerSendNgnDrawer();
+    };
+
     const dismissAction = () => {
         setOpen(false);
         setSellerPaymentDrawerOpen(false);
@@ -293,10 +329,16 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     return (
         <>
-            {sellerPaymentDrawerOpen && 
-                <SellerPaymentDrawer 
-                    toggleDrawer={toggleSellerPaymentDrawer} 
-                    drawerOpen={sellerPaymentDrawerOpen} 
+            {openSellerSendNgnDrawer && 
+                <SellerSendNgnDrawer 
+                    drawerOpen={openSellerSendNgnDrawer} 
+                    toggleDrawer={toggleSellerSendNgnDrawer} 
+                />
+            }
+            {sellerSendEurDrawerOpen && 
+                <SellerSendEurDrawer 
+                    toggleDrawer={toggleSellerSendEurDrawer} 
+                    drawerOpen={sellerSendEurDrawerOpen} 
                     amount={amount} 
                     transactionId={transactionId}
                     sellerUsername={sellerUsername}
@@ -316,7 +358,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 <Typography variant="body2" component="p">View notifications below</Typography>
                 <div>
                     <section className={classes.notifications}>
-                    {notifications.map((notification, index) => {
+                        {/* {notifications.map((notification, index) => {
                             if (hasNotification(notification)) {
                                 return (
                                     <Notification 
@@ -327,6 +369,36 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         buttonAction={() => handleButtonAction(notification)}
                                         // buttonAction={() => setBuyerAccount(notification)}
                                         buttonDisabled={buttonDisabled(notification.seller)}
+                                    />
+                                )
+                            }
+                            return null;
+                        })} */}
+                        {notifications.map((notification, index) => {
+                            if (notification.eventType === BUYER_MADE_PAYMENT) {
+                                return (
+                                    <Notification 
+                                        key={index}
+                                        title="Credit (Exchange)"
+                                        message={setMessage(notification.data.Data)}
+                                        buttonText={buttonDisabled(notification.data.Data.Seller) ? 'Payment Confirmed' : 'Confirm payment'}
+                                        buttonAction={() => handleButtonAction(notification.data.Data, notification.data.Data.Id)}
+                                        // buttonAction={() => setBuyerAccount(notification)}
+                                        buttonDisabled={buttonDisabled(notification.data.Data.Seller)}
+                                    />
+                                )
+                            }
+                            if (notification.eventType === OFFER_MADE) {
+                                return (
+                                    <Notification 
+                                        key={index}
+                                        title="Offer Accepted"
+                                        message={setOfferAcceptedMessage(notification.data)}
+                                        buttonText="Pay NGN"
+                                        buttonAction={handleBuyerPayment}
+                                        // buttonText={offerAcceptedButtonDisabled(notification.data.Seller) ? 'NGN Paid' : 'Pay NGN'}
+                                        // buttonAction={() => handleButtonAction(notification.data.Data, notification.data.Data.Id)}
+                                        // buttonDisabled={buttonDisabled(notification.data.Data.Seller)}
                                     />
                                 )
                             }

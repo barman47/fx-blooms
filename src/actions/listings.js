@@ -5,14 +5,17 @@ import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
+    ACCEPTED_OFFER,
     ADDED_BID, 
     ADDED_LISTING, 
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
     GET_ERRORS,
+    REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_LISTING, 
     SET_LISTINGS, 
+    SET_LISTING_MSG,
     SET_LOADING_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
@@ -155,6 +158,37 @@ export const getMoreListings = (query) => async (dispatch) => {
     }
 };
 
+export const acceptOffer = (data, listing) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken()
+        const res = await axios.post(`${URL}/AcceptOffer`, data);
+        console.log(res);
+        batch(() => {
+            dispatch({
+                type: ACCEPTED_OFFER,
+                payload: {
+                    bid: res.data.data,
+                    listing,
+                    addedBid: true
+                }
+            });
+            dispatch({
+                type: ADDED_BID,
+                payload: {
+                    bid: res.data.data,
+                    listing,
+                }
+            });
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: 'Offer placed successfully'
+            });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const addBid = (bid, listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken()
@@ -178,6 +212,20 @@ export const madePayment = (data) => async (dispatch) => {
         return dispatch({
             type: SET_AS_ACCEPTED,
             payload: data.listingId
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const madePaymentV2 = (data, id) => async (dispatch) => {
+    try {
+        const [res1, res2] = await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
+        console.log(res2);
+        // Remove notification
+        return dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: id
         });
     } catch (err) {
         return handleError(err, dispatch);

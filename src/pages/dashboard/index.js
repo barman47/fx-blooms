@@ -28,6 +28,7 @@ import {
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_PAID, 
+    PAYMENT_NOTIFICATION_OFFER_MADE,
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
@@ -281,13 +282,20 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleSentMessage = () => {
-        const { CANCEL_NEGOTIATION, BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT } = NOTIFICATION_TYPES;
+        const { 
+            CANCEL_NEGOTIATION, 
+            BUYER_MADE_PAYMENT, 
+            BUYER_CONFIRMED_PAYMENT, 
+            OFFER_MADE,
+            SELLER_CONFIRMED_PAYMENT, 
+            SELLER_MADE_PAYMENT 
+        } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
                 const payload = JSON.parse(response.Payload);
-                // console.log('Payload ', payload);
-                // console.log('New Notification ', response, type);
+                console.log('Payload ', payload);
+                console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 let buyer = {};
                 let seller = {};
@@ -394,6 +402,33 @@ const Dashboard = ({ children, title, logout }) => {
                             type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
                             payload: { id }
                         });
+                        break;
+
+                    case OFFER_MADE:
+                        if (customerId === payload.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION_OFFER_MADE,
+                                payload: { 
+                                    accountId: payload.AccountId,
+                                    bidAmount: {
+                                        amount: payload.BidAmount.Amount,
+                                        currency: payload.BidAmount.CurrencyType
+                                    },
+                                    buyerTransferConfirmed: payload.BuyerTransferConfirmed,
+                                    customerId: payload.CustomerId,
+                                    dateCancelled: payload.DateCancelled,
+                                    dateCompleted: payload.DateCompleted,
+                                    datePlaced: payload.DatePlaced,
+                                    id: payload.Id,
+                                    listingId: payload.ListingId,
+                                    transferReference: payload.Reference, 
+                                    status: payload.Status,
+                                    sellerTransferConfirmed: payload.SellerTransferConfirmed,
+                                    bidId: payload.BidId
+                                },
+                            });
+                        }
                         break;
 
                     case CANCEL_NEGOTIATION:

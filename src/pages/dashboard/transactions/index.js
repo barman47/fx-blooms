@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FormControlLabel, Switch } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
@@ -9,6 +9,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getNotifications } from '../../../actions/notifications';
+import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 
@@ -96,6 +97,7 @@ const IOSSwitch = withStyles((theme) => ({
 
 const Transactions = ({ getCurrencies, getNotifications }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const { currencies } = useSelector(state => state);
     const { notifications } = useSelector(state => state.notifications);
@@ -106,13 +108,34 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        getNotifications();
+        getNotifications(true);
         if (currencies.length === 0) {
             // setLoading(true);
             getCurrencies();
         }
         // eslint-disable-next-line
     }, []);
+
+    // Filter transactions
+    useEffect(() => {
+        switch (currency) {
+            case 'ALL':
+                dispatch({ type: SET_ALL_TRANSACTIONS });
+                break;
+
+            case 'EUR':
+                dispatch({ type: SET_EUR_TRANSACTIONS });
+                break;
+
+            case 'NGN':
+                dispatch({ type: SET_NGN_TRANSACTIONS });
+                break;
+
+            default:
+                break;
+        }
+    }, [currency, dispatch]);
+
 
     return (
         <>

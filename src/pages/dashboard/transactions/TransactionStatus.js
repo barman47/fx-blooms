@@ -252,7 +252,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
             type: SET_TRANSACTION,
             payload: {}
         });
-        return history.back();
+        return history.goBack();
     };
 
 	return (    

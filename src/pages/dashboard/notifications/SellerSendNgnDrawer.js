@@ -151,7 +151,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, drawerOpen }) => {
+const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -505,7 +505,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     );
 };
 
-BuyerPaymentDrawer.propTypes = {
+BuyerPaymentNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
@@ -513,4 +513,4 @@ BuyerPaymentDrawer.propTypes = {
     madePayment: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePayment })(BuyerPaymentDrawer);
+export default connect(undefined, { cancelBid, getAccount, madePayment })(BuyerPaymentNgnDrawer);

@@ -15,7 +15,7 @@ import { decode } from 'html-entities';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
-import { sendTransactionNotification } from '../../../actions/notifications';
+import { sendTransactionNotification } from '../../../actions/transactions';
 import { GET_ERRORS } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
@@ -116,7 +116,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
+const SellerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -251,7 +251,7 @@ const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, 
 	);
 };
 
-SellerPaymentDrawer.propTypes = {
+SellerSendEurDrawer.propTypes = {
     amount: PropTypes.number.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
@@ -259,4 +259,4 @@ SellerPaymentDrawer.propTypes = {
     transactionId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { sendTransactionNotification })(SellerPaymentDrawer);
+export default connect(undefined, { sendTransactionNotification })(SellerSendEurDrawer);

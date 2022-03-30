@@ -376,7 +376,7 @@ const AllListings = (props) => {
 		}
 
 		if (unreadNotifications === 0) {
-            getNotifications();
+            getNotifications(true);
         }
 
 		if (accounts.length === 0) {
@@ -411,7 +411,8 @@ const AllListings = (props) => {
 				currencyNeeded: requiredCurrency,
 				currencyAvailable: availableCurrency,
 				minimumExchangeAmount: 0,
-				useCurrencyFilter: false
+				useCurrencyFilter: true,
+				useRatingFilter: false
 			});
 		}
 	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
@@ -433,7 +434,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		}, true);
 	};
 
@@ -444,7 +446,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		});	
 	};
 
@@ -471,7 +474,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useRatingFilter: false,
+			useCurrencyFilter: true
 		});
 	}, [dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 

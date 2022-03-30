@@ -1,4 +1,3 @@
-
 import { 
     ADD_NOTIFICATION,
     SET_NOTIFICATIONS, 
@@ -6,13 +5,13 @@ import {
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
     PAYMENT_NOTIFICATION_SELLER_PAID,
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+    PAYMENT_NOTIFICATION_OFFER_MADE,
     ADD_UNREAD_NOTIFICATIONS,
     SUBTRACT_UNREAD_NOTIFICATIONS,
-    // SET_TRANSACTION_TERMS,
     CUSTOMER_CANCELED,
     SET_SOCKET_CONNECTION_STATUS,
     UPDATE_NOTIFICATION,
-    SET_TRANSACTION,
+    REMOVE_NOTIFICATION,
     SET_NOTIFICATION_MSG
 } from '../actions/types';
 
@@ -57,6 +56,12 @@ const notificationsReducer = (state = initialState, action) => {
                 notifications
             };
 
+        case REMOVE_NOTIFICATION:
+            return {
+                ...state,
+                notifications: state.notifications.map(notification => notification.id !== action.payload)
+            };
+
         case SET_SOCKET_CONNECTION_STATUS:
             return {
                 ...state,
@@ -99,24 +104,19 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notifications: [...notifications]
-            }            
+            }   
+            
+        case PAYMENT_NOTIFICATION_OFFER_MADE:
+            return {
+                ...state,
+                notifications: [action.payload, ...notifications]
+            };
 
         case CUSTOMER_CANCELED:
             return {
                 ...state,
                 customerCanceled: action.payload
             };
-
-        // case SET_TRANSACTION_TERMS:
-        //     chat = state.chat;
-        //     const { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms } = action.payload;
-        //     chat.buyerAcceptedTransactionTerms = buyerAcceptedTransactionTerms;
-        //     chat.sellerAcceptedTransactionTerms = sellerAcceptedTransactionTerms;
-
-        //     return {
-        //         ...state,
-        //         chat
-        //     };
 
         case ADD_UNREAD_NOTIFICATIONS:
             unreadCount = state.unreadNotifications + action.payload;
@@ -136,12 +136,6 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 msg: action.payload
-            };
-
-        case SET_TRANSACTION:
-            return {
-                ...state,
-                transaction: action.payload
             };
 
         default:

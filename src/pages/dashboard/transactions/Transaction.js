@@ -58,7 +58,6 @@ const Transaction = ({ transaction }) => {
     const [currency, setCurrency] = useState('');
     // eslint-disable-next-line
     const [reference, setReference] = useState('');
-    const [status, setStatus] = useState('');
 
     useEffect(() => {
         setTransactionDetails();
@@ -90,11 +89,10 @@ const Transaction = ({ transaction }) => {
     };
 
     const setTransactionDetails = () => {
-        const { amount, currency, reference, status } = getTransactionDetails(transaction);
+        const { amount, currency, reference } = getTransactionDetails(transaction);
         setAmount(amount);
         setCurrency(currency);
         setReference(reference);
-        setStatus(status);
     };
 
     const getTransactionDetails = () => {
@@ -153,7 +151,7 @@ const Transaction = ({ transaction }) => {
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Status</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>{status}</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
             </Box>
         </Box>
     );
