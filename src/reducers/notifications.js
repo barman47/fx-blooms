@@ -71,8 +71,8 @@ const notificationsReducer = (state = initialState, action) => {
         case PAYMENT_NOTIFICATION_BUYER_PAID:
              return {
                  ...state,
-                 notifications: [action.payload.notification, ...state.notifications],
-                 unreadNotifications: action.payload.customerId === action.payload.notification.seller.customerId ? state.unreadNotifications + 1 : state.unreadNotifications
+                 notifications: [action.payload, ...state.notifications],
+                 unreadNotifications: action.payload.customerId === action.payload.data.Seller.CustomerId ? state.unreadNotifications + 1 : state.unreadNotifications
              };
 
         case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
@@ -83,28 +83,43 @@ const notificationsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION_SELLER_PAID:
-            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
-            notifications = state.notifications;
-            notification = notifications[notificationIndex];
-            notification.seller.hasMadePayment = true;
-            notifications.splice(notificationIndex, 1, notification);
+            debugger
+            // if there are notifications, update the notification
+            if (state.notifications.length > 0) {
+                notificationIndex = state.notifications.findIndex(item => item.data.Id === action.payload.id);
+                notifications = state.notifications;
+                notification = notifications[notificationIndex];
+                notification.data.Seller.HasMadePayment = true;
+                notifications.splice(notificationIndex, 1, notification);
 
+                return {
+                    ...state,
+                    notifications: [...notifications]
+                };
+            }
             return {
                 ...state,
-                notifications: [...notifications]
+                notifications: [action.payload],
             };
 
         case PAYMENT_NOTIFICATION_SELLER_CONFIRMED:
-            notificationIndex = state.notifications.findIndex(item => item.id === action.payload.id);
-            notifications = state.notifications;
-            notification = notifications[notificationIndex];
-            notification.seller.hasReceivedPayment = true;
-            notifications.splice(notificationIndex, 1, notification);
-            
+            // if there are notifications, update the notification
+            if (state.notifications.length > 0) {
+                notificationIndex = state.notifications.findIndex(item => item.data.Id === action.payload.id);
+                notifications = state.notifications;
+                notification = notifications[notificationIndex];
+                notification.data.Seller.HasReceivedPayment = true;
+                notifications.splice(notificationIndex, 1, notification);
+                
+                return {
+                    ...state,
+                    notifications: [...notifications]
+                }
+            }
             return {
                 ...state,
-                notifications: [...notifications]
-            }   
+                notifications: [action.payload]
+            };   
             
         case PAYMENT_NOTIFICATION_OFFER_MADE:
             return {

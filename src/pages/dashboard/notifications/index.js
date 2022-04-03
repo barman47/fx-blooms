@@ -116,10 +116,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
-    const { BUYER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
+    const { BUYER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
     
     useEffect(() => {
-        getNotifications(false);
+        getNotifications();
         handleSetTitle('Notifications');
 
         if (!residencePermitUrl && stats.residencePermitStatus !== APPROVED) {
@@ -150,31 +150,32 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         }
     }, [dispatch, sellerSendEurDrawerOpen]);
 
-    const handlePaymentReceived = (id, buyerUsername) => {
+    const handlePaymentReceived = (tranactionId, notificationId, buyerUsername) => {
         const data = {
-            transactionSessionId: id,
+            transactionSessionId: tranactionId,
             message: '',
             rating: 0,
-            receivedExpectedFunds: true
+            receivedExpectedFunds: true,
+            notificationId
         };
         completeTransaction(data, buyerUsername);
     };
 
-    const setBuyerAccount = (notification) => {
-        const { buyer, seller } = notification;
-        setTransactionId(notification.id);
-        setSellerUsername(seller.userName);
+    const setBuyerAccount = (notification, notificationId) => {
+        const { Buyer, Seller } = notification;
+        setTransactionId(notification.Id);
+        setSellerUsername(Seller.UserName);
         
         const buyerAccount = {
-            accounName: buyer.accountName,
-            accountNumber: buyer.accountNumber,
-            bankName: buyer.bankName,
-            reference: buyer.transferReference
+            accounName: Buyer.AccountName,
+            accountNumber: Buyer.AccountNumber,
+            bankName: Buyer.BankName,
+            reference: Buyer.TransferReference
         };
 
-        if (buyer.hasMadePayment) {
+        if (Buyer.HasMadePayment) {
             // Seller should make payment since buyer has paid
-            setAmount(Number(seller.amountTransfered));
+            setAmount(Number(Seller.AmountTransfered));
             dispatch({
                 type: SET_ACCOUNT,
                 payload: buyerAccount
@@ -182,7 +183,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         }
         dispatch({
             type: SET_NOTIFICATION_MSG,
-            payload: `Thanks for confirming ${buyer.userName}'s payment. Please proceed and send the EUR equivalent to the account below. `
+            payload: `Thanks for confirming ${Buyer.UserName}'s payment. Please proceed and send the EUR equivalent to the account below. `
         });
         
         toggleSellerSendEurDrawer();
@@ -202,26 +203,36 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const setMessage = (notification) => {
         const { Buyer, Seller } = notification;
-        const isBuyer = customerId === Buyer.CustomerId ? true : false;
-        const isSeller = customerId === Seller.CustomerId ? true : false;
-        
-        console.log('buyer ', isBuyer);
-        console.log('seller ', isSeller);
-
+        const isBuyer = Buyer.CustomerId === customerId ? true : false;
+        const isSeller = Seller.CustomerId === customerId ? true : false;
 
         let message;
 
         if (isSeller && Buyer.HasMadePayment) {
-            console.log('Setting message');
             message = `${Buyer.UserName} has made a payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(Buyer.AmountTransfered)} to your ${Seller.BankName} account | ${Seller.AccountNumber}`;
-
         }
 
         if (isBuyer && Seller.HasMadePayment) {
-            console.log('Setting message');
             message = `${Seller.UserName} has made a payment of ${decode('&#8364;', { level: 'html5' })}${formatNumber(Seller.AmountTransfered)} to your ${Buyer.BankName} account | ${Buyer.AccountNumber}`;
 
         }
+        return message;
+    };
+
+    const setSellerConfirmedMessage = (notification) => {
+        const { Buyer, Seller } = notification;
+
+        let message;
+        message = `${Seller.UserName} has confirmed your payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(Buyer.AmountTransfered)}`;
+
+        // if (isSeller && Buyer.HasMadePayment) {
+        //     message = `${Buyer.UserName} has made a payment of ${decode('&#8358;', { level: 'html5' })}${formatNumber(Buyer.AmountTransfered)} to your ${Seller.BankName} account | ${Seller.AccountNumber}`;
+        // }
+
+        // if (isBuyer && Seller.HasMadePayment) {
+        //     message = `${Seller.UserName} has made a payment of ${decode('&#8364;', { level: 'html5' })}${formatNumber(Seller.AmountTransfered)} to your ${Buyer.BankName} account | ${Buyer.AccountNumber}`;
+
+        // }
         return message;
     };
 
@@ -263,21 +274,22 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         return message
     };
 
-    const handleButtonAction = (notification, id) => {
+    const handleButtonAction = (notification, transactionId, notificationId) => {
         const { Buyer, Seller } = notification;
 
         if (customerId === Seller.CustomerId) {
-            if (Seller.hasReceivedPayment) {
-                setBuyerAccount(notification);
+            if (Seller.HasReceivedPayment) {
+                setBuyerAccount(notification, notificationId);
             } else {
                 // Seller should make payment
-                setBuyerAccount(notification);
-                handlePaymentReceived(id, Buyer.UserName);
+                console.log('Seller receiving payment');
+                setBuyerAccount(notification, notificationId);
+                handlePaymentReceived(transactionId, notificationId, Buyer.UserName);
             }
 
         } else {
             // End Transaction
-            handlePaymentReceived(id, Buyer.UserName);
+            handlePaymentReceived(transactionId, notificationId, Buyer.UserName);
         }
     };
 
@@ -375,16 +387,25 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                             return null;
                         })} */}
                         {notifications.map((notification, index) => {
-                            if (notification.eventType === BUYER_MADE_PAYMENT) {
+                            if (notification.eventType === BUYER_MADE_PAYMENT || notification.eventType === SELLER_MADE_PAYMENT) {
                                 return (
                                     <Notification 
                                         key={index}
                                         title="Credit (Exchange)"
-                                        message={setMessage(notification.data.Data)}
-                                        buttonText={buttonDisabled(notification.data.Data.Seller) ? 'Payment Confirmed' : 'Confirm payment'}
-                                        buttonAction={() => handleButtonAction(notification.data.Data, notification.data.Data.Id)}
+                                        message={setMessage(notification.data)}
+                                        buttonText={buttonDisabled(notification.data.Seller) ? 'Payment Confirmed' : 'Confirm payment'}
+                                        buttonAction={() => handleButtonAction(notification.data, notification.data.Id, notification.notificationId)}
                                         // buttonAction={() => setBuyerAccount(notification)}
-                                        buttonDisabled={buttonDisabled(notification.data.Data.Seller)}
+                                        buttonDisabled={buttonDisabled(notification.data.Seller)}
+                                    />
+                                )
+                            }
+                            if (notification.eventType === SELLER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
+                                return (
+                                    <Notification 
+                                        key={index}
+                                        title="Payment Confirmed"
+                                        message={setSellerConfirmedMessage(notification.data)}
                                     />
                                 )
                             }

@@ -329,6 +329,9 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     };
 
     const handleMadepayment = () => {
+        if (isEmpty(receivingAccount)) {
+            return setErrors({ receivingAccount: 'Please select a bank account' });
+        }
         setLoading(true);
         madePayment({
             bidId: bid.id,
@@ -494,7 +497,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                         fullWidth 
                         disableFocusRipple
                         className={classes.button}
-                        disabled={loading || buttonDisabled || !isEmpty(errors)  || isEmpty(account) ? true : false}
+                        disabled={loading || buttonDisabled || isEmpty(account) ? true : false}
                         onClick={handleMadepayment}
                     >
                         {loading ? 'One Moment . . .' : `${listing?.amountNeeded?.currencyType}${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}

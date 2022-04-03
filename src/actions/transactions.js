@@ -11,11 +11,10 @@ export const getTransactions = (retrieveAll) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${api}/Transfers?retrieveAll=${retrieveAll}`);
-        dispatch({
+        return dispatch({
             type: SET_NOTIFICATIONS,
             payload: res.data.data
-        });
-        return 
+        }); 
     } catch (err) {
         return handleError(err, dispatch);
     }

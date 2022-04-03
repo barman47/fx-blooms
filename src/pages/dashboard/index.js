@@ -293,13 +293,14 @@ const Dashboard = ({ children, title, logout }) => {
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
-                const payload = JSON.parse(response.Payload);
+                let payload = JSON.parse(response.Payload);
+                payload = { ...payload, Data: JSON.parse(payload.Data) };
                 console.log('Payload ', payload);
                 console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 let buyer = {};
                 let seller = {};
-                let id;
+                const id = payload.Data.Id;
                 
                 switch (type) {
                     case BUYER_MADE_PAYMENT:
@@ -307,42 +308,51 @@ const Dashboard = ({ children, title, logout }) => {
                         seller = payload.Data.Seller;
                         // buyer = payload.Buyer;
                         // seller = payload.Seller;
-                        id = payload.Data.Id;
+                        // id = payload.Data.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
                             batch(() => {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_BUYER_PAID,
                                     payload: { 
-                                        notification: {
-                                            id,
-                                            isClosed: payload.IsClosed,
-                                            buyer: {
-                                                accountName: buyer.AccountName,
-                                                accountNumber: buyer.AccountNumber,
-                                                amountTransfered: buyer.AmountTransfered,
-                                                bankName: buyer.BankName,
-                                                customerId: buyer.CustomerId,
-                                                hasMadePayment: buyer.HasMadePayment,
-                                                hasReceivedPayment: buyer.HasReceivedPayment,
-                                                userName: buyer.UserName,
-                                                transferReference: buyer.TransferReference
-                                            },
-                                            seller: {
-                                                accountName: seller.AccountName,
-                                                accountNumber: seller.AccountNumber,
-                                                amountTransfered: seller.AmountTransfered,
-                                                bankName: seller.BankName,
-                                                customerId: seller.CustomerId,
-                                                hasMadePayment: seller.HasMadePayment,
-                                                hasReceivedPayment: seller.HasReceivedPayment,
-                                                userName: seller.UserName,
-                                                transferReference: seller.TransferReference
-                                            },
-                                            listingId: payload.ListingId,
-                                            bidId: payload.BidId
-                                        },
-                                        customerId
+                                        dateLogged: payload.dateLogged,
+                                        eventType: payload.EventType,
+                                        customerId: payload.CustomerId,
+                                        isDeleted: payload.IsDeleted,
+                                        isRead: payload.IsRead,
+                                        notificationId: payload.NotificationId,
+                                        data: { 
+                                            // Data: {
+                                                Id: payload.Data.Id,
+                                                IsClosed: payload.Data.IsClosed,
+                                                Buyer: buyer,
+                                                Seller: seller,
+                                                // Buyer: {
+                                                //     accountName: buyer.AccountName,
+                                                //     accountNumber: buyer.AccountNumber,
+                                                //     amountTransfered: buyer.AmountTransfered,
+                                                //     bankName: buyer.BankName,
+                                                //     customerId: buyer.CustomerId,
+                                                //     hasMadePayment: buyer.HasMadePayment,
+                                                //     hasReceivedPayment: buyer.HasReceivedPayment,
+                                                //     userName: buyer.UserName,
+                                                //     transferReference: buyer.TransferReference
+                                                // },
+                                                // Seller: {
+                                                //     accountName: seller.AccountName,
+                                                //     accountNumber: seller.AccountNumber,
+                                                //     amountTransfered: seller.AmountTransfered,
+                                                //     bankName: seller.BankName,
+                                                //     customerId: seller.CustomerId,
+                                                //     hasMadePayment: seller.HasMadePayment,
+                                                //     hasReceivedPayment: seller.HasReceivedPayment,
+                                                //     userName: seller.UserName,
+                                                //     transferReference: seller.TransferReference
+                                                // },
+                                                ListingId: payload.ListingId,
+                                                BidId: payload.BidId
+                                            // }
+                                        }
                                     }
                                 });
 
@@ -358,9 +368,9 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
 
                     case BUYER_CONFIRMED_PAYMENT:
-                        buyer = payload.Transfer.Buyer;
-                        seller = payload.Transfer.Seller;
-                        id = payload.Transfer.Id;
+                        buyer = payload.Data.Data.Buyer;
+                        seller = payload.Data.Data.Seller;
+                        // id = payload.Transfer.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
                             dispatch({
@@ -372,9 +382,9 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
 
                     case SELLER_MADE_PAYMENT:
-                        buyer = payload.Buyer;
-                        seller = payload.Seller;
-                        id = payload.Id;
+                        buyer = payload.Data.Buyer;
+                        seller = payload.Data.Seller;
+                        // id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
                             batch(() => {
@@ -394,10 +404,9 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
 
                     case SELLER_CONFIRMED_PAYMENT:
-                        buyer = payload.Transfer.Buyer;
-                        seller = payload.Transfer.Seller;
-                        id = payload.Transfer.Id;
-                        
+                        // buyer = payload.Data.Transfer.Buyer;
+                        // seller = payload.Data.Transfer.Seller;
+                        // id = payload.Data.Transfer.Id;
                         dispatch({
                             type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
                             payload: { id }
