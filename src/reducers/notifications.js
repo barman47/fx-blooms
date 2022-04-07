@@ -8,7 +8,6 @@ import {
     PAYMENT_NOTIFICATION_OFFER_MADE,
     ADD_UNREAD_NOTIFICATIONS,
     SUBTRACT_UNREAD_NOTIFICATIONS,
-    CUSTOMER_CANCELED,
     SET_SOCKET_CONNECTION_STATUS,
     UPDATE_NOTIFICATION,
     REMOVE_NOTIFICATION,
@@ -19,7 +18,6 @@ const initialState = {
     notifications: [],
     notification: {},
     unreadNotifications: 0,
-    customerCanceled: null,
     connectionStatus: null,
     msg: null
 };
@@ -115,12 +113,6 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 notifications: [action.payload, ...state.notifications]
-            };
-
-        case CUSTOMER_CANCELED:
-            return {
-                ...state,
-                customerCanceled: action.payload
             };
 
         case ADD_UNREAD_NOTIFICATIONS:

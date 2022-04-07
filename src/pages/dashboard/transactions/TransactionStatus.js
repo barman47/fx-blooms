@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -16,8 +16,6 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
-
-import { SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -112,11 +110,10 @@ const useStyles = makeStyles(theme => ({
 
 const TransactionStatus = ({ handleSetTitle }) => {
 	const classes = useStyles();
-	const dispatch = useDispatch();
     const history = useHistory();
 
     const { customerId } = useSelector(state => state.customer);
-    const { transaction } = useSelector(state => state.notifications);
+    const { transaction } = useSelector(state => state.transactions);
 
     const [trackerText, setTrackerText] = useState('');
     const [customer, setCustomer] = useState({});
@@ -131,15 +128,6 @@ const TransactionStatus = ({ handleSetTitle }) => {
         initializeTransaction(transaction);
         // eslint-disable-next-line
     }, []);
-
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch({
-    //             type: SET_TRANSACTION,
-    //             payload: {}
-    //         });
-    //     };
-    // }, []);
 
     // Set the current step to the 5th one - Exception
     // useEffect(() => {
@@ -247,14 +235,6 @@ const TransactionStatus = ({ handleSetTitle }) => {
         toast.success('Transaction ID Copied!');
     };
 
-    const handleBackButtonClick = () => {
-        dispatch({
-            type: SET_TRANSACTION,
-            payload: {}
-        });
-        return history.goBack();
-    };
-
 	return (    
         <>
             <Toaster />
@@ -263,7 +243,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Button 
                         color="primary" 
                         variant="outlined" 
-                        onClick={handleBackButtonClick}
+                        onClick={() => history.goBack()}
                         startIcon={<ArrowLeft />}
                     >
                         Back
@@ -296,12 +276,12 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount Sent</Typography>
-                            <Typography variant="body2" component="p">'N/A'{formatNumber(customer.amountTransfered, 2)}</Typography>
+                            <Typography variant="body2" component="p">{`${customer.currency}${formatNumber(customer.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount to Receive</Typography>
-                            <Typography variant="body2" component="p">'N/A'{formatNumber(recepient.amountTransfered, 2)}</Typography>
+                            <Typography variant="body2" component="p">{`${recepient.currency}${formatNumber(recepient.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">

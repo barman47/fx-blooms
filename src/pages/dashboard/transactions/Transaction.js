@@ -101,7 +101,7 @@ const Transaction = ({ transaction }) => {
         if (buyer.customerId === customerId) {
             return { 
                 amount: buyer.amountTransfered, 
-                currency: 'NGN', 
+                currency: buyer.currency,
                 reference: buyer.transferReference,
                 status:  getTransactionStatus(isCompleted)
             };
@@ -110,7 +110,7 @@ const Transaction = ({ transaction }) => {
         if (seller.customerId === customerId) {
             return { 
                 amount: seller.amountTransfered,  
-                currency: 'EUR', 
+                currency: seller.currency,
                 reference: seller.transferReference,
                 status:  getTransactionStatus(isCompleted) 
             };

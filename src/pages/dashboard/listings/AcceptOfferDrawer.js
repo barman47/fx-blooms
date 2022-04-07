@@ -242,7 +242,6 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
                 open={loading ? true : open} 
-                // open={true} 
                 onClose={toggleDrawer}
             >
                 <Box component="header">

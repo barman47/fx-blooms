@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -67,11 +67,11 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
     
     const timeout = useRef();
 
-    useEffect(() => {
-        return () => {
-            clearTimeout(timeout.current);
-        };
-    });
+    // useEffect(() => {
+    //     return () => {
+    //         clearTimeout(timeout.current);
+    //     };
+    // }, []);
 
     const closeDrawer = () => {
         timeout.current = setTimeout(() => {
@@ -97,7 +97,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                         className={classes.tabs}
                         orientation="vertical"
                         // variant="scrollable"
-                        onClick={closeDrawer}
+                        // onClick={closeDrawer}
                     >
                         <LinkTab 
                             label={
@@ -112,6 +112,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 setValue(0);
+                                closeDrawer();
                             }}
                         />
                         <LinkTab 
@@ -127,6 +128,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 setValue(1);
+                                closeDrawer();
                             }}
                         />
                         <LinkTab 
@@ -142,6 +144,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 setValue(2);
+                                closeDrawer();
                             }}
                         />
                         <LinkTab 
@@ -157,6 +160,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 setValue(3);
+                                closeDrawer();
                             }}
                         />
                         <LinkTab 
@@ -174,6 +178,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 setValue(4);
+                                closeDrawer();
                             }}
                         />
                         <LinkTab 
@@ -187,6 +192,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableRipple
                             disableFocusRipple
                             onClick={() => {
+                                clearTimeout(timeout.current);
                                 logout(history);
                             }}
                         />

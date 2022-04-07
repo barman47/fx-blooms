@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SET_NOTIFICATIONS, SET_TRANSACTION_TERMS } from './types';
+import { SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -9,10 +9,12 @@ const api = `${API}/Transfer`;
 
 export const getTransactions = (retrieveAll) => async (dispatch) => {
     try {
+        console.log('Getting transactions');
         await reIssueCustomerToken();
         const res = await axios.get(`${api}/Transfers?retrieveAll=${retrieveAll}`);
+        console.log('transactions ', res);
         return dispatch({
-            type: SET_NOTIFICATIONS,
+            type: SET_TRANSACTIONS,
             payload: res.data.data
         }); 
     } catch (err) {

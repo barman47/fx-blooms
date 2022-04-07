@@ -1,6 +1,7 @@
 import { 
     CUSTOMER_CANCELED,
     SET_TRANSACTION,
+    SET_TRANSACTIONS,
     SET_ALL_TRANSACTIONS,
     SET_EUR_TRANSACTIONS,
     SET_NGN_TRANSACTIONS,
@@ -20,13 +21,6 @@ const transactionsReducer = (state = initialState, action) => {
     let transactions = [];
 
     switch (action.type) {    
-        // case SET_NOTIFICATIONS:
-        //     return {
-        //         ...state,
-        //         transactions: action.payload,
-        //         unreadNotifications: state.unreadNotifications === 0 ? action.payload.length : state.unreadNotifications + action.payload.length
-        //     }; 
-
         case CUSTOMER_CANCELED:
             return {
                 ...state,
@@ -37,6 +31,12 @@ const transactionsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 transaction: action.payload
+            };
+
+        case SET_TRANSACTIONS:
+            return {
+                ...state,
+                transactions: action.payload
             };
 
         case SET_ALL_TRANSACTIONS:
@@ -51,13 +51,14 @@ const transactionsReducer = (state = initialState, action) => {
                 if (transaction.buyer.customerId === action.payload && transaction.buyer.currency === 'EUR') {
                     transactions.push(transaction);
                 }
-                if (transaction.seller.customerId === action.payload && transaction.deller.currency === 'EUR') {
+                if (transaction.seller.customerId === action.payload && transaction.seller.currency === 'EUR') {
                     transactions.push(transaction);
                 }
             });
 
             return {
                 ...state,
+                ngnTransactions: [],
                 eurTransactions: transactions
             };
 
@@ -66,13 +67,14 @@ const transactionsReducer = (state = initialState, action) => {
                 if (transaction.buyer.customerId === action.payload && transaction.buyer.currency === 'NGN') {
                     transactions.push(transaction);
                 }
-                if (transaction.seller.customerId === action.payload && transaction.deller.currency === 'NGN') {
+                if (transaction.seller.customerId === action.payload && transaction.seller.currency === 'NGN') {
                     transactions.push(transaction);
                 }
             });
 
             return {
                 ...state,
+                eurTransactions: [],
                 ngnTransactions: transactions
             };
 

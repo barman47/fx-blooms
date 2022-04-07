@@ -163,7 +163,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const FIVE_MINUTES = 300000; // 5 minutes in milliseconds
+    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
@@ -252,7 +252,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
     }, [msg]);
 
     const startExpiryTimer = () => {
-        const countDownTime = new Date(bid.dateLogged).getTime() + (FIVE_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        const countDownTime = new Date(bid.dateLogged).getTime() + (THIRTY_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownTime - now;
@@ -269,7 +269,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
             } else {
                 setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
                 setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
-                setTimerValue(Math.floor(distance / FIVE_MINUTES * 100));
+                setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
             }
         }, 1000);
     };
@@ -293,7 +293,6 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                 payload: {}
             });
         });
-        
     };
 
     const handleMadepayment = () => {
@@ -393,7 +392,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                     {/* </Collapse>               */}
                 </Grid>
                 <Typography variant="subtitle2" component="span" color="primary">Payment Countdown</Typography>
-                <Typography variant="subtitle2" component="span" color="textSecondary">{firstName} will send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within 5 mins</Typography>
+                <Typography variant="subtitle2" component="span" color="textSecondary">{firstName} will send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within 30 mins</Typography>
                 <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
                     <CircularProgressWithLabel 
                         variant="determinate" 
