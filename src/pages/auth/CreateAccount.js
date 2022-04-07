@@ -26,7 +26,6 @@ import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
 import { externalLogin, registerCustomer } from '../../actions/customer';
-import { getMyLocation } from '../../actions/myLocation';
 
 import isEmpty from '../../utils/isEmpty';
 import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, PRIVACY_POLICY, TERMS, USER_AGREEMENT } from '../../routes';
@@ -185,7 +184,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
+const CreateAccount = ({ externalLogin, registerCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -193,7 +192,6 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
-    const { myLocation } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setEmail] = useState('');
@@ -227,8 +225,6 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
         if (isAuthenticated && authorized) {
             return history.push(DASHBOARD_HOME);
         }
-        
-        getLocation();
 
         return () => {
             dispatch({
@@ -342,13 +338,6 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
         }
     }, [Password, strengthChecker, timeout]);
 
-
-    const getLocation = () => {
-        if (!myLocation.ip) {
-            getMyLocation();
-        }
-    };
-
     const copyUsername = (username) => {
         setUsername(username);
     };
@@ -383,7 +372,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history, myLocation);
+        externalLogin(data, history);
     };
 
     const handleFormSubmit = (e) => {
@@ -647,8 +636,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
 
 CreateAccount.propTypes = {
     externalLogin: PropTypes.func.isRequired,
-    getMyLocation: PropTypes.func.isRequired,
     registerCustomer: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { externalLogin, getMyLocation, registerCustomer })(CreateAccount);
+export default connect(undefined, { externalLogin, registerCustomer })(CreateAccount);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -64,9 +64,17 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
     const history = useHistory();
 
     const [value, setValue] = useState(0);
+    
+    const timeout = useRef();
+
+    useEffect(() => {
+        return () => {
+            clearTimeout(timeout.current);
+        };
+    });
 
     const closeDrawer = () => {
-        setTimeout(() => {
+        timeout.current = setTimeout(() => {
             toggleDrawer();
         }, 600);
     };

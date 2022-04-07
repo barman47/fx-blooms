@@ -16,7 +16,6 @@ import statsReducer from './stats';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
 import walletsReducer from './wallets';
-import locationReducer from './myLocation';
 import transactionsReducer from './transactions';
 
 const appReducer = combineReducers({
@@ -34,8 +33,7 @@ const appReducer = combineReducers({
     subscription: subscriptionReducer,
     transactions: transactionsReducer,
     twoFactor: twoFactorReducer,
-    wallets: walletsReducer,
-    myLocation: locationReducer
+    wallets: walletsReducer
 });
 
 const rootReducer = (state, action) => {

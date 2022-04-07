@@ -141,39 +141,28 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
         }
     }, [addedBid, dispatch, toggleBuyerPaymentDrawer]);
 
-    // useEffect(() => {
-    //     if (openBuyerPaymentDrawer) {
-    //         getAccount(listing.sellersAccountId);
-    //     } else {
-    //         dispatch({
-    //             type: SET_ACCOUNT,
-    //             payload: {}
-    //         });
-    //     }
-    // }, [dispatch, getAccount, listing.sellersAccountId, openBuyerPaymentDrawer]);
-
     const verifyUserId = () => {
         idVerificationModal.current.openModal();
     };
 
-    const handleAcceptOffer = (listing, accountId, reference) => {
-        if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
-            return checkIdStatus();
-        }
+    // const handleAcceptOffer = (listing, accountId, reference) => {
+    //     if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
+    //         return checkIdStatus();
+    //     }
 
-        if (listing.status === open) {
-            setLoading(true);
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-            return acceptOffer({
-                listingId: listing.id,
-                accountId,
-                reference
-            }, listing);
-        }
-    };
+    //     if (listing.status === open) {
+    //         setLoading(true);
+    //         dispatch({
+    //             type: SET_LISTING,
+    //             payload: listing
+    //         });
+    //         return acceptOffer({
+    //             listingId: listing.id,
+    //             accountId,
+    //             reference
+    //         }, listing);
+    //     }
+    // };
 
     const handleAddBid = (listing) => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {

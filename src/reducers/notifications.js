@@ -29,6 +29,7 @@ const notificationsReducer = (state = initialState, action) => {
     let notifications = [];
     let notificationIndex;
     let unreadCount;
+    let endTransaction;
 
     switch (action.type) {    
         case SET_NOTIFICATIONS:
@@ -69,62 +70,51 @@ const notificationsReducer = (state = initialState, action) => {
             };
 
         case PAYMENT_NOTIFICATION_BUYER_PAID:
-             return {
-                 ...state,
-                 notifications: [action.payload, ...state.notifications],
-                 unreadNotifications: action.payload.customerId === action.payload.data.Seller.CustomerId ? state.unreadNotifications + 1 : state.unreadNotifications
-             };
-
-        case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
             return {
                 ...state,
-                notifications: state.notifications.filter(notification => notification.id !== action.payload.id),
-                unreadNotifications: state.unreadNotifications - 1
+                notifications: [action.payload, ...state.notifications],
+                unreadNotifications: action.payload.customerId === action.payload.data.Seller.CustomerId ? state.unreadNotifications + 1 : state.unreadNotifications
             };
 
-        case PAYMENT_NOTIFICATION_SELLER_PAID:
-            debugger
-            // if there are notifications, update the notification
-            if (state.notifications.length > 0) {
-                notificationIndex = state.notifications.findIndex(item => item.data.Id === action.payload.id);
-                notifications = state.notifications;
-                notification = notifications[notificationIndex];
-                notification.data.Seller.HasMadePayment = true;
-                notifications.splice(notificationIndex, 1, notification);
-
+        case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
+            endTransaction = action.payload.endTransaction;
+            if (endTransaction) {
                 return {
                     ...state,
-                    notifications: [...notifications]
+                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId),
+                    unreadNotifications: state.unreadNotifications - 1
                 };
             }
             return {
                 ...state,
-                notifications: [action.payload],
+                notifications: [action.payload.notification, ...state.notifications],
+            };
+            
+
+        case PAYMENT_NOTIFICATION_SELLER_PAID:
+            return {
+                ...state,
+                notifications: [action.payload, ...state.notifications]
             };
 
         case PAYMENT_NOTIFICATION_SELLER_CONFIRMED:
-            // if there are notifications, update the notification
-            if (state.notifications.length > 0) {
-                notificationIndex = state.notifications.findIndex(item => item.data.Id === action.payload.id);
-                notifications = state.notifications;
-                notification = notifications[notificationIndex];
-                notification.data.Seller.HasReceivedPayment = true;
-                notifications.splice(notificationIndex, 1, notification);
-                
+            endTransaction = action.payload.endTransaction;
+            if (endTransaction) {
                 return {
                     ...state,
-                    notifications: [...notifications]
-                }
+                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId),
+                    unreadNotifications: state.unreadNotifications - 1
+                };
             }
             return {
                 ...state,
-                notifications: [action.payload]
-            };   
-            
+                notifications: [action.payload.notification, ...state.notifications]
+            };
+
         case PAYMENT_NOTIFICATION_OFFER_MADE:
             return {
                 ...state,
-                notifications: [action.payload, ...notifications]
+                notifications: [action.payload, ...state.notifications]
             };
 
         case CUSTOMER_CANCELED:

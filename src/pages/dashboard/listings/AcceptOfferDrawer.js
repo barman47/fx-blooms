@@ -227,7 +227,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
             listingId: listing.id,
             accountId: getAccountId(receivingAccount),
             reference
-        });
+        }, listing);
     };
 
     return (
