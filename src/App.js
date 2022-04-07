@@ -148,7 +148,7 @@ const App = () => {
 	const handleSetTitle = (title) => setTitle(title);
 
 	return (
-		<ThemeProvider theme={theme}>
+		<ThemeProvider theme={theme}> 
 			<Router>
 				<Suspense fallback={<FallBack />}>
 					<ScrollToTop>
