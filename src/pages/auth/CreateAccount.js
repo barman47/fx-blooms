@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
@@ -188,7 +188,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const history = useHistory();
+    const history = useNavigate();
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
@@ -223,7 +223,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(DASHBOARD_HOME);
+            return history(DASHBOARD_HOME);
         }
 
         return () => {
@@ -250,7 +250,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
 
     // useEffect(() => {
     //     if (errorsState.usernameAvailable === true) {
-    //         history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+    //         history(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
     //     }
     // }, [Email, Password, Username, history, errorsState.usernameAvailable]);
 
@@ -355,7 +355,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history.push(PENDING_VERIFICATION, { email: Email });
+        return history(PENDING_VERIFICATION, { email: Email });
     };
       
     const handleSocialLoginFailure = (err) => {

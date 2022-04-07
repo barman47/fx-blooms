@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 
 const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     const [value, setValue] = useState(0);
     

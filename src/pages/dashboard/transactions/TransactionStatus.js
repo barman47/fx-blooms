@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
     Box,
@@ -110,7 +110,7 @@ const useStyles = makeStyles(theme => ({
 
 const TransactionStatus = ({ handleSetTitle }) => {
 	const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     const { customerId } = useSelector(state => state.customer);
     const { transaction } = useSelector(state => state.transactions);
@@ -243,7 +243,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Button 
                         color="primary" 
                         variant="outlined" 
-                        onClick={() => history.goBack()}
+                        onClick={() => history(-1)}
                         startIcon={<ArrowLeft />}
                     >
                         Back

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -105,7 +105,7 @@ const ResetPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const errorsState = useSelector(state => state.errors);
@@ -135,7 +135,7 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(DASHBOARD_HOME);
+            return history(DASHBOARD_HOME);
         }
         setToken(history.location.search.split('=')[1]);
         // eslint-disable-next-line
@@ -179,7 +179,7 @@ const ResetPassword = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        history.push(LOGIN)
+        history(LOGIN)
     };
 
     const strengthChecker = useCallback((password) => {

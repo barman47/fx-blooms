@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Box, Button, Divider, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -69,7 +69,7 @@ const useStyles = makeStyles(theme => ({
 
 const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggleWithdrawalDrawer }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     return (
         <Box component="section" className={classes.root} >
@@ -113,7 +113,7 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowLeftRight style={{ backgroundColor: COLORS.primary, borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={() => history.push(MAKE_LISTING)}
+                    onClick={() => history(MAKE_LISTING)}
                     className={classes.button}
                 >
                     Make a Listing

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -179,7 +179,7 @@ const columns = [
 const Customers = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
 
     const { admin } = useSelector(state => state);
     const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended } = useSelector(state => state.customers);
@@ -576,12 +576,12 @@ const Customers = (props) => {
     const viewDetails = () => {
         handleClose();
         // handleSetTitle('User Details');
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        history(`${CUSTOMERS}/${customer.id}`);
     };
 
     const editProfile = () => {
         handleClose();
-        history.push(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
+        history(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
     };
 
     const contact = () => {
@@ -606,7 +606,7 @@ const Customers = (props) => {
             type: SET_CUSTOMER,
             payload: customer
         });
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        history(`${CUSTOMERS}/${customer.id}`);
     }
 
 

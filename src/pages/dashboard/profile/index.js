@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link as RouterLink, useHistory, useLocation } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
@@ -142,7 +142,7 @@ export const toggleDrawer = () => {
 };
 
 const Profile = (props) => {
-    const history = useHistory();
+    const history = useNavigate();
 
     const classes = useStyles();
     const location = useLocation();

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
 const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     const dispatch = useDispatch();
 

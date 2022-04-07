@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -152,7 +152,7 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
@@ -412,7 +412,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
-            history.push(DASHBOARD_HOME);
+            history(DASHBOARD_HOME);
         }
     };
 

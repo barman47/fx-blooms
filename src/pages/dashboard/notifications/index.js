@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
@@ -98,7 +98,7 @@ const useStyles = makeStyles(theme => ({
 
 const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
     const dispatch = useDispatch();
     const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
@@ -349,7 +349,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         window.open(idVerificationLink);
     };
 
-    const setup2FA = () => history.push(ACCOUNT, { mfa: true });
+    const setup2FA = () => history(ACCOUNT, { mfa: true });
 
     const verifyPhone = () => {
         if (phoneNo) {
@@ -362,9 +362,9 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setPhoneNumber(number);
             return setOpen(true);
         }
-        return history.push(ACCOUNT, { verifyPhone: true })
+        return history(ACCOUNT, { verifyPhone: true })
     };
-    // const setPin = () => history.push(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
+    // const setPin = () => history(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
 
     const toggleSellerSendNgnDrawer = () => {
         setSellerSendNgnDrawerOpen(!sellerSendNgnDrawerOpen);

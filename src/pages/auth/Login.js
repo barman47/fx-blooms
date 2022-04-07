@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory, useLocation} from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -114,7 +114,7 @@ const Login = ({ externalLogin, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
     const { customer } = useSelector(state => state);
@@ -129,7 +129,7 @@ const Login = ({ externalLogin, login }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            return history.push(DASHBOARD_HOME);
+            return history(DASHBOARD_HOME);
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
@@ -153,7 +153,7 @@ const Login = ({ externalLogin, login }) => {
     useEffect(() => {
         if (customer.twoFactorEnabled === true && loading) {
             setLoading(false);
-            history.push(VERIFY_2FA, { twoFactorEnabled: true });
+            history(VERIFY_2FA, { twoFactorEnabled: true });
         }
     }, [customer, history, loading]);
 

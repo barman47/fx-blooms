@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch} from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const history = useHistory();
+	const history = useNavigate();
 
     const handleButtonClick = () => {
         handleCloseModal();
@@ -70,7 +70,7 @@ const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
             type: SET_CURRENT_CUSTOMER,
             payload: {}
         });
-        history.push(LOGIN);
+        history(LOGIN);
     };
 
 	return (

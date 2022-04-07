@@ -27,7 +27,7 @@ export const login = (data, history) => async (dispatch) => {
             type: SET_CURRENT_ADMIN,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
-        history.push(ADMIN_HOME);
+        history(ADMIN_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -114,5 +114,5 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
 export const logout = (history) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return history.push(ADMIN_LOGIN);
+    return history(ADMIN_LOGIN);
 };

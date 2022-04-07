@@ -72,7 +72,7 @@ export const checkListingEditable = (listing, history) => async (dispatch) => {
                 type: SET_LISTING,
                 payload: listing
             });
-            return history.push(EDIT_LISTING);
+            return history(EDIT_LISTING);
         }
         return dispatch({
             type: GET_ERRORS,
@@ -247,7 +247,7 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
             type: CANCELED_NEGOTIATION,
             payload: res.data.data
         });
-        history.push(DASHBOARD_HOME);
+        history(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

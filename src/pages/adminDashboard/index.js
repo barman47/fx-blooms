@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
@@ -273,10 +273,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCustomer, logout }) => {
+const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     const location = useLocation();
     const { admin, customers } = useSelector(state => state);
     const { category, pageSize } = useSelector(state => state.customers);
@@ -341,7 +341,7 @@ const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCust
     };
 
     const handleLinkClick = (link) => {
-        history.push(link);
+        history(link);
     };
 
     const handleSearch = (e) => {
@@ -471,7 +471,7 @@ const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCust
                 <div className={clsx(classes.content, {
                     [classes.contentShift]: open})}
                 >
-                    {children}
+                    <Outlet />
                 </div>
                 {/* {showBottomNavigation && 
                     <Box

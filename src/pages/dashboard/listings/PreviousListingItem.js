@@ -1,4 +1,4 @@
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch } from 'react-redux';
 import { Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
 const PreviousListingItem = ({ deleteListing, listing }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     const location = useLocation();
 
     const { open } = LISTING_STATUS;
@@ -79,7 +79,7 @@ const PreviousListingItem = ({ deleteListing, listing }) => {
                 type: SET_LISTING,
                 payload: listing
             });
-            return history.push(EDIT_LISTING);
+            return history(EDIT_LISTING);
         }
         return dispatch({
             type: SET_LISTING,

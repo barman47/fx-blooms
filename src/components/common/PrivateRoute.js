@@ -1,22 +1,12 @@
-import React from 'react';
 import { useSelector } from 'react-redux';
-import { Route, Redirect } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { LOGIN } from '../../routes';
 
-const PrivateRoute = ({ component: Component, ...rest }) => {
+const PrivateRoute = ({ children }) => {
+    const location = useLocation();
     const { isAuthenticated } = useSelector(state => state.customer);
-
-    return (
-        <Route 
-            {...rest}
-            render={props => isAuthenticated === true ? (
-                <Component {...props} />
-            ) : (
-                <Redirect to={LOGIN} />
-            )}
-        />
-    );
+    return isAuthenticated ? children : <Navigate to={LOGIN} state={{ from: location }} replace />
 };
 
 export default PrivateRoute;

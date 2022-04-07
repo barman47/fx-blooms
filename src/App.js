@@ -1,5 +1,5 @@
 import { lazy, Suspense, useState } from 'react';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@material-ui/core';
 
 import { 
@@ -43,7 +43,7 @@ import FallBack from './components/common/FallBack';
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
 const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
-// const Private404 = lazy(() => import('./components/common/Private404'));
+// const Private404 = lazy(() => import('./elements/common/Private404'));
 
 const Home = lazy(() => import('./pages/home'));
 // import Landing from './pages/landing/Landing';
@@ -152,52 +152,48 @@ const App = () => {
 			<Router>
 				<Suspense fallback={<FallBack />}>
 					<ScrollToTop>
-						<Switch>
-							<Route path="/" exact component={Home} />
-							<Route path={ADD_USERNAME} exact component={AddUsername} />
-							<Route path={LOGIN} exact component={Login} />
-							<Route path={SIGN_UP} exact component={CreateAccount} />
-							<Route path={PENDING_VERIFICATION} exact component={PendingVerification} />
-							<Route path={VERIFY_EMAIL} exact component={VerifyEmail} />
-							<Route path={SIGNUP_SUCCESS} exact component={SignUpSuccess} />
-							<Route path={SIGNUP_FAILURE} exact component={SignUpFailure} />
-							<Route path={SETUP_2FA} exact component={QrCode} />
-							<Route path={VERIFY_2FA} exact component={VerifyQrCode} />
-							<Route path={FORGOT_PASSWORD} exact component={ForgotPassword} />
-							<Route path={RESET_PASSWORD} exact component={ResetPassword} />
-							<Route path={ABOUT_US} exact component={AboutUs} />
-							<Route path={CONTACT_US} exact component={ContactUs} />
-							<Route path={TERMS} exact component={TermsAndConditions} />
-							<Route path={FAQS} exact component={FAQs} />
-							<Route path={PRIVACY_POLICY} exact component={PrivacyPolicy} />
-							<Route path={DISCLAIMER} exact component={Disclaimer} />
-							<Route path={DISCLAIMER} exact component={Disclaimer} />
-							<Route path={USER_AGREEMENT} exact component={UserAgreement} />
-							<PrivateRoute path={DASHBOARD}>
-								<Dashboard title={title}>
-									<PrivateRoute path={`${DASHBOARD_HOME}`} exact component={() => <AllListings handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${EDIT_LISTING}`} exact component={() => <EditListing handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${MAKE_LISTING}`} exact component={() => <MakeListing handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${USER_DETAILS}/:id`} exact component={() => <UserDetails handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${ACCOUNT}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${TRANSACTION_STATUS}`} exact component={() => <TransactionStatus handleSetTitle={handleSetTitle} />} />
-									<PrivateRoute path={`${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
-								</Dashboard>
-							</PrivateRoute>
-							<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
-							<AdminRoute path={ADMIN_DASHBOARD}>
-								<AdminDashboard title={title}>
-									<AdminRoute path={`${ADMIN_HOME}`} exact component={() => <AdminHome handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${LISTINGS}`} exact component={() => <Listings handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${DEPOSITS}`} exact component={() => <Deposits handleSetTitle={handleSetTitle} />} />
-									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
-									{/* <AdminRoute exact component={() => <Private404 handleSetTitle={handleSetTitle} />} /> */}
-								</AdminDashboard>
-							</AdminRoute>
-							<Route component={PageNotFound} exact />
-						</Switch>
+						<Routes>
+							<Route index path="/" element={<Home />} />
+							<Route path={ADD_USERNAME} element={<AddUsername />} />
+							<Route path={LOGIN} element={<Login />} />
+							<Route path={SIGN_UP} element={<CreateAccount />} />
+							<Route path={PENDING_VERIFICATION} element={<PendingVerification />} />
+							<Route path={VERIFY_EMAIL} element={<VerifyEmail />} />
+							<Route path={SIGNUP_SUCCESS} element={<SignUpSuccess />} />
+							<Route path={SIGNUP_FAILURE} element={<SignUpFailure />} />
+							<Route path={SETUP_2FA} element={<QrCode />} />
+							<Route path={VERIFY_2FA} element={<VerifyQrCode />} />
+							<Route path={FORGOT_PASSWORD} element={<ForgotPassword />} />
+							<Route path={RESET_PASSWORD} element={<ResetPassword />} />
+							<Route path={ABOUT_US} element={<AboutUs />} />
+							<Route path={CONTACT_US} element={<ContactUs />} />
+							<Route path={TERMS} element={<TermsAndConditions />} />
+							<Route path={FAQS} element={<FAQs />} />
+							<Route path={PRIVACY_POLICY} element={<PrivacyPolicy />} />
+							<Route path={DISCLAIMER} element={<Disclaimer />} />
+							<Route path={DISCLAIMER} element={<Disclaimer />} />
+							<Route path={USER_AGREEMENT} element={<UserAgreement />} />
+							<Route path={DASHBOARD} element={<PrivateRoute><Dashboard title={title} /></PrivateRoute>}>
+								<Route index path={`${DASHBOARD_HOME}`} element={<AllListings handleSetTitle={handleSetTitle} />} />
+								<Route path={`${EDIT_LISTING}`} element={<EditListing handleSetTitle={handleSetTitle} />} />
+								<Route path={`${MAKE_LISTING}`} element={<MakeListing handleSetTitle={handleSetTitle} />} />
+								<Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle} />} />
+								<Route path={`${ACCOUNT}`} element={<Profile handleSetTitle={handleSetTitle} />} />
+								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
+								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
+								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+							</Route>
+							
+							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />
+							<Route path={ADMIN_DASHBOARD} element={<AdminRoute><AdminDashboard title={title} /></AdminRoute>}>
+								<Route path={`${ADMIN_HOME}`} element={<AdminHome handleSetTitle={handleSetTitle} />} />
+								<Route path={`${CUSTOMERS}`} element={<Customers handleSetTitle={handleSetTitle} />} />
+								<Route path={`${LISTINGS}`} element={<Listings handleSetTitle={handleSetTitle} />} />
+								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
+								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
+							</Route>
+							<Route path="*" element={<PageNotFound />} />
+						</Routes>
 					</ScrollToTop>
 				</Suspense>
 			</Router>

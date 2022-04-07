@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -289,7 +289,7 @@ const Root = props => (
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
 
     const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
@@ -368,7 +368,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
         }
     }, [changed, usersFilter, customerCount, dispatch]);
 
-    // const goToDashboard = () => history.push(`${CUSTOMERS}`);
+    // const goToDashboard = () => history(`${CUSTOMERS}`);
 
     const handleListingsFilter = useCallback((timeframe) => {
         const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
@@ -489,13 +489,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     const gotoCustomersPage = (e) => {
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
-            history.push(CUSTOMERS);
+            history(CUSTOMERS);
         }
     };
 
     const gotoListingsPage = (e) => {
         if (e.target.name !== 'listingFilter') {
-            history.push(LISTINGS);
+            history(LISTINGS);
         }
     };
 

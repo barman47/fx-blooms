@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
 const QrCode = (props) => {
     const classes = useStyles();
     
-    const history = useHistory();
+    const history = useNavigate();
 
     const { barcode } = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);

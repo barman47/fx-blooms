@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
@@ -123,10 +123,10 @@ const ToastAction = () => {
     );
 };
 
-const Dashboard = ({ children, title, logout }) => {
+const Dashboard = ({ title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
@@ -430,7 +430,7 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        history.push(link);
+        history(link);
     };
 
     const dismissAction = () => {
@@ -461,7 +461,7 @@ const Dashboard = ({ children, title, logout }) => {
             <PrivateHeader />
             <section className={classes.root}>
                 <div className={classes.content}>
-                    {children}
+                    <Outlet />
                 </div>
                 <HideOnScroll direction="up">
                     <Box

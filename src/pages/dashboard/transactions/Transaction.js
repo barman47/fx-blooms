@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Typography } from '@material-ui/core';
@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 const Transaction = ({ transaction }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
     const { customerId } = useSelector(state => state.customer);
 
     const [amount, setAmount] = useState(0);
@@ -123,7 +123,7 @@ const Transaction = ({ transaction }) => {
             type: SET_TRANSACTION,
             payload: transaction
         });
-        return history.push(TRANSACTION_STATUS);
+        return history(TRANSACTION_STATUS);
     };
 
     return (

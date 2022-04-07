@@ -30,7 +30,7 @@ export const authorizeTwoFactor = ({ code, profileId }, history) => async (dispa
             dispatch({ type: TWO_FACTOR_AUTHORIZED });
         });
         
-        return history.push(DASHBOARD_HOME);
+        return history(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }

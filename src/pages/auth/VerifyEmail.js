@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useHistory, Link } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
 const VerifyEmail = (props) => {
     const classes = useStyles();
 
-    const history = useHistory();
+    const history = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
     
@@ -100,7 +100,7 @@ const VerifyEmail = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history.push(DASHBOARD_HOME);
+        return history(DASHBOARD_HOME);
     };
 
     return (

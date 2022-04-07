@@ -1,5 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { 
     Backdrop,
 	Button,
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
 
 const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     const [open, setOpen] = useState(false);
 
@@ -69,7 +69,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 
     const handleVerifyId = () => {
         setOpen(false);
-        history.push(ACCOUNT, { eu: true });
+        history(ACCOUNT, { eu: true });
     };
 
 	return (

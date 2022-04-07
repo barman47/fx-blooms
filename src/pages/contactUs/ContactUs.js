@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -151,7 +151,7 @@ const useStyles = makeStyles(theme => ({
 
 const ContactUs = ({ sendMail }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const history = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -211,7 +211,7 @@ const ContactUs = ({ sendMail }) => {
         });
     };
 
-    const handleHelpClick = () => history.push(FAQS);
+    const handleHelpClick = () => history(FAQS);
 
     const handleTelegramClick = () => window.open('https://t.me/joinchat/AP-u-dVKEn9mZjg6', '_blank', 'noreferrer');
 

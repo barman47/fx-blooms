@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 const SessionModal = ({ logout }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const history = useNavigate();
 
     const { resetSession } = useSelector(state => state.customer);
 

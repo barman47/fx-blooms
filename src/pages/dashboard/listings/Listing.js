@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -115,7 +115,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
-    const history = useHistory();
+    const history = useNavigate();
 
     const userId = useSelector(state => state.customer.customerId);
 
@@ -174,9 +174,9 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return history.push(`${USER_DETAILS}/${sellerId}`, { sellerId });
+            return history(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return history.push(ACCOUNT);
+        return history(ACCOUNT);
     };
 
     const handleDeleteListing = () => {
