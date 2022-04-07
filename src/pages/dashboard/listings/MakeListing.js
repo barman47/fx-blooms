@@ -498,7 +498,7 @@ const MakeListing = (props) => {
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
-                        <Typography variant="h6">Make a Listing</Typography>
+                        <Typography variant="h6">Make a Listing - (Sell {AvailableCurrency})</Typography>
                         <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
                     </div>
                     {/* <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography> */}

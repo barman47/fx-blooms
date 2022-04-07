@@ -82,7 +82,6 @@ Notification.propTypes = {
     buttonText: PropTypes.string,
     buttonAction: PropTypes.func,
     buttonDisabled: PropTypes.bool
-    // link: PropTypes.string
 };
 
 export default Notification;

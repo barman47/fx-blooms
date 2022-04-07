@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { FormControlLabel, Switch } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
@@ -8,7 +8,8 @@ import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/cor
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
-import { getNotifications } from '../../../actions/notifications';
+import { getTransactions } from '../../../actions/transactions';
+import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 
@@ -94,11 +95,13 @@ const IOSSwitch = withStyles((theme) => ({
     );
 });
 
-const Transactions = ({ getCurrencies, getNotifications }) => {
+const Transactions = ({ getCurrencies, getTransactions }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const { currencies } = useSelector(state => state);
-    const { notifications } = useSelector(state => state.notifications);
+    const { customerId } = useSelector(state => state.customer);
+    const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
     const [showReceived, setShowReceived] = useState(true);
@@ -106,13 +109,38 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        getNotifications();
+        dispatch({
+            type: SET_TRANSACTION,
+            payload: {}
+        });
+        getTransactions(true);
         if (currencies.length === 0) {
             // setLoading(true);
             getCurrencies();
         }
         // eslint-disable-next-line
     }, []);
+
+    // Filter transactions
+    useEffect(() => {
+        switch (currency) {
+            case 'ALL':
+                dispatch({ type: SET_ALL_TRANSACTIONS });
+                break;
+
+            case 'EUR':
+                dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
+                break;
+
+            case 'NGN':
+                dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
+                break;
+
+            default:
+                break;
+        }
+    }, [currency, customerId, dispatch]);
+
 
     return (
         <>
@@ -144,12 +172,13 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
-                    {notifications.map(transaction => (
-                        <Transaction 
-                            key={transaction.id} 
-                            transaction={transaction} 
-                        />
-                    ))}
+                    {eurTransactions.length > 0 ? 
+                        eurTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                        :
+                        ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                        :
+                        transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                    }
                 </Box>
             </Box>
         </>
@@ -158,7 +187,7 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
 
 Transactions.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
-    getNotifications: PropTypes.func.isRequired,
+    getTransactions: PropTypes.func.isRequired,
 };
 
-export default connect(undefined, { getCurrencies, getNotifications })(Transactions);
+export default connect(undefined, { getCurrencies, getTransactions })(Transactions);

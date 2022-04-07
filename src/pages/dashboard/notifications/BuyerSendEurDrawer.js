@@ -15,14 +15,15 @@ import { decode } from 'html-entities';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 
-import { sendTransactionNotification } from '../../../actions/notifications';
-import { GET_ERRORS } from '../../../actions/types';
+import { sendTransactionNotification } from '../../../actions/transactions';
+import { GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 import isEmpty from '../../../utils/isEmpty';
 
+import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
@@ -116,11 +117,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
+const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
+    const { msg } = useSelector(state => state.listings);
     const message = useSelector(state => state.notifications.msg);
     const errorsState = useSelector(state => state.errors);
     
@@ -128,11 +130,20 @@ const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const successModal = useRef();
     const toastRef = useRef();
 
     useEffect(() => {
         setOpen(drawerOpen);
     }, [drawerOpen]);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+            setLoading(false);
+        }
+    }, [msg]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -162,9 +173,20 @@ const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, 
         sendTransactionNotification(transactionId);
     };
 
+    const dismissSuccessModal = () => {
+        successModal.current.closeModal();
+        setLoading(false);
+        toggleDrawer();
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: null
+        });
+    };
+
 	return (
         <>
             <Toaster />
+            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toastRef}
@@ -251,7 +273,7 @@ const SellerPaymentDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, 
 	);
 };
 
-SellerPaymentDrawer.propTypes = {
+BuyerSendEurDrawer.propTypes = {
     amount: PropTypes.number.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
@@ -259,4 +281,4 @@ SellerPaymentDrawer.propTypes = {
     transactionId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { sendTransactionNotification })(SellerPaymentDrawer);
+export default connect(undefined, { sendTransactionNotification })(BuyerSendEurDrawer);

@@ -9,14 +9,17 @@ import {
 	Checkbox,
 	Collapse,
 	FormControlLabel,
+	IconButton,
 	InputAdornment,
 	TextField,
 	Typography,
+	useMediaQuery,
 	// useMediaQuery 
 } from '@material-ui/core';
 // import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -317,6 +320,7 @@ const AllListings = (props) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const theme = useTheme();
+	const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
@@ -328,10 +332,6 @@ const AllListings = (props) => {
 
 	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
 
-	// eslint-disable-next-line
-	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
-	// eslint-disable-next-line
-	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
 	const [timeOfDay, setTimeOfDay] = useState('');
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
@@ -376,7 +376,7 @@ const AllListings = (props) => {
 		}
 
 		if (unreadNotifications === 0) {
-            getNotifications();
+            getNotifications(true);
         }
 
 		if (accounts.length === 0) {
@@ -411,7 +411,8 @@ const AllListings = (props) => {
 				currencyNeeded: requiredCurrency,
 				currencyAvailable: availableCurrency,
 				minimumExchangeAmount: 0,
-				useCurrencyFilter: false
+				useCurrencyFilter: true,
+				useRatingFilter: false
 			});
 		}
 	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
@@ -433,7 +434,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		}, true);
 	};
 
@@ -444,7 +446,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		});	
 	};
 
@@ -471,7 +474,8 @@ const AllListings = (props) => {
 			currencyNeeded: requiredCurrency,
 			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useRatingFilter: false,
+			useCurrencyFilter: true
 		});
 	}, [dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 
@@ -560,7 +564,6 @@ const AllListings = (props) => {
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					{/* <Typography variant="body1" component="p">What would you like to do today?</Typography>  */}
 				</div>
 				{/* <div>
 					<NewNotification 
@@ -694,17 +697,31 @@ const AllListings = (props) => {
 									InputProps={{
 										startAdornment: <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
-											<Button
-												variant="contained"
-												color="primary"
-												// size="large"
-												disableRipple
-												disableFocusRipple
-												className={classes.searchButton}
-												onClick={handleFilter}
-											>
-												Search
-											</Button>
+											{matches ? 
+												<IconButton
+													color="primary"
+													// size="large"
+													disableRipple
+													disableFocusRipple
+													className={classes.searchButton}
+													onClick={handleFilter}
+												>
+													<Magnify />
+												</IconButton>
+											: 
+												<Button
+													variant="contained"
+													color="primary"
+													// size="large"
+													disableRipple
+													disableFocusRipple
+													className={classes.searchButton}
+													onClick={handleFilter}
+												>
+													Search
+												</Button>
+											}
+											
 										</InputAdornment>,
 									}}
 								/>

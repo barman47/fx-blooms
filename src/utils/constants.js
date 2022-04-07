@@ -95,6 +95,7 @@ export const NOTIFICATION_TYPES = {
     BUYER_MADE_PAYMENT: 'BuyerPaymentMade',
     SELLER_MADE_PAYMENT: 'SellerPaymentMade',
     SELLER_CONFIRMED_PAYMENT: 'SellerConfirmedPayment',
+    OFFER_MADE: 'OfferMade',
     CANCEL_NEGOTIATION: 'CancelNegotiation'
 };
 

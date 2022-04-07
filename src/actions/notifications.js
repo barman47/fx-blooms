@@ -1,46 +1,26 @@
 import axios from 'axios';
 
-import { SET_NOTIFICATIONS, SET_TRANSACTION_TERMS, VERIFIED_PHONE_NUMBER } from './types';
+import { SET_NOTIFICATIONS,  VERIFIED_PHONE_NUMBER } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
-const api = `${API}/Transfer`;
+const api = `${API}/Notification`;
 
 export const getNotifications = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.get(`${api}/Transfers`);
+        const res = await axios.get(`${api}/GetNotificationLogs`);
+        console.log('notifications ', res);
+        const notifications = res.data.data.map(notification => {
+            const { data, ...rest } = notification;
+            return { data: JSON.parse(data), ...rest };
+        })
         dispatch({
             type: SET_NOTIFICATIONS,
-            payload: res.data.data
+            payload: notifications
         });
         return 
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const sendTransactionNotification = (transferId) => async (dispatch) => {
-    try {
-        await Promise.all([
-            await reIssueCustomerToken(),
-            await axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
-        ]);
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const acceptChatPopupNotification = (chatId) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${api}/AcceptChatPopupNotification?chatId=${chatId}`);
-        const { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms } = res.data.data;
-        return dispatch({
-            type: SET_TRANSACTION_TERMS,
-            payload: { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms }
-        });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -50,7 +30,7 @@ export const generateOtp = (data) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
-            axios.post(`${API}/Notification/GenerateOTP`, data)
+            axios.post(`${api}/GenerateOTP`, data)
         ]);
     } catch (err) {
         return handleError(err, dispatch);
@@ -61,7 +41,7 @@ export const validatePhoneNumber = (data) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
-            axios.post(`${API}/Notification/ValidatePhoneNumber`, data)
+            axios.post(`${api}/ValidatePhoneNumber`, data)
         ]);
         return dispatch({ 
             type: VERIFIED_PHONE_NUMBER, 

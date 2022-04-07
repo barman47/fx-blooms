@@ -28,6 +28,7 @@ import {
     PAYMENT_NOTIFICATION_BUYER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_PAID, 
+    PAYMENT_NOTIFICATION_OFFER_MADE,
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
@@ -281,98 +282,87 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleSentMessage = () => {
-        const { CANCEL_NEGOTIATION, BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT } = NOTIFICATION_TYPES;
+        const { 
+            CANCEL_NEGOTIATION, 
+            BUYER_MADE_PAYMENT, 
+            BUYER_CONFIRMED_PAYMENT, 
+            OFFER_MADE,
+            SELLER_CONFIRMED_PAYMENT, 
+            SELLER_MADE_PAYMENT 
+        } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
                 let response = JSON.parse(data);
-                const payload = JSON.parse(response.Payload);
-                // console.log('Payload ', payload);
-                // console.log('New Notification ', response, type);
+                let payload = JSON.parse(response.Payload);
+                payload = { ...payload, Data: JSON.parse(payload.Data) };
+                console.log('Payload ', payload);
+                console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
-                let buyer = {};
-                let seller = {};
-                let id;
+                const buyer = payload.Data.Buyer;
+                const seller =payload.Data.Seller;
+                const notification = {
+                    dateLogged: payload.dateLogged,
+                    eventType: payload.EventType,
+                    customerId: payload.CustomerId,
+                    isDeleted: payload.IsDeleted,
+                    isRead: payload.IsRead,
+                    notificationId: payload.Id,
+                    data: { 
+                        Id: payload.Data.Id,
+                        IsClosed: payload.Data.IsClosed,
+                        Buyer: buyer,
+                        Seller: seller,
+                        ListingId: payload.ListingId,
+                        BidId: payload.BidId
+                    }
+                };
                 
                 switch (type) {
                     case BUYER_MADE_PAYMENT:
-                        buyer = payload.Data.Buyer;
-                        seller = payload.Data.Seller;
-                        // buyer = payload.Buyer;
-                        // seller = payload.Seller;
-                        id = payload.Data.Id;
-                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                        // Send buyer payment notification to seller only
+                        if (customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
-                            batch(() => {
-                                dispatch({
-                                    type: PAYMENT_NOTIFICATION_BUYER_PAID,
-                                    payload: { 
-                                        notification: {
-                                            id,
-                                            isClosed: payload.IsClosed,
-                                            buyer: {
-                                                accountName: buyer.AccountName,
-                                                accountNumber: buyer.AccountNumber,
-                                                amountTransfered: buyer.AmountTransfered,
-                                                bankName: buyer.BankName,
-                                                customerId: buyer.CustomerId,
-                                                hasMadePayment: buyer.HasMadePayment,
-                                                hasReceivedPayment: buyer.HasReceivedPayment,
-                                                userName: buyer.UserName,
-                                                transferReference: buyer.TransferReference
-                                            },
-                                            seller: {
-                                                accountName: seller.AccountName,
-                                                accountNumber: seller.AccountNumber,
-                                                amountTransfered: seller.AmountTransfered,
-                                                bankName: seller.BankName,
-                                                customerId: seller.CustomerId,
-                                                hasMadePayment: seller.HasMadePayment,
-                                                hasReceivedPayment: seller.HasReceivedPayment,
-                                                userName: seller.UserName,
-                                                transferReference: seller.TransferReference
-                                            },
-                                            listingId: payload.ListingId,
-                                            bidId: payload.BidId
-                                        },
-                                        customerId
-                                    }
-                                });
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION_BUYER_PAID,
+                                payload: notification
+                            });
+                        }
 
-                                // Show message to buyer only
-                                if (customerId === buyer.CustomerId) {
-                                    dispatch({
-                                        type: SET_LISTING_MSG,
-                                        payload: `${seller.UserName} will confirm your payment and send the EUR equivalent to the account you provided. Thanks!`
-                                    });
-                                }
+                        // Show message to buyer only
+                        if (customerId === buyer.CustomerId) {
+                            dispatch({
+                                type: SET_LISTING_MSG,
+                                payload: `${seller.UserName} will confirm your payment and send the EUR equivalent to the account you provided. Thanks!`
                             });
                         }
                         break;
 
                     case BUYER_CONFIRMED_PAYMENT:
-                        buyer = payload.Transfer.Buyer;
-                        seller = payload.Transfer.Seller;
-                        id = payload.Transfer.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
-                            playAudioNotifcation(senderId);
-                            dispatch({
-                                type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
-                                payload: { id }
-                            });
-                            transactionCompleteModal.current.openModal();
+                            // end transaction
+                            if (buyer.HasMadePayment && seller.HasMadePayment) {
+                                playAudioNotifcation(senderId);
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
+                                    payload: { notification, endTransaction: true }
+                                });
+                                transactionCompleteModal.current.openModal();
+                            } else {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
+                                    payload: { notification }
+                                });
+                            }
                         }
                         break;
 
                     case SELLER_MADE_PAYMENT:
-                        buyer = payload.Buyer;
-                        seller = payload.Seller;
-                        id = payload.Id;
                         if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
                             playAudioNotifcation(senderId);
                             batch(() => {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_SELLER_PAID,
-                                    payload: { id }
+                                    payload: notification
                                 });
                                 // Show message to seller only
                                 if (customerId === seller.CustomerId) {
@@ -386,14 +376,34 @@ const Dashboard = ({ children, title, logout }) => {
                         break;
 
                     case SELLER_CONFIRMED_PAYMENT:
-                        buyer = payload.Transfer.Buyer;
-                        seller = payload.Transfer.Seller;
-                        id = payload.Transfer.Id;
+                        if (customerId === buyer.CustomerId || customerId === seller.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            // end transaction
+                            if (buyer.HasMadePayment && seller.HasMadePayment) {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+                                    payload: { notification, endTransaction: true }
+                                });
+                                transactionCompleteModal.current.openModal();
+                            } else {
+                                dispatch({
+                                    type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
+                                    payload: { notification }
+                                });
+                            }
+                        }
                         
-                        dispatch({
-                            type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
-                            payload: { id }
-                        });
+                        break;
+
+                    case OFFER_MADE:
+                        // Show Offer notification to seller only
+                        if (customerId === seller.CustomerId) {
+                            playAudioNotifcation(senderId);
+                            dispatch({
+                                type: PAYMENT_NOTIFICATION_OFFER_MADE,
+                                payload: notification
+                            });
+                        }
                         break;
 
                     case CANCEL_NEGOTIATION:

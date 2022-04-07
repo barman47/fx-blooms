@@ -5,14 +5,17 @@ import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
+    ACCEPTED_OFFER,
     ADDED_BID, 
     ADDED_LISTING, 
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
     GET_ERRORS,
+    // REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_LISTING, 
     SET_LISTINGS, 
+    SET_LISTING_MSG,
     SET_LOADING_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
@@ -23,27 +26,28 @@ import { batch } from 'react-redux';
 
 const URL = `${API}/Listing`;
 
-export const getAllListings = () => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/GetAllListings`, {
-            pageNumber: 0,
-            pageSize: 15,
-            currencyNeeded: 'NGN',
-            currencyAvailable: 'NGN',
-            minimumExchangeAmount: 0,
-            useCurrencyFilter: false
-        });
-        const { items, ...rest } = res.data.data;
+// export const getAllListings = () => async (dispatch) => {
+//     try {
+//         console.log('getting all listings');
+//         await reIssueCustomerToken();
+//         const res = await axios.post(`${URL}/GetAllListings`, {
+//             pageNumber: 0,
+//             pageSize: 15,
+//             currencyNeeded: 'NGN',
+//             currencyAvailable: 'NGN',
+//             minimumExchangeAmount: 0,
+//             useCurrencyFilter: false
+//         });
+//         const { items, ...rest } = res.data.data;
 
-        dispatch({
-            type: SET_LISTINGS,
-            payload: { listings: items, ...rest }
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
+//         dispatch({
+//             type: SET_LISTINGS,
+//             payload: { listings: items, ...rest }
+//         });
+//     } catch (err) {
+//         return handleError(err, dispatch);
+//     }
+// };
 
 export const addListing = (listing) => async (dispatch) => {
     try {
@@ -122,7 +126,7 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
                 type: SET_LOADING_LISTINGS,
                 payload: false
             });
-            if (setRecommendedRate) {
+            if (setRecommendedRate && items.length > 0) {
                 dispatch({
                     type: SET_RECOMMENDED_RATE,
                     payload: getRecommendedRate(items)
@@ -155,6 +159,36 @@ export const getMoreListings = (query) => async (dispatch) => {
     }
 };
 
+export const acceptOffer = (data, listing) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken()
+        const res = await axios.post(`${URL}/AcceptOffer`, data);
+        batch(() => {
+            dispatch({
+                type: ACCEPTED_OFFER,
+                payload: {
+                    bid: res.data.data,
+                    listing,
+                    addedBid: true
+                }
+            });
+            dispatch({
+                type: ADDED_BID,
+                payload: {
+                    bid: res.data.data,
+                    listing,
+                }
+            });
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: 'Offer placed successfully'
+            });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const addBid = (bid, listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken()
@@ -179,6 +213,19 @@ export const madePayment = (data) => async (dispatch) => {
             type: SET_AS_ACCEPTED,
             payload: data.listingId
         });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const madePaymentV2 = (data, id) => async (dispatch) => {
+    try {
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
+        // Remove notification
+        // return dispatch({
+        //     type: REMOVE_NOTIFICATION,
+        //     payload: id
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

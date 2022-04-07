@@ -182,13 +182,9 @@ export const getIdVerificationLink = () => async (dispatch) => {
     }
 };
 
-export const login = (data, history, userLocation) => async (dispatch) => {
+export const login = (data, history) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/Login`, data, {
-            headers: {
-                'Location': JSON.stringify(userLocation)
-            }
-        });
+        const res = await axios.post(`${api}/Login`, data);
         const {  token } = res.data.data;
         setAuthToken(token);
         dispatch({
@@ -201,13 +197,9 @@ export const login = (data, history, userLocation) => async (dispatch) => {
     }
 };
 
-export const externalLogin = (data, history, userLocation) => async (dispatch) => {
+export const externalLogin = (data, history) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/ExternalLogin`, data, {
-            headers: {
-                'Location': JSON.stringify(userLocation)
-            }
-        });
+        const res = await axios.post(`${api}/ExternalLogin`, data);
         const { authResponse, isLinkedToProfile } = res.data.data;
         setAuthToken(authResponse.token);
         dispatch({

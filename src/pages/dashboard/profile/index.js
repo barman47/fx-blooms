@@ -119,6 +119,7 @@ export const LinkTab = (props) => {
     return (
         <Tab
             component={RouterLink}
+            to="#"
             onClick={(event) => {
                 event.preventDefault();
             }}

@@ -24,7 +24,6 @@ import PropTypes from 'prop-types';
 import Spinner from '../../components/common/Spinner';
 
 import { externalLogin, login } from '../../actions/customer';
-import { getMyLocation } from '../../actions/myLocation';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
@@ -111,14 +110,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = ({ externalLogin, getMyLocation, login }) => {
+const Login = ({ externalLogin, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
     const history = useHistory();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
-    const { customer, myLocation } = useSelector(state => state);
+    const { customer } = useSelector(state => state);
 
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
@@ -136,7 +135,6 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
             setErrors({ msg: location.state.msg });
             history.replace(location.pathname, {});
         }
-        getLocation();
         // eslint-disable-next-line
     }, []);
 
@@ -159,12 +157,6 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         }
     }, [customer, history, loading]);
 
-    const getLocation = () => {
-        if (!myLocation.ip) {
-            getMyLocation();
-        }
-    };
-
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
     };
@@ -182,7 +174,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history, myLocation);
+        externalLogin(data, history);
     };
 
     const handleFormSubmit = (e) => {
@@ -200,7 +192,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        login(data, history, myLocation);
+        login(data, history);
     };   
 
     return (
@@ -344,9 +336,8 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
 };
 
 Login.propTypes = {
-    getMyLocation: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
     externalLogin: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { externalLogin, getMyLocation, login })(Login);
+export default connect(undefined, { externalLogin, login })(Login);
