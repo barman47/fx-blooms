@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 
 const SignupSuccess = () => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     
     const [timeTillRedirect, setTimeTillRedirect] = useState(10);
@@ -78,7 +78,7 @@ const SignupSuccess = () => {
 
     useEffect(() => {
         if (parseInt(timeTillRedirect) <= 0) {
-            history(LOGIN);
+            navigate(LOGIN);
         }
     }, [history, timeTillRedirect]);
 

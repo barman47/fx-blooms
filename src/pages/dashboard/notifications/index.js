@@ -98,7 +98,7 @@ const useStyles = makeStyles(theme => ({
 
 const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
@@ -349,7 +349,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         window.open(idVerificationLink);
     };
 
-    const setup2FA = () => history(ACCOUNT, { mfa: true });
+    const setup2FA = () => navigate(ACCOUNT, { mfa: true });
 
     const verifyPhone = () => {
         if (phoneNo) {
@@ -362,9 +362,9 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setPhoneNumber(number);
             return setOpen(true);
         }
-        return history(ACCOUNT, { verifyPhone: true })
+        return navigate(ACCOUNT, { verifyPhone: true })
     };
-    // const setPin = () => history(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
+    // const setPin = () => navigate(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
 
     const toggleSellerSendNgnDrawer = () => {
         setSellerSendNgnDrawerOpen(!sellerSendNgnDrawerOpen);

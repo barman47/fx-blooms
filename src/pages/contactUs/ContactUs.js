@@ -151,7 +151,7 @@ const useStyles = makeStyles(theme => ({
 
 const ContactUs = ({ sendMail }) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -211,7 +211,7 @@ const ContactUs = ({ sendMail }) => {
         });
     };
 
-    const handleHelpClick = () => history(FAQS);
+    const handleHelpClick = () => navigate(FAQS);
 
     const handleTelegramClick = () => window.open('https://t.me/joinchat/AP-u-dVKEn9mZjg6', '_blank', 'noreferrer');
 

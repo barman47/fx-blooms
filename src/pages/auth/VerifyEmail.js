@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
 const VerifyEmail = (props) => {
     const classes = useStyles();
 
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
     
@@ -100,7 +100,7 @@ const VerifyEmail = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     };
 
     return (

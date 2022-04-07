@@ -276,7 +276,7 @@ const useStyles = makeStyles((theme) => ({
 const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
     const { admin, customers } = useSelector(state => state);
     const { category, pageSize } = useSelector(state => state.customers);
@@ -336,12 +336,12 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
             sessionStorage.removeItem(LOGOUT);
-            logout(history);
+            logout(navigate);
         }
     };
 
     const handleLinkClick = (link) => {
-        history(link);
+        navigate(link);
     };
 
     const handleSearch = (e) => {

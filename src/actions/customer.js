@@ -55,7 +55,7 @@ export const createCustomer = (customer, history) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
         setAuthToken(res.data.data.token);
-        history(SETUP_2FA);
+        navigate(SETUP_2FA);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -101,14 +101,14 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 
         case GOTO_2FA:
             setAuthToken(res.data.data.token);
-            return history(SETUP_2FA);
+            return navigate(SETUP_2FA);
 
         case PROCEED_TO_LOGIN:
             dispatch({
                 type: GET_ERRORS,
                 payload: { msg: `${EmailAddress} Email has been linked to a profile. Please login to continue` }
             });
-            return history(LOGIN);
+            return navigate(LOGIN);
 
         default:
             return;
@@ -191,7 +191,7 @@ export const login = (data, history) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: res.data.data
         });
-        return history(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -207,7 +207,7 @@ export const externalLogin = (data, history) => async (dispatch) => {
             payload: authResponse
         });
         
-        return isLinkedToProfile ? history(DASHBOARD_HOME) : history(ADD_USERNAME, { addUsername: true });
+        return isLinkedToProfile ? navigate(DASHBOARD_HOME) : navigate(ADD_USERNAME, { addUsername: true });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -222,7 +222,7 @@ export const addUsername = (username, history) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: res.data.data
         });
-        return history(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -696,10 +696,10 @@ export const approveResidencePermit = (customerId, currentStatus) => async (disp
     }
 };
 
-export const logout = (history, msg) => dispatch => {
+export const logout = (navigate, msg) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return history(LOGIN, { msg });
+    return navigate(LOGIN, { msg });
 };
 
 export const subscribeToNewsletter = (email) => async (dispatch) => {

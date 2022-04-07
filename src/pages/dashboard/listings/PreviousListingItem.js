@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
 const PreviousListingItem = ({ deleteListing, listing }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
 
     const { open } = LISTING_STATUS;
@@ -79,7 +79,7 @@ const PreviousListingItem = ({ deleteListing, listing }) => {
                 type: SET_LISTING,
                 payload: listing
             });
-            return history(EDIT_LISTING);
+            return navigate(EDIT_LISTING);
         }
         return dispatch({
             type: SET_LISTING,

@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme =>({
 const Customer = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
     const { customer, msg } = useSelector(state => state.customers);
 
@@ -165,7 +165,7 @@ const Customer = () => {
                 type: CLEAR_CUSTOMER_STATUS_MSG
             });
 
-            history(-1);
+            navigate(-1);
         }
     };
 

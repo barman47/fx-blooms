@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
 const Transaction = ({ transaction }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const { customerId } = useSelector(state => state.customer);
 
     const [amount, setAmount] = useState(0);
@@ -123,7 +123,7 @@ const Transaction = ({ transaction }) => {
             type: SET_TRANSACTION,
             payload: transaction
         });
-        return history(TRANSACTION_STATUS);
+        return navigate(TRANSACTION_STATUS);
     };
 
     return (

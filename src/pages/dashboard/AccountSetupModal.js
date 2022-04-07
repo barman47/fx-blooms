@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
 
 const AccountSetupModal = forwardRef((props, ref) => {
 	const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const [open, setOpen] = useState(false);
 
@@ -69,7 +69,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 
     const handleVerifyId = () => {
         setOpen(false);
-        history(ACCOUNT, { eu: true });
+        navigate(ACCOUNT, { eu: true });
     };
 
 	return (

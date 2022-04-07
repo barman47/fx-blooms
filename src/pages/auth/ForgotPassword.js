@@ -86,7 +86,7 @@ const ForgotPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const errorsState = useSelector(state => state.errors);
@@ -101,7 +101,7 @@ const ForgotPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
         // eslint-disable-next-line
     }, []);

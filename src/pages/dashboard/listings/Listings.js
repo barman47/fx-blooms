@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
 const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 

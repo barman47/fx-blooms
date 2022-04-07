@@ -188,7 +188,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
@@ -223,7 +223,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
 
         return () => {
@@ -250,7 +250,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
 
     // useEffect(() => {
     //     if (errorsState.usernameAvailable === true) {
-    //         history(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+    //         navigate(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
     //     }
     // }, [Email, Password, Username, history, errorsState.usernameAvailable]);
 
@@ -355,7 +355,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history(PENDING_VERIFICATION, { email: Email });
+        return navigate(PENDING_VERIFICATION, { email: Email });
     };
       
     const handleSocialLoginFailure = (err) => {

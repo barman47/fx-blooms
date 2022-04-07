@@ -64,7 +64,7 @@ const useStyles = makeStyles(theme => ({
 const SessionModal = ({ logout }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { resetSession } = useSelector(state => state.admin);
 
@@ -112,7 +112,7 @@ const SessionModal = ({ logout }) => {
     const handleLogin = useCallback(() => {
         sessionStorage.removeItem(LOGOUT);
         setOpen(false);
-        logout(history);
+        logout(navigate);
     }, [history, logout]);
 
     // logout user when time has elapsed

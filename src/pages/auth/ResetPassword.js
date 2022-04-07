@@ -105,7 +105,7 @@ const ResetPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const errorsState = useSelector(state => state.errors);
@@ -135,9 +135,9 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
-        setToken(history.location.search.split('=')[1]);
+        setToken(navigate.location.search.split('=')[1]);
         // eslint-disable-next-line
     }, []);
 
@@ -179,7 +179,7 @@ const ResetPassword = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        history(LOGIN)
+        navigate(LOGIN)
     };
 
     const strengthChecker = useCallback((password) => {

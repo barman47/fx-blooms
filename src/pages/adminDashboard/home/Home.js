@@ -289,7 +289,7 @@ const Root = props => (
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
@@ -368,7 +368,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
         }
     }, [changed, usersFilter, customerCount, dispatch]);
 
-    // const goToDashboard = () => history(`${CUSTOMERS}`);
+    // const goToDashboard = () => navigate(`${CUSTOMERS}`);
 
     const handleListingsFilter = useCallback((timeframe) => {
         const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
@@ -489,13 +489,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     const gotoCustomersPage = (e) => {
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
-            history(CUSTOMERS);
+            navigate(CUSTOMERS);
         }
     };
 
     const gotoListingsPage = (e) => {
         if (e.target.name !== 'listingFilter') {
-            history(LISTINGS);
+            navigate(LISTINGS);
         }
     };
 

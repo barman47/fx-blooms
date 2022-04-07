@@ -152,7 +152,7 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
@@ -412,7 +412,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
-            history(DASHBOARD_HOME);
+            navigate(DASHBOARD_HOME);
         }
     };
 

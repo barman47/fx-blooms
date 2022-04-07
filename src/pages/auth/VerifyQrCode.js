@@ -98,7 +98,7 @@ const useStyles = makeStyles(theme => ({
 const VerifyQrCode = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
@@ -176,12 +176,12 @@ const VerifyQrCode = (props) => {
                 payload: null
             });
         });
-        return history(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     };
 
     const logout = (e) => {
         e.preventDefault();
-        props.logout(history);
+        props.logout(navigate);
     };
 
     const onSubmit = (e) => {
@@ -213,7 +213,7 @@ const VerifyQrCode = (props) => {
         });
 
         if (twoFactorEnabled) {
-            return props.authorizeTwoFactor({ code, profileId: customerId }, history);
+            return props.authorizeTwoFactor({ code, profileId: customerId }, navigate);
         }
         return props.enableTwoFactor(code);
     };
@@ -346,7 +346,7 @@ const VerifyQrCode = (props) => {
                         </Grid>
                         <div className={classes.buttonContainer}>
                             <Button variant="contained" color="primary" className={classes.button} type="submit">Proceed</Button>
-                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>props.logout(history)}>Cancel</Button>
+                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() =>props.logout(navigate)}>Cancel</Button>
                         </div>
                     </form>
                 </div>

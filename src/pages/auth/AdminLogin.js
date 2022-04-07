@@ -86,7 +86,7 @@ const AdminLogin = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
 
     const { isAuthenticated } = useSelector(state => state.customer);
@@ -103,7 +103,7 @@ const AdminLogin = (props) => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            return history(`${ADMIN_HOME}`);
+            return navigate(`${ADMIN_HOME}`);
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });

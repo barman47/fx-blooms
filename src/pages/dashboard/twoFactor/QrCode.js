@@ -195,7 +195,7 @@ const QrCode = ({ enableTwoFactor, getBarcode, toggleShowVerifyQrCode }) => {
                             />
                             <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                             <Button variant="contained" color="primary" className={classes.button} onClick={toggleShowVerifyQrCode}>Proceed</Button>
-                            {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
+                            {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(navigate)}>Cancel</Button> */}
                         </>
                     }
                 </div>

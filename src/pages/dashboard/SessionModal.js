@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 const SessionModal = ({ logout }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { resetSession } = useSelector(state => state.customer);
 
@@ -110,7 +110,7 @@ const SessionModal = ({ logout }) => {
     const handleLogin = useCallback(() => {
         sessionStorage.removeItem(LOGOUT);
         setOpen(false);
-        logout(history, 'Your session expired due to inactivity.');
+        logout(navigate, 'Your session expired due to inactivity.');
     }, [history, logout]);
 
     // logout user when time has elapsed

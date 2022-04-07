@@ -179,7 +179,7 @@ const columns = [
 const Customers = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { admin } = useSelector(state => state);
     const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended } = useSelector(state => state.customers);
@@ -576,12 +576,12 @@ const Customers = (props) => {
     const viewDetails = () => {
         handleClose();
         // handleSetTitle('User Details');
-        history(`${CUSTOMERS}/${customer.id}`);
+        navigate(`${CUSTOMERS}/${customer.id}`);
     };
 
     const editProfile = () => {
         handleClose();
-        history(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
+        navigate(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
     };
 
     const contact = () => {
@@ -606,7 +606,7 @@ const Customers = (props) => {
             type: SET_CUSTOMER,
             payload: customer
         });
-        history(`${CUSTOMERS}/${customer.id}`);
+        navigate(`${CUSTOMERS}/${customer.id}`);
     }
 
 

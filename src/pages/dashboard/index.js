@@ -126,7 +126,7 @@ const ToastAction = () => {
 const Dashboard = ({ title, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
@@ -249,14 +249,14 @@ const Dashboard = ({ title, logout }) => {
     // Logout user if he tries to beat 2FA
     const checkTwoFactorStatus = () => {
         if (twoFactorEnabled && !authorized) {
-            logout(history);
+            logout(navigate);
         }
     };
 
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
             sessionStorage.removeItem(LOGOUT);
-            logout(history);
+            logout(navigate);
         }
     };
 
@@ -430,7 +430,7 @@ const Dashboard = ({ title, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        history(link);
+        navigate(link);
     };
 
     const dismissAction = () => {

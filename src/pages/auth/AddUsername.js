@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
 const AddUsername = ({ addUsername }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const navigate = useNavigate();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
 
@@ -89,7 +89,7 @@ const AddUsername = ({ addUsername }) => {
 
     useEffect(() => {
         if (!location?.state?.addUsername) {
-            return history(LOGIN);
+            return navigate(LOGIN);
         }
         // eslint-disable-next-line
     }, []);

@@ -69,7 +69,7 @@ const useStyles = makeStyles(theme => ({
 
 const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggleWithdrawalDrawer }) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     return (
         <Box component="section" className={classes.root} >
@@ -113,7 +113,7 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowLeftRight style={{ backgroundColor: COLORS.primary, borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={() => history(MAKE_LISTING)}
+                    onClick={() => navigate(MAKE_LISTING)}
                     className={classes.button}
                 >
                     Make a Listing

@@ -115,7 +115,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const userId = useSelector(state => state.customer.customerId);
 
@@ -174,9 +174,9 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return history(`${USER_DETAILS}/${sellerId}`, { sellerId });
+            return navigate(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return history(ACCOUNT);
+        return navigate(ACCOUNT);
     };
 
     const handleDeleteListing = () => {

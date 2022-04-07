@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
-	const history = useNavigate();
+	const navigate = useNavigate();
 
     const handleButtonClick = () => {
         handleCloseModal();
@@ -70,7 +70,7 @@ const SignUpSuccessModal = ({ open, handleCloseModal, text }) => {
             type: SET_CURRENT_CUSTOMER,
             payload: {}
         });
-        history(LOGIN);
+        navigate(LOGIN);
     };
 
 	return (

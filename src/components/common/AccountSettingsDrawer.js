@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 
 const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
     const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const [value, setValue] = useState(0);
     
@@ -193,7 +193,7 @@ const AccountSettingsDrawer = ({ toggleDrawer, drawerOpen, logout }) => {
                             disableFocusRipple
                             onClick={() => {
                                 clearTimeout(timeout.current);
-                                logout(history);
+                                logout(navigate);
                             }}
                         />
                     </Tabs>

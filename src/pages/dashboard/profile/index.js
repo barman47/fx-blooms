@@ -142,7 +142,7 @@ export const toggleDrawer = () => {
 };
 
 const Profile = (props) => {
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const classes = useStyles();
     const location = useLocation();
@@ -254,7 +254,7 @@ const Profile = (props) => {
                             } 
                             disableRipple
                             disableFocusRipple
-                            onClick={() => logout(history)}
+                            onClick={() => logout(navigate)}
                         />
                     </Tabs>
                 </div>

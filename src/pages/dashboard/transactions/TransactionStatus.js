@@ -110,7 +110,7 @@ const useStyles = makeStyles(theme => ({
 
 const TransactionStatus = ({ handleSetTitle }) => {
 	const classes = useStyles();
-    const history = useNavigate();
+    const navigate = useNavigate();
 
     const { customerId } = useSelector(state => state.customer);
     const { transaction } = useSelector(state => state.transactions);
@@ -243,7 +243,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Button 
                         color="primary" 
                         variant="outlined" 
-                        onClick={() => history(-1)}
+                        onClick={() => navigate(-1)}
                         startIcon={<ArrowLeft />}
                     >
                         Back
