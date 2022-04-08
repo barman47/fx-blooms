@@ -372,7 +372,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history);
+        externalLogin(data, navigate);
     };
 
     const handleFormSubmit = (e) => {
@@ -403,7 +403,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
             EmailAddress: data.Email.trim(),
             Username,
             Password
-        }, history);
+        }, navigate);
     };
 
     return (

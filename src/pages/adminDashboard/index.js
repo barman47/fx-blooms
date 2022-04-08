@@ -48,7 +48,7 @@ import logo from '../../assets/img/logowhite.svg';
 
 import { getStats, logout, searchForCustomer } from '../../actions/admin';
 import { getCustomers } from '../../actions/customer';
-import { COLORS, CUSTOMER_CATEGORY, LOGOUT } from '../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, DRAWER_WIDTH as drawerWidth, LOGOUT } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
 
 import SessionModal from './SessionModal';
@@ -65,8 +65,6 @@ import {
     RISK_PROFILE 
 } from '../../routes';
 import { SET_CATEGORY } from '../../actions/types';
-
-const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {

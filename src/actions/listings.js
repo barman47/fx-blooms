@@ -62,7 +62,7 @@ export const addListing = (listing) => async (dispatch) => {
     }
 };
 
-export const checkListingEditable = (listing, history) => async (dispatch) => {
+export const checkListingEditable = (listing, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${URL}/Editable/${listing.id}`);
@@ -239,7 +239,7 @@ export const cancelBid = (bidIds) => async (dispatch) => {
     }
 };
 
-export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
+export const cancelNegotiation = (chatSessionId, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/CancelNegotiation?chatSessioId=${chatSessionId}`);

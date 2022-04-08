@@ -117,7 +117,7 @@ const AddUsername = ({ addUsername }) => {
 
         setErrors({});
         setLoading(true);
-        addUsername(Username, history);
+        addUsername(Username, navigate);
     };   
 
     return (

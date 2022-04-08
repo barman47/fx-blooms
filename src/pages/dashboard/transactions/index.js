@@ -15,7 +15,13 @@ import Transaction from './Transaction';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(-3)
+        paddingLeft: theme.spacing(5),
+        paddingRight: theme.spacing(5),
+
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
+        }
     },
 
     filterContainer: {
@@ -28,12 +34,13 @@ const useStyles = makeStyles(theme => ({
             gap: theme.spacing(3),
         }
     },
-
+    
     transactions: {
         display: 'grid',
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(3),
-        marginTop: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        maxWidth: '100%',
     }
 }));
 

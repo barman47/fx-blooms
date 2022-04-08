@@ -111,7 +111,7 @@ const SessionModal = ({ logout }) => {
         sessionStorage.removeItem(LOGOUT);
         setOpen(false);
         logout(navigate, 'Your session expired due to inactivity.');
-    }, [history, logout]);
+    }, [navigate, logout]);
 
     // logout user when time has elapsed
     useEffect(() => {

@@ -133,7 +133,7 @@ const ForgotPassword = (props) => {
                 payload: null
             });
         }
-    }, [dispatch, history, msg]);
+    }, [dispatch, navigate, msg]);
 
     const goHome = () => window.location.href = HOME;;
 

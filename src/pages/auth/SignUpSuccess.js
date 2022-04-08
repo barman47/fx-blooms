@@ -80,7 +80,7 @@ const SignupSuccess = () => {
         if (parseInt(timeTillRedirect) <= 0) {
             navigate(LOGIN);
         }
-    }, [history, timeTillRedirect]);
+    }, [navigate, timeTillRedirect]);
 
     const redirect = () => {
         interval.current = setInterval(() => {

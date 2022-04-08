@@ -15,7 +15,7 @@ import { getNotifications, generateOtp } from '../../../actions/notifications';
 import { SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
-import { ACCOUNT } from '../../../routes';
+import { SECURITY } from '../../../routes';
 
 import Notification from './Notification';
 import BuyerSendEurDrawer from './BuyerSendEurDrawer';
@@ -28,7 +28,6 @@ import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 const useStyles = makeStyles(theme => ({
     root: {
         marginBottom: theme.spacing(8),
-        marginTop: theme.spacing(8),
         paddingLeft: theme.spacing(5),
         paddingRight: theme.spacing(5),
 
@@ -52,7 +51,6 @@ const useStyles = makeStyles(theme => ({
             display: 'grid',
             gridTemplateColumns: '3fr 1fr',
             gap: theme.spacing(3),
-            maxWidth: '100%',
 
             [theme.breakpoints.down('md')]: {
                 display: 'flex',
@@ -62,12 +60,13 @@ const useStyles = makeStyles(theme => ({
             '& aside': {
                 backgroundColor: COLORS.lightTeal,
                 borderRadius: theme.shape.borderRadius,
+                boxSizing: 'border-box',
                 marginTop: theme.spacing(2),
                 padding: theme.spacing(2),
                 alignSelf: 'flex-start',
-
+                
                 [theme.breakpoints.down('md')]: {
-                    width: '100%'
+                    width: '100%',
                 },
 
                 '& h6': {
@@ -349,7 +348,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         window.open(idVerificationLink);
     };
 
-    const setup2FA = () => navigate(ACCOUNT, { mfa: true });
+    const setup2FA = () => navigate(SECURITY, { mfa: true });
 
     const verifyPhone = () => {
         if (phoneNo) {
@@ -362,9 +361,9 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setPhoneNumber(number);
             return setOpen(true);
         }
-        return navigate(ACCOUNT, { verifyPhone: true })
+        return navigate(SECURITY, { verifyPhone: true })
     };
-    // const setPin = () => navigate(`${DASHBOARD}${ACCOUNT}`, { setPin: true });
+    // const setPin = () => navigate(`${DASHBOARD}${SECURITY}`, { setPin: true });
 
     const toggleSellerSendNgnDrawer = () => {
         setSellerSendNgnDrawerOpen(!sellerSendNgnDrawerOpen);

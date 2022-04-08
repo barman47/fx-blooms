@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@material-ui/core';
-import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
+import { Collapse, Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@material-ui/core';
+import Alert from '@material-ui/lab/Alert';
+import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -98,6 +99,7 @@ const AdminLogin = (props) => {
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [open, setOpen] = useState(false);
 
     const toast = useRef();
 
@@ -107,7 +109,7 @@ const AdminLogin = (props) => {
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
-            history.replace(location.pathname, {});
+            navigate.replace(location.pathname, {});
         }
         // eslint-disable-next-line
     }, []);
@@ -147,7 +149,7 @@ const AdminLogin = (props) => {
 
         setErrors({});
         setLoading(true);
-        props.login(data, history);
+        props.login(data, navigate);
     };    
 
     return (
@@ -174,6 +176,27 @@ const AdminLogin = (props) => {
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Complete the form below to sign in
                     </Typography>
+                    {(errors.msg || errors.message) && 
+                        <Collapse in={open}>
+                            <Alert 
+                                severity="error"
+                                action={
+                                    <IconButton 
+                                        color="inherit" 
+                                        size="small"
+                                        onClick={() => {
+                                            setOpen(false);
+                                            dispatch({ type: GET_ERRORS, payload: {} })}
+                                        }
+                                    >
+                                        <Close />
+                                    </IconButton>
+                                }
+                            >
+                                {errors.msg || errors.message}
+                            </Alert>
+                        </Collapse>
+                    }
                     <form onSubmit={handleFormSubmit} className={classes.form} noValidate>
                         <Grid container direction="column">
                             <Grid item xs={12}>

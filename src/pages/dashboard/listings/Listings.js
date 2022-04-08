@@ -213,7 +213,7 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
 
     const handleEditListing = (listing) => {
         setLoading(true);
-        checkListingEditable(listing, history);
+        checkListingEditable(listing, navigate);
     };
 
     const setError = (message) => {

@@ -17,7 +17,7 @@ import {
 
 const api = `${API}/TwoFactor`;
 
-export const authorizeTwoFactor = ({ code, profileId }, history) => async (dispatch) => {
+export const authorizeTwoFactor = ({ code, profileId }, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Authorize?inputCode=${code}&profileId=${profileId}`);
         const token = res.data.data;

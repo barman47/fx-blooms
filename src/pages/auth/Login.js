@@ -131,9 +131,10 @@ const Login = ({ externalLogin, login }) => {
         if (customer.isAuthenticated) {
             return navigate(DASHBOARD_HOME);
         }
+        console.log('location ', location);
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
-            history.replace(location.pathname, {});
+            // navigate(location.pathname, {});
         }
         // eslint-disable-next-line
     }, []);
@@ -155,7 +156,7 @@ const Login = ({ externalLogin, login }) => {
             setLoading(false);
             navigate(VERIFY_2FA, { twoFactorEnabled: true });
         }
-    }, [customer, history, loading]);
+    }, [customer, navigate, loading]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -174,7 +175,7 @@ const Login = ({ externalLogin, login }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history);
+        externalLogin(data, navigate);
     };
 
     const handleFormSubmit = (e) => {
@@ -192,7 +193,7 @@ const Login = ({ externalLogin, login }) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        login(data, history);
+        login(data, navigate);
     };   
 
     return (

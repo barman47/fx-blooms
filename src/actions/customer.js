@@ -51,7 +51,7 @@ import extractIdDetails from '../utils/extractIdDetails';
 
 const api = `${API}/Customer`;
 
-export const createCustomer = (customer, history) => async (dispatch) => {
+export const createCustomer = (customer, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
         setAuthToken(res.data.data.token);
@@ -74,7 +74,7 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, Password } = null) => {
+const handleNextStep = async (res, navigate, dispatch, { Username, EmailAddress, Password } = null) => {
     const { nextStep } = res.data.data;
 
     switch (nextStep) {
@@ -115,7 +115,7 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
     }
 };
 
-export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
+export const registerCustomer = ({ EmailAddress, Username, Password }, navigate) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
@@ -127,7 +127,7 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
                     usernameAvailable: true
                 }
             });
-            return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
+            return handleNextStep(res, navigate, dispatch, { EmailAddress, Username, Password });
         } else {
             return dispatch({
                 type: GET_ERRORS,
@@ -182,7 +182,7 @@ export const getIdVerificationLink = () => async (dispatch) => {
     }
 };
 
-export const login = (data, history) => async (dispatch) => {
+export const login = (data, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Login`, data);
         const {  token } = res.data.data;
@@ -197,7 +197,7 @@ export const login = (data, history) => async (dispatch) => {
     }
 };
 
-export const externalLogin = (data, history) => async (dispatch) => {
+export const externalLogin = (data, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/ExternalLogin`, data);
         const { authResponse, isLinkedToProfile } = res.data.data;
@@ -213,7 +213,7 @@ export const externalLogin = (data, history) => async (dispatch) => {
     }
 };
 
-export const addUsername = (username, history) => async (dispatch) => {
+export const addUsername = (username, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/AddUserName`, { username });
         const {  token } = res.data.data;
@@ -699,7 +699,7 @@ export const approveResidencePermit = (customerId, currentStatus) => async (disp
 export const logout = (navigate, msg) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return navigate(LOGIN, { msg });
+    return navigate(LOGIN, { state: { msg } });
 };
 
 export const subscribeToNewsletter = (email) => async (dispatch) => {

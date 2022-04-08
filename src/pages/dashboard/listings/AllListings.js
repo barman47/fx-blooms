@@ -13,10 +13,8 @@ import {
 	InputAdornment,
 	TextField,
 	Typography,
-	useMediaQuery,
-	// useMediaQuery 
+	useMediaQuery
 } from '@material-ui/core';
-// import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import { Magnify } from 'mdi-material-ui';
@@ -62,14 +60,14 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '1fr 1fr',
 		marginBottom: theme.spacing(2),
-		marginTop: theme.spacing(10),
+		// marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '1fr',
-			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5),
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2),
 			gap: theme.spacing(1)
 		},
 
@@ -77,14 +75,7 @@ const useStyles = makeStyles(theme => ({
 			marginBottom: '0',
 			paddingLeft: theme.spacing(2),
 			paddingRight: theme.spacing(2)
-		},
-
-		// '& div:first-child': {
-		// 	'& p:last-child': {
-		// 		marginTop: theme.spacing(2),
-		// 		color: COLORS.grey
-		// 	}
-		// }
+		}
 	},
 
 	root: {
@@ -200,37 +191,6 @@ const useStyles = makeStyles(theme => ({
 		paddingBottom: theme.spacing(0.7),
 		paddingTop: theme.spacing(0.7)
 	},
-
-	// gateway: {
-	// 	background: 'linear-gradient(238.08deg, #25AEAE -0.48%, #1E6262 99.63%)',
-	// 	boxShadow: '1px 14px 30px -16px rgba(30, 98, 98, 1)',
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	height: 'initial',
-    //     padding: [[theme.spacing(5), 0, 0, theme.spacing(2)]],
-
-	// 	'& div:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'column',
-	// 		justifyContent: 'space-between',
-
-	// 		'& h5': {
-	// 			color: COLORS.offWhite,
-	// 			fontWeight: 600
-	// 		},
-
-	// 		'& p': {
-	// 			color: COLORS.offWhite,
-	// 			marginBottom: theme.spacing(3)
-	// 		},
-	// 	},
-
-	// 	'& img': {
-	// 		width: '35%',
-	// 		alignSelf: 'flex-end'
-	// 	}
-	// },
 	
 	listings: {
 		height: '100vh',
@@ -239,7 +199,9 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: theme.spacing(5),
 
 		[theme.breakpoints.down('md')]: {
-			gridTemplateColumns: '1fr'
+			gridTemplateColumns: '1fr',
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2)
 		},
 
 		[theme.breakpoints.down('sm')]: {
@@ -251,62 +213,6 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		marginTop: theme.spacing(1)
 	},
-
-	// filter: {
-	// 	marginTop: theme.spacing(4)
-	// },
-
-	// filterContainer: {
-	// 	backgroundColor: COLORS.lightTeal,
-	// 	borderRadius: theme.shape.borderRadius,
-	// 	padding: [[theme.spacing(2), theme.spacing(2), theme.spacing(4), theme.spacing(2)]],
-	// 	height: 'initial',
-	// 	alignSelf: 'flex-start',
-	// 	marginTop: theme.spacing(6.5),
-	// 	position: 'sticky',
-
-	// 	[theme.breakpoints.down('md')]: {
-	// 		display: 'none'
-	// 	},
-
-	// 	'& header:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'row',
-	// 		justifyContent: 'space-between',
-	// 		marginBottom: theme.spacing(3),
-	// 		padding: 0,
-	// 	}
-	// },
-
-	// filterButtonContainer: {
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	marginBottom: theme.spacing(3),
-	// 	padding: 0,
-	// },
-
-	// clear: {
-	// 	cursor: 'pointer',
-	// 	'&:hover': {
-	// 		textDecoration: 'underline'
-	// 	}
-	// },
-
-	// filterButton: {
-	// 	'&:hover': {
-	// 		textDecoration: 'none !important'
-	// 	}
-	// },
-
-	// label: {
-	// 	fontSize: theme.spacing(1.5)
-	// },
-
-	// disabledButton: {
-	// 	backgroundColor: '#d8dcdc',
-	// 	color: '#aoa3a3'
-	// },
 
 	buyerPopup: {
 		display: 'inline-block',

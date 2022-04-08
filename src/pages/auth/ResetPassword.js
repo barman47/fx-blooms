@@ -164,7 +164,7 @@ const ResetPassword = (props) => {
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
-    }, [dispatch, history, msg]);
+    }, [dispatch, msg]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);

@@ -39,13 +39,12 @@ import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
-        padding: theme.spacing(4, 2, 2, 2),
+        padding: theme.spacing(0, 2, 2, 2),
         
         '& header': {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(5),
             
             [theme.breakpoints.down('sm')]: {
                 flexDirection: 'column'

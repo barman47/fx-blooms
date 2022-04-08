@@ -17,10 +17,12 @@ import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        marginTop: theme.spacing(-2),
+        paddingLeft: theme.spacing(5),
+        paddingRight: theme.spacing(5),
 
         [theme.breakpoints.down('sm')]: {
-            marginTop: theme.spacing(-4),
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
         }
     },
 

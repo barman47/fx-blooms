@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
         paddingBottom: theme.spacing(1),
         paddingTop: theme.spacing(1),
         transition: '0.3s linear all',
-        width: '15%',
+        // width: '15%',
 
         [theme.breakpoints.down('sm')]: {
             width: '100%'

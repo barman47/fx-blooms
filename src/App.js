@@ -21,7 +21,6 @@ import {
 	DASHBOARD_HOME, 
 	DISCLAIMER,
 	USER_DETAILS,
-	ACCOUNT,
 	FORGOT_PASSWORD,
 	RESET_PASSWORD,
 	TERMS,
@@ -35,7 +34,11 @@ import {
 	ADD_USERNAME,
 	LISTINGS,
 	EDIT_LISTING,
-	TRANSACTION_STATUS
+	TRANSACTIONS,
+	TRANSACTION_STATUS,
+	BANK_ACCOUNTS,
+	SECURITY,
+	PROFILE
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -77,9 +80,14 @@ const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'))
 
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
+const Security = lazy(() => import('./pages/dashboard/security'));
+
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
 const TransactionStatus = lazy(() => import('./pages/dashboard/transactions/TransactionStatus'));
+const Transactions = lazy(() => import('./pages/dashboard/transactions'));
+
+const BankAccounts = lazy(() => import('./pages/dashboard/bankAccount'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
 
@@ -178,8 +186,11 @@ const App = () => {
 								<Route path={`${EDIT_LISTING}`} element={<EditListing handleSetTitle={handleSetTitle} />} />
 								<Route path={`${MAKE_LISTING}`} element={<MakeListing handleSetTitle={handleSetTitle} />} />
 								<Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle} />} />
-								<Route path={`${ACCOUNT}`} element={<Profile handleSetTitle={handleSetTitle} />} />
+								<Route path={`${PROFILE}`} element={<Profile handleSetTitle={handleSetTitle} />} />
+								<Route path={`${SECURITY}`} element={<Security handleSetTitle={handleSetTitle} />} />
+								<Route path={`${BANK_ACCOUNTS}`} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
 								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
+								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
 							</Route>

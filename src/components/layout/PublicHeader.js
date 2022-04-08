@@ -5,16 +5,13 @@ import {
     AppBar, 
     Button, 
     IconButton, 
-    Slide, 
-    Toolbar, 
-    useScrollTrigger 
+    Toolbar
 } from '@material-ui/core';
 import clsx from 'clsx';
 
 import { Link as AnimatedLink } from 'react-scroll';
 import { Menu as MenuIcon } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 
 import MobileNav from './MobileNav';
 
@@ -24,26 +21,7 @@ import { COLORS, SHADOW } from '../../utils/constants';
 import { ABOUT_US, CONTACT_US, HOW_IT_WORKS, SIGN_UP, LOGIN, FAQS, DASHBOARD_HOME } from '../../routes';
 import { useTheme } from '@material-ui/styles';
 
-export const HideOnScroll = (props) => {
-    const { children, direction } = props;
-    const trigger = useScrollTrigger();
-
-    return (
-        <Slide appear={false} direction={direction} in={!trigger}>
-            {children}
-        </Slide>
-    );
-}
-
-HideOnScroll.defaultProps = {
-    direction: 'down'
-};
-
-HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    direction: PropTypes.string
-
-};
+import HideOnScroll from './HideOnScroll';
 
 const useStyles = makeStyles(theme => ({
     root: {

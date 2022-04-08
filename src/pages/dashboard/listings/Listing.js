@@ -13,7 +13,7 @@ import formatNumber from '../../../utils/formatNumber';
 // import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import { REMOVE_EXPIRED_LISTING, SET_LISTING } from '../../../actions/types';
 import { BID_STATUS, COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { ACCOUNT, USER_DETAILS } from '../../../routes';
+import { PROFILE, USER_DETAILS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -176,7 +176,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
             getSeller(sellerId);
             return navigate(`${USER_DETAILS}/${sellerId}`, { sellerId });
         }
-        return navigate(ACCOUNT);
+        return navigate(PROFILE);
     };
 
     const handleDeleteListing = () => {

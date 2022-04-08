@@ -112,8 +112,8 @@ const SessionModal = ({ logout }) => {
     const handleLogin = useCallback(() => {
         sessionStorage.removeItem(LOGOUT);
         setOpen(false);
-        logout(navigate);
-    }, [history, logout]);
+        logout(navigate, 'Your session expired');
+    }, [navigate, logout]);
 
     // logout user when time has elapsed
     useEffect(() => {
