@@ -150,7 +150,7 @@ const useStyles = makeStyles(theme => ({
 		marginBottom: theme.spacing(1),
 		marginTop: theme.spacing(1),
 
-		[theme.breakpoints.down('sm')]: {
+		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '0.7fr 1fr 1fr',
 			rowGap: theme.spacing(0.8),
@@ -181,9 +181,9 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	buttonGroup: {
+	filterLabel: {
 		[theme.breakpoints.down('sm')]: {
-			marginBottom: theme.spacing(1)
+			gridColumn: '1 / span 2'
 		}
 	},
 
@@ -564,7 +564,7 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation className={classes.buttonGroup}>
+							<ButtonGroup disableElevation>
 								<Button
 									color="primary"
 									size="small"
@@ -594,14 +594,14 @@ const AllListings = (props) => {
 									onChange={(e) => handleSetAmount(e.target.value)}
 									type="text"
 									variant="outlined" 
-									placeholder="Enter Amount"
+									placeholder={matches ? `${requiredCurrency} Amount` : 'Enter Amount'}
 									helperText={errors.Amount}
 									fullWidth
 									required
 									error={errors.Amount ? true : false}
 									disabled={listingsLoading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
+										startAdornment: !matches && <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
 											{matches ? 
 												<IconButton
@@ -633,6 +633,7 @@ const AllListings = (props) => {
 								/>
 							</form>
 							<FormControlLabel
+								className={classes.filterLabel}
 								style={{ color: theme.palette.primary.main }}
 								control={
 									<Checkbox

@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+import PropTypes from 'prop-types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -309,6 +310,10 @@ const TransactionStatus = ({ handleSetTitle }) => {
             </Box>
         </>
     );
+};
+
+TransactionStatus.propTypes = {
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default TransactionStatus;

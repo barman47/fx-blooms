@@ -39,7 +39,6 @@ import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
-        padding: theme.spacing(0, 2, 2, 2),
         
         '& header': {
             display: 'flex',
@@ -51,8 +50,7 @@ const useStyles = makeStyles(theme => ({
             },
             
             '& h6': {
-                fontWeight: 600,
-                // marginTop: theme.spacing(2),
+                fontWeight: 600
             },
 
             '& p': {

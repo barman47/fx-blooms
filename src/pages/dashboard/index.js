@@ -111,6 +111,7 @@ const useStyles = makeStyles((theme) => ({
         }),
 
         [theme.breakpoints.down('md')]: {
+            marginBottom: theme.spacing(3),
             marginLeft: '0 !important',
             height: '100vh !important',
             width: '100% !important'
@@ -653,7 +654,7 @@ const Dashboard = (props) => {
                 />
             }
             <Toaster />
-            <HideOnScroll direction="up" {...props}>
+            {/* <HideOnScroll direction="down" {...props}> */}
                 <AppBar position="fixed" elevation={1} className={classes.appBar}>
                     <Toolbar className={classes.appBarContent}>
                         <IconButton onClick={toggleDrawer}>
@@ -663,7 +664,7 @@ const Dashboard = (props) => {
                         <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
                     </Toolbar>
                 </AppBar>
-            </HideOnScroll>
+            {/* </HideOnScroll> */}
             <Box component="section" className={classes.root}>
                 <Drawer 
                     variant={matches ? 'temporary' : 'permanent'}
@@ -727,7 +728,7 @@ const Dashboard = (props) => {
                                     className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(PROFILE) })} 
                                     button 
                                     disableRipple
-                                    onClick={() => navigate(PROFILE)}
+                                    onClick={() => handleLinkClick(PROFILE)}
                                 >
                                     <ListItemIcon className={classes.icon}>
                                         <AccountOutline />
@@ -769,6 +770,7 @@ const Dashboard = (props) => {
                 >
                     <BottomNavigation
                         value={value}
+                        showLabels
                         onChange={(event, newValue) => {
                             setValue(newValue)
                         }}
@@ -777,13 +779,21 @@ const Dashboard = (props) => {
                             <BottomNavigationAction 
                                 onClick={() => handleLinkClick(item.url)} 
                                 key={index} 
+                                showLabels
                                 // label={location.pathname.includes(item.url) && item.text}
                                 label={item.text} 
-                                value={item.text} 
+                                // value={item.text} 
                                 icon={item.icon} 
                                 classes={{ label: classes.label, selected: classes.label }}
                             />
                         ))}
+                        <BottomNavigationAction 
+                            onClick={toggleDrawer} 
+                            label="More" 
+                            // value={3} 
+                            icon={<Menu />} 
+                            classes={{ label: classes.label, selected: classes.label }}
+                        />
                     </BottomNavigation>
                 </Box>
             </HideOnScroll>

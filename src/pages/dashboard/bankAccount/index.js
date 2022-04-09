@@ -64,7 +64,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccounts = ({ deleteAccount }) => {
+const BankAccounts = ({ deleteAccount, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -77,6 +77,11 @@ const BankAccounts = ({ deleteAccount }) => {
 
     const successModalRef = useRef();
     const toast = useRef();
+
+    useEffect(() => {
+        handleSetTitle('Bank Accounts');
+        // eslint-disable-next-line
+    }, []);
     
     const toggleEditAccountDrawer = useCallback(() => {
         setEditAccount(!editAccount)
@@ -187,7 +192,8 @@ const BankAccounts = ({ deleteAccount }) => {
 }
 
 BankAccounts.propTypes = {
-    deleteAccount: PropTypes.func
+    deleteAccount: PropTypes.func,
+    handleSetTitle: PropTypes.func
 };
 
 export default connect( undefined, { deleteAccount })(BankAccounts);

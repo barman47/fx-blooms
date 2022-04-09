@@ -26,13 +26,13 @@ const useStyles = makeStyles(theme => ({
         // gridTemplateColumns: 'repeat(6, 1fr)',
         padding: theme.spacing(2),
 
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: 'repeat(3, 1fr)',
         },
 
-        '& div': {
-            // border: '1px solid red'
+        [theme.breakpoints.down('sm')]: {
+            gridTemplateColumns: '1fr 1fr'
         }
     },
 

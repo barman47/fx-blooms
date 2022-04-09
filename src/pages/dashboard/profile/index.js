@@ -165,7 +165,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile, verifyIdentity }) => {
+const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile, verifyIdentity, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { isPhoneNumberVerified, msg, profile, stats } = useSelector(state => state.customer); 
@@ -197,6 +197,11 @@ const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updatePr
     const successModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
+
+    useEffect(() => {
+        handleSetTitle('Profile');
+        // eslint-disable-next-line
+    }, []);
 
     useEffect(() => {
         if (profile) {
@@ -634,7 +639,8 @@ Profile.propTypes = {
     generateOtp: PropTypes.func.isRequired,
     setHidePhoneNumber: PropTypes.func.isRequired,
     setShowPhoneNumber: PropTypes.func.isRequired,
-    updateProfile: PropTypes.func.isRequired
+    updateProfile: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default connect( undefined, { generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile } )(Profile);

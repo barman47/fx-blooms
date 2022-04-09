@@ -102,7 +102,7 @@ const IOSSwitch = withStyles((theme) => ({
     );
 });
 
-const Transactions = ({ getCurrencies, getTransactions }) => {
+const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -116,6 +116,7 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        handleSetTitle('Transactions');
         dispatch({
             type: SET_TRANSACTION,
             payload: {}
@@ -195,6 +196,7 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
 Transactions.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
     getTransactions: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getCurrencies, getTransactions })(Transactions);
