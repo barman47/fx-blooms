@@ -3,6 +3,7 @@ import { Helmet } from 'react-helmet';
 import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { 
+    AppBar,
     Avatar,
     Drawer, 
     Divider,
@@ -10,12 +11,15 @@ import {
     List, 
     ListItem, 
     ListItemIcon, 
-    ListItemText, 
+    ListItemText,
+    Toolbar,
     Tooltip, 
-    Typography
+    Typography,
+    useMediaQuery,
+    useTheme
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ArrowLeftRight, ChevronLeft, ChevronRight } from 'mdi-material-ui';
+import { ArrowLeftRight, ChevronLeft, ChevronRight, Menu } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
 import _ from 'lodash';
@@ -61,27 +65,35 @@ import logo from '../../assets/img/logo.svg';
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles((theme) => ({
-    // root: {
-    //     display: 'flex',
-    //     flexDirection: 'row',
-    //     flexGrow: 1,
+    appBar: {
+        backgroundColor: COLORS.white,
+        display: 'none',
 
-    //     [theme.breakpoints.down('md')]: {
-    //         marginBottom: theme.spacing(8)
-    //     },
+        [theme.breakpoints.down('md')]: {
+            display: 'block'
+        }
+    },
+    
+    appBarContent: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+    },
 
-    //     [theme.breakpoints.down('sm')]: {
-    //         marginBottom: theme.spacing(5)
-    //     }
-    // },
+    title: {
+        color: COLORS.offBlack,
+        fontWeight: 600
+    },
 
     root: {
         [theme.breakpoints.down('md')]: {
+            marginTop: theme.spacing(10),
             paddingLeft: theme.spacing(5),
             paddingRight: theme.spacing(5),
         },
 
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('sm')]: {
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
         }
@@ -118,9 +130,9 @@ const useStyles = makeStyles((theme) => ({
         whiteSpace: 'nowrap',
         width: drawerWidth,
         
-        [theme.breakpoints.down('md')]: {
-            display: 'none'
-        }
+        // [theme.breakpoints.down('md')]: {
+        //     display: 'none'
+        // }
     },
     
     paper: {
@@ -269,6 +281,9 @@ const Dashboard = (props) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
+    const theme = useTheme();
+
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
@@ -282,7 +297,7 @@ const Dashboard = (props) => {
     const [toastTitle, setToastTitle] = useState('');
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
-    const [open, setOpen] = useState(true);
+    const [open, setOpen] = useState(false);
     
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
@@ -314,6 +329,13 @@ const Dashboard = (props) => {
     const transactionCompleteModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
+
+    useEffect(() => {
+        if (matches) {
+            setOpen(false);
+        }
+        // eslint-disable-next-line
+    }, []);
 
     // Set pathname when ever the location changes, for active link feature
     useEffect(() => {
@@ -436,7 +458,6 @@ const Dashboard = (props) => {
             // navigator.vibrate(500);
         }
     };
-
 
     const onReconnected = () => {
         SignalRService.onReconnected();
@@ -600,6 +621,11 @@ const Dashboard = (props) => {
 
     const handleLinkClick = (link) => {
         navigate(link);
+        if (matches && open) {
+            setTimeout(() => {
+                setOpen(false);
+            }, 1000);
+        }
     };
 
     const dismissAction = () => {
@@ -627,9 +653,20 @@ const Dashboard = (props) => {
                 />
             }
             <Toaster />
+            <HideOnScroll direction="up" {...props}>
+                <AppBar position="fixed" elevation={1} className={classes.appBar}>
+                    <Toolbar className={classes.appBarContent}>
+                        <IconButton onClick={toggleDrawer}>
+                            <Menu />
+                        </IconButton>
+                        <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
+                        <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
+                    </Toolbar>
+                </AppBar>
+            </HideOnScroll>
             <Box component="section" className={classes.root}>
                 <Drawer 
-                    variant="permanent"
+                    variant={matches ? 'temporary' : 'permanent'}
                     className={clsx(classes.drawer, {
                         [classes.drawerOpen]: open,
                         [classes.drawerClose]: !open
@@ -640,6 +677,8 @@ const Dashboard = (props) => {
                             [classes.drawerClose]: !open,
                         }),
                     }}
+                    open={open}
+                    onClose={toggleDrawer}
                 >
                     <div className={clsx(classes.toolbar, {[classes.collapsedToolbar]: !open})}>
                         {open && 

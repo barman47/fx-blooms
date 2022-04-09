@@ -131,7 +131,6 @@ const Login = ({ externalLogin, login }) => {
         if (customer.isAuthenticated) {
             return navigate(DASHBOARD_HOME);
         }
-        console.log('location ', location);
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
             // navigate(location.pathname, {});
