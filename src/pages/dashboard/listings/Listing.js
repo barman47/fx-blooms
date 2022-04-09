@@ -15,6 +15,9 @@ import { REMOVE_EXPIRED_LISTING, SET_LISTING } from '../../../actions/types';
 import { BID_STATUS, COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { PROFILE, USER_DETAILS } from '../../../routes';
 
+import eurLogo from '../../../assets/img/eur-logo.svg';
+import ngnLogo from '../../../assets/img/ngn-logo.svg';
+
 const useStyles = makeStyles(theme => ({
 	root: {
         backgroundColor: COLORS.white,
@@ -22,16 +25,30 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
         display: 'grid',
-        gridTemplateColumns: '1fr',
         marginBottom: theme.spacing(3),
+        gridTemplateColumns: '1fr',
         overflow: 'hidden',
 
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            // justifyContent: 'space-between',
             alignItems: 'center',
             padding: [[theme.spacing(1.5), theme.spacing(3)]],
+
+            '& div:nth-child(2)': {
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginLeft: theme.spacing(2),
+                width: '100%',
+
+                [theme.breakpoints.down('sm')]: {
+                    flexDirection: 'column',
+                    alignItems: 'flex-start'
+                },
+            },
             
             [theme.breakpoints.down('sm')]: {
                 rowGap: theme.spacing(2),
@@ -67,12 +84,14 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
         gap: theme.spacing(1),
-        padding: [[theme.spacing(4), theme.spacing(3)]],
+        padding: [[theme.spacing(2), theme.spacing(4), theme.spacing(2), theme.spacing(8)]],
+        // padding: [[theme.spacing(4), theme.spacing(3)]],
 
         [theme.breakpoints.down('lg')]: {
             gridTemplateColumns: 'repeat(5, 1fr)',
             gap: theme.spacing(1),
-            padding: [[theme.spacing(3), theme.spacing(3)]]
+            // padding: [[theme.spacing(4), theme.spacing(4), theme.spacing(4), theme.spacing(8)]],
+            // padding: [[theme.spacing(3), theme.spacing(3)]]
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -222,19 +241,27 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     return (
         <>
             <section className={classes.root}>
+                
                 <header>
-                    <Typography variant="body2" component="p">
-                        Listed by:&nbsp;
-                        <RouterLink 
-                            to={USER_DETAILS} 
-                            onClick={(e) =>handleSetCustomer(e, customerId)}
-                            >
-                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy?.toLowerCase()}</span>
-                        </RouterLink>
-                    </Typography>
-                    <section className={classes.timestamp}>
-                        <Typography variant="subtitle2" component="span">Expires in: &nbsp;&nbsp;&nbsp;<span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{timerHours}:{timerMinutes}:{timerSeconds}</span></Typography>
-                    </section>
+                    {listing.amountAvailable.currencyType === 'EUR' ? 
+                        <img src={eurLogo} alt="EUR" />
+                        : 
+                        <img src={ngnLogo} alt="NGN" />
+                    }
+                    <Box component="div">
+                        <Typography variant="body2" component="p">
+                            Listed by:&nbsp;
+                            <RouterLink 
+                                to={USER_DETAILS} 
+                                onClick={(e) =>handleSetCustomer(e, customerId)}
+                                >
+                                    <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy?.toLowerCase()}</span>
+                            </RouterLink>
+                        </Typography>
+                        <section className={classes.timestamp}>
+                            <Typography variant="subtitle2" component="span">Expires in: &nbsp;&nbsp;&nbsp;<span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{timerHours}:{timerMinutes}:{timerSeconds}</span></Typography>
+                        </section>
+                    </Box>
                     {/* <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography> */}
                 </header>
                 <Box component="div" className={classes.listingContent}>

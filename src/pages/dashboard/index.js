@@ -298,7 +298,7 @@ const Dashboard = (props) => {
     const [toastTitle, setToastTitle] = useState('');
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
     
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
@@ -333,10 +333,11 @@ const Dashboard = (props) => {
 
     useEffect(() => {
         if (matches) {
+            console.log('small screen');
             setOpen(false);
         }
         // eslint-disable-next-line
-    }, []);
+    }, [matches]);
 
     // Set pathname when ever the location changes, for active link feature
     useEffect(() => {
@@ -712,9 +713,18 @@ const Dashboard = (props) => {
                                         onClick={() => handleLinkClick(link.url)}
                                         // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
                                     >
-                                        <ListItemIcon className={classes.icon}>
-                                            {link.icon}
-                                        </ListItemIcon>
+                                        {open ? 
+                                            <ListItemIcon className={classes.icon}>
+                                                {link.icon}
+                                            </ListItemIcon>
+                                            :
+                                            <Tooltip title={link.text}>
+                                                <ListItemIcon className={classes.icon}>
+                                                    {link.icon}
+                                                </ListItemIcon>
+                                            </Tooltip>
+                                        }
+                                        
                                         {open && <ListItemText primary={link.text} />}
                                     </ListItem>
                                     <Divider />
@@ -761,7 +771,6 @@ const Dashboard = (props) => {
                 <div className={clsx(classes.content, { [classes.contentShift]: open })}>
                     <Outlet />
                 </div>
-                
             </Box>
             <HideOnScroll direction="up" {...props}>
                 <Box
