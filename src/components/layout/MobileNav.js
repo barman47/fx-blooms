@@ -129,7 +129,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                     {homeRoutes.map(({ icon, text, url }, index) => {
                         if (location.pathname === '/') {
                             return (
-                                <ListItemLink button divider key={index}>
+                                <ListItemLink button divider to="#!" key={index}>
                                     <ListItemIcon>
                                         {icon}
                                     </ListItemIcon>

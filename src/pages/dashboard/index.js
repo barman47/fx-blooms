@@ -303,12 +303,7 @@ const Dashboard = (props) => {
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        // { url: WALLET, text:'Wallets', icon: <Wallet /> },
-        { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
-        // { url: NOTIFICATIONS, text:'Bank Accounts', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
-        // { url: SECURITY, text:'Security', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
-        // { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
-        // // { url: ACCOUNT, text:'Account', icon: <Account /> }
+        { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
     ];
 
     const protectedRoutes = [
@@ -318,8 +313,7 @@ const Dashboard = (props) => {
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
-        // { url: ACCOUNT, text:'Account', icon: <Account /> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
     ];
 
     const { title, logout } = props;
@@ -333,7 +327,6 @@ const Dashboard = (props) => {
 
     useEffect(() => {
         if (matches) {
-            console.log('small screen');
             setOpen(false);
         }
         // eslint-disable-next-line
@@ -493,7 +486,7 @@ const Dashboard = (props) => {
                 const buyer = payload.Data.Buyer;
                 const seller =payload.Data.Seller;
                 const notification = {
-                    dateLogged: payload.dateLogged,
+                    dateLogged: payload.DateLogged,
                     eventType: payload.EventType,
                     customerId: payload.CustomerId,
                     isDeleted: payload.IsDeleted,
@@ -718,7 +711,7 @@ const Dashboard = (props) => {
                                                 {link.icon}
                                             </ListItemIcon>
                                             :
-                                            <Tooltip title={link.text}>
+                                            <Tooltip title={link.text} placement="right" arrow>
                                                 <ListItemIcon className={classes.icon}>
                                                     {link.icon}
                                                 </ListItemIcon>

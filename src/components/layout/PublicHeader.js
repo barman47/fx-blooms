@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
@@ -160,9 +160,9 @@ export const PublicHeader = (props) => {
     
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
-    const [open] = useState(false);
-    const anchorRef = useRef(null);
-    const prevOpen = useRef(open);
+    // const [open] = useState(false);
+    // const anchorRef = useRef(null);
+    // const prevOpen = useRef(open);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
@@ -177,12 +177,12 @@ export const PublicHeader = (props) => {
     ];
 
     // return focus to the button when we transitioned from !open -> open
-    useEffect(() => {
-        if (prevOpen.current === true && open === false) {
-            anchorRef.current.focus();
-        }
-        prevOpen.current = open;
-    }, [open]);
+    // useEffect(() => {
+    //     if (prevOpen.current === true && open === false) {
+    //         anchorRef.current.focus();
+    //     }
+    //     prevOpen.current = open;
+    // }, [open]);
 
     const handleScroll = () => {
         const position = window.pageYOffset;
