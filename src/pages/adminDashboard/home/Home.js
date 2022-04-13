@@ -41,8 +41,8 @@ const useStyles = makeStyles((theme) => ({
 
     content: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: theme.spacing(5)
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: theme.spacing(10)
     },
 
     stats: {
@@ -73,14 +73,16 @@ const useStyles = makeStyles((theme) => ({
     },
 
     contentItem: {
-        border: `2px solid ${theme.palette.primary.main}`,
+        border: 'none',
         borderRadius: theme.shape.borderRadius,
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
-        height: theme.spacing(30),
-        padding: theme.spacing(2)
+        height: theme.spacing(15),
+        padding: theme.spacing(2),
+        boxShadow: '1px 1px white',
+        backgroundColor: '#FFFFFF'
     },
     
     disabled: {
@@ -502,6 +504,152 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     return (
         <>
             <Grid container direction="row" spacing={3} className={classes.root}>
+                <Grid item xs={12} className={classes.content}>
+                    <Box component="div" className={classes.contentItem} onClick={gotoCustomersPage}>
+                        <Box component="div" className={classes.dropDownContainer}>
+                            <Typography variant="subtitle2" component="span" color="primary">Users</Typography>
+                            <FormControl 
+                                variant="outlined"
+                            >
+                                <Select
+                                    value={usersFilter}
+                                    onChange={(e) => setUsersFilter(e.target.value)}
+                                    displayEmpty
+                                    classes={{ select: classes.select }}
+                                    inputProps={{ 'aria-label': 'Filter' }}
+                                    name="usersFilter"
+                                    disabled={loadingCustomerCount}
+                                >
+                                    <MenuItem value="" disabled>Select Users Filter</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
+                                </Select>
+                                {/* <FormHelperText>Select Users Filter</FormHelperText> */}
+                            </FormControl>
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingCustomerCount ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    formatNumber(users)
+                                }
+                            </Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem}>
+                        <Typography variant="subtitle2" component="span" color="primary">Active Users</Typography>
+                        <Typography variant="h5" color="primary" className={classes.statsHeader}>200,000 (95%)</Typography>
+                    </Box>
+                    
+                    <Box component="div" className={classes.contentItem} onClick={gotoListingsPage}>
+                        <Box component="div" className={classes.dropDownContainer}>
+                            <Typography variant="subtitle2" component="span" color="primary">Listings</Typography>
+                            <FormControl 
+                                variant="outlined"
+                            >
+                                <Select
+                                    value={listingFilter}
+                                    onChange={(e) => setListingFilter(e.target.value)}
+                                    displayEmpty
+                                    classes={{ select: classes.select }}
+                                    inputProps={{ 'aria-label': 'Select Listing Filter' }}
+                                    name="listingFilter"
+                                    disabled={loadingListingCount}
+                                >
+                                    <MenuItem value="" disabled>Select Listing Filter</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
+                                </Select>
+                                {/* <FormHelperText>Select Listing Filter</FormHelperText> */}
+                            </FormControl>
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingListingCount ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    formatNumber(listings)
+                                }
+                            </Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                    <Box component="div" className={classes.contentItem} >
+                        <Box component="div" className={classes.dropDownContainer}>
+                            <Typography variant="subtitle2" component="span" color="primary">Volume</Typography>
+                            <FormControl 
+                                variant="outlined"
+                            >
+                                <Select
+                                    value={volumeFilter}
+                                    onChange={(e) => setVolumeFilter(e.target.value)}
+                                    displayEmpty
+                                    classes={{ select: classes.select }}
+                                    inputProps={{ 'aria-label': 'Select Volume Filter' }}
+                                    name="volumeFilter"
+                                    disabled={loadingTransactionVolume}
+                                >
+                                    <MenuItem value="" disabled>Select Volume Filter</MenuItem>
+                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
+                                        <MenuItem key={index} value={value}>{value}</MenuItem>
+                                    ))}
+                                </Select>
+                                {/* <FormHelperText>Select Volume Filter</FormHelperText> */}
+                            </FormControl>
+                        </Box>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
+                                {loadingTransactionVolume ? 
+                                    <Box component="div" className={classes.filterLoaderContainer}>
+                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
+                                        <CircularProgress
+                                            variant="indeterminate"
+                                            disableShrink
+                                            className={classes.top}
+                                            classes={{
+                                                circle: classes.circle,
+                                            }}
+                                            size={40}
+                                            thickness={4}
+                                        />
+                                    </Box>
+                                    : 
+                                    `EUR ${formatNumber(volume)}`
+                                }
+                            </Typography>
+                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
+                        </Box>
+                    </Box>
+                </Grid>
+
                 <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.userAcquisitions}>
                         <Typography variant="subtitle2" component="span" color="primary">Listings Breakdown</Typography>
@@ -574,57 +722,8 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                             {/* </Paper> */}
                     </Box>
                 </Grid>
-                <Grid item xs={12} className={classes.content}>
-                    <Box component="div" className={classes.contentItem} onClick={gotoCustomersPage}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Users</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={usersFilter}
-                                    onChange={(e) => setUsersFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Users Filter' }}
-                                    name="usersFilter"
-                                    disabled={loadingCustomerCount}
-                                >
-                                    <MenuItem value="" disabled>Select Users Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Users Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingCustomerCount ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    formatNumber(users)
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem}>
-                        <Typography variant="subtitle2" component="span" color="primary">Active Users</Typography>
-                        <Typography variant="h5" color="primary" className={classes.statsHeader}>200,000 (95%)</Typography>
-                    </Box>
+
+                <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.contentItem}>
                         <Typography variant="subtitle2" component="span" color="primary">Support Board</Typography>
                         <Box component="div">
@@ -632,107 +731,15 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                             
                         </Box>
                     </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }} onClick={gotoListingsPage}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Listings</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={listingFilter}
-                                    onChange={(e) => setListingFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Listing Filter' }}
-                                    name="listingFilter"
-                                    disabled={loadingListingCount}
-                                >
-                                    <MenuItem value="" disabled>Select Listing Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Listing Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingListingCount ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    formatNumber(listings)
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Volume</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={volumeFilter}
-                                    onChange={(e) => setVolumeFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Volume Filter' }}
-                                    name="volumeFilter"
-                                    disabled={loadingTransactionVolume}
-                                >
-                                    <MenuItem value="" disabled>Select Volume Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Volume Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingTransactionVolume ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    `EUR ${formatNumber(volume)}`
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
+
                     <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
                         <Typography variant="subtitle2" component="span" color="primary">AML Board</Typography>
                         <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
-                            
-                            
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>       
                         </Box>
-                    </Box>
+                    </Box>      
                 </Grid>
+                
                 <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.userActivities}>
                         <Typography variant="subtitle2" component="span" color="primary">User Activities</Typography>

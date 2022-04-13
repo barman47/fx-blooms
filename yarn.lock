@@ -2335,6 +2335,19 @@
     "@typescript-eslint/types" "4.15.2"
     "eslint-visitor-keys" "^2.0.0"
 
+"@veriff/incontext-sdk@^1.3.1":
+  "integrity" "sha512-n59bTwrKVKNYoxI5ZhOrncQexWtKsc3MBvUSEsuG6XuXE1VIXbKG4z3PfU8ZTVHf3WarFpKrsfwMTWkBVPJSAg=="
+  "resolved" "https://registry.npmjs.org/@veriff/incontext-sdk/-/incontext-sdk-1.3.1.tgz"
+  "version" "1.3.1"
+  dependencies:
+    "dom-focus-lock" "^1.0.4"
+    "tua-body-scroll-lock" "1.0.0"
+
+"@veriff/js-sdk@^1.2.3":
+  "integrity" "sha512-ikCqUCr0V3DnA2dM7nmsE/KKgixCW4osQDGGim4k2WcxiN5G/xgRH16kB5VQcggKDaugYO0zQetLRUR33KfpFA=="
+  "resolved" "https://registry.npmjs.org/@veriff/js-sdk/-/js-sdk-1.2.3.tgz"
+  "version" "1.2.3"
+
 "@webassemblyjs/ast@1.9.0":
   "integrity" "sha512-C6wW5L+b7ogSDVqymbkkvuW9kruN//YisMED04xzeBBqjHa2FYnmvOlS6Xj68xWQRgWvI9cIglsjFowH/RJyEA=="
   "resolved" "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.9.0.tgz"
@@ -3506,9 +3519,9 @@
     "lodash.uniq" "^4.5.0"
 
 "caniuse-lite@^1.0.0", "caniuse-lite@^1.0.30000981", "caniuse-lite@^1.0.30001109", "caniuse-lite@^1.0.30001125", "caniuse-lite@^1.0.30001181":
-  "integrity" "sha512-HOe1r+9VkU4TFmnU70z+r7OLmtR+/chB1rdcJUeQlAinjEeb0cKL20tlAtOagNZhbrtLnCvV19B4FmF1rgzl6A=="
-  "resolved" "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001251.tgz"
-  "version" "1.0.30001251"
+  "integrity" "sha512-Ue55jHkR/s4r00FLNiX+hGMMuwml/QGqqzVeMQ5thUewznU2EdULFvI3JR7JJid6OrjJNfFvHY2G2dIjmRaDDQ=="
+  "resolved" "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001328.tgz"
+  "version" "1.0.30001328"
 
 "capture-exit@^2.0.0":
   "integrity" "sha512-PiT/hQmTonHhl/HFGN+Lx3JJUznrVYJ3+AQsnthneZbvW7x+f08Tk7yLJTLEOUvBTbduLeeBkxEaYXUOUrRq6g=="
@@ -4728,6 +4741,13 @@
   dependencies:
     "utila" "~0.4"
 
+"dom-focus-lock@^1.0.4":
+  "integrity" "sha512-Tiz2EYedB14UW0/lY5PEzFAie66e9itoEVKhz0M9xz1cHqP4Jd0XUg/AT2m6DtbhCFa9DHo6nQyePuLH7Mx9+A=="
+  "resolved" "https://registry.npmjs.org/dom-focus-lock/-/dom-focus-lock-1.0.4.tgz"
+  "version" "1.0.4"
+  dependencies:
+    "focus-lock" "^0.6.2"
+
 "dom-helpers@^5.0.1":
   "integrity" "sha512-nRCa7CK3VTrM2NmGkIy4cbK7IZlgBE/PYMn55rrXefr5xXDP0LdtfPnblFDoVdcAfslJ7or6iqAUnx0CCGIWQA=="
   "resolved" "https://registry.npmjs.org/dom-helpers/-/dom-helpers-5.2.1.tgz"
@@ -5689,6 +5709,11 @@
   dependencies:
     "inherits" "^2.0.3"
     "readable-stream" "^2.3.6"
+
+"focus-lock@^0.6.2":
+  "integrity" "sha512-vkHTluRCoq9FcsrldC0ulQHiyBYgVJB2CX53I8r0nTC6KnEij7Of0jpBspjt3/CuNb6fyoj3aOh9J2HgQUM0og=="
+  "resolved" "https://registry.npmjs.org/focus-lock/-/focus-lock-0.6.8.tgz"
+  "version" "0.6.8"
 
 "follow-redirects@^1.0.0", "follow-redirects@^1.10.0":
   "integrity" "sha512-HWqDgT7ZEkqRzBvc2s64vSZ/hfOceEol3ac/7tKwzuvEyWx3/4UegXh5oBOIotkGsObyk3xznnSRVADBgWSQVg=="
@@ -9907,24 +9932,17 @@
     "object-assign" "^4.1.1"
     "scheduler" "^0.20.2"
 
-<<<<<<< HEAD
+"react-error-boundary@^3.1.4":
+  "integrity" "sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA=="
+  "resolved" "https://registry.npmjs.org/react-error-boundary/-/react-error-boundary-3.1.4.tgz"
+  "version" "3.1.4"
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+
 "react-error-overlay@^6.0.9":
   "integrity" "sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew=="
   "resolved" "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.9.tgz"
   "version" "6.0.9"
-=======
-react-error-boundary@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/react-error-boundary/-/react-error-boundary-3.1.4.tgz#255db92b23197108757a888b01e5b729919abde0"
-  integrity sha512-uM9uPzZJTF6wRQORmSrvOIgt4lJ9MC1sNgEOj2XGsDTRE4kmpWxg7ENK9EWNKJRMAOY9z0MuF4yIfl6gp4sotA==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-
-react-error-overlay@^6.0.9:
-  version "6.0.9"
-  resolved "https://registry.npmjs.org/react-error-overlay/-/react-error-overlay-6.0.9.tgz"
-  integrity sha512-nQTTcUu+ATDbrSD1BZHr5kgSD4oF8OFjxun8uAaL8RwPBacGBNPf/yAuVVdx17N8XNzRDMrZ9XcKZHCjPW+9ew==
->>>>>>> 17944e8fd0accddefe0bac2446872055a9335e92
 
 "react-fast-compare@^3.1.1":
   "integrity" "sha512-rtGImPZ0YyLrscKI9xTpV8psd6I8VAtjKCzQDlzyDvqJA8XOW78TXYQwNRNd8g8JZnDu8q9Fu/1v4HPAVwVdHA=="
@@ -10150,7 +10168,7 @@ react-error-overlay@^6.0.9:
     "prop-types" "15.7.2"
     "youtube-player" "5.5.2"
 
-"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.5.4 || ^16.0.0 || ^17.0.0", "react@^16 || ^17", "react@^16.3.0 || ^17", "react@^16.3.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0", "react@^16.8.3 || ^17", "react@^17.0.0", "react@^17.0.2", "react@>= 16", "react@>=0.14.1", "react@>=15", "react@>=16", "react@>=16.0.0", "react@>=16.3.0", "react@>=16.6.0", "react@>=16.8.0", "react@>=17.0.2", "react@17.0.2":
+"react@*", "react@^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.0.0 || ^16.0.0 || ^17.0.0", "react@^15.5.4 || ^16.0.0 || ^17.0.0", "react@^16 || ^17", "react@^16.3.0 || ^17", "react@^16.3.0 || ^17.0.0", "react@^16.8.0 || ^17.0.0", "react@^16.8.3 || ^17", "react@^17.0.0", "react@^17.0.2", "react@>= 16", "react@>=0.14.1", "react@>=15", "react@>=16", "react@>=16.0.0", "react@>=16.13.1", "react@>=16.3.0", "react@>=16.6.0", "react@>=16.8.0", "react@>=17.0.2", "react@17.0.2":
   "integrity" "sha512-gnhPt75i/dq/z3/6q/0asP78D0u592D5L1pd7M8P+dck6Fu/jJeL6iVVK23fptSUZj8Vjf++7wXA8UNclGQcbA=="
   "resolved" "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   "version" "17.0.2"
@@ -11907,6 +11925,11 @@ react-error-overlay@^6.0.9:
   "integrity" "sha1-oVe6QC2iTpv5V/mqadUk7tQpAaY="
   "resolved" "https://registry.npmjs.org/tty-browserify/-/tty-browserify-0.0.0.tgz"
   "version" "0.0.0"
+
+"tua-body-scroll-lock@1.0.0":
+  "integrity" "sha512-3ohEBWgwbFCtpt2Dls2dzgmMdAS3CmytbAsiIdh9OvGL91h0JSlbayJ7zG4wuf8KFEQtce2nFAd5/+pw7+Dc9w=="
+  "resolved" "https://registry.npmjs.org/tua-body-scroll-lock/-/tua-body-scroll-lock-1.0.0.tgz"
+  "version" "1.0.0"
 
 "tunnel-agent@^0.6.0":
   "integrity" "sha1-J6XeoGs2sEoKmWZ3SykIaPD8QP0="

@@ -38,5 +38,6 @@ export const EDIT_LISTING = `${DASHBOARD}/listings/edit`;
 export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
 export const WALLET = `${DASHBOARD}/wallet`;
+export const VERIFF = `${DASHBOARD}/veriff`;
 export const ACCOUNT = `${DASHBOARD}/account`;
 export const LOGOUT = '/logout';

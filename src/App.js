@@ -34,10 +34,13 @@ import {
 	USER_AGREEMENT,
 	ADD_USERNAME,
 	LISTINGS,
-	EDIT_LISTING
+	EDIT_LISTING,
+	WITHDRAWALS,
+	VERIFF
 } from './routes';
 
 import FallBack from './components/common/FallBack';
+import VeriffVerify from './pages/dashboard/profile/Veriff';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -86,6 +89,7 @@ const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
 const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
 const Listings = lazy(() => import('./pages/adminDashboard/listings/'));
 const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
+const Withdrawals = lazy(() => import('./pages/adminDashboard/withdrawals/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
@@ -179,6 +183,7 @@ const App = () => {
 									<PrivateRoute path={`${ACCOUNT}`} exact component={() => <Profile handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${NOTIFICATIONS}`} exact component={() => <Notifications handleSetTitle={handleSetTitle} />} />
 									<PrivateRoute path={`${WALLET}`} exact component={() => <Wallet handleSetTitle={handleSetTitle} />} />
+									<PrivateRoute path={`${VERIFF}`} exact component={() => <VeriffVerify handleSetTitle={handleSetTitle} />} />
 								</Dashboard>
 							</PrivateRoute>
 							<Route path={ADMIN_LOGIN} exact component={AdminLogin} />
@@ -188,6 +193,7 @@ const App = () => {
 									<AdminRoute path={`${CUSTOMERS}`} exact component={() => <Customers handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${LISTINGS}`} exact component={() => <Listings handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${DEPOSITS}`} exact component={() => <Deposits handleSetTitle={handleSetTitle} />} />
+									<AdminRoute path={`${WITHDRAWALS}`} exact component={() => <Withdrawals handleSetTitle={handleSetTitle} />} />
 									<AdminRoute path={`${CUSTOMERS}/:id`} exact component={() => <Customer handleSetTitle={handleSetTitle} />} />
 									{/* <AdminRoute exact component={() => <Private404 handleSetTitle={handleSetTitle} />} /> */}
 								</AdminDashboard>

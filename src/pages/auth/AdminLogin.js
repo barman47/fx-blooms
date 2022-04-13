@@ -109,6 +109,8 @@ const AdminLogin = (props) => {
             setErrors({ msg: location.state.msg });
             history.replace(location.pathname, {});
         }
+
+        console.log('hh', showPassword)
         // eslint-disable-next-line
     }, []);
 
@@ -220,14 +222,16 @@ const AdminLogin = (props) => {
                                                     aria-label="toggle password visibility"
                                                     onClick={toggleShowPassword}
                                                 >
-                                                    {showPassword ? 
+                                                    {Password.length > 0 ? 
+                                                        showPassword ?
                                                         <Tooltip title="Hide Password" placement="bottom" arrow>
                                                             <EyeOutline />
-                                                        </Tooltip>
-                                                            : 
-                                                            <Tooltip title="Show Password" placement="bottom" arrow>
+                                                        </Tooltip> : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
                                                             <EyeOffOutline />
                                                         </Tooltip>
+                                                            : 
+                                                        <span></span>
                                                      }
                                                 </IconButton>
                                             </InputAdornment>

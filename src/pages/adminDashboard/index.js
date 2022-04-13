@@ -70,7 +70,7 @@ const drawerWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: COLORS.white,
+        backgroundColor: '#ECF1F1',
 
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(5),
