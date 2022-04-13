@@ -37,8 +37,9 @@ import {
 	TRANSACTIONS,
 	TRANSACTION_STATUS,
 	BANK_ACCOUNTS,
-	SECURITY,
-	PROFILE
+	PROFILE,
+	ID_VERIFICATION,
+	TWO_FACTOR
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -80,7 +81,9 @@ const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'))
 
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
-const Security = lazy(() => import('./pages/dashboard/security'));
+const IdVerification = lazy(() => import('./pages/dashboard/idVerification'));
+
+const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
@@ -187,7 +190,8 @@ const App = () => {
 								<Route path={`${MAKE_LISTING}`} element={<MakeListing handleSetTitle={handleSetTitle} />} />
 								<Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle} />} />
 								<Route path={`${PROFILE}`} element={<Profile handleSetTitle={handleSetTitle} />} />
-								<Route path={`${SECURITY}`} element={<Security handleSetTitle={handleSetTitle} />} />
+								<Route path={`${ID_VERIFICATION}`} element={<IdVerification handleSetTitle={handleSetTitle} />} />
+								<Route path={`${TWO_FACTOR}`} element={<TwoFactor handleSetTitle={handleSetTitle} />} />
 								<Route path={`${BANK_ACCOUNTS}`} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
 								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />

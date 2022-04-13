@@ -15,7 +15,7 @@ import { getNotifications, generateOtp } from '../../../actions/notifications';
 import { SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
-import { SECURITY } from '../../../routes';
+import { PROFILE, TWO_FACTOR } from '../../../routes';
 
 import Notification from './Notification';
 import BuyerSendEurDrawer from './BuyerSendEurDrawer';
@@ -348,8 +348,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         window.open(idVerificationLink);
     };
 
-    const setup2FA = () => navigate(SECURITY, { mfa: true });
-
     const verifyPhone = () => {
         if (phoneNo) {
             const { code, number } = extractCountryCode(phoneNo);
@@ -361,7 +359,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setPhoneNumber(number);
             return setOpen(true);
         }
-        return navigate(SECURITY, { verifyPhone: true })
+        return navigate(PROFILE)
     };
     // const setPin = () => navigate(`${DASHBOARD}${SECURITY}`, { setPin: true });
 
@@ -534,7 +532,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 title="Set up 2FA"
                                 message="Add extra layer of Security"
                                 buttonText="Setup 2FA"
-                                buttonAction={setup2FA}
+                                buttonAction={() => navigate(TWO_FACTOR)}
 						        icon={<Key />}
 						        iconBackgroundColor="#000100"
                             />

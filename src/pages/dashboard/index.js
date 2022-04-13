@@ -4,6 +4,9 @@ import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { 
     AppBar,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
     Avatar,
     Drawer, 
     Divider,
@@ -19,7 +22,6 @@ import {
     useTheme
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { ArrowLeftRight, ChevronLeft, ChevronRight, Menu } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
 import _ from 'lodash';
@@ -37,8 +39,32 @@ import {
     BottomNavigationAction
 } from '@material-ui/core';
 
-import { AccountOutline, BagChecked, HomeOutline, FormatListText, Logout, LockOutline, MessageOutline } from 'mdi-material-ui';
-import { BANK_ACCOUNTS, MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS, SECURITY, TRANSACTIONS, PROFILE } from '../../routes';
+import { 
+    AccountOutline, 
+    ArrowLeftRight, 
+    BagChecked, 
+    ChevronLeft, 
+    ChevronRight, 
+    ChevronDown, 
+    FormatListText, 
+    HomeOutline, 
+    LockOutline, 
+    Logout, 
+    MessageOutline, 
+    Menu 
+} from 'mdi-material-ui';
+import { 
+    BANK_ACCOUNTS, 
+    MAKE_LISTING, 
+    DASHBOARD_HOME, 
+    NOTIFICATIONS, 
+    SECURITY,
+    ID_VERIFICATION, 
+    PIN, 
+    TWO_FACTOR, 
+    TRANSACTIONS, 
+    PROFILE 
+} from '../../routes';
 import { 
     ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
@@ -192,6 +218,14 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'column',
         // justifyContent: 'space-between'
+        '& .MuiPaper-elevation1': {
+            padding: 0,
+            boxShadow: 'none',
+        },
+
+        '& .MuiAccordion-root.Mui-expanded': {
+            margin: 0
+        }
     },
 
     profileContainer: {
@@ -216,6 +250,16 @@ const useStyles = makeStyles((theme) => ({
         }
     },
 
+    accordionLink: {
+        color: theme.palette.primary.main,
+        transition: TRANSITION,
+
+        '&:hover': {
+            color: theme.palette.primary.main,
+            backgroundColor: theme.palette.primary.main
+        }
+    },
+
     activeLink: {
         backgroundColor: theme.palette.primary.main,
         color: COLORS.offWhite
@@ -233,6 +277,33 @@ const useStyles = makeStyles((theme) => ({
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
         color: theme.palette.primary.main
+    },
+
+    accordionSummary: {
+        minHeight: '47px',
+        margin: 0,
+        padding: 0,
+
+        '& .MuiAccordionSummary-content' : {
+            margin: 0
+        }
+    },
+
+    collapsedAccordionSummary: {
+        '& .MuiButtonBase-root': {
+            display: 'flex !important',
+        flexDirection: 'column !important',
+        justifyContent: 'center !important',
+        alignItems: 'center !important'
+        }
+    },
+
+    accordionDetails: {
+        display: 'flex',
+        flexDirection: 'column',
+        paddingBottom: 0,
+        paddingRight: 0,
+        paddingTop: 0
     },
 
     bottomBar: {
@@ -314,6 +385,12 @@ const Dashboard = (props) => {
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+    ];
+
+    const securityLinks = [
+        { url : ID_VERIFICATION, text: 'ID Verification', icon: <HomeOutline /> },
+        { url : PIN, text: 'Set PIN', icon: <FormatListText /> },
+        { url : TWO_FACTOR, text: '2FA Authentication', icon: <FormatListText /> }
     ];
 
     const { title, logout } = props;
@@ -695,34 +772,97 @@ const Dashboard = (props) => {
                     </div> 
                     <Box component="div" className={classes.linksContainer}>
                         <List className={classes.links}>
-                            {protectedRoutes.map((link, index) => (
-                                <Fragment key={index}>
-                                    <ListItem 
-                                        // className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
-                                        className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
-                                        key={index} 
-                                        button 
-                                        disableRipple
-                                        onClick={() => handleLinkClick(link.url)}
-                                        // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
-                                    >
-                                        {open ? 
-                                            <ListItemIcon className={classes.icon}>
-                                                {link.icon}
-                                            </ListItemIcon>
-                                            :
-                                            <Tooltip title={link.text} placement="right" arrow>
+                            {protectedRoutes.map((link, index) => {
+                                if (link.url === SECURITY) {
+                                    return (
+                                        <Fragment key={index}>
+                                            <Accordion>
+                                                <AccordionSummary
+                                                    expandIcon={<ChevronDown />}
+                                                    aria-controls="security-accordion"
+                                                    id="security"
+                                                    className={classes.accordionSummary}
+                                                >
+                                                    <ListItem 
+                                                        className={clsx(classes.accordionLink, { [classes.activeLink]: path.includes(`${link.url}`), [classes.collapsedAccordionSummary]: !open })} 
+                                                        button 
+                                                        disableRipple
+                                                        classes={{ root: classes.collapsedAccordionSummary }}
+                                                    >
+                                                        {open ? 
+                                                            <ListItemIcon className={classes.icon}>
+                                                                {link.icon}
+                                                            </ListItemIcon>
+                                                            :
+                                                            <Tooltip title={link.text} placement="right" arrow>
+                                                                <ListItemIcon className={classes.icon}>
+                                                                    {link.icon}
+                                                                </ListItemIcon>
+                                                            </Tooltip>
+                                                        }
+                                                        
+                                                        {open && <ListItemText primary={link.text} />}
+                                                    </ListItem>
+                                                </AccordionSummary>
+                                                <AccordionDetails className={classes.accordionDetails}>
+                                                    {securityLinks.map((link, index) => (
+                                                        <ListItem 
+                                                            key={index}
+                                                            className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                            button 
+                                                            disableRipple
+                                                            onClick={() => handleLinkClick(link.url)}
+                                                        >
+                                                            {open ? 
+                                                                <ListItemIcon className={classes.icon}>
+                                                                    {link.icon}
+                                                                </ListItemIcon>
+                                                                :
+                                                                <Tooltip title={link.text} placement="right" arrow>
+                                                                    <ListItemIcon className={classes.icon}>
+                                                                        {link.icon}
+                                                                    </ListItemIcon>
+                                                                </Tooltip>
+                                                            }
+                                                            
+                                                            {open && <ListItemText primary={link.text} />}
+                                                        </ListItem>
+                                                    ))}
+                                                </AccordionDetails>
+                                            </Accordion>
+                                            <Divider />
+                                        </Fragment>
+                                    );
+                                }
+                                return (
+                                    <Fragment key={index}>
+                                        <ListItem 
+                                            // className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                            className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                            key={index} 
+                                            button 
+                                            disableRipple
+                                            onClick={() => handleLinkClick(link.url)}
+                                            // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
+                                        >
+                                            {open ? 
                                                 <ListItemIcon className={classes.icon}>
                                                     {link.icon}
                                                 </ListItemIcon>
-                                            </Tooltip>
-                                        }
-                                        
-                                        {open && <ListItemText primary={link.text} />}
-                                    </ListItem>
-                                    <Divider />
-                                </Fragment>
-                            ))}
+                                                :
+                                                <Tooltip title={link.text} placement="right" arrow>
+                                                    <ListItemIcon className={classes.icon}>
+                                                        {link.icon}
+                                                    </ListItemIcon>
+                                                </Tooltip>
+                                            }
+                                            
+                                            {open && <ListItemText primary={link.text} />}
+                                        </ListItem>
+                                        <Divider />
+                                    </Fragment>
+                                );
+                            })}
                         </List>
                         <Box component="div" className={classes.profileContainer}>
                             <List className={classes.links}>

@@ -14,7 +14,8 @@ export const COLORS = {
     darkRed: '#f21c1c'
 };
 
-export const DRAWER_WIDTH = 240;
+export const DRAWER_WIDTH = 300;
+// export const DRAWER_WIDTH = 240;
 
 export const SETUP_2FA = 'SETUP_2FA';
 export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
