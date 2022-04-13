@@ -906,7 +906,7 @@ const Dashboard = (props) => {
                                 <Divider />
                             </List>
                             <Box className={classes.avatarContainer} component="div">
-                                <Tooltip title={userName} arrow>
+                                <Tooltip title={userName} placement="right" arrow>
                                     <Avatar className={classes.avatar}>{userName.charAt(0).toUpperCase()}</Avatar>
                                 </Tooltip>
                                 {open && <Typography variant="h6">{userName}</Typography>}
