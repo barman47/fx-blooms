@@ -32,7 +32,6 @@ const useStyles = makeStyles(theme => ({
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            // justifyContent: 'space-between',
             alignItems: 'center',
             padding: [[theme.spacing(1.5), theme.spacing(3)]],
 
@@ -46,7 +45,7 @@ const useStyles = makeStyles(theme => ({
 
                 [theme.breakpoints.down('sm')]: {
                     flexDirection: 'column',
-                    alignItems: 'flex-start'
+                    alignItems: 'flex-end'
                 },
             },
             
@@ -241,7 +240,6 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     return (
         <>
             <section className={classes.root}>
-                
                 <header>
                     {listing.amountAvailable.currencyType === 'EUR' ? 
                         <img src={eurLogo} alt="EUR" />

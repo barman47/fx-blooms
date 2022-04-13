@@ -425,10 +425,6 @@ const AllListings = (props) => {
 	};
 
 	const setCurrency = (available, required) => {
-		// dispatch({
-		// 	type: SET_LOADING_LISTINGS,
-		// 	payload: true
-		// });
 		dispatch({
 			type: SET_REQUIRED_CURRENCY,
 			payload: {
@@ -436,16 +432,6 @@ const AllListings = (props) => {
 				requiredCurrency: required  
 			}
 		});
-		// getListingsOpenForBid({
-		// 	pageNumber: 1,
-		// 	pageSize: 15,
-		// 	currencyAvailable: available,
-		// 	currencyNeeded: required,
-		// 	amount: Number(Amount),
-		// 	useCurrencyFilter: true,
-		// 	useRatingFilter: false,
-		// 	sellerRating: 0
-		// });
 	}
 
 	const greet = () => {

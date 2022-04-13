@@ -16,6 +16,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+import clsx from 'clsx';
 import PropTypes from 'prop-types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
@@ -27,11 +28,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS.white,
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
-        padding: theme.spacing(5),
+        padding: theme.spacing(0, 5, 5, 5),
         
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 1),
-            
+            padding: theme.spacing(1)
         },
 
         '& header': {
@@ -39,7 +39,11 @@ const useStyles = makeStyles(theme => ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(3)
+
+            [theme.breakpoints.down('sm')]: {
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+            }
         }
     },
 
@@ -90,6 +94,10 @@ const useStyles = makeStyles(theme => ({
         [theme.breakpoints.down('sm')]: {
             margin: 0,
         },
+    },
+
+    inProgress: {
+        color: COLORS.orange
     },
 
     contact: {
@@ -272,7 +280,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Recepient Contact</Typography>
-                            <Typography variant="body2" component="p">+2348147233059</Typography>
+                            <Typography variant="body2" component="p">+2348147233059 (static value)</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -287,7 +295,12 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Transfer Status</Typography>
-                            <Typography variant="body2" component="p" >{completed ? 'Completed' : 'In Progress'}</Typography>
+                            <Typography variant="body2" component="p" className={clsx({[classes.inProgress]: !completed})}>{completed ? 'Completed' : 'In Progress'}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Date</Typography>
+                            <Typography variant="body2" component="p" >January 1st, 1980 at 1:00am(static value)</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>

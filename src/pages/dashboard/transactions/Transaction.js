@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import clsx from 'clsx';
 // import moment from 'moment';
 
 import { SET_TRANSACTION } from '../../../actions/types';
@@ -17,13 +18,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS.lightTeal,
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
-        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // display: 'grid',
-        // gridTemplateColumns: 'repeat(6, 1fr)',
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('md')]: {
@@ -45,6 +43,10 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.offBlack,
         fontWeight: 600,
         marginTop: theme.spacing(1)
+    },
+
+    inProgress: {
+        color: `${COLORS.orange} !important`
     }
 }));
 
@@ -127,15 +129,11 @@ const Transaction = ({ transaction }) => {
     };
 
     return (
-        <Box component="section" className={classes.root} onClick={gotoTransaction}>
-            <Box component="div">
-                <Typography variant="body2" component="span" className={classes.label}>Date</Typography>
-                {/* <Typography variant="body1" component="p" className={classes.text}>{moment().format()}</Typography> */}
-                <Typography variant="body1" component="p" className={classes.text}>Nov 3rd 2022</Typography>
-            </Box>
+        <Box component="section" className={classes.root}>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Time</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>20:34</Typography>
+                {/* <Typography variant="body1" component="p" className={classes.text}>{moment().format()}</Typography> */}
+                <Typography variant="body1" component="p" className={classes.text}>5 mins ago</Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>
@@ -147,12 +145,22 @@ const Transaction = ({ transaction }) => {
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Reference Number</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>889F5F</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>{`${transaction.listingId}-${currency.charAt(0)}`}</Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Status</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
+                <Typography variant="body1" component="p" className={clsx(classes.text, {[classes.inProgress]: !transaction.isClosed})}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
             </Box>
+            <Button 
+                variant="outlined" 
+                color="primary" 
+                disableRipple
+                disableFocusRipple
+                disableTouchRipple
+                onClick={gotoTransaction}
+            >
+                View More
+            </Button>
         </Box>
     );
 };

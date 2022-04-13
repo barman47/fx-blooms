@@ -264,41 +264,9 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                     </Grid>
                 </Grid>
                 <ol>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Transfer the {listing?.amountAvailable?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
-                    <li><Typography variant="body2" component="p">Click on {listing?.amountAvailable?.currencyType} Payment Made</Typography></li>
+                    <li><Typography variant="body2" component="p">Provide an NGN receiving account.</Typography></li>
+                    <li><Typography variant="body2" component="p">Enter a payment reference (OPTIONAL)</Typography></li>
                 </ol>
-                {/* <Grid item xs={12}>
-                    <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                    <Button 
-                        variant="outlined" 
-                        color="primary" 
-                        disabled={_.isEmpty(account) ? false : true}
-                        onClick={getSellerAccount}
-                    >
-                        Show Account Details
-                    </Button>
-                    <Collapse in={!_.isEmpty(account)}>
-                        <section className={classes.accountDetailsContainer}>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
-                            </div>
-                        </section>
-                    </Collapse>              
-                </Grid> */}
                 <Grid item xs={12}>
                     <Typography variant="subtitle2" component="span">Receiving Account</Typography>
                     <FormControl 
@@ -317,7 +285,6 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                             {accounts.map((account) => {
                                 if (account.currency === 'NGN') {
                                     return (
-                                        // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
                                         <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
                                     )
                                 }
@@ -353,7 +320,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                         disabled={loading ? true : false}
                         onClick={handleAcceptOffer}
                     >
-                        {loading ? 'One Moment . . .' : 'Accept Offer'}
+                        {loading ? 'One Moment . . .' : 'Accept NGN Offer'}
                     </Button>
                 </Grid>
             </Drawer>

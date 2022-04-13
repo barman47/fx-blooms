@@ -11,7 +11,8 @@ export const COLORS = {
     darkTeal: '#091d1d',
     lightTeal: '#f6fafa',
     red: '#EB5757',
-    darkRed: '#f21c1c'
+    darkRed: '#f21c1c',
+    orange: '#ffa500'
 };
 
 export const DRAWER_WIDTH = 300;

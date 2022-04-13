@@ -250,15 +250,15 @@ const useStyles = makeStyles((theme) => ({
         }
     },
 
-    accordionLink: {
-        color: theme.palette.primary.main,
-        transition: TRANSITION,
+    // accordionLink: {
+    //     color: theme.palette.primary.main,
+    //     transition: TRANSITION,
 
-        '&:hover': {
-            color: theme.palette.primary.main,
-            backgroundColor: theme.palette.primary.main
-        }
-    },
+    //     '&:hover': {
+    //         backgroundColor: theme.palette.primary.main,
+    //         color: COLORS.offWhite
+    //     }
+    // },
 
     activeLink: {
         backgroundColor: theme.palette.primary.main,
@@ -374,7 +374,7 @@ const Dashboard = (props) => {
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
     ];
 
     const protectedRoutes = [
@@ -784,7 +784,7 @@ const Dashboard = (props) => {
                                                     className={classes.accordionSummary}
                                                 >
                                                     <ListItem 
-                                                        className={clsx(classes.accordionLink, { [classes.activeLink]: path.includes(`${link.url}`), [classes.collapsedAccordionSummary]: !open })} 
+                                                        className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`), [classes.collapsedAccordionSummary]: !open })} 
                                                         button 
                                                         disableRipple
                                                         classes={{ root: classes.collapsedAccordionSummary }}
@@ -800,7 +800,6 @@ const Dashboard = (props) => {
                                                                 </ListItemIcon>
                                                             </Tooltip>
                                                         }
-                                                        
                                                         {open && <ListItemText primary={link.text} />}
                                                     </ListItem>
                                                 </AccordionSummary>
@@ -843,7 +842,6 @@ const Dashboard = (props) => {
                                             button 
                                             disableRipple
                                             onClick={() => handleLinkClick(link.url)}
-                                            // disabled={link.url === MAKE_LISTING || link.url === MESSAGES ? true : false}
                                         >
                                             {open ? 
                                                 <ListItemIcon className={classes.icon}>
@@ -856,7 +854,6 @@ const Dashboard = (props) => {
                                                     </ListItemIcon>
                                                 </Tooltip>
                                             }
-                                            
                                             {open && <ListItemText primary={link.text} />}
                                         </ListItem>
                                         <Divider />
@@ -873,9 +870,17 @@ const Dashboard = (props) => {
                                     disableRipple
                                     onClick={() => handleLinkClick(PROFILE)}
                                 >
-                                    <ListItemIcon className={classes.icon}>
-                                        <AccountOutline />
-                                    </ListItemIcon>
+                                    {open ? 
+                                        <ListItemIcon className={classes.icon}>
+                                            <AccountOutline />
+                                        </ListItemIcon>
+                                        :
+                                        <Tooltip title="Profile" placement="right" arrow>
+                                            <ListItemIcon className={classes.icon}>
+                                                <AccountOutline />
+                                            </ListItemIcon>
+                                        </Tooltip>
+                                    }
                                     {open && <ListItemText primary="Profile" />}
                                 </ListItem>
                                 <Divider />
@@ -885,9 +890,17 @@ const Dashboard = (props) => {
                                     disableRipple
                                     onClick={() => logout(navigate, 'Logged out successfully')}
                                 >
-                                    <ListItemIcon className={classes.icon}>
-                                        <Logout />
-                                    </ListItemIcon>
+                                    {open ? 
+                                        <ListItemIcon className={classes.icon}>
+                                            <Logout />
+                                        </ListItemIcon>
+                                        :
+                                        <Tooltip title="Log Out" placement="right" arrow>
+                                            <ListItemIcon className={classes.icon}>
+                                                <Logout />
+                                            </ListItemIcon>
+                                        </Tooltip>
+                                    }
                                     {open && <ListItemText primary="Log Out" />}
                                 </ListItem>
                                 <Divider />

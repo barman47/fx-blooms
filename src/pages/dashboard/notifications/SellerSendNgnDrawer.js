@@ -24,7 +24,6 @@ import isEmpty from '../../../utils/isEmpty';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
-import CircularProgressWithLabel from '../../../components/common/CircularProgressWithLabel';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 
@@ -139,6 +138,13 @@ const useStyles = makeStyles(theme => ({
         alignSelf: 'flex-end'
     },
 
+    timerContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+
     button: {
         margin: theme.spacing(2, 0),
     },
@@ -149,7 +155,6 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
     const dispatch = useDispatch();
 
     const { account } = useSelector(state => state.bankAccounts);
-    const { firstName } = useSelector(state => state.customer);
     const { bid, listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
@@ -157,7 +162,6 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
 
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
-    const [timerValue, setTimerValue] = useState(0);
 
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
@@ -264,12 +268,12 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                 clearInterval(interval.current);
                 setTimerMinutes('00');
                 setTimerSeconds('00');
-                setTimerValue(0);
+                // setTimerValue(0);
                 expireListing();
             } else {
                 setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
                 setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
-                setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
+                // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
             }
         }, 1000);
     };
@@ -391,16 +395,9 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                         </section>
                     {/* </Collapse>               */}
                 </Grid>
-                <Typography variant="subtitle2" component="span" color="primary">Payment Countdown</Typography>
-                <Typography variant="subtitle2" component="span" color="textSecondary">{firstName} will send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within 30 mins</Typography>
-                <Grid item xs={12} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-                    <CircularProgressWithLabel 
-                        variant="determinate" 
-                        size={100}
-                        value={timerValue} 
-                        minutes={timerMinutes.toString()} 
-                        seconds={timerSeconds.toString()} 
-                    />
+                <Grid item xs={12} className={classes.timerContainer}>
+                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                    <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                     <Button 
