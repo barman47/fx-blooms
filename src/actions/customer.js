@@ -51,11 +51,11 @@ import extractIdDetails from '../utils/extractIdDetails';
 
 const api = `${API}/Customer`;
 
-export const createCustomer = (customer, history) => async (dispatch) => {
+export const createCustomer = (customer, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/CompleteOnboarding`, customer);
         setAuthToken(res.data.data.token);
-        history.push(SETUP_2FA);
+        navigate(SETUP_2FA);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -74,7 +74,7 @@ export const getCustomerInformation = () => async (dispatch) => {
     }
 };
 
-const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, Password } = null) => {
+const handleNextStep = async (res, navigate, dispatch, { Username, EmailAddress, Password } = null) => {
     const { nextStep } = res.data.data;
 
     switch (nextStep) {
@@ -101,21 +101,21 @@ const handleNextStep = async (res, history, dispatch, { Username, EmailAddress, 
 
         case GOTO_2FA:
             setAuthToken(res.data.data.token);
-            return history.push(SETUP_2FA);
+            return navigate(SETUP_2FA);
 
         case PROCEED_TO_LOGIN:
             dispatch({
                 type: GET_ERRORS,
                 payload: { msg: `${EmailAddress} Email has been linked to a profile. Please login to continue` }
             });
-            return history.push(LOGIN);
+            return navigate(LOGIN);
 
         default:
             return;
     }
 };
 
-export const registerCustomer = ({ EmailAddress, Username, Password }, history) => async (dispatch) => {
+export const registerCustomer = ({ EmailAddress, Username, Password }, navigate) => async (dispatch) => {
     try {
         const res = await axios.get(`${api}/Available/username/${Username}/email/${EmailAddress}`);
         const { generatedUsernames, message, isEmailAvailable, isUsernameAvailable } = res.data.data;
@@ -127,7 +127,7 @@ export const registerCustomer = ({ EmailAddress, Username, Password }, history) 
                     usernameAvailable: true
                 }
             });
-            return handleNextStep(res, history, dispatch, { EmailAddress, Username, Password });
+            return handleNextStep(res, navigate, dispatch, { EmailAddress, Username, Password });
         } else {
             return dispatch({
                 type: GET_ERRORS,
@@ -182,32 +182,24 @@ export const getIdVerificationLink = () => async (dispatch) => {
     }
 };
 
-export const login = (data, history, userLocation) => async (dispatch) => {
+export const login = (data, navigate) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/Login`, data, {
-            headers: {
-                'Location': JSON.stringify(userLocation)
-            }
-        });
+        const res = await axios.post(`${api}/Login`, data);
         const {  token } = res.data.data;
         setAuthToken(token);
         dispatch({
             type: SET_CURRENT_CUSTOMER,
             payload: res.data.data
         });
-        return history.push(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const externalLogin = (data, history, userLocation) => async (dispatch) => {
+export const externalLogin = (data, navigate) => async (dispatch) => {
     try {
-        const res = await axios.post(`${api}/ExternalLogin`, data, {
-            headers: {
-                'Location': JSON.stringify(userLocation)
-            }
-        });
+        const res = await axios.post(`${api}/ExternalLogin`, data);
         const { authResponse, isLinkedToProfile } = res.data.data;
         setAuthToken(authResponse.token);
         dispatch({
@@ -215,13 +207,13 @@ export const externalLogin = (data, history, userLocation) => async (dispatch) =
             payload: authResponse
         });
         
-        return isLinkedToProfile ? history.push(DASHBOARD_HOME) : history.push(ADD_USERNAME, { addUsername: true });
+        return isLinkedToProfile ? navigate(DASHBOARD_HOME) : navigate(ADD_USERNAME, { addUsername: true });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const addUsername = (username, history) => async (dispatch) => {
+export const addUsername = (username, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/AddUserName`, { username });
         const {  token } = res.data.data;
@@ -230,7 +222,7 @@ export const addUsername = (username, history) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: res.data.data
         });
-        return history.push(DASHBOARD_HOME);
+        return navigate(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -704,10 +696,10 @@ export const approveResidencePermit = (customerId, currentStatus) => async (disp
     }
 };
 
-export const logout = (history, msg) => dispatch => {
+export const logout = (navigate, msg) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return history.push(LOGIN, { msg });
+    return navigate(LOGIN, { state: { msg } });
 };
 
 export const subscribeToNewsletter = (email) => async (dispatch) => {

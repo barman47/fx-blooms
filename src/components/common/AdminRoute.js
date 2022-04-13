@@ -1,27 +1,12 @@
-import React from 'react';
-import { connect } from 'react-redux';
-import { Route, Redirect } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import { ADMIN_LOGIN } from '../../routes';
 
-const AdminRoute = ({ component: Component, isAuthenticated, ...rest }) => (
-    <Route 
-        {...rest}
-        render={props => isAuthenticated ? (
-            <Component {...props} />
-        ) : (
-            <Redirect to={ADMIN_LOGIN} />
-        )}
-    />
-);
-
-AdminRoute.propTypes = {
-    isAuthenticated: PropTypes.bool.isRequired
+const AdminRoute = ({ children }) => {
+    const location = useLocation();
+    const { isAuthenticated } = useSelector(state => state.admin);
+    return isAuthenticated ? children : <Navigate to={ADMIN_LOGIN} state={{ from: location }} replace />
 };
 
-const mapStateToProps = (state) => ({
-    isAuthenticated: state.admin.isAuthenticated
-});
-
-export default connect(mapStateToProps)(AdminRoute);
+export default AdminRoute;

@@ -16,12 +16,11 @@ import statsReducer from './stats';
 import subscriptionReducer from './subscription';
 import twoFactorReducer from './twoFactor';
 import walletsReducer from './wallets';
-import locationReducer from './myLocation';
+import transactionsReducer from './transactions';
 
 const appReducer = combineReducers({
     admin: adminReducer,
     bankAccounts: bankAccountsReducer,
-    notifications: notificationsReducer,
     countries: countriesReducer,
     customer: customerReducer,
     customers: customersReducer,
@@ -29,11 +28,12 @@ const appReducer = combineReducers({
     documents: documentsReducer,
     errors: errorsReducer,
     listings: listingsReducer,
+    notifications: notificationsReducer,
     stats: statsReducer,
     subscription: subscriptionReducer,
+    transactions: transactionsReducer,
     twoFactor: twoFactorReducer,
-    wallets: walletsReducer,
-    myLocation: locationReducer
+    wallets: walletsReducer
 });
 
 const rootReducer = (state, action) => {

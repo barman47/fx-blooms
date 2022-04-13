@@ -1,26 +1,33 @@
 import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { FormControlLabel, Switch } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
+import { Button, ButtonGroup } from '@material-ui/core';
 
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
-import { getNotifications } from '../../../actions/notifications';
+import { getTransactions } from '../../../actions/transactions';
+import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_TRANSACTION_TYPE, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(-3)
+        paddingLeft: theme.spacing(5),
+        paddingRight: theme.spacing(5),
+
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
+        }
     },
 
     filterContainer: {
         display: 'grid',
         gridTemplateColumns: '0.25fr 0.25fr',
         gap: theme.spacing(20),
+        alignItems: 'center',
         marginTop: theme.spacing(2),
         [theme.breakpoints.down('sm')]: {
             gridTemplateColumns: '0.5fr 0.5fr',
@@ -28,91 +35,76 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    buttonGroup: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+    },
+    
     transactions: {
         display: 'grid',
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(3),
-        marginTop: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        maxWidth: '100%',
     }
 }));
 
-const IOSSwitch = withStyles((theme) => ({
-    root: {
-        width: 42,
-        height: 26,
-        padding: 0,
-        margin: theme.spacing(1),
-    },
-    switchBase: {
-        padding: 1,
-            '&$checked': {
-                transform: 'translateX(16px)',
-                color: theme.palette.common.white,
-                '& + $track': {
-                backgroundColor: theme.palette.primary.main,
-                opacity: 1,
-                border: 'none',
-            }
-        },
-      
-        '&$focusVisible $thumb': {
-            color: '#52d869',
-            border: '6px solid #fff',
-        },
-    },
-    thumb: {
-        width: 24,
-        height: 24,
-    },
-
-    track: {
-        borderRadius: 26 / 2,
-        border: `1px solid ${theme.palette.grey[400]}`,
-        backgroundColor: theme.palette.grey[50],
-        opacity: 1,
-        transition: theme.transitions.create(['background-color', 'border']),
-    },
-
-    checked: {},
-
-    focusVisible: {},
-
-}))(({ classes, ...props }) => {
-    return (
-        <Switch
-            focusVisibleClassName={classes.focusVisible}
-            disableRipple
-            classes={{
-                root: classes.root,
-                switchBase: classes.switchBase,
-                thumb: classes.thumb,
-                track: classes.track,
-                checked: classes.checked,
-            }}
-            {...props}
-        />
-    );
-});
-
-const Transactions = ({ getCurrencies, getNotifications }) => {
+const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
 
     const { currencies } = useSelector(state => state);
-    const { notifications } = useSelector(state => state.notifications);
+    const { customerId } = useSelector(state => state.customer);
+    const { eurTransactions, ngnTransactions, transactions, sent, received } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
-    const [showReceived, setShowReceived] = useState(true);
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        getNotifications();
+        handleSetTitle('Transactions');
+        dispatch({
+            type: SET_TRANSACTION,
+            payload: {}
+        });
+        getTransactions(true);
         if (currencies.length === 0) {
             // setLoading(true);
             getCurrencies();
         }
         // eslint-disable-next-line
     }, []);
+
+    // Filter transactions
+    useEffect(() => {
+        switch (currency) {
+            case 'ALL':
+                dispatch({ type: SET_ALL_TRANSACTIONS });
+                break;
+
+            case 'EUR':
+                dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
+                break;
+
+            case 'NGN':
+                dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
+                break;
+
+            default:
+                break;
+        }
+    }, [currency, customerId, dispatch]);
+
+    const setTransactionType = (sent, received) => {
+		dispatch({
+			type: SET_TRANSACTION_TYPE,
+			payload: {
+				sent,
+				received
+			}
+		});
+	}
+
 
     return (
         <>
@@ -137,19 +129,38 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
                                 {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        <FormControlLabel
-                            control={<IOSSwitch checked={showReceived} onChange={() => setShowReceived(!showReceived)} />}
-                            label={showReceived ? 'Received' : 'Sent'}
-                        />
+                        <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
+                            <Button
+                                color="primary"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={() => setTransactionType(false, true)}
+                                variant={received ? 'contained' : 'outlined'}
+                                fullWidth
+                            >
+                                Received
+                            </Button>
+                            <Button
+                                color="primary"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={() => setTransactionType(true, false)}
+                                variant={sent ? 'contained' : 'outlined'}
+                                fullWidth
+                            >
+                                Sent
+                            </Button>
+                        </ButtonGroup>
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
-                    {notifications.map(transaction => (
-                        <Transaction 
-                            key={transaction.id} 
-                            transaction={transaction} 
-                        />
-                    ))}
+                    {eurTransactions.length > 0 ? 
+                        eurTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                        :
+                        ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                        :
+                        transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                    }
                 </Box>
             </Box>
         </>
@@ -158,7 +169,8 @@ const Transactions = ({ getCurrencies, getNotifications }) => {
 
 Transactions.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
-    getNotifications: PropTypes.func.isRequired,
+    getTransactions: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCurrencies, getNotifications })(Transactions);
+export default connect(undefined, { getCurrencies, getTransactions })(Transactions);

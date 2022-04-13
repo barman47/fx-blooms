@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -16,8 +16,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
-
-import { SET_TRANSACTION } from '../../../actions/types';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -28,11 +28,10 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS.white,
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
-        padding: theme.spacing(5),
+        padding: theme.spacing(0, 5, 5, 5),
         
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 1),
-            
+            padding: theme.spacing(1)
         },
 
         '& header': {
@@ -40,7 +39,11 @@ const useStyles = makeStyles(theme => ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(3)
+
+            [theme.breakpoints.down('sm')]: {
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+            }
         }
     },
 
@@ -93,6 +96,10 @@ const useStyles = makeStyles(theme => ({
         },
     },
 
+    inProgress: {
+        color: COLORS.orange
+    },
+
     contact: {
         marginRight: theme.spacing(5),
         marginTop: theme.spacing(2),
@@ -112,11 +119,10 @@ const useStyles = makeStyles(theme => ({
 
 const TransactionStatus = ({ handleSetTitle }) => {
 	const classes = useStyles();
-	const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { customerId } = useSelector(state => state.customer);
-    const { transaction } = useSelector(state => state.notifications);
+    const { transaction } = useSelector(state => state.transactions);
 
     const [trackerText, setTrackerText] = useState('');
     const [customer, setCustomer] = useState({});
@@ -131,15 +137,6 @@ const TransactionStatus = ({ handleSetTitle }) => {
         initializeTransaction(transaction);
         // eslint-disable-next-line
     }, []);
-
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch({
-    //             type: SET_TRANSACTION,
-    //             payload: {}
-    //         });
-    //     };
-    // }, []);
 
     // Set the current step to the 5th one - Exception
     // useEffect(() => {
@@ -247,14 +244,6 @@ const TransactionStatus = ({ handleSetTitle }) => {
         toast.success('Transaction ID Copied!');
     };
 
-    const handleBackButtonClick = () => {
-        dispatch({
-            type: SET_TRANSACTION,
-            payload: {}
-        });
-        return history.back();
-    };
-
 	return (    
         <>
             <Toaster />
@@ -263,7 +252,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Button 
                         color="primary" 
                         variant="outlined" 
-                        onClick={handleBackButtonClick}
+                        onClick={() => navigate(-1)}
                         startIcon={<ArrowLeft />}
                     >
                         Back
@@ -291,22 +280,27 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Recepient Contact</Typography>
-                            <Typography variant="body2" component="p">+2348147233059</Typography>
+                            <Typography variant="body2" component="p">+2348147233059 (static value)</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount Sent</Typography>
-                            <Typography variant="body2" component="p">'N/A'{formatNumber(customer.amountTransfered, 2)}</Typography>
+                            <Typography variant="body2" component="p">{`${customer.currency}${formatNumber(customer.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount to Receive</Typography>
-                            <Typography variant="body2" component="p">'N/A'{formatNumber(recepient.amountTransfered, 2)}</Typography>
+                            <Typography variant="body2" component="p">{`${recepient.currency}${formatNumber(recepient.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Transfer Status</Typography>
-                            <Typography variant="body2" component="p" >{completed ? 'Completed' : 'In Progress'}</Typography>
+                            <Typography variant="body2" component="p" className={clsx({[classes.inProgress]: !completed})}>{completed ? 'Completed' : 'In Progress'}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Date</Typography>
+                            <Typography variant="body2" component="p" >January 1st, 1980 at 1:00am(static value)</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>
@@ -329,6 +323,10 @@ const TransactionStatus = ({ handleSetTitle }) => {
             </Box>
         </>
     );
+};
+
+TransactionStatus.propTypes = {
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default TransactionStatus;

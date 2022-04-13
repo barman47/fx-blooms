@@ -11,8 +11,12 @@ export const COLORS = {
     darkTeal: '#091d1d',
     lightTeal: '#f6fafa',
     red: '#EB5757',
-    darkRed: '#f21c1c'
+    darkRed: '#f21c1c',
+    orange: '#ffa500'
 };
+
+export const DRAWER_WIDTH = 300;
+// export const DRAWER_WIDTH = 240;
 
 export const SETUP_2FA = 'SETUP_2FA';
 export const EMAIL_VERIFICATION = 'EMAIL_VERIFICATION';
@@ -95,6 +99,7 @@ export const NOTIFICATION_TYPES = {
     BUYER_MADE_PAYMENT: 'BuyerPaymentMade',
     SELLER_MADE_PAYMENT: 'SellerPaymentMade',
     SELLER_CONFIRMED_PAYMENT: 'SellerConfirmedPayment',
+    OFFER_MADE: 'OfferMade',
     CANCEL_NEGOTIATION: 'CancelNegotiation'
 };
 

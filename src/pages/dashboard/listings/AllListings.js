@@ -9,14 +9,15 @@ import {
 	Checkbox,
 	Collapse,
 	FormControlLabel,
+	IconButton,
 	InputAdornment,
 	TextField,
 	Typography,
-	// useMediaQuery 
+	useMediaQuery
 } from '@material-ui/core';
-// import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
+import { Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -29,7 +30,8 @@ import {
 	ACTIVATE_USD_WALLET,
 	ACTIVATE_GPB_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
-	SET_LOADING_LISTINGS 
+	SET_LOADING_LISTINGS,
+	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
 import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
@@ -58,14 +60,14 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '1fr 1fr',
 		marginBottom: theme.spacing(2),
-		marginTop: theme.spacing(10),
+		// marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '1fr',
-			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5),
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2),
 			gap: theme.spacing(1)
 		},
 
@@ -73,14 +75,7 @@ const useStyles = makeStyles(theme => ({
 			marginBottom: '0',
 			paddingLeft: theme.spacing(2),
 			paddingRight: theme.spacing(2)
-		},
-
-		// '& div:first-child': {
-		// 	'& p:last-child': {
-		// 		marginTop: theme.spacing(2),
-		// 		color: COLORS.grey
-		// 	}
-		// }
+		}
 	},
 
 	root: {
@@ -155,7 +150,7 @@ const useStyles = makeStyles(theme => ({
 		marginBottom: theme.spacing(1),
 		marginTop: theme.spacing(1),
 
-		[theme.breakpoints.down('sm')]: {
+		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '0.7fr 1fr 1fr',
 			rowGap: theme.spacing(0.8),
@@ -186,9 +181,9 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	buttonGroup: {
+	filterLabel: {
 		[theme.breakpoints.down('sm')]: {
-			marginBottom: theme.spacing(1)
+			gridColumn: '1 / span 2'
 		}
 	},
 
@@ -196,37 +191,6 @@ const useStyles = makeStyles(theme => ({
 		paddingBottom: theme.spacing(0.7),
 		paddingTop: theme.spacing(0.7)
 	},
-
-	// gateway: {
-	// 	background: 'linear-gradient(238.08deg, #25AEAE -0.48%, #1E6262 99.63%)',
-	// 	boxShadow: '1px 14px 30px -16px rgba(30, 98, 98, 1)',
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	height: 'initial',
-    //     padding: [[theme.spacing(5), 0, 0, theme.spacing(2)]],
-
-	// 	'& div:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'column',
-	// 		justifyContent: 'space-between',
-
-	// 		'& h5': {
-	// 			color: COLORS.offWhite,
-	// 			fontWeight: 600
-	// 		},
-
-	// 		'& p': {
-	// 			color: COLORS.offWhite,
-	// 			marginBottom: theme.spacing(3)
-	// 		},
-	// 	},
-
-	// 	'& img': {
-	// 		width: '35%',
-	// 		alignSelf: 'flex-end'
-	// 	}
-	// },
 	
 	listings: {
 		height: '100vh',
@@ -235,7 +199,9 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: theme.spacing(5),
 
 		[theme.breakpoints.down('md')]: {
-			gridTemplateColumns: '1fr'
+			gridTemplateColumns: '1fr',
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2)
 		},
 
 		[theme.breakpoints.down('sm')]: {
@@ -247,62 +213,6 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		marginTop: theme.spacing(1)
 	},
-
-	// filter: {
-	// 	marginTop: theme.spacing(4)
-	// },
-
-	// filterContainer: {
-	// 	backgroundColor: COLORS.lightTeal,
-	// 	borderRadius: theme.shape.borderRadius,
-	// 	padding: [[theme.spacing(2), theme.spacing(2), theme.spacing(4), theme.spacing(2)]],
-	// 	height: 'initial',
-	// 	alignSelf: 'flex-start',
-	// 	marginTop: theme.spacing(6.5),
-	// 	position: 'sticky',
-
-	// 	[theme.breakpoints.down('md')]: {
-	// 		display: 'none'
-	// 	},
-
-	// 	'& header:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'row',
-	// 		justifyContent: 'space-between',
-	// 		marginBottom: theme.spacing(3),
-	// 		padding: 0,
-	// 	}
-	// },
-
-	// filterButtonContainer: {
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	marginBottom: theme.spacing(3),
-	// 	padding: 0,
-	// },
-
-	// clear: {
-	// 	cursor: 'pointer',
-	// 	'&:hover': {
-	// 		textDecoration: 'underline'
-	// 	}
-	// },
-
-	// filterButton: {
-	// 	'&:hover': {
-	// 		textDecoration: 'none !important'
-	// 	}
-	// },
-
-	// label: {
-	// 	fontSize: theme.spacing(1.5)
-	// },
-
-	// disabledButton: {
-	// 	backgroundColor: '#d8dcdc',
-	// 	color: '#aoa3a3'
-	// },
 
 	buyerPopup: {
 		display: 'inline-block',
@@ -316,9 +226,10 @@ const AllListings = (props) => {
 	const classes = useStyles();
 	const dispatch = useDispatch();
 	const theme = useTheme();
+	const matches = useMediaQuery(theme.breakpoints.down('sm'));
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext } = useSelector(state => state.listings);
+	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const listingsLoading = useSelector(state => state.listings.loading);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
@@ -327,12 +238,8 @@ const AllListings = (props) => {
 
 	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
 
-	// eslint-disable-next-line
-	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
-	// eslint-disable-next-line
-	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
 	const [Amount, setAmount] = useState('');
-
+	const [timeOfDay, setTimeOfDay] = useState('');
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [errors, setErrors] = useState({});
 
@@ -357,6 +264,7 @@ const AllListings = (props) => {
     };
 
 	useEffect(() => {
+		greet();
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
 		getCustomerStats();
@@ -374,7 +282,7 @@ const AllListings = (props) => {
 		}
 
 		if (unreadNotifications === 0) {
-            getNotifications();
+            getNotifications(true);
         }
 
 		if (accounts.length === 0) {
@@ -406,13 +314,14 @@ const AllListings = (props) => {
 			getListingsOpenForBid({
 				pageNumber: 0,
 				pageSize: 15,
-				currencyNeeded: 'EUR',
-				currencyAvailable: 'NGN',
+				currencyNeeded: requiredCurrency,
+				currencyAvailable: availableCurrency,
 				minimumExchangeAmount: 0,
-				useCurrencyFilter: false
+				useCurrencyFilter: true,
+				useRatingFilter: false
 			});
 		}
-	}, [Amount, dispatch, getListingsOpenForBid]);
+	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 
 	useEffect(() => {
 		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
@@ -428,10 +337,11 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 10,
-			currencyNeeded: 'NGN',
-			currencyAvailable: 'EUR',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		}, true);
 	};
 
@@ -439,18 +349,26 @@ const AllListings = (props) => {
 		getMoreListings({
 			pageNumber: currentPageNumber + 1,
 			pageSize: 10,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useCurrencyFilter: true,
+			useRatingFilter: false
 		});	
 	};
 
 	const handleClearFilter = useCallback(() => {
-		setAvailableCurrency('NGN');
-		setRequiredCurrency('EUR');
+		// setAvailableCurrency('NGN');
+		// setRequiredCurrency('EUR');
 		setAmount('');
 		setErrors({});
+		// dispatch({
+		// 	type: SET_REQUIRED_CURRENCY,
+		// 	payload: {
+		// 		availableCurrency: 'NGN',
+		// 		requiredCurrency: 'EUR'
+		// 	}
+		// });
 		dispatch({
 			type: SET_LOADING_LISTINGS,
 			payload: true
@@ -459,12 +377,13 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 0,
 			pageSize: 15,
-			currencyNeeded: 'EUR',
-			currencyAvailable: 'NGN',
+			currencyNeeded: requiredCurrency,
+			currencyAvailable: availableCurrency,
 			minimumExchangeAmount: 0,
-			useCurrencyFilter: false
+			useRatingFilter: false,
+			useCurrencyFilter: true
 		});
-	}, [dispatch, getListingsOpenForBid]);
+	}, [dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
 
 	useEffect(() => {
 		if (hideNegotiationListings === false) {
@@ -475,7 +394,6 @@ const AllListings = (props) => {
 	const hideListingsInNegotiation = () => {
 		setHideNegotiationListings(!hideNegotiationListings);
 		if (!hideNegotiationListings) {
-			console.log('Hiding unavailable listings');
 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
 		}
 	};
@@ -486,7 +404,7 @@ const AllListings = (props) => {
 
 
 		if (isEmpty(Amount)) {
-			return setErrors({ msg: 'Invalid Serach', Amount: 'Please enter an amount' });
+			return setErrors({ msg: 'Invalid Search', Amount: 'Please enter an amount' });
 		}
 
 		setErrors({});
@@ -497,14 +415,37 @@ const AllListings = (props) => {
 		getListingsOpenForBid({
 			pageNumber: 1,
 			pageSize: 15,
-			currencyAvailable: 'NGN',
-			currencyNeeded: 'EUR',
+			currencyAvailable: availableCurrency,
+			currencyNeeded: requiredCurrency,
 			amount: Number(Amount),
 			useCurrencyFilter: true,
 			useRatingFilter: false,
 			sellerRating: 0
 		});
 	};
+
+	const setCurrency = (available, required) => {
+		dispatch({
+			type: SET_REQUIRED_CURRENCY,
+			payload: {
+				availableCurrency: available,
+				requiredCurrency: required  
+			}
+		});
+	}
+
+	const greet = () => {
+        const time = new Date();
+        const hour = time.getHours();
+
+        if (hour < 12) {
+            setTimeOfDay('morning');
+        } else if (hour >= 12 && hour < 16) {
+            setTimeOfDay('afternoon');
+        } else {
+            setTimeOfDay('evening');
+        }
+    };
 
 	return (
 		<>
@@ -514,8 +455,7 @@ const AllListings = (props) => {
             <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
-					<Typography variant="body1" component="p">Hello, <strong>{firstName ? firstName : userName}</strong></Typography> 
-					{/* <Typography variant="body1" component="p">What would you like to do today?</Typography>  */}
+					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
 				</div>
 				{/* <div>
 					<NewNotification 
@@ -610,12 +550,15 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation variant="contained" className={classes.buttonGroup}>
+							<ButtonGroup disableElevation>
 								<Button
 									color="primary"
 									size="small"
 									disableRipple
 									disableFocusRipple
+									onClick={() => setCurrency('NGN', 'EUR')}
+									variant={requiredCurrency === 'EUR' ? 'contained' : 'outlined'}
+									// disabled={requiredCurrency === 'NGN'}
 								>
 									BUY EUR
 								</Button>
@@ -624,7 +567,9 @@ const AllListings = (props) => {
 									size="small"
 									disableRipple
 									disableFocusRipple
-									disabled
+									onClick={() => setCurrency('EUR', 'NGN')}
+									variant={requiredCurrency === 'NGN' ? 'contained' : 'outlined'}
+									// disabled={requiredCurrency === 'EUR'}
 								>
 									BUY NGN
 								</Button>
@@ -635,31 +580,46 @@ const AllListings = (props) => {
 									onChange={(e) => handleSetAmount(e.target.value)}
 									type="text"
 									variant="outlined" 
-									placeholder="Enter Amount"
+									placeholder={matches ? `${requiredCurrency} Amount` : 'Enter Amount'}
 									helperText={errors.Amount}
 									fullWidth
 									required
 									error={errors.Amount ? true : false}
 									disabled={listingsLoading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start" color="primary">EUR | </InputAdornment>,
+										startAdornment: !matches && <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
-											<Button
-												variant="contained"
-												color="primary"
-												// size="large"
-												disableRipple
-												disableFocusRipple
-												className={classes.searchButton}
-												onClick={handleFilter}
-											>
-												Search
-											</Button>
+											{matches ? 
+												<IconButton
+													color="primary"
+													// size="large"
+													disableRipple
+													disableFocusRipple
+													className={classes.searchButton}
+													onClick={handleFilter}
+												>
+													<Magnify />
+												</IconButton>
+											: 
+												<Button
+													variant="contained"
+													color="primary"
+													// size="large"
+													disableRipple
+													disableFocusRipple
+													className={classes.searchButton}
+													onClick={handleFilter}
+												>
+													Search
+												</Button>
+											}
+											
 										</InputAdornment>,
 									}}
 								/>
 							</form>
 							<FormControlLabel
+								className={classes.filterLabel}
 								style={{ color: theme.palette.primary.main }}
 								control={
 									<Checkbox
@@ -676,357 +636,12 @@ const AllListings = (props) => {
 							:
 							<Listings />
 						}
-						
 					</InfiniteScroll>
-					{/* <Filter /> */}
 				</section>
 			</Box>
 		</>
 	);
 }
-
-// const Filter = connect(undefined, { getCurrencies, getListingsOpenForBid })(({ getCurrencies, getListingsOpenForBid }) => {
-// 	const PRICE = 'PRICE';
-// 	const RATING = 'RATING';
-// 	const classes = useStyles();
-// 	const dispatch = useDispatch();
-// 	const theme = useTheme();
-// 	const { currencies, listings } = useSelector(state => state);
-
-// 	// eslint-disable-next-line
-// 	const [AvailableCurrency, setAvailableCurrency] = useState('NGN');
-// 	// eslint-disable-next-line
-// 	const [RequiredCurrency, setRequiredCurrency] = useState('EUR');
-// 	const [Amount, setAmount] = useState('');
-
-// 	const [SellerRating, setSellerRating] = useState(0);
-// 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
-// 	const [errors, setErrors] = useState({});
-// 	const [loading, setLoading] = useState(false);
-// 	const [filter, setFilter] = useState(PRICE);
-
-// 	useEffect(() => {
-// 		if (currencies.length === 0) {
-// 			getCurrencies();
-// 		}
-// 		// eslint-disable-next-line
-// 	}, []);
-
-// 	useEffect(() => {
-// 		setLoading(false);
-// 	}, [listings]);
-
-// 	const handleClearFilter = useCallback(() => {
-// 		setFilter(PRICE);
-// 		setAvailableCurrency('NGN');
-// 		setRequiredCurrency('EUR');
-// 		setAmount('');
-// 		setSellerRating('');
-// 		setErrors({});
-// 		setLoading(false);
-
-// 		getListingsOpenForBid({
-// 			pageNumber: 0,
-// 			pageSize: 15,
-// 			currencyNeeded: 'EUR',
-// 			currencyAvailable: 'NGN',
-// 			minimumExchangeAmount: 0,
-// 			useCurrencyFilter: false
-// 		});
-// 	}, [getListingsOpenForBid]);
-
-// 	useEffect(() => {
-// 		if (hideNegotiationListings === false) {
-// 			handleClearFilter();
-// 		}
-// 	}, [handleClearFilter, hideNegotiationListings]);
-
-// 	const hideListingsInNegotiation = () => {
-// 		setHideNegotiationListings(!hideNegotiationListings);
-// 		if (!hideNegotiationListings) {
-// 			dispatch({ type: HIDE_NEGOTIATION_LISTINGS });
-// 		}
-// 	};
-
-// 	const onSubmit = (e) => {
-// 		e.preventDefault();
-// 		setErrors({});
-
-// 		if (filter === RATING) {
-// 			if (isEmpty(SellerRating)) {
-// 				return setErrors({ msg: 'Invalid Filter', SellerRating: 'Seller rating is required!' });
-// 			}
-
-// 			setErrors({});
-// 			setLoading(true);
-// 			getListingsOpenForBid({
-// 				pageNumber: 1,
-// 				pageSize: 15,
-// 				currencyAvailable: 'NGN',
-// 				currencyNeeded: 'EUR',
-// 				amount: Number(Amount),
-// 				useCurrencyFilter: false,
-// 				useRatingFilter: true,
-// 				sellerRating: parseInt(SellerRating)
-// 			});
-// 		} else {
-// 			// Get rating by star
-// 			const priceFilter = {
-// 				AvailableCurrency: 'NGN',
-// 				RequiredCurrency: 'EUR',
-// 				Amount
-// 			};
-// 			const { errors, isValid } = validatePriceFilter(priceFilter);
-
-// 			if (!isValid) {
-// 				return setErrors({ msg: 'Invalid Filter', ...errors });
-// 			}
-
-// 			setErrors({});
-// 			setLoading(true);
-// 			getListingsOpenForBid({
-// 				pageNumber: 1,
-// 				pageSize: 15,
-// 				currencyAvailable: 'NGN',
-// 				currencyNeeded: 'EUR',
-// 				amount: Number(Amount),
-// 				useCurrencyFilter: true,
-// 				useRatingFilter: false,
-// 				sellerRating: 0
-// 			});
-// 		}
-// 	};
-
-// 	return (
-// 		<section className={classes.filter}>
-// 			<div className={classes.filterContainer}>
-// 				<Box component="header">
-// 					<Typography variant="subtitle2" component="span">Filter</Typography>
-// 					<Typography 
-// 						className={classes.clear}
-// 						variant="subtitle2" 
-// 						component="span" 
-// 						color="primary"
-// 						onClick={handleClearFilter}
-// 						>
-// 							Clear
-// 					</Typography>
-// 				</Box>
-// 				<Box component="div" className={classes.filterButtonContainer}>
-// 					<Button 
-// 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === RATING } )} 
-// 							variant="contained" 
-// 							color="primary" 
-// 							size="small"
-// 							onClick={() => setFilter(PRICE)}
-// 						>
-// 							Amount
-// 						</Button>
-// 						<Button 
-// 							className={clsx(classes.filterButton, { [`${classes.disabledButton}`]: filter === PRICE } )} 
-// 							variant="contained" 
-// 							color="primary" 
-// 							size="small"
-// 							disabled
-// 						>
-// 							Completion Rate
-// 					</Button>
-// 				</Box>
-// 				<form onSubmit={onSubmit} noValidate>
-// 					{
-// 						filter === PRICE
-// 						?
-// 						<Grid container direction="row" spacing={2}>
-// 							<Grid item xs={12}>
-// 								<Typography variant="subtitle2" className={classes.label}>Exchange Amount</Typography>
-// 								<TextField 
-// 									value="NGN"
-// 									// onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									// placeholder="Enter Amount"
-// 									helperText={errors.AvailableCurrency}
-// 									fullWidth
-// 									required
-// 									error={errors.AvailableCurrency ? true : false}
-// 									disabled
-// 								/>
-// 								{/* <FormControl 
-// 									variant="outlined" 
-// 									error={errors.AvailableCurrency ? true : false } 
-// 									fullWidth 
-// 									required
-// 									disabled
-// 									// disabled={loading ? true : false}
-// 								>
-// 									<Select
-// 										labelId="AvailableCurrency"
-// 										value={AvailableCurrency}
-// 										// onChange={(e) => setAvailableCurrency(e.target.value)}
-									
-// 									>
-// 										<MenuItem value="">Select Currency</MenuItem>
-// 										{currencies.length > 0 && currencies.map((currency, index) => (
-// 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'EUR'}>{currency.value}</MenuItem>
-// 										))}
-// 									</Select>
-// 									<FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-// 								</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={5}>
-// 								<Typography variant="subtitle2" className={classes.label}>Expected Amount</Typography>
-// 								<TextField 
-// 									value="EUR"
-// 									// onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									placeholder="Enter Amount"
-// 									helperText={errors.RequiredCurrency}
-// 									fullWidth
-// 									required
-// 									error={errors.RequiredCurrency ? true : false}
-// 									disabled
-// 								/>
-// 								{/* <FormControl 
-// 									variant="outlined" 
-// 									error={errors.RequiredCurrency ? true : false } 
-// 									fullWidth 
-// 									required
-// 									disabled
-// 									// disabled={loading ? true : false}
-// 								>
-// 									<Select
-// 										labelId="RequiredCurrency"
-// 										value={RequiredCurrency}
-// 										// onChange={(e) => setRequiredCurrency(e.target.value)}
-// 									>
-// 										<MenuItem value="" disabled>Select</MenuItem>
-// 										<MenuItem value="" disabled>Select</MenuItem>
-// 										{currencies.length > 0 && currencies.map((currency, index) => (
-// 											<MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
-// 										))}
-// 									</Select>
-// 									<FormHelperText>{errors.RequiredCurrency}</FormHelperText>
-// 								</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={7}>
-// 								<TextField 
-// 									value={Amount}
-// 									onChange={(e) => setAmount(e.target.value)}
-// 									type="text"
-// 									variant="outlined" 
-// 									placeholder="Enter Amount"
-// 									helperText={errors.Amount}
-// 									fullWidth
-// 									required
-// 									error={errors.Amount ? true : false}
-// 									disabled={loading ? true : false}
-// 									style={{ marginTop: theme.spacing(2.2) }}
-// 								/>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<Button 
-// 									type="submit" 
-// 									variant="contained" 
-// 									color="primary"
-// 									fullWidth
-// 									disabled={loading ? true : false}
-// 								>
-// 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-// 								</Button>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<FormControlLabel
-// 									style={{ color: theme.palette.primary.main }}
-// 									control={
-// 										<Checkbox
-// 											checked={hideNegotiationListings}
-// 											onChange={hideListingsInNegotiation}
-// 											color="primary"
-// 										/>
-// 									}
-// 									label="Hide Unavailable Listings"
-// 								/>
-// 							</Grid>
-// 						</Grid>
-// 						:
-// 						<Grid container direction="row" spacing={2}>
-// 							<Grid item xs={12}>
-// 								<Rating 
-// 									color="primary" 
-// 									name="seller-rating"  
-// 									style={{ color: theme.palette.primary.main }}
-// 									value={SellerRating}
-// 									onChange={(e) => setSellerRating(e.target.value)}
-// 									disabled={loading ? true : false}
-// 								/>
-// 								{/* <Typography variant="subtitle2">Number of Stars</Typography> */}
-// 									{/* <FormControl 
-// 										variant="outlined" 
-// 										error={errors.SellerRating ? true : false } 
-// 										fullWidth 
-// 										required
-// 										disabled={loading ? true : false}
-// 									>
-// 										<Select
-// 											labelId="SellerRating"
-// 											value={SellerRating}
-// 											onChange={(e) => setSellerRating(e.target.value)}
-										
-// 										>
-// 											<MenuItem value="">Select Number of Stars</MenuItem>
-// 											<MenuItem value="1">1</MenuItem>
-// 											<MenuItem value="2">2</MenuItem>
-// 											<MenuItem value="3">3</MenuItem>
-// 											<MenuItem value="4">4</MenuItem>
-// 											<MenuItem value="5">5</MenuItem>
-// 										</Select>
-// 										<FormHelperText>{errors.SellerRating}</FormHelperText>
-// 									</FormControl> */}
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<Button 
-// 									type="submit" 
-// 									variant="contained" 
-// 									color="primary"
-// 									fullWidth
-// 									disabled={loading ? true : false}
-// 								>
-// 									{!loading ? 'Filter Result' : <CircularProgress style={{ color: '#f8f8f8' }} />}
-// 								</Button>
-// 							</Grid>
-// 							<Grid item xs={12}>
-// 								<FormControlLabel
-// 									style={{ color: theme.palette.primary.main }}
-// 									control={
-// 										<Checkbox
-// 											checked={hideNegotiationListings}
-// 											onChange={hideListingsInNegotiation}
-// 											color="primary"
-// 										/>
-// 									}
-// 									label="Hide Unavailable Listings"
-// 								/>
-// 							</Grid>
-// 						</Grid>
-// 					}
-// 				</form>
-// 				{/* <Link 
-// 					to="#!" 
-// 					component={RouterLink}
-// 					className={classes.buyerPopup}
-// 				>
-// 					Buyer Account Details Popup
-// 				</Link> */}
-// 			</div>
-// 		</section>
-// 	);
-// });
-
-// Filter.propTypes = {
-// 	getCurrencies: PropTypes.func.isRequired,
-// 	getListingsOpenForBid: PropTypes.func.isRequired
-// };
 
 AllListings.propTypes = {
 	getAccounts: PropTypes.func.isRequired,

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -39,21 +39,23 @@ import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
-        padding: theme.spacing(4, 2, 2, 2),
+        padding: theme.spacing(0, 5),
+
+        [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(0, 2)  
+        },
         
         '& header': {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(5),
             
             [theme.breakpoints.down('sm')]: {
                 flexDirection: 'column'
             },
             
             '& h6': {
-                fontWeight: 600,
-                // marginTop: theme.spacing(2),
+                fontWeight: 600
             },
 
             '& p': {
@@ -152,7 +154,7 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
@@ -274,6 +276,17 @@ const MakeListing = (props) => {
         }
     }, [addedListing, dispatch, msg]);
 
+    // Set NGN as Required currency when EUR is the Available currency and vice versa
+    // useEffect(() => {
+    //     if (AvailableCurrency === 'EUR') {
+    //         setRequiredCurrency('NGN');
+    //     }
+
+    //     if (AvailableCurrency === 'NGN') {
+    //         setRequiredCurrency('EUR');
+    //     }
+    // }, [AvailableCurrency]);
+
     // useEffect(() => {
     //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
     //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
@@ -288,11 +301,16 @@ const MakeListing = (props) => {
     //     }
     // }, [ExchangeAmount, ReceiptAmount]);
 
+    // Set receiving amount
     useEffect(() => {
-        if (ExchangeAmount && ExchangeRate) {
+        if (ExchangeAmount && ExchangeRate && AvailableCurrency === 'EUR') {
             setReceiptAmount(`NGN ${formatNumber(Number(ExchangeAmount) * Number(ExchangeRate), 2)}`);
         }
-    }, [ExchangeAmount, ExchangeRate]);
+
+        if (ExchangeAmount && ExchangeRate && AvailableCurrency === 'NGN') {
+            setReceiptAmount(`EUR ${formatNumber(Number(ExchangeAmount) / Number(ExchangeRate), 2)}`);
+        }
+    }, [AvailableCurrency, ExchangeAmount, ExchangeRate]);
 
     // Set Listing Fee
     // useEffect(() => {
@@ -396,7 +414,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
-            history.push(DASHBOARD_HOME);
+            navigate(DASHBOARD_HOME);
         }
     };
 
@@ -438,7 +456,7 @@ const MakeListing = (props) => {
         setErrors({});
         setLoading(true);
         const listing = {
-            currencyNeeded: RequiredCurrency,
+            currencyNeeded: AvailableCurrency === 'NGN' ? 'EUR' : 'NGN',
             ExchangeRate: parseFloat(ExchangeRate),
             AmountAvailable: {
                 CurrencyType: AvailableCurrency,
@@ -482,7 +500,7 @@ const MakeListing = (props) => {
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
-                        <Typography variant="h6">Make a Listing</Typography>
+                        <Typography variant="h6">Make a Listing - (Sell {AvailableCurrency})</Typography>
                         <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
                     </div>
                     {/* <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography> */}
@@ -498,18 +516,17 @@ const MakeListing = (props) => {
                                         error={errors.AvailableCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        // disabled={loading ? true : false}
-                                        disabled
+                                        disabled={loading ? true : false}
                                     >
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
-                                            // onChange={(e) => setAvailableCurrency(e.target.value)}
+                                            onChange={(e) => setAvailableCurrency(e.target.value)}
                                         
                                         >
                                             <MenuItem value="" disabled>Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
-                                                <MenuItem key={index} value={currency.value} disabled={currency.value === 'NGN'}>{currency.value}</MenuItem>
+                                                <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
                                             ))}
                                         </Select>
                                         <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
@@ -543,13 +560,13 @@ const MakeListing = (props) => {
                                         error={errors.RequiredCurrency ? true : false } 
                                         fullWidth 
                                         required
-                                        disabled
                                         // disabled={loading ? true : false}
+                                        disabled
                                     >
                                         <Select
                                             labelId="RequiredCurrency"
                                             value={RequiredCurrency}
-                                            onChange={(e) => setRequiredCurrency(e.target.value)}
+                                            // onChange={(e) => setRequiredCurrency(e.target.value)}
                                         
                                         >
                                             <MenuItem value="" disabled>Select Currency</MenuItem>
@@ -579,7 +596,7 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                    {recommendedRate && <FormHelperText color="primary">Recomended Rate: <span style={{ color: COLORS.red }}>{recommendedRate}</span></FormHelperText>}
+                                    {recommendedRate && <FormHelperText color="primary">Recomended Rate: 1EUR to <span style={{ color: COLORS.red }}>{recommendedRate}NGN</span></FormHelperText>}
                                 </Grid>
                                 {/* <Grid item xs={4}>
                                     <br />
@@ -639,42 +656,55 @@ const MakeListing = (props) => {
                                             onChange={(e) => setReceivingAccount(e.target.value)}
                                         >
                                             <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            {accounts.map((account) => {
-                                                if (account.currency === 'NGN') {
-                                                    return (
-                                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                    )
-                                                }
-                                                return null;
-                                            })}
+                                            {AvailableCurrency === 'EUR' ?
+                                                accounts.map((account) => {
+                                                    if (account.currency === 'NGN') {
+                                                        return (
+                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })
+                                             : 
+                                                accounts.map((account) => {
+                                                    if (account.currency === 'EUR') {
+                                                        return (
+                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                        );
+                                                    }
+                                                    return null;
+                                                })
+                                            }
                                         </Select>
                                         <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
                                     </FormControl>
                                     <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.Bank ? true : false } 
-                                        fullWidth 
-                                        required
-                                        disabled={loading ? true : false}
-                                    >
-                                        <Select
-                                            labelId="Bank"
-                                            value={Bank}
-                                            onChange={(e) => setBank(e.target.value)}
-                                        
+                                {AvailableCurrency === 'EUR' && 
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
+                                        <FormControl 
+                                            variant="outlined" 
+                                            error={errors.Bank ? true : false } 
+                                            fullWidth 
+                                            required
+                                            disabled={loading ? true : false}
                                         >
-                                            <MenuItem value="" disabled>Select Payment Method</MenuItem>
-                                            {PAYMENT_METHODS.map((method, index) => (
-                                                <MenuItem key={index} value={method}>{method}</MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.Bank}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
+                                            <Select
+                                                labelId="Bank"
+                                                value={Bank}
+                                                onChange={(e) => setBank(e.target.value)}
+                                            
+                                            >
+                                                <MenuItem value="" disabled>Select Payment Method</MenuItem>
+                                                {PAYMENT_METHODS.map((method, index) => (
+                                                    <MenuItem key={index} value={method}>{method}</MenuItem>
+                                                ))}
+                                            </Select>
+                                            <FormHelperText>{errors.Bank}</FormHelperText>
+                                        </FormControl>
+                                    </Grid>
+                                }
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
                                     <TextField 
@@ -698,7 +728,7 @@ const MakeListing = (props) => {
                                             // onKeyUp={handleSetExchangeAmount}
                                             type="text"
                                             variant="outlined" 
-                                            placeholder="NGN 0.00"
+                                            placeholder={AvailableCurrency === 'EUR' ? 'NGN 0.00' : 'EUR 0.00'}
                                             helperText={errors.ReceiptAmount}
                                             fullWidth
                                             required

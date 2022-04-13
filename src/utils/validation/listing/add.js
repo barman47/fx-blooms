@@ -70,7 +70,7 @@ const addListing = (data) => {
         errors.ReceivingAccount = 'Please provide a bank account!';
     }
 
-    if (Validator.isEmpty(data.Bank)) {
+    if (data.AvailableCurrency === 'EUR' && Validator.isEmpty(data.Bank)) {
         errors.Bank = 'Payment method is required!';
     }
    

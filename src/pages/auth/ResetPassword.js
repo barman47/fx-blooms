@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -105,7 +105,7 @@ const ResetPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const errorsState = useSelector(state => state.errors);
@@ -135,9 +135,9 @@ const ResetPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
-        setToken(history.location.search.split('=')[1]);
+        setToken(navigate.location.search.split('=')[1]);
         // eslint-disable-next-line
     }, []);
 
@@ -164,7 +164,7 @@ const ResetPassword = (props) => {
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
-    }, [dispatch, history, msg]);
+    }, [dispatch, msg]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -179,7 +179,7 @@ const ResetPassword = (props) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        history.push(LOGIN)
+        navigate(LOGIN)
     };
 
     const strengthChecker = useCallback((password) => {

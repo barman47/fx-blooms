@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -88,7 +88,7 @@ const useStyles = makeStyles(theme => ({
 const QrCode = (props) => {
     const classes = useStyles();
     
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { barcode } = useSelector(state => state.twoFactor);
     const [barcodeImage, setBarcodeImage] = useState(null);
@@ -168,7 +168,7 @@ const QrCode = (props) => {
                     />
                     <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                     <Button variant="contained" color="primary" component={RouterLink} to={VERIFY_2FA} className={classes.button}>Proceed</Button>
-                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button>
+                    <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(navigate)}>Cancel</Button>
                 </div>
             </Container>
         </>

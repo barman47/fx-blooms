@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import ListItem from '@material-ui/core/ListItem';
+import { ListItem } from '@material-ui/core';
 
 export default function ListItemLink(props) {
     const { to } = props;

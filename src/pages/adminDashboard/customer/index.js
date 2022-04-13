@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme =>({
 const Customer = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const { customer, msg } = useSelector(state => state.customers);
 
@@ -165,7 +165,7 @@ const Customer = () => {
                 type: CLEAR_CUSTOMER_STATUS_MSG
             });
 
-            history.goBack();
+            navigate(-1);
         }
     };
 

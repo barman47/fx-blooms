@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory, useLocation} from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -24,7 +24,6 @@ import PropTypes from 'prop-types';
 import Spinner from '../../components/common/Spinner';
 
 import { externalLogin, login } from '../../actions/customer';
-import { getMyLocation } from '../../actions/myLocation';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
@@ -111,14 +110,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Login = ({ externalLogin, getMyLocation, login }) => {
+const Login = ({ externalLogin, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
-    const { customer, myLocation } = useSelector(state => state);
+    const { customer } = useSelector(state => state);
 
     const [Username, setUsername] = useState('');
     const [Password, setPassword] = useState('');
@@ -130,13 +129,12 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            return history.push(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
-            history.replace(location.pathname, {});
+            // navigate(location.pathname, {});
         }
-        getLocation();
         // eslint-disable-next-line
     }, []);
 
@@ -155,15 +153,9 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
     useEffect(() => {
         if (customer.twoFactorEnabled === true && loading) {
             setLoading(false);
-            history.push(VERIFY_2FA, { twoFactorEnabled: true });
+            navigate(VERIFY_2FA, { twoFactorEnabled: true });
         }
-    }, [customer, history, loading]);
-
-    const getLocation = () => {
-        if (!myLocation.ip) {
-            getMyLocation();
-        }
-    };
+    }, [customer, navigate, loading]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -182,7 +174,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history, myLocation);
+        externalLogin(data, navigate);
     };
 
     const handleFormSubmit = (e) => {
@@ -200,7 +192,7 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        login(data, history, myLocation);
+        login(data, navigate);
     };   
 
     return (
@@ -346,9 +338,8 @@ const Login = ({ externalLogin, getMyLocation, login }) => {
 };
 
 Login.propTypes = {
-    getMyLocation: PropTypes.func.isRequired,
     login: PropTypes.func.isRequired,
     externalLogin: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { externalLogin, getMyLocation, login })(Login);
+export default connect(undefined, { externalLogin, login })(Login);

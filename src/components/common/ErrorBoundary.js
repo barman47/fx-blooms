@@ -1,9 +1,6 @@
 import { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { BrowserRouter, Link as RouterLink } from 'react-router-dom';
 import { Box, Button, Grid, Typography, makeStyles, } from '@material-ui/core';
-
-import { CONTACT_US } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -40,17 +37,17 @@ const useStyles = makeStyles(theme => ({
     
     buttonContainer: {
         display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        flexDirection: 'column',
+        justifyContent: 'center',
         alignItems: 'center'
     }
 }));
 
-export const ErrorFallback = () => {
+export const ErrorFallback = ({ handleReset }) => {
     const classes = useStyles();
 
     return (
-        <BrowserRouter>
+        <>
             <Helmet>
                 <title>Error | FXBLOOMS.com</title>
             </Helmet>
@@ -61,37 +58,25 @@ export const ErrorFallback = () => {
                         <Typography variant="h4" align="center">Oops! Something went wrong</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="body2" component="p" align="center">Sorry this link is broken, kindly try again or contact support.</Typography>
+                        <Typography variant="body2" component="p" align="center">Sorry this link is broken, kindly try again or <a href="mailto:support@fxblooms.com">contact support</a>.</Typography>
                     </Grid>
                     <Grid item xs={12}>
                         <Box component="div" className={classes.buttonContainer}>
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                size="medium"
-                                disableRipple
-                                disableFocusRipple
-                                component={RouterLink}
-                                to="/"
-                            >
-                                Take Me Home
-                            </Button>
                             <Button
                                 variant="outlined"
                                 color="primary"
                                 size="large"
                                 disableRipple
                                 disableFocusRipple
-                                component={RouterLink}
-                                to={CONTACT_US}
+                                onClick={handleReset}
                             >
-                                Contact Us
+                                Try Again
                             </Button>
                         </Box>
                     </Grid>
                 </Grid>
             </Box>
-        </BrowserRouter>
+        </>
     );
 };
 
@@ -113,9 +98,13 @@ class ErrorBoundary extends Component {
         console.log(error, errorInfo);
     }
 
+    handleReset = () => {
+        this.setState({ hasError: false });
+    }
+
     render () {
         if (this.state.hasError) {
-            return <ErrorFallback />
+            return <ErrorFallback handleReset={this.handleReset} />
         }
         return this.props.children;
     }

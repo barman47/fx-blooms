@@ -18,7 +18,7 @@ import {
 
 const api = `${API}/Admin`;
 
-export const login = (data, history) => async (dispatch) => {
+export const login = (data, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Login`, data);
         const { token } = res.data.data;
@@ -27,7 +27,7 @@ export const login = (data, history) => async (dispatch) => {
             type: SET_CURRENT_ADMIN,
             payload: { ...res.data.data, timeGenerated: res.data.timeGenerated }
         });
-        history.push(ADMIN_HOME);
+        navigate(ADMIN_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -111,8 +111,8 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
     }
 };
 
-export const logout = (history) => dispatch => {
+export const logout = (navigate) => dispatch => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
-    return history.push(ADMIN_LOGIN);
+    return navigate(ADMIN_LOGIN);
 };

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -62,7 +62,7 @@ const useStyles = makeStyles(theme => ({
 const SessionModal = ({ logout }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { resetSession } = useSelector(state => state.customer);
 
@@ -110,8 +110,8 @@ const SessionModal = ({ logout }) => {
     const handleLogin = useCallback(() => {
         sessionStorage.removeItem(LOGOUT);
         setOpen(false);
-        logout(history, 'Your session expired due to inactivity.');
-    }, [history, logout]);
+        logout(navigate, 'Your session expired due to inactivity.');
+    }, [navigate, logout]);
 
     // logout user when time has elapsed
     useEffect(() => {

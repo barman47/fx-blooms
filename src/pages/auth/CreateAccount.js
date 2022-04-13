@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
@@ -26,7 +26,6 @@ import SuccessModal from '../../components/common/SuccessModal';
 import Toast from '../../components/common/Toast';
 
 import { externalLogin, registerCustomer } from '../../actions/customer';
-import { getMyLocation } from '../../actions/myLocation';
 
 import isEmpty from '../../utils/isEmpty';
 import { DASHBOARD_HOME, LOGIN, PENDING_VERIFICATION, PRIVACY_POLICY, TERMS, USER_AGREEMENT } from '../../routes';
@@ -185,15 +184,14 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
+const CreateAccount = ({ externalLogin, registerCustomer }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
-    const { myLocation } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
 
     const [Email, setEmail] = useState('');
@@ -225,10 +223,8 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
-        
-        getLocation();
 
         return () => {
             dispatch({
@@ -254,7 +250,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
 
     // useEffect(() => {
     //     if (errorsState.usernameAvailable === true) {
-    //         history.push(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
+    //         navigate(CREATE_PROFILE, { Email: Email.toLowerCase(), Username, Password });
     //     }
     // }, [Email, Password, Username, history, errorsState.usernameAvailable]);
 
@@ -342,13 +338,6 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
         }
     }, [Password, strengthChecker, timeout]);
 
-
-    const getLocation = () => {
-        if (!myLocation.ip) {
-            getMyLocation();
-        }
-    };
-
     const copyUsername = (username) => {
         setUsername(username);
     };
@@ -366,7 +355,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
             type: SET_CUSTOMER_MSG,
             payload: null
         });
-        return history.push(PENDING_VERIFICATION, { email: Email });
+        return navigate(PENDING_VERIFICATION, { email: Email });
     };
       
     const handleSocialLoginFailure = (err) => {
@@ -383,7 +372,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history, myLocation);
+        externalLogin(data, navigate);
     };
 
     const handleFormSubmit = (e) => {
@@ -414,7 +403,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
             EmailAddress: data.Email.trim(),
             Username,
             Password
-        }, history);
+        }, navigate);
     };
 
     return (
@@ -647,8 +636,7 @@ const CreateAccount = ({ externalLogin, getMyLocation, registerCustomer }) => {
 
 CreateAccount.propTypes = {
     externalLogin: PropTypes.func.isRequired,
-    getMyLocation: PropTypes.func.isRequired,
     registerCustomer: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { externalLogin, getMyLocation, registerCustomer })(CreateAccount);
+export default connect(undefined, { externalLogin, registerCustomer })(CreateAccount);

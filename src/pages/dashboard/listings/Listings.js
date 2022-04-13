@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
@@ -8,8 +8,8 @@ import { FormatListText } from 'mdi-material-ui';
 
 import { BID_STATUS, COLORS, ID_STATUS, LISTING_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import { addBid, checkListingEditable } from '../../../actions/listings';
-import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_BID_STATUS } from '../../../actions/types';
+import { acceptOffer, addBid, checkListingEditable } from '../../../actions/listings';
+import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_ACCEPT_OFFER, TOGGLE_BID_STATUS } from '../../../actions/types';
 
 import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
@@ -17,6 +17,7 @@ import BuyerPaymentDrawer from './BuyerPaymentDrawer';
 import Listing from './Listing';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+import AcceptOfferDrawer from './AcceptOfferDrawer';
 
 const { APPROVED, NOT_SUBMITTED, PENDING, REJECTED } = ID_STATUS;
 const { open } = LISTING_STATUS;
@@ -44,9 +45,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listings = ({ addBid, checkListingEditable }) => {
+const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -54,10 +55,11 @@ const Listings = ({ addBid, checkListingEditable }) => {
     const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
     const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
-    const { addedBid, listings, msg } = useSelector(state => state.listings);
+    const { addedBid, acceptedOffer, listings, msg } = useSelector(state => state.listings);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
-    const [openBuyerPaymentDrawer, setOpenSendEurDrawer] = useState(false);
+    const [openAcceptOfferDrawer, setOpenAcceptOfferDrawer] = useState(false);
+    const [openBuyerPaymentDrawer, setOpenBuyerPaymentDrawer] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -105,8 +107,12 @@ const Listings = ({ addBid, checkListingEditable }) => {
         }
     }, [idStatus, showPendingIdModal]);
 
+    const toggleAcceptOfferDrawer = useCallback(() => {
+        setOpenAcceptOfferDrawer(!openAcceptOfferDrawer);
+    }, [openAcceptOfferDrawer]);
+
     const toggleBuyerPaymentDrawer = useCallback(() => {
-        setOpenSendEurDrawer(!openBuyerPaymentDrawer);
+        setOpenBuyerPaymentDrawer(!openBuyerPaymentDrawer);
     }, [openBuyerPaymentDrawer]);
 
     useEffect(() => {
@@ -115,6 +121,16 @@ const Listings = ({ addBid, checkListingEditable }) => {
         }
     }, [msg]);
     
+    useEffect(() => {
+        if (acceptedOffer) {
+            setLoading(false);
+            toggleAcceptOfferDrawer();
+            dispatch({
+                type: TOGGLE_ACCEPT_OFFER
+            });
+        }
+    }, [acceptedOffer, dispatch, toggleAcceptOfferDrawer]);
+
     useEffect(() => {
         if (addedBid) {
             setLoading(false);
@@ -125,20 +141,28 @@ const Listings = ({ addBid, checkListingEditable }) => {
         }
     }, [addedBid, dispatch, toggleBuyerPaymentDrawer]);
 
-    // useEffect(() => {
-    //     if (openBuyerPaymentDrawer) {
-    //         getAccount(listing.sellersAccountId);
-    //     } else {
-    //         dispatch({
-    //             type: SET_ACCOUNT,
-    //             payload: {}
-    //         });
-    //     }
-    // }, [dispatch, getAccount, listing.sellersAccountId, openBuyerPaymentDrawer]);
-
     const verifyUserId = () => {
         idVerificationModal.current.openModal();
     };
+
+    // const handleAcceptOffer = (listing, accountId, reference) => {
+    //     if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
+    //         return checkIdStatus();
+    //     }
+
+    //     if (listing.status === open) {
+    //         setLoading(true);
+    //         dispatch({
+    //             type: SET_LISTING,
+    //             payload: listing
+    //         });
+    //         return acceptOffer({
+    //             listingId: listing.id,
+    //             accountId,
+    //             reference
+    //         }, listing);
+    //     }
+    // };
 
     const handleAddBid = (listing) => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
@@ -170,7 +194,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
                         payload: listing
                     });
                 });
-                return setOpenSendEurDrawer(true);
+                return setOpenBuyerPaymentDrawer(true);
             }
         }
 
@@ -189,8 +213,12 @@ const Listings = ({ addBid, checkListingEditable }) => {
 
     const handleEditListing = (listing) => {
         setLoading(true);
-        checkListingEditable(listing, history);
+        checkListingEditable(listing, navigate);
     };
+
+    const setError = (message) => {
+        setErrors({ msg: message });
+    }
 
     return (
         <>
@@ -204,12 +232,21 @@ const Listings = ({ addBid, checkListingEditable }) => {
                 />
             }
             {loading && <Spinner />}
+            {openAcceptOfferDrawer && <AcceptOfferDrawer drawerOpen={openAcceptOfferDrawer} toggleDrawer={toggleAcceptOfferDrawer} />}
             {openBuyerPaymentDrawer && <BuyerPaymentDrawer drawerOpen={openBuyerPaymentDrawer} toggleDrawer={toggleBuyerPaymentDrawer} />}
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
-                    <Listing key={index} listing={listing} handleAddBid={handleAddBid} checkIdStatus={checkIdStatus} handleEditListing={handleEditListing} />
+                    <Listing 
+                        key={index} 
+                        listing={listing} 
+                        handleAddBid={handleAddBid} 
+                        checkIdStatus={checkIdStatus} 
+                        handleEditListing={handleEditListing} 
+                        toggleAcceptOfferDrawer={toggleAcceptOfferDrawer}
+                        setErrorMessage={setError}
+                    />
                 ))
                 :
                 <div className={classes.noListingContent}>
@@ -222,8 +259,9 @@ const Listings = ({ addBid, checkListingEditable }) => {
 }
 
 Listings.propTypes = {
+    acceptOffer: PropTypes.func.isRequired,
     addBid: PropTypes.func.isRequired,
     checkListingEditable: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addBid, checkListingEditable })(Listings);
+export default connect(undefined, { acceptOffer, addBid, checkListingEditable })(Listings);

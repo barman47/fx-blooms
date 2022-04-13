@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { 
     Container,
@@ -61,7 +61,7 @@ const useStyles = makeStyles(theme => ({
 
 const SignupSuccess = () => {
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     
     const [timeTillRedirect, setTimeTillRedirect] = useState(10);
@@ -78,9 +78,9 @@ const SignupSuccess = () => {
 
     useEffect(() => {
         if (parseInt(timeTillRedirect) <= 0) {
-            history.push(LOGIN);
+            navigate(LOGIN);
         }
-    }, [history, timeTillRedirect]);
+    }, [navigate, timeTillRedirect]);
 
     const redirect = () => {
         interval.current = setInterval(() => {
