@@ -163,3 +163,5 @@ export const olimpicMedals = [{
     bronze: 15,
   }];
 
+
+  export const API_KEY = 'a8b57b7f-6166-4388-90fd-4cecb8e4396d';

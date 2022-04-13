@@ -245,7 +245,7 @@ const columns = [
       label: 'Action',
       format: (value) => value.toLocaleString('en-US'),
     },
-  ];
+];
 
 const pages = [10, 25, 50, 100]
 
