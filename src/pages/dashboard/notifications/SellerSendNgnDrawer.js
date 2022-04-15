@@ -45,7 +45,8 @@ const useStyles = makeStyles(theme => ({
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            alignItems: 'center'
         }
     },
 
@@ -119,7 +120,6 @@ const useStyles = makeStyles(theme => ({
             gridTemplateColumns: '1fr 1fr',
             alignItems: 'center',
             gap: theme.spacing(2)
-            // justifyContent: 'space-between'
         }
     },
 

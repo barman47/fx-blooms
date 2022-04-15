@@ -36,7 +36,7 @@ import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
-        padding: theme.spacing(1, 4),
+        padding: theme.spacing(0, 4, 1, 4),
         width: '35vw',
 
         [theme.breakpoints.down('md')]: {
@@ -50,21 +50,35 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& header': {
+            backgroundColor: COLORS.white,
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            position: 'fixed',
+            width: '35%',
+            zIndex: 2,
+
+            [theme.breakpoints.down('md')]: {
+                width: '50%'
+            },
+
+            [theme.breakpoints.down('sm')]: {
+                width: '90%'
+            }
         }
     },
 
     header: {
         color: theme.palette.primary.main,
     },
-
+    
     transactionContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: theme.spacing(7)
     },
 
     text: {
@@ -114,7 +128,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gridTemplateColumns: '1fr',
-        marginTop: theme.spacing(2),
+        margin: theme.spacing(2, 0),
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('sm')]: {
@@ -408,97 +422,99 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                     <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
                 </ol>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                    <Button 
-                        variant="outlined" 
-                        color="primary" 
-                        disabled={_.isEmpty(account) ? false : true}
-                        onClick={getSellerAccount}
-                    >
-                        Show Account Details
-                    </Button>
-                    <Collapse in={!_.isEmpty(account)}>
-                        <section className={classes.accountDetailsContainer}>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
-                            </div>
-                        </section>
-                    </Collapse>              
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                    <FormControl 
-                        variant="outlined" 
-                        error={errors.receivingAccount ? true : false } 
-                        fullWidth 
-                        required
-                        disabled={loading ? true : false}
-                    >
-                        <Select
-                            labelId="ReceivingAccount"
-                            value={receivingAccount}
-                            onChange={(e) => setReceivingAccount(e.target.value)}
+                <Grid container direction="row">
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                        <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            disabled={_.isEmpty(account) ? false : true}
+                            onClick={getSellerAccount}
                         >
-                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                            {accounts.map((account) => {
-                                if (account.currency === 'EUR') {
-                                    return (
-                                        // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                    )
-                                }
-                                return null;
-                            })}
-                        </Select>
-                        <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                        <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                    <TextField 
-                        value={reference}
-                        placeholder="Enter Payment Reference"
-                        onChange={(e) => setReference(e.target.value)}
-                        disabled={loading ? true : false}
-                        type="text"
-                        variant="outlined" 
-                        fullWidth
-                    />
-                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                </Grid>
-                <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
-                    <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
-                    <Button 
-                        type="submit"
-                        variant="contained" 
-                        color="primary" 
-                        fullWidth 
-                        disableFocusRipple
-                        className={classes.button}
-                        disabled={loading || buttonDisabled || isEmpty(account) ? true : false}
-                        onClick={handleMadepayment}
-                    >
-                        {loading ? 'One Moment . . .' : `${listing?.amountNeeded?.currencyType}${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}
-                    </Button>
+                            Show Account Details
+                        </Button>
+                        <Collapse in={!_.isEmpty(account)}>
+                            <section className={classes.accountDetailsContainer}>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
+                                </div>
+                            </section>
+                        </Collapse>              
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Receiving Account</Typography>
+                        <FormControl 
+                            variant="outlined" 
+                            error={errors.receivingAccount ? true : false } 
+                            fullWidth 
+                            required
+                            disabled={loading ? true : false}
+                        >
+                            <Select
+                                labelId="ReceivingAccount"
+                                value={receivingAccount}
+                                onChange={(e) => setReceivingAccount(e.target.value)}
+                            >
+                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                {accounts.map((account) => {
+                                    if (account.currency === 'EUR') {
+                                        return (
+                                            // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                        )
+                                    }
+                                    return null;
+                                })}
+                            </Select>
+                            <FormHelperText>{errors.receivingAccount}</FormHelperText>
+                            <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                        <TextField 
+                            value={reference}
+                            placeholder="Enter Payment Reference"
+                            onChange={(e) => setReference(e.target.value)}
+                            disabled={loading ? true : false}
+                            type="text"
+                            variant="outlined" 
+                            fullWidth
+                        />
+                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                    </Grid>
+                    <Grid item xs={12} className={classes.timerContainer}>
+                        <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                        <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
+                        <Button 
+                            type="submit"
+                            variant="contained" 
+                            color="primary" 
+                            fullWidth 
+                            disableFocusRipple
+                            className={classes.button}
+                            disabled={loading || buttonDisabled || isEmpty(account) ? true : false}
+                            onClick={handleMadepayment}
+                        >
+                            {loading ? 'One Moment . . .' : `${listing?.amountNeeded?.currencyType}${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}
+                        </Button>
+                    </Grid>
                 </Grid>
             </Drawer>
         </>

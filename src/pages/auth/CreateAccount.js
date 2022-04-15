@@ -612,6 +612,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <GoogleLogin
+                                        onClick={() => alert('clicked!')}
                                         clientId={process.env.REACT_APP_GOOGLE_APP_ID}
                                         className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
                                         buttonText="Sign up with Google"
