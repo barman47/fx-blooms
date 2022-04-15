@@ -442,6 +442,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
                                         // buttonAction={() => setBuyerAccount(notification)}
                                         buttonDisabled={buttonDisabled(notification.data.Seller)}
+                                        date={notification.dateLogged}
                                     />
                                 )
                             }
@@ -452,6 +453,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         key={index}
                                         title="Payment Confirmed"
                                         message={setBuyerConfirmedMessage(notification.data)}
+                                        date={notification.dateLogged}
                                     />
                                 )
                             }
@@ -466,6 +468,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
                                         // buttonAction={() => setBuyerAccount(notification)}
                                         buttonDisabled={buttonDisabled(notification.data.Seller)}
+                                        date={notification.dateLogged}
                                     />
                                 )
                             }
@@ -478,6 +481,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         message={setMessage(notification.data)}
                                         buttonText={`Pay ${notification.data.Buyer.Currency}`}
                                         buttonAction={() => handleBuyerPayment(notification)}
+                                        date={notification.dateLogged}
                                     />
                                 )
                             }
@@ -501,6 +505,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         buttonText={`Pay ${notification.data.Seller.Currency}`}
                                         buttonAction={() => handleBuyerPayment(notification)}
                                         buttonDisabled={notification.data.Seller.HasMadePayment}
+                                        date={notification.dateLogged}
                                     />
                                 )
                             }

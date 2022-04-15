@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Box, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import clsx from 'clsx';
-// import moment from 'moment';
+import moment from 'moment';
 
 import { SET_TRANSACTION } from '../../../actions/types';
 
@@ -132,8 +132,8 @@ const Transaction = ({ transaction }) => {
         <Box component="section" className={classes.root}>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Time</Typography>
-                {/* <Typography variant="body1" component="p" className={classes.text}>{moment().format()}</Typography> */}
-                <Typography variant="body1" component="p" className={classes.text}>5 mins ago</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>{moment(transaction.dateCreated).fromNow()}</Typography>
+                {/* <Typography variant="body1" component="p" className={classes.text}>5 mins ago</Typography> */}
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>

@@ -18,6 +18,7 @@ import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
+import moment from 'moment';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -300,7 +301,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Date</Typography>
-                            <Typography variant="body2" component="p" >January 1st, 1980 at 1:00am(static value)</Typography>
+                            <Typography variant="body2" component="p" >{moment(transaction.dateCreated).format('MMMM Do, YYYY')} at {moment(transaction.dateCreated).format('hh:mm a')}</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>

@@ -184,6 +184,7 @@ const App = () => {
 							<Route path={DISCLAIMER} element={<Disclaimer />} />
 							<Route path={DISCLAIMER} element={<Disclaimer />} />
 							<Route path={USER_AGREEMENT} element={<UserAgreement />} />
+							
 							<Route path={DASHBOARD} element={<PrivateRoute><Dashboard title={title} /></PrivateRoute>}>
 								<Route index path={`${DASHBOARD_HOME}`} element={<AllListings handleSetTitle={handleSetTitle} />} />
 								<Route path={`${EDIT_LISTING}`} element={<EditListing handleSetTitle={handleSetTitle} />} />
