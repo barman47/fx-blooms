@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
     Checkbox,
+    Collapse,
     Divider,
     Grid, 
     IconButton, 
@@ -19,6 +20,7 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import customToast, { Toaster } from 'react-hot-toast';
 import clsx from 'clsx';
+import Alert from '@material-ui/lab/Alert';
 import { GoogleLogin } from 'react-google-login';
 
 import Spinner from '../../components/common/Spinner';
@@ -170,6 +172,11 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr 0.1fr 1fr',
         alignItems: 'center',
         columnGap: theme.spacing(2)
+    },
+
+    info: {
+        color: theme.palette.error.main,
+        fontWeight: 300
     },
 
     disabledButton: {
@@ -594,6 +601,16 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                     />
                                     <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
+                                <Collapse in={!checked}>
+                                    <Grid item xs={12}>
+                                        <Alert 
+                                            variant="outlined" 
+                                            severity="error"
+                                        >
+                                            <Typography variant="subtitle2" component="span" className={classes.info}>Kindly read and agree to our "Terms and Conditions", "Privacy Policy" and "User Agreement" before signing up.</Typography>
+                                        </Alert>
+                                    </Grid>
+                                </Collapse>
                                 <Grid item xs={12}>
                                     <Button 
                                         variant="contained" 

@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
         '& small': {
             color: COLORS.offBlack,
-            fontWeight: 700
+            fontWeight: 300
         },
     },
 
