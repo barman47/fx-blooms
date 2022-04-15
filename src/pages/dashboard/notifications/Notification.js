@@ -81,7 +81,8 @@ const Notification = ({ title, message, buttonText, buttonAction, buttonDisabled
                 <Box component="div" className={classes.timeStampContainer}>
                     <ClockOutline className={classes.clockIcon} />
                     <Typography variant="subtitle2" component="small">
-                        {moment(date).fromNow()}
+                        {moment(date).from()}
+                        {/* {moment(date).fromNow()} */}
                     </Typography>
                 </Box>
                 <Typography variant="body1" component="p">{message}</Typography>

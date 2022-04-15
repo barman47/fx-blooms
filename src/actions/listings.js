@@ -5,7 +5,6 @@ import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
-    ACCEPTED_OFFER,
     ADDED_BID, 
     ADDED_LISTING, 
     CANCELED_NEGOTIATION, 
@@ -164,14 +163,6 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AcceptOffer`, data);
         batch(() => {
-            dispatch({
-                type: ACCEPTED_OFFER,
-                payload: {
-                    bid: res.data.data,
-                    listing,
-                    addedBid: true
-                }
-            });
             dispatch({
                 type: ADDED_BID,
                 payload: {

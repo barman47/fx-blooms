@@ -43,6 +43,7 @@ import {
     AccountOutline, 
     ArrowLeftRight, 
     BagChecked, 
+    CardAccountDetailsOutline,
     ChevronLeft, 
     ChevronRight, 
     ChevronDown, 
@@ -51,7 +52,9 @@ import {
     LockOutline, 
     Logout, 
     MessageOutline, 
-    Menu 
+    Menu,
+    Security,
+    TwoFactorAuthentication 
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -388,9 +391,9 @@ const Dashboard = (props) => {
     ];
 
     const securityLinks = [
-        { url : ID_VERIFICATION, text: 'ID Verification', icon: <HomeOutline /> },
-        { url : PIN, text: 'Set PIN', icon: <FormatListText /> },
-        { url : TWO_FACTOR, text: '2FA Authentication', icon: <FormatListText /> }
+        { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
+        { url : PIN, text: 'Set PIN', icon: <Security /> },
+        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
     const { title, logout } = props;
