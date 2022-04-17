@@ -396,7 +396,7 @@ const Dashboard = (props) => {
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { title, logout } = props;
+    const { logout, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
@@ -577,7 +577,7 @@ const Dashboard = (props) => {
                         IsClosed: payload.Data.IsClosed,
                         Buyer: buyer,
                         Seller: seller,
-                        ListingId: payload.ListingId,
+                        ListingId: payload.ListingId || payload.Data.ListingId,
                         BidId: payload.BidId
                     }
                 };
@@ -619,6 +619,7 @@ const Dashboard = (props) => {
                                 });
                             }
                         }
+                        
                         break;
 
                     case SELLER_MADE_PAYMENT:
@@ -638,6 +639,7 @@ const Dashboard = (props) => {
                                 }
                             });
                         }
+
                         break;
 
                     case SELLER_CONFIRMED_PAYMENT:
@@ -937,7 +939,6 @@ const Dashboard = (props) => {
                             <BottomNavigationAction 
                                 onClick={() => handleLinkClick(item.url)} 
                                 key={index} 
-                                showLabels
                                 // label={location.pathname.includes(item.url) && item.text}
                                 label={item.text} 
                                 // value={item.text} 
@@ -961,7 +962,7 @@ const Dashboard = (props) => {
 
 Dashboard.propTypes = {
     logout: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired
+    title: PropTypes.string.isRequired,
 };
 
 export default connect(undefined, { logout })(Dashboard);

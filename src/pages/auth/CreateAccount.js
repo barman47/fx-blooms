@@ -607,7 +607,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                             variant="outlined" 
                                             severity="error"
                                         >
-                                            <Typography variant="subtitle2" component="span" className={classes.info}>Kindly read and agree to our "Terms and Conditions", "Privacy Policy" and "User Agreement" before signing up.</Typography>
+                                            <Typography variant="subtitle2" component="span" className={classes.info}>You have to agree to our "T &amp; C", "Privacy Policy" and "User Agreement" before signing up.</Typography>
                                         </Alert>
                                     </Grid>
                                 </Collapse>

@@ -117,7 +117,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
+const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
@@ -170,7 +170,7 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
 
     const handleSendTransactionNotification = () => {
         setLoading(true);
-        sendTransactionNotification(transactionId);
+        sendTransactionNotification(transactionId, notificationId);
     };
 
     const dismissSuccessModal = () => {
@@ -278,6 +278,7 @@ BuyerSendEurDrawer.propTypes = {
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
+    notificationId: PropTypes.string.isRequired,
     transactionId: PropTypes.string.isRequired
 };
 

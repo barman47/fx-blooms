@@ -58,7 +58,9 @@ const notificationsReducer = (state = initialState, action) => {
         case REMOVE_NOTIFICATION:
             return {
                 ...state,
-                notifications: state.notifications.map(notification => notification.id !== action.payload)
+                notifications: state.notifications.filter(notification => notification.notificationId !== action.payload),
+                unreadNotifications: state.unreadNotifications - 1,
+                // notificationToRemove: null
             };
 
         case SET_SOCKET_CONNECTION_STATUS:

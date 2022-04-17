@@ -24,6 +24,26 @@ export const getNotifications = () => async (dispatch) => {
     }
 };
 
+export const getUnreadNotificationCount = (customerId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/GetNotificationCount/${customerId}`);
+        console.log('Notification count ', res);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const markNotificationAsRead = (id) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${api}/UpdateNotification/${id}`);
+        console.log('Marked as read ', res);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const generateOtp = (data) => async (dispatch) => {
     try {
         await Promise.all([

@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-import { SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
+import { REMOVE_NOTIFICATION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
+
+import { markNotificationAsRead } from './notifications';
 
 const api = `${API}/Transfer`;
 
@@ -20,12 +22,19 @@ export const getTransactions = (retrieveAll) => async (dispatch) => {
     }
 };
 
-export const sendTransactionNotification = (transferId) => async (dispatch) => {
+export const sendTransactionNotification = (transferId, notificationId = null) => async (dispatch) => {
     try {
         await Promise.all([
-            await reIssueCustomerToken(),
-            await axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
+            reIssueCustomerToken(),
+            axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
         ]);
+        if (notificationId) {
+            dispatch({
+                type: REMOVE_NOTIFICATION,
+                payload: notificationId
+            });
+            markNotificationAsRead(notificationId);
+        }
     } catch (err) {
         return handleError(err, dispatch);
     }

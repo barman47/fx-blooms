@@ -150,7 +150,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawer, drawerOpen }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -304,7 +304,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
         madePaymentV2({
             bidId: bid.data.BidId,
             listingId: bid.data.ListingId
-        });
+        }, notificationId);
     };
 
     const handleCopyTransactionId = () => {
@@ -359,11 +359,11 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                         </IconButton>
                     </Typography>
                 </div>
-                <Grid container direction="row">
-                    <Grid item xs={5}>
+                <Grid container direction="row" alignItems="center">
+                    <Grid item xs={6} lg={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} lg={1}>
                         <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
                     </Grid>
                 </Grid>
@@ -396,7 +396,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                     {/* </Collapse>               */}
                 </Grid>
                 <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
                     <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -418,12 +418,13 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
     );
 };
 
-BuyerPaymentNgnDrawer.propTypes = {
+SellerSendNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
-    madePaymentV2: PropTypes.func.isRequired
+    madePaymentV2: PropTypes.func.isRequired,
+    notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePaymentV2 })(BuyerPaymentNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, madePaymentV2 })(SellerSendNgnDrawer);

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { batch } from 'react-redux';
 import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
 import { API } from '../utils/constants';
@@ -10,7 +11,7 @@ import {
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
     GET_ERRORS,
-    // REMOVE_NOTIFICATION,
+    REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_LISTING, 
     SET_LISTINGS, 
@@ -20,8 +21,8 @@ import {
     SET_RECOMMENDED_RATE,
     UPDATED_LISTING 
 } from './types';
+import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
-import { batch } from 'react-redux';
 
 const URL = `${API}/Listing`;
 
@@ -209,14 +210,14 @@ export const madePayment = (data) => async (dispatch) => {
     }
 };
 
-export const madePaymentV2 = (data, id) => async (dispatch) => {
+export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
-        // Remove notification
-        // return dispatch({
-        //     type: REMOVE_NOTIFICATION,
-        //     payload: id
-        // });
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
+        });
+        return markNotificationAsRead(notificationId);
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -244,12 +245,17 @@ export const cancelNegotiation = (chatSessionId, navigate) => async (dispatch) =
     }
 };
 
-export const completeTransaction = (data) => async (dispatch) => {
+export const completeTransaction = (data, notificationId) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
+        });
+        return markNotificationAsRead(notificationId);
     } catch (err) {
         return handleError(err, dispatch);
     }
