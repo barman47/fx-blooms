@@ -175,7 +175,8 @@ const useStyles = makeStyles(theme => ({
     },
 
     info: {
-        color: theme.palette.error.main,
+        // color: theme.palette.error.main,
+        fontSize: theme.spacing(1.3),
         fontWeight: 300
     },
 
@@ -601,16 +602,16 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                     />
                                     <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
-                                <Collapse in={!checked}>
-                                    <Grid item xs={12}>
+                                <Grid item xs={12}>
+                                    <Collapse in={!checked}>
                                         <Alert 
                                             variant="outlined" 
                                             severity="error"
                                         >
                                             <Typography variant="subtitle2" component="span" className={classes.info}>You have to agree to our "T &amp; C", "Privacy Policy" and "User Agreement" before signing up.</Typography>
                                         </Alert>
-                                    </Grid>
-                                </Collapse>
+                                    </Collapse>
+                                </Grid>
                                 <Grid item xs={12}>
                                     <Button 
                                         variant="contained" 

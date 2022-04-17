@@ -191,7 +191,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return navigate(`${USER_DETAILS}/${sellerId}`, { sellerId });
+            return navigate(`${USER_DETAILS}/${sellerId}`, { state: { customerId: sellerId }});
         }
         return navigate(PROFILE);
     };

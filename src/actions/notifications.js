@@ -36,6 +36,7 @@ export const getUnreadNotificationCount = (customerId) => async (dispatch) => {
 
 export const markNotificationAsRead = (id) => async (dispatch) => {
     try {
+        console.log('Marking');
         await reIssueCustomerToken();
         const res = await axios.post(`${api}/UpdateNotification/${id}`);
         console.log('Marked as read ', res);

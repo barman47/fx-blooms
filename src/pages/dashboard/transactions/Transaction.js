@@ -2,15 +2,19 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+import { ContentCopy } from 'mdi-material-ui';
 import clsx from 'clsx';
 import moment from 'moment';
+import copy from 'copy-to-clipboard';
+import toast from 'react-hot-toast';
 
 import { SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
+import returnLastSixDigits from '../../../utils/returnLastThreeCharacters';
 import { TRANSACTION_STATUS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
@@ -128,6 +132,11 @@ const Transaction = ({ transaction }) => {
         return navigate(TRANSACTION_STATUS);
     };
 
+    const copyListingId = () => {
+        copy(transaction.listingId);
+        toast.success('Listing ID copied');
+    };
+
     return (
         <Box component="section" className={classes.root}>
             <Box component="div">
@@ -144,8 +153,15 @@ const Transaction = ({ transaction }) => {
                 <Typography variant="body1" component="p" className={classes.text}>{currency}{formatNumber(amount, 2)}</Typography>
             </Box>
             <Box component="div">
-                <Typography variant="body2" component="span" className={classes.label}>Reference Number</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>{`${transaction.listingId}-${currency.charAt(0)}`}</Typography>
+                <Typography variant="body2" component="span" className={classes.label}>Listing ID</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>
+                    ... {returnLastSixDigits(transaction.listingId, 6)}
+                    <Tooltip title="Copy Listing ID" arrow>
+                        <IconButton onClick={copyListingId} size="small">
+                            <ContentCopy />
+                        </IconButton>
+                    </Tooltip>
+                </Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Status</Typography>

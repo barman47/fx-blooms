@@ -1,5 +1,5 @@
-const returnLastThreeCharacters = (string) => {
-    const startIndex = string.length - 3;
+const returnLastThreeCharacters = (string, count = 3) => {
+    const startIndex = string.length - count;
     const endIndex = string.length;
     return string.slice(startIndex, endIndex);
 };

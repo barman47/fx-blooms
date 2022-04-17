@@ -217,6 +217,7 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
             type: REMOVE_NOTIFICATION,
             payload: notificationId
         });
+        console.log('Marking notification as read');
         return markNotificationAsRead(notificationId);
     } catch (err) {
         return handleError(err, dispatch);

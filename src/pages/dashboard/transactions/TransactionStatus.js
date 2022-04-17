@@ -24,6 +24,8 @@ import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
+import { USER_DETAILS } from '../../../routes';
+
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.white,
@@ -75,6 +77,12 @@ const useStyles = makeStyles(theme => ({
             justifyContent: 'space-between',
             alignItems: 'center'
         }
+    },
+
+    recipientDetails: {
+        color: theme.palette.primary.main,
+        cursor: 'pointer',
+        textDecoration: 'underline'
     },
 
     transactionIdContainer: {
@@ -195,12 +203,6 @@ const TransactionStatus = ({ handleSetTitle }) => {
                 `${seller.userName} to transfer EUR to you`,
                 `You to confirm - Transaction Completed`
             ]);
-            // setTransactionSteps([
-            //     `You accepted EUR${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
-            //     `${seller.userName} to confirm the NGN payment`, 
-            //     'EUR moved to your EUR Wallet', 
-            //     'Transaction Completed'
-            // ]);
         }
 
         if (customerId === seller.customerId) { // Customer is seller
@@ -212,28 +214,24 @@ const TransactionStatus = ({ handleSetTitle }) => {
                 `You transfer the equivalent EUR to ${buyer.userName}`,
                 `${buyer.userName} confirmed the EUR - Transaction Completed`
             ]);
-            // return setTransactionSteps([
-            //     `You transfer EUR${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName}`, 
-            //     `${buyer.userName} to confirm the EUR payment`,
-            //     'EUR moved to your EUR Wallet', 
-            //     'Transaction Completed'
-            // ]);
         }
     };
 
     const getStepContent = (step, transaction) => {
+        const { buyer, seller } = transaction;
+
         switch (step) {
-          case 0:
-            return `Timestamp`;
+            case 0:
+                return `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}`;
             
             case 1:
-                return 'Timestamp';
+                return `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}`;
 
             case 2:
-                return `Timestamp`;
+                return `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}`;
             
             case 3:
-                return `Timestamp`;
+                return `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}`;
 
           default:
             return '';
@@ -243,6 +241,11 @@ const TransactionStatus = ({ handleSetTitle }) => {
     const handleCopyTransactionId = () => {
         copy(transaction.id);
         toast.success('Transaction ID Copied!');
+    };
+
+    const handleViewCustomerDetails = () => {
+        debugger
+        return navigate(`${USER_DETAILS}/${recepient.customerId}`, { state: { customerId } });
     };
 
 	return (    
@@ -266,7 +269,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Box component="section">
                             <Typography variant="body2" component="p">Transaction ID</Typography>
                             <Box className={classes.transactionIdContainer}>
-                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}`}</Typography>
+                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}-${customer?.currency?.charAt(0)}`}</Typography>
                                 &nbsp;&nbsp;
                                 <Tooltip title="Copy Transaction ID" arrow>
                                     <ContentCopy onClick={handleCopyTransactionId} color="primary" style={{ cursor: 'pointer' }} />
@@ -281,7 +284,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Recepient Contact</Typography>
-                            <Typography variant="body2" component="p">+2348147233059 (static value)</Typography>
+                            <Typography variant="body2" component="p" className={classes.recipientDetails} onClick={handleViewCustomerDetails}>View Recipient Details</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -308,7 +311,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Box className={classes.transactionStatus}>
                         <Stepper activeStep={activeStep} orientation="vertical">
                             {transactionSteps.map((step, index) => (
-                                <Step key={index}>
+                                <Step key={index} expanded={true}>
                                     <StepLabel>{step}</StepLabel>
                                     <StepContent>
                                         <Typography>{getStepContent(index, transaction)}</Typography>

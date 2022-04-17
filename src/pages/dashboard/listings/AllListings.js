@@ -181,6 +181,10 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
+	currencyButtons: {
+		height: theme.spacing(4.3),
+	},
+
 	filterLabel: {
 		[theme.breakpoints.down('sm')]: {
 			gridColumn: '1 / span 2'
@@ -550,7 +554,7 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation>
+							<ButtonGroup disableElevation className={classes.currencyButtons}>
 								<Button
 									color="primary"
 									size="small"

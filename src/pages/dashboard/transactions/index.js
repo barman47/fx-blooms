@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, ButtonGroup } from '@material-ui/core';
-
+import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
+
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
@@ -105,9 +106,9 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
 		});
 	}
 
-
     return (
         <>
+            <Toaster />
             <Box component="section" className={classes.root}>
                 <Typography variant="h6">Transaction History</Typography>
                 <Typography variant="body2" component="p">Here are your recent transactions</Typography>

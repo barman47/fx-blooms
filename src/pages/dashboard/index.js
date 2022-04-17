@@ -86,6 +86,7 @@ import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NO
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
+import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
 
@@ -400,6 +401,7 @@ const Dashboard = (props) => {
     
     const accountSetupModal = useRef();
     const customToast = useRef();
+    const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
     const transactionCompleteModal = useRef();
 
@@ -577,7 +579,7 @@ const Dashboard = (props) => {
                         IsClosed: payload.Data.IsClosed,
                         Buyer: buyer,
                         Seller: seller,
-                        ListingId: payload.ListingId || payload.Data.ListingId,
+                        ListingId: payload.ListingId ?  payload.ListingId : payload.Data.ListingId,
                         BidId: payload.BidId
                     }
                 };
@@ -697,12 +699,26 @@ const Dashboard = (props) => {
     };
 
     const handleLinkClick = (link) => {
-        navigate(link);
-        if (matches && open) {
-            setTimeout(() => {
-                setOpen(false);
-            }, 1000);
+        if (link === MAKE_LISTING && location.pathname.includes(MAKE_LISTING)) {
+            return;
         }
+
+        if (matches) {
+            if (open) {
+                setTimeout(() => {
+                    setOpen(false);
+                }, 500);
+            }
+            if (link === MAKE_LISTING) {
+                return selectCurrencyListingDrawer?.current?.toggleDrawer();
+            }
+            navigate(link); 
+        }
+
+        if (link === MAKE_LISTING) {
+            return selectCurrencyListingDrawer?.current?.toggleDrawer();
+        }
+        navigate(link); 
     };
 
     const dismissAction = () => {
@@ -717,6 +733,7 @@ const Dashboard = (props) => {
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
