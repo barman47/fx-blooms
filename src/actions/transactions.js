@@ -33,7 +33,7 @@ export const sendTransactionNotification = (transferId, notificationId = null) =
                 type: REMOVE_NOTIFICATION,
                 payload: notificationId
             });
-            markNotificationAsRead(notificationId);
+            dispatch(markNotificationAsRead(notificationId));
         }
     } catch (err) {
         return handleError(err, dispatch);

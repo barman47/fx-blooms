@@ -575,12 +575,14 @@ const Dashboard = (props) => {
                     isRead: payload.IsRead,
                     notificationId: payload.Id,
                     data: { 
+                        BidId: payload.Data.BidId,
                         Id: payload.Data.Id,
                         IsClosed: payload.Data.IsClosed,
                         Buyer: buyer,
                         Seller: seller,
-                        ListingId: payload.ListingId ?  payload.ListingId : payload.Data.ListingId,
-                        BidId: payload.BidId
+                        ListingId: payload.Data.ListingId,
+                        // ListingId: payload.ListingId ?  payload.ListingId : payload.Data.ListingId,
+                        // BidId: payload.BidId
                     }
                 };
                 

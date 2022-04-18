@@ -291,8 +291,9 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     useEffect(() => {
         if (msg) {
-            successModal.current.openModal();
             successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            clearInterval(interval.current);
         }
     }, [msg]);
 

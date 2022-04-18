@@ -250,8 +250,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
 
     useEffect(() => {
         if (msg) {
-            successModal.current.openModal();
             successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            clearInterval(interval.current);
         }
     }, [msg]);
 
@@ -374,29 +375,27 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
                 </ol>
                 <Grid item xs={12}>
                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
-                    {/* <Collapse in={!_.isEmpty(account)}> */}
-                        <section className={classes.accountDetailsContainer}>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountNumber}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.BankName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.TransferReference}</Typography>
-                            </div>
-                        </section>
-                    {/* </Collapse>               */}
+                    <section className={classes.accountDetailsContainer}>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountName}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountNumber}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.BankName}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.TransferReference}</Typography>
+                        </div>
+                    </section>
                 </Grid>
                 <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid.data.Seller.Currency}{formatNumber((bid.data.Seller.AmountTransfered), 2)} within...</Typography>
                     <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
                 </Grid>
                 <Grid item xs={12}>
