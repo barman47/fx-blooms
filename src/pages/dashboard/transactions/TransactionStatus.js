@@ -148,35 +148,35 @@ const TransactionStatus = ({ handleSetTitle }) => {
     }, []);
 
     const getActiveNgnStep = (buyer, seller) => {
-        if (buyer.hasMadePayment) {
-            setActiveStep(0);
-            if (buyer.customerId === customerId) {
-                setTrackerText(`Awaiting ${seller.userName}'s Confirmation`);
+        if (seller.hasMadePayment) {
+            setActiveStep(1);
+            if (seller.customerId === customerId) {
+                setTrackerText(`Awaiting ${buyer.userName}'s Confirmation`);
             } else {
                 setTrackerText(`Awaiting your Confirmation`);
             }
         }
 
-        if (buyer.hasMadePayment && seller.hasReceivedPayment) {
-            setActiveStep(1);
-            if (isBuyer) {
-                setTrackerText(`Awaiting ${seller.userName}'s Payment`);
+        if (seller.hasMadePayment && buyer.hasReceivedPayment) {
+            setActiveStep(2);
+            if (!isBuyer) {
+                setTrackerText(`Awaiting ${buyer.userName}'s Payment`);
             } else {
                 setTrackerText(`Awaiting your Payment`);
             }
         }
 
-        if (seller.hasMadePayment) {
-            setActiveStep(2);
-            if (seller.customerId === customerId) {
-                setTrackerText(`${buyer.userName}'s is awaiting your Payment`);
+        if (buyer.hasMadePayment) {
+            setActiveStep(3);
+            if (buyer.customerId === customerId) {
+                setTrackerText(`Awaiting ${seller.userName}'s confirmation`);
             } else {
-                setTrackerText(`Awaiting ${seller.userName}'s payment`);
+                setTrackerText(`Awaiting your confirmation`);
             }
         }
 
-        if (seller.hasMadePayment && buyer.hasReceivedPayment) {
-            setActiveStep(3);
+        if (buyer.hasMadePayment && seller.hasReceivedPayment) {
+            setActiveStep(4);
             setTrackerText(`Transaction Completed`);
             setCompleted(true);
         }
