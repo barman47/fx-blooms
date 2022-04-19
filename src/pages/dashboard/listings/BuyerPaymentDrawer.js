@@ -13,15 +13,12 @@ import {
     Select,
     MenuItem,
     TextField,
-    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
-import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
+import { AlertOutline, Close } from 'mdi-material-ui';
 import _ from 'lodash';
-import toast, { Toaster } from 'react-hot-toast';
-import copy from 'copy-to-clipboard';
 
 import { cancelBid, madePayment } from '../../../actions/listings';
 import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
@@ -29,7 +26,6 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -54,6 +50,7 @@ const useStyles = makeStyles(theme => ({
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
+            marginBottom: theme.spacing(2),
             alignItems: 'center',
             position: 'fixed',
             width: '35%',
@@ -302,6 +299,22 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         setErrors(errorsState);
     }, [errorsState]);
 
+    // function convertUTCDateToLocalDate(date) {
+    //     var newDate = new Date(date.getTime() - date.getTimezoneOffset()*60*1000);
+    //     return newDate;   
+    // }
+
+    // function ConvertUTCTimeToLocalTime(UTCDateString)
+    // {
+    //     var convertdLocalTime = new Date(UTCDateString);
+
+    //     var hourOffset = convertdLocalTime.getTimezoneOffset() / 60;
+
+    //     convertdLocalTime.setHours( convertdLocalTime.getHours() + hourOffset ); 
+
+    //     return convertdLocalTime;
+    // }
+
     const startExpiryTimer = () => {
         const countDownTime = new Date(bid.datePlaced).getTime() + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {
@@ -367,14 +380,8 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         return bank.accountID;
     };
 
-    const handleCopyTransactionId = () => {
-        copy(bid.id);
-        toast.success('Transaction ID Copied!');
-    };
-
     return (
         <>
-            <Toaster />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
@@ -399,17 +406,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                         <Close />
                     </IconButton>
                 </Box>
-                <div className={classes.transactionContainer}>
-                    <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
-                    <Typography variant="body2" component="p">
-                        {bid?.id && `. . . ${returnLastThreeCharacters(bid.id)}`}
-                        <IconButton onClick={handleCopyTransactionId} color="primary">
-                            <Tooltip title="Copy Transaction ID" arrow>
-                                <ContentCopy />
-                            </Tooltip>
-                        </IconButton>
-                    </Typography>
-                </div>
                 <Grid container direction="row">
                     <Grid item xs={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>

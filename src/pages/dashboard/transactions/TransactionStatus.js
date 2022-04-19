@@ -147,14 +147,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
-    // Set the current step to the 5th one - Exception
-    // useEffect(() => {
-    //     if (activeStep === 3 && transactionSteps.length === 5) {
-    //         setActiveStep(4);
-    //     }
-    // }, [activeStep, transactionSteps.length]);
-
-    const getActiveStep = (buyer, seller) => {
+    const getActiveNgnStep = (buyer, seller) => {
         if (buyer.hasMadePayment) {
             setActiveStep(0);
             if (buyer.customerId === customerId) {
@@ -189,53 +182,150 @@ const TransactionStatus = ({ handleSetTitle }) => {
         }
     };
 
-    const initializeTransaction = (transaction) => {
-        const { buyer, seller } = transaction;
-        getActiveStep(buyer, seller);
+    const getActiveEurStep = (buyer, seller) => {
+        if (buyer.hasMadePayment) {
+            setActiveStep(0);
+            if (buyer.customerId === customerId) {
+                setTrackerText(`Awaiting ${seller.userName}'s Confirmation`);
+            } else {
+                setTrackerText(`Awaiting your Confirmation`);
+            }
+        }
 
-        if (customerId === buyer.customerId) { // Customer is buyer
-            setIsBuyer(true);
-            setRecepient(seller);
-            setCustomer(buyer);
+        if (buyer.hasMadePayment && seller.hasReceivedPayment) {
+            setActiveStep(1);
+            if (isBuyer) {
+                setTrackerText(`Awaiting ${seller.userName}'s Payment`);
+            } else {
+                setTrackerText(`Awaiting your Payment`);
+            }
+        }
+
+        if (seller.hasMadePayment) {
+            setActiveStep(2);
+            if (seller.customerId === customerId) {
+                setTrackerText(`${buyer.userName}'s is awaiting your Payment`);
+            } else {
+                setTrackerText(`Awaiting ${seller.userName}'s payment`);
+            }
+        }
+
+        if (seller.hasMadePayment && buyer.hasReceivedPayment) {
+            setActiveStep(3);
+            setTrackerText(`Transaction Completed`);
+            setCompleted(true);
+        }
+    };
+
+    const getBuyerTransactionSteps = (buyer, seller) => {
+        if (seller.currency === 'EUR') {
             setTransactionSteps([
-                `You transfer NGN${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
                 `${seller.userName} to confirm the NGN payment`, 
                 `${seller.userName} to transfer EUR to you`,
                 `You to confirm - Transaction Completed`
             ]);
+        } else {
+            setTransactionSteps([
+                `You accepted offer`, 
+                `${seller.userName} to transfer ${seller.currency}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `You confirmed ${seller.currency} payment`,
+                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `${seller.userName} confirmed the ${buyer.currency} payment - Transaction Completed`,
+            ]);
         }
+    };
 
-        if (customerId === seller.customerId) { // Customer is seller
-            setRecepient(buyer);
-            setCustomer(seller);
+    const getSellerTransactionSteps = (buyer, seller) => {
+        if (seller.currency === 'EUR') {
             setTransactionSteps([
                 `${buyer.userName} to transfer NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
                 `You confirm NGN payment`, 
                 `You transfer the equivalent EUR to ${buyer.userName}`,
                 `${buyer.userName} confirmed the EUR - Transaction Completed`
             ]);
+        } else {
+            setTransactionSteps([
+                `${buyer.userName} accepted offer`, 
+                `You transfer the equivalent ${seller.currency}${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName} within 30 minutes`,
+                `${buyer.userName} confirmed the ${seller.currency} payment`,
+                `${buyer.userName} transferred the ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to you`,
+                `You confirm ${buyer.currency} payment - Transaction Completed`, 
+            ]);
         }
     };
 
-    const getStepContent = (step, transaction) => {
+    const initializeTransaction = (transaction) => {
         const { buyer, seller } = transaction;
 
+        if (seller.currency === 'EUR') {
+            getActiveEurStep()
+        } else {
+            getActiveNgnStep(buyer, seller);
+        }
+
+        if (customerId === buyer.customerId) { // Customer is buyer
+            setIsBuyer(true);
+            setRecepient(seller);
+            setCustomer(buyer);
+            getBuyerTransactionSteps(buyer, seller);
+        }
+
+        if (customerId === seller.customerId) { // Customer is seller
+            setRecepient(buyer);
+            setCustomer(seller);
+            getSellerTransactionSteps(buyer, seller);
+        }
+    };
+
+    const getEurStepContent = (step, transaction) => {
+        const { buyer, seller } = transaction;
         switch (step) {
             case 0:
-                return `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}`;
+                return buyer.datePaymentMade ? `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 1:
-                return `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}`;
+                return seller.datePaymentReceived ? `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
             case 2:
-                return `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}`;
+                return seller.datePaymentMade ? `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 3:
-                return `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}`;
+                return buyer.datePaymentReceived ? `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
           default:
             return '';
         }
+    };
+
+    const getNgnStepContent = (step, transaction) => {
+        const { buyer, seller } = transaction;
+        switch (step) {
+            case 0:
+                return '';
+
+            case 1:
+                return seller.datePaymentMade ? `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+            
+            case 2:
+                return buyer.datePaymentReceived ? `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+
+            case 3:
+                return buyer.datePaymentMade ? `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+            
+            case 4:
+                return seller.datePaymentReceived ? `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+
+            default:
+                return '';
+        }
+    };
+
+    const getStepContent = (step, transaction) => {
+        if (transaction.seller.currency === 'EUR') {
+            return getEurStepContent(step, transaction);
+        }
+        return getNgnStepContent(step, transaction);
     }
 
     const handleCopyTransactionId = () => {
@@ -244,8 +334,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
     };
 
     const handleViewCustomerDetails = () => {
-        debugger
-        return navigate(`${USER_DETAILS}/${recepient.customerId}`, { state: { customerId } });
+        return navigate(`${USER_DETAILS}/${recepient.customerId}`, { state: { customerId: recepient.customerId } });
     };
 
 	return (    

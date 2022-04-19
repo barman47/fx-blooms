@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup } from '@material-ui/core';
+// import { Button, ButtonGroup } from '@material-ui/core';
 import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
@@ -9,7 +9,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_TRANSACTION_TYPE, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 
@@ -56,7 +56,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
 
     const { currencies } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
-    const { eurTransactions, ngnTransactions, transactions, sent, received } = useSelector(state => state.transactions);
+    const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
     // eslint-disable-next-line
@@ -96,15 +96,15 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         }
     }, [currency, customerId, dispatch]);
 
-    const setTransactionType = (sent, received) => {
-		dispatch({
-			type: SET_TRANSACTION_TYPE,
-			payload: {
-				sent,
-				received
-			}
-		});
-	}
+    // const setTransactionType = (sent, received) => {
+	// 	dispatch({
+	// 		type: SET_TRANSACTION_TYPE,
+	// 		payload: {
+	// 			sent,
+	// 			received
+	// 		}
+	// 	});
+	// }
 
     return (
         <>
@@ -130,7 +130,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                                 {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
+                        {/* <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
                             <Button
                                 color="primary"
                                 disableRipple
@@ -151,7 +151,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                             >
                                 Sent
                             </Button>
-                        </ButtonGroup>
+                        </ButtonGroup> */}
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>

@@ -151,10 +151,15 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
         if (listing.status !== open) {
             for (let listingBid of listing.bids) {
                 if (listingBid.customerId === customerId && listingBid.status === BID_STATUS.IN_PROGRES) {
-                    activeOffer = true;
                     yourOffer = true;
                     break;
                 }
+                
+                if (listingBid.status === BID_STATUS.IN_PROGRES) {
+                    activeOffer = true;
+                    break;
+                }
+                
             }
         }
 

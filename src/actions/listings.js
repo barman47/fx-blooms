@@ -173,7 +173,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: 'Offer placed successfully'
+                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
             });
         });
     } catch (err) {
