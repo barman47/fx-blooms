@@ -159,11 +159,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         flexShrink: 0,
         whiteSpace: 'nowrap',
-        width: drawerWidth,
-        
-        // [theme.breakpoints.down('md')]: {
-        //     display: 'none'
-        // }
+        width: drawerWidth
     },
     
     paper: {
@@ -271,6 +267,8 @@ const useStyles = makeStyles((theme) => ({
 
     icon: {
         color: 'inherit',
+        minWidth: 0,
+        marginRight: theme.spacing(1.5),
 
         '&:hover': {
             color: 'inherit'
@@ -293,13 +291,11 @@ const useStyles = makeStyles((theme) => ({
         }
     },
 
-    collapsedAccordionSummary: {
-        '& .MuiButtonBase-root': {
-            display: 'flex !important',
-        flexDirection: 'column !important',
-        justifyContent: 'center !important',
-        alignItems: 'center !important'
-        }
+    collapsedIcon: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     accordionDetails: {
@@ -308,6 +304,10 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: 0,
         paddingRight: 0,
         paddingTop: 0
+    },
+
+    collapsedAccordionDetails: {
+        paddingLeft: 0
     },
 
     bottomBar: {
@@ -802,7 +802,7 @@ const Dashboard = (props) => {
                                         <Fragment key={index}>
                                             <Accordion>
                                                 <AccordionSummary
-                                                    expandIcon={<ChevronDown />}
+                                                    expandIcon={open ? <ChevronDown /> : null}
                                                     aria-controls="security-accordion"
                                                     id="security"
                                                     className={classes.accordionSummary}
@@ -819,7 +819,7 @@ const Dashboard = (props) => {
                                                             </ListItemIcon>
                                                             :
                                                             <Tooltip title={link.text} placement="right" arrow>
-                                                                <ListItemIcon className={classes.icon}>
+                                                                <ListItemIcon className={clsx(classes.icon, {[classes.collapsedIcon]: !open})}>
                                                                     {link.icon}
                                                                 </ListItemIcon>
                                                             </Tooltip>
@@ -827,7 +827,7 @@ const Dashboard = (props) => {
                                                         {open && <ListItemText primary={link.text} />}
                                                     </ListItem>
                                                 </AccordionSummary>
-                                                <AccordionDetails className={classes.accordionDetails}>
+                                                <AccordionDetails className={clsx(classes.accordionDetails, { [classes.collapsedAccordionDetails]: !open})}>
                                                     {securityLinks.map((link, index) => (
                                                         <ListItem 
                                                             key={index}
@@ -958,9 +958,7 @@ const Dashboard = (props) => {
                             <BottomNavigationAction 
                                 onClick={() => handleLinkClick(item.url)} 
                                 key={index} 
-                                // label={location.pathname.includes(item.url) && item.text}
                                 label={item.text} 
-                                // value={item.text} 
                                 icon={item.icon} 
                                 classes={{ label: classes.label, selected: classes.label }}
                             />
@@ -968,7 +966,6 @@ const Dashboard = (props) => {
                         <BottomNavigationAction 
                             onClick={toggleDrawer} 
                             label="More" 
-                            // value={3} 
                             icon={<Menu />} 
                             classes={{ label: classes.label, selected: classes.label }}
                         />

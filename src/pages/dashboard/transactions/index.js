@@ -1,24 +1,23 @@
 import { useEffect, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-// import { Button, ButtonGroup } from '@material-ui/core';
 import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
-
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
+import TransactionSkeleton from './TransactionSkeleton';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        paddingLeft: theme.spacing(5),
-        paddingRight: theme.spacing(5),
+        padding: theme.spacing(0, 5, 5, 5),
 
         [theme.breakpoints.down('sm')]: {
+            paddingBottom: theme.spacing(1),
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
         }
@@ -59,15 +58,12 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
-    // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         handleSetTitle('Transactions');
-        dispatch({
-            type: SET_TRANSACTION,
-            payload: {}
-        });
+        setLoading(true);
+        dispatch({ type: CLEAR_TRANSACTIONS });
         getTransactions(true);
         if (currencies.length === 0) {
             // setLoading(true);
@@ -76,18 +72,27 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if ((transactions.length > 0 || eurTransactions.length > 0 || ngnTransactions.length > 0) && loading) {
+            setLoading(false);
+        }
+    }, [loading, eurTransactions.length, ngnTransactions.length, transactions]);
+
     // Filter transactions
     useEffect(() => {
         switch (currency) {
             case 'ALL':
+                setLoading(true);
                 dispatch({ type: SET_ALL_TRANSACTIONS });
                 break;
 
             case 'EUR':
+                setLoading(true);
                 dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
                 break;
 
             case 'NGN':
+                setLoading(true);
                 dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
                 break;
 
@@ -155,12 +160,24 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
-                    {eurTransactions.length > 0 ? 
+                    {loading ?
+                        <>
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                        </>
+                        :
+                        eurTransactions.length > 0 ? 
                         eurTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                    }
+                    {!loading && transactions.length === 0 && 
+                        <Typography variant="h4" align="center" color="primary">You have no transactions</Typography>
                     }
                 </Box>
             </Box>
