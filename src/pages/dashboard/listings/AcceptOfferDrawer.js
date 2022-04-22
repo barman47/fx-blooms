@@ -245,7 +245,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 onClose={toggleDrawer}
             >
                 <Box component="header">
-                    <Typography variant="h6" className={classes.header}>Buy NGN - Transfer the NGN</Typography>
+                    <Typography variant="h6" className={classes.header}>Accept NGN Offer</Typography>
                     <IconButton 
                         color="primary" 
                         disableFocusRipple

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -7,13 +7,10 @@ import {
     Drawer,
     Grid,
     IconButton,
-    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
-import toast, { Toaster } from 'react-hot-toast';
-import copy from 'copy-to-clipboard';
+import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, madePaymentV2 } from '../../../actions/listings';
 import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
@@ -21,7 +18,6 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 import getTime from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
@@ -53,13 +49,6 @@ const useStyles = makeStyles(theme => ({
 
     header: {
         color: theme.palette.primary.main,
-    },
-
-    transactionContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
     },
 
     text: {
@@ -175,12 +164,13 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
     const errorToast = useRef();
 
     useEffect(() => {
-        startExpiryTimer();
+        // startExpiryTimer();
         if (isEmpty(account) && !isEmpty(listing)) {
             getAccount(listing.sellersAccountId);
         }
 
         return () => {
+            console.log('Stopping timer');
             clearInterval(interval.current);
         };
         // eslint-disable-next-line
@@ -193,6 +183,8 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             payload: {}
         });
         if (!drawerOpen) {
+            console.log('Stopping timer');
+            clearInterval(interval.current);
             setErrors({});
         }
     }, [dispatch, drawerOpen]);
@@ -216,7 +208,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
         return bidIds;
     };
 
-    const expireListing = () => {
+    const expireListing = useCallback(() => {
         clearInterval(interval.current);
         toggleDrawer();
         batch(() => {
@@ -234,30 +226,12 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             });
         });
         cancelBid(getBidIds(listing.bids));
-    };
+    }, [cancelBid, dispatch, listing, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
-    useEffect(() => {
-        setOpen(drawerOpen);
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: {}
-        });
-        if (!drawerOpen) {
-            setErrors({});
-        }
-    }, [dispatch, drawerOpen]);
-
-    useEffect(() => {
-        if (msg) {
-            successModal.current.setModalText(msg);
-            successModal.current.openModal();
-            clearInterval(interval.current);
-        }
-    }, [msg]);
-
-    const startExpiryTimer = () => {
+    const startExpiryTimer = useCallback(() => {
+        console.log('Starting timer');
         // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
         const countDownTime = new Date(bid.dateLogged).getTime() + THIRTY_MINUTES;
         interval.current = setInterval(() => {
@@ -278,7 +252,29 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
                 // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
             }
         }, 1000);
-    };
+    }, [bid, expireListing]);
+
+    useEffect(() => {
+        setOpen(drawerOpen);
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {}
+        });
+        if (!drawerOpen) {
+            clearInterval(interval.current);
+            setErrors({});
+        } else {
+            startExpiryTimer();
+        }
+    }, [dispatch, drawerOpen, startExpiryTimer]);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            clearInterval(interval.current);
+        }
+    }, [msg]);
 
     const dismissSuccessModal = () => {
         // setButtonDisabled(true);
@@ -309,14 +305,8 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
         }, notificationId);
     };
 
-    const handleCopyTransactionId = () => {
-        copy(bid.id);
-        toast.success('Transaction ID Copied!');
-    };
-
     return (
         <>
-            <Toaster />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             {!isEmpty(errors) && 
@@ -349,17 +339,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
                         <Close />
                     </IconButton>
                 </Box>
-                <div className={classes.transactionContainer}>
-                    <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
-                    <Typography variant="body2" component="p">
-                        {bid?.id && `. . . ${returnLastThreeCharacters(bid.id)}`}
-                        <IconButton onClick={handleCopyTransactionId} color="primary">
-                            <Tooltip title="Copy Transaction ID" arrow>
-                                <ContentCopy />
-                            </Tooltip>
-                        </IconButton>
-                    </Typography>
-                </div>
                 <Grid container direction="row" alignItems="center">
                     <Grid item xs={6} lg={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>
