@@ -236,7 +236,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
                 ModalProps={{ 
-                    disableBackdropClick: true,
+                    // disableBackdropClick: true,
                     disableEscapeKeyDown: true,
                 }}
                 PaperProps={{ className: classes.drawer }} 

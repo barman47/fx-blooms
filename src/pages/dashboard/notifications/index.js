@@ -104,7 +104,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
     const [amount, setAmount] = useState(0);
     const [sellerUsername, setSellerUsername] = useState('');
-    const [buyerUsername, setBuyerUsername] = useState('');
     const [buyerSendEurDrawerOpen, setBuyerSendEurDrawerOpen] = useState(false);
     const [sellerSendEurDrawerOpen, setSellerSendEurDrawerOpen] = useState(false);
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
@@ -150,6 +149,19 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             });
         }
     }, [dispatch, sellerSendEurDrawerOpen]);
+    
+    // accounName typo is deliberate and should not be fixed
+    const setAccount = (accounName, accountNumber, bankName, reference) => {
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {
+                accounName,
+                accountNumber,
+                bankName,
+                reference
+            }
+        });
+    };
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
         const data = {
@@ -186,20 +198,20 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const setSellerAccount = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
         setTransactionId(notification.Id);
-        setBuyerUsername(Buyer.UserName);
         
-        const sellerAccount = {
-            accounName: Seller.AccountName,
-            accountNumber: Seller.AccountNumber,
-            bankName: Seller.BankName,
-            reference: Seller.TransferReference
-        };
+        // const sellerAccount = {
+        //     accounName: Seller.AccountName,
+        //     accountNumber: Seller.AccountNumber,
+        //     bankName: Seller.BankName,
+        //     reference: Seller.TransferReference
+        // };
 
         setAmount(Number(Buyer.AmountTransfered));
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: sellerAccount
-        });
+        // dispatch({
+        //     type: SET_ACCOUNT,
+        //     payload: sellerAccount
+        // });
+        setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
         setNotificationId(notificationId);
         toggleBuyerSendEurDrawer();
     };
@@ -319,12 +331,21 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
 
     const handleBuyerPayment = (bid) => {
-        setNotificationId(bid.notificationId);
+        const { notificationId, data } = bid;
+        setNotificationId(notificationId);
         dispatch({
             type: SET_BID,
             payload: bid
         });
-        toggleSellerSendNgnDrawer();
+
+        if (data.Buyer.HasReceivedPayment && !data.Buyer.HasMadePayment) {
+            setAmount(Number(data.Buyer.AmountTransfered));
+            setTransactionId(data.Id); // Double check
+            setAccount(data.Seller.AccountName, data.Seller.AccountNumber, data.Seller.BankName, data.Seller.TransferReference);
+            toggleBuyerSendEurDrawer();
+        } else {
+            toggleSellerSendNgnDrawer();
+        }
     };
 
     const dismissAction = () => {
@@ -368,7 +389,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                     amount={amount} 
                     transactionId={transactionId}
                     notificationId={notificationId}
-                    buyerUsername={buyerUsername}
                 />
             }
             {open && 

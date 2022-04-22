@@ -300,22 +300,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         setErrors(errorsState);
     }, [errorsState]);
 
-    // function convertUTCDateToLocalDate(date) {
-    //     var newDate = new Date(date.getTime() - date.getTimezoneOffset()*60*1000);
-    //     return newDate;   
-    // }
-
-    // function ConvertUTCTimeToLocalTime(UTCDateString)
-    // {
-    //     var convertdLocalTime = new Date(UTCDateString);
-
-    //     var hourOffset = convertdLocalTime.getTimezoneOffset() / 60;
-
-    //     convertdLocalTime.setHours( convertdLocalTime.getHours() + hourOffset ); 
-
-    //     return convertdLocalTime;
-    // }
-
     const startExpiryTimer = () => {
         const countDownTime = new Date(bid.datePlaced).getTime() + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {

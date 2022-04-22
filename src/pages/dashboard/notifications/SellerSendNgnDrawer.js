@@ -259,19 +259,12 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
 
     const startExpiryTimer = () => {
         // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        // countDownTime = countDownTime.toUTCString();
         const countDownTime = new Date(bid.dateLogged).getTime() + THIRTY_MINUTES;
-        // const countDownTime = new Date(bid.dateLogged).getTime() + (THIRTY_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        // const countDownTime = localizeTime(bid.dateLogged, THIRTY_MINUTES);
         interval.current = setInterval(() => {
-            // let now = new Date().toUTCString();
-            // now = new Date(now).getTime();
-            // const now = getTime();
             const distance = countDownTime - getTime();
-            // const distance = localizeTime(bid.dateLogged, THIRTY_MINUTES);
-
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
 
             if (minutes === 0 && seconds === 0) {
                 clearInterval(interval.current);
@@ -337,8 +330,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             }
             <Drawer 
                 ModalProps={{ 
-                    disableBackdropClick: true,
-                    disableEscapeKeyDown: true,
+                    disableEscapeKeyDown: true
                 }}
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
@@ -378,8 +370,8 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
                 </Grid>
                 <ol>
                     <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
-                    <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
+                    <li><Typography variant="body2" component="p">Transfer the {bid.data.Seller.Currency} to {`${bid.data.Buyer.UserName?.toLowerCase()}'s`} account below</Typography></li>
+                    <li><Typography variant="body2" component="p">Click on <Typography variant="body2" component="span" color="primary" style={{ fontWeight: 600 }}>{bid.data.Seller.Currency}{formatNumber(bid.data.Seller.AmountTransfered, 2)} Payment Made</Typography></Typography></li>
                 </ol>
                 <Grid item xs={12}>
                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>

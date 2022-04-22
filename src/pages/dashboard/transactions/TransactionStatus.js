@@ -18,7 +18,6 @@ import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 
 import { getBid } from '../../../actions/listings';
 
@@ -289,16 +288,16 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         const { buyer, seller } = transaction;
         switch (step) {
             case 0:
-                return buyer.datePaymentMade ? `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return buyer.datePaymentMade ? `${convertToLocalTime(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 1:
-                return seller.datePaymentReceived ? `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return seller.datePaymentReceived ? `${convertToLocalTime(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
             case 2:
-                return seller.datePaymentMade ? `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return seller.datePaymentMade ? `${convertToLocalTime(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 3:
-                return buyer.datePaymentReceived ? `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return buyer.datePaymentReceived ? `${convertToLocalTime(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
           default:
             return '';
@@ -309,19 +308,19 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         const { buyer, seller } = transaction;
         switch (step) {
             case 0:
-                return `${moment(bid.datePlaced).format('MMMM Do YYYY, h:mm:ss a')}`;
+                return `${convertToLocalTime(bid.datePlaced).format('MMMM Do YYYY, h:mm:ss a')}`;
 
             case 1:
-                return seller.datePaymentMade ? `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return seller.datePaymentMade ? `${convertToLocalTime(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 2:
-                return buyer.datePaymentReceived ? `${moment(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return buyer.datePaymentReceived ? `${convertToLocalTime(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
             case 3:
-                return buyer.datePaymentMade ? `${moment(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return buyer.datePaymentMade ? `${convertToLocalTime(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 4:
-                return seller.datePaymentReceived ? `${moment(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+                return seller.datePaymentReceived ? `${convertToLocalTime(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
             default:
                 return '';

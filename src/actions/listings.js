@@ -20,6 +20,7 @@ import {
     SET_LOADING_LISTINGS, 
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
+    SET_REQUIRED_CURRENCY,
     UPDATED_LISTING 
 } from './types';
 import { markNotificationAsRead } from './notifications';
@@ -54,9 +55,18 @@ export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
-        return dispatch({
-            type: ADDED_LISTING,
-            payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+        return batch(() => {
+            dispatch({
+                type: ADDED_LISTING,
+                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+            });
+            dispatch({
+                type: SET_REQUIRED_CURRENCY,
+                payload: {
+                    availableCurrency: listing.currencyNeeded,
+                    requiredCurrency: listing.AmountAvailable.CurrencyType  
+                }
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

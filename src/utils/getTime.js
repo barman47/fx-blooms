@@ -1,6 +1,11 @@
 import moment from 'moment-timezone';
 
-const getTime = (date) =>  new Date(new Date(date).toUTCString()).getTime(); // Converting to UTC time
+const getTime = (date = null) =>  {
+    if (date) {
+        return new Date(new Date(date).toUTCString()).getTime();
+    }
+    return new Date(new Date().toUTCString()).getTime();
+};
 
 export const convertToLocalTime = (date) => {
     const serverTime = moment.tz(date, 'Africa/Lagos'); // Convert to Africa/Lagos timezone

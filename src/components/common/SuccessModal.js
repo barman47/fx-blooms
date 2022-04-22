@@ -89,7 +89,6 @@ const SuccessModal = forwardRef((props, ref) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            disableBackdropClick
             disableEscapeKeyDown
             onClose={() => setOpen(false)}
             closeAfterTransition
