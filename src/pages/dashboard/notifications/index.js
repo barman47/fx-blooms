@@ -117,7 +117,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
-    const { BUYER_MADE_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
+    const { BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
     
     useEffect(() => {
         getNotifications();
@@ -129,13 +129,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         if (!residencePermitUrl && stats.idStatus !== APPROVED) {
             getIdVerificationLink();
         }
-
-        // return () => {
-        //     dispatch({
-        //         type: SET_NOTIFICATION_TO_REMOVE,
-        //         payload: null
-        //     });
-        // };
         // eslint-disable-next-line
     }, []);
 
@@ -401,7 +394,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                         message={setMessage(notification.data)}
                                         buttonText={buttonDisabled(notification.data.Seller) ? 'Payment Confirmed' : 'Confirm payment'}
                                         buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
-                                        // buttonAction={() => setBuyerAccount(notification)}
                                         buttonDisabled={buttonDisabled(notification.data.Seller)}
                                         date={notification.dateLogged}
                                     />
@@ -437,28 +429,31 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 )
                             }
 
-                            // if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
-                            //     return (
-                            //         <Notification 
-                            //             key={index}
-                            //             title="Credit (Exchange)"
-                            //             message={setMessage(notification.data)}
-                            //             buttonText={`Pay ${notification.data.Buyer.Currency}`}
-                            //             buttonAction={() => handleBuyerPayment(notification)}
-                            //             date={notification.dateLogged}
-                            //         />
-                            //     )
-                            // }
+                            if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
+                                return (
+                                    <Notification 
+                                        key={index}
+                                        title="Credit (Exchange)"
+                                        message={setMessage(notification.data)}
+                                        buttonText={`Pay ${notification.data.Buyer.Currency}`}
+                                        buttonAction={() => handleBuyerPayment(notification)}
+                                        date={notification.dateLogged}
+                                    />
+                                )
+                            }
 
-                            // if (notification.eventType === SELLER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
-                            //     return (
-                            //         <Notification 
-                            //             key={index}
-                            //             title="Payment Confirmed"
-                            //             message={setSellerConfirmedMessage(notification.data)}
-                            //         />
-                            //     )
-                            // }
+                            if (notification.eventType === SELLER_CONFIRMED_PAYMENT && customerId === notification.data.Seller.CustomerId) {
+                                return (
+                                    <Notification 
+                                        key={index}
+                                        title="Credit (Exchange)"
+                                        message={setMessage(notification.data)}
+                                        buttonText={`Pay ${notification.data.Seller.Currency}`}
+                                        buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
+                                        date={notification.dateLogged}
+                                    />
+                                )
+                            }
 
                             // if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Seller.CustomerId && notification.data.Buyer.HasMadePayment === false) {
                             //     return (

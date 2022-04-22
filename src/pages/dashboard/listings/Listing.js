@@ -16,6 +16,7 @@ import { PROFILE, USER_DETAILS } from '../../../routes';
 
 import eurLogo from '../../../assets/img/eur-logo.svg';
 import ngnLogo from '../../../assets/img/ngn-logo.svg';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -164,7 +165,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date(dateCreated).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;

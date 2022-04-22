@@ -22,6 +22,7 @@ import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+import getTime from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -257,10 +258,17 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
     }, [msg]);
 
     const startExpiryTimer = () => {
-        const countDownTime = new Date(bid.dateLogged).getTime() + (THIRTY_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        // countDownTime = countDownTime.toUTCString();
+        const countDownTime = new Date(bid.dateLogged).getTime() + THIRTY_MINUTES;
+        // const countDownTime = new Date(bid.dateLogged).getTime() + (THIRTY_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        // const countDownTime = localizeTime(bid.dateLogged, THIRTY_MINUTES);
         interval.current = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = countDownTime - now;
+            // let now = new Date().toUTCString();
+            // now = new Date(now).getTime();
+            // const now = getTime();
+            const distance = countDownTime - getTime();
+            // const distance = localizeTime(bid.dateLogged, THIRTY_MINUTES);
 
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);

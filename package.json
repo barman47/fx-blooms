@@ -22,6 +22,7 @@
     "html-entities": "^2.3.2",
     "mdi-material-ui": "6.22.1",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.34",
     "numbro": "^2.3.5",
     "react": "17.0.2",
     "react-dom": "17.0.2",

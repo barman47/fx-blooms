@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -20,11 +20,14 @@ import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 
+import { getBid } from '../../../actions/listings';
+
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 import { USER_DETAILS } from '../../../routes';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -126,11 +129,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const TransactionStatus = ({ handleSetTitle }) => {
+const TransactionStatus = ({ getBid, handleSetTitle }) => {
 	const classes = useStyles();
     const navigate = useNavigate();
 
     const { customerId } = useSelector(state => state.customer);
+    const { bid } = useSelector(state => state.listings);
     const { transaction } = useSelector(state => state.transactions);
 
     const [trackerText, setTrackerText] = useState('');
@@ -142,6 +146,9 @@ const TransactionStatus = ({ handleSetTitle }) => {
     const [activeStep, setActiveStep] = useState(0);
 
     useEffect(() => {
+        if (transaction.seller.currency === 'NGN') {
+            getBid(transaction.bidId);
+        }
         handleSetTitle('Transaction Status');
         initializeTransaction(transaction);
         // eslint-disable-next-line
@@ -259,7 +266,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
         const { buyer, seller } = transaction;
 
         if (seller.currency === 'EUR') {
-            getActiveEurStep()
+            getActiveEurStep(buyer, seller)
         } else {
             getActiveNgnStep(buyer, seller);
         }
@@ -302,7 +309,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
         const { buyer, seller } = transaction;
         switch (step) {
             case 0:
-                return '';
+                return `${moment(bid.datePlaced).format('MMMM Do YYYY, h:mm:ss a')}`;
 
             case 1:
                 return seller.datePaymentMade ? `${moment(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
@@ -393,7 +400,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Date</Typography>
-                            <Typography variant="body2" component="p" >{moment(transaction.dateCreated).format('MMMM Do, YYYY')} at {moment(transaction.dateCreated).format('hh:mm a')}</Typography>
+                            <Typography variant="body2" component="p" >{convertToLocalTime(transaction.dateCreated).format('MMMM Do, YYYY')} at {convertToLocalTime(transaction.dateCreated).format('hh:mm a')}</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>
@@ -419,7 +426,8 @@ const TransactionStatus = ({ handleSetTitle }) => {
 };
 
 TransactionStatus.propTypes = {
+    getBid: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default TransactionStatus;
+export default connect(undefined, { getBid })(TransactionStatus);

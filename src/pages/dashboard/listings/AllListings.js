@@ -33,7 +33,7 @@ import {
 	SET_LOADING_LISTINGS,
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
-import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
+import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
 import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -192,8 +192,8 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	searchButton: {
-		paddingBottom: theme.spacing(0.7),
-		paddingTop: theme.spacing(0.7)
+		paddingBottom: theme.spacing(0.55),
+		paddingTop: theme.spacing(0.55)
 	},
 	
 	listings: {
@@ -240,7 +240,17 @@ const AllListings = (props) => {
 	const { unreadNotifications } = useSelector(state => state.notifications);
 	const { eurActive, ngnActive, usdActive, gbpActive } = useSelector(state => state.wallets);
 
-	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
+	const { 
+		getAccounts, 
+		getCustomerInformation, 
+		getCustomerStats, 
+		getIdVerificationLink, 
+		getListingsOpenForBid, 
+		getMoreListings, 
+		getNotifications, 
+		handleSetTitle,
+		removeExpiredListings 
+	} = props;
 
 	const [Amount, setAmount] = useState('');
 	const [timeOfDay, setTimeOfDay] = useState('');
@@ -268,6 +278,7 @@ const AllListings = (props) => {
     };
 
 	useEffect(() => {
+		removeExpiredListings();
 		greet();
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
@@ -609,6 +620,7 @@ const AllListings = (props) => {
 													variant="contained"
 													color="primary"
 													// size="large"
+													disableElevation
 													disableRipple
 													disableFocusRipple
 													className={classes.searchButton}
@@ -658,4 +670,13 @@ AllListings.propTypes = {
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccounts, getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, getNotifications })(AllListings);
+export default connect(undefined, { 
+	getAccounts, 
+	getIdVerificationLink, 
+	getCustomerInformation, 
+	getCustomerStats, 
+	getListingsOpenForBid, 
+	getMoreListings, 
+	getNotifications,
+	removeExpiredListings 
+})(AllListings);

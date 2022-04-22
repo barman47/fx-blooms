@@ -6,7 +6,6 @@ import { Box, Button, IconButton, Tooltip, Typography } from '@material-ui/core'
 import { makeStyles } from '@material-ui/styles';
 import { ContentCopy } from 'mdi-material-ui';
 import clsx from 'clsx';
-import moment from 'moment';
 import copy from 'copy-to-clipboard';
 import toast from 'react-hot-toast';
 
@@ -15,6 +14,7 @@ import { SET_TRANSACTION } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastSixDigits from '../../../utils/returnLastThreeCharacters';
+import { convertToLocalTime } from '../../../utils/getTime';
 import { TRANSACTION_STATUS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
@@ -141,8 +141,7 @@ const Transaction = ({ transaction }) => {
         <Box component="section" className={classes.root}>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Time</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>{moment(transaction.dateCreated).fromNow()}</Typography>
-                {/* <Typography variant="body1" component="p" className={classes.text}>5 mins ago</Typography> */}
+                <Typography variant="body1" component="p" className={classes.text}>{convertToLocalTime(transaction.dateCreated).fromNow()}</Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>

@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 import TransactionSkeleton from './TransactionSkeleton';
@@ -64,6 +64,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         handleSetTitle('Transactions');
         setLoading(true);
         dispatch({ type: CLEAR_TRANSACTIONS });
+        dispatch({ type: SET_BID, payload: {} });
         getTransactions(true);
         if (currencies.length === 0) {
             // setLoading(true);

@@ -13,6 +13,7 @@ import {
     GET_ERRORS,
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
+    SET_BID,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
@@ -96,6 +97,30 @@ export const updateListing = (listing) => async (dispatch) => {
     }
 };
 
+export const getBid = (bidId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/GetBid?id=${bidId}`);
+        return dispatch({
+            type: SET_BID,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const removeExpiredListings = () => async (dispatch) => {
+    try {
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${API}/Admin/RemoveExpiredListingsAndBids`)
+        ]);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const deleteListing = (listingId) => async (dispatch) => {
     try {
         await Promise.all([
@@ -111,6 +136,8 @@ export const deleteListing = (listingId) => async (dispatch) => {
         return handleError(err, dispatch);
     }
 };
+
+
 
 export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {

@@ -1,10 +1,10 @@
 import { Box, Button, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import { ClockOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -81,8 +81,7 @@ const Notification = ({ title, message, buttonText, buttonAction, buttonDisabled
                 <Box component="div" className={classes.timeStampContainer}>
                     <ClockOutline className={classes.clockIcon} />
                     <Typography variant="subtitle2" component="small">
-                        {moment(date).from()}
-                        {/* {moment(date).fromNow()} */}
+                        {convertToLocalTime(date).from()}
                     </Typography>
                 </Box>
                 <Typography variant="body1" component="p">{message}</Typography>
