@@ -197,9 +197,6 @@ const TransactionDetails = () => {
     dispatch(getAllListings())
 
   }, [dispatch])
-
-  console.log('CUSTOMER' , customer)
-
   
   useEffect(() => {
     dispatch(getCustomer(customer.id))

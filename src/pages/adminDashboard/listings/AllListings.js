@@ -124,10 +124,6 @@ const AllListings = () => {
 
 //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 //   const [page, setPage] = useState(0);
-
-//   console.log('ITEMS', items)
-//   console.log('listings', listings)
-  
   useEffect(() => {
     dispatch(getAllListings())
 
@@ -139,8 +135,6 @@ const AllListings = () => {
         pageNumber: 1,
         pageSize: 15
     }))
-
-    // console.log('listings', items)
   }, [dispatch])
     
 

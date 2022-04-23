@@ -69,7 +69,6 @@ const VerifyEmail = (props) => {
         const data = location.search;
         const externalid = data.substring(data.indexOf('=') + 1,data.indexOf('&'));
         const token = data.split('token=')[1];
-        console.log('PROPS', props)
         
         verifyEmail({ externalid, token });
         // eslint-disable-next-line
