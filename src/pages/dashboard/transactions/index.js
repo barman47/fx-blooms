@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
@@ -7,7 +7,7 @@ import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
 import TransactionSkeleton from './TransactionSkeleton';
@@ -53,18 +53,22 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { currencies } = useSelector(state => state);
+    const { currencies, loading } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
     const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         handleSetTitle('Transactions');
-        setLoading(true);
-        dispatch({ type: CLEAR_TRANSACTIONS });
-        dispatch({ type: SET_BID, payload: {} });
+        batch(() => {
+            dispatch({
+                type: SET_LOADING,
+                payload: true
+            });
+            dispatch({ type: CLEAR_TRANSACTIONS });
+            dispatch({ type: SET_BID, payload: {} });
+        });
         getTransactions(true);
         if (currencies.length === 0) {
             // setLoading(true);
@@ -73,27 +77,31 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if ((transactions.length > 0 || eurTransactions.length > 0 || ngnTransactions.length > 0) && loading) {
-            setLoading(false);
-        }
-    }, [loading, eurTransactions.length, ngnTransactions.length, transactions]);
-
     // Filter transactions
     useEffect(() => {
         switch (currency) {
             case 'ALL':
-                setLoading(true);
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_ALL_TRANSACTIONS });
                 break;
 
             case 'EUR':
-                setLoading(true);
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
                 break;
 
             case 'NGN':
-                setLoading(true);
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
+
                 dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
                 break;
 

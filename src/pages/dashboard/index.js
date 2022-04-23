@@ -79,9 +79,10 @@ import {
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
-import audioFile from '../../assets/sounds/notification.mp3';
+
 
 import { logout } from '../../actions/customer';
+import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
 import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
@@ -90,6 +91,7 @@ import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer'
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
 
+import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
@@ -397,7 +399,7 @@ const Dashboard = (props) => {
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { logout, title } = props;
+    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
@@ -408,6 +410,7 @@ const Dashboard = (props) => {
     const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        getNotificationCount(customerId);
         if (matches) {
             setOpen(false);
         }
@@ -559,6 +562,7 @@ const Dashboard = (props) => {
         } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
+                getNotificationCount(customerId);
                 let response = JSON.parse(data);
                 let payload = JSON.parse(response.Payload);
                 payload = { ...payload, Data: JSON.parse(payload.Data) };
@@ -616,6 +620,7 @@ const Dashboard = (props) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
@@ -656,6 +661,7 @@ const Dashboard = (props) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
@@ -977,8 +983,10 @@ const Dashboard = (props) => {
 };
 
 Dashboard.propTypes = {
+    getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
+    markNotificationAsRead: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { logout })(Dashboard);
+export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);

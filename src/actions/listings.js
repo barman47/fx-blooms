@@ -17,7 +17,7 @@ import {
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
-    SET_LOADING_LISTINGS, 
+    SET_LOADING, 
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
     SET_REQUIRED_CURRENCY,
@@ -160,7 +160,7 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
                 payload: { listings: items, ...rest }
             });
             dispatch({
-                type: SET_LOADING_LISTINGS,
+                type: SET_LOADING,
                 payload: false
             });
             if (setRecommendedRate && items.length > 0) {

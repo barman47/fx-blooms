@@ -301,7 +301,8 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     }, [errorsState]);
 
     const startExpiryTimer = () => {
-        const countDownTime = new Date(bid.datePlaced).getTime() + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
+        const date = bid.datePlaced.endsWith('Z') ? new Date(bid.datePlaced) : new Date(bid.datePlaced + 'Z');
+        const countDownTime = new Date(date).getTime() + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {
             const distance = countDownTime - getTime();
 

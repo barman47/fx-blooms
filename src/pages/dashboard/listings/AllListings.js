@@ -30,7 +30,7 @@ import {
 	ACTIVATE_USD_WALLET,
 	ACTIVATE_GPB_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
-	SET_LOADING_LISTINGS,
+	SET_LOADING,
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
@@ -234,7 +234,7 @@ const AllListings = (props) => {
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
-	const listingsLoading = useSelector(state => state.listings.loading);
+	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
@@ -286,7 +286,7 @@ const AllListings = (props) => {
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
 			dispatch({
-				type: SET_LOADING_LISTINGS,
+				type: SET_LOADING,
 				payload: true
 			});
 			getListings();
@@ -322,7 +322,7 @@ const AllListings = (props) => {
 	useEffect(() => {
 		if (isEmpty(Amount)) {
 			dispatch({
-				type: SET_LOADING_LISTINGS,
+				type: SET_LOADING,
 				payload: true
 			});
 	
@@ -385,7 +385,7 @@ const AllListings = (props) => {
 		// 	}
 		// });
 		dispatch({
-			type: SET_LOADING_LISTINGS,
+			type: SET_LOADING,
 			payload: true
 		});
 
@@ -424,7 +424,7 @@ const AllListings = (props) => {
 
 		setErrors({});
 		dispatch({
-			type: SET_LOADING_LISTINGS,
+			type: SET_LOADING,
 			payload: true
 		});
 		getListingsOpenForBid({
@@ -600,7 +600,7 @@ const AllListings = (props) => {
 									fullWidth
 									required
 									error={errors.Amount ? true : false}
-									disabled={listingsLoading ? true : false}
+									disabled={loading ? true : false}
 									InputProps={{
 										startAdornment: !matches && <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
@@ -647,7 +647,7 @@ const AllListings = (props) => {
 								label="Hide Unavailable Listings"
 							/>
 						</Box>
-						{listingsLoading === true ?
+						{loading === true ?
 							<ListingsSkeleton />
 							:
 							<Listings />

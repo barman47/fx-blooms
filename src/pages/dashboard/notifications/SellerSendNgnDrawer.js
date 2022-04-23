@@ -232,8 +232,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
 
     const startExpiryTimer = useCallback(() => {
         console.log('Starting timer');
+        const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged) : new Date(bid.dateLogged + 'Z');
         // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        const countDownTime = new Date(bid.dateLogged).getTime() + THIRTY_MINUTES;
+        const countDownTime = new Date(date).getTime() + THIRTY_MINUTES;
         interval.current = setInterval(() => {
             const distance = countDownTime - getTime();
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));

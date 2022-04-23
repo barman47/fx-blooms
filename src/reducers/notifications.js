@@ -11,6 +11,7 @@ import {
     SET_SOCKET_CONNECTION_STATUS,
     UPDATE_NOTIFICATION,
     REMOVE_NOTIFICATION,
+    SET_NOTIFICATION_COUNT,
     SET_NOTIFICATION_MSG
 } from '../actions/types';
 
@@ -33,15 +34,13 @@ const notificationsReducer = (state = initialState, action) => {
         case SET_NOTIFICATIONS:
             return {
                 ...state,
-                notifications: action.payload,
-                unreadNotifications: state.unreadNotifications === 0 ? action.payload.length : state.unreadNotifications + action.payload.length
+                notifications: action.payload
             }; 
 
         case ADD_NOTIFICATION:
             return {
                 ...state,
-                notifications: action.payload ? [ action.payload, ...state.notifications ] : [ ...state.notifications ],
-                unreadNotifications: state.unreadNotifications + 1
+                notifications: action.payload ? [ action.payload, ...state.notifications ] : [ ...state.notifications ]
             };
 
         case UPDATE_NOTIFICATION:
@@ -60,7 +59,6 @@ const notificationsReducer = (state = initialState, action) => {
                 ...state,
                 notifications: state.notifications.filter(notification => notification.notificationId !== action.payload),
                 unreadNotifications: state.unreadNotifications - 1,
-                // notificationToRemove: null
             };
 
         case SET_SOCKET_CONNECTION_STATUS:
@@ -72,8 +70,7 @@ const notificationsReducer = (state = initialState, action) => {
         case PAYMENT_NOTIFICATION_BUYER_PAID:
             return {
                 ...state,
-                notifications: [action.payload, ...state.notifications],
-                unreadNotifications: action.payload.customerId === action.payload.data.Seller.CustomerId ? state.unreadNotifications + 1 : state.unreadNotifications
+                notifications: [action.payload, ...state.notifications]
             };
 
         case PAYMENT_NOTIFICATION_BUYER_CONFIRMED:
@@ -81,8 +78,7 @@ const notificationsReducer = (state = initialState, action) => {
             if (endTransaction) {
                 return {
                     ...state,
-                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId),
-                    unreadNotifications: state.unreadNotifications - 1
+                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId)
                 };
             }
             return {
@@ -102,8 +98,7 @@ const notificationsReducer = (state = initialState, action) => {
             if (endTransaction) {
                 return {
                     ...state,
-                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId),
-                    unreadNotifications: state.unreadNotifications - 1
+                    notifications: state.notifications.filter(notification => notification.notificationId !== action.payload.notification.notificationId)
                 };
             }
             return {
@@ -130,6 +125,12 @@ const notificationsReducer = (state = initialState, action) => {
                 ...state,
                 unreadNotifications: unreadCount < 0 ? 0 : unreadCount
             }
+
+        case SET_NOTIFICATION_COUNT:
+            return {
+                ...state,
+                unreadNotifications: action.payload
+            };
 
         case SET_NOTIFICATION_MSG:
             return {
