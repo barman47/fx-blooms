@@ -185,7 +185,6 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, markNotification
         });
 
         if (notifications[0].data.Id === notificationId) {
-            console.log('Removing notification');
             markNotificationAsRead(notificationId);
             dispatch({
                 type: REMOVE_NOTIFICATION,

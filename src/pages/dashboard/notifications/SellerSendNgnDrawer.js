@@ -170,7 +170,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
         }
 
         return () => {
-            console.log('Stopping timer');
             clearInterval(interval.current);
         };
         // eslint-disable-next-line
@@ -183,7 +182,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             payload: {}
         });
         if (!drawerOpen) {
-            console.log('Stopping timer');
             clearInterval(interval.current);
             setErrors({});
         }
@@ -231,7 +229,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
     const startExpiryTimer = useCallback(() => {
-        console.log('Starting timer');
         const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged) : new Date(bid.dateLogged + 'Z');
         // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
         const countDownTime = new Date(date).getTime() + THIRTY_MINUTES;
