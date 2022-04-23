@@ -13,7 +13,10 @@ import { DotsHorizontal } from 'mdi-material-ui';
 
 import { getSuspendedCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
+
+
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -56,9 +59,8 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
+
 const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
 
     const suspendedCustomers = useSelector(state => state.customers?.suspended?.items);
 
@@ -73,17 +75,10 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
     //     // eslint-disable-next-line
     // }, []);
 
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
-
     return (
         <>
-            {suspendedCustomers && suspendedCustomers.map((customer) => (
+            <GenericTableBody data={suspendedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            {/* {suspendedCustomers && suspendedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
@@ -108,7 +103,7 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

@@ -3,10 +3,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { 
   Typography, 
   Box, 
-  Select, 
-  MenuItem, 
-  InputLabel, 
-  FormControl,
+  // Select, 
+  // MenuItem, 
+  // InputLabel, 
+  // FormControl,
   Paper,
   Divider,
 } from '@material-ui/core'
@@ -18,11 +18,9 @@ import { getAllListings } from '../../../actions/adminListings'
 
 const useStyles = makeStyles(theme =>({
   root: {
-      backgroundColor: COLORS.lightTeal,
+      backgroundColor: 'white',
       borderRadius: theme.shape.borderRadius,
-      marginTop: theme.spacing(3),
       padding: [[theme.spacing(2), theme.spacing(5)]],
-      height: '100%',
 
       [theme.breakpoints.down('md')]: {
           paddingBottom: theme.spacing(4)
@@ -31,7 +29,6 @@ const useStyles = makeStyles(theme =>({
 
   content: {
       display: 'grid',
-      marginTop: theme.spacing(12),
       gridTemplateColumns: '1fr 0.2fr 1fr'
   },
 
@@ -198,8 +195,6 @@ const TransactionDetails = () => {
 
   }, [dispatch])
 
-  console.log('CUSTOMER' , customer)
-
   
   useEffect(() => {
     dispatch(getCustomer(customer.id))
@@ -212,7 +207,7 @@ const TransactionDetails = () => {
       <Typography className={classes.detailTitle} variant="h6" color="primary">Transaction Details</Typography>
       <Box component="section" className={classes.content}>
         <Box component="div" className={classes.detail}>
-          <div className={classes.subDetailTitle}>
+          {/* <div className={classes.subDetailTitle}>
             <Typography color="primary" variant="h6">Transactions</Typography>
             <Box component="div" sx={{ minWidth: 70 }}>
               <FormControl fullWidth className={classes.selectForm}>
@@ -233,9 +228,9 @@ const TransactionDetails = () => {
                 </Select>
               </FormControl>
             </Box>
-          </div>
+          </div> */}
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="subtitle2" variant="h">Listings</Typography>
+            <Typography component="h6">Listings</Typography>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -326,7 +321,7 @@ const TransactionDetails = () => {
           </Paper>
 
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="subtitle2" variant="h">Volume</Typography>
+            <Typography component="h6" >Volume</Typography>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">

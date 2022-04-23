@@ -132,6 +132,10 @@ const theme = createTheme({
 			main: '#EB5757'
 		},
 
+		danger: {
+			main: 'red'
+		},
+
 		text: {
 			// primary: '#f8f8f8',
 			// secondary: '#f8f8f8'
@@ -201,6 +205,7 @@ const App = () => {
 								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
 							</Route>
 							
 							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />
@@ -210,6 +215,7 @@ const App = () => {
 								<Route path={`${LISTINGS}`} element={<Listings handleSetTitle={handleSetTitle} />} />
 								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
+								<Route path={`${WITHDRAWALS}`} element={<Withdrawals handleSetTitle={handleSetTitle} />} />
 							</Route>
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>

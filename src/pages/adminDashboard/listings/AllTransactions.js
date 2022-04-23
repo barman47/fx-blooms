@@ -4,19 +4,20 @@ import { LISTING_COLUMNS } from '../../../utils/constants';
 import { getAllListings } from '../../../actions/adminListings'
 import { getCustomers } from '../../../actions/customer'
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
-import { getCustomersWithoutProfile } from '../../../actions/customer';
+import { getNewCustomers } from '../../../actions/customer';
 
 
 
 const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
 
-const AllListings = ({ handleClick, }) => {
+const AllTransactions = ({ handleClick, }) => {
   const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
 
 //   const { listings: { listings } } = useSelector(state => state)
-  const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
+const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
+
 
 //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 //   const [page, setPage] = useState(0);
@@ -26,8 +27,7 @@ const AllListings = ({ handleClick, }) => {
   
   useEffect(() => {
     // dispatch(getAllListings())
-    dispatch(getCustomersWithoutProfile())
-
+    dispatch(getNewCustomers())
   }, [dispatch])
 
 
@@ -38,16 +38,17 @@ const AllListings = ({ handleClick, }) => {
     }))
 
     // console.log('listings', items)
-  }, [dispatch])    
+  }, [dispatch])
+    
 
 
   return (
     <>
-        <GenericTableBody gridColumns={gridColumns} addColumn={true} data={noProfileCustomers} handleClick={handleClick} columnList={LISTING_COLUMNS} />
+        <GenericTableBody gridColumns={gridColumns} addColumn={true} data={verifiedCustomers} handleClick={handleClick} columnList={LISTING_COLUMNS} />
     </>
   )
 }
 
-export default AllListings
+export default AllTransactions
 
 

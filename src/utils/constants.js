@@ -168,5 +168,40 @@ export const olimpicMedals = [{
     bronze: 15,
   }];
 
+  export const energyConsumption = [
+    {
+      country: 'USA', hydro: 59.8, oil: 937.6, gas: 582, coal: 564.3, nuclear: 187.9,
+    }, {
+      country: 'China', hydro: 74.2, oil: 308.6, gas: 35.1, coal: 956.9, nuclear: 11.3,
+    }, {
+      country: 'Russia', hydro: 40, oil: 128.5, gas: 361.8, coal: 105, nuclear: 32.4,
+    }, {
+      country: 'Japan', hydro: 22.6, oil: 241.5, gas: 64.9, coal: 120.8, nuclear: 64.8,
+    }, {
+      country: 'India', hydro: 19, oil: 119.3, gas: 28.9, coal: 204.8, nuclear: 3.8,
+    }, {
+      country: 'Germany', hydro: 6.1, oil: 123.6, gas: 77.3, coal: 85.7, nuclear: 37.8,
+    }];
+
 
   export const API_KEY = 'a8b57b7f-6166-4388-90fd-4cecb8e4396d';
+
+  export const USER_COLUMNS = {
+    1: 'firstName',
+    2: 'lastName',
+    3: 'email',
+    4: 'username',
+    5: 'customerStatus',
+    6: '',
+    7: 'riskProfile'
+  }
+
+  export const LISTING_COLUMNS = {
+    1: 'firstName',
+    2: 'lastName',
+    3: 'email',
+    4: 'username',
+    5: 'customerStatus',
+    6: 'occupation',
+    7: 'riskProfile'
+  }

@@ -14,7 +14,9 @@ import TextClamp from 'react-string-clamp';
 
 import { getNewCustomers } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
+
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -58,8 +60,6 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const VerifiedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
 
     const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
 
@@ -74,17 +74,10 @@ const VerifiedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }
     //     // eslint-disable-next-line
     // }, []);
 
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
-
     return (
         <>
-            {verifiedCustomers && verifiedCustomers.map((customer) => (
+            <GenericTableBody data={verifiedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            {/* {verifiedCustomers && verifiedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
@@ -109,7 +102,7 @@ const VerifiedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

@@ -14,7 +14,8 @@ import TextClamp from 'react-string-clamp';
 
 import { getCustomersWithoutProfile } from '../../../actions/customer';
 import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
 const useStyles = makeStyles(theme => ({
     customer: {
@@ -57,9 +58,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
+const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter }) => {
 
     const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
 
@@ -72,17 +71,11 @@ const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCusto
     //     // eslint-disable-next-line
     // }, []);
 
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
-
     return (
         <>
-            {noProfileCustomers && noProfileCustomers.map((customer) => (
+            <GenericTableBody data={noProfileCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            
+            {/* {noProfileCustomers && noProfileCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
@@ -107,7 +100,7 @@ const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCusto
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

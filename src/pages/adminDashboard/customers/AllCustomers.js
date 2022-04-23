@@ -15,18 +15,22 @@ import TextClamp from 'react-string-clamp';
 
 import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import { getCustomers } from '../../../actions/customer';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
+
 
 const useStyles = makeStyles(theme => ({
     customer: {
         background: 'transparent',
         display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
+        gridTemplateColumns: '0.2fr 1.5fr 1.5fr 2fr 1fr 0.5fr 0.8fr 0.5fr',
         alignItems: 'center',
 
         '&:last-child': {
             borderBottom: 'none'
-        }
+        },
+
+        borderBottom: '1px solid grey'
     },
 
     text: {
@@ -45,6 +49,7 @@ const useStyles = makeStyles(theme => ({
 
     item: {
         border: 'none',
+        // borderBottom: '1px solid grey',
         marginBottom: 0
     },
     
@@ -58,8 +63,8 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+
 const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
     const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
@@ -73,27 +78,20 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
     //     // eslint-disable-next-line
     // }, []);
 
-    useEffect(() => {
-        return () => {
-            dispatch({ type: CLEAR_ALL_CUSTOMERS });
-        };
+    // useEffect(() => {
+    //     return () => {
+    //         dispatch({ type: CLEAR_ALL_CUSTOMERS });
+    //     };
 
-        // eslint-disable-next-line
-    }, []);
-
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
+    //     // eslint-disable-next-line
+    // }, []);
 
     return (
         <>
-            {customers && customers.map((customer) => (
+            <GenericTableBody data={customers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            {/* {customers && customers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
-                    <TableCell className={classes.item}>
+                    <TableCell className={classes.F}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
                     <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
@@ -116,7 +114,7 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

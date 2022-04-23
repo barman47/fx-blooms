@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { batch, useDispatch, useSelector } from 'react-redux';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 
 import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
-import { COLORS, USER_DETAILS } from '../../../utils/constants';
+// import { USER_DETAILS } from '../../../utils/constants';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -18,6 +18,7 @@ import TransactionDetails from './TransactionDetails';
 const useStyles = makeStyles(theme =>({
     root: {
         padding: [[theme.spacing(2), theme.spacing(3)]],
+        backgroundColor: '#F8F9FA',
 
         [theme.breakpoints.down('sm')]: {
             padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
@@ -28,85 +29,22 @@ const useStyles = makeStyles(theme =>({
         }
     },
 
-    tabContainer: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: theme.spacing(4),
-        marginTop: theme.spacing(2)
-    },
-
-    tab: {
-        backgroundColor: COLORS.lightTeal,
-        border: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        cursor: 'pointer',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        padding: theme.spacing(1),
-
-        '& span:first-child': {
-            fontWeight: 600,
-            color: theme.palette.primary.main
-        },
-
-        '& span:last-child': {
-            color: theme.palette.primary.main,
-            fontWeight: 600
-        }
-    },
-
-    active: {
-        backgroundColor: theme.palette.primary.main,
-        
-        '& span': {
-            color: `${COLORS.offWhite} !important`,
-        }
-    },
-
-    container: {
-        marginTop: theme.spacing(1)
-    },
-
-    buttonContainer: {
+    content: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        columnGap: theme.spacing(1),
-        marginTop: theme.spacing(2)
+        gap: theme.spacing(6),
     },
 
-    button: {
-        padding: [[theme.spacing(2), theme.spacing(3)]]
-    },
+    // personalDetails: {
 
-    reactivateButton: {
-        borderColor: theme.palette.primary.main,
-        color: theme.palette.primary.main,
+    // },
 
-        '&:hover': {
-            backgroundColor: theme.palette.primary.main,
-            color: COLORS.offWhite
-        }
-    },
+    container: {
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: theme.spacing(2)
+    }
 
-    deactivateButton: {
-        borderColor: COLORS.red,
-        color: COLORS.red,
-
-        '&:hover': {
-            backgroundColor: 'initial'
-        }
-    },
-
-    removeButton: {
-        color: COLORS.white,
-        backgroundColor: COLORS.red,
-
-        '&:hover': {
-            backgroundColor: COLORS.red
-        }
-    },
 }));
 
 const Customer = () => {
@@ -116,9 +54,9 @@ const Customer = () => {
     const location = useLocation();
     const { customer, msg } = useSelector(state => state.customers);
 
-    const { PERSONAL_DETAILS, ID_DETAILS, AUTHENTICATION, TRANSACTION_DETAILS } = USER_DETAILS;
+    // const { PERSONAL_DETAILS, ID_DETAILS, AUTHENTICATION, TRANSACTION_DETAILS } = USER_DETAILS;
 
-    const [tab, setTab] = useState(PERSONAL_DETAILS);
+    // const [tab, setTab] = useState(PERSONAL_DETAILS);
     const [loading, setLoading] = useState(false);
 
     const successModal = useRef();
@@ -173,29 +111,19 @@ const Customer = () => {
         <>
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             {loading && <Spinner />}
-            <section className={classes.root}>
+            <Grid container direction="row" spacing={3} className={classes.root}>
                 <Typography variant="h5" >User Details</Typography>
-                <Box component="section" className={classes.tabContainer}>
-                    <div className={clsx(classes.tab, tab === PERSONAL_DETAILS && classes.active)} onClick={() => setTab(PERSONAL_DETAILS)}>
-                        <Typography variant="subtitle2" component="span">{PERSONAL_DETAILS}</Typography>
-                    </div>
-                    <div className={clsx(classes.tab, tab === ID_DETAILS && classes.active)} onClick={() => setTab(ID_DETAILS)}>
-                        <Typography variant="subtitle2" component="span">{ID_DETAILS}</Typography>
-                    </div>
-                    <div className={clsx(classes.tab, tab === AUTHENTICATION && classes.active)} onClick={() => setTab(AUTHENTICATION)}>
-                        <Typography variant="subtitle2" component="span">{AUTHENTICATION}</Typography>
-                    </div>
-                    <div className={clsx(classes.tab, tab === TRANSACTION_DETAILS && classes.active)} onClick={() => setTab(TRANSACTION_DETAILS)}>
-                        <Typography variant="subtitle2" component="span">{TRANSACTION_DETAILS}</Typography>
-                    </div>
-                </Box>
-                <Box component="section" className={classes.container}>
-                    {tab === PERSONAL_DETAILS && <PersonalDetails  />}
-                    {tab === ID_DETAILS && <IdentityDetails />}
-                    {tab === AUTHENTICATION && <AuthenticationDetails />}
-                    {tab === TRANSACTION_DETAILS && <TransactionDetails />}
-                </Box>
-            </section>
+                <Grid item xs={12} className={classes.content}>
+                    <Box component="div" className={classes.personalDetails}>
+                        <PersonalDetails  />
+                    </Box>
+                    <Box component="div" className={classes.container}>
+                        <IdentityDetails />
+                        <AuthenticationDetails />
+                        <TransactionDetails />
+                    </Box>
+                </Grid>
+            </Grid>
         </>
     );
 };

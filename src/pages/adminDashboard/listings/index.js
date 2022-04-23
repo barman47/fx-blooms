@@ -1,196 +1,120 @@
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 // import { batch, useDispatch } from 'react-redux';
 // import { SET_CUSTOMER, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import clsx from 'clsx';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography, Menu, MenuItem, Divider, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
+import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import AllListings from './AllListings'
-// import Spinner from '../../../components/common/Spinner';
-import {
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
-  } from '@material-ui/core';
+import AllTransactions from './AllTransactions';
+import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
+import GenericButton from '../../../components/admin-dashboard/GenericButton'
+import { ArrowTopRight, Filter } from 'mdi-material-ui';
 
 
-const useStyles = makeStyles(theme =>({
-  root: {
-      padding: [[theme.spacing(2), theme.spacing(3)]],
-
-      [theme.breakpoints.down('sm')]: {
-          padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
-      },
-
-      '& h6': {
-          fontWeight: 600
-      },
-  },
-
-  title: {
-    fontWeight: 600
-},
-
-  tabContainer: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
-      gap: theme.spacing(4),
-      marginTop: theme.spacing(2)
-  },
-
-  tab: {
-      backgroundColor: COLORS.lightTeal,
-      border: `1px solid ${theme.palette.primary.main}`,
-      borderRadius: theme.shape.borderRadius,
-      cursor: 'pointer',
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      padding: theme.spacing(1),
-
-      '& span:first-child': {
-          fontWeight: 600,
-          color: theme.palette.primary.main
-      },
-
-      '& span:last-child': {
-          color: theme.palette.primary.main,
-          fontWeight: 600
-      }
-  },
-
-  active: {
-      backgroundColor: theme.palette.primary.main,
-      
-      '& span': {
-          color: `${COLORS.offWhite} !important`,
-      }
-  },
-
-  container: {
-      marginTop: theme.spacing(1)
-  },
-
-  buttonContainer: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      columnGap: theme.spacing(1),
-      marginTop: theme.spacing(2)
-  },
-
-  button: {
-      padding: [[theme.spacing(2), theme.spacing(3)]]
-  },
-
-  reactivateButton: {
-      borderColor: theme.palette.primary.main,
-      color: theme.palette.primary.main,
-
-      '&:hover': {
-          backgroundColor: theme.palette.primary.main,
-          color: COLORS.offWhite
-      }
-  },
-
-  deactivateButton: {
-      borderColor: COLORS.red,
-      color: COLORS.red,
-
-      '&:hover': {
-          backgroundColor: 'initial'
-      }
-  },
-
-  removeButton: {
-      color: COLORS.white,
-      backgroundColor: COLORS.red,
-
-      '&:hover': {
-          backgroundColor: COLORS.red
-      }
-  },
-
-  link: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer'
-},
-
-filterContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(5, 1fr)',
-    gap: theme.spacing(4),
-    marginTop: theme.spacing(1)
-},
-
-filter: {
-    backgroundColor: COLORS.lightTeal,
-    border: `1px solid ${theme.palette.primary.main}`,
-    borderRadius: theme.shape.borderRadius,
-    cursor: 'pointer',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: theme.spacing(1),
-
-    '& span:first-child': {
-        fontWeight: 600,
-        color: theme.palette.primary.main
+  const useStyles = makeStyles((theme) => ({
+    root: {
+        // padding: theme.spacing(0, 3),
+        backgroundColor: 'white',
+        paddingRight: theme.spacing(8),
+        paddingLeft: theme.spacing(5),
+        paddingTop: theme.spacing(9),
+        paddingBottom: theme.spacing(12),
     },
 
-    '& span:last-child': {
+    title: {
+        fontWeight: 600,
+        fontSize: theme.spacing(3)
+    },
+
+    link: {
         color: theme.palette.primary.main,
-        fontWeight: 600
+        cursor: 'pointer'
+    },
+
+    filterContainer: {
+        display: 'grid',
+        gridTemplateColumns: '.12fr .12fr',
+        // gap: theme.spacing(4),
+        marginTop: theme.spacing(3),
+        borderBottom: '1px solid #E3E8EE'
+    },
+
+    filter: {
+        // backgroundColor: COLORS.lightTeal,
+        cursor: 'pointer',
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: theme.spacing(1),
+        width: 'fit-content',
+        gap: theme.spacing(1),
+        color: '#697386',
+        padding: '5px',
+        
+        '& span': {
+            fontWeight: '600'
+        },
+
+        '& span:nth-child(2)': {
+            color: '#1E625E',
+            backgroundColor: '#AEC7C0',
+            padding: '0px 3px',
+            borderRadius: theme.spacing(1)
+        }
+    },
+
+    active: {
+        borderBottom: '2px solid #1E6262'
+    },
+
+    table: {
+        marginTop: theme.spacing(3)
+    },
+
+    tableHeader: {
+        display: 'grid',
+        gridTemplateColumns: '0.2fr 1.5fr 1.5fr 2fr 1fr 0.5fr 0.8fr 0.5fr',
+    },
+
+    content: {
+        display: 'grid',
+        gridTemplateColumns: '1fr'
+    },
+
+    customerLink: {
+        color: `${theme.palette.primary.main}`,
+        cursor: 'pointer'
+    },
+
+    pagination: {
+        backgroundColor: COLORS.lightTeal,
+        borderBottom: `1px solid ${theme.palette.primary.main}`,
+        borderLeft: `1px solid ${theme.palette.primary.main}`,
+        borderRight: `1px solid ${theme.palette.primary.main}`,
+        borderRadius: theme.shape.borderRadius,
+        borderTopLeftRadius: '0px',
+        borderTopRightRadius: '0px',
+    },
+
+    menu: {
+        backgroundColor: 'white',
+        border: `none`,
+        borderRadius: theme.spacing(1.9),
+        marginRight: '10px',
+        cursor: 'pointer',
+        left: '1695px !important',
+
+        '& ul': {
+            padding: '0'
+        },
+
+        '& li': {
+            padding: theme.spacing(2),
+            paddingLeft: theme.spacing(2.5)
+        }
     }
-},
-
-table: {
-    borderTop: `1px solid ${theme.palette.primary.main}`,
-    borderLeft: `1px solid ${theme.palette.primary.main}`,
-    borderRight: `1px solid ${theme.palette.primary.main}`,
-    borderRadius: theme.shape.borderRadius,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
-    maxHeight: '50vh',
-    backgroundColor: COLORS.lightTeal,
-    marginTop: theme.spacing(3)
-},
-
-tableHeader: {
-    display: 'grid',
-    gridTemplateColumns: '0.2fr 1fr 1.5fr .5fr .5fr 0.5fr 0.5fr 0.5fr 0.7fr 1fr 1fr .5fr',
-},
-
-content: {
-    display: 'grid',
-    gridTemplateColumns: '1fr'
-},
-
-customerLink: {
-    color: `${theme.palette.primary.main}`,
-    cursor: 'pointer'
-},
-
-pagination: {
-    backgroundColor: COLORS.lightTeal,
-    borderBottom: `1px solid ${theme.palette.primary.main}`,
-    borderLeft: `1px solid ${theme.palette.primary.main}`,
-    borderRight: `1px solid ${theme.palette.primary.main}`,
-    borderRadius: theme.shape.borderRadius,
-    borderTopLeftRadius: '0px',
-    borderTopRightRadius: '0px',
-},
-
-menu: {
-    backgroundColor: COLORS.lightTeal,
-    border: `1px solid ${theme.palette.primary.main}`,
-    borderRadius: theme.shape.borderRadius
-}
 }));
 
 const columns = [
@@ -211,11 +135,6 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'timeStamp',
-      label: 'Timestamp',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
       id: 'rate',
       label: 'Rate',
       format: (value) => value.toLocaleString('en-US'),
@@ -226,18 +145,13 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
     {
+        id: 'timeStamp',
+        label: 'Timestamp',
+        format: (value) => value.toLocaleString('en-US'),
+    },
+    {
       id: 'status',
       label: 'Status',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'associatedTransactions',
-      label: 'Associated Transactions',
-      format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'riskScore',
-      label: 'Risk Score',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
@@ -246,6 +160,8 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
 ];
+
+const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
 
 const pages = [10, 25, 50, 100]
 
@@ -258,10 +174,20 @@ const Listings = () => {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
+  const [anchorEl, setAnchorEl] = useState(null);
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+};
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
   
   const handleChangeRowsPerPage = (event) => {
@@ -273,57 +199,44 @@ const Listings = () => {
   return (
     <>
       <section className={classes.root}>
-          <Typography variant="h6" >ALL USERS</Typography>
-          <Box component="section" className={classes.tabContainer}>
-              <div className={clsx(classes.tab, tab === ALL_LISTINGS && classes.active)} onClick={() => setTab(ALL_LISTINGS)}>
+            <Grid container direction="row" justifyContent="space-between">
+                <Grid item>
+                    {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
+                    {tab === ALL_TRANSACTIONS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
+                </Grid>
+                <Grid item>
+                    <Box component="div" sx={{ display: 'flex', flexDirection: 'row', gap: '10px'}}>
+                        <GenericButton buttonName="Filter">
+                            <Filter />
+                        </GenericButton>
+                        <GenericButton buttonName="Export">
+                            <ArrowTopRight />
+                        </GenericButton>
+                    </Box>
+                </Grid>
+            </Grid>
+          <Box component="section" className={classes.filterContainer}>
+              <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => setTab(ALL_LISTINGS)}>
                   <Typography variant="subtitle2" component="span">{ALL_LISTINGS}</Typography>
               </div>
-              <div className={clsx(classes.tab, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => setTab(ALL_TRANSACTIONS)}>
+              <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => setTab(ALL_TRANSACTIONS)}>
                   <Typography variant="subtitle2" component="span">{ALL_TRANSACTIONS}</Typography>
               </div>
           </Box>
-          <Box component="section" className={classes.container}>
-            <Paper>
-                <TableContainer className={classes.table}>
-                    <Table stickyHeader aria-label="sticky table" style={{ width: '100%' }}>
-                        <TableHead>
-                            <TableRow className={classes.tableHeader}>
-                                {columns.map((column) => (
-                                    <TableCell
-                                        key={column.id}
-                                        align={column.align}
-                                        style={{ background: 'transparent', minWidth: column.minWidth, fontWeight: 'bold',  }}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody className={classes.content}>
-                            {tab === ALL_LISTINGS && <AllListings  />}
-                            {/* {tab === ALL_TRANSACTIONS && <PersonalDetails  />} */}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={pages}
-                    component="div"
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                    classes={{
-                        root: classes.pagination
-                    }}
-                />
-            </Paper>
-            {/* <Menu
+          <Box component="div" className={classes.table}>
+                <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
+                {tab === ALL_LISTINGS && <AllListings handleClick={handleClick} />}
+                {tab === ALL_TRANSACTIONS && <AllTransactions handleClick={handleClick} />}
+            </Box>
+          
+            <Menu
                 id="customer-menu"
                 anchorEl={anchorEl}
                 keepMounted
                 open={Boolean(anchorEl)}
                 onClose={handleClose}
                 classes={{ paper: classes.menu }}
+                disableScrollLock={ true }
             >
                 <MenuItem>View Details</MenuItem>
                 <Divider />
@@ -331,11 +244,10 @@ const Listings = () => {
                 <Divider />
                 <MenuItem>Contact</MenuItem>
                 <Divider />
-                <MenuItem disabled={filter === SUSPENDED || filter === REJECTED}>Suspend</MenuItem>
+                <MenuItem>Suspend</MenuItem>
                 <Divider />
                 <MenuItem>Change Risk Profile</MenuItem>
-            </Menu> */}
-          </Box>
+            </Menu>
       </section>
     </>
   )

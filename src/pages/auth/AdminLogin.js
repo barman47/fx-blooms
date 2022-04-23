@@ -4,7 +4,7 @@ import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Collapse, Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@material-ui/core';
 import Alert from '@material-ui/lab/Alert';
-import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
+import { Close, Eye, EyeOff } from 'mdi-material-ui';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -109,7 +109,7 @@ const AdminLogin = (props) => {
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
-            navigate.replace(location.pathname, {});
+            navigate(location.pathname, { replace: true });
         }
 
         console.log('hh', showPassword)
@@ -248,10 +248,10 @@ const AdminLogin = (props) => {
                                                     {Password.length > 0 ? 
                                                         showPassword ?
                                                         <Tooltip title="Hide Password" placement="bottom" arrow>
-                                                            <EyeOutline />
+                                                            <EyeOff />
                                                         </Tooltip> : 
-                                                        <Tooltip title="Show Password" placement="bottom" arrow>
-                                                            <EyeOffOutline />
+                                                        <Tooltip title="Reveal Password" placement="bottom" arrow>
+                                                            <Eye />
                                                         </Tooltip>
                                                             : 
                                                         <span></span>
