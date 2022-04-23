@@ -26,7 +26,7 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getTime from '../../../utils/getTime';
+import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -301,8 +301,10 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     }, [errorsState]);
 
     const startExpiryTimer = () => {
-        const date = bid.datePlaced.endsWith('Z') ? new Date(bid.datePlaced).getTime() : new Date(bid.datePlaced + 'Z').getTime();
-        const countDownTime = date + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
+        const countDownTime = new Date((convertToLocalTime(bid.datePlaced))).getTime() + (FIVE_MINUTES - 19000);
+        // const date = bid.datePlaced.endsWith('Z') ? new Date(bid.datePlaced).getTime() : new Date(bid.datePlaced + 'Z').getTime();
+        // const countDownTime = date + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
+        // const countDownTime = date + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {
             const distance = countDownTime - getTime();
 

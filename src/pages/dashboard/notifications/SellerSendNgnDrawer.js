@@ -18,7 +18,7 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getTime from '../../../utils/getTime';
+import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -229,9 +229,10 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
     const startExpiryTimer = useCallback(() => {
-        const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
+        // const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
         // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        const countDownTime = date + THIRTY_MINUTES;
+        // const countDownTime = date + THIRTY_MINUTES;
+        const countDownTime = new Date((convertToLocalTime(bid.dateLogged))).getTime() + THIRTY_MINUTES;
         interval.current = setInterval(() => {
             const distance = countDownTime - getTime();
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
