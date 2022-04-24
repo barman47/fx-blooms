@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
       backgroundColor: 'white',
       color: '#3C4257',
       boxShadow: '3px 2px 3px grey',
-      border: 'none',
+      // border: 'none',
       border: '1px solid #ACAFB7',
       borderRadius: '5px',
       cursor: 'pointer',
@@ -34,17 +34,17 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const GenericButton = ({  buttonName, children, isDisabled }) => {
+const GenericButton = ({  buttonName, children, isDisabled, clickAction }) => {
 
   const classes = useStyles()
 
   const handleDisabled = useMemo(() => clsx({
     [classes.disabled]: !!isDisabled
-  }), [isDisabled])
+  }), [isDisabled, classes.disabled])
 
   return (
     <Box component="span" className={classes.btn}>
-      <button type="button" disabled={isDisabled} className={handleDisabled}>
+      <button onClick={clickAction} type="button" disabled={isDisabled} className={handleDisabled}>
         <Typography>{ children }</Typography>
         <Typography>{ buttonName }</Typography>     
     </button>

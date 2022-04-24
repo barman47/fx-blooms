@@ -1,13 +1,11 @@
 import {
   Box,
   CircularProgress,
-  FormControl,
-  MenuItem,
-  Select,
   Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { ADMIN_FILTERS } from '../../utils/constants';
+import GenericSelect from './GenericSelect'
 
 
 const useStyles = makeStyles(theme =>({
@@ -87,7 +85,8 @@ const GenericMiniCard = ({ gotToPage, cardName, cardIcon, filterType, setFilterT
     <Box component="div" className={classes.contentItem} onClick={gotToPage}>
       <Box component="div" className={classes.dropDownContainer}>
         <Typography className={classes.contentIcon} variant="subtitle2" component="span" color="primary">{cardIcon}</Typography>
-        <FormControl 
+        <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={setFilterType} loading={loading} />
+        {/* <FormControl 
             variant="outlined"
         >
             <Select
@@ -103,9 +102,9 @@ const GenericMiniCard = ({ gotToPage, cardName, cardIcon, filterType, setFilterT
                 {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
                     <MenuItem key={index} value={value}>{value}</MenuItem>
                 ))}
-            </Select>
+            </Select> */}
             {/* <FormHelperText>Select Users Filter</FormHelperText> */}
-        </FormControl>
+        {/* </FormControl> */}
       </Box>
       <Box component="div">
         <Typography className={classes.contentTitle} variant="subtitle2" component="span" color="primary">{ cardName }</Typography>

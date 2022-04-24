@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useSelector } from 'react-redux';
+// import { useSelector } from 'react-redux';
 // import { batch, useDispatch } from 'react-redux';
 // import { SET_CUSTOMER, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import clsx from 'clsx';
@@ -13,7 +13,7 @@ import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter } from 'mdi-material-ui';
 
 
-  const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((theme) => ({
     root: {
         // padding: theme.spacing(0, 3),
         backgroundColor: 'white',
@@ -47,7 +47,7 @@ import { ArrowTopRight, Filter } from 'mdi-material-ui';
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: theme.spacing(1),
+        // padding: theme.spacing(1),
         width: 'fit-content',
         gap: theme.spacing(1),
         color: '#697386',
@@ -172,14 +172,14 @@ const Listings = () => {
   const { ALL_LISTINGS, ALL_TRANSACTIONS } = LISTING_DETAILS;
   const [tab, setTab] = useState(ALL_LISTINGS);
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
+//   const [page, setPage] = useState(0);
+//   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
   const [anchorEl, setAnchorEl] = useState(null);
 
 
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+//   const handleChangePage = (event, newPage) => {
+//     setPage(newPage);
+//   };
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -190,10 +190,10 @@ const Listings = () => {
     };
 
   
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(1);
-  };
+//   const handleChangeRowsPerPage = (event) => {
+//     setRowsPerPage(+event.target.value);
+//     setPage(1);
+//   };
 
 
   return (

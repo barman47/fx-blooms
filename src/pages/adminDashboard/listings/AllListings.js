@@ -1,17 +1,17 @@
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { LISTING_COLUMNS } from '../../../utils/constants';
-import { getAllListings } from '../../../actions/adminListings'
-import { getCustomers } from '../../../actions/customer'
+// import { getAllListings } from '../../../actions/adminListings'
+// import { getCustomers } from '../../../actions/customer'
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 import { getCustomersWithoutProfile } from '../../../actions/customer';
-
+import PropTypes from 'prop-types';
 
 
 const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
 
-const AllListings = ({ handleClick, }) => {
-  const dispatch = useDispatch()
+const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
+  // const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
 
@@ -24,21 +24,23 @@ const AllListings = ({ handleClick, }) => {
 //   console.log('ITEMS', items)
 //   console.log('listings', listings)
   
-  useEffect(() => {
-    // dispatch(getAllListings())
-    dispatch(getCustomersWithoutProfile())
+  // useEffect(() => {
+  //   // dispatch(getAllListings())
+    
+  //   dispatch(getCustomersWithoutProfile())
+    
+  // }, [dispatch])
+  
+  console.log('Hello Listings', noProfileCustomers)
 
-  }, [dispatch])
+  // useEffect(() => {
+  //   dispatch(getCustomers({
+  //       pageNumber: 1,
+  //       pageSize: 15
+  //   }))
 
-
-  useEffect(() => {
-    dispatch(getCustomers({
-        pageNumber: 1,
-        pageSize: 15
-    }))
-
-    // console.log('listings', items)
-  }, [dispatch])    
+  //   // console.log('listings', items)
+  // }, [dispatch])    
 
 
   return (
@@ -48,6 +50,12 @@ const AllListings = ({ handleClick, }) => {
   )
 }
 
-export default AllListings
+AllListings.propTypes = {
+  getCustomersWithoutProfile: PropTypes.func.isRequired,
+  handleClick: PropTypes.func.isRequired,
+  // viewCustomerProfile: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getCustomersWithoutProfile })(AllListings)
 
 

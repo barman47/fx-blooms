@@ -13,14 +13,14 @@ import {
     Grid,
     Menu,
     MenuItem,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
+    // Paper,
+    // Table,
+    // TableBody,
+    // TableCell,
+    // TableContainer,
+    // TableHead,
+    // TablePagination,
+    // TableRow,
     Typography
 } from '@material-ui/core';
 
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: theme.spacing(1),
+        // padding: theme.spacing(1),
         width: 'fit-content',
         gap: theme.spacing(1),
         color: '#697386',
@@ -209,11 +209,11 @@ const Customers = (props) => {
     } = useSelector(state => state.stats);
     const [ isDisabled, setDisabled ] = useState(true)
 
-    const { isMenuOpen } = useSelector(state => state.admin);
+    // const { isMenuOpen } = useSelector(state => state.admin);
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
 
-    const pages = [25, 50, 75, 100]
+    const pages = [20, 50, 75, 100]
     
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
@@ -223,6 +223,8 @@ const Customers = (props) => {
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState(ALL_CUSTOMERS);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [pageNumber, setPageNumber] = useState(0)
+    const [pageNumberList, setPageNumberList] = useState([])
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -245,6 +247,52 @@ const Customers = (props) => {
     } = props;
 
     const successModal = useRef();
+
+    const handlePageNUmberList = useCallback(() => {
+        const pageNumArr = []
+        if (pageNumber >= 1) {
+            for (let i=1; i<=pageNumber; i++) {
+                pageNumArr.push(i)
+            }
+        }
+        setPageNumberList(pageNumArr)
+    }, [pageNumber])
+
+    const nextPage = useCallback(() => {
+        switch (filter) {
+            case CONFIRMED:
+                setCustomerCount(confirmed.totalItemCount || 0);
+                break;
+
+            case PENDING:
+                setCustomerCount(pending.totalItemCount || 0);
+                break;
+
+            case REJECTED:
+                setCustomerCount(rejected.totalItemCount || 0);
+                break;
+
+            case SUSPENDED:
+                setCustomerCount(suspended.totalItemCount || 0);
+                break;
+
+            case NO_PROFILE:
+                setCustomerCount(noProfile.totalItemCount || 0);
+                break;
+            
+            case ALL_CUSTOMERS:
+                setPage(page + 1)
+                getCustomers({
+                    pageSize: pages[0] += pages[0] + 5,
+                    pageNumber: page
+                });
+                break;
+
+            default:
+                setCustomerCount(0);
+                break;
+        }
+    })
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -439,12 +487,13 @@ const Customers = (props) => {
                     pageSize: rowsPerPage,
                     pageNumber: page
                 });
+                setPageNumber(Math.ceil(totalCustomers/20))
+                handlePageNUmberList()
                 break;
-
             default:
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page]);
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, totalCustomers]);
 
     // Get customers when page number changes
     useEffect(() => {
@@ -464,14 +513,14 @@ const Customers = (props) => {
         }
     }, [fetchCustomers, rowsPerPage]);
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    // const handleChangePage = (event, newPage) => {
+    //     setPage(newPage);
+    // };
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(1);
-    };
+    // const handleChangeRowsPerPage = (event) => {
+    //     setRowsPerPage(+event.target.value);
+    //     setPage(1);
+    // };
 
 
     const handleSetFilter = (filter) => {
@@ -508,6 +557,7 @@ const Customers = (props) => {
                     pageNumber: 1,
                     pageSize: rowsPerPage
                 });
+
                 break;
 
             case SUSPENDED:
@@ -809,9 +859,24 @@ const Customers = (props) => {
                 </Menu>
 
 
-                <Box component="div" sx={{ display: 'flex', gap: '15px', marginTop: '60px' }}>
-                    <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                    <GenericButton isDisabled={!isDisabled} buttonName="Next" />
+                <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                    <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                        <Typography component="span">{'20'} results</Typography>
+                    </Box>
+
+                    <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+                            <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                        </Box> 
+                        <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                            {
+                                pageNumberList.map(n => (
+                                    <Typography variant="subtitle2">{n}</Typography>
+                                ))
+                            }
+                        </Box>
+                    </Box>                    
                 </Box>
             </section>
         </>

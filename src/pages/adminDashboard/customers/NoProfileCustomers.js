@@ -1,62 +1,62 @@
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { 
-    Checkbox,
-    FormControlLabel,
-    IconButton, 
-    TableCell, 
-    TableRow, 
-    Typography 
-} from '@material-ui/core';
+// import { 
+//     Checkbox,
+//     FormControlLabel,
+//     IconButton, 
+//     TableCell, 
+//     TableRow, 
+//     Typography 
+// } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { DotsHorizontal } from 'mdi-material-ui';
-import TextClamp from 'react-string-clamp';
+// import { DotsHorizontal } from 'mdi-material-ui';
+// import TextClamp from 'react-string-clamp';
 
 import { getCustomersWithoutProfile } from '../../../actions/customer';
-import { SET_CUSTOMER } from '../../../actions/types';
+// import { SET_CUSTOMER } from '../../../actions/types';
 import { COLORS, USER_COLUMNS } from '../../../utils/constants';
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
-const useStyles = makeStyles(theme => ({
-    customer: {
-        background: 'transparent',
-        display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
-        alignItems: 'center',
+// const useStyles = makeStyles(theme => ({
+//     customer: {
+//         background: 'transparent',
+//         display: 'grid',
+//         gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
+//         alignItems: 'center',
 
-        '&:last-child': {
-            borderBottom: 'none'
-        }
-    },
+//         '&:last-child': {
+//             borderBottom: 'none'
+//         }
+//     },
 
-    text: {
-        color: COLORS.offBlack,
-        fontWeight: 400,
-        padding: theme.spacing(1),
+//     text: {
+//         color: COLORS.offBlack,
+//         fontWeight: 400,
+//         padding: theme.spacing(1),
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(1.2)
-        },
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(1.2)
+//         },
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(0.7)
-        }
-    },
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(0.7)
+//         }
+//     },
 
-    item: {
-        border: 'none',
-        marginBottom: 0
-    },
+//     item: {
+//         border: 'none',
+//         marginBottom: 0
+//     },
     
-    button: {
-        justifySelf: 'center'
-    },
+//     button: {
+//         justifySelf: 'center'
+//     },
 
-    customerLink: {
-        color: `${theme.palette.primary.main}`,
-        cursor: 'pointer'
-    },
-}));
+//     customerLink: {
+//         color: `${theme.palette.primary.main}`,
+//         cursor: 'pointer'
+//     },
+// }));
 
 const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter }) => {
 

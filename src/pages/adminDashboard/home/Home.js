@@ -3,25 +3,32 @@ import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
     Box,
     Grid,
     // Paper,
     Typography
 } from '@material-ui/core';
-
+import { getCustomersWithoutProfile } from '../../../actions/customer';
 import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
-import { Stack, Animation } from '@devexpress/dx-react-chart';
+import { Stack, Animation, ArgumentScale } from '@devexpress/dx-react-chart';
 import {
     Chart,
     ArgumentAxis,
     ValueAxis,
     BarSeries,
+    LineSeries,
+    Title,
     Legend,
   } from '@devexpress/dx-react-chart-material-ui';
-
-import { olimpicMedals as data } from '../../../utils/constants';
+import { scalePoint } from 'd3-scale';
+import {
+    curveCatmullRom,
+    line,
+  } from 'd3-shape';
+import { olimpicMedals as data, energyConsumption as data2 } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
 // import { useCallback } from 'react';
@@ -87,6 +94,12 @@ const useStyles = makeStyles((theme) => ({
         marginBottom: theme.spacing(3.13),
         color: 'black',
         lineHeight: '1.6'
+    },
+
+    legend: {
+        '& ul li div span': {
+            fontSize: '10px !important'
+        }
     },
 
     contentItem: {
@@ -304,20 +317,34 @@ const useStyles = makeStyles((theme) => ({
         justifySelf: 'flex-end'
     }
 }));
-
+  
+const Line = props => (
+<LineSeries.Path
+    {...props}
+    path={line()
+    .x(({ arg }) => arg)
+    .y(({ val }) => val)
+    .curve(curveCatmullRom)}
+/>
+);
+  
 const Root = props => (
     <Legend.Root {...props} sx={{ display: 'flex', margin: 'auto', flexDirection: 'row', position: 'absolute', top: '-3px', right: '40px' }} />
-  );
+);
   const Label = props => (
-    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap', fontSize: '14px !important' }} />
-  );
+    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap', fontSize: '9px !important' }} />
+);
+
+const Item = props => (
+    <Legend.Item {...props} sx={{ flexDirection: 'column-reverse' }} />
+);
 
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
+    const { changed, totalCustomersWithNoProfile, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
@@ -330,19 +357,30 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const [loadingListingCount, setLoadingListingCount] = useState(false);
     const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
     const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
+    const [totalNoProfilePercent, setTotalNoProfilePercent] = useState(0);
 
     // eslint-disable-next-line
     // const [errors, setErrors] = useState({});
 
-    console.log('hsh',changed);
     useEffect(() => {
         handleSetTitle('Admin Home');
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        dispatch(getCustomersWithoutProfile())
+    }, [dispatch])
+
+    useEffect(() => {
+        if (totalCustomersWithNoProfile && totalCustomers) {
+            const noProfilePercentage = Math.round((totalCustomersWithNoProfile / totalCustomers) * 100)
+            setTotalNoProfilePercent(noProfilePercentage)
+        }
+    }, [totalNoProfilePercent, totalCustomersWithNoProfile, totalCustomers])
+
     // Show total listing count when no filter is selected
     useEffect(() => {
-        if (totalListings && !listingFilter) {
+        if (totalListings && !!listingFilter) {
             setListings(totalListings);
         }
     }, [totalListings, listingFilter]);
@@ -539,38 +577,51 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 <Grid item xs={12} className={classes.stats}>
                     <Box component="div" className={classes.userGraph}>
                         <Typography className={classes.graphName} variant="h6" component="h6" color="primary">Listings Breakdown</Typography>
-                        {/* <Paper className={classes.chart}> */}
                         <Chart
+                            data={data2}
                             className={classes.chart}
-                            data={data}
                             >
+                            <ArgumentScale factory={scalePoint} />
                             <ArgumentAxis />
                             <ValueAxis />
 
-                            <BarSeries
-                                name="Gold Medals"
-                                valueField="gold"
+                            <LineSeries
+                                name="Hydro-electric"
+                                valueField="hydro"
                                 argumentField="country"
-                                color="#ffd700"
+                                seriesComponent={Line}
                             />
-                            <BarSeries
-                                name="Silver Medals"
-                                valueField="silver"
+                            <LineSeries
+                                name="Oil"
+                                valueField="oil"
                                 argumentField="country"
-                                color="#c0c0c0"
+                                seriesComponent={Line}
                             />
-                            <BarSeries
-                                name="Bronze Medals"
-                                valueField="bronze"
+                            <LineSeries
+                                name="Natural gas"
+                                valueField="gas"
                                 argumentField="country"
-                                color="#cd7f32"
+                                seriesComponent={Line}
                             />
+                            <LineSeries
+                                name="Coal"
+                                valueField="coal"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <LineSeries
+                                name="Nuclear"
+                                valueField="nuclear"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <Legend className={classes.legend} position="top" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
+                            {/* <Title
+                                text="Energy Consumption in 2004\n(Millions of Tons, Oil Equivalent)"
+                                textComponent={'Text'}
+                            /> */}
                             <Animation />
-                            <Legend position="top" rootComponent={Root} labelComponent={Label} />
-                            {/* <Title text="Olimpic Medals in 2008" /> */}
-                            <Stack />
                         </Chart>
-                        {/* </Paper> */}
                     </Box>
                     <Box component="div" className={classes.userGraph}>
                         <Typography className={classes.graphName} variant="h6" component="h6" color="primary">User Acquisitions</Typography>
@@ -660,7 +711,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                             <Typography component="h6" variant="subtitle1">&#37;</Typography>
                         </Box>
 
-                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No Profile'} number={323} progressNumber={60} />
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No Profile'} number={totalCustomersWithNoProfile} progressNumber={totalNoProfilePercent} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'Not signed in in the last 30days'} number={323} progressNumber={10} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'Have transact in the last 30days'} number={200} progressNumber={100} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'No listing in the last 30days'} number={650} progressNumber={100} />

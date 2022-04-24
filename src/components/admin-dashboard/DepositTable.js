@@ -1,11 +1,11 @@
-import { useCallback } from 'react';
+// import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import { Box, Typography, IconButton, } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
-import { CUSTOMER_CATEGORY } from '../../utils/constants';
+// import { CUSTOMER_CATEGORY } from '../../utils/constants';
 
 
 const useStyles = makeStyles(theme =>({

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Box, Typography, IconButton, FormControlLabel, Checkbox } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -6,7 +6,7 @@ import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
-
+// import GenericButton from './GenericButton'
 
 const useStyles = makeStyles(theme =>({
 
@@ -59,7 +59,8 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
   const classes = useStyles();
 
   const dispatch = useDispatch();
-  const { CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
+  const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
+  const [ isDisabled, setDisabled ] = useState(true)
 
   const handleButtonClick = (customer, e) => {
     console.log('mennnuuu')
@@ -86,7 +87,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
       default:
         return
     }
-  }, [])
+  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified])
 
   const handleDisplayStatus = useCallback((status) => {
     switch (status) {
@@ -159,6 +160,17 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
             </Box>
         ))
       }
+
+      {/* <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+        <Box component="div">
+            <Typography component="span">{ data?.length ?? 0 } results</Typography>
+        </Box>
+
+        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+            <GenericButton isDisabled={!isDisabled} buttonName="Next" />
+        </Box> 
+      </Box> */}
     </>
   )
 }

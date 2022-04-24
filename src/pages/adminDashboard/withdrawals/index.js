@@ -131,7 +131,7 @@ const columns = [
   },
 ];
 
-const pages = [10, 25, 50, 100]
+// const pages = [10, 25, 50, 100]
 
 const gridColumns = '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr';
 
@@ -155,41 +155,41 @@ const Withdrawals = () => {
 //     setPage(1);
 //   };
 
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
 
-    const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
-        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-        switch (switchType) {
-            case TWENTY_FOUR_HOURS:
-                getFunction('1');
-                setLoadingType(true);
-                break;
+  // const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
+  //     const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+  //     switch (switchType) {
+  //         case TWENTY_FOUR_HOURS:
+  //             getFunction('1');
+  //             setLoadingType(true);
+  //             break;
 
-            case SEVEN_DAYS:
-                getFunction('7');
-                setLoadingType(true);
-                break;
+  //         case SEVEN_DAYS:
+  //             getFunction('7');
+  //             setLoadingType(true);
+  //             break;
 
-            case THIRTY_DAYS:
-                getFunction('30');
-                setLoadingType(true);
-                break;
+  //         case THIRTY_DAYS:
+  //             getFunction('30');
+  //             setLoadingType(true);
+  //             break;
 
-            case THREE_MONTHS:
-                getFunction('90');
-                setLoadingType(true);
-                break;
+  //         case THREE_MONTHS:
+  //             getFunction('90');
+  //             setLoadingType(true);
+  //             break;
 
-            case ALL:
-                setFilterType(total);
-                break;
-            
-            default:
-                break;
-        }
-    }
+  //         case ALL:
+  //             setFilterType(total);
+  //             break;
+          
+  //         default:
+  //             break;
+  //     }
+  // }
 
     // const handleVolumeFilter = useCallback((timeframe) => {
     //     handleSwitchCase(timeframe)

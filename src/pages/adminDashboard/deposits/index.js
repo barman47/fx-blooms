@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Menu, MenuItem, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
+// import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
 import DepositAndWithdrawalTable from '../../../components/admin-dashboard/DepositTable'
@@ -153,41 +153,41 @@ const Deposits = () => {
 //     setPage(1);
 //   };
 
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
 
-    const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
-        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-        switch (switchType) {
-            case TWENTY_FOUR_HOURS:
-                getFunction('1');
-                setLoadingType(true);
-                break;
+    // const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
+    //     const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+    //     switch (switchType) {
+    //         case TWENTY_FOUR_HOURS:
+    //             getFunction('1');
+    //             setLoadingType(true);
+    //             break;
 
-            case SEVEN_DAYS:
-                getFunction('7');
-                setLoadingType(true);
-                break;
+    //         case SEVEN_DAYS:
+    //             getFunction('7');
+    //             setLoadingType(true);
+    //             break;
 
-            case THIRTY_DAYS:
-                getFunction('30');
-                setLoadingType(true);
-                break;
+    //         case THIRTY_DAYS:
+    //             getFunction('30');
+    //             setLoadingType(true);
+    //             break;
 
-            case THREE_MONTHS:
-                getFunction('90');
-                setLoadingType(true);
-                break;
+    //         case THREE_MONTHS:
+    //             getFunction('90');
+    //             setLoadingType(true);
+    //             break;
 
-            case ALL:
-                setFilterType(total);
-                break;
+    //         case ALL:
+    //             setFilterType(total);
+    //             break;
             
-            default:
-                break;
-        }
-    }
+    //         default:
+    //             break;
+    //     }
+    // }
 
     // const handleVolumeFilter = useCallback((timeframe) => {
     //     handleSwitchCase(timeframe)
