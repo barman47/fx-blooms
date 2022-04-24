@@ -58,7 +58,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 //     },
 // }));
 
-const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter }) => {
+const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter, loading }) => {
 
     const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
 
@@ -73,7 +73,7 @@ const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCusto
 
     return (
         <>
-            <GenericTableBody data={noProfileCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            <GenericTableBody loading={loading} data={noProfileCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
             
             {/* {noProfileCustomers && noProfileCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>

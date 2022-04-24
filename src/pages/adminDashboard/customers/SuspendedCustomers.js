@@ -60,7 +60,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 // }));
 
 
-const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile }) => {
+const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile, loading }) => {
 
     const suspendedCustomers = useSelector(state => state.customers?.suspended?.items);
 
@@ -77,7 +77,7 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
 
     return (
         <>
-            <GenericTableBody data={suspendedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            <GenericTableBody loading={loading} data={suspendedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
             {/* {suspendedCustomers && suspendedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>

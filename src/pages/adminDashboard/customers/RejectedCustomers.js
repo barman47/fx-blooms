@@ -60,7 +60,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 // }));
 
 
-const RejectedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }) => {
+const RejectedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile, loading }) => {
 
     const rejectedCustomers = useSelector(state => state.customers.rejected.items);
 
@@ -77,7 +77,7 @@ const RejectedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile }
 
     return (
         <>
-            <GenericTableBody data={rejectedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            <GenericTableBody loading={loading} data={rejectedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
             {/* {rejectedCustomers && rejectedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>

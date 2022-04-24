@@ -353,6 +353,8 @@ const Customers = (props) => {
         });
     };
 
+    // const handleLoading = useCallback(() => {})
+
     const getCount = useCallback(() => {
         switch (filter) {
             case CONFIRMED:
@@ -512,6 +514,7 @@ const Customers = (props) => {
             fetchCustomers();
         }
     }, [fetchCustomers, rowsPerPage]);
+
 
     // const handleChangePage = (event, newPage) => {
     //     setPage(newPage);
@@ -739,6 +742,7 @@ const Customers = (props) => {
                         <NoProfileCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile} 
                         />
                     }
@@ -746,6 +750,7 @@ const Customers = (props) => {
                         <SuspendedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -753,6 +758,7 @@ const Customers = (props) => {
                         <VerifiedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -760,6 +766,7 @@ const Customers = (props) => {
                         <RejectedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -767,6 +774,7 @@ const Customers = (props) => {
                         <AllCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle}
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -859,25 +867,28 @@ const Customers = (props) => {
                 </Menu>
 
 
-                <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
-                    <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                        <Typography component="span">{'20'} results</Typography>
-                    </Box>
-
-                    <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                            <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
-                        </Box> 
-                        <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
-                            {
-                                pageNumberList.map(n => (
-                                    <Typography variant="subtitle2">{n}</Typography>
-                                ))
-                            }
+                {
+                    loading ? '' :
+                    <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                        <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                            <Typography component="span">{'20'} results</Typography>
                         </Box>
-                    </Box>                    
-                </Box>
+
+                        <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                                <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+                                <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                            </Box> 
+                            <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                                {
+                                    pageNumberList.map(n => (
+                                        <Typography variant="subtitle2">{n}</Typography>
+                                    ))
+                                }
+                            </Box>
+                        </Box>                    
+                    </Box>
+                }
             </section>
         </>
     );

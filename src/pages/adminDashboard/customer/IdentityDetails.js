@@ -139,8 +139,8 @@ const useStyles = makeStyles(theme =>({
 const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
-    const errorsState = useSelector(state => state.errors);
+    // const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    // const errorsState = useSelector(state => state.errors);
     
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
@@ -151,36 +151,36 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
 
     // const { APPROVED } = ID_STATUS;
 
-    useEffect(() => {
-        if (!idCheckData) {
-            getIdCardValidationResponse(customer.id);
-        }
+    // useEffect(() => {
+    //     if (!idCheckData) {
+    //         getIdCardValidationResponse(customer.id);
+    //     }
 
-        if (!profileCheckData) {
-            getResidencePermitValidationResponse(customer.id);
-        }
+    //     if (!profileCheckData) {
+    //         getResidencePermitValidationResponse(customer.id);
+    //     }
 
-        dispatch({
-            type: GET_ERRORS,
-            payload: {}
-        });
-        // eslint-disable-next-line
-    }, []);
+    //     dispatch({
+    //         type: GET_ERRORS,
+    //         payload: {}
+    //     });
+    //     // eslint-disable-next-line
+    // }, []);
 
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setLoading(false);
-            // toast.current.handleClick();
-        }
-    }, [errorsState, errors]);
+    // useEffect(() => {
+    //     if (errorsState?.msg) {
+    //         setLoading(false);
+    //         // toast.current.handleClick();
+    //     }
+    // }, [errorsState, errors]);
 
-    useEffect(() => {
-        if (msg) {
-            setLoading(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
-        }
-    }, [dispatch, msg]);
+    // useEffect(() => {
+    //     if (msg) {
+    //         setLoading(false);
+    //         successModal.current.openModal();
+    //         successModal.current.setModalText(msg);
+    //     }
+    // }, [dispatch, msg]);
 
     const dismissSuccessModal = () => {
         dispatch({
@@ -188,6 +188,8 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
             payload: null
         });
     };
+
+    console.log('hello')
 
     // const handleCloseModal = () => {
     //     setModalImage('');

@@ -86,25 +86,6 @@ const GenericMiniCard = ({ gotToPage, cardName, cardIcon, filterType, setFilterT
       <Box component="div" className={classes.dropDownContainer}>
         <Typography className={classes.contentIcon} variant="subtitle2" component="span" color="primary">{cardIcon}</Typography>
         <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={setFilterType} loading={loading} />
-        {/* <FormControl 
-            variant="outlined"
-        >
-            <Select
-                value={filterType}
-                onChange={(e) => setFilterType(e.target.value)}
-                displayEmpty
-                classes={{ select: classes.select }}
-                inputProps={{ 'aria-label': 'Filter' }}
-                name="usersFilter"
-                disabled={loading}
-            >
-                <MenuItem value="" disabled>Filter</MenuItem>
-                {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                    <MenuItem key={index} value={value}>{value}</MenuItem>
-                ))}
-            </Select> */}
-            {/* <FormHelperText>Select Users Filter</FormHelperText> */}
-        {/* </FormControl> */}
       </Box>
       <Box component="div">
         <Typography className={classes.contentTitle} variant="subtitle2" component="span" color="primary">{ cardName }</Typography>

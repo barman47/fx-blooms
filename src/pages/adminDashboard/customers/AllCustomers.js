@@ -64,7 +64,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 // }));
 
 
-const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
+const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile, loading }) => {
     // const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
@@ -88,7 +88,7 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
 
     return (
         <>
-            <GenericTableBody data={customers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            <GenericTableBody loading={loading} data={customers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
             {/* {customers && customers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.F}>

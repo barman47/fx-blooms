@@ -102,11 +102,11 @@ const AuthenticationDetails = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
-    const errorsState = useSelector(state => state.errors);
+    // const errorsState = useSelector(state => state.errors);
     
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
 
     // const toast = useRef();
     const successModal = useRef();
@@ -125,41 +125,43 @@ const AuthenticationDetails = () => {
       [classes.authTrue]: customer.hasSetUpTwoFactor,
     }), [customer, classes.authFalse, classes.authTrue])
 
-    useLayoutEffect(() => {
+    // useLayoutEffect(() => {
       
-      if (!idCheckData) {
-          dispatch(getIdCardValidationResponse(customer.id));
-      }
+    //   if (!idCheckData) {
+    //       dispatch(getIdCardValidationResponse(customer.id));
+    //   }
 
-      if (!profileCheckData) {
-          dispatch(getResidencePermitValidationResponse(customer.id));
-      }
+    //   if (!profileCheckData) {
+    //       dispatch(getResidencePermitValidationResponse(customer.id));
+    //   }
 
-      dispatch({
-          type: GET_ERRORS,
-          payload: {}
-      });
-        // eslint-disable-next-line
-    }, []);
+    //   dispatch({
+    //       type: GET_ERRORS,
+    //       payload: {}
+    //   });
+    //     // eslint-disable-next-line
+    // }, []);
 
-    useEffect(() => {
-        if (errorsState?.msg) {
-            setLoading(false);
-            // toast.current.handleClick();
-        }
-    }, [errorsState, errors]);
+    console.log('hello')
 
-    useEffect(() => {
-        if (msg) {
-            setLoading(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
-        }
-    }, [dispatch, msg]);
+    // useEffect(() => {
+    //     if (errorsState?.msg) {
+    //         setLoading(false);
+    //         // toast.current.handleClick();
+    //     }
+    // }, [errorsState, errors]);
 
-    useEffect(() => {
-      dispatch(getCustomer(customer.id))
-    }, [dispatch, customer])
+    // useEffect(() => {
+    //     if (msg) {
+    //         setLoading(false);
+    //         successModal.current.openModal();
+    //         successModal.current.setModalText(msg);
+    //     }
+    // }, [dispatch, msg]);
+
+    // useEffect(() => {
+    //   dispatch(getCustomer(customer.id))
+    // }, [dispatch, customer])
 
     const dismissSuccessModal = () => {
         dispatch({

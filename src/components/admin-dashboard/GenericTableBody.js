@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Box, Typography, IconButton, FormControlLabel, Checkbox } from '@material-ui/core';
+import { Box, Typography, IconButton, FormControlLabel, Checkbox, CircularProgress, } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme =>({
 }));
 
 
-const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns, addColumn, columnList }) => {
+const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns, addColumn, columnList, loading }) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -113,7 +113,9 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   return (
     <>
-      {
+      { loading ? <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
+                    <CircularProgress />
+                  </Box> :
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: handleGridColumns }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
