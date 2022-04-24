@@ -5,6 +5,7 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
     Checkbox,
+    Collapse,
     Divider,
     Grid, 
     IconButton, 
@@ -19,6 +20,7 @@ import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import customToast, { Toaster } from 'react-hot-toast';
 import clsx from 'clsx';
+import Alert from '@material-ui/lab/Alert';
 import { GoogleLogin } from 'react-google-login';
 
 import Spinner from '../../components/common/Spinner';
@@ -170,6 +172,12 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr 0.1fr 1fr',
         alignItems: 'center',
         columnGap: theme.spacing(2)
+    },
+
+    info: {
+        // color: theme.palette.error.main,
+        fontSize: theme.spacing(1.3),
+        fontWeight: 300
     },
 
     disabledButton: {
@@ -595,6 +603,16 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                     <Typography variant="subtitle2" component="span">I agree to the <Link to={TERMS} target="_blank" rel="noreferrer" className={classes.link}>Terms and Conditons</Link>, <Link to={PRIVACY_POLICY} target="_blank" rel="noreferrer" className={classes.link}>Privacy Policy</Link> and <Link to={USER_AGREEMENT} target="_blank" rel="noreferrer" className={classes.link}>User Agreement</Link>.</Typography>
                                 </Grid>
                                 <Grid item xs={12}>
+                                    <Collapse in={!checked}>
+                                        <Alert 
+                                            variant="outlined" 
+                                            severity="error"
+                                        >
+                                            <Typography variant="subtitle2" component="span" className={classes.info}>You have to agree to our "T &amp; C", "Privacy Policy" and "User Agreement" before signing up.</Typography>
+                                        </Alert>
+                                    </Collapse>
+                                </Grid>
+                                <Grid item xs={12}>
                                     <Button 
                                         variant="contained" 
                                         color="primary"
@@ -612,6 +630,7 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                 </Grid>
                                 <Grid item xs={12}>
                                     <GoogleLogin
+                                        onClick={() => alert('clicked!')}
                                         clientId={process.env.REACT_APP_GOOGLE_APP_ID}
                                         className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
                                         buttonText="Sign up with Google"

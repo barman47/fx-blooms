@@ -587,7 +587,6 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetIDCardValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
-        console.log('id card ', data);
         const customerData = extractIdDetails(data.servicesResults.docCheck.extracted.ocr.$values,
             {
                 idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
@@ -612,7 +611,6 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
 
         //     status: data.overallResult.status
         // };
-        console.log('customerData', customerData);
         dispatch({
             type: SET_ID_CHECK_DATA,
             payload: customerData
@@ -627,7 +625,6 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetResidencePermitValidationResponse/id/${customerId}`);
         const data = JSON.parse(res.data.data);
-        console.log('residence permit ', data);
         const customerData = extractIdDetails(data.servicesResults.docCheck.extracted.ocr.$values,
             {
                 idFront:  data.servicesResults.docCheck.extracted.images.$values[0].content,
@@ -635,7 +632,6 @@ export const getResidencePermitValidationResponse = (customerId) => async (dispa
                 status: data.overallResult.status
             }
         );
-        console.log('customerData', customerData);
         // const customerData = {
         //     documentNumber: data.servicesResults.docCheck.extracted.ocr.$values[0].content,
         //     expiryDate: data.servicesResults.docCheck.extracted.ocr.$values[1].content,

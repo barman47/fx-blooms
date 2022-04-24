@@ -1,4 +1,5 @@
 import { 
+    CLEAR_TRANSACTIONS,
     CUSTOMER_CANCELED,
     SET_TRANSACTION,
     SET_TRANSACTIONS,
@@ -86,6 +87,15 @@ const transactionsReducer = (state = initialState, action) => {
                 ...state,
                 sent: action.payload.sent,
                 received: action.payload.received  
+            };
+
+        case CLEAR_TRANSACTIONS:
+            return {
+                ...state,
+                transaction: {},
+                transactions: [],
+                eurTransactions: [],
+                ngnTransactions: [],
             };
 
         default:

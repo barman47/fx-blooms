@@ -13,7 +13,12 @@ const useStyles = makeStyles(theme => ({
     root: {
         display: 'grid',
         gridTemplateColumns: '1fr',
-        gap: theme.spacing(5)
+        gap: theme.spacing(5),
+        padding: theme.spacing(0, 5),
+
+        [theme.breakpoints.down('md')]: {
+            padding: theme.spacing(0, 2)
+        }
     },
 
     header: {

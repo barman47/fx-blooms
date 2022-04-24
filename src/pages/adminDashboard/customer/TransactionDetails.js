@@ -193,14 +193,12 @@ const TransactionDetails = () => {
   useEffect(() => {
     dispatch(getAllListings())
 
-  }, [dispatch])
-
+  }, [dispatch]);
   
   useEffect(() => {
     dispatch(getCustomer(customer.id))
   }, [dispatch, customer])
   
-
   return (
     <>
     <Box component="section" className={classes.root}>

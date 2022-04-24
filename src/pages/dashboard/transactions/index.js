@@ -1,23 +1,23 @@
 import { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, ButtonGroup } from '@material-ui/core';
-
+import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_TRANSACTION_TYPE, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
+import TransactionSkeleton from './TransactionSkeleton';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        paddingLeft: theme.spacing(5),
-        paddingRight: theme.spacing(5),
+        padding: theme.spacing(0, 5, 5, 5),
 
         [theme.breakpoints.down('sm')]: {
+            paddingBottom: theme.spacing(1),
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
         }
@@ -53,19 +53,21 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { currencies } = useSelector(state => state);
+    const { currencies, loading } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
-    const { eurTransactions, ngnTransactions, transactions, sent, received } = useSelector(state => state.transactions);
+    const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
-    // eslint-disable-next-line
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         handleSetTitle('Transactions');
-        dispatch({
-            type: SET_TRANSACTION,
-            payload: {}
+        batch(() => {
+            dispatch({
+                type: SET_LOADING,
+                payload: true
+            });
+            dispatch({ type: CLEAR_TRANSACTIONS });
+            dispatch({ type: SET_BID, payload: {} });
         });
         getTransactions(true);
         if (currencies.length === 0) {
@@ -79,14 +81,27 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     useEffect(() => {
         switch (currency) {
             case 'ALL':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_ALL_TRANSACTIONS });
                 break;
 
             case 'EUR':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
                 break;
 
             case 'NGN':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
+
                 dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
                 break;
 
@@ -95,19 +110,19 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         }
     }, [currency, customerId, dispatch]);
 
-    const setTransactionType = (sent, received) => {
-		dispatch({
-			type: SET_TRANSACTION_TYPE,
-			payload: {
-				sent,
-				received
-			}
-		});
-	}
-
+    // const setTransactionType = (sent, received) => {
+	// 	dispatch({
+	// 		type: SET_TRANSACTION_TYPE,
+	// 		payload: {
+	// 			sent,
+	// 			received
+	// 		}
+	// 	});
+	// }
 
     return (
         <>
+            <Toaster />
             <Box component="section" className={classes.root}>
                 <Typography variant="h6">Transaction History</Typography>
                 <Typography variant="body2" component="p">Here are your recent transactions</Typography>
@@ -129,7 +144,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                                 {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
+                        {/* <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
                             <Button
                                 color="primary"
                                 disableRipple
@@ -150,16 +165,28 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                             >
                                 Sent
                             </Button>
-                        </ButtonGroup>
+                        </ButtonGroup> */}
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
-                    {eurTransactions.length > 0 ? 
+                    {loading ?
+                        <>
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                        </>
+                        :
+                        eurTransactions.length > 0 ? 
                         eurTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                    }
+                    {!loading && transactions.length === 0 && 
+                        <Typography variant="h4" align="center" color="primary">You have no transactions</Typography>
                     }
                 </Box>
             </Box>

@@ -15,7 +15,7 @@ export const COLORS = {
     orange: '#ffa500'
 };
 
-export const DRAWER_WIDTH = 300;
+export const DRAWER_WIDTH = 260;
 // export const DRAWER_WIDTH = 240;
 
 export const SETUP_2FA = 'SETUP_2FA';

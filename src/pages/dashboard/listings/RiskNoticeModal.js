@@ -84,7 +84,6 @@ const RiskNoticeModal = () => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            disableBackdropClick
             disableEscapeKeyDown
             onClose={() => setOpen(false)}
             closeAfterTransition

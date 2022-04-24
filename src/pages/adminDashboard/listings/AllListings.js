@@ -30,8 +30,6 @@ const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
   //   dispatch(getCustomersWithoutProfile())
     
   // }, [dispatch])
-  
-  console.log('Hello Listings', noProfileCustomers)
 
   // useEffect(() => {
   //   dispatch(getCustomers({
@@ -40,8 +38,20 @@ const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
   //   }))
 
   //   // console.log('listings', items)
-  // }, [dispatch])    
+  // }, [dispatch]);
+  
+  useEffect(() => {
+    dispatch(getAllListings())
 
+  }, [dispatch])
+
+
+  useEffect(() => {
+    dispatch(getCustomers({
+        pageNumber: 1,
+        pageSize: 15
+    }))
+  }, [dispatch]);
 
   return (
     <>
