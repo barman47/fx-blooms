@@ -1,10 +1,12 @@
 import { 
+    CLEAR_TRANSACTIONS,
     CUSTOMER_CANCELED,
     SET_TRANSACTION,
     SET_TRANSACTIONS,
     SET_ALL_TRANSACTIONS,
     SET_EUR_TRANSACTIONS,
     SET_NGN_TRANSACTIONS,
+    SET_TRANSACTION_TYPE,
 } from '../actions/types';
 
 const initialState = {
@@ -14,6 +16,8 @@ const initialState = {
     transaction: {},
     customerCanceled: null,
     connectionStatus: null,
+    sent: true,
+    received: false,
     msg: null
 };
 
@@ -76,6 +80,22 @@ const transactionsReducer = (state = initialState, action) => {
                 ...state,
                 eurTransactions: [],
                 ngnTransactions: transactions
+            };
+
+        case SET_TRANSACTION_TYPE:
+            return {
+                ...state,
+                sent: action.payload.sent,
+                received: action.payload.received  
+            };
+
+        case CLEAR_TRANSACTIONS:
+            return {
+                ...state,
+                transaction: {},
+                transactions: [],
+                eurTransactions: [],
+                ngnTransactions: [],
             };
 
         default:

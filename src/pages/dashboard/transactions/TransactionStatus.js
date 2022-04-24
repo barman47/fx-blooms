@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -16,21 +16,27 @@ import { makeStyles } from '@material-ui/core/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+import clsx from 'clsx';
+import PropTypes from 'prop-types';
+
+import { getBid } from '../../../actions/listings';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+
+import { USER_DETAILS } from '../../../routes';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.white,
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
-        padding: theme.spacing(5),
+        padding: theme.spacing(0, 5, 5, 5),
         
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 1),
-            
+            padding: theme.spacing(1)
         },
 
         '& header': {
@@ -38,7 +44,11 @@ const useStyles = makeStyles(theme => ({
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(3)
+
+            [theme.breakpoints.down('sm')]: {
+                alignItems: 'flex-start',
+                flexDirection: 'column',
+            }
         }
     },
 
@@ -71,6 +81,12 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    recipientDetails: {
+        color: theme.palette.primary.main,
+        cursor: 'pointer',
+        textDecoration: 'underline'
+    },
+
     transactionIdContainer: {
         display: 'flex',
         flexDirection: 'row',
@@ -91,6 +107,10 @@ const useStyles = makeStyles(theme => ({
         },
     },
 
+    inProgress: {
+        color: COLORS.orange
+    },
+
     contact: {
         marginRight: theme.spacing(5),
         marginTop: theme.spacing(2),
@@ -108,11 +128,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const TransactionStatus = ({ handleSetTitle }) => {
+const TransactionStatus = ({ getBid, handleSetTitle }) => {
 	const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { customerId } = useSelector(state => state.customer);
+    const { bid } = useSelector(state => state.listings);
     const { transaction } = useSelector(state => state.transactions);
 
     const [trackerText, setTrackerText] = useState('');
@@ -124,19 +145,50 @@ const TransactionStatus = ({ handleSetTitle }) => {
     const [activeStep, setActiveStep] = useState(0);
 
     useEffect(() => {
+        if (transaction.seller.currency === 'NGN') {
+            getBid(transaction.bidId);
+        }
         handleSetTitle('Transaction Status');
         initializeTransaction(transaction);
         // eslint-disable-next-line
     }, []);
 
-    // Set the current step to the 5th one - Exception
-    // useEffect(() => {
-    //     if (activeStep === 3 && transactionSteps.length === 5) {
-    //         setActiveStep(4);
-    //     }
-    // }, [activeStep, transactionSteps.length]);
+    const getActiveNgnStep = (buyer, seller) => {
+        if (seller.hasMadePayment) {
+            setActiveStep(1);
+            if (seller.customerId === customerId) {
+                setTrackerText(`Awaiting ${buyer.userName}'s Confirmation`);
+            } else {
+                setTrackerText(`Awaiting your Confirmation`);
+            }
+        }
 
-    const getActiveStep = (buyer, seller) => {
+        if (seller.hasMadePayment && buyer.hasReceivedPayment) {
+            setActiveStep(2);
+            if (!isBuyer) {
+                setTrackerText(`Awaiting ${buyer.userName}'s Payment`);
+            } else {
+                setTrackerText(`Awaiting your Payment`);
+            }
+        }
+
+        if (buyer.hasMadePayment) {
+            setActiveStep(3);
+            if (buyer.customerId === customerId) {
+                setTrackerText(`Awaiting ${seller.userName}'s confirmation`);
+            } else {
+                setTrackerText(`Awaiting your confirmation`);
+            }
+        }
+
+        if (buyer.hasMadePayment && seller.hasReceivedPayment) {
+            setActiveStep(4);
+            setTrackerText(`Transaction Completed`);
+            setCompleted(true);
+        }
+    };
+
+    const getActiveEurStep = (buyer, seller) => {
         if (buyer.hasMadePayment) {
             setActiveStep(0);
             if (buyer.customerId === customerId) {
@@ -171,68 +223,124 @@ const TransactionStatus = ({ handleSetTitle }) => {
         }
     };
 
-    const initializeTransaction = (transaction) => {
-        const { buyer, seller } = transaction;
-        getActiveStep(buyer, seller);
-
-        if (customerId === buyer.customerId) { // Customer is buyer
-            setIsBuyer(true);
-            setRecepient(seller);
-            setCustomer(buyer);
+    const getBuyerTransactionSteps = (buyer, seller) => {
+        if (seller.currency === 'EUR') {
             setTransactionSteps([
-                `You transfer NGN${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
                 `${seller.userName} to confirm the NGN payment`, 
                 `${seller.userName} to transfer EUR to you`,
                 `You to confirm - Transaction Completed`
             ]);
-            // setTransactionSteps([
-            //     `You accepted EUR${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
-            //     `${seller.userName} to confirm the NGN payment`, 
-            //     'EUR moved to your EUR Wallet', 
-            //     'Transaction Completed'
-            // ]);
+        } else {
+            setTransactionSteps([
+                `You accepted offer`, 
+                `${seller.userName} to transfer ${seller.currency}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `You confirmed ${seller.currency} payment`,
+                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `${seller.userName} confirmed the ${buyer.currency} payment - Transaction Completed`,
+            ]);
         }
+    };
 
-        if (customerId === seller.customerId) { // Customer is seller
-            setRecepient(buyer);
-            setCustomer(seller);
+    const getSellerTransactionSteps = (buyer, seller) => {
+        if (seller.currency === 'EUR') {
             setTransactionSteps([
                 `${buyer.userName} to transfer NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
                 `You confirm NGN payment`, 
                 `You transfer the equivalent EUR to ${buyer.userName}`,
                 `${buyer.userName} confirmed the EUR - Transaction Completed`
             ]);
-            // return setTransactionSteps([
-            //     `You transfer EUR${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName}`, 
-            //     `${buyer.userName} to confirm the EUR payment`,
-            //     'EUR moved to your EUR Wallet', 
-            //     'Transaction Completed'
-            // ]);
+        } else {
+            setTransactionSteps([
+                `${buyer.userName} accepted offer`, 
+                `You transfer the equivalent ${seller.currency}${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName} within 30 minutes`,
+                `${buyer.userName} confirmed the ${seller.currency} payment`,
+                `${buyer.userName} transferred the ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to you`,
+                `You confirm ${buyer.currency} payment - Transaction Completed`, 
+            ]);
         }
     };
 
-    const getStepContent = (step, transaction) => {
+    const initializeTransaction = (transaction) => {
+        const { buyer, seller } = transaction;
+
+        if (seller.currency === 'EUR') {
+            getActiveEurStep(buyer, seller)
+        } else {
+            getActiveNgnStep(buyer, seller);
+        }
+
+        if (customerId === buyer.customerId) { // Customer is buyer
+            setIsBuyer(true);
+            setRecepient(seller);
+            setCustomer(buyer);
+            getBuyerTransactionSteps(buyer, seller);
+        }
+
+        if (customerId === seller.customerId) { // Customer is seller
+            setRecepient(buyer);
+            setCustomer(seller);
+            getSellerTransactionSteps(buyer, seller);
+        }
+    };
+
+    const getEurStepContent = (step, transaction) => {
+        const { buyer, seller } = transaction;
         switch (step) {
-          case 0:
-            return `Timestamp`;
+            case 0:
+                return buyer.datePaymentMade ? `${convertToLocalTime(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 1:
-                return 'Timestamp';
+                return seller.datePaymentReceived ? `${convertToLocalTime(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
             case 2:
-                return `Timestamp`;
+                return seller.datePaymentMade ? `${convertToLocalTime(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
             
             case 3:
-                return `Timestamp`;
+                return buyer.datePaymentReceived ? `${convertToLocalTime(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
 
           default:
             return '';
         }
+    };
+
+    const getNgnStepContent = (step, transaction) => {
+        const { buyer, seller } = transaction;
+        switch (step) {
+            case 0:
+                return `${convertToLocalTime(bid.datePlaced).format('MMMM Do YYYY, h:mm:ss a')}`;
+
+            case 1:
+                return seller.datePaymentMade ? `${convertToLocalTime(seller.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+            
+            case 2:
+                return buyer.datePaymentReceived ? `${convertToLocalTime(buyer.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+
+            case 3:
+                return buyer.datePaymentMade ? `${convertToLocalTime(buyer.datePaymentMade).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+            
+            case 4:
+                return seller.datePaymentReceived ? `${convertToLocalTime(seller.datePaymentReceived).format('MMMM Do YYYY, h:mm:ss a')}` : '';
+
+            default:
+                return '';
+        }
+    };
+
+    const getStepContent = (step, transaction) => {
+        if (transaction.seller.currency === 'EUR') {
+            return getEurStepContent(step, transaction);
+        }
+        return getNgnStepContent(step, transaction);
     }
 
     const handleCopyTransactionId = () => {
         copy(transaction.id);
         toast.success('Transaction ID Copied!');
+    };
+
+    const handleViewCustomerDetails = () => {
+        return navigate(`${USER_DETAILS}/${recepient.customerId}`, { state: { customerId: recepient.customerId } });
     };
 
 	return (    
@@ -243,7 +351,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                     <Button 
                         color="primary" 
                         variant="outlined" 
-                        onClick={() => history.goBack()}
+                        onClick={() => navigate(-1)}
                         startIcon={<ArrowLeft />}
                     >
                         Back
@@ -256,7 +364,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Box component="section">
                             <Typography variant="body2" component="p">Transaction ID</Typography>
                             <Box className={classes.transactionIdContainer}>
-                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}`}</Typography>
+                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}-${customer?.currency?.charAt(0)}`}</Typography>
                                 &nbsp;&nbsp;
                                 <Tooltip title="Copy Transaction ID" arrow>
                                     <ContentCopy onClick={handleCopyTransactionId} color="primary" style={{ cursor: 'pointer' }} />
@@ -271,7 +379,7 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Recepient Contact</Typography>
-                            <Typography variant="body2" component="p">+2348147233059</Typography>
+                            <Typography variant="body2" component="p" className={classes.recipientDetails} onClick={handleViewCustomerDetails}>View Recipient Details</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -286,14 +394,19 @@ const TransactionStatus = ({ handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Transfer Status</Typography>
-                            <Typography variant="body2" component="p" >{completed ? 'Completed' : 'In Progress'}</Typography>
+                            <Typography variant="body2" component="p" className={clsx({[classes.inProgress]: !completed})}>{completed ? 'Completed' : 'In Progress'}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Date</Typography>
+                            <Typography variant="body2" component="p" >{convertToLocalTime(transaction.dateCreated).format('MMMM Do, YYYY')} at {convertToLocalTime(transaction.dateCreated).format('hh:mm a')}</Typography>
                         </Box>
                     </Box>
                     <Typography variant="h6" className={classes.title} color="primary">Tracker - {trackerText}</Typography>
                     <Box className={classes.transactionStatus}>
                         <Stepper activeStep={activeStep} orientation="vertical">
                             {transactionSteps.map((step, index) => (
-                                <Step key={index}>
+                                <Step key={index} expanded={true}>
                                     <StepLabel>{step}</StepLabel>
                                     <StepContent>
                                         <Typography>{getStepContent(index, transaction)}</Typography>
@@ -311,4 +424,9 @@ const TransactionStatus = ({ handleSetTitle }) => {
     );
 };
 
-export default TransactionStatus;
+TransactionStatus.propTypes = {
+    getBid: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getBid })(TransactionStatus);

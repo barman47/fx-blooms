@@ -22,14 +22,13 @@ const useStyles = makeStyles(theme => ({
         alignItems: 'center',
         justifyContent: 'center',
         fontWeight: 300,
-        marginTop: theme.spacing(-3),
+        margin: theme.spacing(0, 4),
         padding: theme.spacing(3),
         textAlign: 'center',
-        // width: '100%',
 
         [theme.breakpoints.down('sm')]: {
-            marginTop: theme.spacing(2),
-            padding: theme.spacing(1)
+            margin: theme.spacing(0, 2),
+            padding: theme.spacing(2)
         }
     },
 

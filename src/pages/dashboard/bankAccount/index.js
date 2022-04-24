@@ -17,10 +17,12 @@ import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        marginTop: theme.spacing(-2),
+        padding: theme.spacing(0, 5, 5, 5),
 
         [theme.breakpoints.down('sm')]: {
-            marginTop: theme.spacing(-4),
+            paddingBottom: theme.spacing(1),
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
         }
     },
 
@@ -62,7 +64,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const BankAccounts = ({ deleteAccount }) => {
+const BankAccounts = ({ deleteAccount, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -75,6 +77,11 @@ const BankAccounts = ({ deleteAccount }) => {
 
     const successModalRef = useRef();
     const toast = useRef();
+
+    useEffect(() => {
+        handleSetTitle('Bank Accounts');
+        // eslint-disable-next-line
+    }, []);
     
     const toggleEditAccountDrawer = useCallback(() => {
         setEditAccount(!editAccount)
@@ -185,7 +192,8 @@ const BankAccounts = ({ deleteAccount }) => {
 }
 
 BankAccounts.propTypes = {
-    deleteAccount: PropTypes.func
+    deleteAccount: PropTypes.func,
+    handleSetTitle: PropTypes.func
 };
 
 export default connect( undefined, { deleteAccount })(BankAccounts);

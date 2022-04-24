@@ -1,11 +1,31 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
+import { 
+    AppBar,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Avatar,
+    Drawer, 
+    Divider,
+    IconButton, 
+    List, 
+    ListItem, 
+    ListItemIcon, 
+    ListItemText,
+    Toolbar,
+    Tooltip, 
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
 import _ from 'lodash';
+import clsx from 'clsx';
 
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
@@ -19,8 +39,35 @@ import {
     BottomNavigationAction
 } from '@material-ui/core';
 
-import { Account, HomeMinus, FormatListText, Message } from 'mdi-material-ui';
-import { ACCOUNT, MAKE_LISTING, DASHBOARD_HOME, NOTIFICATIONS } from '../../routes';
+import { 
+    AccountOutline, 
+    ArrowLeftRight, 
+    BagChecked, 
+    CardAccountDetailsOutline,
+    ChevronLeft, 
+    ChevronRight, 
+    ChevronDown, 
+    FormatListText, 
+    HomeOutline, 
+    LockOutline, 
+    Logout, 
+    MessageOutline, 
+    Menu,
+    // Security,
+    TwoFactorAuthentication 
+} from 'mdi-material-ui';
+import { 
+    BANK_ACCOUNTS, 
+    MAKE_LISTING, 
+    DASHBOARD_HOME, 
+    NOTIFICATIONS, 
+    SECURITY,
+    ID_VERIFICATION, 
+    // PIN, 
+    TWO_FACTOR, 
+    TRANSACTIONS, 
+    PROFILE 
+} from '../../routes';
 import { 
     ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
@@ -29,50 +76,206 @@ import {
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_PAID, 
     PAYMENT_NOTIFICATION_OFFER_MADE,
+    REMOVE_NOTIFICATION,
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
-import audioFile from '../../assets/sounds/notification.mp3';
+
 
 import { logout } from '../../actions/customer';
-import { CHAT_CONNECTION_STATUS, COLORS, LOGOUT, NOTIFICATION_TYPES, ID_STATUS } from '../../utils/constants';
+import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
+import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
-import PrivateHeader, { HideOnScroll } from '../../components/layout/PrivateHeader';
+import HideOnScroll from '../../components/layout/HideOnScroll';
+import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
+
+import audioFile from '../../assets/sounds/notification.mp3';
+import logo from '../../assets/img/logo.svg';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
 
 const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'flex',
-        flexDirection: 'row',
-        flexGrow: 1,
+    appBar: {
+        backgroundColor: COLORS.white,
+        display: 'none',
 
         [theme.breakpoints.down('md')]: {
-            marginBottom: theme.spacing(8)
-        },
-
-        [theme.breakpoints.down('sm')]: {
-            marginBottom: theme.spacing(5)
+            display: 'block'
         }
+    },
+    
+    appBarContent: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center'
     },
 
     title: {
-        flexGrow: 1,
+        color: COLORS.offBlack,
+        fontWeight: 600
     },
 
-    hide: {
-        display: 'none',
+    root: {
+        [theme.breakpoints.down('md')]: {
+            marginTop: theme.spacing(10),
+            paddingLeft: theme.spacing(5),
+            paddingRight: theme.spacing(5),
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
+        }
+    },
+
+    content: {
+        flexGrow: 1,
+        marginLeft: theme.spacing(9) + 1,
+        marginTop: theme.spacing(4),
+        zIndex: '997',
+        width: `calc(100% - ${theme.spacing(9) + 1}px)`,
+        transition: theme.transitions.create(['width', 'margin'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginBottom: theme.spacing(3),
+            marginLeft: '0 !important',
+            height: '100vh !important',
+            width: '100% !important'
+        }
+    },
+
+    contentShift: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`
+    },
+
+    drawer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        flexShrink: 0,
+        whiteSpace: 'nowrap',
+        width: drawerWidth
+    },
+    
+    paper: {
+        overflowX: 'hidden',
+        boxSizing: 'border-box'
+    },
+
+    drawerOpen: {
+        width: drawerWidth,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+
+    drawerClose: {
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+        overflowX: 'hidden',
+        width: theme.spacing(7) + 1,
+        [theme.breakpoints.up('sm')]: {
+            width: theme.spacing(9) + 1,
+        },
     },
 
     logo: {
         width: '100%'
     },
 
-    content: {
-        flexGrow: 1
+    collapseIcon: {
+        color: theme.palette.primary.main
+    },
+    
+    expandIcon: {
+        color: theme.palette.primary.main
+    },
+
+    toolbar: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: [[theme.spacing(2), theme.spacing(2), 0, theme.spacing(2)]],
+        // necessary for content to be below app bar
+        ...theme.mixins.toolbar,
+    },
+
+    collapsedToolbar: {
+        justifyContent: 'center',
+    },
+
+    linksContainer: {
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        // justifyContent: 'space-between'
+        '& .MuiPaper-elevation1': {
+            padding: 0,
+            boxShadow: 'none',
+        },
+
+        '& .MuiAccordion-root.Mui-expanded': {
+            margin: 0
+        }
+    },
+
+    profileContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        justifySelf: 'flex-end',
+        height: '100%'
+    },
+
+    links: {
+        marginTop: theme.spacing(4.5)
+    },
+
+    linkItem: {
+        color: theme.palette.primary.main,
+        transition: TRANSITION,
+
+        '&:hover': {
+            backgroundColor: theme.palette.primary.main,
+            color: COLORS.offWhite
+        }
+    },
+
+    // accordionLink: {
+    //     color: theme.palette.primary.main,
+    //     transition: TRANSITION,
+
+    //     '&:hover': {
+    //         backgroundColor: theme.palette.primary.main,
+    //         color: COLORS.offWhite
+    //     }
+    // },
+
+    activeLink: {
+        backgroundColor: theme.palette.primary.main,
+        color: COLORS.offWhite
+    },
+
+    icon: {
+        color: 'inherit',
+        minWidth: 0,
+        marginRight: theme.spacing(1.5),
+
+        '&:hover': {
+            color: 'inherit'
+        }
     },
 
     link: {
@@ -81,23 +284,33 @@ const useStyles = makeStyles((theme) => ({
         color: theme.palette.primary.main
     },
 
-    links: {
-        marginTop: theme.spacing(4.5)
+    accordionSummary: {
+        minHeight: '47px',
+        margin: 0,
+        padding: 0,
+
+        '& .MuiAccordionSummary-content' : {
+            margin: 0
+        }
     },
 
-    linkItem: {
-        backgroundColor: `${COLORS.lightTeal} !important`,
-        marginBottom: theme.spacing(2)
+    collapsedIcon: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
-    icon: {
-        color: theme.palette.primary.main
+    accordionDetails: {
+        display: 'flex',
+        flexDirection: 'column',
+        paddingBottom: 0,
+        paddingRight: 0,
+        paddingTop: 0
     },
 
-    avatar: {
-        borderRadius: '30px',
-        maxWidth: theme.spacing(8),
-        width: '50%'
+    collapsedAccordionDetails: {
+        paddingLeft: 0
     },
 
     bottomBar: {
@@ -114,6 +327,25 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '9px !important',
         fontWeight: 300,
         textTransform: 'uppercase'
+    },
+
+    avatarContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: theme.spacing(1.5),
+        paddingRight: theme.spacing(1.5),
+
+        '& h6': {
+            fontSize: theme.spacing(1.5),
+            marginLeft: theme.spacing(2.5)
+        }
+    },
+
+    avatar: {
+        backgroundColor: theme.palette.primary.main,
+        color: COLORS.offWhite,
+        fontWeight: 600
     }
 }));
 
@@ -123,37 +355,73 @@ const ToastAction = () => {
     );
 };
 
-const Dashboard = ({ children, title, logout }) => {
+const Dashboard = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const theme = useTheme();
+
+    const matches = useMediaQuery(theme.breakpoints.down('md'));
     
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
     
+    const [path, setPath] = useState('');
     const [toastDuration, setToastDuration] = useState(0);
     const [toastMessage, setToastMessage] = useState('');
     const [toastTitle, setToastTitle] = useState('');
     const [toastType, setToastType] = useState('error');
     const [toastAction, setToastAction] = useState(null);
+    const [open, setOpen] = useState(true);
     
     const mobileLinks = [
-        { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeMinus /> },
+        { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        // { url: WALLET, text:'Wallet', icon: <Wallet /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><Message /></Badge> },
-        { url: ACCOUNT, text:'Account', icon: <Account /> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
     ];
+
+    const protectedRoutes = [
+        { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
+        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
+        // { url: WALLET, text:'Wallets', icon: <Wallet /> },
+        { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
+        { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
+        { url: SECURITY, text:'Security', icon: <LockOutline /> },
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+    ];
+
+    const securityLinks = [
+        { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
+        // { url : PIN, text: 'Set PIN', icon: <Security /> },
+        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
+    ];
+
+    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
+    const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
     const transactionCompleteModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
+
+    useEffect(() => {
+        getNotificationCount(customerId);
+        if (matches) {
+            setOpen(false);
+        }
+        // eslint-disable-next-line
+    }, [matches]);
+
+    // Set pathname when ever the location changes, for active link feature
+    useEffect(() => {
+        setPath(location.pathname);
+    }, [location.pathname]);
 
     useEffect(() => {
         checkTwoFactorStatus();
@@ -205,10 +473,6 @@ const Dashboard = ({ children, title, logout }) => {
         }
     }, [NOT_SUBMITTED, stats]);
 
-    // useEffect(() => {
-    //     setPath(location.pathname);
-    // }, [location]);
-
     useEffect(() => {
         switch (connectionStatus) {
             case CONNECTED:
@@ -246,17 +510,21 @@ const Dashboard = ({ children, title, logout }) => {
         }
     }, [connectionStatus]);
 
+    const toggleDrawer = () => {
+        setOpen(!open);
+    };
+
     // Logout user if he tries to beat 2FA
     const checkTwoFactorStatus = () => {
         if (twoFactorEnabled && !authorized) {
-            logout(history);
+            logout(navigate, 'Sorry, not that fast!');
         }
     };
 
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
             sessionStorage.removeItem(LOGOUT);
-            logout(history);
+            logout(navigate, 'Your session expired');
         }
     };
 
@@ -267,7 +535,6 @@ const Dashboard = ({ children, title, logout }) => {
             // navigator.vibrate(500);
         }
     };
-
 
     const onReconnected = () => {
         SignalRService.onReconnected();
@@ -292,6 +559,7 @@ const Dashboard = ({ children, title, logout }) => {
         } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
+                getNotificationCount(customerId);
                 let response = JSON.parse(data);
                 let payload = JSON.parse(response.Payload);
                 payload = { ...payload, Data: JSON.parse(payload.Data) };
@@ -299,21 +567,23 @@ const Dashboard = ({ children, title, logout }) => {
                 console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 const buyer = payload.Data.Buyer;
-                const seller =payload.Data.Seller;
+                const seller = payload.Data.Seller;
                 const notification = {
-                    dateLogged: payload.dateLogged,
+                    dateLogged: payload.DateLogged,
                     eventType: payload.EventType,
                     customerId: payload.CustomerId,
                     isDeleted: payload.IsDeleted,
                     isRead: payload.IsRead,
                     notificationId: payload.Id,
                     data: { 
+                        BidId: payload.Data.BidId,
                         Id: payload.Data.Id,
                         IsClosed: payload.Data.IsClosed,
                         Buyer: buyer,
                         Seller: seller,
-                        ListingId: payload.ListingId,
-                        BidId: payload.BidId
+                        ListingId: payload.Data.ListingId,
+                        // ListingId: payload.ListingId ?  payload.ListingId : payload.Data.ListingId,
+                        // BidId: payload.BidId
                     }
                 };
                 
@@ -347,6 +617,7 @@ const Dashboard = ({ children, title, logout }) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
@@ -354,6 +625,7 @@ const Dashboard = ({ children, title, logout }) => {
                                 });
                             }
                         }
+                        
                         break;
 
                     case SELLER_MADE_PAYMENT:
@@ -373,6 +645,17 @@ const Dashboard = ({ children, title, logout }) => {
                                 }
                             });
                         }
+
+                        // Remove SellerConfirmedPayment notification after seller payment succeeds if the confirmation notification was not used to continue the transaction
+                        // if (customerId === seller.CustomerId) {
+                        //     console.log('closing');
+                        //     dispatch({
+                        //         type: REMOVE_NOTIFICATION,
+                        //         payload: { notificationId: notification.notificationId }
+                        //     });
+                        //     markNotificationAsRead(notification.notificationId);
+                        // }
+
                         break;
 
                     case SELLER_CONFIRMED_PAYMENT:
@@ -385,6 +668,7 @@ const Dashboard = ({ children, title, logout }) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
@@ -430,7 +714,26 @@ const Dashboard = ({ children, title, logout }) => {
     };
 
     const handleLinkClick = (link) => {
-        history.push(link);
+        if (link === MAKE_LISTING && location.pathname.includes(MAKE_LISTING)) {
+            return;
+        }
+
+        if (matches) {
+            if (open) {
+                setTimeout(() => {
+                    setOpen(false);
+                }, 500);
+            }
+            if (link === MAKE_LISTING) {
+                return selectCurrencyListingDrawer?.current?.toggleDrawer();
+            }
+            navigate(link); 
+        }
+
+        if (link === MAKE_LISTING) {
+            return selectCurrencyListingDrawer?.current?.toggleDrawer();
+        }
+        navigate(link); 
     };
 
     const dismissAction = () => {
@@ -445,6 +748,7 @@ const Dashboard = ({ children, title, logout }) => {
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
@@ -458,44 +762,238 @@ const Dashboard = ({ children, title, logout }) => {
                 />
             }
             <Toaster />
-            <PrivateHeader />
-            <section className={classes.root}>
-                <div className={classes.content}>
-                    {children}
-                </div>
-                <HideOnScroll direction="up">
-                    <Box
-                        boxShadow={5}
-                        className={classes.bottomBar}
-                    >
-                        <BottomNavigation
-                            value={value}
-                            onChange={(event, newValue) => {
-                                setValue(newValue)
-                            }}
-                        >
-                            {mobileLinks.map((item, index) => (
-                                <BottomNavigationAction 
-                                    onClick={() => handleLinkClick(item.url)} 
-                                    key={index} 
-                                    // label={location.pathname.includes(item.url) && item.text}
-                                    label={item.text} 
-                                    value={item.text} 
-                                    icon={item.icon} 
-                                    classes={{ label: classes.label, selected: classes.label }}
-                                />
-                            ))}
-                        </BottomNavigation>
+            {/* <HideOnScroll direction="down" {...props}> */}
+                <AppBar position="fixed" elevation={1} className={classes.appBar}>
+                    <Toolbar className={classes.appBarContent}>
+                        <IconButton onClick={toggleDrawer}>
+                            <Menu />
+                        </IconButton>
+                        <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
+                        <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
+                    </Toolbar>
+                </AppBar>
+            {/* </HideOnScroll> */}
+            <Box component="section" className={classes.root}>
+                <Drawer 
+                    variant={matches ? 'temporary' : 'permanent'}
+                    className={clsx(classes.drawer, {
+                        [classes.drawerOpen]: open,
+                        [classes.drawerClose]: !open
+                    })}
+                    classes={{
+                        paper: clsx(classes.paper, {
+                            [classes.drawerOpen]: open,
+                            [classes.drawerClose]: !open,
+                        }),
+                    }}
+                    open={open}
+                    onClose={toggleDrawer}
+                >
+                    <div className={clsx(classes.toolbar, {[classes.collapsedToolbar]: !open})}>
+                        {open && 
+                            <Link to="/">
+                                <img className={classes.logo} src={logo} alt="FXBLOOMS Logo" />
+                            </Link>
+                        }
+                        <IconButton onClick={toggleDrawer}>
+                            {!open ?
+                                <Tooltip title="Expand Navigation" placement="top" arrow>
+                                    <ChevronRight className={classes.expandIcon} />
+                                </Tooltip>
+                                :
+                                <Tooltip title="Collapse Navigation" placement="top" arrow>
+                                    <ChevronLeft className={classes.collapseIcon} />
+                                </Tooltip>
+                            }
+                        </IconButton>
+                    </div> 
+                    <Box component="div" className={classes.linksContainer}>
+                        <List className={classes.links}>
+                            {protectedRoutes.map((link, index) => {
+                                if (link.url === SECURITY) {
+                                    return (
+                                        <Fragment key={index}>
+                                            <Accordion>
+                                                <AccordionSummary
+                                                    expandIcon={open ? <ChevronDown /> : null}
+                                                    aria-controls="security-accordion"
+                                                    id="security"
+                                                    className={classes.accordionSummary}
+                                                >
+                                                    <ListItem 
+                                                        className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`), [classes.collapsedAccordionSummary]: !open })} 
+                                                        button 
+                                                        disableRipple
+                                                        classes={{ root: classes.collapsedAccordionSummary }}
+                                                    >
+                                                        {open ? 
+                                                            <ListItemIcon className={classes.icon}>
+                                                                {link.icon}
+                                                            </ListItemIcon>
+                                                            :
+                                                            <Tooltip title={link.text} placement="right" arrow>
+                                                                <ListItemIcon className={clsx(classes.icon, {[classes.collapsedIcon]: !open})}>
+                                                                    {link.icon}
+                                                                </ListItemIcon>
+                                                            </Tooltip>
+                                                        }
+                                                        {open && <ListItemText primary={link.text} />}
+                                                    </ListItem>
+                                                </AccordionSummary>
+                                                <AccordionDetails className={clsx(classes.accordionDetails, { [classes.collapsedAccordionDetails]: !open})}>
+                                                    {securityLinks.map((link, index) => (
+                                                        <ListItem 
+                                                            key={index}
+                                                            className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                            button 
+                                                            disableRipple
+                                                            onClick={() => handleLinkClick(link.url)}
+                                                        >
+                                                            {open ? 
+                                                                <ListItemIcon className={classes.icon}>
+                                                                    {link.icon}
+                                                                </ListItemIcon>
+                                                                :
+                                                                <Tooltip title={link.text} placement="right" arrow>
+                                                                    <ListItemIcon className={classes.icon}>
+                                                                        {link.icon}
+                                                                    </ListItemIcon>
+                                                                </Tooltip>
+                                                            }
+                                                            
+                                                            {open && <ListItemText primary={link.text} />}
+                                                        </ListItem>
+                                                    ))}
+                                                </AccordionDetails>
+                                            </Accordion>
+                                            <Divider />
+                                        </Fragment>
+                                    );
+                                }
+                                return (
+                                    <Fragment key={index}>
+                                        <ListItem 
+                                            // className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                            className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                            key={index} 
+                                            button 
+                                            disableRipple
+                                            onClick={() => handleLinkClick(link.url)}
+                                        >
+                                            {open ? 
+                                                <ListItemIcon className={classes.icon}>
+                                                    {link.icon}
+                                                </ListItemIcon>
+                                                :
+                                                <Tooltip title={link.text} placement="right" arrow>
+                                                    <ListItemIcon className={classes.icon}>
+                                                        {link.icon}
+                                                    </ListItemIcon>
+                                                </Tooltip>
+                                            }
+                                            {open && <ListItemText primary={link.text} />}
+                                        </ListItem>
+                                        <Divider />
+                                    </Fragment>
+                                );
+                            })}
+                        </List>
+                        <Box component="div" className={classes.profileContainer}>
+                            <List className={classes.links}>
+                                <Divider />
+                                <ListItem 
+                                    className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(PROFILE) })} 
+                                    button 
+                                    disableRipple
+                                    onClick={() => handleLinkClick(PROFILE)}
+                                >
+                                    {open ? 
+                                        <ListItemIcon className={classes.icon}>
+                                            <AccountOutline />
+                                        </ListItemIcon>
+                                        :
+                                        <Tooltip title="Profile" placement="right" arrow>
+                                            <ListItemIcon className={classes.icon}>
+                                                <AccountOutline />
+                                            </ListItemIcon>
+                                        </Tooltip>
+                                    }
+                                    {open && <ListItemText primary="Profile" />}
+                                </ListItem>
+                                <Divider />
+                                <ListItem 
+                                    className={classes.linkItem} 
+                                    button 
+                                    disableRipple
+                                    onClick={() => logout(navigate, 'Logged out successfully')}
+                                >
+                                    {open ? 
+                                        <ListItemIcon className={classes.icon}>
+                                            <Logout />
+                                        </ListItemIcon>
+                                        :
+                                        <Tooltip title="Log Out" placement="right" arrow>
+                                            <ListItemIcon className={classes.icon}>
+                                                <Logout />
+                                            </ListItemIcon>
+                                        </Tooltip>
+                                    }
+                                    {open && <ListItemText primary="Log Out" />}
+                                </ListItem>
+                                <Divider />
+                            </List>
+                            <Box className={classes.avatarContainer} component="div">
+                                <Tooltip title={userName} placement="right" arrow>
+                                    <Avatar className={classes.avatar}>{userName.charAt(0).toUpperCase()}</Avatar>
+                                </Tooltip>
+                                {open && <Typography variant="h6">{userName}</Typography>}
+                            </Box>
+                        </Box>
                     </Box>
-                </HideOnScroll>
-            </section>
+                </Drawer>
+                <div className={clsx(classes.content, { [classes.contentShift]: open })}>
+                    <Outlet />
+                </div>
+            </Box>
+            <HideOnScroll direction="up" {...props}>
+                <Box
+                    boxShadow={5}
+                    className={classes.bottomBar}
+                >
+                    <BottomNavigation
+                        value={value}
+                        showLabels
+                        onChange={(event, newValue) => {
+                            setValue(newValue)
+                        }}
+                    >
+                        {mobileLinks.map((item, index) => (
+                            <BottomNavigationAction 
+                                onClick={() => handleLinkClick(item.url)} 
+                                key={index} 
+                                label={item.text} 
+                                icon={item.icon} 
+                                classes={{ label: classes.label, selected: classes.label }}
+                            />
+                        ))}
+                        <BottomNavigationAction 
+                            onClick={toggleDrawer} 
+                            label="More" 
+                            icon={<Menu />} 
+                            classes={{ label: classes.label, selected: classes.label }}
+                        />
+                    </BottomNavigation>
+                </Box>
+            </HideOnScroll>
         </>
     );
 };
 
 Dashboard.propTypes = {
+    getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired
+    markNotificationAsRead: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { logout })(Dashboard);
+export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);

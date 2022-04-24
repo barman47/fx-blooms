@@ -1,64 +1,66 @@
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { 
-    Checkbox,
-    FormControlLabel,
-    IconButton, 
-    TableCell, 
-    TableRow, 
-    Typography 
-} from '@material-ui/core';
+// import { 
+//     Checkbox,
+//     FormControlLabel,
+//     IconButton, 
+//     TableCell, 
+//     TableRow, 
+//     Typography 
+// } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { DotsHorizontal } from 'mdi-material-ui';
+// import { DotsHorizontal } from 'mdi-material-ui';
 
 import { getSuspendedCustomers } from '../../../actions/customer';
-import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS } from '../../../utils/constants';
+// import { SET_CUSTOMER } from '../../../actions/types';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
-const useStyles = makeStyles(theme => ({
-    customer: {
-        background: 'transparent',
-        display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
-        alignItems: 'center',
 
-        '&:last-child': {
-            borderBottom: 'none'
-        }
-    },
 
-    text: {
-        color: COLORS.offBlack,
-        fontWeight: 400,
-        padding: theme.spacing(1),
+// const useStyles = makeStyles(theme => ({
+//     customer: {
+//         background: 'transparent',
+//         display: 'grid',
+//         gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
+//         alignItems: 'center',
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(1.2)
-        },
+//         '&:last-child': {
+//             borderBottom: 'none'
+//         }
+//     },
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(0.7)
-        }
-    },
+//     text: {
+//         color: COLORS.offBlack,
+//         fontWeight: 400,
+//         padding: theme.spacing(1),
 
-    item: {
-        border: 'none',
-        marginBottom: 0
-    },
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(1.2)
+//         },
+
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(0.7)
+//         }
+//     },
+
+//     item: {
+//         border: 'none',
+//         marginBottom: 0
+//     },
     
-    button: {
-        justifySelf: 'center'
-    },
+//     button: {
+//         justifySelf: 'center'
+//     },
 
-    customerLink: {
-        color: `${theme.palette.primary.main}`,
-        cursor: 'pointer'
-    },
-}));
+//     customerLink: {
+//         color: `${theme.palette.primary.main}`,
+//         cursor: 'pointer'
+//     },
+// }));
+
 
 const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
 
     const suspendedCustomers = useSelector(state => state.customers?.suspended?.items);
 
@@ -73,17 +75,10 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
     //     // eslint-disable-next-line
     // }, []);
 
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
-
     return (
         <>
-            {suspendedCustomers && suspendedCustomers.map((customer) => (
+            <GenericTableBody data={suspendedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            {/* {suspendedCustomers && suspendedCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
                     <TableCell className={classes.item}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
@@ -108,7 +103,7 @@ const SuspendedCustomers = ({ getSuspendedCustomers, handleClick, viewCustomerPr
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

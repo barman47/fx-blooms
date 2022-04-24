@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SET_NOTIFICATIONS,  VERIFIED_PHONE_NUMBER } from './types';
+import { SET_NOTIFICATIONS, SET_NOTIFICATION_COUNT, VERIFIED_PHONE_NUMBER } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -11,16 +11,38 @@ export const getNotifications = () => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${api}/GetNotificationLogs`);
-        console.log('notifications ', res);
         const notifications = res.data.data.map(notification => {
             const { data, ...rest } = notification;
             return { data: JSON.parse(data), ...rest };
         })
-        dispatch({
+        return dispatch({
             type: SET_NOTIFICATIONS,
             payload: notifications
         });
-        return 
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getNotificationCount = (customerId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/GetNotificationCount/${customerId}`);
+        return dispatch({
+            type: SET_NOTIFICATION_COUNT,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const markNotificationAsRead = (id) => async (dispatch) => {
+    try {
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/UpdateNotification/${id}`)
+        ]);
     } catch (err) {
         return handleError(err, dispatch);
     }

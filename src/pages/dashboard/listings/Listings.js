@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
 const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const classes = useStyles();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const dispatch = useDispatch();
 
@@ -145,24 +145,38 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
         idVerificationModal.current.openModal();
     };
 
-    // const handleAcceptOffer = (listing, accountId, reference) => {
-    //     if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
-    //         return checkIdStatus();
-    //     }
+    const handleAcceptOffer = (listing) => {
+        let activeOffer = false;
+        let yourOffer = false;
+        if (listing.status !== open) {
+            for (let listingBid of listing.bids) {
+                if (listingBid.customerId === customerId && listingBid.status === BID_STATUS.IN_PROGRES) {
+                    yourOffer = true;
+                    break;
+                }
+                
+                if (listingBid.status === BID_STATUS.IN_PROGRES) {
+                    activeOffer = true;
+                    break;
+                }
+                
+            }
+        }
 
-    //     if (listing.status === open) {
-    //         setLoading(true);
-    //         dispatch({
-    //             type: SET_LISTING,
-    //             payload: listing
-    //         });
-    //         return acceptOffer({
-    //             listingId: listing.id,
-    //             accountId,
-    //             reference
-    //         }, listing);
-    //     }
-    // };
+        if (yourOffer) {
+            return setErrors({ msg: 'You already have an active offer' });
+        }
+
+        if (activeOffer) {
+            return setErrors({ msg: 'This listing has an active offer' });
+        }
+
+        dispatch({
+            type: SET_LISTING,
+            payload: listing
+        });
+        toggleAcceptOfferDrawer();
+    };
 
     const handleAddBid = (listing) => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
@@ -213,12 +227,8 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
 
     const handleEditListing = (listing) => {
         setLoading(true);
-        checkListingEditable(listing, history);
+        checkListingEditable(listing, navigate);
     };
-
-    const setError = (message) => {
-        setErrors({ msg: message });
-    }
 
     return (
         <>
@@ -241,11 +251,10 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
                     <Listing 
                         key={index} 
                         listing={listing} 
+                        handleAcceptOffer={handleAcceptOffer} 
                         handleAddBid={handleAddBid} 
                         checkIdStatus={checkIdStatus} 
                         handleEditListing={handleEditListing} 
-                        toggleAcceptOfferDrawer={toggleAcceptOfferDrawer}
-                        setErrorMessage={setError}
                     />
                 ))
                 :

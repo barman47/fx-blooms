@@ -1,20 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
     AppBar, 
     Button, 
     IconButton, 
-    Slide, 
-    Toolbar, 
-    useScrollTrigger 
+    Toolbar
 } from '@material-ui/core';
 import clsx from 'clsx';
 
 import { Link as AnimatedLink } from 'react-scroll';
 import { Menu as MenuIcon } from 'mdi-material-ui';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 
 import MobileNav from './MobileNav';
 
@@ -24,26 +21,7 @@ import { COLORS, SHADOW } from '../../utils/constants';
 import { ABOUT_US, CONTACT_US, HOW_IT_WORKS, SIGN_UP, LOGIN, FAQS, DASHBOARD_HOME } from '../../routes';
 import { useTheme } from '@material-ui/styles';
 
-export const HideOnScroll = (props) => {
-    const { children, direction } = props;
-    const trigger = useScrollTrigger();
-
-    return (
-        <Slide appear={false} direction={direction} in={!trigger}>
-            {children}
-        </Slide>
-    );
-}
-
-HideOnScroll.defaultProps = {
-    direction: 'down'
-};
-
-HideOnScroll.propTypes = {
-    children: PropTypes.element.isRequired,
-    direction: PropTypes.string
-
-};
+import HideOnScroll from './HideOnScroll';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -182,9 +160,9 @@ export const PublicHeader = (props) => {
     
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
-    const [open] = useState(false);
-    const anchorRef = useRef(null);
-    const prevOpen = useRef(open);
+    // const [open] = useState(false);
+    // const anchorRef = useRef(null);
+    // const prevOpen = useRef(open);
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
@@ -199,12 +177,12 @@ export const PublicHeader = (props) => {
     ];
 
     // return focus to the button when we transitioned from !open -> open
-    useEffect(() => {
-        if (prevOpen.current === true && open === false) {
-            anchorRef.current.focus();
-        }
-        prevOpen.current = open;
-    }, [open]);
+    // useEffect(() => {
+    //     if (prevOpen.current === true && open === false) {
+    //         anchorRef.current.focus();
+    //     }
+    //     prevOpen.current = open;
+    // }, [open]);
 
     const handleScroll = () => {
         const position = window.pageYOffset;

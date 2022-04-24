@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import { makeStyles } from '@material-ui/core/styles';
@@ -48,7 +48,7 @@ import logo from '../../assets/img/logowhite.svg';
 
 import { getStats, logout, searchForCustomer } from '../../actions/admin';
 import { getCustomers } from '../../actions/customer';
-import { COLORS, CUSTOMER_CATEGORY, LOGOUT } from '../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, DRAWER_WIDTH as drawerWidth, LOGOUT } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
 
 import SessionModal from './SessionModal';
@@ -66,18 +66,16 @@ import {
 } from '../../routes';
 import { SET_CATEGORY } from '../../actions/types';
 
-const drawerWidth = 240;
-
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: COLORS.white,
+        backgroundColor: '#ECF1F1',
 
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(5),
             paddingRight: theme.spacing(5),
         },
 
-        [theme.breakpoints.down('md')]: {
+        [theme.breakpoints.down('sm')]: {
             paddingLeft: theme.spacing(1),
             paddingRight: theme.spacing(1),
         }
@@ -87,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
         // border: '1px solid red',
         flexGrow: 1,
         marginLeft: theme.spacing(9) + 1,
-        marginTop: theme.spacing(12),
+        marginTop: theme.spacing(10.13),
         zIndex: '997',
         width: `calc(100% - ${theme.spacing(9) + 1}px)`,
         transition: theme.transitions.create(['width', 'margin'], {
@@ -273,10 +271,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCustomer, logout }) => {
+const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logout }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const { admin, customers } = useSelector(state => state);
     const { category, pageSize } = useSelector(state => state.customers);
@@ -336,12 +334,12 @@ const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCust
     const checkSession = () => {
         if (sessionStorage.getItem(LOGOUT)) {
             sessionStorage.removeItem(LOGOUT);
-            logout(history);
+            logout(navigate);
         }
     };
 
     const handleLinkClick = (link) => {
-        history.push(link);
+        navigate(link);
     };
 
     const handleSearch = (e) => {
@@ -471,7 +469,7 @@ const AdminDashboard = ({ children, title, getCustomers, getStats, searchForCust
                 <div className={clsx(classes.content, {
                     [classes.contentShift]: open})}
                 >
-                    {children}
+                    <Outlet />
                 </div>
                 {/* {showBottomNavigation && 
                     <Box

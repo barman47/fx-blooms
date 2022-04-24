@@ -24,8 +24,8 @@ import { ContentCopy } from 'mdi-material-ui';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        padding: 0,
-        marginTop: theme.spacing(-8),
+        // padding: ,
+        // marginTop: theme.spacing(-8),
         [theme.breakpoints.down('sm')]: {
             paddingTop: theme.spacing(2)
         }
@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
         paddingBottom: theme.spacing(1),
         paddingTop: theme.spacing(1),
         transition: '0.3s linear all',
-        width: '15%',
+        // width: '15%',
 
         [theme.breakpoints.down('sm')]: {
             width: '100%'
@@ -195,7 +195,7 @@ const QrCode = ({ enableTwoFactor, getBarcode, toggleShowVerifyQrCode }) => {
                             />
                             <Typography variant="subtitle1" component="p">Once FXBLOOMS is registered, you'll see a 6-digit code on your authenticator app</Typography>
                             <Button variant="contained" color="primary" className={classes.button} onClick={toggleShowVerifyQrCode}>Proceed</Button>
-                            {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(history)}>Cancel</Button> */}
+                            {/* <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => props.logout(navigate)}>Cancel</Button> */}
                         </>
                     }
                 </div>

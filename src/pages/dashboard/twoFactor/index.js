@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { Box } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 import { SET_2FA_MSG } from '../../../actions/types';
 
@@ -8,7 +10,12 @@ import QrCode from './QrCode';
 import VerifyQrCode from './VerifyQrCode';
 import SuccessModal from '../../../components/common/SuccessModal';
 
+const useStyles = makeStyles(theme => ({
+
+}));
+
 const Index = () => {
+    const classes = useStyles();
     const dispatch = useDispatch();
     const { hasSetup2FA, twoFactorEnabled } = useSelector(state => state.customer);
     const {  msg } = useSelector(state => state.twoFactor);
@@ -37,7 +44,7 @@ const Index = () => {
     };
 
     return (
-        <>  
+        <Box component="section" className={classes.root}>  
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {!hasSetup2FA ? 
                 <>
@@ -51,17 +58,7 @@ const Index = () => {
                     {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
                 </>
             }
-            {/* {!hasSetup2FA && <QrCode />}
-            {hasSetup2FA && twoFactorEnabled
-                ?
-                <DisableTwoFactor />
-                :
-                <>
-                    {showVerifyQrCode ? <VerifyQrCode /> : <QrCode toggleShowVerifyQrCode={toggleShowVerifyQrCode} showVerifyQrCode={showVerifyQrCode} />}
-                </>
-
-            } */}
-        </>
+        </Box>
     );
 };
 

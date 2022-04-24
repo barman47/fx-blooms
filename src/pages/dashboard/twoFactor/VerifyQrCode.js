@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
@@ -95,7 +95,7 @@ const useStyles = makeStyles(theme => ({
 const VerifyQrCode = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
@@ -204,7 +204,7 @@ const VerifyQrCode = (props) => {
         });
 
         if (twoFactorEnabled) {
-            return props.authorizeTwoFactor({ code, profileId: customerId }, history);
+            return props.authorizeTwoFactor({ code, profileId: customerId }, navigate);
         }
         return props.enableTwoFactor(code);
     };
@@ -334,7 +334,7 @@ const VerifyQrCode = (props) => {
                         </Grid>
                         <div className={classes.buttonContainer}>
                             <Button variant="contained" color="primary" className={classes.button} type="submit">Proceed</Button>
-                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => history.goBack()}>Cancel</Button>
+                            <Button className={clsx(classes.button, classes.cancelButton)} onClick={() => navigate(-1)}>Cancel</Button>
                         </div>
                     </form>
                 </div>

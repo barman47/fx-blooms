@@ -1,33 +1,60 @@
 import axios from 'axios';
+import { batch } from 'react-redux';
 
-import { SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
+import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
+import { markNotificationAsRead } from './notifications';
+
 const api = `${API}/Transfer`;
 
-export const getTransactions = (retrieveAll) => async (dispatch) => {
+export const getTransaction = (transferId) => async (dispatch) => {
     try {
-        console.log('Getting transactions');
         await reIssueCustomerToken();
-        const res = await axios.get(`${api}/Transfers?retrieveAll=${retrieveAll}`);
-        console.log('transactions ', res);
+        const res = await axios.get(`${api}/Transfer?transferId=${transferId}`);
         return dispatch({
-            type: SET_TRANSACTIONS,
+            type: SET_TRANSACTION,
             payload: res.data.data
-        }); 
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const sendTransactionNotification = (transferId) => async (dispatch) => {
+export const getTransactions = (retrieveAll) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/Transfers?retrieveAll=${retrieveAll}`);
+        return batch(() => {
+            dispatch({
+                type: SET_TRANSACTIONS,
+                payload: res.data.data
+            });
+            dispatch({
+                type: SET_LOADING,
+                payload: false
+            });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const sendTransactionNotification = (transferId, notificationId = null) => async (dispatch) => {
     try {
         await Promise.all([
-            await reIssueCustomerToken(),
-            await axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
+            reIssueCustomerToken(),
+            axios.post(`${api}/TransactionNotification?transferId=${transferId}`)
         ]);
+        if (notificationId) {
+            dispatch({
+                type: REMOVE_NOTIFICATION,
+                payload: notificationId
+            });
+            dispatch(markNotificationAsRead(notificationId));
+        }
     } catch (err) {
         return handleError(err, dispatch);
     }

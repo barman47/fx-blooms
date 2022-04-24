@@ -88,9 +88,9 @@ const UserDetails = (props) => {
     const successModal = useRef();
 
     useEffect(() => {
-        setSellerId(location.state.sellerId);
+        setSellerId(location.state.customerId);
         if (isEmpty(seller)) {
-            props.getSeller(location.state.sellerId);
+            props.getSeller(location.state.customerId);
         }
         return () => {
             dispatch({
@@ -175,7 +175,7 @@ const UserDetails = (props) => {
                                             helperText={errors.Message}
                                             fullWidth
                                             multiline
-                                            rows={matches ? 4 : 1}
+                                            minRows={matches ? 4 : 1}
                                             required
                                             error={errors.Message ? true : false}
                                         />

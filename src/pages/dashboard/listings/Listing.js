@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -10,10 +10,13 @@ import { getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
-// import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import { REMOVE_EXPIRED_LISTING, SET_LISTING } from '../../../actions/types';
-import { BID_STATUS, COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { ACCOUNT, USER_DETAILS } from '../../../routes';
+import { REMOVE_EXPIRED_LISTING } from '../../../actions/types';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { PROFILE, USER_DETAILS } from '../../../routes';
+
+import eurLogo from '../../../assets/img/eur-logo.svg';
+import ngnLogo from '../../../assets/img/ngn-logo.svg';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -22,16 +25,29 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         boxShadow: SHADOW,
         display: 'grid',
-        gridTemplateColumns: '1fr',
         marginBottom: theme.spacing(3),
+        gridTemplateColumns: '1fr',
         overflow: 'hidden',
 
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between',
             alignItems: 'center',
             padding: [[theme.spacing(1.5), theme.spacing(3)]],
+
+            '& div:nth-child(2)': {
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginLeft: theme.spacing(2),
+                width: '100%',
+
+                [theme.breakpoints.down('sm')]: {
+                    flexDirection: 'column',
+                    alignItems: 'flex-end'
+                },
+            },
             
             [theme.breakpoints.down('sm')]: {
                 rowGap: theme.spacing(2),
@@ -67,12 +83,14 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(5, 1fr)',
         gap: theme.spacing(1),
-        padding: [[theme.spacing(4), theme.spacing(3)]],
+        padding: [[theme.spacing(2), theme.spacing(4), theme.spacing(2), theme.spacing(8)]],
+        // padding: [[theme.spacing(4), theme.spacing(3)]],
 
         [theme.breakpoints.down('lg')]: {
             gridTemplateColumns: 'repeat(5, 1fr)',
             gap: theme.spacing(1),
-            padding: [[theme.spacing(3), theme.spacing(3)]]
+            // padding: [[theme.spacing(4), theme.spacing(4), theme.spacing(4), theme.spacing(8)]],
+            // padding: [[theme.spacing(3), theme.spacing(3)]]
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -111,11 +129,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getSeller, toggleAcceptOfferDrawer, setErrorMessage }) => {
+const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditListing, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const userId = useSelector(state => state.customer.customerId);
 
@@ -147,7 +165,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date(dateCreated).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -174,9 +192,9 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return history.push(`${USER_DETAILS}/${sellerId}`, { sellerId });
+            return navigate(`${USER_DETAILS}/${sellerId}`, { state: { customerId: sellerId }});
         }
-        return history.push(ACCOUNT);
+        return navigate(PROFILE);
     };
 
     const handleDeleteListing = () => {
@@ -190,51 +208,32 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         if (listing.amountAvailable.currencyType === 'EUR') {
             return handleAddBid(listing);
         }
-
-        let activeOffer = false;
-        let yourOffer = false;
-        if (listing.status !== open) {
-            for (let listingBid of listing.bids) {
-                if (listingBid.customerId === customerId && listingBid.status === BID_STATUS.IN_PROGRES) {
-                    activeOffer = true;
-                    yourOffer = true;
-                    break;
-                }
-            }
-        }
-
-        if (activeOffer) {
-            return setErrorMessage({ msg: 'This listing has an active offer' });
-        }
-
-        if (yourOffer) {
-            return setErrorMessage('You already have an active offer');
-        }
-
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-
-        toggleAcceptOfferDrawer();
+        return handleAcceptOffer(listing);
     };
     
     return (
         <>
             <section className={classes.root}>
                 <header>
-                    <Typography variant="body2" component="p">
-                        Listed by:&nbsp;
-                        <RouterLink 
-                            to={USER_DETAILS} 
-                            onClick={(e) =>handleSetCustomer(e, customerId)}
-                            >
-                                <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy?.toLowerCase()}</span>
-                        </RouterLink>
-                    </Typography>
-                    <section className={classes.timestamp}>
-                        <Typography variant="subtitle2" component="span">Expires in: &nbsp;&nbsp;&nbsp;<span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{timerHours}:{timerMinutes}:{timerSeconds}</span></Typography>
-                    </section>
+                    {listing.amountAvailable.currencyType === 'EUR' ? 
+                        <img src={eurLogo} alt="EUR" />
+                        : 
+                        <img src={ngnLogo} alt="NGN" />
+                    }
+                    <Box component="div">
+                        <Typography variant="body2" component="p">
+                            Listed by:&nbsp;
+                            <RouterLink 
+                                to={USER_DETAILS} 
+                                onClick={(e) =>handleSetCustomer(e, customerId)}
+                                >
+                                    <span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{userId === customerId ? 'Me' : listedBy?.toLowerCase()}</span>
+                            </RouterLink>
+                        </Typography>
+                        <section className={classes.timestamp}>
+                            <Typography variant="subtitle2" component="span">Expires in: &nbsp;&nbsp;&nbsp;<span style={{ color: theme.palette.primary.main, fontWeight: 600 }}>{timerHours}:{timerMinutes}:{timerSeconds}</span></Typography>
+                        </section>
+                    </Box>
                     {/* <Typography variant="body2" component="p">167 Listings, 89% Completion</Typography> */}
                 </header>
                 <Box component="div" className={classes.listingContent}>
@@ -257,7 +256,6 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`NGN${formatNumber(exchangeRate, 2)} to ${decode('&#8364;')}1`}
-                        {/* {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`} */}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         {amountAvailable?.currencyType === 'EUR' && 
@@ -342,13 +340,12 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
 };
 
 Listing.propTypes = {
+    handleAcceptOffer: PropTypes.func.isRequired,
     handleAddBid: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
     handleEditListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
-    deleteListing: PropTypes.func.isRequired,
-    toggleAcceptOfferDrawer: PropTypes.func.isRequired,
-    setErrorMessage: PropTypes.func.isRequired
+    deleteListing: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { deleteListing, getSeller })(Listing);

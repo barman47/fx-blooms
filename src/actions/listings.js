@@ -1,28 +1,30 @@
 import axios from 'axios';
+import { batch } from 'react-redux';
 import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
 import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
-    ACCEPTED_OFFER,
     ADDED_BID, 
     ADDED_LISTING, 
     CANCELED_NEGOTIATION, 
     DELETED_LISTING, 
     GET_ERRORS,
-    // REMOVE_NOTIFICATION,
+    REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
+    SET_BID,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
-    SET_LOADING_LISTINGS, 
+    SET_LOADING, 
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
+    SET_REQUIRED_CURRENCY,
     UPDATED_LISTING 
 } from './types';
+import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
-import { batch } from 'react-redux';
 
 const URL = `${API}/Listing`;
 
@@ -53,16 +55,25 @@ export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
-        return dispatch({
-            type: ADDED_LISTING,
-            payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+        return batch(() => {
+            dispatch({
+                type: ADDED_LISTING,
+                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+            });
+            dispatch({
+                type: SET_REQUIRED_CURRENCY,
+                payload: {
+                    availableCurrency: listing.currencyNeeded,
+                    requiredCurrency: listing.AmountAvailable.CurrencyType  
+                }
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const checkListingEditable = (listing, history) => async (dispatch) => {
+export const checkListingEditable = (listing, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${URL}/Editable/${listing.id}`);
@@ -72,7 +83,7 @@ export const checkListingEditable = (listing, history) => async (dispatch) => {
                 type: SET_LISTING,
                 payload: listing
             });
-            return history.push(EDIT_LISTING);
+            return navigate(EDIT_LISTING);
         }
         return dispatch({
             type: GET_ERRORS,
@@ -96,6 +107,30 @@ export const updateListing = (listing) => async (dispatch) => {
     }
 };
 
+export const getBid = (bidId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/GetBid?id=${bidId}`);
+        return dispatch({
+            type: SET_BID,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const removeExpiredListings = () => async (dispatch) => {
+    try {
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${API}/Admin/RemoveExpiredListingsAndBids`)
+        ]);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const deleteListing = (listingId) => async (dispatch) => {
     try {
         await Promise.all([
@@ -112,6 +147,8 @@ export const deleteListing = (listingId) => async (dispatch) => {
     }
 };
 
+
+
 export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
@@ -123,7 +160,7 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
                 payload: { listings: items, ...rest }
             });
             dispatch({
-                type: SET_LOADING_LISTINGS,
+                type: SET_LOADING,
                 payload: false
             });
             if (setRecommendedRate && items.length > 0) {
@@ -165,14 +202,6 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
         const res = await axios.post(`${URL}/AcceptOffer`, data);
         batch(() => {
             dispatch({
-                type: ACCEPTED_OFFER,
-                payload: {
-                    bid: res.data.data,
-                    listing,
-                    addedBid: true
-                }
-            });
-            dispatch({
                 type: ADDED_BID,
                 payload: {
                     bid: res.data.data,
@@ -181,7 +210,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: 'Offer placed successfully'
+                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
             });
         });
     } catch (err) {
@@ -218,14 +247,15 @@ export const madePayment = (data) => async (dispatch) => {
     }
 };
 
-export const madePaymentV2 = (data, id) => async (dispatch) => {
+export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
-        // Remove notification
-        // return dispatch({
-        //     type: REMOVE_NOTIFICATION,
-        //     payload: id
-        // });
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
+        });
+
+        return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -239,7 +269,7 @@ export const cancelBid = (bidIds) => async (dispatch) => {
     }
 };
 
-export const cancelNegotiation = (chatSessionId, history) => async (dispatch) => {
+export const cancelNegotiation = (chatSessionId, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/CancelNegotiation?chatSessioId=${chatSessionId}`);
@@ -247,18 +277,23 @@ export const cancelNegotiation = (chatSessionId, history) => async (dispatch) =>
             type: CANCELED_NEGOTIATION,
             payload: res.data.data
         });
-        history.push(DASHBOARD_HOME);
+        navigate(DASHBOARD_HOME);
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const completeTransaction = (data) => async (dispatch) => {
+export const completeTransaction = (data, notificationId) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
+        });
+        return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
         return handleError(err, dispatch);
     }
