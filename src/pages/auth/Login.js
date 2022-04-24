@@ -281,14 +281,16 @@ const Login = ({ externalLogin, login }) => {
                                                     aria-label="toggle password visibility"
                                                     onClick={toggleShowPassword}
                                                 >
-                                                    {showPassword ? 
+                                                    {Password.length > 0 ? 
+                                                        showPassword ?
                                                         <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip> : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
                                                             <EyeOutline />
                                                         </Tooltip>
                                                             : 
-                                                            <Tooltip title="Show Password" placement="bottom" arrow>
-                                                            <EyeOffOutline />
-                                                        </Tooltip>
+                                                        <span></span>
                                                      }
                                                 </IconButton>
                                             </InputAdornment>

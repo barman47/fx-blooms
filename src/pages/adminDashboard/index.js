@@ -68,7 +68,7 @@ import { SET_CATEGORY } from '../../actions/types';
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        backgroundColor: COLORS.white,
+        backgroundColor: '#ECF1F1',
 
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(5),
@@ -85,7 +85,7 @@ const useStyles = makeStyles((theme) => ({
         // border: '1px solid red',
         flexGrow: 1,
         marginLeft: theme.spacing(9) + 1,
-        marginTop: theme.spacing(12),
+        marginTop: theme.spacing(10.13),
         zIndex: '997',
         width: `calc(100% - ${theme.spacing(9) + 1}px)`,
         transition: theme.transitions.create(['width', 'margin'], {

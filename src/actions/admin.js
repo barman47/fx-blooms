@@ -12,7 +12,8 @@ import {
     SET_LISTING_COUNT,
     SET_CUSTOMERS,
     SET_TRANSACTION_VOLUME,
-    SET_STATS, 
+    SET_STATS,
+    SET_ACTIVE_CUSTOMER_COUNT, 
     UPDATED_CUSTOMER 
 } from './types';
 
@@ -52,6 +53,19 @@ export const getCustomerCount = (timeframe) => async (dispatch) => {
         const res = await axios.get(`${api}/GetCustomerCount?timeframe=${timeframe}`);
         return dispatch({
             type: SET_CUSTOMER_COUNT,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getActiveUserCoount = (timeframe) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/GetCustomerCount?timeframe=${timeframe}`);
+        return dispatch({
+            type: SET_ACTIVE_CUSTOMER_COUNT,
             payload: res.data.data
         });
     } catch (err) {

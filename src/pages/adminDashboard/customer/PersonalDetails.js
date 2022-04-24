@@ -4,24 +4,23 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Avatar,
     Box, 
-    Button,
-    FormControl,
-    FormControlLabel,
-    FormHelperText,
-    MenuItem,
-    Select,
-    Switch,
+    // Button,
+    // FormControl,
+    // FormControlLabel,
+    // FormHelperText,
+    // MenuItem,
+    // Select,
+    // Switch,
     Typography, 
-    TextField
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
-import moment from 'moment';
+// import PropTypes from 'prop-types';
+// import moment from 'moment';
 
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 
-import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+// import { CUSTOMER_CATEGORY } from '../../../utils/constants';
 import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
 import isEmpty from '../../../utils/isEmpty';
 import avatar from '../../../assets/img/avatar.jpg';
@@ -29,75 +28,165 @@ import avatar from '../../../assets/img/avatar.jpg';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
+import { SquareEditOutline, CheckDecagram } from 'mdi-material-ui';
+import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
+import Status from '../../../components/admin-dashboard/Status'
+import GenericButton from '../../../components/admin-dashboard/GenericButton'
+
+
 
 const useStyles = makeStyles(theme =>({
     root: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: '30px',
-        marginTop: theme.spacing(3),
-        padding: [[theme.spacing(2), theme.spacing(3)]],
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        // marginTop: theme.spacing(3),
+        padding: [[theme.spacing(2), theme.spacing(5)]],
+        boxSizing: '200px 10px 20px white',
 
         [theme.breakpoints.down('md')]: {
             paddingBottom: theme.spacing(4)
         }
     },
 
-    form: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: theme.spacing(2)
-    },
+    // form: {
+    //     display: 'grid',
+    //     gridTemplateColumns: 'repeat(3, 1fr)',
+    //     gap: theme.spacing(2)
+    // },
 
 
-    box: {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        rowGap: theme.spacing(2)
-    },
+    // box: {
+    //     display: 'grid',
+    //     gridTemplateColumns: '1fr',
+    //     rowGap: theme.spacing(2)
+    // },
 
-    label: {
-        color: COLORS.offBlack
-    },
+    // label: {
+    //     color: COLORS.offBlack
+    // },
 
-    info: {
-        color: theme.palette.primary.main,
-        fontWeight: 600
-    },
+    // info: {
+    //     color: theme.palette.primary.main,
+    //     fontWeight: 600
+    // },
 
-    buttonContainer: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        alignItems: 'center',
-        columnGap: theme.spacing(2)
+    // buttonContainer: {
+    //     display: 'grid',
+    //     gridTemplateColumns: 'repeat(3, 1fr)',
+    //     alignItems: 'center',
+    //     columnGap: theme.spacing(2)
         
+    // },
+
+    // statusButtonContainer: {
+    //     display: 'flex',
+    //     flexDirection: 'row',
+    //     justifyContent: 'space-between',
+    // },
+
+    // button: {
+    //     fontWeight: 600,
+    // },
+
+    // remarkContainer: {
+    //     display: 'flex',
+    //     flexDirection: 'column',
+    //     marginTop: theme.spacing(2)
+    // },
+
+    // saveRemarkButton: {
+    //     alignSelf: 'flex-end',
+    //     marginTop: theme.spacing(2)
+    // },
+
+    // avatar: {
+    //     borderRadius: theme.shape.borderRadius,
+    //     width: theme.spacing(25),
+    //     height: theme.spacing(25),
+    // },
+
+
+    // NEW STYLE
+    userDetails: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        alignItems: 'center',
+        marginTop: theme.spacing(2),
     },
 
-    statusButtonContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    headerTitle: {
+        color: '#5D6060',
+        fontWeight: '600',
+        fontSize: theme.spacing(2.7)
     },
 
-    button: {
-        fontWeight: 600,
+    headerIcon: {
+        justifySelf: 'flex-end',
+        color: '#5D6060',
+        fontSize: theme.spacing(4.5),
     },
 
-    remarkContainer: {
-        display: 'flex',
-        flexDirection: 'column',
-        marginTop: theme.spacing(2)
-    },
+    userPassport: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1.2fr',
 
-    saveRemarkButton: {
-        alignSelf: 'flex-end',
         marginTop: theme.spacing(2)
     },
 
     avatar: {
-        borderRadius: theme.shape.borderRadius,
-        width: theme.spacing(25),
-        height: theme.spacing(25),
+        borderRadius: '10px',
+        width: theme.spacing(35),
+        height: theme.spacing(35),
     },
+
+    userStatus: {
+        alignSelf: 'center',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+
+    userStatusTitle: {
+        backgroundColor: '#DDF2E5',
+        alignItems: 'center',
+        color: '#1E6262',
+        width: 'fit-content',
+        padding: theme.spacing(.7, 4),
+        borderRadius: '10px',
+        fontSize: theme.spacing(4),
+        marginBottom: theme.spacing(3),
+        textAlign: 'center',
+    },
+
+    userStatusSub: {
+        // alignItems: 'flex-start',
+        padding: theme.spacing(1),
+        // alignSelf: 'center',
+    },
+
+    userPersonalDetails: {
+        marginTop: theme.spacing(1.5)
+    },
+
+    amlTable: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        padding: theme.spacing(1),
+
+        '&:not(:last-child)': {
+            borderBottom: '1px solid #E5E5E5',
+        }
+    },
+
+    amlTitle: {
+        fontWeight: '350 !important',
+    },
+
+    amlNumber: {
+        fontWeight: '500 !important',
+        justifySelf: 'flex-end'
+    },
+
 }));
 
 const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile }) => {
@@ -133,8 +222,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const successModal = useRef();
     const toast = useRef();
 
-    const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
-    const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];;
+    // const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
+    // const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];
 
     useEffect(() => {
         if (!idCheckData) {
@@ -168,14 +257,14 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         const { customerStatus } = customer;
         // const { address, occupation, riskProfile, remark, status } = customer;
 
-        // setAddress(address);
+        setAddress(address);
         setStatus(customerStatus);
         setRemarks('')
-        // setOccupation(occupation);
-        // setRiskProfile(riskProfile);
-        // setRemark(remark);
+        setOccupation(occupation);
+        setRiskProfile(riskProfile);
+        setRemarks(remarks);
     
-    }, [customer]);
+    }, [customer, address, remarks, riskProfile, occupation]);
 
     useEffect(() => {
         if (msg) {
@@ -186,25 +275,25 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         }
     }, [msg]);
 
-    const suspendCustomer = () => {
-        setLoadingText('Suspending Customer...');
-        setLoading(true);
-        setCustomerStatus({
-            customerID: customer.id,
-            newStatus: SUSPENDED,
-            currentStatus: status
-        });
-    };
+    // const suspendCustomer = () => {
+    //     setLoadingText('Suspending Customer...');
+    //     setLoading(true);
+    //     setCustomerStatus({
+    //         customerID: customer.id,
+    //         newStatus: SUSPENDED,
+    //         currentStatus: status
+    //     });
+    // };
 
-    const confirmCustomer = () => {
-        setLoadingText('Confirming Customer...');
-        setLoading(true);
-        setCustomerStatus({
-            customerID: customer.id,
-            newStatus: CONFIRMED,
-            currentStatus: status
-        });
-    };
+    // const confirmCustomer = () => {
+    //     setLoadingText('Confirming Customer...');
+    //     setLoading(true);
+    //     setCustomerStatus({
+    //         customerID: customer.id,
+    //         newStatus: CONFIRMED,
+    //         currentStatus: status
+    //     });
+    // };
 
     const dismissAction = () => {
         dispatch({
@@ -240,30 +329,30 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         updateCustomerProfile(data);
     };
 
-    const saveRemark = (e) => {
-        e.preventDefault();
-        setErrors({});
-        setLoadingText('');
+    // const saveRemark = (e) => {
+    //     e.preventDefault();
+    //     setErrors({});
+    //     setLoadingText('');
 
-        const data = {
-            customerId: customer.id,
-            firstName: firstName,
-            lastName: lastName,
-            otherName: middleName,
-            phoneNumber: '',
-            country: '',
-            address: '',
-            postalCode: '',
-            occupation: '',
-            risk: '',
-            remarks
-        };
+    //     const data = {
+    //         customerId: customer.id,
+    //         firstName: firstName,
+    //         lastName: lastName,
+    //         otherName: middleName,
+    //         phoneNumber: '',
+    //         country: '',
+    //         address: '',
+    //         postalCode: '',
+    //         occupation: '',
+    //         risk: '',
+    //         remarks
+    //     };
 
-        setLoadingText('Saving Remark . . .');
-        setLoading(true);
-        setErrors({});
-        updateCustomerProfile(data);
-    };
+    //     setLoadingText('Saving Remark . . .');
+    //     setLoading(true);
+    //     setErrors({});
+    //     updateCustomerProfile(data);
+    // };
 
     return (
         <>
@@ -279,6 +368,45 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
+                <Box component="div" className={classes.userDetails}>
+                    <Typography className={classes.headerTitle}>Personal details</Typography>
+                    <SquareEditOutline className={classes.headerIcon} />
+                </Box>
+                <Box component="div" className={classes.userPassport}>
+                    <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
+                    <Typography component="div" className={classes.userStatus}>
+                        <Typography variant="h6" className={classes.userStatusTitle}>
+                            <CheckDecagram className={classes.userStatusIcon} />
+                            {'Verified'}
+                        </Typography>
+                        <Typography component="span" variant="subtitle2" className={classes.userStatusSub}><Status wdth="fit-content" statusName="CHANGE STATUS" bgColor="#1E6262" textColor="white" /></Typography>
+                    </Typography>
+                </Box>
+                <form onSubmit={onSubmit} noValidate className={classes.userPersonalDetails}>
+                    <AmlBoard classes={classes} amlTitle={'Username'} amlNumber={userName} />
+                    <AmlBoard classes={classes} amlTitle={"First Name"} amlNumber={firstName} />
+                    <AmlBoard classes={classes} amlTitle={"Middle Name"} amlNumber={middleName} />
+                    <AmlBoard classes={classes} amlTitle={"Last Name"} amlNumber={lastName} />
+                    <AmlBoard classes={classes} amlTitle={"Date of Birth"} amlNumber={dateOfBirth} />
+                    <AmlBoard classes={classes} amlTitle={"Phone Number"} amlNumber={phoneNumber} />
+                    <AmlBoard classes={classes} amlTitle={"Email"} amlNumber={email} />
+                    <AmlBoard classes={classes} amlTitle={"Client since"} amlNumber={'20.04.2020'} />
+                    <AmlBoard classes={classes} amlTitle={"Nationality"} amlNumber={nationality} />
+                    <AmlBoard classes={classes} amlTitle={"Occupation"} amlNumber={occupation} />
+                    <AmlBoard classes={classes} amlTitle={"Risk profile"} amlNumber={riskProfile} />
+                    <AmlBoard classes={classes} amlTitle={"Address"} amlNumber={address} />
+                    <AmlBoard classes={classes} amlTitle={"Postal code"} amlNumber={postalCode} />
+                    <AmlBoard classes={classes} amlTitle={"City"} amlNumber={city} />
+                    <AmlBoard classes={classes} amlTitle={"Country of Residence"} amlNumber={country} />
+                </form>
+            </Box>
+
+            <Box component="div">
+                <GenericButton buttonName="save" />
+            </Box>
+
+
+            {/* <Box component="section" className={classes.root}>
                 <form onSubmit={onSubmit} noValidate className={classes.form}>
                     <Box component="div" className={classes.box}>
                         <Box component="header">
@@ -525,16 +653,16 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                         Save
                     </Button>
                 </form>
-            </Box>
+            </Box> */}
         </>
     );
 };
 
 PersonalDetails.propTypes = {
-    getIdCardValidationResponse: PropTypes.func.isRequired,
-    getResidencePermitValidationResponse: PropTypes.func.isRequired,
-    setCustomerStatus: PropTypes.func.isRequired,
-    updateCustomerProfile: PropTypes.func.isRequired
+    // getIdCardValidationResponse: PropTypes.func.isRequired,
+    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    // setCustomerStatus: PropTypes.func.isRequired,
+    // updateCustomerProfile: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus })(PersonalDetails);

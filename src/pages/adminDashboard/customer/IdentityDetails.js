@@ -3,102 +3,137 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Box, 
-    Button,
-    Divider,
+    // Button,
+    // Divider,
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 
-import { COLORS, ID_STATUS } from '../../../utils/constants';
+// import { ID_STATUS } from '../../../utils/constants';
 import { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
-import isEmpty from '../../../utils/isEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
-import Toast from '../../../components/common/Toast';
+// import Toast from '../../../components/common/Toast';
+import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
+import Status from '../../../components/admin-dashboard/Status'
+// import { IdCard } from 'mdi-material-ui';
+// import { CheckDecagram } from 'mdi-material-ui';
 
-import { IdCard } from 'mdi-material-ui';
 
 const useStyles = makeStyles(theme =>({
     root: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius,
-        marginTop: theme.spacing(3),
+        backgroundColor: 'white',
+        borderRadius: '12px',
         padding: [[theme.spacing(2), theme.spacing(5)]],
-        height: '100%',
 
         [theme.breakpoints.down('md')]: {
             paddingBottom: theme.spacing(4)
         }
     },
 
-    content: {
+    // content: {
+    //     display: 'grid',
+    //     gridTemplateColumns: '1fr 0.2fr 1fr'
+    // },
+
+    // details: {
+    //     display: 'grid',
+    //     gridTemplateColumns: '1fr 1fr',
+    //     marginTop: theme.spacing(2),
+
+    //     '& p:first-child': {
+    //         color: COLORS.offBlack,
+    //         fontWeight: 300
+    //     },
+
+    //     '& p:last-child': {
+    //         color: theme.palette.primary.main
+    //     }
+    // },
+
+    // detail: {
+    //     marginBottom: theme.spacing(2),
+
+    //     '& h6:first-child': {
+    //         margin: theme.spacing(2, 0)
+    //     }
+    // },
+
+    // button: {
+    //     marginBottom: theme.spacing(2)
+    // },
+
+    // infoButton: {
+    //     cursor: 'auto',
+    //     marginBottom: theme.spacing(2),
+
+    //     '&:hover': {
+    //         backgroundColor: 'transparent'
+    //     }
+    // },
+
+    // errorButton: {
+    //     color: theme.palette.error.main
+    // },
+
+    // label: {
+    //     fontWeight: 300
+    // },
+
+    // divider: {
+    //     backgroundColor: theme.palette.primary.main,
+    //     width: theme.spacing(0.5)
+    // },
+
+    // noDocument: {
+    //     display: 'flex',
+    //     flexDirection: 'column',
+    //     justifyContent: 'space-evenly',
+    //     alignItems: 'center'
+    // },
+
+    // noDocumentIcon: {
+    //     color: theme.palette.primary.main,
+    //     fontSize: theme.spacing(10)
+    // }
+
+    //NEW STYLE
+    header: {
         display: 'grid',
-        gridTemplateColumns: '1fr 0.2fr 1fr'
+        gridTemplateColumns: '1fr'
     },
 
-    details: {
+    idHeader: {
+        color: '#5D6060'
+    },
+
+    approveId: {
+        justifySelf: 'center',
+    },
+
+    // idDetails: {
+    //     display: 'grid',
+    //     gridTemplateColumns: '1fr 1fr',
+    // },
+
+    amlTable: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        marginTop: theme.spacing(2),
-
-        '& p:first-child': {
-            color: COLORS.offBlack,
-            fontWeight: 300
-        },
-
-        '& p:last-child': {
-            color: theme.palette.primary.main
-        }
+        marginBottom: theme.spacing(.7)
     },
 
-    detail: {
-        marginBottom: theme.spacing(2),
-
-        '& h6:first-child': {
-            margin: theme.spacing(2, 0)
-        }
+    amlTitle: {
+        fontWeight: '350 !important',
     },
 
-    button: {
-        marginBottom: theme.spacing(2)
+    amlNumber: {
+        fontWeight: '500 !important',
+        justifySelf: 'flex-end'
     },
-
-    infoButton: {
-        cursor: 'auto',
-        marginBottom: theme.spacing(2),
-
-        '&:hover': {
-            backgroundColor: 'transparent'
-        }
-    },
-
-    errorButton: {
-        color: theme.palette.error.main
-    },
-
-    label: {
-        fontWeight: 300
-    },
-
-    divider: {
-        backgroundColor: theme.palette.primary.main,
-        width: theme.spacing(0.5)
-    },
-
-    noDocument: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center'
-    },
-
-    noDocumentIcon: {
-        color: theme.palette.primary.main,
-        fontSize: theme.spacing(10)
-    }
 }));
 
 const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
@@ -111,10 +146,10 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
-    const toast = useRef();
+    // const toast = useRef();
     const successModal = useRef();
 
-    const { APPROVED } = ID_STATUS;
+    // const { APPROVED } = ID_STATUS;
 
     useEffect(() => {
         if (!idCheckData) {
@@ -135,7 +170,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
     useEffect(() => {
         if (errorsState?.msg) {
             setLoading(false);
-            toast.current.handleClick();
+            // toast.current.handleClick();
         }
     }, [errorsState, errors]);
 
@@ -166,15 +201,15 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
     //     setOpen(true);
     // };
 
-    const handleApproveId = () => {
-        setLoading(true);
-        approveIdCard(customer.id);
-    };
+    // const handleApproveId = () => {
+    //     setLoading(true);
+    //     approveIdCard(customer.id);
+    // };
 
-    const handleApproveResidencePermit = () => {
-        setLoading(true);
-        approveResidencePermit(customer.id);
-    };
+    // const handleApproveResidencePermit = () => {
+    //     setLoading(true);
+    //     approveResidencePermit(customer.id);
+    // };
 
     // const onSubmit = (e) => {
     //     e.preventDefault();
@@ -182,7 +217,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
 
     return (
         <>
-            {!isEmpty(errorsState) && 
+            {/* {!isEmpty(errorsState) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
@@ -190,10 +225,25 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                     msg={errorsState.msg || ''}
                     type="error"
                 />
-            }
+            } */}
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <Box component="section" className={classes.root}>
+                <Box component="div" className={classes.header}>
+                    <Typography variant="h6" className={classes.idHeader}>Identification details</Typography>
+                    <Typography variant="subtitle2" className={classes.approveId}><Status statusName="APPROVE ID" bgColor="#1E6262" textColor="white" /></Typography>
+                </Box>
+
+                <Box component="div" className={classes.idDetails}>
+                    <AmlBoard  classes={classes} amlTitle={"Status"} amlNumber={<Status statusName="Verified" bgColor="#DDF2E5" textColor="#1E6262" />} />
+                    <AmlBoard classes={classes} amlTitle={"Document Type"} amlNumber={'Resident Permit'} />
+                    <AmlBoard classes={classes} amlTitle={"Document Number"} amlNumber={'Y09ZXQ879'} />
+                    <AmlBoard classes={classes} amlTitle={"Issue Country"} amlNumber={'Nigeria'} />
+                    <AmlBoard classes={classes} amlTitle={"Date of Issue"} amlNumber={'20-12-2020'} />
+                    <AmlBoard classes={classes} amlTitle={"Date of Entry"} amlNumber={'20-12-2023'} />
+                </Box>
+            </Box>
+            {/* <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary">ID Details</Typography>
                 <Box component="section" className={classes.content}>
                     <Box component="div" className={classes.detail}>
@@ -321,7 +371,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                         
                     </Box>     
                 </Box>
-            </Box>
+            </Box> */}
         </>
     );
 };

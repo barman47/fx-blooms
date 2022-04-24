@@ -34,8 +34,10 @@ import {
 	ADD_USERNAME,
 	LISTINGS,
 	EDIT_LISTING,
-	TRANSACTIONS,
 	TRANSACTION_STATUS,
+	WITHDRAWALS,
+	VERIFF,
+	TRANSACTIONS,
 	BANK_ACCOUNTS,
 	PROFILE,
 	ID_VERIFICATION,
@@ -43,6 +45,7 @@ import {
 } from './routes';
 
 import FallBack from './components/common/FallBack';
+import VeriffVerify from './pages/dashboard/profile/Veriff';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -100,6 +103,7 @@ const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
 const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
 const Listings = lazy(() => import('./pages/adminDashboard/listings/'));
 const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
+const Withdrawals = lazy(() => import('./pages/adminDashboard/withdrawals/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
@@ -126,6 +130,10 @@ const theme = createTheme({
 
 		secondary: {
 			main: '#EB5757'
+		},
+
+		danger: {
+			main: 'red'
 		},
 
 		text: {
@@ -198,6 +206,7 @@ const App = () => {
 								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
 							</Route>
 							
 							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />
@@ -207,6 +216,7 @@ const App = () => {
 								<Route path={`${LISTINGS}`} element={<Listings handleSetTitle={handleSetTitle} />} />
 								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
+								<Route path={`${WITHDRAWALS}`} element={<Withdrawals handleSetTitle={handleSetTitle} />} />
 							</Route>
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>

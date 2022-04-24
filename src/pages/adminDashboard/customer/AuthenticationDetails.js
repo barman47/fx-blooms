@@ -1,95 +1,100 @@
-import { useEffect, useRef, useState, useLayoutEffect, useCallback, useMemo } from 'react'; 
+import { useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import { 
     Box, 
-    Button,
-    Divider,
-    Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { DotsHorizontal } from 'mdi-material-ui';
 import clsx from 'clsx';
 
-import { COLORS } from '../../../utils/constants';
+// import { COLORS } from '../../../utils/constants';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, getCustomer } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
-import isEmpty from '../../../utils/isEmpty';
+// import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
-import Toast from '../../../components/common/Toast';
+// import Toast from '../../../components/common/Toast';
+import GenericGridAuth from '../../../components/admin-dashboard/GenericGridAuth'
+
 
 const useStyles = makeStyles(theme =>({
-    root: {
-        backgroundColor: COLORS.lightTeal,
-        borderRadius: theme.shape.borderRadius,
-        marginTop: theme.spacing(3),
-        padding: [[theme.spacing(2), theme.spacing(5)]],
-        height: '100%',
+  root: {
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      padding: [[theme.spacing(2), theme.spacing(4)]],
 
-        [theme.breakpoints.down('md')]: {
-            paddingBottom: theme.spacing(4)
-        }
-    },
-
-    content: {
-        display: 'grid',
-      marginTop: theme.spacing(15),
-      gridTemplateColumns: '1fr 0.2fr 1fr'
-    },
-
-    detail: {
-        marginBottom: theme.spacing(2),
-
-        '& h6:first-child': {
-            margin: theme.spacing(2, 0)
-        }
-    },
-
-    divider: {
-        backgroundColor: theme.palette.primary.main,
-        width: theme.spacing(0.5)
-    },
-
-    detailTitle: {
-      marginBottom: theme.spacing(5)
-    },
-
-    btnGroup: {
-      marginBottom: theme.spacing(5),
-      marginTop: theme.spacing(5),
-      '& button': {
-        marginRight: theme.spacing(2),
-        color: theme.palette.primary.main,
-        fontWeight: theme.typography.fontWeightBold,
-        borderColor: theme.palette.primary.main,
+      [theme.breakpoints.down('md')]: {
+          paddingBottom: theme.spacing(4)
       }
-    },
+  },
 
-    btn: {
-      '& span': {
-        gap: theme.spacing(3),
-        color: 'red',
-      }
-    },
+  // content: {
+  //   display: 'grid',
+  //   gridTemplateColumns: '1fr 0.2fr 1fr'
+  // },
 
-    authTrue: {
-      color: 'green !important',
-    },
+  // detail: {
+  //     marginBottom: theme.spacing(2),
 
-    authFalse: {
-      color: 'grey !important',
-    },
+  //     '& h6:first-child': {
+  //         margin: theme.spacing(2, 0)
+  //     }
+  // },
 
-    btnLeft: {
-      '& span': {
-        gap: theme.spacing(3),
-        color: theme.palette.primary.main,
-        textTransform: 'uppercase'
-      }
-    },
+  // divider: {
+  //     backgroundColor: theme.palette.primary.main,
+  //     width: theme.spacing(0.5)
+  // },
 
+  // detailTitle: {
+  //   marginBottom: theme.spacing(5)
+  // },
+
+  // btnGroup: {
+  //   marginBottom: theme.spacing(5),
+  //   marginTop: theme.spacing(5),
+  //   '& button': {
+  //     marginRight: theme.spacing(2),
+  //     color: theme.palette.primary.main,
+  //     fontWeight: theme.typography.fontWeightBold,
+  //     borderColor: theme.palette.primary.main,
+  //   }
+  // },
+
+  // btn: {
+  //   '& span': {
+  //     gap: theme.spacing(3),
+  //     color: 'red',
+  //   }
+  // },
+
+  // authTrue: {
+  //   color: 'green !important',
+  // },
+
+  // authFalse: {
+  //   color: 'grey !important',
+  // },
+
+  // btnLeft: {
+  //   '& span': {
+  //     gap: theme.spacing(3),
+  //     color: theme.palette.primary.main,
+  //     textTransform: 'uppercase'
+  //   }
+  // },
+
+
+  //NEW STYLE
+  authentications: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+  },
+
+  twoFA: {
+    // borderRight: '1px solid #C4C4C4'
+  }
 
 }));
 
@@ -103,17 +108,17 @@ const AuthenticationDetails = () => {
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
-    const toast = useRef();
+    // const toast = useRef();
     const successModal = useRef();
 
-    const handleAuthClass = useCallback((detail) => clsx({
-      // [classes.authFalse]: !customer[detail],
-      [classes.authTrue]: customer[detail],
-    }), [customer, classes.authTrue])
+    // const handleAuthClass = useCallback((detail) => clsx({
+    //   // [classes.authFalse]: !customer[detail],
+    //   [classes.authTrue]: customer[detail],
+    // }), [customer, classes.authTrue])
 
-    const hasSetup2FAInactive = useMemo(() => clsx({
-      [classes.authFalse]: customer.twoFactorEnabled,
-    }), [customer, classes.authFalse])
+    // const hasSetup2FAInactive = useMemo(() => clsx({
+    //   [classes.authFalse]: customer.twoFactorEnabled,
+    // }), [customer, classes.authFalse])
 
     const hasSetup2FASetup = useMemo(() => clsx({
       [classes.authFalse]: customer.twoFactorEnabled,
@@ -140,7 +145,7 @@ const AuthenticationDetails = () => {
     useEffect(() => {
         if (errorsState?.msg) {
             setLoading(false);
-            toast.current.handleClick();
+            // toast.current.handleClick();
         }
     }, [errorsState, errors]);
 
@@ -165,7 +170,7 @@ const AuthenticationDetails = () => {
 
     return (
         <>
-            {!isEmpty(errorsState) && 
+            {/* {!isEmpty(errorsState) && 
                 <Toast 
                     ref={toast}
                     title="ERROR"
@@ -173,11 +178,23 @@ const AuthenticationDetails = () => {
                     msg={errorsState.msg || ''}
                     type="error"
                 />
-            }
+            } */}
             {loading && <Spinner />}
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            <Box component="section" className={classes.root}>
-                <Typography className={classes.detailTitle} variant="h6" color="primary">AUTHENTICATIONS</Typography>
+            <Box component="div" className={classes.root}>
+              <Box component="div" className={classes.authentications}>
+                <Box component="div" className={classes.twoFA}>
+                  <GenericGridAuth mb="15px" twoFactorName="Google Authenticator" statusName="Active" bgColor="#DDF2E5" textColor="#1E6262" hasSetup2FASetup={hasSetup2FASetup} />
+                  <GenericGridAuth mb="15px" twoFactorName="SMS Authenticator" statusName="Inactive" bgColor="#FFCECE" textColor="#1E6262" hasSetup2FASetup={hasSetup2FASetup} />
+                  <GenericGridAuth mb="15px" twoFactorName="Email Authenticator" statusName="Not setup" bgColor="#C4C4C4" textColor="#FFFFFF" hasSetup2FASetup={hasSetup2FASetup} />
+                </Box>
+
+                <Box component="div" className={classes.verifications}>
+                  
+                </Box>
+              </Box>
+            </Box>
+            {/* <Box component="section" className={classes.root}>
                 <Box component="section" className={classes.content}>
                     <Box component="div" className={classes.detail}>
                         <Typography color="primary" variant="h6">2FA</Typography>
@@ -234,15 +251,15 @@ const AuthenticationDetails = () => {
                     </Box>
                     </Box>     
                 </Box>
-            </Box>
+            </Box> */}
         </>
     );
 };
 
 AuthenticationDetails.propTypes = {
-    getIdCardValidationResponse: PropTypes.func.isRequired,
-    getResidencePermitValidationResponse: PropTypes.func.isRequired,
-    getCustomer: PropTypes.func.isRequired,
+    // getIdCardValidationResponse: PropTypes.func.isRequired,
+    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    // getCustomer: PropTypes.func.isRequired,
 };
 
 export default AuthenticationDetails;
