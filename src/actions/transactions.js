@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
+import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
 import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -9,6 +9,19 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { markNotificationAsRead } from './notifications';
 
 const api = `${API}/Transfer`;
+
+export const getTransaction = (transferId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/Transfer?transferId=${transferId}`);
+        return dispatch({
+            type: SET_TRANSACTION,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const getTransactions = (retrieveAll) => async (dispatch) => {
     try {

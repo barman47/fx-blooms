@@ -11,6 +11,7 @@ import formatNumber from '../../../utils/formatNumber';
 
 import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
+import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
 import { SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
@@ -95,7 +96,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp, handleSetTitle }) => {
+const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getTransaction, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -192,27 +193,17 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             payload: buyerAccount
         });
         setNotificationId(notificationId);
+        getTransaction(notification.Id);
         toggleSellerSendEurDrawer();
     };
 
     const setSellerAccount = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
         setTransactionId(notification.Id);
-        
-        // const sellerAccount = {
-        //     accounName: Seller.AccountName,
-        //     accountNumber: Seller.AccountNumber,
-        //     bankName: Seller.BankName,
-        //     reference: Seller.TransferReference
-        // };
-
         setAmount(Number(Buyer.AmountTransfered));
-        // dispatch({
-        //     type: SET_ACCOUNT,
-        //     payload: sellerAccount
-        // });
         setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
         setNotificationId(notificationId);
+        getTransaction(notification.Id);
         toggleBuyerSendEurDrawer();
     };
 
@@ -229,8 +220,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     };
 
     const toggleSellerSendEurDrawer = () => {
-        setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);
-
         // clear message if drawer is open and being closed
         if (sellerSendEurDrawerOpen) {
             dispatch({
@@ -238,6 +227,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 payload: null
             });
         }
+        setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
     };
 
     const setMessage = (notification) => {
@@ -343,8 +333,10 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             setTransactionId(data.Id); // Double check
             setAccount(data.Seller.AccountName, data.Seller.AccountNumber, data.Seller.BankName, data.Seller.TransferReference);
             toggleBuyerSendEurDrawer();
+            getTransaction(data.Id);
         } else {
             toggleSellerSendNgnDrawer();
+            getTransaction(data.Id);
         }
     };
 
@@ -548,10 +540,11 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
 
 Index.propTypes = {
     completeTransaction: PropTypes.func.isRequired,
+    getTransaction: PropTypes.func.isRequired,
     getNotifications: PropTypes.func.isRequired,
     getIdVerificationLink: PropTypes.func.isRequired,
     getResidencePermitLink: PropTypes.func.isRequired,
     generateOtp: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getNotifications, generateOtp })(Index);
+export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getTransaction, getNotifications, generateOtp })(Index);

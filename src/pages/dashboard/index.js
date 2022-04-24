@@ -53,7 +53,7 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    Security,
+    // Security,
     TwoFactorAuthentication 
 } from 'mdi-material-ui';
 import { 
@@ -63,7 +63,7 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    PIN, 
+    // PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE 
@@ -76,6 +76,7 @@ import {
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_PAID, 
     PAYMENT_NOTIFICATION_OFFER_MADE,
+    REMOVE_NOTIFICATION,
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
@@ -395,7 +396,7 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        { url : PIN, text: 'Set PIN', icon: <Security /> },
+        // { url : PIN, text: 'Set PIN', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
@@ -471,10 +472,6 @@ const Dashboard = (props) => {
             }
         }
     }, [NOT_SUBMITTED, stats]);
-
-    // useEffect(() => {
-    //     setPath(location.pathname);
-    // }, [location]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -570,7 +567,7 @@ const Dashboard = (props) => {
                 console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 const buyer = payload.Data.Buyer;
-                const seller =payload.Data.Seller;
+                const seller = payload.Data.Seller;
                 const notification = {
                     dateLogged: payload.DateLogged,
                     eventType: payload.EventType,
@@ -648,6 +645,16 @@ const Dashboard = (props) => {
                                 }
                             });
                         }
+
+                        // Remove SellerConfirmedPayment notification after seller payment succeeds if the confirmation notification was not used to continue the transaction
+                        // if (customerId === seller.CustomerId) {
+                        //     console.log('closing');
+                        //     dispatch({
+                        //         type: REMOVE_NOTIFICATION,
+                        //         payload: { notificationId: notification.notificationId }
+                        //     });
+                        //     markNotificationAsRead(notification.notificationId);
+                        // }
 
                         break;
 

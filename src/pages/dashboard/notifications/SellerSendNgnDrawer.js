@@ -13,7 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, madePaymentV2 } from '../../../actions/listings';
-import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -164,7 +164,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
     const errorToast = useRef();
 
     useEffect(() => {
-        // startExpiryTimer();
+        startExpiryTimer();
         if (isEmpty(account) && !isEmpty(listing)) {
             getAccount(listing.sellersAccountId);
         }
@@ -182,6 +182,10 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             payload: {}
         });
         if (!drawerOpen) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
             clearInterval(interval.current);
             setErrors({});
         }
@@ -262,8 +266,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
         if (!drawerOpen) {
             clearInterval(interval.current);
             setErrors({});
-        } else {
-            startExpiryTimer();
         }
     }, [dispatch, drawerOpen, startExpiryTimer]);
 

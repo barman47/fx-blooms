@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -14,9 +14,11 @@ import { Close, ContentCopy } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+import _ from 'lodash';
 
+import { markNotificationAsRead } from '../../../actions/notifications';
 import { sendTransactionNotification } from '../../../actions/transactions';
-import { GET_ERRORS } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_NOTIFICATION, SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -116,12 +118,13 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SellerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, notificationId, transactionId, sendTransactionNotification }) => {
+const SellerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, markNotificationAsRead, notificationId, transactionId, sendTransactionNotification }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
     const message = useSelector(state => state.notifications.msg);
+    const { transaction } = useSelector(state => state.transactions);
     const errorsState = useSelector(state => state.errors);
     
     const [open, setOpen] = useState(false);
@@ -132,7 +135,35 @@ const SellerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, notificationId,
 
     useEffect(() => {
         setOpen(drawerOpen);
-    }, [drawerOpen]);
+        if (!drawerOpen) {
+            dispatch({
+                type: SET_TRANSACTION,
+                payload: {}
+            });
+        }
+    }, [dispatch, drawerOpen]);
+
+    // Close transaction if it is still open and it has been completed
+    useEffect(() => {
+        if (!_.isEmpty(transaction)) {
+            const { seller } = transaction;
+            if (seller.hasMadePayment) {
+                setErrors({ msg: 'This transaction has already been completed' });
+                batch(() => {
+                    dispatch({
+                        type: SET_TRANSACTION,
+                        payload: {}
+                    });
+                    dispatch({
+                        type: REMOVE_NOTIFICATION,
+                        payload: notificationId
+                    });
+                });
+                markNotificationAsRead(notificationId);
+                toggleDrawer();
+            }
+        }
+    }, [dispatch, markNotificationAsRead, notificationId, toggleDrawer, transaction]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -256,8 +287,9 @@ SellerSendEurDrawer.propTypes = {
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
+    markNotificationAsRead: PropTypes.func.isRequired,
     notificationId: PropTypes.string.isRequired,
     transactionId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { sendTransactionNotification })(SellerSendEurDrawer);
+export default connect(undefined, { markNotificationAsRead, sendTransactionNotification })(SellerSendEurDrawer);
