@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -39,21 +39,23 @@ import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 const useStyles = makeStyles(theme => ({
     root: {
         height: '100%',
-        padding: theme.spacing(4, 2, 2, 2),
+        padding: theme.spacing(0, 5),
+
+        [theme.breakpoints.down('sm')]: {
+            padding: theme.spacing(0, 2)  
+        },
         
         '& header': {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            marginTop: theme.spacing(5),
             
             [theme.breakpoints.down('sm')]: {
                 flexDirection: 'column'
             },
             
             '& h6': {
-                fontWeight: 600,
-                // marginTop: theme.spacing(2),
+                fontWeight: 600
             },
 
             '& p': {
@@ -152,7 +154,8 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const history = useHistory();
+    const location = useLocation();
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { residencePermitStatus } = useSelector(state => state.customer.stats);
@@ -200,6 +203,7 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         handleSetTitle('Add Listing');
+        setPresetSelectedCurrency();
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             getResidencePermitLink();
         }
@@ -211,7 +215,6 @@ const MakeListing = (props) => {
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
-        
         // eslint-disable-next-line
     }, []);
 
@@ -358,6 +361,15 @@ const MakeListing = (props) => {
     //     setOpenAccountModal(true);
     // };
 
+    const setPresetSelectedCurrency = () => {
+        if (location.state.eur) {
+            setAvailableCurrency('EUR');
+        }
+        if (location.state.ngn) {
+            setAvailableCurrency('NGN');
+        }
+    };
+
     const checkResidencePermitStatus = () => {
         switch (residencePermitStatus) {
             case APPROVED:
@@ -412,7 +424,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
-            history.push(DASHBOARD_HOME);
+            navigate(DASHBOARD_HOME);
         }
     };
 

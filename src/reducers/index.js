@@ -11,6 +11,7 @@ import customerReducer from './customer';
 import customersReducer from './customers';
 import documentsReducer from './documents';
 import listingsReducer from './listings';
+import loadingReducer from './loading';
 import errorsReducer from './errors';
 import statsReducer from './stats';
 import subscriptionReducer from './subscription';
@@ -19,6 +20,7 @@ import walletsReducer from './wallets';
 import transactionsReducer from './transactions';
 
 const appReducer = combineReducers({
+    loading: loadingReducer,
     admin: adminReducer,
     bankAccounts: bankAccountsReducer,
     countries: countriesReducer,

@@ -3,7 +3,7 @@ import { RESET_ADMIN_SESSION, SET_CURRENT_ADMIN } from '../actions/types';
 const initialState = {
     profile: {},
     isAuthenticated: false,
-    resetSession: false
+    resetSession: false,
 };
 
 const customerReducer =  (state = initialState, action) => {

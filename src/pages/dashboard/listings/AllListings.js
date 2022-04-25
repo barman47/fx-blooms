@@ -13,10 +13,8 @@ import {
 	InputAdornment,
 	TextField,
 	Typography,
-	useMediaQuery,
-	// useMediaQuery 
+	useMediaQuery
 } from '@material-ui/core';
-// import Rating from '@material-ui/lab/Rating';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import { Magnify } from 'mdi-material-ui';
@@ -32,10 +30,10 @@ import {
 	ACTIVATE_USD_WALLET,
 	ACTIVATE_GPB_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
-	SET_LOADING_LISTINGS,
+	SET_LOADING,
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
-import { getListingsOpenForBid, getMoreListings } from '../../../actions/listings';
+import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
 import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
@@ -62,14 +60,14 @@ const useStyles = makeStyles(theme => ({
 		display: 'grid',
 		gridTemplateColumns: '1fr 1fr',
 		marginBottom: theme.spacing(2),
-		marginTop: theme.spacing(10),
+		// marginTop: theme.spacing(10),
 		padding: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '1fr',
-			paddingLeft: theme.spacing(5),
-			paddingRight: theme.spacing(5),
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2),
 			gap: theme.spacing(1)
 		},
 
@@ -77,14 +75,7 @@ const useStyles = makeStyles(theme => ({
 			marginBottom: '0',
 			paddingLeft: theme.spacing(2),
 			paddingRight: theme.spacing(2)
-		},
-
-		// '& div:first-child': {
-		// 	'& p:last-child': {
-		// 		marginTop: theme.spacing(2),
-		// 		color: COLORS.grey
-		// 	}
-		// }
+		}
 	},
 
 	root: {
@@ -159,7 +150,7 @@ const useStyles = makeStyles(theme => ({
 		marginBottom: theme.spacing(1),
 		marginTop: theme.spacing(1),
 
-		[theme.breakpoints.down('sm')]: {
+		[theme.breakpoints.down('md')]: {
 			display: 'grid',
 			gridTemplateColumns: '0.7fr 1fr 1fr',
 			rowGap: theme.spacing(0.8),
@@ -190,47 +181,20 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	buttonGroup: {
+	currencyButtons: {
+		height: theme.spacing(4.3),
+	},
+
+	filterLabel: {
 		[theme.breakpoints.down('sm')]: {
-			marginBottom: theme.spacing(1)
+			gridColumn: '1 / span 2'
 		}
 	},
 
 	searchButton: {
-		paddingBottom: theme.spacing(0.7),
-		paddingTop: theme.spacing(0.7)
+		paddingBottom: theme.spacing(0.55),
+		paddingTop: theme.spacing(0.55)
 	},
-
-	// gateway: {
-	// 	background: 'linear-gradient(238.08deg, #25AEAE -0.48%, #1E6262 99.63%)',
-	// 	boxShadow: '1px 14px 30px -16px rgba(30, 98, 98, 1)',
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	height: 'initial',
-    //     padding: [[theme.spacing(5), 0, 0, theme.spacing(2)]],
-
-	// 	'& div:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'column',
-	// 		justifyContent: 'space-between',
-
-	// 		'& h5': {
-	// 			color: COLORS.offWhite,
-	// 			fontWeight: 600
-	// 		},
-
-	// 		'& p': {
-	// 			color: COLORS.offWhite,
-	// 			marginBottom: theme.spacing(3)
-	// 		},
-	// 	},
-
-	// 	'& img': {
-	// 		width: '35%',
-	// 		alignSelf: 'flex-end'
-	// 	}
-	// },
 	
 	listings: {
 		height: '100vh',
@@ -239,7 +203,9 @@ const useStyles = makeStyles(theme => ({
 		paddingRight: theme.spacing(5),
 
 		[theme.breakpoints.down('md')]: {
-			gridTemplateColumns: '1fr'
+			gridTemplateColumns: '1fr',
+			paddingLeft: theme.spacing(2),
+			paddingRight: theme.spacing(2)
 		},
 
 		[theme.breakpoints.down('sm')]: {
@@ -251,62 +217,6 @@ const useStyles = makeStyles(theme => ({
 	listingContainer: {
 		marginTop: theme.spacing(1)
 	},
-
-	// filter: {
-	// 	marginTop: theme.spacing(4)
-	// },
-
-	// filterContainer: {
-	// 	backgroundColor: COLORS.lightTeal,
-	// 	borderRadius: theme.shape.borderRadius,
-	// 	padding: [[theme.spacing(2), theme.spacing(2), theme.spacing(4), theme.spacing(2)]],
-	// 	height: 'initial',
-	// 	alignSelf: 'flex-start',
-	// 	marginTop: theme.spacing(6.5),
-	// 	position: 'sticky',
-
-	// 	[theme.breakpoints.down('md')]: {
-	// 		display: 'none'
-	// 	},
-
-	// 	'& header:first-child': {
-	// 		display: 'flex',
-	// 		flexDirection: 'row',
-	// 		justifyContent: 'space-between',
-	// 		marginBottom: theme.spacing(3),
-	// 		padding: 0,
-	// 	}
-	// },
-
-	// filterButtonContainer: {
-	// 	display: 'flex',
-	// 	flexDirection: 'row',
-	// 	justifyContent: 'space-between',
-	// 	marginBottom: theme.spacing(3),
-	// 	padding: 0,
-	// },
-
-	// clear: {
-	// 	cursor: 'pointer',
-	// 	'&:hover': {
-	// 		textDecoration: 'underline'
-	// 	}
-	// },
-
-	// filterButton: {
-	// 	'&:hover': {
-	// 		textDecoration: 'none !important'
-	// 	}
-	// },
-
-	// label: {
-	// 	fontSize: theme.spacing(1.5)
-	// },
-
-	// disabledButton: {
-	// 	backgroundColor: '#d8dcdc',
-	// 	color: '#aoa3a3'
-	// },
 
 	buyerPopup: {
 		display: 'inline-block',
@@ -324,13 +234,23 @@ const AllListings = (props) => {
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
-	const listingsLoading = useSelector(state => state.listings.loading);
+	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
 	const { eurActive, ngnActive, usdActive, gbpActive } = useSelector(state => state.wallets);
 
-	const { getAccounts, getCustomerInformation, getCustomerStats, getIdVerificationLink, getListingsOpenForBid, getMoreListings, getNotifications, handleSetTitle } = props;
+	const { 
+		getAccounts, 
+		getCustomerInformation, 
+		getCustomerStats, 
+		getIdVerificationLink, 
+		getListingsOpenForBid, 
+		getMoreListings, 
+		getNotifications, 
+		handleSetTitle,
+		removeExpiredListings 
+	} = props;
 
 	const [Amount, setAmount] = useState('');
 	const [timeOfDay, setTimeOfDay] = useState('');
@@ -358,6 +278,7 @@ const AllListings = (props) => {
     };
 
 	useEffect(() => {
+		removeExpiredListings();
 		greet();
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
@@ -365,7 +286,7 @@ const AllListings = (props) => {
 		handleSetTitle('All Listings');
 		if (isAuthenticated) {
 			dispatch({
-				type: SET_LOADING_LISTINGS,
+				type: SET_LOADING,
 				payload: true
 			});
 			getListings();
@@ -401,7 +322,7 @@ const AllListings = (props) => {
 	useEffect(() => {
 		if (isEmpty(Amount)) {
 			dispatch({
-				type: SET_LOADING_LISTINGS,
+				type: SET_LOADING,
 				payload: true
 			});
 	
@@ -464,7 +385,7 @@ const AllListings = (props) => {
 		// 	}
 		// });
 		dispatch({
-			type: SET_LOADING_LISTINGS,
+			type: SET_LOADING,
 			payload: true
 		});
 
@@ -503,7 +424,7 @@ const AllListings = (props) => {
 
 		setErrors({});
 		dispatch({
-			type: SET_LOADING_LISTINGS,
+			type: SET_LOADING,
 			payload: true
 		});
 		getListingsOpenForBid({
@@ -519,10 +440,6 @@ const AllListings = (props) => {
 	};
 
 	const setCurrency = (available, required) => {
-		// dispatch({
-		// 	type: SET_LOADING_LISTINGS,
-		// 	payload: true
-		// });
 		dispatch({
 			type: SET_REQUIRED_CURRENCY,
 			payload: {
@@ -530,16 +447,6 @@ const AllListings = (props) => {
 				requiredCurrency: required  
 			}
 		});
-		// getListingsOpenForBid({
-		// 	pageNumber: 1,
-		// 	pageSize: 15,
-		// 	currencyAvailable: available,
-		// 	currencyNeeded: required,
-		// 	amount: Number(Amount),
-		// 	useCurrencyFilter: true,
-		// 	useRatingFilter: false,
-		// 	sellerRating: 0
-		// });
 	}
 
 	const greet = () => {
@@ -658,7 +565,7 @@ const AllListings = (props) => {
 						// height={1000}
 					>
 						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation className={classes.buttonGroup}>
+							<ButtonGroup disableElevation className={classes.currencyButtons}>
 								<Button
 									color="primary"
 									size="small"
@@ -688,14 +595,14 @@ const AllListings = (props) => {
 									onChange={(e) => handleSetAmount(e.target.value)}
 									type="text"
 									variant="outlined" 
-									placeholder="Enter Amount"
+									placeholder={matches ? `${requiredCurrency} Amount` : 'Enter Amount'}
 									helperText={errors.Amount}
 									fullWidth
 									required
 									error={errors.Amount ? true : false}
-									disabled={listingsLoading ? true : false}
+									disabled={loading ? true : false}
 									InputProps={{
-										startAdornment: <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
+										startAdornment: !matches && <InputAdornment position="start" color="primary">{requiredCurrency} | </InputAdornment>,
 										endAdornment: <InputAdornment position="end">
 											{matches ? 
 												<IconButton
@@ -713,6 +620,7 @@ const AllListings = (props) => {
 													variant="contained"
 													color="primary"
 													// size="large"
+													disableElevation
 													disableRipple
 													disableFocusRipple
 													className={classes.searchButton}
@@ -727,6 +635,7 @@ const AllListings = (props) => {
 								/>
 							</form>
 							<FormControlLabel
+								className={classes.filterLabel}
 								style={{ color: theme.palette.primary.main }}
 								control={
 									<Checkbox
@@ -738,7 +647,7 @@ const AllListings = (props) => {
 								label="Hide Unavailable Listings"
 							/>
 						</Box>
-						{listingsLoading === true ?
+						{loading === true ?
 							<ListingsSkeleton />
 							:
 							<Listings />
@@ -761,4 +670,13 @@ AllListings.propTypes = {
 	handleSetTitle:PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getAccounts, getIdVerificationLink, getCustomerInformation, getCustomerStats, getListingsOpenForBid, getMoreListings, getNotifications })(AllListings);
+export default connect(undefined, { 
+	getAccounts, 
+	getIdVerificationLink, 
+	getCustomerInformation, 
+	getCustomerStats, 
+	getListingsOpenForBid, 
+	getMoreListings, 
+	getNotifications,
+	removeExpiredListings 
+})(AllListings);

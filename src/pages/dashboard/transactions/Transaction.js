@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
-// import moment from 'moment';
+import { ContentCopy } from 'mdi-material-ui';
+import clsx from 'clsx';
+import copy from 'copy-to-clipboard';
+import toast from 'react-hot-toast';
 
 import { SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
+import returnLastSixDigits from '../../../utils/returnLastThreeCharacters';
+import { convertToLocalTime } from '../../../utils/getTime';
 import { TRANSACTION_STATUS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
@@ -17,22 +22,19 @@ const useStyles = makeStyles(theme => ({
         backgroundColor: COLORS.lightTeal,
         border: `1px solid ${theme.palette.primary.main}`,
         borderRadius: theme.shape.borderRadius,
-        cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // display: 'grid',
-        // gridTemplateColumns: 'repeat(6, 1fr)',
         padding: theme.spacing(2),
 
-        [theme.breakpoints.down('sm')]: {
+        [theme.breakpoints.down('md')]: {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: 'repeat(3, 1fr)',
         },
 
-        '& div': {
-            // border: '1px solid red'
+        [theme.breakpoints.down('sm')]: {
+            gridTemplateColumns: '1fr 1fr'
         }
     },
 
@@ -45,13 +47,17 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.offBlack,
         fontWeight: 600,
         marginTop: theme.spacing(1)
+    },
+
+    inProgress: {
+        color: `${COLORS.orange} !important`
     }
 }));
 
 const Transaction = ({ transaction }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const { customerId } = useSelector(state => state.customer);
 
     const [amount, setAmount] = useState(0);
@@ -123,19 +129,19 @@ const Transaction = ({ transaction }) => {
             type: SET_TRANSACTION,
             payload: transaction
         });
-        return history.push(TRANSACTION_STATUS);
+        return navigate(TRANSACTION_STATUS);
+    };
+
+    const copyListingId = () => {
+        copy(transaction.listingId);
+        toast.success('Listing ID copied');
     };
 
     return (
-        <Box component="section" className={classes.root} onClick={gotoTransaction}>
-            <Box component="div">
-                <Typography variant="body2" component="span" className={classes.label}>Date</Typography>
-                {/* <Typography variant="body1" component="p" className={classes.text}>{moment().format()}</Typography> */}
-                <Typography variant="body1" component="p" className={classes.text}>Nov 3rd 2022</Typography>
-            </Box>
+        <Box component="section" className={classes.root}>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Time</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>20:34</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>{convertToLocalTime(transaction.dateCreated).fromNow()}</Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>
@@ -146,13 +152,30 @@ const Transaction = ({ transaction }) => {
                 <Typography variant="body1" component="p" className={classes.text}>{currency}{formatNumber(amount, 2)}</Typography>
             </Box>
             <Box component="div">
-                <Typography variant="body2" component="span" className={classes.label}>Reference Number</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>889F5F</Typography>
+                <Typography variant="body2" component="span" className={classes.label}>Listing ID</Typography>
+                <Typography variant="body1" component="p" className={classes.text}>
+                    ... {returnLastSixDigits(transaction.listingId, 6)}
+                    <Tooltip title="Copy Listing ID" arrow>
+                        <IconButton onClick={copyListingId} size="small">
+                            <ContentCopy />
+                        </IconButton>
+                    </Tooltip>
+                </Typography>
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Status</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
+                <Typography variant="body1" component="p" className={clsx(classes.text, {[classes.inProgress]: !transaction.isClosed})}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
             </Box>
+            <Button 
+                variant="outlined" 
+                color="primary" 
+                disableRipple
+                disableFocusRipple
+                disableTouchRipple
+                onClick={gotoTransaction}
+            >
+                View More
+            </Button>
         </Box>
     );
 };

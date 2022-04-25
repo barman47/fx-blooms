@@ -21,7 +21,6 @@ import { CONTACT_US, FAQS, SIGN_UP, LOGIN, ABOUT_US, HOW_IT_WORKS, DASHBOARD_HOM
 
 const useStyles = makeStyles(theme => ({
     drawer: {
-        // backgroundColor: theme.palette.primary.main,
         display: 'flex',
         flexDirection: 'column',
         paddingTop: theme.spacing(5),
@@ -130,7 +129,7 @@ const MobileNav = ({ toggleDrawer, drawerOpen }) => {
                     {homeRoutes.map(({ icon, text, url }, index) => {
                         if (location.pathname === '/') {
                             return (
-                                <ListItemLink button divider key={index}>
+                                <ListItemLink button divider to="#!" key={index}>
                                     <ListItemIcon>
                                         {icon}
                                     </ListItemIcon>

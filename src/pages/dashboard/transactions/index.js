@@ -1,27 +1,33 @@
 import { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { FormControlLabel, Switch } from '@material-ui/core';
-import { withStyles } from '@material-ui/core/styles';
-
+import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { SET_ALL_TRANSACTIONS, SET_EUR_TRANSACTIONS, SET_TRANSACTION, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
 
 import Transaction from './Transaction';
+import TransactionSkeleton from './TransactionSkeleton';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        marginTop: theme.spacing(-3)
+        padding: theme.spacing(0, 5, 5, 5),
+
+        [theme.breakpoints.down('sm')]: {
+            paddingBottom: theme.spacing(1),
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1),
+        }
     },
 
     filterContainer: {
         display: 'grid',
         gridTemplateColumns: '0.25fr 0.25fr',
         gap: theme.spacing(20),
+        alignItems: 'center',
         marginTop: theme.spacing(2),
         [theme.breakpoints.down('sm')]: {
             gridTemplateColumns: '0.5fr 0.5fr',
@@ -29,89 +35,39 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
+    buttonGroup: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+    },
+    
     transactions: {
         display: 'grid',
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(3),
-        marginTop: theme.spacing(2)
+        marginTop: theme.spacing(2),
+        maxWidth: '100%',
     }
 }));
 
-const IOSSwitch = withStyles((theme) => ({
-    root: {
-        width: 42,
-        height: 26,
-        padding: 0,
-        margin: theme.spacing(1),
-    },
-    switchBase: {
-        padding: 1,
-            '&$checked': {
-                transform: 'translateX(16px)',
-                color: theme.palette.common.white,
-                '& + $track': {
-                backgroundColor: theme.palette.primary.main,
-                opacity: 1,
-                border: 'none',
-            }
-        },
-      
-        '&$focusVisible $thumb': {
-            color: '#52d869',
-            border: '6px solid #fff',
-        },
-    },
-    thumb: {
-        width: 24,
-        height: 24,
-    },
-
-    track: {
-        borderRadius: 26 / 2,
-        border: `1px solid ${theme.palette.grey[400]}`,
-        backgroundColor: theme.palette.grey[50],
-        opacity: 1,
-        transition: theme.transitions.create(['background-color', 'border']),
-    },
-
-    checked: {},
-
-    focusVisible: {},
-
-}))(({ classes, ...props }) => {
-    return (
-        <Switch
-            focusVisibleClassName={classes.focusVisible}
-            disableRipple
-            classes={{
-                root: classes.root,
-                switchBase: classes.switchBase,
-                thumb: classes.thumb,
-                track: classes.track,
-                checked: classes.checked,
-            }}
-            {...props}
-        />
-    );
-});
-
-const Transactions = ({ getCurrencies, getTransactions }) => {
+const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { currencies } = useSelector(state => state);
+    const { currencies, loading } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
     const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
 
     const [currency, setCurrency] = useState('ALL');
-    const [showReceived, setShowReceived] = useState(true);
-    // eslint-disable-next-line
-    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        dispatch({
-            type: SET_TRANSACTION,
-            payload: {}
+        handleSetTitle('Transactions');
+        batch(() => {
+            dispatch({
+                type: SET_LOADING,
+                payload: true
+            });
+            dispatch({ type: CLEAR_TRANSACTIONS });
+            dispatch({ type: SET_BID, payload: {} });
         });
         getTransactions(true);
         if (currencies.length === 0) {
@@ -125,14 +81,27 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
     useEffect(() => {
         switch (currency) {
             case 'ALL':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_ALL_TRANSACTIONS });
                 break;
 
             case 'EUR':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
                 dispatch({ type: SET_EUR_TRANSACTIONS, payload: customerId });
                 break;
 
             case 'NGN':
+                // dispatch({
+                //     type: SET_LOADING,
+                //     payload: true
+                // });
+
                 dispatch({ type: SET_NGN_TRANSACTIONS, payload: customerId });
                 break;
 
@@ -141,9 +110,19 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
         }
     }, [currency, customerId, dispatch]);
 
+    // const setTransactionType = (sent, received) => {
+	// 	dispatch({
+	// 		type: SET_TRANSACTION_TYPE,
+	// 		payload: {
+	// 			sent,
+	// 			received
+	// 		}
+	// 	});
+	// }
 
     return (
         <>
+            <Toaster />
             <Box component="section" className={classes.root}>
                 <Typography variant="h6">Transaction History</Typography>
                 <Typography variant="body2" component="p">Here are your recent transactions</Typography>
@@ -165,19 +144,49 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
                                 {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        <FormControlLabel
-                            control={<IOSSwitch checked={showReceived} onChange={() => setShowReceived(!showReceived)} />}
-                            label={showReceived ? 'Received' : 'Sent'}
-                        />
+                        {/* <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
+                            <Button
+                                color="primary"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={() => setTransactionType(false, true)}
+                                variant={received ? 'contained' : 'outlined'}
+                                fullWidth
+                            >
+                                Received
+                            </Button>
+                            <Button
+                                color="primary"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={() => setTransactionType(true, false)}
+                                variant={sent ? 'contained' : 'outlined'}
+                                fullWidth
+                            >
+                                Sent
+                            </Button>
+                        </ButtonGroup> */}
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
-                    {eurTransactions.length > 0 ? 
+                    {loading ?
+                        <>
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                            <TransactionSkeleton />
+                        </>
+                        :
+                        eurTransactions.length > 0 ? 
                         eurTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
                         transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                    }
+                    {!loading && transactions.length === 0 && 
+                        <Typography variant="h4" align="center" color="primary">You have no transactions</Typography>
                     }
                 </Box>
             </Box>
@@ -188,6 +197,7 @@ const Transactions = ({ getCurrencies, getTransactions }) => {
 Transactions.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
     getTransactions: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { getCurrencies, getTransactions })(Transactions);

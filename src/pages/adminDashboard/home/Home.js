@@ -1,86 +1,132 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
+import { styled } from '@mui/material/styles';
 import {
     Box,
-    CircularProgress,
-    FormControl,
     Grid,
     // Paper,
-    MenuItem,
-    Select,
     Typography
 } from '@material-ui/core';
-
+import { getCustomersWithoutProfile } from '../../../actions/customer';
 import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
-import { Stack, Animation } from '@devexpress/dx-react-chart';
+import { Stack, Animation, ArgumentScale } from '@devexpress/dx-react-chart';
 import {
     Chart,
     ArgumentAxis,
     ValueAxis,
     BarSeries,
+    LineSeries,
     Title,
     Legend,
   } from '@devexpress/dx-react-chart-material-ui';
-
-import { olimpicMedals as data } from '../../../utils/constants';
+import { scalePoint } from 'd3-scale';
+import {
+    curveCatmullRom,
+    line,
+  } from 'd3-shape';
+import { olimpicMedals as data, energyConsumption as data2 } from '../../../utils/constants';
 import { CUSTOMERS, LISTINGS } from '../../../routes';
 import { ADMIN_FILTERS } from '../../../utils/constants';
 // import { useCallback } from 'react';
 // import { CalendarTodayIcon } from '@material-ui/icons';
 import formatNumber from '../../../utils/formatNumber';
+// import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
+import { AccountSupervisor, Receipt, ViewDashboardVariant, CompareHorizontal, BankOutline, ArrowTopRight, ArrowBottomLeft } from 'mdi-material-ui';
+import UserActivitiesRow from '../../../components/admin-dashboard/UserActivities_Row'
+import RecentTransactions from '../../../components/admin-dashboard/RecentTransactions'
+import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
+import GenericMiniCard from '../../../components/admin-dashboard/GenericMiniCard'
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        marginTop: theme.spacing(5),
-        padding: theme.spacing(0, 3)
+        // marginTop: theme.spacing(5),
+        padding: theme.spacing(2.3, 3),
+        gap: theme.spacing(2),
     },
 
     content: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: theme.spacing(5)
+        gridTemplateColumns: 'repeat(4, 1fr)',
+        gap: theme.spacing(10)
     },
 
     stats: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: theme.spacing(10)
+        gap: theme.spacing(7)
     },
 
     statsHeader: {
         fontWeight: 700,
-        marginBottom: theme.spacing(1)
+        color: 'black'
+        // marginBottom: theme.spacing(1)
     },
 
-    userAcquisitions: {
-        backgroundColor: '#FBEDFF',
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        height: theme.spacing(50),
-        padding: theme.spacing(2)
+    contentTitle: {
+        color: '#A0AEC0',
+        fontWeight: '700',
+        fontSize: theme.spacing(2.2)
     },
 
-    listingsBreakdown: {
-        backgroundColor: '#FCF8F3',
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
+    totalPercent: {
+        color: '#48BB78',
+        fontSize: '16px'
+    },
+
+    userGraph: {
+        backgroundColor: 'white',
+        border: `none`,
+        borderRadius: theme.spacing(1.9),
         height: theme.spacing(50),
-        padding: theme.spacing(2)
+        padding: theme.spacing(2),
+        boxShadow: '2px 2px 2px white',
+        position: 'relative',
+    },
+
+    graphName: {
+        fontWeight: '700',
+        fontSize: theme.spacing(2.4),
+        marginBottom: theme.spacing(3.13),
+        color: 'black',
+        lineHeight: '1.6'
+    },
+
+    legend: {
+        '& ul li div span': {
+            fontSize: '10px !important'
+        }
     },
 
     contentItem: {
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
+        border: 'none',
+        borderRadius: theme.spacing(1.9),
         cursor: 'pointer',
+        padding: theme.spacing(2),
+        boxShadow: '2px 2px 2px white',
+        backgroundColor: '#FFFFFF'
+    },
+
+    contentItemLong: {
+        width: '47vw',
+
+        '& span': {
+            marginBottom: theme.spacing(1.4)
+        }
+    },
+
+    contentIcon: {
+        backgroundColor: '#E4EBEB',
+        padding: theme.spacing(0.5, 1),
+        borderRadius: theme.spacing(1.3),
+        width: '8%',
         display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        height: theme.spacing(30),
-        padding: theme.spacing(2)
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     
     disabled: {
@@ -91,27 +137,55 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        
+        marginBottom: theme.spacing(2.5),
     },
 
-    userActivities: {
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        height: theme.spacing(35),
-        padding: theme.spacing(2)
+    supportTable: {
+        display: 'flex',
+    },
+
+    supportContent: {
+        '&:not(:last-child)': {
+            paddingRight: '4.2rem',
+            borderRight: '2.5px solid #E6EBF2',
+        },
+
+        '&:not(:first-child)': {
+            paddingLeft: '2.3rem'
+        },
+
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px',
+        width: 'fit-content',
+        paddingTop: '1rem',
+        paddingBottom: '2.5px'
+    },
+
+    supportHeader: {
+        fontSize: '15px',
+        color: '#A0AEC0',
+        fontWeight: '500'
+    },
+
+    supportBody: {
+        fontSize: '25px',
+        color: 'black',
+        fontWeight: 'bold'
     },
 
     select: {
-        fontSize: theme.spacing(1.7),
-        minWidth: theme.spacing(15),
+        fontSize: theme.spacing(1.5),
+        minWidth: theme.spacing(7),
         paddingBottom: theme.spacing(0.6),
         paddingTop: theme.spacing(0.6),
+        backgroundColor: 'white',
+        border: '.7px solid #E6E6E6'
     },
 
     recentTransactions: {
-        border: `2px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        height: theme.spacing(35),
         padding: theme.spacing(2),
 
         display: 'flex',
@@ -125,195 +199,188 @@ const useStyles = makeStyles((theme) => ({
     },
 
     chart: {
-        height: '375px !important'
+        height: '375px !important',
+        paddingBottom: '26px !important',
+    },
+
+    userActivities: {
+        // height: theme.spacing(40),
+        padding: theme.spacing(3, 3),
+        backgroundColor: 'white',
     },
 
     userActivitiesHeader: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        color: theme.palette.primary.main,
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr 1.5fr',
+        color: '#94A1B2',
+        borderBottom: '1px solid #E2E8F0',
+        paddingBottom: theme.spacing(.3),
+        marginTop: theme.spacing(3.5),
 
-        marginTop: theme.spacing(3),
 
         '& h6': {
-            flexBasis: '70%',
-            marginLeft: theme.spacing(3),
-            fontWeight: '600',
-            fontSize: '1rem'
-        }
-    },
-
-    subActivitiesHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        flexBasis: '30%',
-        
-        '& p': {
             fontWeight: '600',
             fontSize: '1rem'
         }
     },
 
     userActivitiesBody: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        color: theme.palette.primary.main,
-
+        display: 'grid',
+        gridTemplateColumns: '2fr 1fr 1.5fr',
+        color: 'black',
+        borderBottom: '1px solid #E2E8F0',
+        padding: theme.spacing(1, 0),
         marginTop: theme.spacing(2),
 
         '& h6': {
-            flexBasis: '70%',
-            marginLeft: theme.spacing(3),
-            fontSize: '1rem'
-        }
-    },
-
-    subActivitiesBody: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-around',
-        flexBasis: '30%',
-        
-        '& p': {
-            fontSize: '1rem'
-        }
-    },
-
-    recentHeader: {
-        display: 'flex',
-        justifyContent: 'space-between',
-    },
-
-    recentContent: {
-        display: 'flex',
-        flexDirection: 'column',
-    },
-
-    recentTable: {
-        display: 'flex',
-        flexDirection: 'column',
-        color: 'grey',
-        marginTop: theme.spacing(1.7),
-        gap: '5px',
-
-        '& h6': {
+            fontSize: '1rem',
             fontWeight: '600',
+            color: '#2D3748'
         }
     },
 
-    recentBody: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-
-        '& h6': {
-            color: '#006400'
-        }
+    transactionSection: {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        gap: theme.spacing(3)
     },
 
-    recentRow: {
-        display: 'flex',
-        flexDirection: 'row',
-        gap: '10px',
-        flexBasis: '70%',
-        alignItems: 'center',
+    recentTransactionList: {
+        marginTop: theme.spacing(3),
+
         
-        '& > h6:first-child': {
-            border: `1px solid green`,
-            borderRadius: '50%',
-            height: '25px',
-            width: '25px',
-            color: 'green',
-            textAlign: 'center'
-        },
-
-        '& p': {
-            color: 'black',
-            fontWeight: 'bold',
-            fontSize: theme.spacing(1.8)
-        },
-
-        '& h6': {
-            fontWeight: 'bold',
-            fontSize: theme.spacing(1.5),
-            color: 'grey'
-        }
     },
 
-    recentRow_2: {
-        display: 'flex',
-        flexDirection: 'row',
-        gap: '10px',
-        flexBasis: '70%',
-        alignItems: 'center',
-        
-        '& > h6:first-child': {
-            border: `1px solid red`,
-            borderRadius: '50%',
-            height: '25px',
-            width: '25px',
-            color: 'red',
-            textAlign: 'center'
-        },
-
-        '& p': {
-            color: 'black',
-            fontWeight: 'bold',
-            fontSize: theme.spacing(1.8)
-        },
-
-        '& h6': {
-            fontWeight: 'bold',
-            fontSize: theme.spacing(1.5),
-            color: 'grey'
-        }
+    recentList: {
+        display: 'grid',
+        gridTemplateColumns: '.5fr 1.5fr 1fr',
     },
 
-    recentCells: {
-        color: 'red !important',
+    recentIcon: {
+        padding: theme.spacing(.8),
+        borderRadius: '50%',
+        backgroundColor: '#E8EFEF'
+    },
+
+    recentName: {
+        fontSize: theme.spacing(2.3),
+        fontWeight: '600'
+    },
+
+    recentDivider: {
+        height: theme.spacing(5),
+        backgroundColor: '#E2E8F0',
+        padding: theme.spacing(.1),
+        width: '1px',
+        margin: theme.spacing(.3, 0, .3, 2.5),
+    },
+
+    recentDate: {
+        fontSize: theme.spacing(1.7),
+        fontWeight: '700',
+        color: '#A0AEC0',
+        marginTop: theme.spacing(-.9)
+    },
+
+    recentAmount: {
+        color: '#48BB78',
+        fontWeight: '700',
+        marginTop: theme.spacing(-3.125)
+    },
+
+    amlBoard: {
+        paddingLeft: theme.spacing(2.5),
+        paddingRight: theme.spacing(2.5),
+    },
+
+    amlContent: {
+
+        '& h6': {
+            fontWeight: '600'
+        },
+    },
+
+    amlTable: {
+        display: 'grid',
+        gridTemplateColumns: '1.5fr .5fr',
+
+        '&:not(:last-child)': {
+            paddingBottom: theme.spacing(2)
+        },
+
+        '&:not(:first-child)': {
+            paddingTop: theme.spacing(2)
+        },
+    },
+
+    amlNumber: {
+        justifySelf: 'flex-end'
     }
 }));
-
+  
+const Line = props => (
+<LineSeries.Path
+    {...props}
+    path={line()
+    .x(({ arg }) => arg)
+    .y(({ val }) => val)
+    .curve(curveCatmullRom)}
+/>
+);
+  
 const Root = props => (
-    <Legend.Root {...props} sx={{ display: 'flex', margin: 'auto', flexDirection: 'row' }} />
-  );
+    <Legend.Root {...props} sx={{ display: 'flex', margin: 'auto', flexDirection: 'row', position: 'absolute', top: '-3px', right: '40px' }} />
+);
   const Label = props => (
-    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap' }} />
-  );
+    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap', fontSize: '9px !important' }} />
+);
+
+const Item = props => (
+    <Legend.Item {...props} sx={{ flexDirection: 'column-reverse' }} />
+);
 
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
-    const { changed, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
+    const { changed, totalCustomersWithNoProfile, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
     const [usersFilter, setUsersFilter] = useState('');
+    const [activeUsersFilter, setActiveUsersFilter] = useState('');
     const [users, setUsers] = useState(0);
     const [volumeFilter, setVolumeFilter] = useState('');
     const [volume, setVolume] = useState(0);
     const [loadingCustomerCount, setLoadingCustomerCount] = useState(false);
     const [loadingListingCount, setLoadingListingCount] = useState(false);
     const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
+    const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
+    const [totalNoProfilePercent, setTotalNoProfilePercent] = useState(0);
 
     // eslint-disable-next-line
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
 
     useEffect(() => {
         handleSetTitle('Admin Home');
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        dispatch(getCustomersWithoutProfile())
+    }, [dispatch])
+
+    useEffect(() => {
+        if (totalCustomersWithNoProfile && totalCustomers) {
+            const noProfilePercentage = Math.round((totalCustomersWithNoProfile / totalCustomers) * 100)
+            setTotalNoProfilePercent(noProfilePercentage)
+        }
+    }, [totalNoProfilePercent, totalCustomersWithNoProfile, totalCustomers])
+
     // Show total listing count when no filter is selected
     useEffect(() => {
-        if (totalListings && !listingFilter) {
+        if (totalListings && !!listingFilter) {
             setListings(totalListings);
         }
     }, [totalListings, listingFilter]);
@@ -335,7 +402,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     // Show volume from filter value
     useEffect(() => {
         // if (changed) {
-            if (volumeFilter && (transactionVolume !== undefined) && changed) {
+        if (volumeFilter && (transactionVolume !== undefined) && changed) {
             setLoadingTransactionVolume(false);
             setVolume(transactionVolume);
             dispatch({
@@ -347,7 +414,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     // Show listing from filter value
     useEffect(() => {
         // if (changed) {
-            if (listingFilter && (listingCount !== undefined) && changed) {
+        if (listingFilter && (listingCount !== undefined) && changed) {
             setLoadingListingCount(false);
             setListings(listingCount);
             dispatch({
@@ -359,8 +426,8 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     // Show customer count from filter value
     useEffect(() => {
         // if (changed) {
-            if (usersFilter && (customerCount !== undefined) && changed) {
-                setLoadingCustomerCount(false);
+        if (usersFilter && (customerCount !== undefined) && changed) {
+            setLoadingCustomerCount(false);
             setUsers(customerCount);
             dispatch({
                 type: TOGGLE_STATS_CHANGE_STATUS
@@ -368,103 +435,55 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
         }
     }, [changed, usersFilter, customerCount, dispatch]);
 
-    // const goToDashboard = () => history.push(`${CUSTOMERS}`);
+    // const goToDashboard = () => navigate.push(`${CUSTOMERS}`);
+
+    const handleSwitchCase = useCallback((switchType, getFunction, setLoadingType, setFilterType, total) => {
+        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
+        switch (switchType) {
+            case TWENTY_FOUR_HOURS:
+                getFunction('1');
+                setLoadingType(true);
+                break;
+
+            case SEVEN_DAYS:
+                getFunction('7');
+                setLoadingType(true);
+                break;
+
+            case THIRTY_DAYS:
+                getFunction('30');
+                setLoadingType(true);
+                break;
+
+            case THREE_MONTHS:
+                getFunction('90');
+                setLoadingType(true);
+                break;
+
+            case ALL:
+                setFilterType(total);
+                break;
+            
+            default:
+                break;
+        }
+    }, [])
 
     const handleListingsFilter = useCallback((timeframe) => {
-        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-        switch (timeframe) {
-            case TWENTY_FOUR_HOURS:
-                getListingCount('1');
-                setLoadingListingCount(true);
-                break;
-
-            case SEVEN_DAYS:
-                getListingCount('7');
-                setLoadingListingCount(true);
-                break;
-
-            case THIRTY_DAYS:
-                getListingCount('30');
-                setLoadingListingCount(true);
-                break;
-
-            case THREE_MONTHS:
-                getListingCount('90');
-                setLoadingListingCount(true);
-                break;
-
-            case ALL:
-                setListings(totalListings);
-                break;
-            
-            default:
-                break;
-        }
-    }, [getListingCount, totalListings]);
+        handleSwitchCase(timeframe, getListingCount, setLoadingListingCount, setListings, totalListings)
+    }, [getListingCount, totalListings, handleSwitchCase]);
     
     const handleUsersFilter = useCallback((timeframe) => {
-        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-        switch (timeframe) {
-            case TWENTY_FOUR_HOURS:
-                getCustomerCount('1');
-                setLoadingCustomerCount(true);
-                break;
-
-            case SEVEN_DAYS:
-                getCustomerCount('7');
-                setLoadingCustomerCount(true);
-                break;
-
-            case THIRTY_DAYS:
-                getCustomerCount('30');
-                setLoadingCustomerCount(true);
-                break;
-
-            case THREE_MONTHS:
-                getCustomerCount('90');
-                setLoadingCustomerCount(true);
-                break;
-
-            case ALL:
-                setUsers(totalCustomers);
-                break;
-            
-            default:
-                break;
-        }
-    }, [getCustomerCount, totalCustomers]);
+        handleSwitchCase(timeframe, getCustomerCount, setLoadingCustomerCount, setUsers, totalCustomers)
+    }, [getCustomerCount, totalCustomers, handleSwitchCase]);
     
     const handleVolumeFilter = useCallback((timeframe) => {
-        const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-        switch (timeframe) {
-            case TWENTY_FOUR_HOURS:
-                getTransactionVolume('1');
-                setLoadingTransactionVolume(true);
-                break;
+        handleSwitchCase(timeframe, getTransactionVolume, setLoadingTransactionVolume, setVolume, totalEuroTransfered)
+    }, [getTransactionVolume, totalEuroTransfered, handleSwitchCase]);
 
-            case SEVEN_DAYS:
-                getTransactionVolume('7');
-                setLoadingTransactionVolume(true);
-                break;
-
-            case THIRTY_DAYS:
-                getTransactionVolume('30');
-                setLoadingTransactionVolume(true);
-                break;
-
-            case THREE_MONTHS:
-                getTransactionVolume('90');
-                setLoadingTransactionVolume(true);
-                break;
-
-            case ALL:
-                setVolume(totalEuroTransfered);
-                break;
-            
-            default:
-                break;
-        }
-    }, [getTransactionVolume, totalEuroTransfered]);
+    const handleActiveUserFilter = useCallback((timeframe) => {
+        handleSwitchCase(timeframe, getTransactionVolume, setLoadingTransactionVolume, setVolume, totalEuroTransfered)
+    }, [getTransactionVolume, totalEuroTransfered, handleSwitchCase]);
 
     // Get user count when user filter changes
     useEffect(() => {
@@ -487,59 +506,125 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
         }
     }, [handleVolumeFilter, volumeFilter]);
 
+    useEffect(() => {
+        if (!!activeUsersFilter) {
+            handleActiveUserFilter(activeUsersFilter)
+        }
+    }, [handleActiveUserFilter, activeUsersFilter]);
+
     const gotoCustomersPage = (e) => {
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
-            history.push(CUSTOMERS);
+            navigate.push(CUSTOMERS);
         }
     };
 
     const gotoListingsPage = (e) => {
         if (e.target.name !== 'listingFilter') {
-            history.push(LISTINGS);
+            navigate.push(LISTINGS);
         }
     };
 
     return (
         <>
             <Grid container direction="row" spacing={3} className={classes.root}>
-                <Grid item xs={12} className={classes.stats}>
-                    <Box component="div" className={classes.userAcquisitions}>
-                        <Typography variant="subtitle2" component="span" color="primary">Listings Breakdown</Typography>
-                        {/* <Paper className={classes.chart}> */}
-                            <Chart
-                                className={classes.chart}
-                                data={data}
-                                >
-                                <ArgumentAxis />
-                                <ValueAxis />
+                <Grid item xs={12} className={classes.content}>
+                    <GenericMiniCard 
+                    goToPage={gotoCustomersPage}
+                    cardName="Users" 
+                    cardIcon={<AccountSupervisor />} 
+                    filterType={usersFilter} 
+                    setFilterType={setUsersFilter} 
+                    loading={loadingCustomerCount}
+                    formatFn={formatNumber} 
+                    useCase={users}
+                    />
 
-                                <BarSeries
-                                    name="Gold Medals"
-                                    valueField="gold"
-                                    argumentField="country"
-                                    color="#ffd700"
-                                />
-                                <BarSeries
-                                    name="Silver Medals"
-                                    valueField="silver"
-                                    argumentField="country"
-                                    color="#c0c0c0"
-                                />
-                                <BarSeries
-                                    name="Bronze Medals"
-                                    valueField="bronze"
-                                    argumentField="country"
-                                    color="#cd7f32"
-                                />
-                                <Animation />
-                                <Legend position="bottom" rootComponent={Root} labelComponent={Label} />
-                                <Title text="Olimpic Medals in 2008" />
-                                <Stack />
-                            </Chart>
-                        {/* </Paper> */}
+                    <GenericMiniCard 
+                    cardName="Active Users"
+                    cardIcon={<AccountSupervisor />} 
+                    filterType={activeUsersFilter} 
+                    setFilterType={setActiveUsersFilter} 
+                    loading={loadingActiveUsers}
+                    formatFn="" 
+                    useCase=""
+                    />
+
+                    {/* //LISTING CARD */}
+                    <GenericMiniCard 
+                    goToPage={gotoListingsPage}
+                    cardName="Listing" 
+                    cardIcon={<Receipt />} 
+                    filterType={listingFilter} 
+                    setFilterType={setListingFilter} 
+                    loading={loadingListingCount}
+                    formatFn={formatNumber} 
+                    useCase={listings}
+                    />
+
+                    {/* //VOLUME CARD */}
+                    <GenericMiniCard 
+                    // goToPage={gotoListingsPage}
+                    cardName="Volume" 
+                    cardIcon={<ViewDashboardVariant />} 
+                    filterType={volumeFilter} 
+                    setFilterType={setVolumeFilter} 
+                    loading={loadingTransactionVolume}
+                    formatFn={formatNumber} 
+                    useCase={volume}
+                    />
+                </Grid>
+
+                <Grid item xs={12} className={classes.stats}>
+                    <Box component="div" className={classes.userGraph}>
+                        <Typography className={classes.graphName} variant="h6" component="h6" color="primary">Listings Breakdown</Typography>
+                        <Chart
+                            data={data2}
+                            className={classes.chart}
+                            >
+                            <ArgumentScale factory={scalePoint} />
+                            <ArgumentAxis />
+                            <ValueAxis />
+
+                            <LineSeries
+                                name="Hydro-electric"
+                                valueField="hydro"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <LineSeries
+                                name="Oil"
+                                valueField="oil"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <LineSeries
+                                name="Natural gas"
+                                valueField="gas"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <LineSeries
+                                name="Coal"
+                                valueField="coal"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <LineSeries
+                                name="Nuclear"
+                                valueField="nuclear"
+                                argumentField="country"
+                                seriesComponent={Line}
+                            />
+                            <Legend className={classes.legend} position="top" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
+                            {/* <Title
+                                text="Energy Consumption in 2004\n(Millions of Tons, Oil Equivalent)"
+                                textComponent={'Text'}
+                            /> */}
+                            <Animation />
+                        </Chart>
                     </Box>
-                    <Box component="div" className={classes.listingsBreakdown}>
-                        <Typography variant="subtitle2" component="span" color="primary">User Acquisitions</Typography>
+                    <Box component="div" className={classes.userGraph}>
+                        <Typography className={classes.graphName} variant="h6" component="h6" color="primary">User Acquisitions</Typography>
                         {/* <Paper className={classes.chart}> */}
                                 <Chart
                                     className={classes.chart}
@@ -567,289 +652,104 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         color="#cd7f32"
                                     />
                                     <Animation />
-                                    <Legend position="bottom" rootComponent={Root} labelComponent={Label} />
-                                    <Title text="Olimpic Medals in 2008" />
+                                    <Legend position="top" rootComponent={Root} labelComponent={Label} />
+                                    {/* <Title text="Olimpic Medals in 2008" /> */}
                                     <Stack />
                                 </Chart>
                             {/* </Paper> */}
                     </Box>
                 </Grid>
-                <Grid item xs={12} className={classes.content}>
-                    <Box component="div" className={classes.contentItem} onClick={gotoCustomersPage}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Users</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={usersFilter}
-                                    onChange={(e) => setUsersFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Users Filter' }}
-                                    name="usersFilter"
-                                    disabled={loadingCustomerCount}
-                                >
-                                    <MenuItem value="" disabled>Select Users Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Users Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingCustomerCount ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    formatNumber(users)
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem}>
-                        <Typography variant="subtitle2" component="span" color="primary">Active Users</Typography>
-                        <Typography variant="h5" color="primary" className={classes.statsHeader}>200,000 (95%)</Typography>
-                    </Box>
-                    <Box component="div" className={classes.contentItem}>
-                        <Typography variant="subtitle2" component="span" color="primary">Support Board</Typography>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
-                            
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }} onClick={gotoListingsPage}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Listings</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={listingFilter}
-                                    onChange={(e) => setListingFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Listing Filter' }}
-                                    name="listingFilter"
-                                    disabled={loadingListingCount}
-                                >
-                                    <MenuItem value="" disabled>Select Listing Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Listing Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingListingCount ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    formatNumber(listings)
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
-                        <Box component="div" className={classes.dropDownContainer}>
-                            <Typography variant="subtitle2" component="span" color="primary">Volume</Typography>
-                            <FormControl 
-                                variant="outlined"
-                            >
-                                <Select
-                                    value={volumeFilter}
-                                    onChange={(e) => setVolumeFilter(e.target.value)}
-                                    displayEmpty
-                                    classes={{ select: classes.select }}
-                                    inputProps={{ 'aria-label': 'Select Volume Filter' }}
-                                    name="volumeFilter"
-                                    disabled={loadingTransactionVolume}
-                                >
-                                    <MenuItem value="" disabled>Select Volume Filter</MenuItem>
-                                    {Object.entries(ADMIN_FILTERS).map(([key, value], index) => (
-                                        <MenuItem key={index} value={value}>{value}</MenuItem>
-                                    ))}
-                                </Select>
-                                {/* <FormHelperText>Select Volume Filter</FormHelperText> */}
-                            </FormControl>
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>
-                                {loadingTransactionVolume ? 
-                                    <Box component="div" className={classes.filterLoaderContainer}>
-                                        <Typography>Please wait . . .</Typography>&nbsp;&nbsp;&nbsp;
-                                        <CircularProgress
-                                            variant="indeterminate"
-                                            disableShrink
-                                            className={classes.top}
-                                            classes={{
-                                                circle: classes.circle,
-                                            }}
-                                            size={40}
-                                            thickness={4}
-                                        />
-                                    </Box>
-                                    : 
-                                    `EUR ${formatNumber(volume)}`
-                                }
-                            </Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">Total</Typography>
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.contentItem} style={{ backgroundColor: '#FBEDFF' }}>
-                        <Typography variant="subtitle2" component="span" color="primary">AML Board</Typography>
-                        <Box component="div">
-                            <Typography variant="h5" color="primary" className={classes.statsHeader}>User Activities</Typography>
-                            
-                            
-                        </Box>
-                    </Box>
-                </Grid>
+
                 <Grid item xs={12} className={classes.stats}>
-                    <Box component="div" className={classes.userActivities}>
-                        <Typography variant="subtitle2" component="span" color="primary">User Activities</Typography>
-                        <div className={classes.userActivitiesHeader}>
-                            <Typography  variant="subtitle2">
+                    <Box component="div" className={[classes.contentItem, classes.contentItemLong]}>
+                        <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">Support Board</Typography>
+
+                        <Box component="div" className={classes.supportTable}>
+                            <Box component="div" className={classes.supportContent}>
+                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Total Tickets</Typography>
+                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">120</Typography>
+                            </Box>
+
+                            <Box component="div" className={classes.supportContent}>
+                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">In progress</Typography>
+                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">25</Typography>
+                            </Box>
+
+                            <Box component="div" className={classes.supportContent}>
+                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Awaiting clients reply</Typography>
+                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">10</Typography>
+                            </Box>
+
+                            <Box component="div" className={classes.supportContent}>
+                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">New</Typography>
+                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">40</Typography>
+                            </Box>
+
+                            <Box component="div" className={classes.supportContent}>
+                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Unresolved</Typography>
+                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">120</Typography>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    <Box component="div" className={classes.contentItem}>
+                        <Typography variant="subtitle2" component="span" color="primary"></Typography>
+                        <Box component="div">
+                            <Typography variant="h5" color="primary" className={classes.statsHeader}></Typography>       
+                        </Box>
+                    </Box>      
+                </Grid>
+                
+                <Grid item xs={12} className={classes.stats}>
+                    <Box component="div" className={[classes.contentItem, classes.userActivities]}>
+                        <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">User Activities</Typography>
+                        <Box component="div"className={classes.userActivitiesHeader}>
+                            <Typography component="h6" variant="subtitle1">
                                 Category
                             </Typography>
-                            <div className={classes.subActivitiesHeader} compoennt="div" variant="subtitle2">
-                                <Typography>Nos</Typography>
-                                <Typography>&#37;</Typography>
-                            </div>
-                        </div>
+                            <Typography component="h6" variant="subtitle1">Number</Typography>
+                            <Typography component="h6" variant="subtitle1">&#37;</Typography>
+                        </Box>
 
-                        <div className={classes.userActivitiesBody}>
-                            <Typography  variant="subtitle2">
-                                No profile
-                            </Typography>
-                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
-                                <Typography>344</Typography>
-                                <Typography>5%</Typography>
-                            </div>
-                        </div>
-
-                        <div className={classes.userActivitiesBody}>
-                            <Typography  variant="subtitle2">
-                                Not signed in in the last 30days
-                            </Typography>
-                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
-                                <Typography>325</Typography>
-                                <Typography>50%</Typography>
-                            </div>
-                        </div>
-
-                        <div className={classes.userActivitiesBody}>
-                            <Typography  variant="subtitle2">
-                                Have transact in the last 30days
-                            </Typography>
-                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
-                                <Typography>200</Typography>
-                                <Typography>20%</Typography>
-                            </div>
-                        </div>
-
-                        <div className={classes.userActivitiesBody}>
-                            <Typography  variant="subtitle2">
-                                No listing in the last 30days
-                            </Typography>
-                            <div className={classes.subActivitiesBody} compoennt="div" variant="subtitle2">
-                                <Typography>650</Typography>
-                                <Typography>5%</Typography>
-                            </div>
-                        </div>
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No Profile'} number={totalCustomersWithNoProfile} progressNumber={totalNoProfilePercent} />
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'Not signed in in the last 30days'} number={323} progressNumber={10} />
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'Have transact in the last 30days'} number={200} progressNumber={100} />
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No listing in the last 30days'} number={650} progressNumber={100} />
                     </Box>
-                    <Box component="div" className={classes.recentTransactions}>
-                        <div className={classes.recentHeader}>
-                            <Typography variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
-                            <Typography variant="subtitle2" component="span" color="primary">
-                                {/* <CalendarTodayIcon /> */}
-                                23-30 March 2022
-                                </Typography>
-                        </div>
-                       <div className={classes.recentContent}>
-                            <div className={classes.recentTable}>
-                                <Typography variant="subtitle2">
-                                    NEWEST
-                                </Typography>
-                                <div className={classes.recentBody}>
-                                    <Typography className={classes.recentRow} component="div" variant="body1">
-                                        <Typography variant="subtitle1">&#43;</Typography>
-                                        <Typography className={classes.recentCell} variant="body1">
-                                            Listing
-                                            <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
-                                        </Typography>
-                                    </Typography>
-                                    <Typography variant="subtitle2">&#43; &#163; 2,000</Typography>
-                                </div>
+                    <Box component="div" className={classes.transactionSection}>
+                        <Box component="div" className={[classes.contentItem, classes.recentTransactions]}>
+                            <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
+            
+                           <Box component="div" className={classes.recentTransactionList}>
+                                <RecentTransactions classes={classes} recentName={'Listing'} recentDate={ '22 DEC, 2021 7:00PM' } recentAmount={3000}>
+                                    <CompareHorizontal className={classes.recentIcon} color="primary" />
+                                </RecentTransactions>
 
-                                <div className={classes.recentBody}>
-                                    <Typography className={classes.recentRow_2} component="div" variant="body1">
-                                        <Typography variant="subtitle1">&#8722;</Typography>
-                                        <Typography variant="body1">
-                                            Purchase
-                                            <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
-                                        </Typography>
-                                    </Typography>
-                                    <Typography className={classes.recentCells} variant="subtitle2">&#8722; &#163; 5,000</Typography>
-                                </div>
-                            </div>
+                                <RecentTransactions classes={classes} recentName={'Purchase'} recentDate={ '22 DEC, 2021 7:00PM' } recentAmount={3000}>
+                                    <BankOutline className={classes.recentIcon} color="primary" style={{ color: 'purple' }}/>
+                                </RecentTransactions>
 
-                            <div className={classes.recentTable}>
-                                <Typography variant="subtitle2">
-                                    YESTERDAY
-                                </Typography>
-                                <div className={classes.recentBody}>
-                                    <Typography className={classes.recentRow} component="div" variant="body1">
-                                        <Typography variant="subtitle1">&#43;</Typography>
-                                        <Typography className={classes.recentCell} variant="body1">
-                                            Listing
-                                            <Typography variant="subtitle1">27 March 2021, at 4:30PM</Typography>
-                                        </Typography>
-                                    </Typography>
-                                    <Typography variant="subtitle2">&#43; &#163; 2,000</Typography>
-                                </div>
+                                <RecentTransactions classes={classes} recentName={'Withdrawal'} recentDate={ '22 DEC, 2021 7:00PM' } recentAmount={3000}>
+                                    <ArrowTopRight className={classes.recentIcon} style={{ color: 'red' }} />
+                                </RecentTransactions>
 
-                                <div className={classes.recentBody}>
-                                    <Typography className={classes.recentRow_2} component="div" variant="body1">
-                                        <Typography variant="subtitle1">&#8722;</Typography>
-                                        <Typography variant="body1">
-                                            Purchase
-                                            <Typography variant="subtitle1">27 March 2021, at 12:30PM</Typography>
-                                        </Typography>
-                                    </Typography>
-                                    <Typography className={classes.recentCells} variant="subtitle2">&#8722; &#163; 5,000</Typography>
-                                </div>
-                            </div>
-                       </div>
-                                                
+                                <RecentTransactions classes={classes} recentName={'Deposit'} recentDate={ '22 DEC, 2021 7:00PM' } recentAmount={3000}>
+                                    <ArrowBottomLeft className={classes.recentIcon} color="primary" />
+                                </RecentTransactions>
+                           </Box>
+                           
+                        </Box>
+                        <Box component="div" className={[classes.contentItem, classes.amlBoard]}>
+                            <Typography className={classes.graphName} variant="subtitle2" component="h5" color="primary">AML Board</Typography>
+
+                            <Box component="div" className={classes.amlContent}>
+                                <AmlBoard classes={classes} amlTitle={"Transaction withhold"} amlNumber={24} />
+                                <AmlBoard classes={classes} amlTitle={"Unassigned risk profile"} amlNumber={30} />
+                                <AmlBoard classes={classes} amlTitle={"Suspended accounts"} amlNumber={12} />
+                                <AmlBoard classes={classes} amlTitle={"Pending cases"} amlNumber={28} />
+                                <AmlBoard classes={classes} amlTitle={"Watch list"} amlNumber={40}/>
+                            </Box>
+                        </Box>
                     </Box>
                 </Grid>
             </Grid>

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
@@ -13,14 +13,14 @@ import {
     Grid,
     Menu,
     MenuItem,
-    Paper,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TablePagination,
-    TableRow,
+    // Paper,
+    // Table,
+    // TableBody,
+    // TableCell,
+    // TableContainer,
+    // TableHead,
+    // TablePagination,
+    // TableRow,
     Typography
 } from '@material-ui/core';
 
@@ -46,14 +46,24 @@ import RejectedCustomers from './RejectedCustomers';
 import VerifiedCustomers from './VerifiedCustomers';
 import SuccessModal from '../../../components/common/SuccessModal';
 import isEmpty from '../../../utils/isEmpty';
+import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
+import GenericButton from '../../../components/admin-dashboard/GenericButton'
+import { ArrowTopRight } from 'mdi-material-ui';
+
 
 const useStyles = makeStyles((theme) => ({
     root: {
-        padding: theme.spacing(0, 3)
+        // padding: theme.spacing(0, 3),
+        backgroundColor: 'white',
+        paddingRight: theme.spacing(8),
+        paddingLeft: theme.spacing(5),
+        paddingTop: theme.spacing(9),
+        paddingBottom: theme.spacing(12),
     },
 
     title: {
-        fontWeight: 600
+        fontWeight: 600,
+        fontSize: theme.spacing(3)
     },
 
     link: {
@@ -63,55 +73,47 @@ const useStyles = makeStyles((theme) => ({
 
     filterContainer: {
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
-        gap: theme.spacing(4),
-        marginTop: theme.spacing(1)
+        gridTemplateColumns: '.1fr .1fr .1fr .1fr .1fr',
+        // gap: theme.spacing(4),
+        marginTop: theme.spacing(3),
+        borderBottom: '1px solid #E3E8EE'
     },
 
     filter: {
-        backgroundColor: COLORS.lightTeal,
-        border: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
+        // backgroundColor: COLORS.lightTeal,
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        padding: theme.spacing(1),
-
-        '& span:first-child': {
-            fontWeight: 600,
-            color: theme.palette.primary.main
+        // padding: theme.spacing(1),
+        width: 'fit-content',
+        gap: theme.spacing(1),
+        color: '#697386',
+        padding: '5px',
+        
+        '& span': {
+            fontWeight: '600'
         },
 
-        '& span:last-child': {
-            color: theme.palette.primary.main,
-            fontWeight: 600
+        '& span:nth-child(2)': {
+            color: '#1E625E',
+            backgroundColor: '#AEC7C0',
+            padding: '0px 3px',
+            borderRadius: theme.spacing(1)
         }
     },
 
     active: {
-        backgroundColor: theme.palette.primary.main,
-        
-        '& span': {
-            color: `${COLORS.offWhite} !important`,
-        }
+        borderBottom: '2px solid #1E6262'
     },
 
     table: {
-        borderTop: `1px solid ${theme.palette.primary.main}`,
-        borderLeft: `1px solid ${theme.palette.primary.main}`,
-        borderRight: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
-        borderBottomLeftRadius: 0,
-        borderBottomRightRadius: 0,
-        maxHeight: '50vh',
-        backgroundColor: COLORS.lightTeal,
-        marginTop: theme.spacing(3)
+        marginTop: theme.spacing(2)
     },
 
     tableHeader: {
         display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
+        gridTemplateColumns: '0.2fr 1.5fr 1.5fr 2fr 1fr 0.5fr 0.8fr 0.5fr',
     },
 
     content: {
@@ -135,9 +137,21 @@ const useStyles = makeStyles((theme) => ({
     },
 
     menu: {
-        backgroundColor: COLORS.lightTeal,
-        border: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius
+        backgroundColor: 'white',
+        border: `none`,
+        borderRadius: theme.spacing(1.9),
+        marginRight: '10px',
+        cursor: 'pointer',
+        left: '1695px !important',
+
+        '& ul': {
+            padding: '0'
+        },
+
+        '& li': {
+            padding: theme.spacing(2),
+            paddingLeft: theme.spacing(2.5)
+        }
     }
 }));
 
@@ -176,10 +190,12 @@ const columns = [
     }
 ];
 
+const gridColumns = '0.2fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+
 const Customers = (props) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const { admin } = useSelector(state => state);
     const { confirmed, customer, customers, msg, noProfile, pending, rejected, suspended } = useSelector(state => state.customers);
@@ -191,10 +207,13 @@ const Customers = (props) => {
         totalSuspendedCustomers,
         totalCustomersWithNoProfile 
     } = useSelector(state => state.stats);
+    const [ isDisabled, setDisabled ] = useState(true)
+
+    // const { isMenuOpen } = useSelector(state => state.admin);
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
 
-    const pages = [10, 25, 100]
+    const pages = [20, 50, 75, 100]
     
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
@@ -202,8 +221,10 @@ const Customers = (props) => {
     const [error, setError] = useState('');
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
-    const [filter, setFilter] = useState(NO_PROFILE);
+    const [filter, setFilter] = useState(ALL_CUSTOMERS);
     const [anchorEl, setAnchorEl] = useState(null);
+    const [pageNumber, setPageNumber] = useState(0)
+    const [pageNumberList, setPageNumberList] = useState([])
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -226,6 +247,52 @@ const Customers = (props) => {
     } = props;
 
     const successModal = useRef();
+
+    const handlePageNUmberList = useCallback(() => {
+        const pageNumArr = []
+        if (pageNumber >= 1) {
+            for (let i=1; i<=pageNumber; i++) {
+                pageNumArr.push(i)
+            }
+        }
+        setPageNumberList(pageNumArr)
+    }, [pageNumber])
+
+    const nextPage = useCallback(() => {
+        switch (filter) {
+            case CONFIRMED:
+                setCustomerCount(confirmed.totalItemCount || 0);
+                break;
+
+            case PENDING:
+                setCustomerCount(pending.totalItemCount || 0);
+                break;
+
+            case REJECTED:
+                setCustomerCount(rejected.totalItemCount || 0);
+                break;
+
+            case SUSPENDED:
+                setCustomerCount(suspended.totalItemCount || 0);
+                break;
+
+            case NO_PROFILE:
+                setCustomerCount(noProfile.totalItemCount || 0);
+                break;
+            
+            case ALL_CUSTOMERS:
+                setPage(page + 1)
+                getCustomers({
+                    pageSize: pages[0] += pages[0] + 5,
+                    pageNumber: page
+                });
+                break;
+
+            default:
+                setCustomerCount(0);
+                break;
+        }
+    })
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -420,12 +487,13 @@ const Customers = (props) => {
                     pageSize: rowsPerPage,
                     pageNumber: page
                 });
+                setPageNumber(Math.ceil(totalCustomers/20))
+                handlePageNUmberList()
                 break;
-
             default:
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page]);
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, totalCustomers]);
 
     // Get customers when page number changes
     useEffect(() => {
@@ -445,14 +513,14 @@ const Customers = (props) => {
         }
     }, [fetchCustomers, rowsPerPage]);
 
-    const handleChangePage = (event, newPage) => {
-        setPage(newPage);
-    };
+    // const handleChangePage = (event, newPage) => {
+    //     setPage(newPage);
+    // };
 
-    const handleChangeRowsPerPage = (event) => {
-        setRowsPerPage(+event.target.value);
-        setPage(1);
-    };
+    // const handleChangeRowsPerPage = (event) => {
+    //     setRowsPerPage(+event.target.value);
+    //     setPage(1);
+    // };
 
 
     const handleSetFilter = (filter) => {
@@ -489,6 +557,7 @@ const Customers = (props) => {
                     pageNumber: 1,
                     pageSize: rowsPerPage
                 });
+
                 break;
 
             case SUSPENDED:
@@ -576,12 +645,12 @@ const Customers = (props) => {
     const viewDetails = () => {
         handleClose();
         // handleSetTitle('User Details');
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        navigate(`${CUSTOMERS}/${customer.id}`);
     };
 
     const editProfile = () => {
         handleClose();
-        history.push(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
+        navigate(`${CUSTOMERS}/${customer.id}`, { editProfile: true });
     };
 
     const contact = () => {
@@ -606,7 +675,7 @@ const Customers = (props) => {
             type: SET_CUSTOMER,
             payload: customer
         });
-        history.push(`${CUSTOMERS}/${customer.id}`);
+        navigate(`${CUSTOMERS}/${customer.id}`);
     }
 
 
@@ -631,18 +700,22 @@ const Customers = (props) => {
             <section className={classes.root}>
                 <Grid container direction="row" justifyContent="space-between">
                     <Grid item>
-                        <Typography variant="body1" className={classes.title}>Customers</Typography>
+                        <Typography variant="body1" className={classes.title}>All Users</Typography>
                     </Grid>
                     <Grid item>
-                        <Typography variant="body1" className={classes.link} onClick={downloadRecords}>Download Records</Typography>
+                        <Box component="div">
+                            <GenericButton buttonName="Export" onClick={downloadRecords}>
+                                <ArrowTopRight />
+                            </GenericButton>
+                        </Box>
                     </Grid>
                 </Grid>
                 <Box component="section" className={classes.filterContainer}>
-                    <div className={clsx(classes.filter, filter === NO_PROFILE && classes.active)} onClick={() => handleSetFilter(NO_PROFILE)}>
-                        <Typography variant="subtitle2" component="span">No Profile</Typography>
-                        <Typography variant="subtitle2" component="span">{totalCustomersWithNoProfile}</Typography>
+                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
+                        <Typography variant="subtitle2" component="span">All</Typography>
+                        <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
                     </div>
-                    <div className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => handleSetFilter(CONFIRMED)}>
+                    <div style={{ color: '#1E6262'}} className={clsx(classes.filter, filter === CONFIRMED && classes.active)} onClick={() => handleSetFilter(CONFIRMED)}>
                         <Typography variant="subtitle2" component="span">Verified</Typography>
                         <Typography variant="subtitle2" component="span">{totalApprovedCustomers}</Typography>
                     </div>
@@ -654,67 +727,105 @@ const Customers = (props) => {
                         <Typography variant="subtitle2" component="span">Suspended</Typography>
                         <Typography variant="subtitle2" component="span">{totalSuspendedCustomers}</Typography>
                     </div>
-                    <div className={clsx(classes.filter, filter === ALL_CUSTOMERS && classes.active)} onClick={() => handleSetFilter(ALL_CUSTOMERS)}>
-                        <Typography variant="subtitle2" component="span">All</Typography>
-                        <Typography variant="subtitle2" component="span">{totalCustomers}</Typography>
+                    <div className={clsx(classes.filter, filter === NO_PROFILE && classes.active)} onClick={() => handleSetFilter(NO_PROFILE)}>
+                        <Typography variant="subtitle2" component="span">No Profile</Typography>
+                        <Typography variant="subtitle2" component="span">{totalCustomersWithNoProfile}</Typography>
                     </div>
                 </Box>
-                <Paper>
-                    <TableContainer className={classes.table}>
-                        <Table stickyHeader aria-label="sticky table" style={{ width: '100%' }}>
-                            <TableHead>
-                                <TableRow className={classes.tableHeader}>
-                                    {columns.map((column) => (
-                                        <TableCell
-                                            key={column.id}
-                                            align={column.align}
-                                            style={{ background: 'transparent', minWidth: column.minWidth, fontWeight: 'bold',  }}
-                                        >
-                                            {column.label}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody className={classes.content}>
-                                {filter === NO_PROFILE && 
-                                    <NoProfileCustomers 
-                                        handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle} 
-                                        viewCustomerProfile={viewCustomerProfile} 
-                                    />
-                                }
-                                {filter === SUSPENDED && 
-                                    <SuspendedCustomers 
-                                        handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle} 
-                                        viewCustomerProfile={viewCustomerProfile}
-                                    />
-                                }
-                                {filter === CONFIRMED && 
-                                    <VerifiedCustomers 
-                                        handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle} 
-                                        viewCustomerProfile={viewCustomerProfile}
-                                    />
-                                }
-                                {filter === REJECTED && 
-                                    <RejectedCustomers 
-                                        handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle} 
-                                        viewCustomerProfile={viewCustomerProfile}
-                                    />
-                                }
-                                {filter === ALL_CUSTOMERS && 
-                                    <AllCustomers 
-                                        handleClick={handleClick} 
-                                        handleSetTitle={handleSetTitle}
-                                        viewCustomerProfile={viewCustomerProfile}
-                                    />
-                                }
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                    <TablePagination
+                {/* <Paper> */}
+                <Box component="div" className={classes.table}>
+                    <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
+                    {filter === NO_PROFILE && 
+                        <NoProfileCustomers 
+                            handleClick={handleClick} 
+                            handleSetTitle={handleSetTitle} 
+                            viewCustomerProfile={viewCustomerProfile} 
+                        />
+                    }
+                    {filter === SUSPENDED && 
+                        <SuspendedCustomers 
+                            handleClick={handleClick} 
+                            handleSetTitle={handleSetTitle} 
+                            viewCustomerProfile={viewCustomerProfile}
+                        />
+                    }
+                    {filter === CONFIRMED && 
+                        <VerifiedCustomers 
+                            handleClick={handleClick} 
+                            handleSetTitle={handleSetTitle} 
+                            viewCustomerProfile={viewCustomerProfile}
+                        />
+                    }
+                    {filter === REJECTED && 
+                        <RejectedCustomers 
+                            handleClick={handleClick} 
+                            handleSetTitle={handleSetTitle} 
+                            viewCustomerProfile={viewCustomerProfile}
+                        />
+                    }
+                    {filter === ALL_CUSTOMERS && 
+                        <AllCustomers 
+                            handleClick={handleClick} 
+                            handleSetTitle={handleSetTitle}
+                            viewCustomerProfile={viewCustomerProfile}
+                        />
+                    }
+                </Box>
+                {/* <TableContainer className={classes.table}>
+                    <Table stickyHeader aria-label="sticky table" style={{ width: '100%' }}>
+                        <TableHead>
+                            <TableRow className={classes.tableHeader}>
+                                {columns.map((column, i) => (
+                                    <TableCell
+                                        key={i}
+                                        // align={column.align}
+                                        style={{ background: 'transparent', minWidth: column.minWidth, fontWeight: 'bold',  }}
+                                    >
+                                        {column.label}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableHead>
+                        <TableBody className={classes.content}>
+                            {filter === NO_PROFILE && 
+                                <NoProfileCustomers 
+                                    handleClick={handleClick} 
+                                    handleSetTitle={handleSetTitle} 
+                                    viewCustomerProfile={viewCustomerProfile} 
+                                />
+                            }
+                            {filter === SUSPENDED && 
+                                <SuspendedCustomers 
+                                    handleClick={handleClick} 
+                                    handleSetTitle={handleSetTitle} 
+                                    viewCustomerProfile={viewCustomerProfile}
+                                />
+                            }
+                            {filter === CONFIRMED && 
+                                <VerifiedCustomers 
+                                    handleClick={handleClick} 
+                                    handleSetTitle={handleSetTitle} 
+                                    viewCustomerProfile={viewCustomerProfile}
+                                />
+                            }
+                            {filter === REJECTED && 
+                                <RejectedCustomers 
+                                    handleClick={handleClick} 
+                                    handleSetTitle={handleSetTitle} 
+                                    viewCustomerProfile={viewCustomerProfile}
+                                />
+                            }
+                            {filter === ALL_CUSTOMERS && 
+                                <AllCustomers 
+                                    handleClick={handleClick} 
+                                    handleSetTitle={handleSetTitle}
+                                    viewCustomerProfile={viewCustomerProfile}
+                                />
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer> */}
+                    {/* <TablePagination
                         rowsPerPageOptions={pages}
                         component="div"
                         count={customerCount}
@@ -725,8 +836,8 @@ const Customers = (props) => {
                         classes={{
                             root: classes.pagination
                         }}
-                    />
-                </Paper>
+                    /> */}
+                {/* </Paper> */}
                 <Menu
                     id="customer-menu"
                     anchorEl={anchorEl}
@@ -734,6 +845,7 @@ const Customers = (props) => {
                     open={Boolean(anchorEl)}
                     onClose={handleClose}
                     classes={{ paper: classes.menu }}
+                    disableScrollLock={ true }
                 >
                     <MenuItem onClick={viewDetails}>View Details</MenuItem>
                     <Divider />
@@ -745,6 +857,27 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
+
+
+                <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                    <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                        <Typography component="span">{'20'} results</Typography>
+                    </Box>
+
+                    <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+                            <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                        </Box> 
+                        <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                            {
+                                pageNumberList.map(n => (
+                                    <Typography variant="subtitle2">{n}</Typography>
+                                ))
+                            }
+                        </Box>
+                    </Box>                    
+                </Box>
             </section>
         </>
     );

@@ -1,66 +1,71 @@
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { 
-    Checkbox,
-    FormControlLabel,
-    IconButton, 
-    TableCell, 
-    TableRow, 
-    Typography 
-} from '@material-ui/core';
+// import { 
+//     Checkbox,
+//     FormControlLabel,
+//     IconButton, 
+//     TableCell, 
+//     TableRow, 
+//     Typography 
+// } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { DotsHorizontal } from 'mdi-material-ui';
-import TextClamp from 'react-string-clamp';
+// import { DotsHorizontal } from 'mdi-material-ui';
+// import TextClamp from 'react-string-clamp';
 
-import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
+// import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import { getCustomers } from '../../../actions/customer';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
-const useStyles = makeStyles(theme => ({
-    customer: {
-        background: 'transparent',
-        display: 'grid',
-        gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
-        alignItems: 'center',
 
-        '&:last-child': {
-            borderBottom: 'none'
-        }
-    },
+// const useStyles = makeStyles(theme => ({
+//     customer: {
+//         background: 'transparent',
+//         display: 'grid',
+//         gridTemplateColumns: '0.2fr 1.5fr 1.5fr 2fr 1fr 0.5fr 0.8fr 0.5fr',
+//         alignItems: 'center',
 
-    text: {
-        color: COLORS.offBlack,
-        fontWeight: 400,
-        padding: theme.spacing(1),
+//         '&:last-child': {
+//             borderBottom: 'none'
+//         },
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(1.2)
-        },
+//         borderBottom: '1px solid grey'
+//     },
 
-        [theme.breakpoints.down('md')]: {
-            fontSize: theme.spacing(0.7)
-        }
-    },
+//     text: {
+//         color: COLORS.offBlack,
+//         fontWeight: 400,
+//         padding: theme.spacing(1),
 
-    item: {
-        border: 'none',
-        marginBottom: 0
-    },
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(1.2)
+//         },
+
+//         [theme.breakpoints.down('md')]: {
+//             fontSize: theme.spacing(0.7)
+//         }
+//     },
+
+//     item: {
+//         border: 'none',
+//         // borderBottom: '1px solid grey',
+//         marginBottom: 0
+//     },
     
-    button: {
-        justifySelf: 'center'
-    },
+//     button: {
+//         justifySelf: 'center'
+//     },
 
-    customerLink: {
-        color: `${theme.palette.primary.main}`,
-        cursor: 'pointer'
-    }
-}));
+//     customerLink: {
+//         color: `${theme.palette.primary.main}`,
+//         cursor: 'pointer'
+//     }
+// }));
+
 
 const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
-    const classes = useStyles();
-    const dispatch = useDispatch();
+    // const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
 
@@ -73,27 +78,20 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
     //     // eslint-disable-next-line
     // }, []);
 
-    useEffect(() => {
-        return () => {
-            dispatch({ type: CLEAR_ALL_CUSTOMERS });
-        };
+    // useEffect(() => {
+    //     return () => {
+    //         dispatch({ type: CLEAR_ALL_CUSTOMERS });
+    //     };
 
-        // eslint-disable-next-line
-    }, []);
-
-    const handleButtonClick = (customer, e) => {
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer
-        });
-        handleClick(e);
-    };
+    //     // eslint-disable-next-line
+    // }, []);
 
     return (
         <>
-            {customers && customers.map((customer) => (
+            <GenericTableBody data={customers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            {/* {customers && customers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
-                    <TableCell className={classes.item}>
+                    <TableCell className={classes.F}>
                         <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
                     </TableCell>
                     <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}><TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} className={classes.text} /></TableCell>
@@ -116,7 +114,7 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile }) => {
                         </IconButton>
                     </TableCell>
                 </TableRow>
-            ))}
+            ))} */}
         </>
     );
 };

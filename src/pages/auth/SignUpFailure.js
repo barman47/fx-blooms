@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { 
     Container,
@@ -53,10 +53,9 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SignUpSuccess = (props) => {
+const SignUpFailure = () => {
     const classes = useStyles();
-
-    const handleTryAgain = () => window.history.back();
+    const navigate = useNavigate();
 
     return (
         <>
@@ -68,11 +67,11 @@ const SignUpSuccess = (props) => {
                 <div className={classes.content}>
                     <Typography variant="h5">Sign Up Failed</Typography>
                     <Typography variant="subtitle1" component="p">Sign up was unsuccessful. Please try again.</Typography>
-                    <Button color="primary" onClick={handleTryAgain}>Try Again</Button>
+                    <Button color="primary" onClick={() => navigate(-1)}>Try Again</Button>
                 </div>
             </Container>
         </>
     );
 };
 
-export default SignUpSuccess;
+export default SignUpFailure;

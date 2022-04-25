@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory, useLocation} from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
 const AddUsername = ({ addUsername }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
 
@@ -89,7 +89,7 @@ const AddUsername = ({ addUsername }) => {
 
     useEffect(() => {
         if (!location?.state?.addUsername) {
-            return history.push(LOGIN);
+            return navigate(LOGIN);
         }
         // eslint-disable-next-line
     }, []);
@@ -117,7 +117,7 @@ const AddUsername = ({ addUsername }) => {
 
         setErrors({});
         setLoading(true);
-        addUsername(Username, history);
+        addUsername(Username, navigate);
     };   
 
     return (

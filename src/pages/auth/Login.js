@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory, useLocation} from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useLocation} from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -114,7 +114,7 @@ const Login = ({ externalLogin, login }) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const location = useLocation();
     const errorsState = useSelector(state => state.errors);
     const { customer } = useSelector(state => state);
@@ -129,11 +129,11 @@ const Login = ({ externalLogin, login }) => {
 
     useEffect(() => {
         if (customer.isAuthenticated) {
-            return history.push(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
         if (location.state?.msg) {
             setErrors({ msg: location.state.msg });
-            history.replace(location.pathname, {});
+            // navigate(location.pathname, {});
         }
         // eslint-disable-next-line
     }, []);
@@ -153,9 +153,9 @@ const Login = ({ externalLogin, login }) => {
     useEffect(() => {
         if (customer.twoFactorEnabled === true && loading) {
             setLoading(false);
-            history.push(VERIFY_2FA, { twoFactorEnabled: true });
+            navigate(VERIFY_2FA, { twoFactorEnabled: true });
         }
-    }, [customer, history, loading]);
+    }, [customer, navigate, loading]);
 
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -174,7 +174,7 @@ const Login = ({ externalLogin, login }) => {
             provider: 'google',
             idToken: tokenId
         };
-        externalLogin(data, history);
+        externalLogin(data, navigate);
     };
 
     const handleFormSubmit = (e) => {
@@ -192,7 +192,7 @@ const Login = ({ externalLogin, login }) => {
         setErrors({});
         setOpen(false);
         setLoading(true);
-        login(data, history);
+        login(data, navigate);
     };   
 
     return (
@@ -281,14 +281,16 @@ const Login = ({ externalLogin, login }) => {
                                                     aria-label="toggle password visibility"
                                                     onClick={toggleShowPassword}
                                                 >
-                                                    {showPassword ? 
+                                                    {Password.length > 0 ? 
+                                                        showPassword ?
                                                         <Tooltip title="Hide Password" placement="bottom" arrow>
+                                                            <EyeOffOutline />
+                                                        </Tooltip> : 
+                                                        <Tooltip title="Show Password" placement="bottom" arrow>
                                                             <EyeOutline />
                                                         </Tooltip>
                                                             : 
-                                                            <Tooltip title="Show Password" placement="bottom" arrow>
-                                                            <EyeOffOutline />
-                                                        </Tooltip>
+                                                        <span></span>
                                                      }
                                                 </IconButton>
                                             </InputAdornment>

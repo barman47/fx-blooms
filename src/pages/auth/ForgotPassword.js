@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Button, Grid, TextField, Typography } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
@@ -86,7 +86,7 @@ const ForgotPassword = (props) => {
     const classes = useStyles();
     const theme = useTheme();
     const dispatch = useDispatch();
-    const history = useHistory();
+    const navigate = useNavigate();
     const { isAuthenticated, msg } = useSelector(state => state.customer);
     const { authorized } = useSelector(state => state.twoFactor);
     const errorsState = useSelector(state => state.errors);
@@ -101,7 +101,7 @@ const ForgotPassword = (props) => {
 
     useEffect(() => {
         if (isAuthenticated && authorized) {
-            return history.push(DASHBOARD_HOME);
+            return navigate(DASHBOARD_HOME);
         }
         // eslint-disable-next-line
     }, []);
@@ -133,7 +133,7 @@ const ForgotPassword = (props) => {
                 payload: null
             });
         }
-    }, [dispatch, history, msg]);
+    }, [dispatch, navigate, msg]);
 
     const goHome = () => window.location.href = HOME;;
 
