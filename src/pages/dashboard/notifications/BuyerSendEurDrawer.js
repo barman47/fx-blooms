@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
 	Button,
@@ -14,9 +14,11 @@ import { Close, ContentCopy } from 'mdi-material-ui';
 import { decode } from 'html-entities';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';
+import _ from 'lodash';
 
 import { sendTransactionNotification } from '../../../actions/transactions';
-import { GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
+import { markNotificationAsRead } from '../../../actions/notifications';
+import { GET_ERRORS, REMOVE_NOTIFICATION, SET_LISTING_MSG, SET_TRANSACTION } from '../../../actions/types';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -117,13 +119,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, sendTransactionNotification }) => {
+const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, markNotificationAsRead, transactionId, sendTransactionNotification, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     
     const { account } = useSelector(state => state.bankAccounts);
     const { msg } = useSelector(state => state.listings);
     const message = useSelector(state => state.notifications.msg);
+    const { transaction } = useSelector(state => state.transactions);
     const errorsState = useSelector(state => state.errors);
     
     const [open, setOpen] = useState(false);
@@ -135,7 +138,17 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
 
     useEffect(() => {
         setOpen(drawerOpen);
-    }, [drawerOpen]);
+        if (!drawerOpen) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+            dispatch({
+                type: SET_TRANSACTION,
+                payload: {}
+            });
+        }
+    }, [dispatch, drawerOpen]);
 
     useEffect(() => {
         if (msg) {
@@ -150,6 +163,28 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
             toastRef.current.handleClick();
         }
     }, [errors]);
+
+    // Close transaction if it is still open and it has been completed
+    useEffect(() => {
+        if (!_.isEmpty(transaction)) {
+            const { buyer } = transaction;
+            if (buyer.hasMadePayment) {
+                setErrors({ msg: 'This transaction has already been completed' });
+                batch(() => {
+                    dispatch({
+                        type: SET_TRANSACTION,
+                        payload: {}
+                    });
+                    dispatch({
+                        type: REMOVE_NOTIFICATION,
+                        payload: notificationId
+                    });
+                });
+                markNotificationAsRead(notificationId);
+                toggleDrawer();
+            }
+        }
+    }, [dispatch, markNotificationAsRead, notificationId, toggleDrawer, transaction]);
 
     useEffect(() => {
         if (errorsState?.msg) {
@@ -170,7 +205,7 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
 
     const handleSendTransactionNotification = () => {
         setLoading(true);
-        sendTransactionNotification(transactionId);
+        sendTransactionNotification(transactionId, notificationId);
     };
 
     const dismissSuccessModal = () => {
@@ -181,6 +216,14 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
             type: SET_LISTING_MSG,
             payload: null
         });
+
+        // if (notifications[0].data.Id === notificationId) {
+        //     markNotificationAsRead(notificationId);
+        //     dispatch({
+        //         type: REMOVE_NOTIFICATION,
+        //         payload: notificationId
+        //     });
+        // }
     };
 
 	return (
@@ -217,7 +260,7 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
                     <Grid item xs={12} className={classes.transactionContainer}>
                         <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
                         <Typography variant="body2" component="p">
-                            {`. . . ${returnLastThreeCharacters(transactionId)}`}
+                            {transactionId && `. . . ${returnLastThreeCharacters(transactionId)}`}
                             <IconButton onClick={handleCopyTransactionId} color="primary">
                                 <Tooltip title="Copy Transaction ID" arrow>
                                     <ContentCopy />
@@ -233,7 +276,7 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
                         <Typography variant="subtitle1" component="p" className={classes.transferAmount}>&#8364;{formatNumber(amount)}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
+                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
                         <section className={classes.accountDetailsContainer}>
                             <div>
                                 <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
@@ -275,10 +318,12 @@ const BuyerSendEurDrawer = ({ amount, toggleDrawer, drawerOpen, transactionId, s
 
 BuyerSendEurDrawer.propTypes = {
     amount: PropTypes.number.isRequired,
+    markNotificationAsRead: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     sendTransactionNotification: PropTypes.func.isRequired,
+    notificationId: PropTypes.string.isRequired,
     transactionId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { sendTransactionNotification })(BuyerSendEurDrawer);
+export default connect(undefined, { markNotificationAsRead, sendTransactionNotification })(BuyerSendEurDrawer);

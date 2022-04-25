@@ -187,8 +187,8 @@ const useStyles = makeStyles(theme =>({
 const TransactionDetails = () => {
   const classes = useStyles()
 
-  // const dispatch = useDispatch()
-  // const { customer } = useSelector(state => state.customers);
+  const dispatch = useDispatch()
+  const { customer } = useSelector(state => state.customers);
 
   // useEffect(() => {
   //   dispatch(getAllListings())
@@ -196,13 +196,12 @@ const TransactionDetails = () => {
   // }, [dispatch])
 
   
-  // useEffect(() => {
-  //   dispatch(getCustomer(customer.id))
-  // }, [dispatch, customer])
+  useEffect(() => {
+    dispatch(getCustomer(customer.id))
+  }, [dispatch, customer])
 
   console.log('hello')
   
-
   return (
     <>
     <Box component="section" className={classes.root}>

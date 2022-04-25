@@ -43,6 +43,7 @@ import {
     AccountOutline, 
     ArrowLeftRight, 
     BagChecked, 
+    CardAccountDetailsOutline,
     ChevronLeft, 
     ChevronRight, 
     ChevronDown, 
@@ -51,7 +52,9 @@ import {
     LockOutline, 
     Logout, 
     MessageOutline, 
-    Menu 
+    Menu,
+    // Security,
+    TwoFactorAuthentication 
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -60,7 +63,7 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    PIN, 
+    // PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE 
@@ -73,19 +76,23 @@ import {
     PAYMENT_NOTIFICATION_SELLER_CONFIRMED, 
     PAYMENT_NOTIFICATION_SELLER_PAID, 
     PAYMENT_NOTIFICATION_OFFER_MADE,
+    REMOVE_NOTIFICATION,
     SET_CUSTOMER_MSG,
     SET_LISTING_MSG
 } from '../../actions/types';
-import audioFile from '../../assets/sounds/notification.mp3';
+
 
 import { logout } from '../../actions/customer';
+import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
 import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
+import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
 
+import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
 
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
@@ -155,11 +162,7 @@ const useStyles = makeStyles((theme) => ({
         justifyContent: 'space-between',
         flexShrink: 0,
         whiteSpace: 'nowrap',
-        width: drawerWidth,
-        
-        // [theme.breakpoints.down('md')]: {
-        //     display: 'none'
-        // }
+        width: drawerWidth
     },
     
     paper: {
@@ -267,6 +270,8 @@ const useStyles = makeStyles((theme) => ({
 
     icon: {
         color: 'inherit',
+        minWidth: 0,
+        marginRight: theme.spacing(1.5),
 
         '&:hover': {
             color: 'inherit'
@@ -289,13 +294,11 @@ const useStyles = makeStyles((theme) => ({
         }
     },
 
-    collapsedAccordionSummary: {
-        '& .MuiButtonBase-root': {
-            display: 'flex !important',
-        flexDirection: 'column !important',
-        justifyContent: 'center !important',
-        alignItems: 'center !important'
-        }
+    collapsedIcon: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     accordionDetails: {
@@ -304,6 +307,10 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: 0,
         paddingRight: 0,
         paddingTop: 0
+    },
+
+    collapsedAccordionDetails: {
+        paddingLeft: 0
     },
 
     bottomBar: {
@@ -388,21 +395,23 @@ const Dashboard = (props) => {
     ];
 
     const securityLinks = [
-        { url : ID_VERIFICATION, text: 'ID Verification', icon: <HomeOutline /> },
-        { url : PIN, text: 'Set PIN', icon: <FormatListText /> },
-        { url : TWO_FACTOR, text: '2FA Authentication', icon: <FormatListText /> }
+        { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
+        // { url : PIN, text: 'Set PIN', icon: <Security /> },
+        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { title, logout } = props;
+    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
+    const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
     const transactionCompleteModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        getNotificationCount(customerId);
         if (matches) {
             setOpen(false);
         }
@@ -463,10 +472,6 @@ const Dashboard = (props) => {
             }
         }
     }, [NOT_SUBMITTED, stats]);
-
-    // useEffect(() => {
-    //     setPath(location.pathname);
-    // }, [location]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -554,6 +559,7 @@ const Dashboard = (props) => {
         } = NOTIFICATION_TYPES;
         SignalRService.registerReceiveNotification((data, type) => {
             try {
+                getNotificationCount(customerId);
                 let response = JSON.parse(data);
                 let payload = JSON.parse(response.Payload);
                 payload = { ...payload, Data: JSON.parse(payload.Data) };
@@ -561,7 +567,7 @@ const Dashboard = (props) => {
                 console.log('New Notification ', response, type);
                 const senderId = response.SenderId;
                 const buyer = payload.Data.Buyer;
-                const seller =payload.Data.Seller;
+                const seller = payload.Data.Seller;
                 const notification = {
                     dateLogged: payload.DateLogged,
                     eventType: payload.EventType,
@@ -570,12 +576,14 @@ const Dashboard = (props) => {
                     isRead: payload.IsRead,
                     notificationId: payload.Id,
                     data: { 
+                        BidId: payload.Data.BidId,
                         Id: payload.Data.Id,
                         IsClosed: payload.Data.IsClosed,
                         Buyer: buyer,
                         Seller: seller,
-                        ListingId: payload.ListingId,
-                        BidId: payload.BidId
+                        ListingId: payload.Data.ListingId,
+                        // ListingId: payload.ListingId ?  payload.ListingId : payload.Data.ListingId,
+                        // BidId: payload.BidId
                     }
                 };
                 
@@ -609,6 +617,7 @@ const Dashboard = (props) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_BUYER_CONFIRMED,
@@ -616,6 +625,7 @@ const Dashboard = (props) => {
                                 });
                             }
                         }
+                        
                         break;
 
                     case SELLER_MADE_PAYMENT:
@@ -635,6 +645,17 @@ const Dashboard = (props) => {
                                 }
                             });
                         }
+
+                        // Remove SellerConfirmedPayment notification after seller payment succeeds if the confirmation notification was not used to continue the transaction
+                        // if (customerId === seller.CustomerId) {
+                        //     console.log('closing');
+                        //     dispatch({
+                        //         type: REMOVE_NOTIFICATION,
+                        //         payload: { notificationId: notification.notificationId }
+                        //     });
+                        //     markNotificationAsRead(notification.notificationId);
+                        // }
+
                         break;
 
                     case SELLER_CONFIRMED_PAYMENT:
@@ -647,6 +668,7 @@ const Dashboard = (props) => {
                                     payload: { notification, endTransaction: true }
                                 });
                                 transactionCompleteModal.current.openModal();
+                                markNotificationAsRead(notification.notificationId);
                             } else {
                                 dispatch({
                                     type: PAYMENT_NOTIFICATION_SELLER_CONFIRMED,
@@ -692,12 +714,26 @@ const Dashboard = (props) => {
     };
 
     const handleLinkClick = (link) => {
-        navigate(link);
-        if (matches && open) {
-            setTimeout(() => {
-                setOpen(false);
-            }, 1000);
+        if (link === MAKE_LISTING && location.pathname.includes(MAKE_LISTING)) {
+            return;
         }
+
+        if (matches) {
+            if (open) {
+                setTimeout(() => {
+                    setOpen(false);
+                }, 500);
+            }
+            if (link === MAKE_LISTING) {
+                return selectCurrencyListingDrawer?.current?.toggleDrawer();
+            }
+            navigate(link); 
+        }
+
+        if (link === MAKE_LISTING) {
+            return selectCurrencyListingDrawer?.current?.toggleDrawer();
+        }
+        navigate(link); 
     };
 
     const dismissAction = () => {
@@ -712,6 +748,7 @@ const Dashboard = (props) => {
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
@@ -778,7 +815,7 @@ const Dashboard = (props) => {
                                         <Fragment key={index}>
                                             <Accordion>
                                                 <AccordionSummary
-                                                    expandIcon={<ChevronDown />}
+                                                    expandIcon={open ? <ChevronDown /> : null}
                                                     aria-controls="security-accordion"
                                                     id="security"
                                                     className={classes.accordionSummary}
@@ -795,7 +832,7 @@ const Dashboard = (props) => {
                                                             </ListItemIcon>
                                                             :
                                                             <Tooltip title={link.text} placement="right" arrow>
-                                                                <ListItemIcon className={classes.icon}>
+                                                                <ListItemIcon className={clsx(classes.icon, {[classes.collapsedIcon]: !open})}>
                                                                     {link.icon}
                                                                 </ListItemIcon>
                                                             </Tooltip>
@@ -803,7 +840,7 @@ const Dashboard = (props) => {
                                                         {open && <ListItemText primary={link.text} />}
                                                     </ListItem>
                                                 </AccordionSummary>
-                                                <AccordionDetails className={classes.accordionDetails}>
+                                                <AccordionDetails className={clsx(classes.accordionDetails, { [classes.collapsedAccordionDetails]: !open})}>
                                                     {securityLinks.map((link, index) => (
                                                         <ListItem 
                                                             key={index}
@@ -934,10 +971,7 @@ const Dashboard = (props) => {
                             <BottomNavigationAction 
                                 onClick={() => handleLinkClick(item.url)} 
                                 key={index} 
-                                showLabels
-                                // label={location.pathname.includes(item.url) && item.text}
                                 label={item.text} 
-                                // value={item.text} 
                                 icon={item.icon} 
                                 classes={{ label: classes.label, selected: classes.label }}
                             />
@@ -945,7 +979,6 @@ const Dashboard = (props) => {
                         <BottomNavigationAction 
                             onClick={toggleDrawer} 
                             label="More" 
-                            // value={3} 
                             icon={<Menu />} 
                             classes={{ label: classes.label, selected: classes.label }}
                         />
@@ -957,8 +990,10 @@ const Dashboard = (props) => {
 };
 
 Dashboard.propTypes = {
+    getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
-    title: PropTypes.string.isRequired
+    markNotificationAsRead: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { logout })(Dashboard);
+export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);

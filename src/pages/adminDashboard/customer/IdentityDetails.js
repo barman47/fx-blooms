@@ -139,7 +139,7 @@ const useStyles = makeStyles(theme =>({
 const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    // const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
     // const errorsState = useSelector(state => state.errors);
     
     const [loading, setLoading] = useState(false);

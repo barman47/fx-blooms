@@ -20,7 +20,7 @@ import {
     ValueAxis,
     BarSeries,
     LineSeries,
-    Title,
+    // Title,
     Legend,
   } from '@devexpress/dx-react-chart-material-ui';
 import { scalePoint } from 'd3-scale';
@@ -558,7 +558,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     setFilterType={setListingFilter} 
                     loading={loadingListingCount}
                     formatFn={formatNumber} 
-                    useCase={listings}
+                    useCase={totalListings}
                     />
 
                     {/* //VOLUME CARD */}
@@ -711,7 +711,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                             <Typography component="h6" variant="subtitle1">&#37;</Typography>
                         </Box>
 
-                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No Profile'} number={totalCustomersWithNoProfile} progressNumber={totalNoProfilePercent} />
+                        <UserActivitiesRow classname={classes.userActivitiesBody} category={'No Profile'} number={totalCustomersWithNoProfile ?? 0} progressNumber={totalNoProfilePercent ?? 0} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'Not signed in in the last 30days'} number={323} progressNumber={10} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'Have transact in the last 30days'} number={200} progressNumber={100} />
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'No listing in the last 30days'} number={650} progressNumber={100} />

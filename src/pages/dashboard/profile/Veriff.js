@@ -6,19 +6,21 @@ import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Veriff } from '@veriff/js-sdk';
 import { createVeriffFrame } from '@veriff/incontext-sdk';
-import { API_KEY } from '../../../utils/constants';
 import { makeStyles } from '@material-ui/core/styles';
+import { VERIFF_HOST } from '../../../utils/constants'
 
 // In this example both Web SDKs are covered. You can use either of implementations
 
-const implementationType = 'JS_SDK';
-//const implementationType = 'INCONTEXT_SDK';
+// const implementationType = 'JS_SDK';
+const implementationType = 'INCONTEXT_SDK';
 
 const useStyles = makeStyles(theme => ({
   app: {
     marginTop: theme.spacing(42)
   },
 }))
+
+const VERIFF_API = `${process.env.REACT_APP_VERIFF_API}`
 
 function VeriffVerify() {
   const classes = useStyles();
@@ -27,17 +29,18 @@ function VeriffVerify() {
   useEffect(() => {
     // here we generate a verification session needless of a server;
     const veriff = Veriff({
-      host: 'https://stationapi.veriff.com',
-      apiKey: API_KEY,
+      host: VERIFF_HOST,
+      apiKey: VERIFF_API,
       parentId: 'veriff-root',
       onSession: function (err, response) {
         //Here the end user flow is triggered.
         switch (implementationType) {
           case 'JS_SDK':
+            console.log('response',response)
+            // debugger
             // JS SDK implementation--> redirects user to the verification url
             // window.location.replace(response.verification.url);
             window.open(response.verification.url, '_blank');
-            console.log('response',response)
             break;
           case 'INCONTEXT_SDK':
             // Incontext SDK implementation-->  user stays in the webpage

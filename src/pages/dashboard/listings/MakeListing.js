@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -154,6 +154,7 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
+    const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -202,6 +203,7 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         handleSetTitle('Add Listing');
+        setPresetSelectedCurrency();
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             getResidencePermitLink();
         }
@@ -213,7 +215,6 @@ const MakeListing = (props) => {
         if (accounts.length === 0) {
             getAccounts(customerId);
         }
-        
         // eslint-disable-next-line
     }, []);
 
@@ -359,6 +360,15 @@ const MakeListing = (props) => {
     // const handleOpenAccountModalModal = () => {
     //     setOpenAccountModal(true);
     // };
+
+    const setPresetSelectedCurrency = () => {
+        if (location.state.eur) {
+            setAvailableCurrency('EUR');
+        }
+        if (location.state.ngn) {
+            setAvailableCurrency('NGN');
+        }
+    };
 
     const checkResidencePermitStatus = () => {
         switch (residencePermitStatus) {

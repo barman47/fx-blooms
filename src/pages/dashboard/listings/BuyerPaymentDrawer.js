@@ -13,15 +13,12 @@ import {
     Select,
     MenuItem,
     TextField,
-    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
-import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
+import { AlertOutline, Close } from 'mdi-material-ui';
 import _ from 'lodash';
-import toast, { Toaster } from 'react-hot-toast';
-import copy from 'copy-to-clipboard';
 
 import { cancelBid, madePayment } from '../../../actions/listings';
 import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
@@ -29,14 +26,14 @@ import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
-        padding: theme.spacing(1, 4),
+        padding: theme.spacing(0, 4, 1, 4),
         width: '35vw',
 
         [theme.breakpoints.down('md')]: {
@@ -50,21 +47,36 @@ const useStyles = makeStyles(theme => ({
         },
 
         '& header': {
+            backgroundColor: COLORS.white,
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            marginBottom: theme.spacing(2),
+            alignItems: 'center',
+            position: 'fixed',
+            width: '35%',
+            zIndex: 2,
+
+            [theme.breakpoints.down('md')]: {
+                width: '50%'
+            },
+
+            [theme.breakpoints.down('sm')]: {
+                width: '90%'
+            }
         }
     },
 
     header: {
         color: theme.palette.primary.main,
     },
-
+    
     transactionContainer: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginTop: theme.spacing(7)
     },
 
     text: {
@@ -114,7 +126,7 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
         gridTemplateColumns: '1fr',
-        marginTop: theme.spacing(2),
+        margin: theme.spacing(2, 0),
         padding: theme.spacing(2),
 
         [theme.breakpoints.down('sm')]: {
@@ -277,8 +289,9 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     useEffect(() => {
         if (msg) {
-            successModal.current.openModal();
             successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            clearInterval(interval.current);
         }
     }, [msg]);
 
@@ -288,10 +301,12 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     }, [errorsState]);
 
     const startExpiryTimer = () => {
-        const countDownTime = new Date(bid.datePlaced).getTime() + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
+        const countDownTime = new Date((convertToLocalTime(bid.datePlaced))).getTime() + (FIVE_MINUTES - 19000);
+        // const date = bid.datePlaced.endsWith('Z') ? new Date(bid.datePlaced).getTime() : new Date(bid.datePlaced + 'Z').getTime();
+        // const countDownTime = date + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
+        // const countDownTime = date + (FIVE_MINUTES - 19000); // Remove 19 Seconds from the timer. I don't know why but when it starts there's an additional 22 seconds
         interval.current = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = countDownTime - now;
+            const distance = countDownTime - getTime();
 
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
@@ -352,20 +367,13 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         return bank.accountID;
     };
 
-    const handleCopyTransactionId = () => {
-        copy(bid.id);
-        toast.success('Transaction ID Copied!');
-    };
-
     return (
         <>
-            <Toaster />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
                 ModalProps={{ 
-                    disableBackdropClick: true,
-                    disableEscapeKeyDown: true,
+                    disableEscapeKeyDown: true
                 }}
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
@@ -384,17 +392,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                         <Close />
                     </IconButton>
                 </Box>
-                <div className={classes.transactionContainer}>
-                    <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
-                    <Typography variant="body2" component="p">
-                        {bid?.id && `. . . ${returnLastThreeCharacters(bid.id)}`}
-                        <IconButton onClick={handleCopyTransactionId} color="primary">
-                            <Tooltip title="Copy Transaction ID" arrow>
-                                <ContentCopy />
-                            </Tooltip>
-                        </IconButton>
-                    </Typography>
-                </div>
                 <Grid container direction="row">
                     <Grid item xs={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>
@@ -408,97 +405,99 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                     <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
                 </ol>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
-                    <Button 
-                        variant="outlined" 
-                        color="primary" 
-                        disabled={_.isEmpty(account) ? false : true}
-                        onClick={getSellerAccount}
-                    >
-                        Show Account Details
-                    </Button>
-                    <Collapse in={!_.isEmpty(account)}>
-                        <section className={classes.accountDetailsContainer}>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
-                            </div>
-                        </section>
-                    </Collapse>              
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                    <FormControl 
-                        variant="outlined" 
-                        error={errors.receivingAccount ? true : false } 
-                        fullWidth 
-                        required
-                        disabled={loading ? true : false}
-                    >
-                        <Select
-                            labelId="ReceivingAccount"
-                            value={receivingAccount}
-                            onChange={(e) => setReceivingAccount(e.target.value)}
+                <Grid container direction="row">
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Seller Account Details</Typography>
+                        <Button 
+                            variant="outlined" 
+                            color="primary" 
+                            disabled={_.isEmpty(account) ? false : true}
+                            onClick={getSellerAccount}
                         >
-                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                            {accounts.map((account) => {
-                                if (account.currency === 'EUR') {
-                                    return (
-                                        // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                    )
-                                }
-                                return null;
-                            })}
-                        </Select>
-                        <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                        <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                    <TextField 
-                        value={reference}
-                        placeholder="Enter Payment Reference"
-                        onChange={(e) => setReference(e.target.value)}
-                        disabled={loading ? true : false}
-                        type="text"
-                        variant="outlined" 
-                        fullWidth
-                    />
-                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                </Grid>
-                <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
-                    <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
-                </Grid>
-                <Grid item xs={12}>
-                    {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
-                    <Button 
-                        type="submit"
-                        variant="contained" 
-                        color="primary" 
-                        fullWidth 
-                        disableFocusRipple
-                        className={classes.button}
-                        disabled={loading || buttonDisabled || isEmpty(account) ? true : false}
-                        onClick={handleMadepayment}
-                    >
-                        {loading ? 'One Moment . . .' : `${listing?.amountNeeded?.currencyType}${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}
-                    </Button>
+                            Show Account Details
+                        </Button>
+                        <Collapse in={!_.isEmpty(account)}>
+                            <section className={classes.accountDetailsContainer}>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountName}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.accountNumber}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{account.bankName}</Typography>
+                                </div>
+                                <div>
+                                    <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                                    <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{listing.reference ? listing.reference : 'N/A'}</Typography>
+                                </div>
+                            </section>
+                        </Collapse>              
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Receiving Account</Typography>
+                        <FormControl 
+                            variant="outlined" 
+                            error={errors.receivingAccount ? true : false } 
+                            fullWidth 
+                            required
+                            disabled={loading ? true : false}
+                        >
+                            <Select
+                                labelId="ReceivingAccount"
+                                value={receivingAccount}
+                                onChange={(e) => setReceivingAccount(e.target.value)}
+                            >
+                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                {accounts.map((account) => {
+                                    if (account.currency === 'EUR') {
+                                        return (
+                                            // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
+                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                        )
+                                    }
+                                    return null;
+                                })}
+                            </Select>
+                            <FormHelperText>{errors.receivingAccount}</FormHelperText>
+                            <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                        <TextField 
+                            value={reference}
+                            placeholder="Enter Payment Reference"
+                            onChange={(e) => setReference(e.target.value)}
+                            disabled={loading ? true : false}
+                            type="text"
+                            variant="outlined" 
+                            fullWidth
+                        />
+                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                    </Grid>
+                    <Grid item xs={12} className={classes.timerContainer}>
+                        <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                        <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>}
+                        <Button 
+                            type="submit"
+                            variant="contained" 
+                            color="primary" 
+                            fullWidth 
+                            disableFocusRipple
+                            className={classes.button}
+                            disabled={loading || buttonDisabled || isEmpty(account) ? true : false}
+                            onClick={handleMadepayment}
+                        >
+                            {loading ? 'One Moment . . .' : `${listing?.amountNeeded?.currencyType}${formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} Payment Made`}
+                        </Button>
+                    </Grid>
                 </Grid>
             </Drawer>
         </>

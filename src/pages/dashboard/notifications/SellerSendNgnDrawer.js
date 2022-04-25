@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -7,21 +7,18 @@ import {
     Drawer,
     Grid,
     IconButton,
-    Tooltip,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { AlertOutline, Close, ContentCopy } from 'mdi-material-ui';
-import toast, { Toaster } from 'react-hot-toast';
-import copy from 'copy-to-clipboard';
+import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, madePaymentV2 } from '../../../actions/listings';
-import { MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
+import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -45,19 +42,13 @@ const useStyles = makeStyles(theme => ({
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            alignItems: 'center'
         }
     },
 
     header: {
         color: theme.palette.primary.main,
-    },
-
-    transactionContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between'
     },
 
     text: {
@@ -119,7 +110,6 @@ const useStyles = makeStyles(theme => ({
             gridTemplateColumns: '1fr 1fr',
             alignItems: 'center',
             gap: theme.spacing(2)
-            // justifyContent: 'space-between'
         }
     },
 
@@ -150,7 +140,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawer, drawerOpen }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -192,6 +182,11 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
             payload: {}
         });
         if (!drawerOpen) {
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+            clearInterval(interval.current);
             setErrors({});
         }
     }, [dispatch, drawerOpen]);
@@ -215,7 +210,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
         return bidIds;
     };
 
-    const expireListing = () => {
+    const expireListing = useCallback(() => {
         clearInterval(interval.current);
         toggleDrawer();
         batch(() => {
@@ -233,36 +228,20 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
             });
         });
         cancelBid(getBidIds(listing.bids));
-    };
+    }, [cancelBid, dispatch, listing, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
-    useEffect(() => {
-        setOpen(drawerOpen);
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: {}
-        });
-        if (!drawerOpen) {
-            setErrors({});
-        }
-    }, [dispatch, drawerOpen]);
-
-    useEffect(() => {
-        if (msg) {
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
-        }
-    }, [msg]);
-
-    const startExpiryTimer = () => {
-        const countDownTime = new Date(bid.dateLogged).getTime() + (THIRTY_MINUTES - 22000); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+    const startExpiryTimer = useCallback(() => {
+        // const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
+        // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        // const countDownTime = date + THIRTY_MINUTES;
+        const countDownTime = new Date((convertToLocalTime(bid.dateLogged))).getTime() + THIRTY_MINUTES;
         interval.current = setInterval(() => {
-            const now = new Date().getTime();
-            const distance = countDownTime - now;
-
+            const distance = countDownTime - getTime();
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
 
             if (minutes === 0 && seconds === 0) {
                 clearInterval(interval.current);
@@ -276,7 +255,27 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                 // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
             }
         }, 1000);
-    };
+    }, [bid, expireListing]);
+
+    useEffect(() => {
+        setOpen(drawerOpen);
+        dispatch({
+            type: SET_ACCOUNT,
+            payload: {}
+        });
+        if (!drawerOpen) {
+            clearInterval(interval.current);
+            setErrors({});
+        }
+    }, [dispatch, drawerOpen, startExpiryTimer]);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.setModalText(msg);
+            successModal.current.openModal();
+            clearInterval(interval.current);
+        }
+    }, [msg]);
 
     const dismissSuccessModal = () => {
         // setButtonDisabled(true);
@@ -304,17 +303,11 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
         madePaymentV2({
             bidId: bid.data.BidId,
             listingId: bid.data.ListingId
-        });
-    };
-
-    const handleCopyTransactionId = () => {
-        copy(bid.id);
-        toast.success('Transaction ID Copied!');
+        }, notificationId);
     };
 
     return (
         <>
-            <Toaster />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             {!isEmpty(errors) && 
@@ -328,8 +321,7 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
             }
             <Drawer 
                 ModalProps={{ 
-                    disableBackdropClick: true,
-                    disableEscapeKeyDown: true,
+                    disableEscapeKeyDown: true
                 }}
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
@@ -348,55 +340,42 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
                         <Close />
                     </IconButton>
                 </Box>
-                <div className={classes.transactionContainer}>
-                    <Typography variant="body2" component="p" color="primary">Transaction ID</Typography>
-                    <Typography variant="body2" component="p">
-                        {bid?.id && `. . . ${returnLastThreeCharacters(bid.id)}`}
-                        <IconButton onClick={handleCopyTransactionId} color="primary">
-                            <Tooltip title="Copy Transaction ID" arrow>
-                                <ContentCopy />
-                            </Tooltip>
-                        </IconButton>
-                    </Typography>
-                </div>
-                <Grid container direction="row">
-                    <Grid item xs={5}>
+                <Grid container direction="row" alignItems="center">
+                    <Grid item xs={6} lg={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} lg={1}>
                         <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
                     </Grid>
                 </Grid>
                 <ol>
                     <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
-                    <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
-                    <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
+                    <li><Typography variant="body2" component="p">Transfer the {bid.data.Seller.Currency} to {`${bid.data.Buyer.UserName?.toLowerCase()}'s`} account below</Typography></li>
+                    <li><Typography variant="body2" component="p">Click on <Typography variant="body2" component="span" color="primary" style={{ fontWeight: 600 }}>{bid.data.Seller.Currency}{formatNumber(bid.data.Seller.AmountTransfered, 2)} Payment Made</Typography></Typography></li>
                 </ol>
                 <Grid item xs={12}>
                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
-                    {/* <Collapse in={!_.isEmpty(account)}> */}
-                        <section className={classes.accountDetailsContainer}>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountNumber}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.BankName}</Typography>
-                            </div>
-                            <div>
-                                <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
-                                <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.TransferReference}</Typography>
-                            </div>
-                        </section>
-                    {/* </Collapse>               */}
+                    <section className={classes.accountDetailsContainer}>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Name</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountName}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Account Number</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.AccountNumber}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Bank</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.BankName}</Typography>
+                        </div>
+                        <div>
+                            <Typography variant="subtitle1" component="p" className={classes.accountDetailsHeader}>Transaction Reference</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.TransferReference}</Typography>
+                        </div>
+                    </section>
                 </Grid>
                 <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
+                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid.data.Seller.Currency}{formatNumber((bid.data.Seller.AmountTransfered), 2)} within...</Typography>
                     <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
                 </Grid>
                 <Grid item xs={12}>
@@ -418,12 +397,13 @@ const BuyerPaymentNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDra
     );
 };
 
-BuyerPaymentNgnDrawer.propTypes = {
+SellerSendNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
-    madePaymentV2: PropTypes.func.isRequired
+    madePaymentV2: PropTypes.func.isRequired,
+    notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePaymentV2 })(BuyerPaymentNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, madePaymentV2 })(SellerSendNgnDrawer);

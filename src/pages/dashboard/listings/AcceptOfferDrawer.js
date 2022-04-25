@@ -44,7 +44,8 @@ const useStyles = makeStyles(theme => ({
         '& header': {
             display: 'flex',
             flexDirection: 'row',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            alignItems: 'center'
         }
     },
 
@@ -75,7 +76,6 @@ const useStyles = makeStyles(theme => ({
             gridTemplateColumns: '1fr 1fr',
             alignItems: 'center',
             gap: theme.spacing(2)
-            // justifyContent: 'space-between'
         }
     },
 
@@ -236,7 +236,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
                 ModalProps={{ 
-                    disableBackdropClick: true,
+                    // disableBackdropClick: true,
                     disableEscapeKeyDown: true,
                 }}
                 PaperProps={{ className: classes.drawer }} 
@@ -245,7 +245,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 onClose={toggleDrawer}
             >
                 <Box component="header">
-                    <Typography variant="h6" className={classes.header}>Buy EUR - Transfer the NGN</Typography>
+                    <Typography variant="h6" className={classes.header}>Accept NGN Offer</Typography>
                     <IconButton 
                         color="primary" 
                         disableFocusRipple
@@ -256,10 +256,10 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                     </IconButton>
                 </Box>
                 <Grid container direction="row">
-                    <Grid item xs={5}>
+                    <Grid item xs={6} lg={5}>
                         <Typography variant="h6" color="primary">Actions Required</Typography>
                     </Grid>
-                    <Grid item xs={1}>
+                    <Grid item xs={6} lg={1}>
                         <AlertOutline style={{ color: '#F67171', position: 'relative', top: 3 }} />
                     </Grid>
                 </Grid>
@@ -267,61 +267,62 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                     <li><Typography variant="body2" component="p">Provide an NGN receiving account.</Typography></li>
                     <li><Typography variant="body2" component="p">Enter a payment reference (OPTIONAL)</Typography></li>
                 </ol>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                    <FormControl 
-                        variant="outlined" 
-                        error={errors.receivingAccount ? true : false } 
-                        fullWidth 
-                        required
-                        disabled={loading ? true : false}
-                    >
-                        <Select
-                            labelId="ReceivingAccount"
-                            value={receivingAccount}
-                            onChange={(e) => setReceivingAccount(e.target.value)}
+                <Grid container direction="row">
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Receiving Account</Typography>
+                        <FormControl 
+                            variant="outlined" 
+                            error={errors.receivingAccount ? true : false } 
+                            fullWidth 
+                            required
+                            disabled={loading ? true : false}
                         >
-                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                            {accounts.map((account) => {
-                                if (account.currency === 'NGN') {
-                                    return (
-                                        <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                    )
-                                }
-                                return null;
-                            })}
-                        </Select>
-                        <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                        <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                    </FormControl>
-                </Grid>
-                <Grid item xs={12}>
-                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                    <TextField 
-                        value={reference}
-                        placeholder="Enter Payment Reference"
-                        onChange={(e) => setReference(e.target.value)}
-                        disabled={loading ? true : false}
-                        type="text"
-                        variant="outlined" 
-                        fullWidth
-                    />
-                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                </Grid>
-                <Grid item xs={12}>
-                    {/* {isEmpty(account) && <Alert severity="error">Click the "Show Account Details" button first</Alert>} */}
-                    <Button 
-                        type="submit"
-                        variant="contained" 
-                        color="primary" 
-                        fullWidth 
-                        disableFocusRipple
-                        className={classes.button}
-                        disabled={loading ? true : false}
-                        onClick={handleAcceptOffer}
-                    >
-                        {loading ? 'One Moment . . .' : 'Accept NGN Offer'}
-                    </Button>
+                            <Select
+                                labelId="ReceivingAccount"
+                                value={receivingAccount}
+                                onChange={(e) => setReceivingAccount(e.target.value)}
+                            >
+                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                {accounts.map((account) => {
+                                    if (account.currency === 'NGN') {
+                                        return (
+                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                        )
+                                    }
+                                    return null;
+                                })}
+                            </Select>
+                            <FormHelperText>{errors.receivingAccount}</FormHelperText>
+                            <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                        </FormControl>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                        <TextField 
+                            value={reference}
+                            placeholder="Enter Payment Reference"
+                            onChange={(e) => setReference(e.target.value)}
+                            disabled={loading ? true : false}
+                            type="text"
+                            variant="outlined" 
+                            fullWidth
+                        />
+                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button 
+                            type="submit"
+                            variant="contained" 
+                            color="primary" 
+                            fullWidth 
+                            disableFocusRipple
+                            className={classes.button}
+                            disabled={loading ? true : false}
+                            onClick={handleAcceptOffer}
+                        >
+                            {loading ? 'One Moment . . .' : 'Accept NGN Offer'}
+                        </Button>
+                    </Grid>
                 </Grid>
             </Drawer>
         </>

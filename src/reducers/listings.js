@@ -9,7 +9,6 @@ import {
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_AS_ACCEPTED,
-    SET_LOADING_LISTINGS,
     SET_LISTING_MSG,
     HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
@@ -178,12 +177,6 @@ const listingsReducer = (state = initialState, action) => {
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
                 msg: action.payload.msg
-            };
-
-        case SET_LOADING_LISTINGS:
-            return {
-                ...state,
-                loading: action.payload
             };
 
         case SET_LISTING_MSG:

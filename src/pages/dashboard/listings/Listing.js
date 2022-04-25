@@ -10,13 +10,13 @@ import { getSeller } from '../../../actions/customer';
 import { deleteListing } from '../../../actions/listings';
 
 import formatNumber from '../../../utils/formatNumber';
-// import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import { REMOVE_EXPIRED_LISTING, SET_LISTING } from '../../../actions/types';
-import { BID_STATUS, COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
+import { REMOVE_EXPIRED_LISTING } from '../../../actions/types';
+import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
 import { PROFILE, USER_DETAILS } from '../../../routes';
 
 import eurLogo from '../../../assets/img/eur-logo.svg';
 import ngnLogo from '../../../assets/img/ngn-logo.svg';
+import { convertToLocalTime } from '../../../utils/getTime';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -129,7 +129,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getSeller, toggleAcceptOfferDrawer, setErrorMessage }) => {
+const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditListing, listing, getSeller }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
@@ -165,7 +165,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date(dateCreated).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -192,7 +192,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         e.preventDefault();
         if (userId !== customerId) {
             getSeller(sellerId);
-            return navigate(`${USER_DETAILS}/${sellerId}`, { sellerId });
+            return navigate(`${USER_DETAILS}/${sellerId}`, { state: { customerId: sellerId }});
         }
         return navigate(PROFILE);
     };
@@ -208,33 +208,7 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
         if (listing.amountAvailable.currencyType === 'EUR') {
             return handleAddBid(listing);
         }
-
-        let activeOffer = false;
-        let yourOffer = false;
-        if (listing.status !== open) {
-            for (let listingBid of listing.bids) {
-                if (listingBid.customerId === customerId && listingBid.status === BID_STATUS.IN_PROGRES) {
-                    activeOffer = true;
-                    yourOffer = true;
-                    break;
-                }
-            }
-        }
-
-        if (activeOffer) {
-            return setErrorMessage({ msg: 'This listing has an active offer' });
-        }
-
-        if (yourOffer) {
-            return setErrorMessage('You already have an active offer');
-        }
-
-        dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-
-        toggleAcceptOfferDrawer();
+        return handleAcceptOffer(listing);
     };
     
     return (
@@ -282,7 +256,6 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
                     <Typography variant="subtitle2" component="span">
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`NGN${formatNumber(exchangeRate, 2)} to ${decode('&#8364;')}1`}
-                        {/* {`${amountNeeded?.currencyType}${formatNumber(exchangeRate, 2)} to ${getCurrencySymbol(amountAvailable?.currencyType)}1`} */}
                     </Typography>
                     <Typography variant="subtitle2" component="span">
                         {amountAvailable?.currencyType === 'EUR' && 
@@ -367,13 +340,12 @@ const Listing = ({ handleAddBid, deleteListing, handleEditListing, listing, getS
 };
 
 Listing.propTypes = {
+    handleAcceptOffer: PropTypes.func.isRequired,
     handleAddBid: PropTypes.func.isRequired,
     getSeller: PropTypes.func.isRequired,
     handleEditListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
-    deleteListing: PropTypes.func.isRequired,
-    toggleAcceptOfferDrawer: PropTypes.func.isRequired,
-    setErrorMessage: PropTypes.func.isRequired
+    deleteListing: PropTypes.func.isRequired
 };
 
 export default connect(undefined, { deleteListing, getSeller })(Listing);

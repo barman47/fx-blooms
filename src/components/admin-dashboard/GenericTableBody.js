@@ -6,7 +6,9 @@ import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
-// import GenericButton from './GenericButton'
+import formatId from '../../utils/formatId';
+import GenericButton from './GenericButton'
+
 
 const useStyles = makeStyles(theme =>({
 
@@ -96,11 +98,11 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
       default:
         return status
     }
-  }, [])
+  }, [CONFIRMED])
 
   const handleGridColumns = useMemo(() => {
     if (!gridColumns) {
-      return '0.2fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr'
+      return '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr'
     }
     return gridColumns
   }, [gridColumns])
@@ -110,6 +112,9 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     e.stopPropagation();
   }
 
+  const handleTimeStamp = useCallback((value) => {
+    console.log('value', value)
+  }, [])
 
   return (
     <>
@@ -122,13 +127,13 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     <FormControlLabel control={<Checkbox name="checked" className={classes.checkBox} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
                 </Typography>
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[columnList[1]] ? customer[columnList[1]] : ''} lines={1} />
+                    <TextClamp text={customer[columnList[1]] ? formatId(customer[columnList[1]]) : ''} lines={1} />
                 </Typography>
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer[columnList[2]] ? customer[columnList[2]] : ''} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[columnList[3]] ? customer[columnList[3]] : ''} lines={1} />
+                    <TextClamp text={customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? ''} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer[columnList[4]] ? customer[columnList[4]] : ''} lines={1} />
@@ -143,9 +148,12 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                 </Typography> : 
                   ''
                 }
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
+                { 
+                  !addColumn ?
+                  <Typography component="span" className={classes.tableCell} variant="subtitle1">
                     {customer[columnList[7]]}
-                </Typography>
+                  </Typography> : ''
+                }
                 <Typography style={{ textAlign: 'center' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <IconButton 
                             variant="text" 
@@ -163,16 +171,28 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
         ))
       }
 
-      {/* <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
-        <Box component="div">
-            <Typography component="span">{ data?.length ?? 0 } results</Typography>
-        </Box>
+      {
+        loading ? '' :
+        <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+            <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                <Typography component="span">{data?.length ?? 0} results</Typography>
+            </Box>
 
-        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-            <GenericButton isDisabled={!isDisabled} buttonName="Next" />
-        </Box> 
-      </Box> */}
+            <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                    <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+                    <GenericButton isDisabled={!isDisabled} buttonName="Next" />
+                </Box> 
+                <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                    {/* {
+                        pageNumberList.map(n => (
+                            <Typography variant="subtitle2">{n}</Typography>
+                        ))
+                    } */}
+                </Box>
+            </Box>                    
+        </Box>
+    }
     </>
   )
 }

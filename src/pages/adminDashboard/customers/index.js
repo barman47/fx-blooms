@@ -190,7 +190,7 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.2fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
 
 const Customers = (props) => {
     const classes = useStyles();
@@ -258,41 +258,42 @@ const Customers = (props) => {
         setPageNumberList(pageNumArr)
     }, [pageNumber])
 
-    const nextPage = useCallback(() => {
-        switch (filter) {
-            case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount || 0);
-                break;
+    // NEXT PAGE BUTTON
+    // const nextPage = useCallback(() => {
+    //     switch (filter) {
+    //         case CONFIRMED:
+    //             setCustomerCount(confirmed.totalItemCount || 0);
+    //             break;
 
-            case PENDING:
-                setCustomerCount(pending.totalItemCount || 0);
-                break;
+    //         case PENDING:
+    //             setCustomerCount(pending.totalItemCount || 0);
+    //             break;
 
-            case REJECTED:
-                setCustomerCount(rejected.totalItemCount || 0);
-                break;
+    //         case REJECTED:
+    //             setCustomerCount(rejected.totalItemCount || 0);
+    //             break;
 
-            case SUSPENDED:
-                setCustomerCount(suspended.totalItemCount || 0);
-                break;
+    //         case SUSPENDED:
+    //             setCustomerCount(suspended.totalItemCount || 0);
+    //             break;
 
-            case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount || 0);
-                break;
+    //         case NO_PROFILE:
+    //             setCustomerCount(noProfile.totalItemCount || 0);
+    //             break;
             
-            case ALL_CUSTOMERS:
-                setPage(page + 1)
-                getCustomers({
-                    pageSize: pages[0] += pages[0] + 5,
-                    pageNumber: page
-                });
-                break;
+    //         case ALL_CUSTOMERS:
+    //             setPage(page + 1)
+    //             getCustomers({
+    //                 pageSize: pages[0] += pages[0] + 5,
+    //                 pageNumber: page
+    //             });
+    //             break;
 
-            default:
-                setCustomerCount(0);
-                break;
-        }
-    })
+    //         default:
+    //             setCustomerCount(0);
+    //             break;
+    //     }
+    // })
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -867,7 +868,7 @@ const Customers = (props) => {
                 </Menu>
 
 
-                {
+                {/* {
                     loading ? '' :
                     <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
                         <Box component="div" sx={{ alignSelf: "flex-start" }}>
@@ -888,7 +889,7 @@ const Customers = (props) => {
                             </Box>
                         </Box>                    
                     </Box>
-                }
+                } */}
             </section>
         </>
     );

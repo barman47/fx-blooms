@@ -52,7 +52,7 @@ const Customer = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const location = useLocation();
-    // const { customer, msg } = useSelector(state => state.customers);
+    const { customer, msg } = useSelector(state => state.customers);
 
     // const { PERSONAL_DETAILS, ID_DETAILS, AUTHENTICATION, TRANSACTION_DETAILS } = USER_DETAILS;
 
@@ -79,7 +79,7 @@ const Customer = () => {
         // eslint-disable-next-line
     }, []);
 
-    console.log('hello')
+    console.log('hello', customer)
 
     // useEffect(() => {
     //     if (errorsState?.msg) {
@@ -91,13 +91,13 @@ const Customer = () => {
     //     }
     // }, [dispatch, errorsState]);
 
-    // useEffect(() => {
-    //     if ((msg && customer) && location.pathname.split('/').length === 3) { //Only run on the customer page
-    //         setLoading(false);
-    //         successModal.current.openModal();
-    //         successModal.current.setModalText(msg);
-    //     }
-    // }, [customer, dispatch, location.pathname, msg]);
+    useEffect(() => {
+        if ((msg && customer) && location.pathname.split('/').length === 3) { //Only run on the customer page
+            setLoading(false);
+            successModal.current.openModal();
+            successModal.current.setModalText(msg);
+        }
+    }, [customer, dispatch, location.pathname, msg]);
 
     const dismissAction = useCallback(() => {
         if (location.pathname.split('/').length === 3) { //Only run on the customer page
