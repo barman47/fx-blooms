@@ -290,7 +290,7 @@ const Login = ({ externalLogin, login }) => {
                                                             <EyeOutline />
                                                         </Tooltip>
                                                             : 
-                                                        <span></span>
+                                                        null
                                                      }
                                                 </IconButton>
                                             </InputAdornment>

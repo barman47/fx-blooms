@@ -237,7 +237,7 @@ const AdminLogin = (props) => {
                                     helperText={errors.Password || errors.message}
                                     fullWidth
                                     required
-                                    error={errors.Password  || errors.message ? true : false}
+                                    error={errors.Password || errors.message ? true : false}
                                     InputProps={{
                                         endAdornment: (
                                             <InputAdornment position="end">
