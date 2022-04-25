@@ -191,6 +191,7 @@ const columns = [
 ];
 
 const gridColumns = '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
     const classes = useStyles();
@@ -207,13 +208,11 @@ const Customers = (props) => {
         totalSuspendedCustomers,
         totalCustomersWithNoProfile 
     } = useSelector(state => state.stats);
-    const [ isDisabled, setDisabled ] = useState(true)
+    // const [ isDisabled, setDisabled ] = useState(true)
 
     // const { isMenuOpen } = useSelector(state => state.admin);
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
-
-    const pages = [20, 50, 75, 100]
     
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
@@ -225,6 +224,7 @@ const Customers = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
+    const [ isDisabled ] = useState(true)
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -259,41 +259,41 @@ const Customers = (props) => {
     }, [pageNumber])
 
     // NEXT PAGE BUTTON
-    // const nextPage = useCallback(() => {
-    //     switch (filter) {
-    //         case CONFIRMED:
-    //             setCustomerCount(confirmed.totalItemCount || 0);
-    //             break;
+    const nextPage = useCallback(() => {
+        switch (filter) {
+            case CONFIRMED:
+                setCustomerCount(confirmed.totalItemCount || 0);
+                break;
 
-    //         case PENDING:
-    //             setCustomerCount(pending.totalItemCount || 0);
-    //             break;
+            case PENDING:
+                setCustomerCount(pending.totalItemCount || 0);
+                break;
 
-    //         case REJECTED:
-    //             setCustomerCount(rejected.totalItemCount || 0);
-    //             break;
+            case REJECTED:
+                setCustomerCount(rejected.totalItemCount || 0);
+                break;
 
-    //         case SUSPENDED:
-    //             setCustomerCount(suspended.totalItemCount || 0);
-    //             break;
+            case SUSPENDED:
+                setCustomerCount(suspended.totalItemCount || 0);
+                break;
 
-    //         case NO_PROFILE:
-    //             setCustomerCount(noProfile.totalItemCount || 0);
-    //             break;
+            case NO_PROFILE:
+                setCustomerCount(noProfile.totalItemCount || 0);
+                break;
             
-    //         case ALL_CUSTOMERS:
-    //             setPage(page + 1)
-    //             getCustomers({
-    //                 pageSize: pages[0] += pages[0] + 5,
-    //                 pageNumber: page
-    //             });
-    //             break;
+            case ALL_CUSTOMERS:
+                setPage(page + 1)
+                getCustomers({
+                    pageSize: pages[0] += pages[0] + 5,
+                    pageNumber: page
+                });
+                break;
 
-    //         default:
-    //             setCustomerCount(0);
-    //             break;
-    //     }
-    // })
+            default:
+                setCustomerCount(0);
+                break;
+        }
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -490,13 +490,13 @@ const Customers = (props) => {
                     pageSize: rowsPerPage,
                     pageNumber: page
                 });
-                setPageNumber(Math.ceil(totalCustomers/20))
+                setPageNumber(Math.ceil(customerCount/20))
                 handlePageNUmberList()
                 break;
             default:
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, totalCustomers]);
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, customerCount]);
 
     // Get customers when page number changes
     useEffect(() => {
@@ -868,7 +868,7 @@ const Customers = (props) => {
                 </Menu>
 
 
-                {/* {
+                {
                     loading ? '' :
                     <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
                         <Box component="div" sx={{ alignSelf: "flex-start" }}>
@@ -889,7 +889,7 @@ const Customers = (props) => {
                             </Box>
                         </Box>                    
                     </Box>
-                } */}
+                }
             </section>
         </>
     );

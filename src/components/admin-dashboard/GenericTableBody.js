@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 import { Box, Typography, IconButton, FormControlLabel, Checkbox, CircularProgress, } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -7,7 +7,7 @@ import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
 import formatId from '../../utils/formatId';
-import GenericButton from './GenericButton'
+// import GenericButton from './GenericButton'
 
 
 const useStyles = makeStyles(theme =>({
@@ -62,7 +62,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const dispatch = useDispatch();
   const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
-  const [ isDisabled, setDisabled ] = useState(true)
+  // const [ isDisabled ] = useState(true)
 
   const handleButtonClick = (customer, e) => {
     console.log('mennnuuu')
@@ -112,9 +112,9 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     e.stopPropagation();
   }
 
-  const handleTimeStamp = useCallback((value) => {
-    console.log('value', value)
-  }, [])
+  // const handleTimeStamp = useCallback((value) => {
+  //   console.log('value', value)
+  // }, [])
 
   return (
     <>
@@ -171,7 +171,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
         ))
       }
 
-      {
+      {/* {
         loading ? '' :
         <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
             <Box component="div" sx={{ alignSelf: "flex-start" }}>
@@ -184,15 +184,15 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     <GenericButton isDisabled={!isDisabled} buttonName="Next" />
                 </Box> 
                 <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
-                    {/* {
+                    {
                         pageNumberList.map(n => (
                             <Typography variant="subtitle2">{n}</Typography>
                         ))
-                    } */}
+                    }
                 </Box>
             </Box>                    
         </Box>
-    }
+    } */}
     </>
   )
 }

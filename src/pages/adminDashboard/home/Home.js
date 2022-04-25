@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { styled } from '@mui/material/styles';
+// import { styled } from '@mui/material/styles';
 import {
     Box,
     Grid,
@@ -356,7 +356,8 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const [loadingCustomerCount, setLoadingCustomerCount] = useState(false);
     const [loadingListingCount, setLoadingListingCount] = useState(false);
     const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
-    const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
+    // const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
+    const [loadingActiveUsers] = useState(false);
     const [totalNoProfilePercent, setTotalNoProfilePercent] = useState(0);
 
     // eslint-disable-next-line
@@ -380,10 +381,13 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     // Show total listing count when no filter is selected
     useEffect(() => {
-        if (totalListings && !!listingFilter) {
+        console.log('hh', totalListings)
+        if (totalListings && !listingFilter) {
+            console.log('list')
             setListings(totalListings);
         }
     }, [totalListings, listingFilter]);
+
 
     // Show total customer count when no filter is selected
     useEffect(() => {
@@ -478,6 +482,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     }, [getCustomerCount, totalCustomers, handleSwitchCase]);
     
     const handleVolumeFilter = useCallback((timeframe) => {
+        console.log('eur', totalEuroTransfered)
         handleSwitchCase(timeframe, getTransactionVolume, setLoadingTransactionVolume, setVolume, totalEuroTransfered)
     }, [getTransactionVolume, totalEuroTransfered, handleSwitchCase]);
 
@@ -533,7 +538,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     cardName="Users" 
                     cardIcon={<AccountSupervisor />} 
                     filterType={usersFilter} 
-                    setFilterType={setUsersFilter} 
+                    handleOnChange={setUsersFilter} 
                     loading={loadingCustomerCount}
                     formatFn={formatNumber} 
                     useCase={users}
@@ -543,7 +548,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     cardName="Active Users"
                     cardIcon={<AccountSupervisor />} 
                     filterType={activeUsersFilter} 
-                    setFilterType={setActiveUsersFilter} 
+                    handleOnChange={setActiveUsersFilter} 
                     loading={loadingActiveUsers}
                     formatFn="" 
                     useCase=""
@@ -555,10 +560,10 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     cardName="Listing" 
                     cardIcon={<Receipt />} 
                     filterType={listingFilter} 
-                    setFilterType={setListingFilter} 
+                    handleOnChange={setListingFilter} 
                     loading={loadingListingCount}
                     formatFn={formatNumber} 
-                    useCase={totalListings}
+                    useCase={listings}
                     />
 
                     {/* //VOLUME CARD */}
@@ -567,7 +572,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     cardName="Volume" 
                     cardIcon={<ViewDashboardVariant />} 
                     filterType={volumeFilter} 
-                    setFilterType={setVolumeFilter} 
+                    handleOnChange={setVolumeFilter} 
                     loading={loadingTransactionVolume}
                     formatFn={formatNumber} 
                     useCase={volume}

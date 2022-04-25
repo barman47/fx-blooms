@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState, } from 'react';
+import { useSelector } from 'react-redux';
 import { Box, Typography, Menu, MenuItem, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
@@ -129,7 +129,7 @@ const columns = [
   },
 ];
 
-const pages = [10, 25, 50, 100]
+// const pages = [10, 25, 50, 100]
 
 const gridColumns = '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr';
 
@@ -137,7 +137,7 @@ const Deposits = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [ depositFilter, setDepositFilter ] = useState('')
-  const [ loadingDeposit, setLoadingDeposit ] = useState(false)
+  const [ loadingDeposit ] = useState(false)
 
 
 //   const [page, setPage] = useState(0);

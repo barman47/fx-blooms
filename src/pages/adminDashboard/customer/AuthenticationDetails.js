@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useLayoutEffect, useMemo } from 'react'; 
+import { useRef, useState, useMemo } from 'react'; 
 import { useDispatch, useSelector } from 'react-redux';
 // import PropTypes from 'prop-types';
 import { 
@@ -8,8 +8,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 
 // import { COLORS } from '../../../utils/constants';
-import { getIdCardValidationResponse, getResidencePermitValidationResponse, getCustomer } from '../../../actions/customer';
-import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
+// import { getIdCardValidationResponse, getResidencePermitValidationResponse, getCustomer } from '../../../actions/customer';
+import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
+// import { CLEAR_CUSTOMER_STATUS_MSG, GET_RRORS } from '../../../actions/types';
 // import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
@@ -101,10 +102,12 @@ const useStyles = makeStyles(theme =>({
 const AuthenticationDetails = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    // const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
+    const { customer } = useSelector(state => state.customers);
     // const errorsState = useSelector(state => state.errors);
     
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
+    const [loading] = useState(false);
     // eslint-disable-next-line
     // const [errors, setErrors] = useState({});
 

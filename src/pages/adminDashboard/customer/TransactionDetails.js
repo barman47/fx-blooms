@@ -13,7 +13,7 @@ import {
 import { COLORS } from '../../../utils/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import { getCustomer } from '../../../actions/customer';
-import { getAllListings } from '../../../actions/adminListings'
+// import { getAllListings } from '../../../actions/adminListings'
 
 
 const useStyles = makeStyles(theme =>({

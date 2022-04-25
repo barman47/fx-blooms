@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react'; 
+import { useEffect, useRef, useState } from 'react'; 
 import { useLocation } from 'react-router-dom'; 
 import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
@@ -11,13 +11,13 @@ import {
     // MenuItem,
     // Select,
     // Switch,
-    TextField,
+    // TextField,
     Typography, 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import PropTypes from 'prop-types';
 // import moment from 'moment';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
 import PropTypes from 'prop-types';
@@ -220,10 +220,11 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [country] = useState(customer.countryId);
     const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
-    const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
-    const [remarks, setRemarks] = useState(customer.remarks);
+    // const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
+    const [riskProfile] = useState(customer.riskProfile);
+    // const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
-    const [status, setStatus] = useState(customer.customerStatus);
+    // const [status, setStatus] = useState(customer.customerStatus);
 
     const [loadingText, setLoadingText] = useState('');
     const [errors, setErrors] = useState({});

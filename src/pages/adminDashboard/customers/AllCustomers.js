@@ -1,5 +1,5 @@
 // import { useEffect } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { 
 //     Checkbox,
@@ -9,13 +9,13 @@ import PropTypes from 'prop-types';
 //     TableRow, 
 //     Typography 
 // } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 // import { DotsHorizontal } from 'mdi-material-ui';
 // import TextClamp from 'react-string-clamp';
 
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import { getCustomers } from '../../../actions/customer';
-import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import { USER_COLUMNS } from '../../../utils/constants';
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
 

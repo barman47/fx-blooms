@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import clsx from 'clsx';
 import { Box, Typography, Menu, MenuItem, Divider, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+// import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
 import AllListings from './AllListings'
 import AllTransactions from './AllTransactions';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
@@ -158,7 +159,7 @@ const columns = [
 
 const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .3fr';
 
-const pages = [10, 25, 50, 100]
+// const pages = [10, 25, 50, 100]
 
 const Listings = () => {
     const classes = useStyles()
