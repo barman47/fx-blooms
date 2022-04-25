@@ -13,7 +13,7 @@ import {
 import { COLORS } from '../../../utils/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import { getCustomer } from '../../../actions/customer';
-import { getAllListings } from '../../../actions/adminListings'
+// import { getAllListings } from '../../../actions/adminListings'
 
 
 const useStyles = makeStyles(theme =>({
@@ -190,14 +190,17 @@ const TransactionDetails = () => {
   const dispatch = useDispatch()
   const { customer } = useSelector(state => state.customers);
 
-  useEffect(() => {
-    dispatch(getAllListings())
+  // useEffect(() => {
+  //   dispatch(getAllListings())
 
-  }, [dispatch]);
+  // }, [dispatch])
+
   
   useEffect(() => {
     dispatch(getCustomer(customer.id))
   }, [dispatch, customer])
+
+  console.log('hello')
   
   return (
     <>

@@ -2,6 +2,7 @@ import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
 const updateCustomerProfile = (data) => {
+    console.log('hello', data)
     let errors = {};
     data.phoneNumber = !isEmpty(data.phoneNumber) ?  data.phoneNumber : '';
     data.address = !isEmpty(data.address) ?  data.address : '';

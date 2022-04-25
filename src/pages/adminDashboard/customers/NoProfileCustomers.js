@@ -1,4 +1,4 @@
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { 
 //     Checkbox,
@@ -8,13 +8,13 @@ import PropTypes from 'prop-types';
 //     TableRow, 
 //     Typography 
 // } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+// import { makeStyles } from '@material-ui/core/styles';
 // import { DotsHorizontal } from 'mdi-material-ui';
 // import TextClamp from 'react-string-clamp';
 
 import { getCustomersWithoutProfile } from '../../../actions/customer';
 // import { SET_CUSTOMER } from '../../../actions/types';
-import { COLORS, USER_COLUMNS } from '../../../utils/constants';
+import { USER_COLUMNS } from '../../../utils/constants';
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 
 // const useStyles = makeStyles(theme => ({
@@ -58,7 +58,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 //     },
 // }));
 
-const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter }) => {
+const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCustomerProfile, filter, loading }) => {
 
     const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
 
@@ -73,7 +73,7 @@ const NoProfileCustomers = ({ getCustomersWithoutProfile, handleClick, viewCusto
 
     return (
         <>
-            <GenericTableBody data={noProfileCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
+            <GenericTableBody loading={loading} data={noProfileCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
             
             {/* {noProfileCustomers && noProfileCustomers.map((customer) => (
                 <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
 import { Box, Typography, Menu, MenuItem, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
@@ -139,7 +139,7 @@ const Withdrawals = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
   const [ withdrawalFilter, setDepositFilter ] = useState('')
-  const [ loadingDeposit, setLoadingDeposit ] = useState(false)
+  const [ loadingDeposit ] = useState(false)
 
 
 //   const [page, setPage] = useState(0);

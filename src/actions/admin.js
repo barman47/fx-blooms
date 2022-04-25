@@ -60,7 +60,7 @@ export const getCustomerCount = (timeframe) => async (dispatch) => {
     }
 };
 
-export const getActiveUserCoount = (timeframe) => async (dispatch) => {
+export const getActiveUserCount = (timeframe) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetCustomerCount?timeframe=${timeframe}`);
@@ -90,6 +90,7 @@ export const getTransactionVolume = (timeframe) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetTransactionVolume?timeframe=${timeframe}`);
+        console.log('hello')
         return dispatch({
             type: SET_TRANSACTION_VOLUME,
             payload: res.data.data

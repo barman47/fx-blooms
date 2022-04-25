@@ -1,16 +1,17 @@
-import { useState } from 'react';
-// import { useSelector } from 'react-redux';
-// import { batch, useDispatch } from 'react-redux';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // import { SET_CUSTOMER, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import clsx from 'clsx';
 import { Box, Typography, Menu, MenuItem, Divider, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+// import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
+import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
 import AllListings from './AllListings'
 import AllTransactions from './AllTransactions';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter } from 'mdi-material-ui';
+import { getListingCount } from '../../../actions/admin';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -118,7 +119,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const columns = [
-    { id: 'id', label: '', maxWidth: 10},
+    { id: 'id', label: ''},
     {
       id: 'listing ID',
       label: 'Listing ID',
@@ -140,19 +141,14 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'originalAmount',
-      label: 'Original Amount',
-      format: (value) => value.toLocaleString('en-US'),
-    },
+        id: 'status',
+        label: 'Status',
+        format: (value) => value.toLocaleString('en-US'),
+      },
     {
         id: 'timeStamp',
         label: 'Timestamp',
         format: (value) => value.toLocaleString('en-US'),
-    },
-    {
-      id: 'status',
-      label: 'Status',
-      format: (value) => value.toLocaleString('en-US'),
     },
     {
       id: 'action',
@@ -161,44 +157,49 @@ const columns = [
     },
 ];
 
-const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .3fr';
 
-const pages = [10, 25, 50, 100]
+// const pages = [10, 25, 50, 100]
 
 const Listings = () => {
-  const classes = useStyles()
-//   const dispatch = useDispatch()
-//   const dispatch = useDispatch();
-  const { ALL_LISTINGS, ALL_TRANSACTIONS } = LISTING_DETAILS;
-  const [tab, setTab] = useState(ALL_LISTINGS);
+    const classes = useStyles()
+    const dispatch = useDispatch();
+    const { ALL_LISTINGS, ALL_TRANSACTIONS } = LISTING_DETAILS;
+    const [tab, setTab] = useState(ALL_LISTINGS);
 
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-  const [anchorEl, setAnchorEl] = useState(null);
+    //   const [page, setPage] = useState(0);
+    //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const { totalListings } = useSelector(state => state.stats)
+
+    //   const handleChangePage = (event, newPage) => {
+    //     setPage(newPage);
+    //   };
 
 
-//   const handleChangePage = (event, newPage) => {
-//     setPage(newPage);
-//   };
 
-  const handleClick = (event) => {
+    const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
-};
-
-    const handleClose = () => {
-        setAnchorEl(null);
     };
 
-  
-//   const handleChangeRowsPerPage = (event) => {
-//     setRowsPerPage(+event.target.value);
-//     setPage(1);
-//   };
+    const handleClose = () => {
+    setAnchorEl(null);
+    };
+
+    useEffect(() => {
+        dispatch(getListingCount())
+    })
 
 
-  return (
+    //   const handleChangeRowsPerPage = (event) => {
+    //     setRowsPerPage(+event.target.value);
+    //     setPage(1);
+    //   };
+
+
+    return (
     <>
-      <section className={classes.root}>
+        <section className={classes.root}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
                     {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
@@ -215,20 +216,22 @@ const Listings = () => {
                     </Box>
                 </Grid>
             </Grid>
-          <Box component="section" className={classes.filterContainer}>
-              <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => setTab(ALL_LISTINGS)}>
-                  <Typography variant="subtitle2" component="span">{ALL_LISTINGS}</Typography>
-              </div>
-              <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => setTab(ALL_TRANSACTIONS)}>
-                  <Typography variant="subtitle2" component="span">{ALL_TRANSACTIONS}</Typography>
-              </div>
-          </Box>
-          <Box component="div" className={classes.table}>
+            <Box component="section" className={classes.filterContainer}>
+                <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => setTab(ALL_LISTINGS)}>
+                    <Typography variant="subtitle2" component="span">All Listings</Typography>
+                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                </div>
+                <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => setTab(ALL_TRANSACTIONS)}>
+                    <Typography variant="subtitle2" component="span">All Transactions</Typography>
+                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                </div>
+            </Box>
+            <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
                 {tab === ALL_LISTINGS && <AllListings handleClick={handleClick} />}
                 {tab === ALL_TRANSACTIONS && <AllTransactions handleClick={handleClick} />}
             </Box>
-          
+            
             <Menu
                 id="customer-menu"
                 anchorEl={anchorEl}
@@ -248,9 +251,9 @@ const Listings = () => {
                 <Divider />
                 <MenuItem>Change Risk Profile</MenuItem>
             </Menu>
-      </section>
+        </section>
     </>
-  )
+    )
 }
 
 export default Listings;

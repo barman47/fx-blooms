@@ -11,17 +11,18 @@ import {
     // MenuItem,
     // Select,
     // Switch,
+    // TextField,
     Typography, 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import PropTypes from 'prop-types';
 // import moment from 'moment';
-
+// import clsx from 'clsx';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
 import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
-
+import PropTypes from 'prop-types';
 // import { CUSTOMER_CATEGORY } from '../../../utils/constants';
-import validateUpdateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
+import updateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
 import isEmpty from '../../../utils/isEmpty';
 import avatar from '../../../assets/img/avatar.jpg';
 
@@ -32,6 +33,7 @@ import { SquareEditOutline, CheckDecagram } from 'mdi-material-ui';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
 import Status from '../../../components/admin-dashboard/Status'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
+import GenericTextField from '../../../components/admin-dashboard/GenericTextField'
 
 
 
@@ -124,6 +126,8 @@ const useStyles = makeStyles(theme =>({
         justifySelf: 'flex-end',
         color: '#5D6060',
         fontSize: theme.spacing(4.5),
+
+        cursor: 'pointer'
     },
 
     userPassport: {
@@ -187,6 +191,13 @@ const useStyles = makeStyles(theme =>({
         justifySelf: 'flex-end'
     },
 
+    saveBtn: {
+        marginTop: theme.spacing(3),
+
+        display: 'flex',
+        justifyContent: 'flex-end'
+    },
+
 }));
 
 const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile }) => {
@@ -209,10 +220,11 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [country] = useState(customer.countryId);
     const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
-    const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
-    const [remarks, setRemarks] = useState(customer.remarks);
+    // const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
+    const [riskProfile] = useState(customer.riskProfile);
+    // const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
-    const [status, setStatus] = useState(customer.customerStatus);
+    // const [status, setStatus] = useState(customer.customerStatus);
 
     const [loadingText, setLoadingText] = useState('');
     const [errors, setErrors] = useState({});
@@ -252,19 +264,19 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         }
     }, [errorsState, errors]);
 
-    useEffect(() => {
-        setEditable(false);
-        const { customerStatus } = customer;
-        // const { address, occupation, riskProfile, remark, status } = customer;
+    // useEffect(() => {
+    //     setEditable(false);
+    //     const { customerStatus } = customer;
+    //     // const { address, occupation, riskProfile, remark, status } = customer;
 
-        setAddress(address);
-        setStatus(customerStatus);
-        setRemarks('')
-        setOccupation(occupation);
-        setRiskProfile(riskProfile);
-        setRemarks(remarks);
+    //     setAddress(address);
+    //     setStatus(customerStatus);
+    //     setRemarks('')
+    //     setOccupation(occupation);
+    //     setRiskProfile(riskProfile);
+    //     setRemarks(remarks);
     
-    }, [customer, address, remarks, riskProfile, occupation]);
+    // }, [customer, address, remarks, riskProfile, occupation]);
 
     useEffect(() => {
         if (msg) {
@@ -319,12 +331,13 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             risk: riskProfile
         };
 
-        const { errors, isValid } = validateUpdateCustomerProfile(data);
-        if (!isValid) {
+        const { errors, isValid } = updateCustomerProfile(data);
+        if (!!isValid) {
             return setErrors({ msg: 'Invalid customer data', ...errors });
         }
         setLoadingText('Updating Customer . . .');
         setLoading(true);
+        setEditable(false)
         setErrors({});
         updateCustomerProfile(data);
     };
@@ -370,7 +383,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             <Box component="section" className={classes.root}>
                 <Box component="div" className={classes.userDetails}>
                     <Typography className={classes.headerTitle}>Personal details</Typography>
-                    <SquareEditOutline className={classes.headerIcon} />
+                    <SquareEditOutline onClick={() => setEditable(!editable)} className={classes.headerIcon} />
                 </Box>
                 <Box component="div" className={classes.userPassport}>
                     <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
@@ -388,21 +401,25 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                     <AmlBoard classes={classes} amlTitle={"Middle Name"} amlNumber={middleName} />
                     <AmlBoard classes={classes} amlTitle={"Last Name"} amlNumber={lastName} />
                     <AmlBoard classes={classes} amlTitle={"Date of Birth"} amlNumber={dateOfBirth} />
-                    <AmlBoard classes={classes} amlTitle={"Phone Number"} amlNumber={phoneNumber} />
+                    <AmlBoard editable={editable} classes={classes} amlTitle={"Phone Number"} amlNumber={phoneNumber} formField={<GenericTextField textTitle="phoneNumber" inputValue={phoneNumber} handleOnChange={setPhoneNumber} errors={errors} errorValue={phoneNumber} placeHolder={phoneNumber} />} />
                     <AmlBoard classes={classes} amlTitle={"Email"} amlNumber={email} />
                     <AmlBoard classes={classes} amlTitle={"Client since"} amlNumber={'20.04.2020'} />
                     <AmlBoard classes={classes} amlTitle={"Nationality"} amlNumber={nationality} />
-                    <AmlBoard classes={classes} amlTitle={"Occupation"} amlNumber={occupation} />
+
+                    <AmlBoard editable={editable} classes={classes} amlTitle={"Occupation"} amlNumber={occupation} formField={<GenericTextField textTitle="occupation" inputValue={occupation} handleOnChange={setOccupation} errors={errors} errorValue={occupation} placeHolder={occupation} />} />
+
                     <AmlBoard classes={classes} amlTitle={"Risk profile"} amlNumber={riskProfile} />
-                    <AmlBoard classes={classes} amlTitle={"Address"} amlNumber={address} />
+                    
+                    <AmlBoard editable={editable} classes={classes} amlTitle={"Address"} amlNumber={address} formField={<GenericTextField textTitle="address" inputValue={address} handleOnChange={setAddress} errors={errors} errorValue={address} placeHolder={address} />} />
+
                     <AmlBoard classes={classes} amlTitle={"Postal code"} amlNumber={postalCode} />
                     <AmlBoard classes={classes} amlTitle={"City"} amlNumber={city} />
                     <AmlBoard classes={classes} amlTitle={"Country of Residence"} amlNumber={country} />
                 </form>
             </Box>
 
-            <Box component="div">
-                <GenericButton buttonName="save" />
+            <Box component="div" className={classes.saveBtn}>
+                <GenericButton clickAction={onSubmit} buttonName="save" />
             </Box>
 
 
@@ -659,10 +676,10 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 };
 
 PersonalDetails.propTypes = {
-    // getIdCardValidationResponse: PropTypes.func.isRequired,
-    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
-    // setCustomerStatus: PropTypes.func.isRequired,
-    // updateCustomerProfile: PropTypes.func.isRequired
+    getIdCardValidationResponse: PropTypes.func.isRequired,
+    getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    setCustomerStatus: PropTypes.func.isRequired,
+    updateCustomerProfile: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus })(PersonalDetails);
+export default connect(undefined, { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus, updateCustomerProfile })(PersonalDetails);
