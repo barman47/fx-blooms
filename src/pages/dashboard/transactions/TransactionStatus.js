@@ -226,7 +226,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
     const getBuyerTransactionSteps = (buyer, seller) => {
         if (seller.currency === 'EUR') {
             setTransactionSteps([
-                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `You transfered ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
                 `${seller.userName} to confirm the NGN payment`, 
                 `${seller.userName} to transfer EUR to you`,
                 `You to confirm - Transaction Completed`
@@ -234,10 +234,10 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         } else {
             setTransactionSteps([
                 `You accepted offer`, 
-                `${seller.userName} to transfer ${seller.currency}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
-                `You confirmed ${seller.currency} payment`,
-                `You transfered ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
-                `${seller.userName} confirmed the ${buyer.currency} payment - Transaction Completed`,
+                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `You confirmed ${seller.currency ? seller.currency : ''} payment`,
+                `You transfered ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                `${seller.userName} confirmed the ${buyer.currency ? buyer.currency : ''} payment - Transaction Completed`,
             ]);
         }
     };
@@ -253,10 +253,10 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         } else {
             setTransactionSteps([
                 `${buyer.userName} accepted offer`, 
-                `You transfer the equivalent ${seller.currency}${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName} within 30 minutes`,
-                `${buyer.userName} confirmed the ${seller.currency} payment`,
-                `${buyer.userName} transferred the ${buyer.currency}${formatNumber(buyer.amountTransfered, 2)} to you`,
-                `You confirm ${buyer.currency} payment - Transaction Completed`, 
+                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName} within 30 minutes`,
+                `${buyer.userName} confirmed the ${seller.currency ? seller.currency : ''} payment`,
+                `${buyer.userName} transferred the ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to you`,
+                `You confirm ${buyer.currency ? buyer.currency : ''} payment - Transaction Completed`, 
             ]);
         }
     };
@@ -364,7 +364,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
                         <Box component="section">
                             <Typography variant="body2" component="p">Transaction ID</Typography>
                             <Box className={classes.transactionIdContainer}>
-                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}-${customer?.currency?.charAt(0)}`}</Typography>
+                                <Typography variant="body2" component="p">{`. . . ${returnLastThreeCharacters(transaction?.id)}${customer.currency ? '-'+ customer.currency.charAt(0) : ''}`}</Typography>
                                 &nbsp;&nbsp;
                                 <Tooltip title="Copy Transaction ID" arrow>
                                     <ContentCopy onClick={handleCopyTransactionId} color="primary" style={{ cursor: 'pointer' }} />
@@ -384,12 +384,12 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount Sent</Typography>
-                            <Typography variant="body2" component="p">{`${customer.currency}${formatNumber(customer.amountTransfered, 2)}`}</Typography>
+                            <Typography variant="body2" component="p">{`${customer.currency ? customer.currency : ''}${formatNumber(customer.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount to Receive</Typography>
-                            <Typography variant="body2" component="p">{`${recepient.currency}${formatNumber(recepient.amountTransfered, 2)}`}</Typography>
+                            <Typography variant="body2" component="p">{`${recepient.currency ? recepient.currency : ''}${formatNumber(recepient.amountTransfered, 2)}`}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
