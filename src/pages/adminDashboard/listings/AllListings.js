@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { LISTING_COLUMNS } from '../../../utils/constants';
-// import { getAllListings } from '../../../actions/adminListings'
-// import { getCustomers } from '../../../actions/customer'
+import { getAllListings } from '../../../actions/adminListings'
+import { getCustomers } from '../../../actions/customer'
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
 import { getCustomersWithoutProfile } from '../../../actions/customer';
 import PropTypes from 'prop-types';
@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
 
 const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
-  // const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
 
