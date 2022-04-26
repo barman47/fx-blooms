@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { WALLET_API as API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
+const API = `${process.env.REACT_APP_WALLET_API}`;
 const URL = `${API}/account-management`;
 
 export const addAccount = (account) => async (dispatch) => {

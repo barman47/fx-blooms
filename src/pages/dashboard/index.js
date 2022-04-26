@@ -53,7 +53,7 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    // Security,
+    Security,
     TwoFactorAuthentication 
 } from 'mdi-material-ui';
 import { 
@@ -63,7 +63,7 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    // PIN, 
+    PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE 
@@ -396,7 +396,7 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        // { url : PIN, text: 'Set PIN', icon: <Security /> },
+        { url : PIN, text: 'Set PIN', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 

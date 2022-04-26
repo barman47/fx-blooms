@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import setAuthToken from '../utils/setAuthToken';
 import { DASHBOARD_HOME } from '../routes';
@@ -15,6 +14,7 @@ import {
     TWO_FACTOR_AUTHORIZED
  } from './types';
 
+ const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/TwoFactor`;
 
 export const authorizeTwoFactor = ({ code, profileId }, navigate) => async (dispatch) => {

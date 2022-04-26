@@ -4,7 +4,6 @@ import { batch } from 'react-redux';
 import { ADD_USERNAME, DASHBOARD_HOME, LOGIN, SETUP_2FA } from '../routes';
 import { ACCEPTED_CUSTOMER_ID, ACCEPTED_CUSTOMER_RESIDENCE_PERMIT, PROFILE_UPDATED, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from './types';
 import { 
-    API,
     SETUP_2FA as GOTO_2FA,
     EMAIL_VERIFICATION,
     PROCEED_TO_LOGIN,
@@ -48,7 +47,7 @@ import {
 import extractIdDetails from '../utils/extractIdDetails';
 
  const { APPROVED } = ID_STATUS;
-
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Customer`;
 
 export const createCustomer = (customer, navigate) => async (dispatch) => {

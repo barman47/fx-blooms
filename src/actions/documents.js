@@ -3,7 +3,8 @@ import axios from 'axios';
 import { SET_DOCUMENTS } from './types';
 
 import handleError from '../utils/handleError';
-import { API } from '../utils/constants';
+
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 
 export const getDocuments = () => async dispatch => {
     try {

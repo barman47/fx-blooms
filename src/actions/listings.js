@@ -2,7 +2,6 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
-import { API } from '../utils/constants';
 import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
@@ -26,6 +25,7 @@ import {
 import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
 // export const getAllListings = () => async (dispatch) => {
