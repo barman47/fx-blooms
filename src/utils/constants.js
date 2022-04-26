@@ -183,9 +183,6 @@ export const olimpicMedals = [{
       country: 'Germany', hydro: 6.1, oil: 123.6, gas: 77.3, coal: 85.7, nuclear: 37.8,
     }];
 
-
-  export const API_KEY = 'a8b57b7f-6166-4388-90fd-4cecb8e4396d';
-
   export const USER_COLUMNS = {
     1: 'firstName',
     2: 'lastName',
@@ -197,11 +194,12 @@ export const olimpicMedals = [{
   }
 
   export const LISTING_COLUMNS = {
-    1: 'firstName',
-    2: 'lastName',
-    3: 'email',
-    4: 'username',
-    5: 'customerStatus',
-    6: 'occupation',
-    7: 'riskProfile'
+    1: 'id',
+    2: 'listedBy',
+    3: 'amountNeeded',
+    4: 'exchangeRate',
+    5: 'status',
+    6: 'dateCreated',
   }
+
+  export const VERIFF_HOST = "https://stationapi.veriff.com"

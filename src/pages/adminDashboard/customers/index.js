@@ -190,7 +190,8 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.2fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
     const classes = useStyles();
@@ -207,13 +208,11 @@ const Customers = (props) => {
         totalSuspendedCustomers,
         totalCustomersWithNoProfile 
     } = useSelector(state => state.stats);
-    const [ isDisabled, setDisabled ] = useState(true)
+    // const [ isDisabled, setDisabled ] = useState(true)
 
     // const { isMenuOpen } = useSelector(state => state.admin);
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
-
-    const pages = [20, 50, 75, 100]
     
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
@@ -225,6 +224,7 @@ const Customers = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
+    const [ isDisabled ] = useState(true)
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -258,6 +258,7 @@ const Customers = (props) => {
         setPageNumberList(pageNumArr)
     }, [pageNumber])
 
+    // NEXT PAGE BUTTON
     const nextPage = useCallback(() => {
         switch (filter) {
             case CONFIRMED:
@@ -292,7 +293,7 @@ const Customers = (props) => {
                 setCustomerCount(0);
                 break;
         }
-    })
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -352,6 +353,8 @@ const Customers = (props) => {
             });
         });
     };
+
+    // const handleLoading = useCallback(() => {})
 
     const getCount = useCallback(() => {
         switch (filter) {
@@ -487,13 +490,13 @@ const Customers = (props) => {
                     pageSize: rowsPerPage,
                     pageNumber: page
                 });
-                setPageNumber(Math.ceil(totalCustomers/20))
+                setPageNumber(Math.ceil(customerCount/20))
                 handlePageNUmberList()
                 break;
             default:
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, totalCustomers]);
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, customerCount]);
 
     // Get customers when page number changes
     useEffect(() => {
@@ -512,6 +515,7 @@ const Customers = (props) => {
             fetchCustomers();
         }
     }, [fetchCustomers, rowsPerPage]);
+
 
     // const handleChangePage = (event, newPage) => {
     //     setPage(newPage);
@@ -739,6 +743,7 @@ const Customers = (props) => {
                         <NoProfileCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile} 
                         />
                     }
@@ -746,6 +751,7 @@ const Customers = (props) => {
                         <SuspendedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -753,6 +759,7 @@ const Customers = (props) => {
                         <VerifiedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -760,6 +767,7 @@ const Customers = (props) => {
                         <RejectedCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle} 
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -767,6 +775,7 @@ const Customers = (props) => {
                         <AllCustomers 
                             handleClick={handleClick} 
                             handleSetTitle={handleSetTitle}
+                            loading={loading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     }
@@ -859,25 +868,28 @@ const Customers = (props) => {
                 </Menu>
 
 
-                <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
-                    <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                        <Typography component="span">{'20'} results</Typography>
-                    </Box>
-
-                    <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                            <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                            <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
-                        </Box> 
-                        <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
-                            {
-                                pageNumberList.map(n => (
-                                    <Typography variant="subtitle2">{n}</Typography>
-                                ))
-                            }
+                {
+                    loading ? '' :
+                    <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                        <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                            <Typography component="span">{'20'} results</Typography>
                         </Box>
-                    </Box>                    
-                </Box>
+
+                        <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                                <GenericButton isDisabled={isDisabled} buttonName="Previous" />
+                                <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                            </Box> 
+                            <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                                {
+                                    pageNumberList.map(n => (
+                                        <Typography variant="subtitle2">{n}</Typography>
+                                    ))
+                                }
+                            </Box>
+                        </Box>                    
+                    </Box>
+                }
             </section>
         </>
     );

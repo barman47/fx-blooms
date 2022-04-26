@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Grid } from '@material-ui/core';
@@ -62,7 +62,7 @@ const Customer = () => {
     const successModal = useRef();
 
     useEffect(() => {
-        return () => batch(() => {
+        return batch(() => {
             dispatch({ 
                 type: SET_CUSTOMER,
                 payload: {}
@@ -78,6 +78,8 @@ const Customer = () => {
         });
         // eslint-disable-next-line
     }, []);
+
+    console.log('hello', customer)
 
     // useEffect(() => {
     //     if (errorsState?.msg) {
@@ -97,7 +99,7 @@ const Customer = () => {
         }
     }, [customer, dispatch, location.pathname, msg]);
 
-    const dismissAction = () => {
+    const dismissAction = useCallback(() => {
         if (location.pathname.split('/').length === 3) { //Only run on the customer page
             dispatch({
                 type: CLEAR_CUSTOMER_STATUS_MSG
@@ -105,7 +107,7 @@ const Customer = () => {
 
             navigate(-1);
         }
-    };
+    }, [dispatch, location.pathname, navigate]);
 
     return (
         <>

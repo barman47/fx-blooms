@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { LISTING_COLUMNS } from '../../../utils/constants';
 import { getAllListings } from '../../../actions/adminListings'
@@ -8,15 +8,15 @@ import { getCustomersWithoutProfile } from '../../../actions/customer';
 import PropTypes from 'prop-types';
 
 
-const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .3fr';
 
 const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
   const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
 
-//   const { listings: { listings } } = useSelector(state => state)
-  const noProfileCustomers = useSelector(state => state.customers?.noProfile?.items);
+  const { listings } = useSelector(state => state.listings)
+  const [loadingListings, setLoadingListings] = useState(false)
 
 //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 //   const [page, setPage] = useState(0);
@@ -41,6 +41,7 @@ const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
   // }, [dispatch]);
   
   useEffect(() => {
+    setLoadingListings(true)
     dispatch(getAllListings())
 
   }, [dispatch])
@@ -53,9 +54,19 @@ const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
     }))
   }, [dispatch]);
 
+  useEffect(() => {
+    if (listings && listings.length > 0) {
+      setLoadingListings(false)
+    }
+  }, [listings])
+
+  const viewListing = useCallback((listing) => {
+    console.log('helo');
+  }, [])
+
   return (
     <>
-        <GenericTableBody gridColumns={gridColumns} addColumn={true} data={noProfileCustomers} handleClick={handleClick} columnList={LISTING_COLUMNS} />
+        <GenericTableBody viewCustomerProfile={viewListing} loading={loadingListings} gridColumns={gridColumns} addColumn={true} data={listings} handleClick={handleClick} columnList={LISTING_COLUMNS} />
     </>
   )
 }
