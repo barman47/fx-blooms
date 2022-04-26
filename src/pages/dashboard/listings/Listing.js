@@ -143,7 +143,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     const [timerSeconds, setTimerSeconds] = useState('00');
 
     const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
-    const { finalized, open } = LISTING_STATUS;
+    const { finalized, negotiation, open } = LISTING_STATUS;
 
     const interval = useRef();
 
@@ -267,6 +267,23 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                     </Typography>
                     {listing.status === finalized ?
                         <Button 
+                            disabled
+                            to="#!"
+                            component={RouterLink} 
+                            variant="contained" 
+                            size="large" 
+                            color="primary"
+                            disableElevation
+                            classes={{ 
+                                contained: classes.button,
+                                root: classes.button
+                            }}
+                        >
+                            Completed
+                        </Button>
+                        :
+                        listing.status === negotiation ?
+                            <Button 
                             disabled
                             to="#!"
                             component={RouterLink} 

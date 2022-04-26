@@ -13,7 +13,8 @@ import { makeStyles } from '@material-ui/core/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, madePaymentV2 } from '../../../actions/listings';
-import { GET_ERRORS, MAKE_LISTING_OPEN, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { markNotificationAsRead } from '../../../actions/notifications';
+import { GET_ERRORS, GET_LISTING, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -140,7 +141,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawer, drawerOpen, notificationId }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -165,6 +166,10 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
 
     useEffect(() => {
         startExpiryTimer();
+        dispatch({
+            type: GET_LISTING,
+            payload: bid.data.ListingId
+        });
         if (isEmpty(account) && !isEmpty(listing)) {
             getAccount(listing.sellersAccountId);
         }
@@ -182,11 +187,21 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             payload: {}
         });
         if (!drawerOpen) {
-            dispatch({
-                type: GET_ERRORS,
-                payload: {}
-            });
             clearInterval(interval.current);
+            batch(() => {
+                dispatch({
+                    type: GET_ERRORS,
+                    payload: {}
+                });
+                dispatch({
+                    type: SET_BID,
+                    payload: {}
+                });
+                dispatch({
+                    type: SET_LISTING,
+                    payload: {}
+                });
+            });
             setErrors({});
         }
     }, [dispatch, drawerOpen]);
@@ -212,23 +227,15 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
 
     const expireListing = useCallback(() => {
         clearInterval(interval.current);
-        toggleDrawer();
-        batch(() => {
-            dispatch({
-                type: SET_BID,
-                payload: {}
-            });
-            dispatch({
-                type: SET_LISTING,
-                payload: {}
-            });
-            dispatch({
-                type: MAKE_LISTING_OPEN,
-                payload: listing.id
-            });
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
         });
+        
         cancelBid(getBidIds(listing.bids));
-    }, [cancelBid, dispatch, listing, toggleDrawer]);
+        markNotificationAsRead(notificationId);
+        toggleDrawer();
+    }, [cancelBid, dispatch, listing, markNotificationAsRead, notificationId, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
@@ -243,12 +250,12 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, toggleDrawe
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
 
-            if (minutes === 0 && seconds === 0) {
+            if (minutes <= 0 && seconds <= 0) {
                 clearInterval(interval.current);
                 setTimerMinutes('00');
                 setTimerSeconds('00');
-                // setTimerValue(0);
                 expireListing();
+                // setTimerValue(0);
             } else {
                 setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
                 setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
@@ -403,7 +410,8 @@ SellerSendNgnDrawer.propTypes = {
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     madePaymentV2: PropTypes.func.isRequired,
+    markNotificationAsRead: PropTypes.func.isRequired,
     notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePaymentV2 })(SellerSendNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);
