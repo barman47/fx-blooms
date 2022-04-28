@@ -89,7 +89,7 @@ const useStyles = makeStyles(theme => ({
 	walletsContainer: {
 		display: 'grid',
 		gridTemplateColumns: '1fr',
-		flexDirection: 'column',
+		// flexDirection: 'column',
 		// gap: theme.spacing(1),
 		paddingLeft: theme.spacing(5),
 		paddingRight: theme.spacing(5),
@@ -113,9 +113,9 @@ const useStyles = makeStyles(theme => ({
 		borderRadius: theme.shape.borderRadius,
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'space-around',
 		margin: '0 auto',
-		width: '100%',
+		width: theme.spacing(40),
 
 		[theme.breakpoints.down('md')]: {
 			width: '100%'
@@ -513,7 +513,7 @@ const AllListings = (props) => {
 								active={ngnActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_NGN_WALLET })}
 							/>
-							<Wallet 
+							{/* <Wallet 
 								type="USD"
 								flag={USFlag}
 								active={usdActive}
@@ -524,14 +524,8 @@ const AllListings = (props) => {
 								flag={GBPFlag}
 								active={gbpActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_GPB_WALLET })}
-							/>
-							{/* <Paper className={classes.gateway}>
-								<div>
-									<Typography variant="h5">Your Gateway<br />into Decentralized<br />Money Exchange</Typography>
-									<Link to={ABOUT_US} component="a" target="_blank">Learn More</Link>
-								</div>
-								<img src={img} alt="decentralized money exchange" />
-							</Paper> */}
+							/> */}
+
 						</section>
 
 						<WalletInfo 

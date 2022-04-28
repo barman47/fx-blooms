@@ -39,7 +39,9 @@ const useStyles = makeStyles(theme => ({
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-around',
+        margin: '0 auto',
+        width: theme.spacing(40),
 
         [theme.breakpoints.down('sm')]: {
             display: 'grid',
@@ -106,17 +108,6 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
                     className={classes.button}
                 >
                     Withdraw
-                </Button>
-                <Button 
-                    variant="outlined" 
-                    color="primary"
-                    disableFocusRipple
-                    disableRipple
-                    startIcon={<ArrowLeftRight style={{ backgroundColor: COLORS.primary, borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={() => navigate(MAKE_LISTING)}
-                    className={classes.button}
-                >
-                    Make a Listing
                 </Button>
             </Box>
         </Box>
