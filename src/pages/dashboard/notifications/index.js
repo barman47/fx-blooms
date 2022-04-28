@@ -512,7 +512,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                         }
                         {!isPhoneNumberVerified && 
                             <Notification 
-                            title="Verify phone number"
+                                title="Verify phone number"
                                 message="Required to receive SMS notifications. Click Verify Phone to proceed."
                                 buttonText="Verify Phone"
                                 buttonAction={verifyPhone}

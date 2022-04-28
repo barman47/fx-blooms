@@ -41,7 +41,8 @@ import {
 	BANK_ACCOUNTS,
 	PROFILE,
 	ID_VERIFICATION,
-	TWO_FACTOR
+	TWO_FACTOR,
+	PIN
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -87,6 +88,8 @@ const Profile = lazy(() => import('./pages/dashboard/profile'));
 const IdVerification = lazy(() => import('./pages/dashboard/idVerification'));
 
 const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
+
+const Pin = lazy(() => import('./pages/dashboard/pin'));
 
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
@@ -207,6 +210,7 @@ const App = () => {
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
 								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
+								<Route path={`${PIN}`} element={<Pin handleSetTitle={handleSetTitle} />} />
 							</Route>
 							
 							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />
