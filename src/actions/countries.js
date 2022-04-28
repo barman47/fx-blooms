@@ -4,7 +4,8 @@ import { SET_COUNTRIES } from './types';
 
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import handleError from '../utils/handleError';
-import { API } from '../utils/constants';
+
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 
 export const getCountries = () => async (dispatch) => {
     try {

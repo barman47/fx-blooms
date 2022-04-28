@@ -1,12 +1,13 @@
 import { createBrowserHistory } from 'history';
 import axios from 'axios';
 
-import { API } from './constants';
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
 import { AUTH_TOKEN } from './constants';
 import { RESET_ADMIN_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
 import { ADMIN_LOGIN } from '../routes';
+
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 
 const reIssueAdminToken = () => {
     return new Promise(async(resolve, reject) => {

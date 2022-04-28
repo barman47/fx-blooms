@@ -2,12 +2,12 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 
 import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
-import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 import { markNotificationAsRead } from './notifications';
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Transfer`;
 
 export const getTransaction = (transferId) => async (dispatch) => {
