@@ -503,7 +503,7 @@ const MakeListing = (props) => {
                     type="error"
                 />
             }
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={AvailableCurrency === 'NGN' ? false : true} eur={AvailableCurrency === 'EUR' ? false : true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
