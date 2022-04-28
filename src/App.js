@@ -28,7 +28,8 @@ import {
 	PRIVACY_POLICY,
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
-	WALLET,
+	WALLETS,
+	FUND_WALLET,
 	CONTACT_US,
 	USER_AGREEMENT,
 	ADD_USERNAME,
@@ -99,6 +100,7 @@ const Transactions = lazy(() => import('./pages/dashboard/transactions'));
 const BankAccounts = lazy(() => import('./pages/dashboard/bankAccount'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
+const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
@@ -208,7 +210,8 @@ const App = () => {
 								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
-								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${WALLETS}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${FUND_WALLET}`} element={<FundWallet handleSetTitle={handleSetTitle} />} />
 								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
 								<Route path={`${PIN}`} element={<Pin handleSetTitle={handleSetTitle} />} />
 							</Route>

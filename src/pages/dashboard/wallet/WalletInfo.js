@@ -1,11 +1,11 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Box, Button, Divider, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import { ArrowLeftRight, ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
+import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
-import { MAKE_LISTING } from '../../../routes';
+import { FUND_WALLET } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -71,7 +71,6 @@ const useStyles = makeStyles(theme => ({
 
 const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggleWithdrawalDrawer }) => {
     const classes = useStyles();
-    const navigate = useNavigate();
 
     return (
         <Box component="section" className={classes.root} >
@@ -88,12 +87,14 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
             </Box>
             <Box component="section" className={classes.buttonContainer}>
                 <Button 
+                    to={FUND_WALLET}
+                    underline="none"
+                    component={Link}
                     variant="outlined" 
                     color="primary" 
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowBottomLeftThinCircleOutline style={{ backgroundColor: '#00A389', borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={toggleFundDrawer}
                     className={classes.button}
                 >
                     Add Fund

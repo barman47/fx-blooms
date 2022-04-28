@@ -23,11 +23,10 @@ import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { getWallets } from '../../../actions/wallets';
 import { 
 	ACTIVATE_EUR_WALLET,
 	ACTIVATE_NGN_WALLET,
-	ACTIVATE_USD_WALLET,
-	ACTIVATE_GPB_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
 	SET_LOADING,
 	SET_REQUIRED_CURRENCY 
@@ -47,11 +46,8 @@ import WalletInfo from '../wallet/WalletInfo';
 // import NewNotification from '../notifications/NewNotification';
 // import RiskNoticeModal from './RiskNoticeModal';
 
-// import img from '../../../assets/img/decentralized.svg';
 import EUFlag from '../../../assets/img/EU-flag.svg';
 import NGNFlag from '../../../assets/img/NGN-flag.svg';
-import USFlag from '../../../assets/img/US-flag.svg';
-import GBPFlag from '../../../assets/img/GBP-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
@@ -237,7 +233,7 @@ const AllListings = (props) => {
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { eurActive, ngnActive, usdActive, gbpActive } = useSelector(state => state.wallets);
+	const { eurActive, ngnActive, wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -246,7 +242,8 @@ const AllListings = (props) => {
 		getIdVerificationLink, 
 		getListingsOpenForBid, 
 		getMoreListings, 
-		getNotifications, 
+		getNotifications,
+		getWallets,
 		handleSetTitle,
 		removeExpiredListings 
 	} = props;
@@ -289,6 +286,10 @@ const AllListings = (props) => {
 				payload: true
 			});
 			getListings();
+		}
+
+		if (wallets.length === 0) {
+			getWallets(customerId);
 		}
 
 		if (_.isEmpty(profile)) {
@@ -660,6 +661,7 @@ AllListings.propTypes = {
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
+	getWallets: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
@@ -671,5 +673,6 @@ export default connect(undefined, {
 	getListingsOpenForBid, 
 	getMoreListings, 
 	getNotifications,
+	getWallets,
 	removeExpiredListings 
 })(AllListings);
