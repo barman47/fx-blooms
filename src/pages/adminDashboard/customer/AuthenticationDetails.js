@@ -103,7 +103,7 @@ const AuthenticationDetails = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     // const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
-    const { customer } = useSelector(state => state.customers);
+    // const { customer } = useSelector(state => state.customers);
     // const errorsState = useSelector(state => state.errors);
     
     // const [loading, setLoading] = useState(false);
@@ -113,6 +113,7 @@ const AuthenticationDetails = () => {
 
     // const toast = useRef();
     const successModal = useRef();
+    console.log('hello')
 
     // const handleAuthClass = useCallback((detail) => clsx({
     //   // [classes.authFalse]: !customer[detail],
@@ -124,9 +125,9 @@ const AuthenticationDetails = () => {
     // }), [customer, classes.authFalse])
 
     const hasSetup2FASetup = useMemo(() => clsx({
-      [classes.authFalse]: customer.twoFactorEnabled,
-      [classes.authTrue]: customer.hasSetUpTwoFactor,
-    }), [customer, classes.authFalse, classes.authTrue])
+      // [classes.authFalse]: customer.twoFactorEnabled,
+      // [classes.authTrue]: customer.hasSetUpTwoFactor,
+    }), [])
 
     // useLayoutEffect(() => {
       
