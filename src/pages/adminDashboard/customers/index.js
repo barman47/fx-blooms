@@ -49,7 +49,6 @@ import isEmpty from '../../../utils/isEmpty';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
-import { usePagination, DOTS } from '../../../utils/UsePagination';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -206,9 +205,6 @@ const columns = [
 
 const gridColumns = '0.15fr 1fr 1fr 1.2fr 1.2fr .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
-const pageSize = 20;
-const siblingCount = 1;
-const totalCount = 1;
 
 const Customers = (props) => {
     const classes = useStyles();
@@ -242,10 +238,10 @@ const Customers = (props) => {
     const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
-    const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
+    // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
 
 
-    const [ lastPage ] = useState(4)
+    const [ lastPage ] = useState(pageNumberList?.length - 1)
 
     const handleClick = (event) => {
         console.log('event', event.currentTarget)
@@ -290,46 +286,46 @@ const Customers = (props) => {
     }
 
     useEffect(() => {
-        console.log('test', currentPage)
+        console.log('test', lastPage)
         // if (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) return null
-    }, [currentPage, paginationRange])
+    }, [currentPage, lastPage])
 
     // NEXT PAGE BUTTON
-    const nextPage = useCallback(() => {
-        switch (filter) {
-            case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount || 0);
-                break;
+    // const nextPage = useCallback(() => {
+    //     switch (filter) {
+    //         case CONFIRMED:
+    //             setCustomerCount(confirmed.totalItemCount || 0);
+    //             break;
 
-            case PENDING:
-                setCustomerCount(pending.totalItemCount || 0);
-                break;
+    //         case PENDING:
+    //             setCustomerCount(pending.totalItemCount || 0);
+    //             break;
 
-            case REJECTED:
-                setCustomerCount(rejected.totalItemCount || 0);
-                break;
+    //         case REJECTED:
+    //             setCustomerCount(rejected.totalItemCount || 0);
+    //             break;
 
-            case SUSPENDED:
-                setCustomerCount(suspended.totalItemCount || 0);
-                break;
+    //         case SUSPENDED:
+    //             setCustomerCount(suspended.totalItemCount || 0);
+    //             break;
 
-            case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount || 0);
-                break;
+    //         case NO_PROFILE:
+    //             setCustomerCount(noProfile.totalItemCount || 0);
+    //             break;
             
-            case ALL_CUSTOMERS:
-                setPage(page + 1)
-                getCustomers({
-                    pageSize: pages[0] += pages[0] + 5,
-                    pageNumber: page
-                });
-                break;
+    //         case ALL_CUSTOMERS:
+    //             setPage(page + 1)
+    //             getCustomers({
+    //                 pageSize: pages[0] += pages[0] + 5,
+    //                 pageNumber: page
+    //             });
+    //             break;
 
-            default:
-                setCustomerCount(0);
-                break;
-        }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
+    //         default:
+    //             setCustomerCount(0);
+    //             break;
+    //     }
+    // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -921,7 +917,7 @@ const Customers = (props) => {
                             <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
                                 {
                                     pageNumberList && pageNumberList.map((pageNUmber, i) => (
-                                        <Typography className={clsx(pageNumber === currentPage && classes.active)} onClick={() => setCurrentPage(pageNumber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
+                                        <Typography className={clsx(pageNUmber === currentPage && classes.active)} onClick={() => setCurrentPage(pageNumber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
                                     ))
                                 }
                             </Box>

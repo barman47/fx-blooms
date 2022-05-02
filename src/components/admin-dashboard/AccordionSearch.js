@@ -1,6 +1,7 @@
 import {Accordion, AccordionSummary, AccordionDetails, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import CircularProgressBar from './CircularProgressBar'
+import { ChevronDown, } from 'mdi-material-ui';
 
 const useStyles = makeStyles((theme) => ({
   accordion: {
@@ -24,7 +25,7 @@ const AccordionSearch = ({ viewCustomerProfile, searchText, customers, loading }
   return (
     <Accordion className={classes.accordion} expanded={searchText && searchText?.length > 0 ? true : false}>
       <AccordionSummary
-      // expandIcon={<ExpandMoreIcon />}
+      expandIcon={<ChevronDown />}
       aria-controls="panel1a-content"
       id="panel1a-header"
       className={classes.accordionSummary}
