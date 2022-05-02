@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { createBrowserHistory } from 'history';
 
-import { API } from './constants';
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
 import { AUTH_TOKEN } from './constants';
 import { RESET_CUSTOMER_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
 import { LOGIN } from '../routes';
+
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 
 const reIssueCustomerToken = () => {
     return new Promise(async(resolve, reject) => {

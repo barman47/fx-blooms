@@ -1,10 +1,10 @@
 import axios from 'axios';
 
 import { SET_NOTIFICATIONS, SET_NOTIFICATION_COUNT, VERIFIED_PHONE_NUMBER } from './types';
-import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Notification`;
 
 export const getNotifications = () => async (dispatch) => {

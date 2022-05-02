@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-import { API } from '../utils/constants';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 import { SET_CURRENCIES } from './types';
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 
 export const getCurrencies = () => async (dispatch) => {
     try {

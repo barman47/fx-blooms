@@ -1,11 +1,13 @@
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Box, Button, Divider, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
-import { ArrowLeftRight, ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
+import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
-import { MAKE_LISTING } from '../../../routes';
+import formatNumber from '../../../utils/formatNumber';
+import { FUND_WALLET } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -39,7 +41,9 @@ const useStyles = makeStyles(theme => ({
     buttonContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-evenly',
+        justifyContent: 'space-around',
+        margin: '0 auto',
+        width: theme.spacing(40),
 
         [theme.breakpoints.down('sm')]: {
             display: 'grid',
@@ -67,56 +71,49 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggleWithdrawalDrawer }) => {
+const WalletInfo = ({ toggleWithdrawalDrawer }) => {
     const classes = useStyles();
-    const navigate = useNavigate();
+
+    const { wallet } = useSelector(state => state.wallets);
 
     return (
         <Box component="section" className={classes.root} >
             <Box component="div" className={classes.balance}>
                 <Box component="div">
                     <Typography variant="h6" className={classes.title}>Available Balance</Typography>
-                    <Typography variant="h6" className={classes.label}>{availableBalance}</Typography>
+                    <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.available, 2)}</Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem light />
                 <Box component="div">
                     <Typography variant="h6" className={classes.title}>Escrowed Balance</Typography>
-                    <Typography variant="h6" className={classes.label}>{escrowedBalance}</Typography>
+                    <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.lien, 2)}</Typography>
                 </Box>
             </Box>
             <Box component="section" className={classes.buttonContainer}>
                 <Button 
+                    to={FUND_WALLET}
+                    underline="none"
+                    component={Link}
                     variant="outlined" 
                     color="primary" 
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowBottomLeftThinCircleOutline style={{ backgroundColor: '#00A389', borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={toggleFundDrawer}
                     className={classes.button}
                 >
                     Add Fund
                 </Button>
                 <Button 
+                    component={Link}
+                    to={FUND_WALLET}
                     variant="outlined" 
                     color="primary" 
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowTopRightThinCircleOutline style={{ backgroundColor: '#FF7880', borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={toggleWithdrawalDrawer}
                     className={classes.button}
                 >
                     Withdraw
-                </Button>
-                <Button 
-                    variant="outlined" 
-                    color="primary"
-                    disableFocusRipple
-                    disableRipple
-                    startIcon={<ArrowLeftRight style={{ backgroundColor: COLORS.primary, borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={() => navigate(MAKE_LISTING)}
-                    className={classes.button}
-                >
-                    Make a Listing
                 </Button>
             </Box>
         </Box>
@@ -124,9 +121,6 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
 };
 
 WalletInfo.propTypes = {
-    availableBalance: PropTypes.string.isRequired,
-    escrowedBalance: PropTypes.string.isRequired,
-    toggleFundDrawer: PropTypes.func.isRequired,
     toggleWithdrawalDrawer: PropTypes.func.isRequired
 };
 
