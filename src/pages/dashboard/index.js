@@ -601,10 +601,17 @@ const Dashboard = (props) => {
                         }
 
                         // Show message to buyer only
-                        if (customerId === buyer.CustomerId) {
+                        if (customerId === buyer.CustomerId && seller.HasMadePayment === false) {
                             dispatch({
                                 type: SET_LISTING_MSG,
-                                payload: `${seller.UserName} will confirm your payment and send the EUR equivalent to the account you provided. Thanks!`
+                                payload: `${seller.UserName} will confirm your payment and send the ${seller.Currency} equivalent to the account you provided.`
+                            });
+                        }
+
+                        if (customerId === buyer.CustomerId && seller.HasMadePayment) {
+                            dispatch({
+                                type: SET_LISTING_MSG,
+                                payload: `Payment successful, a notification was sent. Once ${seller.UserName} confirms, this transaction will be considered complete.`
                             });
                         }
                         break;
@@ -639,10 +646,17 @@ const Dashboard = (props) => {
                                     payload: notification
                                 });
                                 // Show message to seller only
-                                if (customerId === seller.CustomerId) {
+                                if (customerId === seller.CustomerId && buyer.HasMadePayment) {
                                     dispatch({
                                         type: SET_CUSTOMER_MSG,
-                                        payload: `Thanks for the payment, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                        payload: `Payment successful, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                    });
+                                }
+
+                                if (customerId === seller.CustomerId && buyer.HasMadePayment === false) {
+                                    dispatch({
+                                        type: SET_CUSTOMER_MSG,
+                                        payload: `${buyer.UserName} will confirm your payment and send the ${buyer.Currency} equivalent to the account you provided.`
                                     });
                                 }
                             });

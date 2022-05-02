@@ -13,7 +13,7 @@ import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import { PROFILE, TWO_FACTOR } from '../../../routes';
@@ -129,6 +129,14 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         if (!residencePermitUrl && stats.idStatus !== APPROVED) {
             getIdVerificationLink();
         }
+
+        return () => {
+            console.log('Clearing errors');
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        };
         // eslint-disable-next-line
     }, []);
 

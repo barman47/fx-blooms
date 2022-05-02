@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -14,15 +14,20 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Security } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
+import { fundWallet } from '../../../actions/wallets';
+import { GET_ERRORS } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS } from '../../../utils/constants';
+import getAccountId from '../../../utils/getAccountId';
+import validateFundWallet from '../../../utils/validation/wallets/fund';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Toast from '../../../components/common/Toast';
@@ -82,6 +87,17 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 600
     },
 
+    option: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        '& img': {
+            marginLeft: theme.spacing(2),
+            width: theme.spacing(3),
+        }
+    },
+
     text: {
         color: COLORS.grey,
         fontWeight: 300,
@@ -114,16 +130,20 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     const navigate = useNavigate();
 
+    const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
-    const { currencies, institutions } = useSelector(state => state);
+    const { institutions, currencies, customer } = useSelector(state => state);
+    const { wallet } = useSelector(state => state.wallets);
 
     const [currency, setCurrency] = useState('EUR');
     const [amount, setAmount] = useState('');
-    const [receivingAccount, setReceivingAccount] = useState(false);
+    const [sourceAccount, setSourceAccount] = useState('');
+    const [institution, setInstitution] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     // eslint-disable-next-line
     const [loading, setLoading] = useState(false);
@@ -143,15 +163,51 @@ const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
+
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
-        setReceivingAccount('');
+        setSourceAccount('');
     };
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
+        setErrors({});
+        const data = {
+            institutionId: institution,
+            fullName: `${customer.firstName} ${customer.lastName}`,
+            type: 1,
+            amount: amount ? Number(amount) : '',
+            walletId: wallet.id,
+            accountId: sourceAccount ? getAccountId(sourceAccount, accounts) : '',
+            reference: "WALLET FUNDING"
+        };
+
+        const { errors, isValid } = validateFundWallet(data);
+
+        if (!isValid) {
+            return setErrors({ ...errors, msg: 'Invalid funding data!' });
+        }
+        console.log(data);
+        setLoading(true);
+        fundWallet(data);
     };
 
     return (
@@ -165,7 +221,7 @@ const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
                     type="error"
                 />
             }
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? false : true} eur={currency === 'EUR' ? false : true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
                 <form onSubmit={handleFormSubmit} noValidate>
@@ -207,33 +263,25 @@ const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
                                 error={errors.amount ? true : false}
                                 disabled={loading}
                                 fullWidth 
+                                helperText={errors.amount}
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Select Source Account</Typography>
                             <FormControl 
                                 variant="outlined" 
-                                error={errors.receivingAccount ? true : false } 
+                                error={errors.sourceAccount ? true : false } 
                                 fullWidth 
                                 required
                                 disabled={loading ? true : false}
                             >
                                 <Select
-                                    labelId="receivingAccount"
-                                    value={receivingAccount}
-                                    onChange={(e) => setReceivingAccount(e.target.value)}
+                                    labelId="sourceAccount"
+                                    value={sourceAccount}
+                                    onChange={(e) => setSourceAccount(e.target.value)}
                                 >
                                     <MenuItem value="" disabled>Select your receiving account</MenuItem>
                                     {currency === 'EUR' ?
-                                        accounts.map((account) => {
-                                            if (account.currency === 'NGN') {
-                                                return (
-                                                    <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                );
-                                            }
-                                            return null;
-                                        })
-                                        : 
                                         accounts.map((account) => {
                                             if (account.currency === 'EUR') {
                                                 return (
@@ -242,11 +290,54 @@ const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
                                             }
                                             return null;
                                         })
+                                        :
+                                        accounts.map((account) => {
+                                            if (account.currency === 'NGN') {
+                                                return (
+                                                    <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                );
+                                            }
+                                            return null;
+                                        })
                                     }
                                 </Select>
-                                <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
+                                <FormHelperText>{errors.sourceAccount}</FormHelperText>
                             </FormControl>
                             <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Financial Institution</Typography>
+                            <Autocomplete
+                                id="country-select"
+                                options={institutions}
+                                autoHighlight
+                                disableClearable
+                                getOptionLabel={(option) => {
+                                    setInstitution(option.id);
+                                    return option.fullName;
+                                }}
+                                renderOption={(option) => (
+                                    <>
+                                        <div className={classes.option}>
+                                            <span>{option.fullName}</span>
+                                            <img src={option.media[0].source} alt={`${institution.fullName} Logo`} />
+                                        </div>
+                                    </>
+                                )}
+                                renderInput={(params) => (
+                                    <TextField
+                                        error={errors.institution ? true : false}
+                                        helperText={errors.institution}
+                                        {...params}
+                                        variant="outlined"
+                                        inputProps={{
+                                            ...params.inputProps,
+                                            // autoComplete: 'new-password',
+                                        }}
+                                        // onChange={(e) => setCountryCode(e.target.value)}
+                                    />
+                                )}
+                            />
                         </Grid>
                         <Grid item xs={12}>
                             <Box component="section" className={classes.paymentMethod}>
@@ -336,7 +427,8 @@ const FundWallet = ({ getCurrencies, getInstitutions, handleSetTitle }) => {
 
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
-    getInstitutions: PropTypes.func.isRequired
+    getInstitutions: PropTypes.func.isRequired,
+    fundWallet: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCurrencies, getInstitutions })(FundWallet);
+export default connect(undefined, { fundWallet, getCurrencies, getInstitutions })(FundWallet);

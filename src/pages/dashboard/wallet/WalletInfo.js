@@ -1,10 +1,12 @@
 import { Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Box, Button, Divider, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
+import formatNumber from '../../../utils/formatNumber';
 import { FUND_WALLET } from '../../../routes';
 
 
@@ -69,20 +71,22 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggleWithdrawalDrawer }) => {
+const WalletInfo = ({ toggleWithdrawalDrawer }) => {
     const classes = useStyles();
+
+    const { wallet } = useSelector(state => state.wallets);
 
     return (
         <Box component="section" className={classes.root} >
             <Box component="div" className={classes.balance}>
                 <Box component="div">
                     <Typography variant="h6" className={classes.title}>Available Balance</Typography>
-                    <Typography variant="h6" className={classes.label}>{availableBalance}</Typography>
+                    <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.available, 2)}</Typography>
                 </Box>
                 <Divider orientation="vertical" flexItem light />
                 <Box component="div">
                     <Typography variant="h6" className={classes.title}>Escrowed Balance</Typography>
-                    <Typography variant="h6" className={classes.label}>{escrowedBalance}</Typography>
+                    <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.lien, 2)}</Typography>
                 </Box>
             </Box>
             <Box component="section" className={classes.buttonContainer}>
@@ -100,12 +104,13 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
                     Add Fund
                 </Button>
                 <Button 
+                    component={Link}
+                    to={FUND_WALLET}
                     variant="outlined" 
                     color="primary" 
                     disableFocusRipple
                     disableRipple
                     startIcon={<ArrowTopRightThinCircleOutline style={{ backgroundColor: '#FF7880', borderRadius: '50%', color: COLORS.offWhite }} />}
-                    onClick={toggleWithdrawalDrawer}
                     className={classes.button}
                 >
                     Withdraw
@@ -116,9 +121,6 @@ const WalletInfo = ({ availableBalance, escrowedBalance, toggleFundDrawer, toggl
 };
 
 WalletInfo.propTypes = {
-    availableBalance: PropTypes.string.isRequired,
-    escrowedBalance: PropTypes.string.isRequired,
-    toggleFundDrawer: PropTypes.func.isRequired,
     toggleWithdrawalDrawer: PropTypes.func.isRequired
 };
 

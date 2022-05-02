@@ -26,8 +26,9 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getWallets } from '../../../actions/wallets';
 import { 
 	ACTIVATE_EUR_WALLET,
-	ACTIVATE_NGN_WALLET,
+	// ACTIVATE_NGN_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
+	SET_WALLET,
 	SET_LOADING,
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
@@ -47,7 +48,7 @@ import WalletInfo from '../wallet/WalletInfo';
 // import RiskNoticeModal from './RiskNoticeModal';
 
 import EUFlag from '../../../assets/img/EU-flag.svg';
-import NGNFlag from '../../../assets/img/NGN-flag.svg';
+// import NGNFlag from '../../../assets/img/NGN-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
@@ -233,7 +234,7 @@ const AllListings = (props) => {
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { eurActive, ngnActive, wallets } = useSelector(state => state.wallets);
+	const { eurActive, wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -317,6 +318,15 @@ const AllListings = (props) => {
 		}
 		setAmount(value);
 	};
+
+	useEffect(() => {
+		if (wallets.length > 0) {
+			dispatch({
+				type: SET_WALLET,
+				payload: { currency: 'EUR' }
+			});	
+		}
+	}, [dispatch, wallets]);
 
 	// Fetch listings when search field is empty
 	useEffect(() => {
@@ -508,13 +518,13 @@ const AllListings = (props) => {
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-							<Wallet 
+							{/* <Wallet
 								type="NGN"
 								flag={NGNFlag}
 								active={ngnActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_NGN_WALLET })}
 							/>
-							{/* <Wallet 
+							<Wallet 
 								type="USD"
 								flag={USFlag}
 								active={usdActive}
