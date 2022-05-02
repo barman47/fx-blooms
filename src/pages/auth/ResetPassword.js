@@ -280,7 +280,7 @@ const ResetPassword = (props) => {
                 </RouterLink>
                 <div className={classes.formContainer}>
                     <Typography variant="h5" align="center">
-                        Forgot Password
+                        Reset Password
                     </Typography>
                     <Typography variant="subtitle2" style={{ fontWeight: 300, marginTop: theme.spacing(2) }} align="center">
                         Set your new Password
