@@ -78,14 +78,14 @@ const useStyles = makeStyles(theme =>({
 }))
 
 
-const GenericMiniCard = ({ gotToPage, cardName, cardIcon, filterType, handleOnChange, loading, formatFn, useCase   }) => {
+const GenericMiniCard = ({ goToPage, filterName, cardName, cardIcon, filterType, handleOnChange, loading, formatFn, useCase   }) => {
   const classes = useStyles()
 
   return (
-    <Box component="div" className={classes.contentItem} onClick={gotToPage}>
+    <Box component="div" className={classes.contentItem} onClick={goToPage}>
       <Box component="div" className={classes.dropDownContainer}>
         <Typography className={classes.contentIcon} variant="subtitle2" component="span" color="primary">{cardIcon}</Typography>
-        <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} />
+        <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} />
       </Box>
       <Box component="div">
         <Typography className={classes.contentTitle} variant="subtitle2" component="span" color="primary">{ cardName }</Typography>

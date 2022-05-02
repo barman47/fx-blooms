@@ -280,7 +280,7 @@ const TransactionDetails = () => {
             </div>
           </Paper>
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="subtitle2" variant="h">Transactions</Typography>
+            <Typography variant="h6">Transactions</Typography>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -364,7 +364,7 @@ const TransactionDetails = () => {
           </Paper>
 
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="subtitle2" variant="h">Fees</Typography>
+            <Typography variant="h6">Fees</Typography>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">

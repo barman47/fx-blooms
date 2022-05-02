@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { SET_CUSTOMER, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import clsx from 'clsx';
-import { Box, Typography, Menu, MenuItem, Divider, Grid } from '@material-ui/core';
+import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
@@ -98,24 +98,6 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: '0px',
         borderTopRightRadius: '0px',
     },
-
-    menu: {
-        backgroundColor: 'white',
-        border: `none`,
-        borderRadius: theme.spacing(1.9),
-        marginRight: '10px',
-        cursor: 'pointer',
-        left: '1695px !important',
-
-        '& ul': {
-            padding: '0'
-        },
-
-        '& li': {
-            padding: theme.spacing(2),
-            paddingLeft: theme.spacing(2.5)
-        }
-    }
 }));
 
 const columns = [
@@ -169,7 +151,7 @@ const Listings = () => {
 
     //   const [page, setPage] = useState(0);
     //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-    const [anchorEl, setAnchorEl] = useState(null);
+    // const [anchorEl, setAnchorEl] = useState(null);
     const { totalListings } = useSelector(state => state.stats)
 
     //   const handleChangePage = (event, newPage) => {
@@ -178,13 +160,9 @@ const Listings = () => {
 
 
 
-    const handleClick = (event) => {
-    setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-    setAnchorEl(null);
-    };
+    // const handleClick = (event) => {
+    //     setAnchorEl(event.currentTarget);
+    // };
 
     useEffect(() => {
         dispatch(getListingCount())
@@ -228,29 +206,9 @@ const Listings = () => {
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
-                {tab === ALL_LISTINGS && <AllListings handleClick={handleClick} />}
-                {tab === ALL_TRANSACTIONS && <AllTransactions handleClick={handleClick} />}
+                {tab === ALL_LISTINGS && <AllListings />}
+                {tab === ALL_TRANSACTIONS && <AllTransactions />}
             </Box>
-            
-            <Menu
-                id="customer-menu"
-                anchorEl={anchorEl}
-                keepMounted
-                open={Boolean(anchorEl)}
-                onClose={handleClose}
-                classes={{ paper: classes.menu }}
-                disableScrollLock={ true }
-            >
-                <MenuItem>View Details</MenuItem>
-                <Divider />
-                <MenuItem>Edit Profile</MenuItem>
-                <Divider />
-                <MenuItem>Contact</MenuItem>
-                <Divider />
-                <MenuItem>Suspend</MenuItem>
-                <Divider />
-                <MenuItem>Change Risk Profile</MenuItem>
-            </Menu>
         </section>
     </>
     )

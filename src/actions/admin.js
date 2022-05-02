@@ -104,7 +104,7 @@ export const searchForCustomer = ({searchText, pageNumber, pageSize}) => async (
     try {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/SearchForCustomer?KeyWord=${searchText}&PageNumber=${pageNumber}&PageSize=${pageSize}`);
-        dispatch({
+        return dispatch({
             type: SET_CUSTOMERS,
             payload: res.data.data
         });

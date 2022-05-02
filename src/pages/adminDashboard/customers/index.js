@@ -72,11 +72,13 @@ const useStyles = makeStyles((theme) => ({
     },
 
     filterContainer: {
-        display: 'grid',
-        gridTemplateColumns: '.1fr .1fr .1fr .1fr .1fr',
+        display: 'flex',
+        gap: theme.spacing(2),
+        // gridTemplateColumns: '.13fr .13fr .13fr .13fr .15fr',
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
-        borderBottom: '1px solid #E3E8EE'
+        borderBottom: '1px solid #E3E8EE',
+        width: '70%'
     },
 
     filter: {
@@ -84,22 +86,27 @@ const useStyles = makeStyles((theme) => ({
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         // padding: theme.spacing(1),
         width: 'fit-content',
-        gap: theme.spacing(1),
+        // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
+        gap: '10px',
         
         '& span': {
-            fontWeight: '600'
+            fontWeight: '600',
         },
 
         '& span:nth-child(2)': {
             color: '#1E625E',
             backgroundColor: '#AEC7C0',
-            padding: '0px 3px',
+            padding: '0px 5px',
+            textAlign: 'center',
             borderRadius: theme.spacing(1)
+        },
+
+        '&:not(:first-child) span': {
         }
     },
 
@@ -142,7 +149,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: theme.spacing(1.9),
         marginRight: '10px',
         cursor: 'pointer',
-        left: '1695px !important',
+        // left: '1695px !important',
 
         '& ul': {
             padding: '0'
@@ -152,6 +159,12 @@ const useStyles = makeStyles((theme) => ({
             padding: theme.spacing(2),
             paddingLeft: theme.spacing(2.5)
         }
+    },
+
+    selected: {
+        color: 'red',
+        fontWeight: 600,
+        fontSize: '2vw'
     }
 }));
 
@@ -190,7 +203,7 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = '0.15fr 1fr 1fr 1.2fr 1.2fr .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
@@ -224,9 +237,14 @@ const Customers = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
-    const [ isDisabled ] = useState(true)
+    const [ currentPage, setCurrentPage ] = useState(1)
+    // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
+
+
+    const [ lastPage ] = useState(pageNumberList?.length - 1)
 
     const handleClick = (event) => {
+        console.log('event', event.currentTarget)
         setAnchorEl(event.currentTarget);
     };
 
@@ -258,42 +276,56 @@ const Customers = (props) => {
         setPageNumberList(pageNumArr)
     }, [pageNumber])
 
+
+    const onNextPage = () => {
+        setCurrentPage(currentPage + 1)
+    }
+
+    const onPrevPage = () => {
+        setCurrentPage(currentPage - 1)
+    }
+
+    useEffect(() => {
+        console.log('test', lastPage)
+        // if (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) return null
+    }, [currentPage, lastPage])
+
     // NEXT PAGE BUTTON
-    const nextPage = useCallback(() => {
-        switch (filter) {
-            case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount || 0);
-                break;
+    // const nextPage = useCallback(() => {
+    //     switch (filter) {
+    //         case CONFIRMED:
+    //             setCustomerCount(confirmed.totalItemCount || 0);
+    //             break;
 
-            case PENDING:
-                setCustomerCount(pending.totalItemCount || 0);
-                break;
+    //         case PENDING:
+    //             setCustomerCount(pending.totalItemCount || 0);
+    //             break;
 
-            case REJECTED:
-                setCustomerCount(rejected.totalItemCount || 0);
-                break;
+    //         case REJECTED:
+    //             setCustomerCount(rejected.totalItemCount || 0);
+    //             break;
 
-            case SUSPENDED:
-                setCustomerCount(suspended.totalItemCount || 0);
-                break;
+    //         case SUSPENDED:
+    //             setCustomerCount(suspended.totalItemCount || 0);
+    //             break;
 
-            case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount || 0);
-                break;
+    //         case NO_PROFILE:
+    //             setCustomerCount(noProfile.totalItemCount || 0);
+    //             break;
             
-            case ALL_CUSTOMERS:
-                setPage(page + 1)
-                getCustomers({
-                    pageSize: pages[0] += pages[0] + 5,
-                    pageNumber: page
-                });
-                break;
+    //         case ALL_CUSTOMERS:
+    //             setPage(page + 1)
+    //             getCustomers({
+    //                 pageSize: pages[0] += pages[0] + 5,
+    //                 pageNumber: page
+    //             });
+    //             break;
 
-            default:
-                setCustomerCount(0);
-                break;
-        }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
+    //         default:
+    //             setCustomerCount(0);
+    //             break;
+    //     }
+    // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
 
     useEffect(() => {
         handleSetTitle('Customers');
@@ -661,13 +693,15 @@ const Customers = (props) => {
         handleClose();
     };
 
-    const suspend = () => {
+    const suspend = (e) => {
         handleClose();
-        setCustomerStatus({
-            customerID: customer.id,
-            newStatus: SUSPENDED,
-            currentStatus: filter
-        });
+        if (customer.customerStatus !== SUSPENDED) {
+            setCustomerStatus({
+                customerID: customer.id,
+                newStatus: SUSPENDED,
+                currentStatus: filter
+            });
+        }
     };
 
     const changeRiskProfile = () => {
@@ -862,7 +896,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={filter === SUSPENDED || filter === REJECTED}>Suspend</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -877,13 +911,13 @@ const Customers = (props) => {
 
                         <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                                <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                                <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                                <GenericButton clickAction={onPrevPage} isDisabled={currentPage === 1} buttonName="Previous" />
+                                <GenericButton clickAction={onNextPage} isDisabled={currentPage === lastPage} buttonName="Next" />
                             </Box> 
                             <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
                                 {
-                                    pageNumberList.map(n => (
-                                        <Typography variant="subtitle2">{n}</Typography>
+                                    pageNumberList && pageNumberList.map((pageNUmber, i) => (
+                                        <Typography className={clsx(pageNUmber === currentPage && classes.active)} onClick={() => setCurrentPage(pageNumber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
                                     ))
                                 }
                             </Box>
