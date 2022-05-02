@@ -399,8 +399,8 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
         e.preventDefault();
         setSearchText(e.target.value)
         if (isEmpty(searchText)) {
-            // return setErrors({ searchText: 'Please enter a search term' });
-            return
+            return setErrors({ searchText: 'Please enter a search term' });
+            // return
         }
         // setLoading(true);
         // setLoadingText('Searching . . .');
