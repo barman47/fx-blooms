@@ -19,12 +19,12 @@ const createAccount = (data) => {
         errors.Username = 'Username is required!';
     }
 
-    if (Validator.isEmpty(data.Password)) {
-        errors.Password = 'Password is required!';
-    }
-
     if (!Validator.isLength(data.Password, { min: 8 })) {
         errors.Password = 'Password should be at least 8 characters long!';
+    }
+
+    if (Validator.isEmpty(data.Password)) {
+        errors.Password = 'Password is required!';
     }
 
     if (!Validator.equals(data.Password, data.ConfirmPassword)) {
