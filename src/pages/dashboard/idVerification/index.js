@@ -160,13 +160,13 @@ const IDVerification = ({ getIdVerificationLink, getResidencePermitLink }) => {
     }, [APPROVED, email, getIdVerificationLink, getResidencePermitLink, idVerificationLink, residencePermitUrl, idStatus, residencePermitStatus]);
 
     const verifyID = () => {
-        // window.open(idVerificationLink);
-        window.open('/dashboard/veriff')
+        window.open(idVerificationLink);
+        // window.open('/dashboard/veriff')
     };
 
     const verifyEUID = () => {
-        // window.open(residencePermitUrl);
-        window.open('/dashboard/veriff')
+        window.open(residencePermitUrl);
+        // window.open('/dashboard/veriff')
     };
 
     return (
