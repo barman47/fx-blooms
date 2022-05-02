@@ -27,6 +27,7 @@ import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import getTime, { convertToLocalTime } from '../../../utils/getTime';
+import getAccountId from '../../../utils/getAccountId';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -355,17 +356,12 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         madePayment({
             bidId: bid.id,
             listingId: listing.id,
-            accountId: getAccountId(receivingAccount),
+            accountId: getAccountId(receivingAccount, accounts),
             reference
         });
     };
 
     const getSellerAccount = () => getAccount(listing.sellersAccountId);
-
-    const getAccountId = (account) => {
-        const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
-        return bank.accountID;
-    };
 
     return (
         <>

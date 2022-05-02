@@ -10,6 +10,7 @@ import currencyReducer from './currencies';
 import customerReducer from './customer';
 import customersReducer from './customers';
 import documentsReducer from './documents';
+import institutionsReducer from './institutions';
 import listingsReducer from './listings';
 import loadingReducer from './loading';
 import errorsReducer from './errors';
@@ -30,6 +31,7 @@ const appReducer = combineReducers({
     documents: documentsReducer,
     errors: errorsReducer,
     listings: listingsReducer,
+    institutions: institutionsReducer,
     notifications: notificationsReducer,
     stats: statsReducer,
     subscription: subscriptionReducer,

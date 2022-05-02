@@ -80,9 +80,11 @@ const Notification = ({ title, message, buttonText, buttonAction, buttonDisabled
                 <Typography variant="body1" component="p">{title}</Typography>
                 <Box component="div" className={classes.timeStampContainer}>
                     <ClockOutline className={classes.clockIcon} />
-                    <Typography variant="subtitle2" component="small">
-                        {convertToLocalTime(date).from()}
-                    </Typography>
+                    {date && 
+                        <Typography variant="subtitle2" component="small">
+                            {convertToLocalTime(date).from()}
+                        </Typography>
+                    }
                 </Box>
                 <Typography variant="body1" component="p">{message}</Typography>
             </div>

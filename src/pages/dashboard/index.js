@@ -53,8 +53,9 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    Security,
-    TwoFactorAuthentication 
+    // Security,
+    TwoFactorAuthentication,
+    // Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -63,10 +64,11 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    PIN, 
+    // PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
-    PROFILE 
+    PROFILE,
+    // WALLETS
 } from '../../routes';
 import { 
     ADD_NOTIFICATION,
@@ -387,7 +389,7 @@ const Dashboard = (props) => {
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        // { url: WALLET, text:'Wallets', icon: <Wallet /> },
+        // { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
@@ -396,7 +398,7 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        { url : PIN, text: 'Set PIN', icon: <Security /> },
+        // { url : PIN, text: 'Set PIN', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
@@ -599,10 +601,17 @@ const Dashboard = (props) => {
                         }
 
                         // Show message to buyer only
-                        if (customerId === buyer.CustomerId) {
+                        if (customerId === buyer.CustomerId && seller.HasMadePayment === false) {
                             dispatch({
                                 type: SET_LISTING_MSG,
-                                payload: `${seller.UserName} will confirm your payment and send the EUR equivalent to the account you provided. Thanks!`
+                                payload: `${seller.UserName} will confirm your payment and send the ${seller.Currency} equivalent to the account you provided.`
+                            });
+                        }
+
+                        if (customerId === buyer.CustomerId && seller.HasMadePayment) {
+                            dispatch({
+                                type: SET_LISTING_MSG,
+                                payload: `Payment successful, a notification was sent. Once ${seller.UserName} confirms, this transaction will be considered complete.`
                             });
                         }
                         break;
@@ -637,10 +646,17 @@ const Dashboard = (props) => {
                                     payload: notification
                                 });
                                 // Show message to seller only
-                                if (customerId === seller.CustomerId) {
+                                if (customerId === seller.CustomerId && buyer.HasMadePayment) {
                                     dispatch({
                                         type: SET_CUSTOMER_MSG,
-                                        payload: `Thanks for the payment, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                        payload: `Payment successful, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                    });
+                                }
+
+                                if (customerId === seller.CustomerId && buyer.HasMadePayment === false) {
+                                    dispatch({
+                                        type: SET_CUSTOMER_MSG,
+                                        payload: `${buyer.UserName} will confirm your payment and send the ${buyer.Currency} equivalent to the account you provided.`
                                     });
                                 }
                             });

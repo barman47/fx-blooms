@@ -154,6 +154,13 @@ const SessionModal = ({ logout }) => {
         resetSessionTimer();
     };
 
+    const handleOnClose = (e, reason) => {
+        if (reason === 'backdropClick') {
+            return;
+        }
+        setOpen(false);
+    };
+
 	return (
         <Modal
             aria-labelledby="session-modal-title"
@@ -161,7 +168,7 @@ const SessionModal = ({ logout }) => {
             className={classes.modal}
             open={open}
             disableEscapeKeyDown
-            onClose={() => setOpen(false)}
+            onClose={handleOnClose}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
