@@ -22,8 +22,8 @@ const UserActivitiesRow = ({ classname, category, number, progressNumber }) => {
       </Typography>
       <Typography component="h6" variant="subtitle2">{number}</Typography>
       <Typography component="h6" variant="subtitle2">
-        <Typography color="success">{ progress + '%' }</Typography>
-        <LinearProgress color="success" variant="buffer" value={progress} />
+        <Typography style={{ fontSize: '.9vw'}}>{ progress + '%' }</Typography>
+        <LinearProgress color="success" variant="determinate" value={progress} />
         </Typography>
     </Box>
   )

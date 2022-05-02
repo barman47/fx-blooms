@@ -8,9 +8,9 @@ const useStyles = makeStyles(theme =>({
     minWidth: theme.spacing(3),
     paddingBottom: theme.spacing(0.6),
     paddingTop: theme.spacing(0.6),
-    backgroundColor: 'white',
+    backgroundColor: 'transparent',
     border: '.7px solid #E6E6E6',
-    boxShadow: '3px 2px 3px grey',
+    // boxShadow: '3px 2px 3px grey',
 
     '&:active': {
       outline: 'none'
@@ -18,11 +18,12 @@ const useStyles = makeStyles(theme =>({
   },
 }))
 
-const GenericSelect = ({ FILTERS, selectValue, setOnChange, loading }) => {
+const GenericSelect = ({ selectFilterName, FILTERS, selectValue, setOnChange, loading }) => {
   const classes = useStyles();
 
   return (
-    <FormControl 
+    <>
+      <FormControl 
         variant="outlined"
     >
         <Select
@@ -31,7 +32,7 @@ const GenericSelect = ({ FILTERS, selectValue, setOnChange, loading }) => {
             displayEmpty
             classes={{ select: classes.select }}
             inputProps={{ 'aria-label': 'Filter', MenuProps: {disableScrollLock: true} }}
-            name="usersFilter"
+            name={selectFilterName}
             disabled={loading}
         >
             <MenuItem value="" disabled>Filter</MenuItem>
@@ -39,7 +40,8 @@ const GenericSelect = ({ FILTERS, selectValue, setOnChange, loading }) => {
                 <MenuItem key={index} value={value}>{value}</MenuItem>
             ))}
         </Select>
-    </FormControl>
+      </FormControl>
+    </>
   )
 }
 
