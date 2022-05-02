@@ -86,6 +86,7 @@ const AllCustomers = ({ getCustomers, handleClick, viewCustomerProfile, loading 
     //     // eslint-disable-next-line
     // }, []);
 
+
     return (
         <>
             <GenericTableBody loading={loading} data={customers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />

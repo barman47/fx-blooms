@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 
 const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .3fr';
 
-const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
+const AllListings = ({ getCustomersWithoutProfile }) => {
   const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
@@ -66,7 +66,7 @@ const AllListings = ({ getCustomersWithoutProfile, handleClick }) => {
 
   return (
     <>
-        <GenericTableBody viewCustomerProfile={viewListing} loading={loadingListings} gridColumns={gridColumns} addColumn={true} data={listings} handleClick={handleClick} columnList={LISTING_COLUMNS} />
+        <GenericTableBody viewCustomerProfile={viewListing} loading={loadingListings} gridColumns={gridColumns} addColumn={true} data={listings} viewMore={true} columnList={LISTING_COLUMNS} />
     </>
   )
 }

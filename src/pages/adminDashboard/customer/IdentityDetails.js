@@ -146,7 +146,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
     // const [loading, setLoading] = useState(false);
     const [loading] = useState(false);
     // eslint-disable-next-line
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
 
     // const toast = useRef();
     const successModal = useRef();

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import {
     AppBar,
     Avatar,
-    Button,
     Box,
     Drawer,
     IconButton,
@@ -22,11 +21,13 @@ import {
     Tooltip,
     Toolbar,
     Typography,
-    TextField
+    TextField,
+    // Accordion,
+    // AccordionSummary,
+    // AccordionDetails
 } from '@material-ui/core';
 
 import { 
-    Account,
     AccountMultiple, 
     AlertOutline,
     BagChecked,
@@ -37,22 +38,20 @@ import {
     ChevronLeft, 
     ChevronRight,
     CashMinus,
-    FilterOutline,
     Headset,
     History,
     Magnify,
-    Sort
 } from 'mdi-material-ui';
-
+// import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import logo from '../../assets/img/logowhite.svg';
-
+import avatar from '../../assets/img/avatar.jpg';
 import { getStats, logout, searchForCustomer } from '../../actions/admin';
 import { getCustomers } from '../../actions/customer';
-import { COLORS, CUSTOMER_CATEGORY, DRAWER_WIDTH as drawerWidth, LOGOUT } from '../../utils/constants';
+import { COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
 
 import SessionModal from './SessionModal';
-import Spinner from '../../components/common/Spinner';
+// import Spinner from '../../components/common/Spinner';
 
 import { 
     ADMIN_HOME,
@@ -64,11 +63,14 @@ import {
     SUPPORT,
     RISK_PROFILE 
 } from '../../routes';
-import { SET_CATEGORY } from '../../actions/types';
+import { SET_CATEGORY, SET_CUSTOMER } from '../../actions/types';
+import AccordionSearch from '../../components/admin-dashboard/AccordionSearch'
+// import CircularProgressBar from '../../components/admin-dashboard/CircularProgressBar'
 
 const useStyles = makeStyles((theme) => ({
     root: {
         backgroundColor: '#ECF1F1',
+        position: 'relative',
 
         [theme.breakpoints.down('md')]: {
             paddingLeft: theme.spacing(5),
@@ -141,18 +143,26 @@ const useStyles = makeStyles((theme) => ({
     formContainer: {
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center'
+        // justifyContent: 'space-between',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        backgroundColor: '#F8F9FA'
     },
 
     searchField: {
-        paddingBottom: theme.spacing(0.1),
-        paddingTop: theme.spacing(0.1)
+        // paddingBottom: theme.spacing(0.1),
+        // paddingTop: theme.spacing(0.1),
+        padding: theme.spacing(1.3, 3),
+        outline: 'none',
+        border: '1px solid #E2E8F0',
+        backgroundColor: 'white',
+        borderRadius: '20px',
+        width: '20rem'
     },
 
     headerLinks: {
         display: 'grid',
-        gridTemplateColumns: '1fr 1fr 0.5fr 0.5fr',
+        gridTemplateColumns: '0.5fr 0.5fr',
         listStyleType: 'none',
         alignItems: 'center',
         gap: theme.spacing(1),
@@ -168,12 +178,15 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        padding: theme.spacing(0, 1)
+        padding: theme.spacing(0, 1),
+        backgroundColor: '#F8F9FA',
+        paddingLeft: theme.spacing(3)
     },
 
     adminName: {
-        color: COLORS.grey,
-        fontWeight: 500
+        color: '#6D6E6E',
+        fontWeight: 500,
+        fontSize: '0.9vw'
     },
 
     drawer: {
@@ -268,6 +281,45 @@ const useStyles = makeStyles((theme) => ({
 
     icon: {
         color: COLORS.offWhite
+    },
+
+    searchBarContainer: {
+        position: 'fixed',
+        backdropFilter: 'blur(10px)',
+        backgroundColor: 'rgba(0,0,0,0.3)',
+        top: 0,
+        right: 0,
+        zIndex: 1000,
+        width: '100%',
+        height: '100vh',
+        transform: 'translate(0, 84px)'
+    },
+
+    searchBarResult: {
+        backgroundColor: 'white',
+        width: '50%',
+        height: '80vh',
+        marginLeft: 'auto',
+        borderRadius: '3px',
+        marginTop: '.6rem',
+        // paddingTop: '3rem',
+        // paddingLeft: '1.5rem',
+        padding: '3rem 1.5rem 1rem 1.5rem',
+        overflowY: 'scroll'
+    },
+
+    accordion: {
+        boxShadow: 'none',
+    },
+
+    accordionSummary: {
+        backgroundColor: '#F7F7F9',
+
+        '&.Mui-expanded': {
+            minHeight: '48px',
+            // maxHeight: '55px'
+            // backgroundColor: '#a5a5a5',
+        }
     }
 }));
 
@@ -277,11 +329,11 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
     const navigate = useNavigate();
     const location = useLocation();
     const { admin, customers } = useSelector(state => state);
-    const { category, pageSize } = useSelector(state => state.customers);
+    const { pageSize } = useSelector(state => state.customers);
 
     const [searchText, setSearchText] = useState('');
     const [path, setPath] = useState('');
-    const [loadingText, setLoadingText] = useState('One Moment . . .');
+    // const [loadingText, setLoadingText] = useState('One Moment . . .');
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -306,8 +358,8 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
     // Get customers when serach field is cleared
     useEffect(() => {
         if (isEmpty(searchText)) {
-            setLoading(true);
-            setLoadingText('One Moment . . .');
+            // setLoading(true);
+            // setLoadingText('One Moment . . .');
             getCustomers({ pageNumber: 0, pageSize });
         }
     }, [getCustomers, pageSize, searchText]);
@@ -339,78 +391,72 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
     };
 
     const handleLinkClick = (link) => {
+        setSearchText('')
         navigate(link);
     };
 
-    const handleSearch = (e) => {
+    const handleSearch = useCallback((e) => {
         e.preventDefault();
+        setSearchText(e.target.value)
         if (isEmpty(searchText)) {
-            return setErrors({ searchText: 'Please enter a search term' });
+            // return setErrors({ searchText: 'Please enter a search term' });
+            return
         }
-        setLoading(true);
-        setLoadingText('Searching . . .');
+        // setLoading(true);
+        // setLoadingText('Searching . . .');
+        // const test = searchForCustomer({ searchText, pageNumber: 0, pageSize });
         searchForCustomer({ searchText, pageNumber: 0, pageSize });
-    };
+    }, [searchText, pageSize, searchForCustomer]);
+
+
+    const viewCustomerProfile = (customer) => {
+        dispatch({
+            type: SET_CUSTOMER,
+            payload: customer
+        });
+        navigate(`${CUSTOMERS}/${customer.id}`);
+        setSearchText('')
+    }
 
     return (
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <SessionModal />
-            {loading && <Spinner text={loadingText} />}
+            {/* {loading && <Spinner text={loadingText} />} */}
             <section className={classes.root}>
                 <AppBar position="fixed" color="transparent" elevation={0} className={clsx(classes.appBar, {
                     [classes.appBarShift]: open,
                 })}>
-                    <Toolbar className={classes.appBarContent}>
+                    <Toolbar disableGutters className={classes.appBarContent}>
                         <Box component="div" className={classes.formContainer}>
-                            {(path === CUSTOMERS) && (category === CUSTOMER_CATEGORY.ALL_CUSTOMERS) &&
-                                <form noValidate onSubmit={handleSearch}>
-                                    <TextField 
-                                        className={classes.searchField}
-                                        type="text"
-                                        variant="outlined"
-                                        placeholder="Search . . ."
-                                        value={searchText}
-                                        onChange={(e) => setSearchText(e.target.value)}
-                                        helperText={errors.searchText}
-                                        error={errors.searchText ? true : false}
-                                        InputProps={{
-                                            startAdornment: (
-                                                <InputAdornment position="start">
-                                                    <Magnify />
-                                                </InputAdornment>
-                                            )
-                                        }}
-                                    />
-                                </form>
-                            }
+                            <form noValidate onSubmit={handleSearch}>
+                                <TextField 
+                                    className={classes.searchField}
+                                    type="text"
+                                    placeholder="Search . . ."
+                                    value={searchText}
+                                    onChange={handleSearch}
+                                    helperText={errors.searchText}
+                                    // error={errors.searchText ? true : false}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Magnify />
+                                            </InputAdornment>
+                                        ),
+                                        disableUnderline: true
+                                    }}
+                                />
+                            </form>
                             <Box component="div">
                                 <ul className={classes.headerLinks}>
-                                    <li>
-                                        <Button
-                                            variant="text"
-                                            startIcon={<Sort />}
-                                        >
-                                            Sort
-                                        </Button>
-                                    </li>
-                                    <li>
-                                        <Button
-                                            variant="text"
-                                            startIcon={<FilterOutline />}
-                                        >
-                                            Filter
-                                        </Button>
-                                    </li>
-                                    <li><IconButton color="primary"><BellAlertOutline /></IconButton></li>
                                     <li><IconButton color="primary"><CogOutline /></IconButton></li>
+                                    <li><IconButton color="primary"><BellAlertOutline /></IconButton></li>
                                 </ul>
                             </Box>
                         </Box>
                         <Box component="div" className={classes.avatarContainer}>
-                            <Avatar>
-                                <Account />
-                            </Avatar>
+                            <Avatar sx={{ width: 60, height: 60 }} src={avatar} className={classes.avatar} />
                             &nbsp;&nbsp;
                             <Typography variant="body2" component="span" className={classes.adminName}>{`${admin.firstName} ${admin.lastName}`}</Typography>
                         </Box>
@@ -471,6 +517,14 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                 >
                     <Outlet />
                 </div>
+                {
+                    searchText && searchText.length > 0 ? 
+                    <Box component="div" className={classes.searchBarContainer} onClick={() => setSearchText('')}>
+                        <Box component="div" className={classes.searchBarResult}>
+                            <AccordionSearch viewCustomerProfile={viewCustomerProfile}  searchText={searchText} customers={customers.customers} loading={loading} />
+                        </Box>
+                    </Box> : ''
+                }
                 {/* {showBottomNavigation && 
                     <Box
                         boxShadow={5}
@@ -490,6 +544,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                     </Box>
                 } */}
             </section>
+
         </>
     );
 };
