@@ -11,9 +11,9 @@ const useStyles = makeStyles(theme =>({
       borderBottom: '2px solid #E3E8EE',
       '& span': {
           fontWeight: '600',
-          paddingTop: theme.spacing(1),
-          paddingBottom: theme.spacing(1),
-          fontSize: theme.spacing(2.2),
+          // paddingTop: theme.spacing(1),
+          // paddingBottom: theme.spacing(1),
+          fontSize: '1.1vw',
           fontStretch: '50%'
       }
   },
@@ -28,8 +28,8 @@ const GenericTableHeader = ({ columns, gridColumns, headerPadding }) => {
     <>
       <Box component="section" sx={{ gridTemplateColumns: gridColumns, padding: `${headerPadding ? headerPadding : '11.2px 0'}` }} className={classes.tableHeaderRow}>
           {
-              columns && columns.map((column) => (
-                  <Typography component="span" key={column.id} className={classes.tableCell} variant="subtitle1">
+              columns && columns.map((column, i) => (
+                  <Typography component="span" key={i} className={classes.tableCell} variant="subtitle1">
                           { column.label}
                   </Typography>
               ))

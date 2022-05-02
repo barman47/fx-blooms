@@ -58,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
     stats: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
-        gap: theme.spacing(7)
+        gap: theme.spacing(4)
     },
 
     statsHeader: {
@@ -96,9 +96,10 @@ const useStyles = makeStyles((theme) => ({
         lineHeight: '1.6'
     },
 
-    legend: {
-        '& ul li div span': {
-            fontSize: '10px !important'
+    chartLegend: {
+        '& span': {
+            fontSize: '.63vw',
+            marginTop: '1px'
         }
     },
 
@@ -112,10 +113,11 @@ const useStyles = makeStyles((theme) => ({
     },
 
     contentItemLong: {
-        width: '47vw',
+        width: '45vw',
+        paddingBottom: '6px',
 
         '& span': {
-            marginBottom: theme.spacing(1.4)
+            marginBottom: '3.2px'
         }
     },
 
@@ -143,35 +145,33 @@ const useStyles = makeStyles((theme) => ({
     },
 
     supportTable: {
-        display: 'flex',
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1.2fr .8fr 1fr'
     },
 
     supportContent: {
         '&:not(:last-child)': {
-            paddingRight: '4.2rem',
             borderRight: '2.5px solid #E6EBF2',
         },
 
-        '&:not(:first-child)': {
-            paddingLeft: '2.3rem'
+        '&:not(:first-child) span': {
+            paddingLeft: '20px'
         },
 
         display: 'flex',
         flexDirection: 'column',
-        gap: '12px',
-        width: 'fit-content',
+        width: '100%',
         paddingTop: '1rem',
-        paddingBottom: '2.5px'
     },
 
     supportHeader: {
-        fontSize: '15px',
+        fontSize: '63%',
         color: '#A0AEC0',
         fontWeight: '500'
     },
 
     supportBody: {
-        fontSize: '25px',
+        fontSize: '20px',
         color: 'black',
         fontWeight: 'bold'
     },
@@ -186,7 +186,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     recentTransactions: {
-        padding: theme.spacing(2),
+        padding: '14px',
 
         display: 'flex',
         flexDirection: 'column',
@@ -233,7 +233,7 @@ const useStyles = makeStyles((theme) => ({
         marginTop: theme.spacing(2),
 
         '& h6': {
-            fontSize: '1rem',
+            fontSize: '.9vw',
             fontWeight: '600',
             color: '#2D3748'
         }
@@ -259,33 +259,36 @@ const useStyles = makeStyles((theme) => ({
     recentIcon: {
         padding: theme.spacing(.8),
         borderRadius: '50%',
-        backgroundColor: '#E8EFEF'
+        backgroundColor: '#E8EFEF',
+        width:'50%',
+        height: '50%'
     },
 
     recentName: {
-        fontSize: theme.spacing(2.3),
+        fontSize: '1vw',
         fontWeight: '600'
     },
 
     recentDivider: {
-        height: theme.spacing(5),
+        height: '35px',
         backgroundColor: '#E2E8F0',
-        padding: theme.spacing(.1),
+        padding: '.72px',
         width: '1px',
-        margin: theme.spacing(.3, 0, .3, 2.5),
+        margin: theme.spacing(0, 0, .3, 2.125),
     },
 
     recentDate: {
-        fontSize: theme.spacing(1.7),
+        fontSize: '.6vw',
         fontWeight: '700',
         color: '#A0AEC0',
-        marginTop: theme.spacing(-.9)
+        marginTop: '-10.2px'
     },
 
     recentAmount: {
         color: '#48BB78',
         fontWeight: '700',
-        marginTop: theme.spacing(-3.125)
+        marginTop: theme.spacing(-3.125),
+        fontSize: '.8vw'
     },
 
     amlBoard: {
@@ -296,7 +299,8 @@ const useStyles = makeStyles((theme) => ({
     amlContent: {
 
         '& h6': {
-            fontWeight: '600'
+            fontWeight: '600',
+            fontSize: '.9vw'
         },
     },
 
@@ -329,14 +333,14 @@ const Line = props => (
 );
   
 const Root = props => (
-    <Legend.Root {...props} sx={{ display: 'flex', margin: 'auto', flexDirection: 'row', position: 'absolute', top: '-3px', right: '40px' }} />
+    <Legend.Root {...props} sx={{ display: 'flex', flexDirection: 'row',  position: 'absolute', top: '19px', right: '10px', padding: "0 !important" }} />
 );
   const Label = props => (
-    <Legend.Label {...props} sx={{ whiteSpace: 'nowrap', fontSize: '9px !important' }} />
+    <Legend.Label {...props} className={useStyles().chartLegend} sx={{ whiteSpace: 'nowrap', fontSize: '3px !important' }} />
 );
 
 const Item = props => (
-    <Legend.Item {...props} sx={{ flexDirection: 'column-reverse' }} />
+    <Legend.Item {...props} disableGutters={true} sx={{  }} />
 );
 
 const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, handleSetTitle }) => {
@@ -518,14 +522,18 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     }, [handleActiveUserFilter, activeUsersFilter]);
 
     const gotoCustomersPage = (e) => {
+        console.log('usersFilter', e.target.name)
+        console.log('loadingCustomerCount', loadingCustomerCount)
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
-            navigate.push(CUSTOMERS);
+            navigate(CUSTOMERS);
         }
     };
 
     const gotoListingsPage = (e) => {
-        if (e.target.name !== 'listingFilter') {
-            navigate.push(LISTINGS);
+        console.log('listingFilter', e.target.name)
+        console.log('loadingListingCount', loadingListingCount)
+        if (e.target.name !== 'listingFilter' && !loadingListingCount) {
+            navigate(LISTINGS);
         }
     };
 
@@ -542,6 +550,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     loading={loadingCustomerCount}
                     formatFn={formatNumber} 
                     useCase={users}
+                    filterName="usersFilter"
                     />
 
                     <GenericMiniCard 
@@ -552,6 +561,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     loading={loadingActiveUsers}
                     formatFn="" 
                     useCase=""
+                    filterName="activeFilter"
                     />
 
                     {/* //LISTING CARD */}
@@ -564,11 +574,12 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     loading={loadingListingCount}
                     formatFn={formatNumber} 
                     useCase={listings}
+                    filterName="listingFilter"
                     />
 
                     {/* //VOLUME CARD */}
                     <GenericMiniCard 
-                    // goToPage={gotoListingsPage}
+                    goToPage={gotoListingsPage}
                     cardName="Volume" 
                     cardIcon={<ViewDashboardVariant />} 
                     filterType={volumeFilter} 
@@ -576,6 +587,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                     loading={loadingTransactionVolume}
                     formatFn={formatNumber} 
                     useCase={volume}
+                    filterName="volumeFilter"
                     />
                 </Grid>
 
@@ -620,7 +632,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                 argumentField="country"
                                 seriesComponent={Line}
                             />
-                            <Legend className={classes.legend} position="top" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
+                            <Legend position="top" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
                             {/* <Title
                                 text="Energy Consumption in 2004\n(Millions of Tons, Oil Equivalent)"
                                 textComponent={'Text'}
@@ -657,7 +669,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                                         color="#cd7f32"
                                     />
                                     <Animation />
-                                    <Legend position="top" rootComponent={Root} labelComponent={Label} />
+                                    <Legend position="top" rootComponent={Root} itemComponent={Item} labelComponent={Label} />
                                     {/* <Title text="Olimpic Medals in 2008" /> */}
                                     <Stack />
                                 </Chart>
@@ -671,28 +683,28 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
                         <Box component="div" className={classes.supportTable}>
                             <Box component="div" className={classes.supportContent}>
-                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Total Tickets</Typography>
-                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">120</Typography>
+                                <Typography className={classes.supportHeader} component='span' variant="h6">Total Tickets</Typography>
+                                <Typography className={classes.supportBody} component='span' variant="h5">120</Typography>
                             </Box>
 
                             <Box component="div" className={classes.supportContent}>
-                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">In progress</Typography>
-                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">25</Typography>
+                                <Typography className={classes.supportHeader} component='span' variant="h6">In progress</Typography>
+                                <Typography className={classes.supportBody} component='span' variant="h5">25</Typography>
                             </Box>
 
                             <Box component="div" className={classes.supportContent}>
-                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Awaiting clients reply</Typography>
-                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">10</Typography>
+                                <Typography className={classes.supportHeader} component='span' variant="h6">Awaiting clients reply</Typography>
+                                <Typography className={classes.supportBody} component='span' variant="h5">10</Typography>
                             </Box>
 
                             <Box component="div" className={classes.supportContent}>
-                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">New</Typography>
-                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">40</Typography>
+                                <Typography className={classes.supportHeader} component='span' variant="h6">New</Typography>
+                                <Typography className={classes.supportBody} component='span' variant="h5">40</Typography>
                             </Box>
 
                             <Box component="div" className={classes.supportContent}>
-                                <Typography className={classes.supportHeader} component='subtitle1' variant="h6">Unresolved</Typography>
-                                <Typography className={classes.supportBody} component='subtitle1' variant="h5">120</Typography>
+                                <Typography className={classes.supportHeader} component='span' variant="h6">Unresolved</Typography>
+                                <Typography className={classes.supportBody} component='span' variant="h5">120</Typography>
                             </Box>
                         </Box>
                     </Box>

@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
-import { Box, Typography, IconButton, FormControlLabel, Checkbox, CircularProgress, } from '@material-ui/core';
+import { Box, Typography, IconButton, FormControlLabel, Checkbox, } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
 import formatId from '../../utils/formatId';
-// import GenericButton from './GenericButton'
+import CircularProgressBar from './CircularProgressBar'
 
 
 const useStyles = makeStyles(theme =>({
@@ -21,9 +21,9 @@ const useStyles = makeStyles(theme =>({
 
     '& span': {
         fontWeight: '300',
-        paddingTop: theme.spacing(.7),
-        paddingBottom: theme.spacing(.7),
-        fontSize: theme.spacing(1.9),
+        paddingTop: '4.6px',
+        paddingBottom: '4.6px',
+        fontSize: '.8vw',
         fontStretch: '50%'
     },
   },
@@ -31,10 +31,10 @@ const useStyles = makeStyles(theme =>({
 
   status: {
     color: 'white',
-    fontSize: '12px !important',
-    borderRadius: theme.spacing(.8),
+    fontSize: '11px !important',
+    borderRadius: '3.4px',
     backgroundColor: '#C4C4C4',
-    padding: '3px 5px',
+    padding: '1px 2px',
     width: '87px',
     fontWeight: "500 !important",
     textAlign: 'center'
@@ -54,10 +54,18 @@ const useStyles = makeStyles(theme =>({
     backgroundColor: '#FFCECE',
     color: '#FF0000',
   },
+
+  viewBtn: {
+    fontSize: theme.spacing(1.95),
+    outline: 'none',
+    border: 'none',
+    backgroundColor: '#FFFFFF',
+    cursor: 'pointer'
+  }
 }));
 
 
-const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns, addColumn, columnList, loading }) => {
+const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns, addColumn, columnList, loading, viewMore }) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
@@ -66,14 +74,18 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const handleButtonClick = (customer, e) => {
     console.log('mennnuuu')
-    e.preventDefault();
-    e.stopPropagation();
     
-    dispatch({
+    if (!viewMore) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      dispatch({
         type: SET_CUSTOMER,
         payload: customer
-    });
-    handleClick(e);
+      });
+
+      handleClick(e);
+    }
   };
 
   const handleStatus = useCallback((status) => {
@@ -102,7 +114,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const handleGridColumns = useMemo(() => {
     if (!gridColumns) {
-      return '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr'
+      return '0.3fr 1fr 1fr 1.4fr 1.2fr .8fr 1fr 0.3fr'
     }
     return gridColumns
   }, [gridColumns])
@@ -112,15 +124,17 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     e.stopPropagation();
   }
 
+  // const handleDisplayRow = (value) => (
+  //   value.substring(0, 28)
+  // )
+
   // const handleTimeStamp = useCallback((value) => {
   //   console.log('value', value)
   // }, [])
 
   return (
     <>
-      { loading ? <Box sx={{ display: 'flex', justifyContent: 'center', marginTop: '50px' }}>
-                    <CircularProgress />
-                  </Box> :
+      { loading ? <CircularProgressBar topMargin="50px" /> :
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: handleGridColumns }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
@@ -155,7 +169,10 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                   </Typography> : ''
                 }
                 <Typography style={{ textAlign: 'center' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <IconButton 
+                    {
+                      viewMore && viewMore 
+                      ? <button onClick={() => handleButtonClick()} className={classes.viewBtn}>view more</button> :
+                      <IconButton 
                             variant="text" 
                             size="small" 
                             className={classes.button} 
@@ -165,7 +182,8 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                             disableRipple
                         >
                             <DotsHorizontal />
-                        </IconButton>
+                      </IconButton>
+                    }
                 </Typography>
             </Box>
         ))

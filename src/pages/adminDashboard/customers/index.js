@@ -72,11 +72,13 @@ const useStyles = makeStyles((theme) => ({
     },
 
     filterContainer: {
-        display: 'grid',
-        gridTemplateColumns: '.1fr .1fr .1fr .1fr .1fr',
+        display: 'flex',
+        gap: theme.spacing(2),
+        // gridTemplateColumns: '.13fr .13fr .13fr .13fr .15fr',
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
-        borderBottom: '1px solid #E3E8EE'
+        borderBottom: '1px solid #E3E8EE',
+        width: '70%'
     },
 
     filter: {
@@ -84,12 +86,13 @@ const useStyles = makeStyles((theme) => ({
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         // padding: theme.spacing(1),
         width: 'fit-content',
-        gap: theme.spacing(1),
+        // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
+        gap: '10px',
         
         '& span': {
             fontWeight: '600'
@@ -100,6 +103,10 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#AEC7C0',
             padding: '0px 3px',
             borderRadius: theme.spacing(1)
+        },
+
+        '&:not(:first-child) span': {
+            paddingLeft: '10px'
         }
     },
 
@@ -190,7 +197,7 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.3fr 1fr 1fr 1.5fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = '0.3fr 1fr 1fr 1.4fr 1.2fr .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
@@ -882,8 +889,8 @@ const Customers = (props) => {
                             </Box> 
                             <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
                                 {
-                                    pageNumberList.map(n => (
-                                        <Typography variant="subtitle2">{n}</Typography>
+                                    pageNumberList.map((n, i) => (
+                                        <Typography variant="subtitle2" key={i}>{n}</Typography>
                                     ))
                                 }
                             </Box>
