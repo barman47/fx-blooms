@@ -9,12 +9,15 @@ const useStyles = makeStyles(theme =>({
 
       color: '#3C3C3C',
       borderBottom: '2px solid #E3E8EE',
+      alignItems: 'center',
+
       '& span': {
           fontWeight: '600',
           // paddingTop: theme.spacing(1),
           // paddingBottom: theme.spacing(1),
           fontSize: '1.1vw',
-          fontStretch: '50%'
+          fontStretch: '50%',
+          // borderLeft: `1px solid red`
       }
   },
 }));

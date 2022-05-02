@@ -49,6 +49,7 @@ import isEmpty from '../../../utils/isEmpty';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
+import { usePagination, DOTS } from '../../../utils/UsePagination';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -95,18 +96,18 @@ const useStyles = makeStyles((theme) => ({
         gap: '10px',
         
         '& span': {
-            fontWeight: '600'
+            fontWeight: '600',
         },
 
         '& span:nth-child(2)': {
             color: '#1E625E',
             backgroundColor: '#AEC7C0',
-            padding: '0px 3px',
+            padding: '0px 5px',
+            textAlign: 'center',
             borderRadius: theme.spacing(1)
         },
 
         '&:not(:first-child) span': {
-            paddingLeft: '10px'
         }
     },
 
@@ -149,7 +150,7 @@ const useStyles = makeStyles((theme) => ({
         borderRadius: theme.spacing(1.9),
         marginRight: '10px',
         cursor: 'pointer',
-        left: '1695px !important',
+        // left: '1695px !important',
 
         '& ul': {
             padding: '0'
@@ -159,6 +160,12 @@ const useStyles = makeStyles((theme) => ({
             padding: theme.spacing(2),
             paddingLeft: theme.spacing(2.5)
         }
+    },
+
+    selected: {
+        color: 'red',
+        fontWeight: 600,
+        fontSize: '2vw'
     }
 }));
 
@@ -197,8 +204,11 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.3fr 1fr 1fr 1.4fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = '0.15fr 1fr 1fr 1.2fr 1.2fr .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
+const pageSize = 20;
+const siblingCount = 1;
+const totalCount = 1;
 
 const Customers = (props) => {
     const classes = useStyles();
@@ -231,9 +241,14 @@ const Customers = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
-    const [ isDisabled ] = useState(true)
+    const [ currentPage, setCurrentPage ] = useState(1)
+    const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
+
+
+    const [ lastPage ] = useState(4)
 
     const handleClick = (event) => {
+        console.log('event', event.currentTarget)
         setAnchorEl(event.currentTarget);
     };
 
@@ -264,6 +279,20 @@ const Customers = (props) => {
         }
         setPageNumberList(pageNumArr)
     }, [pageNumber])
+
+
+    const onNextPage = () => {
+        setCurrentPage(currentPage + 1)
+    }
+
+    const onPrevPage = () => {
+        setCurrentPage(currentPage - 1)
+    }
+
+    useEffect(() => {
+        console.log('test', currentPage)
+        // if (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) return null
+    }, [currentPage, paginationRange])
 
     // NEXT PAGE BUTTON
     const nextPage = useCallback(() => {
@@ -668,13 +697,15 @@ const Customers = (props) => {
         handleClose();
     };
 
-    const suspend = () => {
+    const suspend = (e) => {
         handleClose();
-        setCustomerStatus({
-            customerID: customer.id,
-            newStatus: SUSPENDED,
-            currentStatus: filter
-        });
+        if (customer.customerStatus !== SUSPENDED) {
+            setCustomerStatus({
+                customerID: customer.id,
+                newStatus: SUSPENDED,
+                currentStatus: filter
+            });
+        }
     };
 
     const changeRiskProfile = () => {
@@ -869,7 +900,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={filter === SUSPENDED || filter === REJECTED}>Suspend</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -884,13 +915,13 @@ const Customers = (props) => {
 
                         <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                             <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                                <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                                <GenericButton clickAction={nextPage} isDisabled={!isDisabled} buttonName="Next" />
+                                <GenericButton clickAction={onPrevPage} isDisabled={currentPage === 1} buttonName="Previous" />
+                                <GenericButton clickAction={onNextPage} isDisabled={currentPage === lastPage} buttonName="Next" />
                             </Box> 
                             <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
                                 {
-                                    pageNumberList.map((n, i) => (
-                                        <Typography variant="subtitle2" key={i}>{n}</Typography>
+                                    pageNumberList && pageNumberList.map((pageNUmber, i) => (
+                                        <Typography className={clsx(pageNumber === currentPage && classes.active)} onClick={() => setCurrentPage(pageNumber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
                                     ))
                                 }
                             </Box>

@@ -522,16 +522,16 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     }, [handleActiveUserFilter, activeUsersFilter]);
 
     const gotoCustomersPage = (e) => {
-        console.log('usersFilter', e.target.name)
-        console.log('loadingCustomerCount', loadingCustomerCount)
+        e.preventDefault();
+        e.stopPropagation();
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
             navigate(CUSTOMERS);
         }
     };
 
     const gotoListingsPage = (e) => {
-        console.log('listingFilter', e.target.name)
-        console.log('loadingListingCount', loadingListingCount)
+        e.preventDefault();
+        e.stopPropagation();
         if (e.target.name !== 'listingFilter' && !loadingListingCount) {
             navigate(LISTINGS);
         }

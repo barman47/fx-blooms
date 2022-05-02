@@ -22,7 +22,8 @@ const GenericSelect = ({ selectFilterName, FILTERS, selectValue, setOnChange, lo
   const classes = useStyles();
 
   return (
-    <FormControl 
+    <>
+      <FormControl 
         variant="outlined"
     >
         <Select
@@ -39,7 +40,8 @@ const GenericSelect = ({ selectFilterName, FILTERS, selectValue, setOnChange, lo
                 <MenuItem key={index} value={value}>{value}</MenuItem>
             ))}
         </Select>
-    </FormControl>
+      </FormControl>
+    </>
   )
 }
 

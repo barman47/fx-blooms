@@ -18,14 +18,23 @@ const useStyles = makeStyles(theme =>({
     borderBottom: '2px solid #E3E8EE',
     alignItems: 'center',
     cursor: 'pointer',
+    // justifyContent: 'flex-start',
 
     '& span': {
         fontWeight: '300',
-        paddingTop: '4.6px',
-        paddingBottom: '4.6px',
+        padding: '4.6px 0',
         fontSize: '.8vw',
-        fontStretch: '50%'
+        fontStretch: '50%',
+        // borderLeft: `1px solid red`
     },
+
+    '& span label': {
+      marginRight: '0'
+    },
+
+    '& span label span:nth-child(2)': {
+      display: 'none'
+    }
   },
 
 
@@ -34,7 +43,7 @@ const useStyles = makeStyles(theme =>({
     fontSize: '11px !important',
     borderRadius: '3.4px',
     backgroundColor: '#C4C4C4',
-    padding: '1px 2px',
+    padding: '3px',
     width: '87px',
     fontWeight: "500 !important",
     textAlign: 'center'
@@ -72,10 +81,9 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
   const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
   // const [ isDisabled ] = useState(true)
 
-  const handleButtonClick = (customer, e) => {
-    console.log('mennnuuu')
-    
+  const handleButtonClick = (customer, e) => {    
     if (!viewMore) {
+      console.log('egg')
       e.preventDefault();
       e.stopPropagation();
       
@@ -114,7 +122,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const handleGridColumns = useMemo(() => {
     if (!gridColumns) {
-      return '0.3fr 1fr 1fr 1.4fr 1.2fr .8fr 1fr 0.3fr'
+      return 'minmax(0, 0.15fr) repeat(2, minmax(0, 1fr)) repeat(2, minmax(0, 1.2fr)) .8fr 1fr 0.3fr'
     }
     return gridColumns
   }, [gridColumns])
@@ -124,9 +132,12 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     e.stopPropagation();
   }
 
-  // const handleDisplayRow = (value) => (
-  //   value.substring(0, 28)
-  // )
+  const handleDisplayRow = (value) => {
+    if (typeof value === 'string') {
+      return value.substring(0, 25)
+    }
+    return
+  }
 
   // const handleTimeStamp = useCallback((value) => {
   //   console.log('value', value)
@@ -136,9 +147,9 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     <>
       { loading ? <CircularProgressBar topMargin="50px" /> :
         data && data.map((customer, i) => (
-            <Box component="div" sx={{ gridTemplateColumns: handleGridColumns }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
+            <Box component="div" sx={{ gridTemplateColumns: handleGridColumns, padding: '1px 0px' }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
-                    <FormControlLabel control={<Checkbox name="checked" className={classes.checkBox} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
+                  <FormControlLabel  onClick={(e) => handleCheckBox(e)}  control={<Checkbox name="checked" className={classes.tableCell} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
                 </Typography>
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer[columnList[1]] ? formatId(customer[columnList[1]]) : ''} lines={1} />
@@ -147,10 +158,10 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     <TextClamp text={customer[columnList[2]] ? customer[columnList[2]] : ''} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? ''} lines={1} />
+                    <TextClamp text={handleDisplayRow(customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? '')} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[columnList[4]] ? customer[columnList[4]] : ''} lines={1} />
+                    <TextClamp text={handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')} lines={1} />
                 </Typography>
                 <Typography component="span" className={[classes.tableCell, classes.status, handleStatus(customer[columnList[5]])]} variant="subtitle1">
                 { handleDisplayStatus(customer[columnList[5]]) }

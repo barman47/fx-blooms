@@ -399,8 +399,8 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
         e.preventDefault();
         setSearchText(e.target.value)
         if (isEmpty(searchText)) {
-            return setErrors({ searchText: 'Please enter a search term' });
-            // return
+            // return setErrors({ searchText: 'Please enter a search term' });
+            return
         }
         // setLoading(true);
         // setLoadingText('Searching . . .');
@@ -519,7 +519,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                 </div>
                 {
                     searchText && searchText.length > 0 ? 
-                    <Box component="div" className={classes.searchBarContainer}>
+                    <Box component="div" className={classes.searchBarContainer} onClick={() => setSearchText('')}>
                         <Box component="div" className={classes.searchBarResult}>
                             <AccordionSearch viewCustomerProfile={viewCustomerProfile}  searchText={searchText} customers={customers.customers} loading={loading} />
                         </Box>
