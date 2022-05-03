@@ -8,6 +8,7 @@ import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
 import formatId from '../../utils/formatId';
 import CircularProgressBar from './CircularProgressBar'
+import clsx from 'clsx';
 
 
 const useStyles = makeStyles(theme =>({
@@ -83,7 +84,6 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const handleButtonClick = (customer, e) => {    
     if (!viewMore) {
-      console.log('egg')
       e.preventDefault();
       e.stopPropagation();
       
@@ -163,7 +163,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')} lines={1} />
                 </Typography>
-                <Typography component="span" className={[classes.tableCell, classes.status, handleStatus(customer[columnList[5]])]} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatus(customer[columnList[5]]))} variant="subtitle1">
                 { handleDisplayStatus(customer[columnList[5]]) }
                 </Typography>
                 {
