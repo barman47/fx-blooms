@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
-import * as FileSaver from 'file-saver';
-import * as XLSX from 'xlsx';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -49,6 +47,7 @@ import isEmpty from '../../../utils/isEmpty';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
+import { exportRecords } from '../../../utils/exportRecords'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -213,7 +212,7 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.15fr 1fr 1fr 1.2fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = 'minmax(0, 0.15fr) repeat(2, minmax(0, 1fr)) repeat(2, minmax(0, 1.2fr)) .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
@@ -247,6 +246,7 @@ const Customers = (props) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumberList, setPageNumberList] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
+    const [customerStatus, setStatus] = useState(customer.customerStatus)
     // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
 
 
@@ -311,7 +311,11 @@ const Customers = (props) => {
         if (filter) {
             setCurrentPage(1);
         }
-    }, [filter]);
+
+        if (!customerStatus) {
+            setStatus(customer.customerStatus);
+        }
+    }, [filter, customer.customerStatus, customerStatus]);
 
     // Set page number for search when page number changes
     useEffect(() => {
@@ -490,8 +494,6 @@ const Customers = (props) => {
                     pageSize: rowsPerPage,
                     pageNumber: currentPage
                 });
-                // setPageNumber(Math.ceil(customerCount/20))
-                // handlePageNUmberList()
                 break;
             default:
                 break;
@@ -518,16 +520,6 @@ const Customers = (props) => {
     }, [fetchCustomers, rowsPerPage]);
 
 
-    // const handleChangePage = (event, newPage) => {
-    //     setPage(newPage);
-    // };
-
-    // const handleChangeRowsPerPage = (event) => {
-    //     setRowsPerPage(+event.target.value);
-    //     setPage(1);
-    // };
-
-
     const handleSetFilter = (filter) => {
         setFilter(filter);
         setRowsPerPage(pages[0]);
@@ -535,62 +527,11 @@ const Customers = (props) => {
             type: SET_CATEGORY,
             payload: filter
         });
-        switch (filter) {
-            case CONFIRMED:
-                getVerifiedCustomers({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case PENDING:
-                getNewCustomers({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case REJECTED:
-                getRejectedCustomers({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case ALL_CUSTOMERS:
-                getCustomers({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-
-                break;
-
-            case SUSPENDED:
-                getSuspendedCustomers({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case NO_PROFILE:
-                getCustomersWithoutProfile({
-                    pageNumber: currentPage,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            default:
-                break;
-        }  
     };
 
     const downloadRecords = () => {
-        setError('');
-        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-        const fileExtension = '.xlsx';
-        let data = [];
-        console.log('hello')
-
+        let data = []        
+        let exportErrors = {}
         switch (filter) {
             case CONFIRMED:
                 data = [...confirmed.items];
@@ -620,41 +561,13 @@ const Customers = (props) => {
                 break;
         }
 
-        if (data.length === 0) {
-            return setError('Cannot an empty list');
-        }
+        const { errors } = exportRecords(data, admin, filter)
+        exportErrors = errors
 
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wsCols = [
-            {wpx: 40},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250}
-        ];
-        ws['!cols'] = wsCols;
-        console.log('hello')
-        // ws['!protect'] = {
-        //     selectLockedCells: false
-        // };
-        // ws['A1'].v = 'This is a test header';
-        // const customProps = {
-        //     Exported: new Date().toISOString(),
-        //     Category: filter,
-        //     Admin: `${admin.firstName} ${admin.lastName}`
-        // };
-        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] }; 
-    
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array', Props: {
-            Owner: 'FXBLOOMS.com',
-            Date: new Date().toISOString(),
-            Category: filter,
-            Admin: `${admin.firstName} ${admin.lastName}`
-        }});
-    
-        const usersData = new Blob([excelBuffer], { type: fileType });
-        FileSaver.saveAs(usersData, `FXBLOOMS Customers - ${new Date().toISOString()}${fileExtension}`);
+        if (!isEmpty(exportErrors)) {
+            // setErrors()
+            return
+        }
     };
 
     const viewDetails = () => {
@@ -674,7 +587,7 @@ const Customers = (props) => {
 
     const suspend = (e) => {
         handleClose();
-        if (customer.customerStatus !== SUSPENDED && customer.customerStatus === CONFIRMED) {
+        if (customerStatus !== SUSPENDED && customerStatus === CONFIRMED) {
             setCustomerStatus({
                 customerID: customer.id,
                 newStatus: SUSPENDED,
@@ -875,7 +788,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customerStatus === REJECTED || customerStatus === "NO_PROFILE"}>{ customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -885,7 +798,7 @@ const Customers = (props) => {
                     loading ? '' :
                     <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
                         <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                            <Typography component="span">{'20'} results</Typography>
+                            {/* <Typography component="span">{'20'} results</Typography> */}
                         </Box>
 
                         <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>

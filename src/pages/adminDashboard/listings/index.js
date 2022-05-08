@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { SET_CUSTOMER, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
 import clsx from 'clsx';
@@ -11,7 +11,12 @@ import AllTransactions from './AllTransactions';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter } from 'mdi-material-ui';
-import { getListingCount } from '../../../actions/admin';
+// import { getStats } from '../../../actions/admin';
+import { getAllListings } from '../../../actions/adminListings';
+import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+import { exportRecords } from '../../../utils/exportRecords'
+import isEmpty from '../../../utils/isEmpty';
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,11 +40,13 @@ const useStyles = makeStyles((theme) => ({
     },
 
     filterContainer: {
-        display: 'grid',
-        gridTemplateColumns: '.12fr .12fr',
+        display: 'flex',
+        gap: theme.spacing(2),
+        // gridTemplateColumns: '.13fr .13fr .13fr .13fr .15fr',
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
-        borderBottom: '1px solid #E3E8EE'
+        borderBottom: '1px solid #E3E8EE',
+        width: '70%'
     },
 
     filter: {
@@ -47,22 +54,31 @@ const useStyles = makeStyles((theme) => ({
         cursor: 'pointer',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         // padding: theme.spacing(1),
         width: 'fit-content',
-        gap: theme.spacing(1),
+        // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
+        gap: '10px',
         
         '& span': {
-            fontWeight: '600'
+            fontWeight: '600',
         },
 
         '& span:nth-child(2)': {
             color: '#1E625E',
             backgroundColor: '#AEC7C0',
-            padding: '0px 3px',
+            padding: '0px 5px',
+            textAlign: 'center',
+            lineHeight: '1 !important',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             borderRadius: theme.spacing(1)
+        },
+
+        '&:not(:first-child) span': {
         }
     },
 
@@ -98,6 +114,18 @@ const useStyles = makeStyles((theme) => ({
         borderTopLeftRadius: '0px',
         borderTopRightRadius: '0px',
     },
+
+    selected: {
+        borderBottom: '2px solid #1E6262',
+        fontWeight: 600,
+        fontSize: '1.4vw'
+    },
+
+    pageList: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end'
+    }
 }));
 
 const columns = [
@@ -139,40 +167,145 @@ const columns = [
     },
 ];
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .3fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .5fr';
 
-// const pages = [10, 25, 50, 100]
+const pages = [15, 25, 50, 100]
 
 const Listings = () => {
     const classes = useStyles()
     const dispatch = useDispatch();
+
+    const { admin } = useSelector(state => state);
+
     const { ALL_LISTINGS, ALL_TRANSACTIONS } = LISTING_DETAILS;
     const [tab, setTab] = useState(ALL_LISTINGS);
+    const [loading, setLoading] = useState(true)
+    const [pageNumberList, setPageNumberList] = useState([])
+    const [ currentPage, setCurrentPage ] = useState(1)
+    const [pageCount, setPageCount] = useState(0);
+    const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
+    const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 
     //   const [page, setPage] = useState(0);
-    //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     // const [anchorEl, setAnchorEl] = useState(null);
     const { totalListings } = useSelector(state => state.stats)
+    const { totalPageCount, listings } = useSelector(state => state.listings)
 
-    //   const handleChangePage = (event, newPage) => {
-    //     setPage(newPage);
-    //   };
+    const handlePageNUmberList = useCallback(() => {
+        const pageNumArr = []
+        if (pageCount >= 1) {
+            for (let i=1; i<=pageCount; i++) {
+                pageNumArr.push(i)
+            }
+        }
+        setPageNumberList(pageNumArr)
+        setLastPage(pageCount)
+    }, [pageCount])
 
+    const onNextPage = () => {
+        setCurrentPage(currentPage + 1)
+    }
 
-
-    // const handleClick = (event) => {
-    //     setAnchorEl(event.currentTarget);
-    // };
+    const onPrevPage = () => {
+        setCurrentPage(currentPage - 1)
+    }
 
     useEffect(() => {
-        dispatch(getListingCount())
-    })
+        if (tab) {
+            setCurrentPage(1);
+        }
+    }, [tab]);
 
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_SIZE,
+            payload: rowsPerPage
+        });
+    }, [dispatch, rowsPerPage]);
+    
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_NUMBER,
+            payload: currentPage
+        });
+    }, [dispatch, currentPage]);
 
-    //   const handleChangeRowsPerPage = (event) => {
-    //     setRowsPerPage(+event.target.value);
-    //     setPage(1);
-    //   };
+    useEffect(() => {
+        if (listings.length > 0)  {
+            setLoading(false)
+        }
+    }, [listings])
+
+    useEffect(() => {
+        setLoading(true)
+        switch (tab) {
+            case ALL_LISTINGS:
+                dispatch(getAllListings({
+                    pageSize: rowsPerPage,
+                    pageNumber: currentPage
+                }))
+                setPageCount(totalPageCount || 0);
+                break;
+
+            case ALL_TRANSACTIONS:
+                getAllListings({
+                    pageSize: rowsPerPage,
+                    pageNumber: currentPage
+                })
+                setPageCount(totalPageCount || 0);
+                break;
+
+            default:
+                break;
+        }
+        handlePageNUmberList()
+    }, [ALL_LISTINGS, ALL_TRANSACTIONS, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount])
+
+    const downloadRecords = () => {
+        let data = []        
+        let exportErrors = {}
+        switch (tab) {
+            case ALL_LISTINGS:
+                data = [...listings];
+                break;
+
+            case ALL_TRANSACTIONS:
+                data = [...listings];
+                break;
+
+            default:
+                break;
+        }
+
+        const { errors } = exportRecords(data, admin, tab)
+        exportErrors = errors
+
+        if (!isEmpty(exportErrors)) {
+            // setErrors()
+            return
+        }
+    };
+
+    // useEffect(() => {
+    //     if (currentPage > 0) {
+    //         fetchData();
+    //     }
+    // }, [fetchData, currentPage]);
+
+    // useEffect(() => {
+    //     if (rowsPerPage > 0) {
+    //         fetchData();
+    //     }
+    // }, [fetchData, rowsPerPage]);
+
+    const handleSetTab = (tab) => {
+        setTab(tab);
+        setRowsPerPage(pages[0]);
+    }
+
+    const viewTableRow = (listing) => {
+        return
+    }
 
 
     return (
@@ -188,27 +321,51 @@ const Listings = () => {
                         <GenericButton buttonName="Filter">
                             <Filter />
                         </GenericButton>
-                        <GenericButton buttonName="Export">
+                        <GenericButton clickAction={downloadRecords} buttonName="Export">
                             <ArrowTopRight />
                         </GenericButton>
                     </Box>
                 </Grid>
             </Grid>
             <Box component="section" className={classes.filterContainer}>
-                <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => setTab(ALL_LISTINGS)}>
+                <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => handleSetTab(ALL_LISTINGS)}>
                     <Typography variant="subtitle2" component="span">All Listings</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
-                <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => setTab(ALL_TRANSACTIONS)}>
+                <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => handleSetTab(ALL_TRANSACTIONS)}>
                     <Typography variant="subtitle2" component="span">All Transactions</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
-                {tab === ALL_LISTINGS && <AllListings />}
+                {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
                 {tab === ALL_TRANSACTIONS && <AllTransactions />}
             </Box>
+
+
+            {
+                loading ? '' :
+                    <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                        <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                            {/* <Typography component="span">{'20'} results</Typography> */}
+                        </Box>
+
+                        <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                            <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                                <GenericButton clickAction={onPrevPage} isDisabled={currentPage === 1} buttonName="Previous" />
+                                <GenericButton clickAction={onNextPage} isDisabled={currentPage === lastPage} buttonName="Next" />
+                            </Box> 
+                            <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                                {
+                                    pageNumberList && pageNumberList.map((pageNUmber, i) => (
+                                        <Typography className={clsx(classes.pageList, pageNUmber === currentPage && classes.selected)} onClick={() => setCurrentPage(pageNUmber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
+                                    ))
+                                }
+                            </Box>
+                        </Box>                    
+                    </Box>
+                }
         </section>
     </>
     )

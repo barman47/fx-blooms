@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'; 
+import { useEffect, useRef, useState, useCallback } from 'react'; 
 import { useLocation } from 'react-router-dom'; 
 import { connect, useDispatch, useSelector } from 'react-redux'; 
 import { 
@@ -8,7 +8,8 @@ import {
     // FormControl,
     // FormControlLabel,
     // FormHelperText,
-    // MenuItem,
+    Menu,
+    MenuItem,
     // Select,
     // Switch,
     // TextField,
@@ -17,23 +18,25 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 // import PropTypes from 'prop-types';
 // import moment from 'moment';
-// import clsx from 'clsx';
+import clsx from 'clsx';
 import { getIdCardValidationResponse, getResidencePermitValidationResponse, setCustomerStatus } from '../../../actions/customer';
-import { CLEAR_CUSTOMER_STATUS_MSG } from '../../../actions/types';
+import { updateCustomerProfile } from '../../../actions/admin';
+import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
 import PropTypes from 'prop-types';
-// import { CUSTOMER_CATEGORY } from '../../../utils/constants';
-import updateCustomerProfile from '../../../utils/validation/customer/updateCustomerProfile';
+import { CUSTOMER_CATEGORY } from '../../../utils/constants';
+import validateCustomerProfile from '../../../utils/validation/customer/validateCustomerProfile';
 import isEmpty from '../../../utils/isEmpty';
 import avatar from '../../../assets/img/avatar.jpg';
 
-import Spinner from '../../../components/common/Spinner';
+// import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import { SquareEditOutline, CheckDecagram } from 'mdi-material-ui';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
-import Status from '../../../components/admin-dashboard/Status'
+// import Status from '../../../components/admin-dashboard/Status'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import GenericTextField from '../../../components/admin-dashboard/GenericTextField'
+import CircularProgressBar from '../../../components/admin-dashboard/CircularProgressBar'
 
 
 
@@ -41,7 +44,7 @@ const useStyles = makeStyles(theme =>({
     root: {
         backgroundColor: 'white',
         borderRadius: '12px',
-        // marginTop: theme.spacing(3),
+        boxShadow: '1px 1px 3px #dbdddd',
         padding: [[theme.spacing(2), theme.spacing(5)]],
         boxSizing: '200px 10px 20px white',
 
@@ -138,9 +141,19 @@ const useStyles = makeStyles(theme =>({
     },
 
     avatar: {
-        borderRadius: '10px',
-        width: theme.spacing(35),
+        width: theme.spacing(30),
         height: theme.spacing(35),
+        
+        display: 'flex',
+        justifyContent: 'flex-start',
+        
+        '& img': {
+            width: '15vw',
+            height: '80%',
+            display: 'flex',
+            borderRadius: '10px',
+            justifyContent: 'flex-start',
+        }
     },
 
     userStatus: {
@@ -151,31 +164,65 @@ const useStyles = makeStyles(theme =>({
     },
 
     userStatusTitle: {
-        backgroundColor: '#DDF2E5',
-        alignItems: 'center',
+        // backgroundColor: '#DDF2E5',
         color: '#1E6262',
         width: 'fit-content',
-        padding: theme.spacing(.7, 4),
+        padding: '5.6px 1vw',
         borderRadius: '10px',
-        fontSize: theme.spacing(4),
+        fontSize: '1.4vw',
         marginBottom: theme.spacing(3),
         textAlign: 'center',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    status: {
+        color: 'white',
+        fontWeight: "500 !important",
+        textAlign: 'center',
+        backgroundColor: '#C4C4C4'
+    },
+
+    verified: {
+        backgroundColor: '#DDF2E5',
+        color: '#1E6262',
+    },
+
+    pending: {
+        backgroundColor: '#FFF5CE',
+        color: '#FBBC05',
+    },
+
+    rejected: {
+        backgroundColor: '#FFCECE',
+        color: '#FF0000',
+    },
+
+    suspended: {
+        backgroundColor: '#f5f7be',
+        color: '#d1c70c',
     },
 
     userStatusSub: {
         // alignItems: 'flex-start',
         padding: theme.spacing(1),
         // alignSelf: 'center',
+
+        '& p': {
+            fontSize: '.9vw'
+        }
     },
 
     userPersonalDetails: {
-        marginTop: theme.spacing(1.5)
+        // marginTop: theme.spacing(1.5)
     },
 
     amlTable: {
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
         padding: theme.spacing(1),
+        // width: '100%',
 
         '&:not(:last-child)': {
             borderBottom: '1px solid #E5E5E5',
@@ -184,11 +231,13 @@ const useStyles = makeStyles(theme =>({
 
     amlTitle: {
         fontWeight: '350 !important',
+        fontSize: '.9vw'
     },
 
     amlNumber: {
         fontWeight: '500 !important',
-        justifySelf: 'flex-end'
+        justifySelf: 'flex-end',
+        fontSize: '.9vw'
     },
 
     saveBtn: {
@@ -197,6 +246,61 @@ const useStyles = makeStyles(theme =>({
         display: 'flex',
         justifyContent: 'flex-end'
     },
+
+    menu: {
+        backgroundColor: 'white',
+        border: `none`,
+        borderRadius: theme.spacing(1.5),
+        marginRight: '10px',
+        cursor: 'pointer',
+        // left: '675px !important',
+        top: '390px !important',
+        width: '175px !important',
+
+        '& ul': {
+            padding: '8px'
+        },
+
+        '& li': {
+            padding: '12px 12px 12px 17px',
+        },
+        
+        '& li:hover': {
+            borderRadius: theme.spacing(1.5),
+            backgroundColor: '#E7EEEE',
+            color: '#1E6262'
+        }
+    },
+
+    remark: {
+        color: '#5D6060',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '15px',
+        
+         '& h5': {
+            fontWeight: '600',
+            fontSize: '25px',
+         },
+
+         '& p': {
+             color: '#000000',
+             fontSize: '15px'
+         }
+    },
+
+    remarkArea: {
+        width: '100%',
+        outline: 'none',
+        border: 'none',
+        borderRadius: '10px',
+        boxShadow: '1px 1px 3px #dbdddd',
+        padding: '10px'
+    },
+
+    editMode: {
+        color: '#1E6262'
+    }
 
 }));
 
@@ -208,6 +312,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const { customer, idCheckData, msg, profileCheckData } = useSelector(state => state.customers);
     const errorsState = useSelector(state => state.errors);
 
+    const [ anchorEl, setAnchorEl ] = useState(null)
+    
     const [firstName] = useState(customer.firstName);
     const [middleName] = useState(customer.otherName);
     const [lastName] = useState(customer.lastName);
@@ -220,13 +326,12 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const [country] = useState(customer.countryId);
     const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo);
-    // const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
-    const [riskProfile] = useState(customer.riskProfile);
-    // const [remarks, setRemarks] = useState(customer.remarks);
+    const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
+    // const [riskProfile] = useState(customer.riskProfile);
+    const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
-    // const [status, setStatus] = useState(customer.customerStatus);
+    const [status, setStatus] = useState(customer.customerStatus);
 
-    const [loadingText, setLoadingText] = useState('');
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -234,7 +339,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const successModal = useRef();
     const toast = useRef();
 
-    // const { CONFIRMED, NO_PROFILE, SUSPENDED } = CUSTOMER_CATEGORY;
+    const { CONFIRMED, SUSPENDED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
     // const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];
 
     useEffect(() => {
@@ -248,6 +353,14 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 
         // eslint-disable-next-line
     }, []);
+
+    const handleClose = () => {
+        setAnchorEl(null)
+    }
+
+    const handleMenu = (e) => {
+        setAnchorEl(e.currentTarget)
+    }
 
     useEffect(() => {
         const { state } = location;
@@ -264,19 +377,22 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         }
     }, [errorsState, errors]);
 
-    // useEffect(() => {
-    //     setEditable(false);
-    //     const { customerStatus } = customer;
-    //     // const { address, occupation, riskProfile, remark, status } = customer;
+    useEffect(() => {
+        // setEditable(false);
+        // const { customerStatus } = customer;
+        // const { address, occupation, riskProfile, remark, status } = customer;
+        // console.log('cs', remarks)
 
-    //     setAddress(address);
-    //     setStatus(customerStatus);
-    //     setRemarks('')
-    //     setOccupation(occupation);
-    //     setRiskProfile(riskProfile);
-    //     setRemarks(remarks);
+        if (!editable) {
+            setAddress(address);
+            setStatus(customer.customerStatus);
+            // setRemarks('')
+            setOccupation(occupation);
+            setRiskProfile(riskProfile);
+            setRemarks(remarks);
+        }
     
-    // }, [customer, address, remarks, riskProfile, occupation]);
+    }, [customer.customerStatus, editable, address, remarks, riskProfile, occupation, status]);
 
     useEffect(() => {
         if (msg) {
@@ -287,25 +403,64 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         }
     }, [msg]);
 
-    // const suspendCustomer = () => {
-    //     setLoadingText('Suspending Customer...');
-    //     setLoading(true);
-    //     setCustomerStatus({
-    //         customerID: customer.id,
-    //         newStatus: SUSPENDED,
-    //         currentStatus: status
-    //     });
-    // };
+    const editMode = useCallback(() => {
+        if (editable) {
+            return classes.editMode
+        }
+    }, [editable, classes.editMode])
 
-    // const confirmCustomer = () => {
-    //     setLoadingText('Confirming Customer...');
-    //     setLoading(true);
-    //     setCustomerStatus({
-    //         customerID: customer.id,
-    //         newStatus: CONFIRMED,
-    //         currentStatus: status
-    //     });
-    // };
+    const suspendCustomer = () => {
+        handleClose();
+        setLoading(true);
+        if (customer.customerStatus !== SUSPENDED && customer.customerStatus === CONFIRMED) {
+            setCustomerStatus({
+                customerID: customer.id,
+                newStatus: SUSPENDED,
+                currentStatus: status
+            });
+        }
+    };
+
+    const confirmCustomer = () => {
+        // setLoadingText('Confirming Customer...');
+        handleClose();
+        setLoading(true);
+        if (customer.customerStatus !== CONFIRMED && customer.customerStatus === SUSPENDED) {
+            setCustomerStatus({
+                customerID: customer.id,
+                newStatus: CONFIRMED,
+                currentStatus: status
+            });
+        } else {
+            setErrors({ msg: 'User can not be verified', ...errors });
+        }
+        // setErrors({})
+    };
+
+    const handleStatus = useCallback((status) => {
+        switch (status) {
+          case CONFIRMED:
+            return classes.verified
+          case PENDING:
+            return classes.pending
+          case REJECTED:
+            return classes.rejected
+          case SUSPENDED:
+            return classes.suspended
+          default:
+            return 
+        }
+      }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified, classes.rejected])
+
+      const handleDisplayStatus = useCallback((status) => {
+        switch (status) {
+          case CONFIRMED:
+            return 'VERIFIED'
+          default:
+            return status
+        }
+      }, [CONFIRMED])
+    
 
     const dismissAction = () => {
         dispatch({
@@ -316,7 +471,8 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
     const onSubmit = (e) => {
         e.preventDefault();
         setErrors({});
-        setLoadingText('');
+        setLoading(true);
+        // setLoadingText('');
 
         const data = {
             customerId: customer.id,
@@ -328,19 +484,27 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             address: address,
             postalCode: postalCode,
             occupation: occupation,
-            risk: riskProfile
+            risk: riskProfile,
+            remarks: remarks
         };
 
-        const { errors, isValid } = updateCustomerProfile(data);
-        if (!!isValid) {
-            return setErrors({ msg: 'Invalid customer data', ...errors });
+        const { updateErrors, isValid } = validateCustomerProfile(data);
+        if (!isValid) {
+            setLoading(false);
+            return setErrors({ msg: 'Invalid customer data', ...updateErrors });
         }
-        setLoadingText('Updating Customer . . .');
-        setLoading(true);
+        // setLoadingText('Updating Customer . . .');
         setEditable(false)
         setErrors({});
         updateCustomerProfile(data);
     };
+
+    useEffect(() => {
+        dispatch({
+            type: GET_ERRORS,
+            payload: {}
+        });
+    }, [dispatch])
 
     // const saveRemark = (e) => {
     //     e.preventDefault();
@@ -369,7 +533,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
 
     return (
         <>
-            {loading && <Spinner text={loadingText} />}
+            {/* {loading && <Spinner text={loadingText} />} */}
             {!isEmpty(errorsState) && 
                 <Toast 
                     ref={toast}
@@ -379,20 +543,44 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                     type="error"
                 />
             }
+            {errors && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <Box component="div" className={classes.userDetails}>
                     <Typography className={classes.headerTitle}>Personal details</Typography>
-                    <SquareEditOutline onClick={() => setEditable(!editable)} className={classes.headerIcon} />
+                    <SquareEditOutline onClick={() => setEditable(!editable)} className={clsx(classes.headerIcon, editMode())} />
                 </Box>
                 <Box component="div" className={classes.userPassport}>
                     <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
                     <Typography component="div" className={classes.userStatus}>
-                        <Typography variant="h6" className={classes.userStatusTitle}>
-                            <CheckDecagram className={classes.userStatusIcon} />
-                            {'Verified'}
+                        <Typography variant="h6" className={clsx(classes.userStatusTitle, classes.status, handleStatus(status))}>
+                            { status === CONFIRMED ? <CheckDecagram className={classes.userStatusIcon} /> : ''}
+                            {loading ? <CircularProgressBar newWidth="20px" newHeight="20px" /> : handleDisplayStatus(status)}
                         </Typography>
-                        <Typography component="span" variant="subtitle2" className={classes.userStatusSub}><Status wdth="fit-content" statusName="CHANGE STATUS" bgColor="#1E6262" textColor="white" /></Typography>
+                        <GenericButton clickAction={handleMenu} fontsize=".9vw" buttonName="CHANGE STATUS" fontColor="white" bgColor="#1E6262" textColor="white" />
+                        <Menu
+                            id="customer-menu"
+                            anchorEl={anchorEl}
+                            keepMounted
+                            open={Boolean(anchorEl)}
+                            onClose={handleClose}
+                            classes={{ paper: classes.menu }}
+                            disableScrollLock={ true }
+                        >
+                            <MenuItem onClick={confirmCustomer}>Verified</MenuItem>
+                            <MenuItem>Pending</MenuItem>
+                            <MenuItem onClick={suspendCustomer} disabled={customer.customerStatus === REJECTED}>Suspended</MenuItem>
+                            <MenuItem>No Profile</MenuItem>
+                            <MenuItem>Rejected</MenuItem>
+                        </Menu>
                     </Typography>
                 </Box>
                 <form onSubmit={onSubmit} noValidate className={classes.userPersonalDetails}>
@@ -419,7 +607,16 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
             </Box>
 
             <Box component="div" className={classes.saveBtn}>
-                <GenericButton clickAction={onSubmit} buttonName="save" />
+                    <GenericButton isDisabled={!editable} clickAction={onSubmit} buttonName={loading ? <CircularProgressBar newWidth="15px" newHeight="15px" />
+                    : 'save'} />
+            </Box>
+
+            <Box component="div" className={classes.remark}>
+                <Typography variant="h5">Remarks</Typography>
+
+                <Typography component="p">Previous remarks go here</Typography>
+
+                <textarea disabled={!editable} id="txtid" name="txtname" rows="10" cols="60" className={classes.remarkArea}></textarea>
             </Box>
 
 

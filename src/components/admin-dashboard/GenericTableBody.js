@@ -52,7 +52,7 @@ const useStyles = makeStyles(theme =>({
 
   verified: {
     backgroundColor: '#DDF2E5',
-    color: '#48BB78',
+    color: '#1E6262',
   },
 
   pending: {
@@ -60,9 +60,14 @@ const useStyles = makeStyles(theme =>({
     color: '#FBBC05',
   },
 
-  suspended: {
+  rejected: {
     backgroundColor: '#FFCECE',
     color: '#FF0000',
+  },
+
+  suspended: {
+    backgroundColor: '#f5f7be',
+    color: '#d1c70c',
   },
 
   viewBtn: {
@@ -91,7 +96,6 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
         type: SET_CUSTOMER,
         payload: customer
       });
-
       handleClick(e);
     }
   };
@@ -103,13 +107,13 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
       case PENDING:
         return classes.pending
       case REJECTED:
-        return classes.suspended
+        return classes.rejected
       case SUSPENDED:
         return classes.suspended
       default:
         return
     }
-  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified])
+  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified, classes.rejected])
 
   const handleDisplayStatus = useCallback((status) => {
     switch (status) {
@@ -136,7 +140,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     if (typeof value === 'string') {
       return value.substring(0, 25)
     }
-    return
+    return value
   }
 
   // const handleTimeStamp = useCallback((value) => {
@@ -145,7 +149,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   return (
     <>
-      { loading ? <CircularProgressBar topMargin="50px" /> :
+      { loading ? <CircularProgressBar newWidth="40px" newHeight="40px" topMargin="50px" /> :
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: handleGridColumns, padding: '1px 0px' }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">

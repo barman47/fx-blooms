@@ -63,7 +63,7 @@ export const getCustomerCount = (timeframe) => async (dispatch) => {
 export const getActiveUserCount = (timeframe) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.get(`${api}/GetCustomerCount?timeframe=${timeframe}`);
+        const res = await axios.get(`${api}/GetActiveUserCount?timeframe=${timeframe}`);
         return dispatch({
             type: SET_ACTIVE_CUSTOMER_COUNT,
             payload: res.data.data

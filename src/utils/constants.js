@@ -15,7 +15,7 @@ export const COLORS = {
     orange: '#ffa500'
 };
 
-export const DRAWER_WIDTH = 260;
+export const DRAWER_WIDTH = 235;
 // export const DRAWER_WIDTH = 240;
 
 export const SETUP_2FA = 'SETUP_2FA';
@@ -203,3 +203,8 @@ export const olimpicMedals = [{
   }
 
   export const VERIFF_HOST = "https://stationapi.veriff.com"
+
+  export const ID_STATUS_CATEGORY = {
+    DECLINED: 'declined',
+    ACCEPTED: 'accepted'
+  }

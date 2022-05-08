@@ -14,6 +14,9 @@ import { COLORS } from '../../../utils/constants';
 import { makeStyles } from '@material-ui/core/styles';
 import { getCustomer } from '../../../actions/customer';
 // import { getAllListings } from '../../../actions/adminListings'
+// import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
+import Shape from '../../../assets/img/Shape.svg'
+import icon from '../../../assets/img/icon.png'
 
 
 const useStyles = makeStyles(theme =>({
@@ -21,23 +24,26 @@ const useStyles = makeStyles(theme =>({
       backgroundColor: 'white',
       borderRadius: theme.shape.borderRadius,
       padding: [[theme.spacing(2), theme.spacing(5)]],
+      boxShadow: '1px 1px 3px #dbdddd',
 
       [theme.breakpoints.down('md')]: {
           paddingBottom: theme.spacing(4)
       }
   },
 
+
   content: {
       display: 'grid',
-      gridTemplateColumns: '1fr 0.2fr 1fr'
+      // gridTemplateColumns: '1fr 1fr',
+      gridAutoColumns: '1fr',
+      // gridAutoFlow: 'column dense',
+      // display: 'flex',
+      // flexWrap: 'wrap',
   },
 
   detail: {
       marginBottom: theme.spacing(2),
-
-      '& h6:first-child': {
-          margin: theme.spacing(2, 0)
-      }
+      // width: '325.61px'
   },
 
   select: {
@@ -94,8 +100,10 @@ const useStyles = makeStyles(theme =>({
 
   paperBx: {
     marginRight: theme.spacing(5),
-    padding: [[theme.spacing(1), theme.spacing(2)]],
-    border: `1px solid ${COLORS.primary}`,
+    // padding: [[theme.spacing(1), theme.spacing(2)]],
+    border: `1px solid #E8E9EA`,
+    outline: 'none',
+    // width: '443.39px',
     
     '&:not(:last-child)': {
       marginBottom: theme.spacing(5),
@@ -116,31 +124,46 @@ const useStyles = makeStyles(theme =>({
     }
   },
 
+  transactionHeader: {
+    padding: '10px',
+    borderBottom: '1px solid #E8E9EA',
+    textTransform: 'uppercase',
+
+    '& h6': {
+      margin: 0,
+      color: '#3C3C3C',
+      fontWeight: '500'
+    }
+  },
+
   detailsRow: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
+    padding: '10px 13px',
+    gap: '7px',
 
     '& h6': {
       fontSize: '14px',
-      fontWeight: 'normal'
+      fontWeight: 'normal',
+      color: '#3C3C3C',
     },
 
     '& h6:last-child': {
-      color: COLORS.primary,
+      color: '#3C3C3C',
       fontWeight: 'bold'
     }
   },
 
   paperWalletCard: {
     height: '200px',
-    maxWidth: '24rem',
+    maxWidth: '26rem',
     borderRadius: '10px',
-    // border: 'none',
-    backgroundImage: `linear-gradient(60deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.9) 90%)`,
-
-    display: 'flex',
-    alignItems: 'center',
+    position: 'relative',
+    
+    '&:nth-child(2) img.walletDesign': {
+      backgroundColor: 'black'
+    },
 
     '&:not(:last-child)': {
       marginBottom: theme.spacing(5),
@@ -169,18 +192,35 @@ const useStyles = makeStyles(theme =>({
     paddingTop: '20px',
     paddingLeft: '25px',
 
-    '& h6': {
-      color: COLORS.primary,
-    },
-
     '& h6:not(:last-child)': {
-      marginBottom: '45px'
+      marginBottom: '25px'
     },
+  },
 
-    '& h6:last-child': {
-      fontSize: '1rem'
-    },
-  }
+  walletDesign: {
+    height: '198px',
+    position: 'absolute',
+    top: 1,
+    right: 1
+  },
+
+  walletIcon: {
+    width: 40,
+  },
+
+  walletCurrency: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: theme.spacing(2),
+    color: 'black'
+  },
+
+  walletAmount: {
+    paddingLeft: 51,
+    fontSize: '1.5rem',
+    fontWeight: 'bold',
+
+  },
 
 }));
 
@@ -196,11 +236,11 @@ const TransactionDetails = () => {
   // }, [dispatch])
 
   
-  useEffect(() => {
-    dispatch(getCustomer(customer.id))
-  }, [dispatch, customer])
+  // useEffect(() => {
+  //   dispatch(getCustomer(customer.id))
+  // }, [dispatch, customer])
 
-  console.log('hello')
+  console.log('trans')
   
   return (
     <>
@@ -231,7 +271,10 @@ const TransactionDetails = () => {
             </Box>
           </div> */}
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="h6">Listings</Typography>
+            <Box component="div" className={classes.transactionHeader}>
+              <Typography component="h6">LISTINGS</Typography>
+                {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
+            </Box>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -280,7 +323,10 @@ const TransactionDetails = () => {
             </div>
           </Paper>
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography variant="h6">Transactions</Typography>
+          <Box component="div" className={classes.transactionHeader}>
+              <Typography variant="h6">Transactions</Typography>
+                {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
+            </Box>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -322,7 +368,10 @@ const TransactionDetails = () => {
           </Paper>
 
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography component="h6" >Volume</Typography>
+          <Box component="div" className={classes.transactionHeader}>
+              <Typography component="h6" >Volume</Typography>
+                {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
+            </Box>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -364,7 +413,10 @@ const TransactionDetails = () => {
           </Paper>
 
           <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
-            <Typography variant="h6">Fees</Typography>
+          <Box component="div" className={classes.transactionHeader}>
+              <Typography variant="h6">Fees</Typography>
+                {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
+            </Box>
             <div className={classes.paperBxContent}>
                   <div className={classes.detailsRow}>
                     <Typography variant="h6">
@@ -397,38 +449,41 @@ const TransactionDetails = () => {
           </Paper>
         </Box>
 
-
-        <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} /> 
+        {/* <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} />  */}
         
-
-
         <Box component="div" className={classes.detail}>
           <div className={classes.subDetailTitle}>
             <Typography color="primary" variant="h6">Wallets</Typography>
           </div>
           <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle>
             <div className={classes.cardLeftContent}>
-              <Typography variant="subtitle2">
+              <Typography className={classes.walletCurrency} variant="subtitle2">
+                <img className={classes.walletIcon} alt="icon" src={icon} />
                 EUR WALLET
               </Typography>
 
-              <Typography variant="h6">
+              <Typography className={classes.walletAmount} variant="h6">
                 EUR 5000
               </Typography>
             </div>
-            <div className={classes.cardRightContent}></div>
+            <Box component="div">
+              <img className={classes.walletDesign} src={Shape} alt="wallet design" />
+            </Box>
           </Paper>
-          <Paper className={classes.paperWalletCard} elevation={2} variant="outlined" rectangle>
-            <div className={classes.cardRightContent2}></div>
+          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle>
             <div className={classes.cardLeftContent}>
-              <Typography variant="subtitle2">
+              <Typography className={classes.walletCurrency} variant="subtitle2">
+                <img className={classes.walletIcon} alt="icon" src={icon} />
                 EUR WALLET
               </Typography>
 
-              <Typography variant="h6">
+              <Typography className={classes.walletAmount} variant="h6">
                 EUR 5000
               </Typography>
             </div>
+            <Box component="div">
+              <img className={classes.walletDesign} src={Shape} alt="wallet design" />
+            </Box>
           </Paper>
 
         </Box>
