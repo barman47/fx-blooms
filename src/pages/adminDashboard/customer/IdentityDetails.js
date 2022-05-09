@@ -143,7 +143,11 @@ const useStyles = makeStyles(theme =>({
     amlNumber: {
         fontWeight: '500 !important',
         justifySelf: 'flex-end',
-        fontSize: '1vw'
+        fontSize: '1vw',
+
+        '& p:first-child': {
+            fontWeight: '600 !important',
+        }
     },
 
     verified: {
@@ -240,13 +244,13 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
             getResidencePermitValidationResponse(customer.id);
         }
 
-        if (!docType) {
-            setExpiryDate(idCheckData?.expiryDate)
-            setDateOfIssue(idCheckData?.dateOfIssue)
-            setDocStatus(idCheckData?.status)
-            setIssueCountry(idCheckData?.issueCountry)
-            setDocNumber(idCheckData?.documentNumber)
-            setDocType(idCheckData?.documentType)
+        if (!docType && idCheckData) {
+            setExpiryDate(idCheckData.expiryDate)
+            setDateOfIssue(idCheckData.dateOfIssue)
+            setDocStatus(idCheckData.status)
+            setIssueCountry(idCheckData.issueCountry)
+            setDocNumber(idCheckData.documentNumber)
+            setDocType(idCheckData.documentType)
         }
 
         // dispatch({
@@ -254,7 +258,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
         //     payload: {}
         // });
         // eslint-disable-next-line
-    }, []);
+    }, [idCheckData]);
 
     const handleClose = () => {
         setAnchorEl(null)
@@ -285,8 +289,6 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
             payload: null
         });
     };
-
-    console.log('id')
 
     // const handleCloseModal = () => {
     //     setModalImage('');
@@ -350,7 +352,7 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                 </Box>
 
                 <Box component="div" className={classes.idDetails}>
-                    <AmlBoard  classes={classes} amlTitle={"Status"} amlNumber={<Status extraStyles={handleStatus(docStatus)} statusName={docStatus} />} />
+                    <AmlBoard  classes={classes} amlTitle={"Status"} amlNumber={<Status extraStyles={handleStatus(docStatus)} statusName={docStatus?.toUpperCase()} />} />
                     <AmlBoard classes={classes} amlTitle={"Document Type"} amlNumber={docType} />
                     <AmlBoard classes={classes} amlTitle={"Document Number"} amlNumber={docNumber} />
                     <AmlBoard classes={classes} amlTitle={"Issue Country"} amlNumber={issueCountry} />

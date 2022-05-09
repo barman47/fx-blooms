@@ -436,7 +436,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                                     placeholder="Search . . ."
                                     value={searchText}
                                     onChange={handleSearch}
-                                    helperText={errors.searchText}
+                                    // helperText={errors.searchText}
                                     // error={errors.searchText ? true : false}
                                     InputProps={{
                                         startAdornment: (

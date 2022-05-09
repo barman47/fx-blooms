@@ -101,12 +101,17 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
   };
 
   const handleStatus = useCallback((status) => {
+    // console.log('status', status)
     switch (status) {
       case CONFIRMED:
         return classes.verified
       case PENDING:
         return classes.pending
+      case "OPEN":
+        return classes.verified
       case REJECTED:
+        return classes.rejected
+      case "REMOVED":
         return classes.rejected
       case SUSPENDED:
         return classes.suspended
@@ -162,10 +167,10 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     <TextClamp text={customer[columnList[2]] ? customer[columnList[2]] : ''} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={handleDisplayRow(customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? '')} lines={1} />
+                    {handleDisplayRow(customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? '')}
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')} lines={1} />
+                    {handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')}
                 </Typography>
                 <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatus(customer[columnList[5]]))} variant="subtitle1">
                 { handleDisplayStatus(customer[columnList[5]]) }

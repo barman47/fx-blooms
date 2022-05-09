@@ -11,7 +11,7 @@ import {
     Typography
 } from '@material-ui/core';
 import { getCustomersWithoutProfile } from '../../../actions/customer';
-import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
+import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, getActiveUserCount } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
 import { Stack, Animation, ArgumentScale } from '@devexpress/dx-react-chart';
 import {
@@ -349,21 +349,21 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { changed, totalCustomersWithNoProfile, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
+    const { changed, totalCustomersWithNoProfile, customerCount, activeUserCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
     const [usersFilter, setUsersFilter] = useState('');
     const [activeUsersFilter, setActiveUsersFilter] = useState('');
     const [users, setUsers] = useState(0);
-    const [activeUsers, setActiveUsers] = useState(0);
+    // const [activeUsers, setActiveUsers] = useState(0);
     const [volumeFilter, setVolumeFilter] = useState('');
     const [volume, setVolume] = useState(0);
 
     const [loadingCustomerCount, setLoadingCustomerCount] = useState(false);
     const [loadingListingCount, setLoadingListingCount] = useState(false);
     const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
-    const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
+    // const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
     // const [loadingActiveUsers] = useState(false);
     const [totalNoProfilePercent, setTotalNoProfilePercent] = useState(0);
 
@@ -388,7 +388,6 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     // Show total listing count when no filter is selected
     useEffect(() => {
-        console.log('hh', listingCount)
         if (totalListings && !listingFilter) {
             console.log('list')
             setListings(totalListings);
@@ -396,11 +395,10 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     }, [totalListings, listingFilter]);
 
     useEffect(() => {
-        if (totalListings && !activeUsersFilter) {
-            console.log('list')
-            setListings(totalListings);
+        if (!activeUserCount && !activeUsersFilter) {
+            dispatch(getActiveUserCount())
         }
-    }, [totalListings, activeUsersFilter]);
+    }, [activeUserCount, activeUsersFilter, dispatch]);
 
 
     // Show total customer count when no filter is selected
@@ -567,12 +565,12 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
                     <GenericMiniCard 
                     cardName="Active Users"
+                    filterBtn={false}
                     cardIcon={<AccountSupervisor />} 
                     filterType={activeUsersFilter} 
                     handleOnChange={setActiveUsersFilter} 
-                    loading={loadingActiveUsers}
                     formatFn={formatNumber}
-                    useCase={activeUsers}
+                    useCase={activeUserCount}
                     filterName="activeFilter"
                     />
 

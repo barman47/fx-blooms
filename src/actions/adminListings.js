@@ -21,3 +21,16 @@ export const getAllListings = (query) => async (dispatch) => {
         return handleError(err, dispatch);
     }
 };
+
+export const getListingByStatus = (status) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${URL}/GetListingByStatus`);
+        return dispatch({
+            type: SET_LISTINGS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+}

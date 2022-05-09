@@ -206,5 +206,5 @@ export const olimpicMedals = [{
 
   export const ID_STATUS_CATEGORY = {
     DECLINED: 'declined',
-    ACCEPTED: 'accepted'
+    ACCEPTED: 'approved'
   }
