@@ -1,10 +1,10 @@
 import axios from 'axios';
 import handleError from '../utils/handleError';
-import { API } from '../utils/constants';
 import { SET_LISTINGS } from './types';
 import reIssueAdminToken from '../utils/reIssueAdminToken';
 
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
 export const getAllListings = (query) => async (dispatch) => {

@@ -28,7 +28,8 @@ import {
 	PRIVACY_POLICY,
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
-	WALLET,
+	WALLETS,
+	FUND_WALLET,
 	CONTACT_US,
 	USER_AGREEMENT,
 	ADD_USERNAME,
@@ -41,7 +42,8 @@ import {
 	BANK_ACCOUNTS,
 	PROFILE,
 	ID_VERIFICATION,
-	TWO_FACTOR
+	TWO_FACTOR,
+	PIN
 } from './routes';
 
 import FallBack from './components/common/FallBack';
@@ -88,6 +90,8 @@ const IdVerification = lazy(() => import('./pages/dashboard/idVerification'));
 
 const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 
+const Pin = lazy(() => import('./pages/dashboard/pin'));
+
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
 
 const TransactionStatus = lazy(() => import('./pages/dashboard/transactions/TransactionStatus'));
@@ -96,6 +100,7 @@ const Transactions = lazy(() => import('./pages/dashboard/transactions'));
 const BankAccounts = lazy(() => import('./pages/dashboard/bankAccount'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
+const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
@@ -205,8 +210,10 @@ const App = () => {
 								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
-								<Route path={`${WALLET}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${WALLETS}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${FUND_WALLET}`} element={<FundWallet handleSetTitle={handleSetTitle} />} />
 								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
+								<Route path={`${PIN}`} element={<Pin handleSetTitle={handleSetTitle} />} />
 							</Route>
 							
 							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />

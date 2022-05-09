@@ -6,6 +6,7 @@ import {
     SET_BID,
     SET_LISTINGS, 
     SET_MORE_LISTINGS,
+    GET_LISTING,
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_AS_ACCEPTED,
@@ -136,6 +137,12 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 listings,
                 ...rest
+            };
+
+        case GET_LISTING:
+            return {
+                ...state,
+                listing: state.listings.find(listing => listing.id === action.payload)
             };
 
         case HIDE_NEGOTIATION_LISTINGS:

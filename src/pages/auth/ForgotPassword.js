@@ -16,7 +16,7 @@ import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
 import isEmpty from '../../utils/isEmpty';
-import { DASHBOARD_HOME, HOME, LOGIN } from '../../routes';
+import { DASHBOARD_HOME, LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -135,8 +135,6 @@ const ForgotPassword = (props) => {
         }
     }, [dispatch, navigate, msg]);
 
-    const goHome = () => window.location.href = HOME;;
-
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -166,7 +164,7 @@ const ForgotPassword = (props) => {
                     type="error"
                 />
             }
-            <SuccessModal ref={successModal} dismissAction={goHome} />
+            <SuccessModal ref={successModal} dismissAction={() => navigate('/')} />
             {loading && <Spinner />}
             <section className={classes.root}>
                 <RouterLink to="/">

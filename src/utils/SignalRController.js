@@ -1,12 +1,11 @@
 import { HttpTransportType, HubConnectionBuilder, HubConnectionState, LogLevel } from '@microsoft/signalr';
 import { SET_SOCKET_CONNECTION_STATUS } from '../actions/types';
 
-import { HUB_URL, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
+import { CHAT_CONNECTION_STATUS, RECEIVE_NOTIFICATION, SEND_MESSAGE } from './constants';
 import { store } from '../store';
 
-import { CHAT_CONNECTION_STATUS } from '../utils/constants';
-
 const { CONNECTED, DISCONNECTED, RECONNECTED, RECONNECTING } = CHAT_CONNECTION_STATUS;
+const HUB_URL =  `${process.env.REACT_APP_HUB_URL}`;
 
 class SignalRController {
     connected = false;

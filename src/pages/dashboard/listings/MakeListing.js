@@ -30,6 +30,7 @@ import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/typ
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
+import getAccountId from '../../../utils/getAccountId';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import PendingIdModal from './PendingIdModal';
@@ -428,11 +429,6 @@ const MakeListing = (props) => {
         }
     };
 
-    const getAccountId = (account) => {
-        const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
-        return bank.accountID;
-    };
-
     const onSubmit = (e) => {
         e.preventDefault();
         setErrors({});
@@ -478,7 +474,7 @@ const MakeListing = (props) => {
                 // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
-            accountID: getAccountId(ReceivingAccount),
+            accountID: getAccountId(ReceivingAccount, accounts),
             reference
         };
 
@@ -503,7 +499,7 @@ const MakeListing = (props) => {
                     type="error"
                 />
             }
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={AvailableCurrency === 'NGN' ? false : true} eur={AvailableCurrency === 'EUR' ? false : true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />

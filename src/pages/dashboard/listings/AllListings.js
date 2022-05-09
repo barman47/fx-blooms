@@ -16,20 +16,20 @@ import {
 	useMediaQuery
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-// import { Camera, ChevronDown, ChevronRight, FilterOutline } from 'mdi-material-ui';
 import { Magnify } from 'mdi-material-ui';
+// import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { getWallets } from '../../../actions/wallets';
 import { 
 	ACTIVATE_EUR_WALLET,
-	ACTIVATE_NGN_WALLET,
-	ACTIVATE_USD_WALLET,
-	ACTIVATE_GPB_WALLET,
+	// ACTIVATE_NGN_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
+	SET_WALLET,
 	SET_LOADING,
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
@@ -48,11 +48,8 @@ import WalletInfo from '../wallet/WalletInfo';
 // import NewNotification from '../notifications/NewNotification';
 // import RiskNoticeModal from './RiskNoticeModal';
 
-// import img from '../../../assets/img/decentralized.svg';
 import EUFlag from '../../../assets/img/EU-flag.svg';
-import NGNFlag from '../../../assets/img/NGN-flag.svg';
-import USFlag from '../../../assets/img/US-flag.svg';
-import GBPFlag from '../../../assets/img/GBP-flag.svg';
+// import NGNFlag from '../../../assets/img/NGN-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
 const useStyles = makeStyles(theme => ({
@@ -90,7 +87,7 @@ const useStyles = makeStyles(theme => ({
 	walletsContainer: {
 		display: 'grid',
 		gridTemplateColumns: '1fr',
-		flexDirection: 'column',
+		// flexDirection: 'column',
 		// gap: theme.spacing(1),
 		paddingLeft: theme.spacing(5),
 		paddingRight: theme.spacing(5),
@@ -114,9 +111,9 @@ const useStyles = makeStyles(theme => ({
 		borderRadius: theme.shape.borderRadius,
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'space-between',
+		justifyContent: 'space-around',
 		margin: '0 auto',
-		width: '100%',
+		width: theme.spacing(40),
 
 		[theme.breakpoints.down('md')]: {
 			width: '100%'
@@ -238,7 +235,7 @@ const AllListings = (props) => {
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { eurActive, ngnActive, usdActive, gbpActive } = useSelector(state => state.wallets);
+	const { eurActive, wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -247,7 +244,8 @@ const AllListings = (props) => {
 		getIdVerificationLink, 
 		getListingsOpenForBid, 
 		getMoreListings, 
-		getNotifications, 
+		getNotifications,
+		getWallets,
 		handleSetTitle,
 		removeExpiredListings 
 	} = props;
@@ -292,6 +290,10 @@ const AllListings = (props) => {
 			getListings();
 		}
 
+		if (wallets.length === 0) {
+			getWallets(customerId);
+		}
+
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
 		}
@@ -317,6 +319,15 @@ const AllListings = (props) => {
 		}
 		setAmount(value);
 	};
+
+	useEffect(() => {
+		if (wallets.length > 0) {
+			dispatch({
+				type: SET_WALLET,
+				payload: { currency: 'EUR' }
+			});	
+		}
+	}, [dispatch, wallets]);
 
 	// Fetch listings when search field is empty
 	useEffect(() => {
@@ -508,7 +519,7 @@ const AllListings = (props) => {
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-							<Wallet 
+							{/* <Wallet
 								type="NGN"
 								flag={NGNFlag}
 								active={ngnActive}
@@ -525,14 +536,8 @@ const AllListings = (props) => {
 								flag={GBPFlag}
 								active={gbpActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_GPB_WALLET })}
-							/>
-							{/* <Paper className={classes.gateway}>
-								<div>
-									<Typography variant="h5">Your Gateway<br />into Decentralized<br />Money Exchange</Typography>
-									<Link to={ABOUT_US} component="a" target="_blank">Learn More</Link>
-								</div>
-								<img src={img} alt="decentralized money exchange" />
-							</Paper> */}
+							/> */}
+
 						</section>
 
 						<WalletInfo 
@@ -667,6 +672,7 @@ AllListings.propTypes = {
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
+	getWallets: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
@@ -678,5 +684,6 @@ export default connect(undefined, {
 	getListingsOpenForBid, 
 	getMoreListings, 
 	getNotifications,
+	getWallets,
 	removeExpiredListings 
 })(AllListings);

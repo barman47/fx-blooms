@@ -1,6 +1,5 @@
 import axios from 'axios';
 
-import { API } from '../utils/constants';
 import { ADMIN_HOME, ADMIN_LOGIN } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueAdminToken from '../utils/reIssueAdminToken';
@@ -17,6 +16,7 @@ import {
     UPDATED_CUSTOMER 
 } from './types';
 
+const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Admin`;
 
 export const login = (data, navigate) => async (dispatch) => {
