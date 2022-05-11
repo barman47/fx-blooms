@@ -30,7 +30,7 @@ const Pin = ({ handleSetTitle }) => {
 
     return (
         <>
-            <PinOtpModal />
+            {/* <PinOtpModal /> */}
             <Box component="section" className={classes.root}>
                 <SetPin />
             </Box>

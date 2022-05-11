@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { SET_NOTIFICATIONS, SET_NOTIFICATION_COUNT, VERIFIED_PHONE_NUMBER } from './types';
+import { SET_NOTIFICATIONS, SET_NOTIFICATION_COUNT, VERIFIED_PHONE_NUMBER, SET_CUSTOMER_MSG } from './types';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
@@ -68,6 +68,19 @@ export const validatePhoneNumber = (data) => async (dispatch) => {
         return dispatch({ 
             type: VERIFIED_PHONE_NUMBER, 
             payload: { phoneNumber: data.phoneNumber }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const generatePinOtp = (data) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${api}/GenerateOTPForPinCreation`, data);
+        return dispatch({ 
+            type: SET_CUSTOMER_MSG, 
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

@@ -39,6 +39,7 @@ export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
 export const WALLETS = `${DASHBOARD}/wallets`;
 export const FUND_WALLET = `${WALLETS}/fundWallet`;
+export const FUND_SUCCESS = `${WALLETS}/fundSuccess`;
 export const VERIFF = `${DASHBOARD}/veriff`;
 export const ACCOUNT = `${DASHBOARD}/account`;
 export const PROFILE = `${DASHBOARD}/profile`;

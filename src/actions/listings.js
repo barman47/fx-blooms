@@ -147,8 +147,6 @@ export const deleteListing = (listingId) => async (dispatch) => {
     }
 };
 
-
-
 export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
