@@ -169,6 +169,7 @@ const SessionModal = ({ logout }) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
+            // disableBackdropClick
             disableEscapeKeyDown
             onClose={handleOnClose}
             closeAfterTransition

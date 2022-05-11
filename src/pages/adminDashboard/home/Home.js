@@ -11,7 +11,7 @@ import {
     Typography
 } from '@material-ui/core';
 import { getCustomersWithoutProfile } from '../../../actions/customer';
-import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer } from '../../../actions/admin';
+import { getCustomerCount, getListingCount, getTransactionVolume, searchForCustomer, getActiveUserCount } from '../../../actions/admin';
 import { TOGGLE_STATS_CHANGE_STATUS } from '../../../actions/types';
 import { Stack, Animation, ArgumentScale } from '@devexpress/dx-react-chart';
 import {
@@ -40,6 +40,7 @@ import UserActivitiesRow from '../../../components/admin-dashboard/UserActivitie
 import RecentTransactions from '../../../components/admin-dashboard/RecentTransactions'
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard'
 import GenericMiniCard from '../../../components/admin-dashboard/GenericMiniCard'
+import clsx from 'clsx'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -348,20 +349,22 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { changed, totalCustomersWithNoProfile, customerCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
+    const { changed, totalCustomersWithNoProfile, customerCount, activeUserCount, listingCount, totalCustomers, totalListings, totalEuroTransfered, transactionVolume } = useSelector(state => state.stats);
 
     const [listingFilter, setListingFilter] = useState('');
     const [listings, setListings] = useState(0);
     const [usersFilter, setUsersFilter] = useState('');
     const [activeUsersFilter, setActiveUsersFilter] = useState('');
     const [users, setUsers] = useState(0);
+    // const [activeUsers, setActiveUsers] = useState(0);
     const [volumeFilter, setVolumeFilter] = useState('');
     const [volume, setVolume] = useState(0);
+
     const [loadingCustomerCount, setLoadingCustomerCount] = useState(false);
     const [loadingListingCount, setLoadingListingCount] = useState(false);
     const [loadingTransactionVolume, setLoadingTransactionVolume] = useState(false);
     // const [loadingActiveUsers, setloadingActiveUsers] = useState(false);
-    const [loadingActiveUsers] = useState(false);
+    // const [loadingActiveUsers] = useState(false);
     const [totalNoProfilePercent, setTotalNoProfilePercent] = useState(0);
 
     // eslint-disable-next-line
@@ -385,12 +388,17 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     // Show total listing count when no filter is selected
     useEffect(() => {
-        console.log('hh', totalListings)
         if (totalListings && !listingFilter) {
             console.log('list')
             setListings(totalListings);
         }
     }, [totalListings, listingFilter]);
+
+    useEffect(() => {
+        if (!activeUserCount && !activeUsersFilter) {
+            dispatch(getActiveUserCount())
+        }
+    }, [activeUserCount, activeUsersFilter, dispatch]);
 
 
     // Show total customer count when no filter is selected
@@ -445,7 +453,9 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     // const goToDashboard = () => navigate.push(`${CUSTOMERS}`);
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     const handleSwitchCase = useCallback((switchType, getFunction, setLoadingType, setFilterType, total) => {
+        console.log("switchcase")
         const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
         switch (switchType) {
             case TWENTY_FOUR_HOURS:
@@ -555,12 +565,12 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
                     <GenericMiniCard 
                     cardName="Active Users"
+                    filterBtn={false}
                     cardIcon={<AccountSupervisor />} 
                     filterType={activeUsersFilter} 
                     handleOnChange={setActiveUsersFilter} 
-                    loading={loadingActiveUsers}
-                    formatFn="" 
-                    useCase=""
+                    formatFn={formatNumber}
+                    useCase={activeUserCount}
                     filterName="activeFilter"
                     />
 
@@ -678,7 +688,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 </Grid>
 
                 <Grid item xs={12} className={classes.stats}>
-                    <Box component="div" className={[classes.contentItem, classes.contentItemLong]}>
+                    <Box component="div" className={clsx(classes.contentItem, classes.contentItemLong)}>
                         <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">Support Board</Typography>
 
                         <Box component="div" className={classes.supportTable}>
@@ -718,7 +728,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                 </Grid>
                 
                 <Grid item xs={12} className={classes.stats}>
-                    <Box component="div" className={[classes.contentItem, classes.userActivities]}>
+                    <Box component="div" className={clsx(classes.contentItem, classes.userActivities)}>
                         <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">User Activities</Typography>
                         <Box component="div"className={classes.userActivitiesHeader}>
                             <Typography component="h6" variant="subtitle1">
@@ -734,7 +744,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                         <UserActivitiesRow classname={classes.userActivitiesBody} category={'No listing in the last 30days'} number={650} progressNumber={100} />
                     </Box>
                     <Box component="div" className={classes.transactionSection}>
-                        <Box component="div" className={[classes.contentItem, classes.recentTransactions]}>
+                        <Box component="div" className={clsx(classes.contentItem, classes.recentTransactions)}>
                             <Typography className={classes.graphName} variant="subtitle2" component="span" color="primary">Recent Transactions</Typography>
             
                            <Box component="div" className={classes.recentTransactionList}>
@@ -756,7 +766,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
                            </Box>
                            
                         </Box>
-                        <Box component="div" className={[classes.contentItem, classes.amlBoard]}>
+                        <Box component="div" className={clsx(classes.contentItem, classes.amlBoard)}>
                             <Typography className={classes.graphName} variant="subtitle2" component="h5" color="primary">AML Board</Typography>
 
                             <Box component="div" className={classes.amlContent}>

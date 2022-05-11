@@ -7,17 +7,10 @@ import reIssueAdminToken from '../utils/reIssueAdminToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
-export const getAllListings = () => async (dispatch) => {
+export const getAllListings = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.post(`${URL}/GetAllListings`, {
-            pageNumber: 0,
-            pageSize: 15,
-            currencyNeeded: 'NGN',
-            currencyAvailable: 'NGN',
-            minimumExchangeAmount: 0,
-            useCurrencyFilter: false
-        });
+        const res = await axios.post(`${URL}/GetAllListings`, query);
         const { items, ...rest } = res.data.data;
 
         dispatch({
@@ -28,3 +21,16 @@ export const getAllListings = () => async (dispatch) => {
         return handleError(err, dispatch);
     }
 };
+
+export const getListingByStatus = (status) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${URL}/GetListingByStatus`);
+        return dispatch({
+            type: SET_LISTINGS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+}

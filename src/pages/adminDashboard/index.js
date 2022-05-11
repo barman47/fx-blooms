@@ -201,7 +201,7 @@ const useStyles = makeStyles((theme) => ({
     
     paper: {
         backgroundColor: theme.palette.primary.main,
-        borderTopRightRadius: '40px',
+        borderTopRightRadius: '0',
         overflowX: 'hidden',
         boxSizing: 'border-box',
         paddingRight: theme.spacing(2)
@@ -256,8 +256,8 @@ const useStyles = makeStyles((theme) => ({
     admin: {
         color: COLORS.offWhite,
         position: 'relative',
-        top: -30,
-        left: 53
+        top: -25,
+        left: 52
     },
 
     links: {
@@ -436,7 +436,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                                     placeholder="Search . . ."
                                     value={searchText}
                                     onChange={handleSearch}
-                                    helperText={errors.searchText}
+                                    // helperText={errors.searchText}
                                     // error={errors.searchText ? true : false}
                                     InputProps={{
                                         startAdornment: (
@@ -450,8 +450,8 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                             </form>
                             <Box component="div">
                                 <ul className={classes.headerLinks}>
-                                    <li><IconButton color="primary"><CogOutline /></IconButton></li>
-                                    <li><IconButton color="primary"><BellAlertOutline /></IconButton></li>
+                                    <li><IconButton style={{ color: '#718096', fontWeight: 600 }} ><CogOutline /></IconButton></li>
+                                    <li><IconButton style={{ color: '#718096', fontWeight: 600 }}><BellAlertOutline /></IconButton></li>
                                 </ul>
                             </Box>
                         </Box>
