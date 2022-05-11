@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCustomer } from '../../../actions/customer';
-import { getListingByStatus } from '../../../actions/adminListings';
+// import { getListingByStatus } from '../../../actions/adminListings';
 import clsx from 'clsx';
-import { Box, Typography, Grid, Menu, MenuItem } from '@material-ui/core';
+import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
