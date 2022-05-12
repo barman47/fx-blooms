@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { batch, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import clsx from 'clsx';
 
-import { SET_CUSTOMER, CLEAR_CUSTOMER_STATUS_MSG, SET_ID_CHECK_DATA, SET_PROFILE_CHECK_DATA } from '../../../actions/types';
+import { CLEAR_CUSTOMER_STATUS_MSG, } from '../../../actions/types';
 // import { USER_DETAILS } from '../../../utils/constants';
 
 import Spinner from '../../../components/common/Spinner';
@@ -61,25 +61,23 @@ const Customer = () => {
 
     const successModal = useRef();
 
-    useEffect(() => {
-        return batch(() => {
-            dispatch({ 
-                type: SET_CUSTOMER,
-                payload: {}
-            })
-            dispatch({ 
-                type: SET_ID_CHECK_DATA,
-                payload: null
-            })
-            dispatch({ 
-                type: SET_PROFILE_CHECK_DATA,
-                payload: null
-            })
-        });
-        // eslint-disable-next-line
-    }, []);
-
-    console.log('hello', customer)
+    // useEffect(() => {
+    //     return batch(() => {
+    //         dispatch({ 
+    //             type: SET_CUSTOMER,
+    //             payload: {}
+    //         })
+    //         dispatch({ 
+    //             type: SET_ID_CHECK_DATA,
+    //             payload: null
+    //         })
+    //         dispatch({ 
+    //             type: SET_PROFILE_CHECK_DATA,
+    //             payload: null
+    //         })
+    //     });
+    //     // eslint-disable-next-line
+    // }, []);
 
     // useEffect(() => {
     //     if (errorsState?.msg) {
