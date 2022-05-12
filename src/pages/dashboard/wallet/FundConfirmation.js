@@ -97,6 +97,7 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
                         <Typography variant="body2" component="p">Method</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.fundingMethod}</Typography>
                     </Box>
+                    <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Customer</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.customer}</Typography>
