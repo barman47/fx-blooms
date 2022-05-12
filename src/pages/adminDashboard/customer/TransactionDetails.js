@@ -1,5 +1,5 @@
-import { useEffect } from 'react'; 
-import { useDispatch, useSelector } from 'react-redux';
+// import { useEffect } from 'react'; 
+// import { useDispatch, useSelector } from 'react-redux';
 import { 
   Typography, 
   Box, 
@@ -8,11 +8,11 @@ import {
   // InputLabel, 
   // FormControl,
   Paper,
-  Divider,
+  // Divider,
 } from '@material-ui/core'
 import { COLORS } from '../../../utils/constants';
 import { makeStyles } from '@material-ui/core/styles';
-import { getCustomer } from '../../../actions/customer';
+// import { getCustomer } from '../../../actions/customer';
 // import { getAllListings } from '../../../actions/adminListings'
 // import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
 import Shape from '../../../assets/img/Shape.svg'
@@ -175,7 +175,7 @@ const useStyles = makeStyles(theme =>({
     borderRadius: '10px',
     width: '100%',
     height: '100%',
-    clipPath: 'polygon(67% 0, 83% 0, 100% 0, 100% 79%, 100% 100%, 85% 100%, 79% 62%, 50% 31%, 47% 0)',
+    // clipPath: 'polygon(67% 0, 83% 0, 100% 0, 100% 79%, 100% 100%, 85% 100%, 79% 62%, 50% 31%, 47% 0)',
   },
 
   cardRightContent2: {
@@ -183,7 +183,7 @@ const useStyles = makeStyles(theme =>({
     borderRadius: '10px',
     width: '100%',
     height: '100%',
-    clipPath: 'polygon(28% 0, 45% 53%, 72% 100%, 0% 100%, 0 57%, 0% 0%)',
+    // clipPath: 'polygon(28% 0, 45% 53%, 72% 100%, 0% 100%, 0 57%, 0% 0%)',
   },
 
   cardLeftContent: {
@@ -227,8 +227,8 @@ const useStyles = makeStyles(theme =>({
 const TransactionDetails = () => {
   const classes = useStyles()
 
-  const dispatch = useDispatch()
-  const { customer } = useSelector(state => state.customers);
+  // const dispatch = useDispatch()
+  // const { customer } = useSelector(state => state.customers);
 
   // useEffect(() => {
   //   dispatch(getAllListings())
