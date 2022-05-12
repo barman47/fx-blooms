@@ -24,11 +24,12 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0, 1, 1, 1),
+            width: '90%',
         },
     },
 
     content: {
-        border: '1px solid red',
+        // border: '1px solid red',
         width: '100%',
         // justifyContent: 'center',
     },
