@@ -1,4 +1,4 @@
-import { SET_CUSTOMER_COUNT, SET_LISTING_COUNT, SET_STATS, SET_TRANSACTION_VOLUME, TOGGLE_STATS_CHANGE_STATUS } from '../actions/types';
+import { SET_CUSTOMER_COUNT, SET_ACTIVE_CUSTOMER_COUNT, SET_LISTING_COUNT, SET_STATS, SET_TRANSACTION_VOLUME, TOGGLE_STATS_CHANGE_STATUS } from '../actions/types';
 
 const initialState = {
     changed: false
@@ -30,6 +30,13 @@ const statsREducer = (state = initialState, action) => {
             return {
                 ...state,
                 transactionVolume: action.payload,
+                changed: true
+            };
+
+        case SET_ACTIVE_CUSTOMER_COUNT:
+            return {
+                ...state,
+                activeUserCount: action.payload,
                 changed: true
             };
 

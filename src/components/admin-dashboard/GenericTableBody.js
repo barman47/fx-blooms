@@ -8,6 +8,7 @@ import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
 import formatId from '../../utils/formatId';
 import CircularProgressBar from './CircularProgressBar'
+import clsx from 'clsx';
 
 
 const useStyles = makeStyles(theme =>({
@@ -51,7 +52,7 @@ const useStyles = makeStyles(theme =>({
 
   verified: {
     backgroundColor: '#DDF2E5',
-    color: '#48BB78',
+    color: '#1E6262',
   },
 
   pending: {
@@ -59,9 +60,14 @@ const useStyles = makeStyles(theme =>({
     color: '#FBBC05',
   },
 
-  suspended: {
+  rejected: {
     backgroundColor: '#FFCECE',
     color: '#FF0000',
+  },
+
+  suspended: {
+    backgroundColor: '#f5f7be',
+    color: '#d1c70c',
   },
 
   viewBtn: {
@@ -83,7 +89,6 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   const handleButtonClick = (customer, e) => {    
     if (!viewMore) {
-      console.log('egg')
       e.preventDefault();
       e.stopPropagation();
       
@@ -91,25 +96,29 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
         type: SET_CUSTOMER,
         payload: customer
       });
-
       handleClick(e);
     }
   };
 
   const handleStatus = useCallback((status) => {
+    // console.log('status', status)
     switch (status) {
       case CONFIRMED:
         return classes.verified
       case PENDING:
         return classes.pending
+      case "OPEN":
+        return classes.verified
       case REJECTED:
-        return classes.suspended
+        return classes.rejected
+      case "REMOVED":
+        return classes.rejected
       case SUSPENDED:
         return classes.suspended
       default:
         return
     }
-  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified])
+  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified, classes.rejected])
 
   const handleDisplayStatus = useCallback((status) => {
     switch (status) {
@@ -136,7 +145,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     if (typeof value === 'string') {
       return value.substring(0, 25)
     }
-    return
+    return value
   }
 
   // const handleTimeStamp = useCallback((value) => {
@@ -145,7 +154,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
 
   return (
     <>
-      { loading ? <CircularProgressBar topMargin="50px" /> :
+      { loading ? <CircularProgressBar newWidth="40px" newHeight="40px" topMargin="50px" /> :
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: handleGridColumns, padding: '1px 0px' }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
@@ -158,12 +167,12 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     <TextClamp text={customer[columnList[2]] ? customer[columnList[2]] : ''} lines={1} />
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={handleDisplayRow(customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? '')} lines={1} />
+                    {handleDisplayRow(customer[columnList[3]].amount ? customer[columnList[3]].amount : customer[columnList[3]] ?? '')}
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')} lines={1} />
+                    {handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')}
                 </Typography>
-                <Typography component="span" className={[classes.tableCell, classes.status, handleStatus(customer[columnList[5]])]} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatus(customer[columnList[5]]))} variant="subtitle1">
                 { handleDisplayStatus(customer[columnList[5]]) }
                 </Typography>
                 {

@@ -8,33 +8,32 @@ const useStyles = makeStyles(theme =>({
   
   btnGroup: {
     display: 'grid',
-    gridTemplateColumns: '2fr 1fr',
+    gap: '1.1vw',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
 
   btnLeft: {
     boxSizing: 'border-box',
-    padding: theme.spacing(1),
+    padding: '.1vw .1vw .1vw .2vw',
     textAlign: 'center',
-    width: '206px',
     display: 'flex',
     justifyContent: 'space-between',
     backgroundColor: 'white',
     border: '1px solid #E3E3E3',
-    fontSize: theme.spacing(1.7),
-    borderRadius: theme.spacing(.7)
+    fontSize: '.7vw',
+    borderRadius: theme.spacing(.7),
+    alignItems: 'center',
   }
 }))
 
-const GenericGridAuth = ({ statusName, bgColor, textColor, twoFactorName, mb, hasSetup2FASetup  }) => {
+const GenericGridAuth = ({ statusName, bgColor, textColor, twoFactorName, mb, btnWidth, gridColumns, conditionalStyles  }) => {
   const classes = useStyles()
 
   return (
-    <Box component="div" sx={{ marginBottom: mb }} className={classes.btnGroup}>
-      <Typography className={classes.btnLeft} component="div">{ twoFactorName } &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Typography>
-      <Typography className={classes.btn} component="div">
-        <Status wdth="100px"  statusName={statusName} bgColor={bgColor} textColor={textColor} />
-      </Typography>
+    <Box component="div" sx={{ marginBottom: mb, gridTemplateColumns: gridColumns ?? '2fr 1fr', }} className={classes.btnGroup}>
+      <Typography style={{ width: btnWidth ?? '10.8vw'}} className={classes.btnLeft} component="div">{ twoFactorName } &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Typography>
+      <Status extraStyles={conditionalStyles} wdth="fit-content" fontSz=".9vw" statusName={statusName} bgColor={bgColor} textColor={textColor} />
     </Box>
   )
 }

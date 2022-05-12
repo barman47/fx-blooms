@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
-import * as FileSaver from 'file-saver';
-import * as XLSX from 'xlsx';
 import clsx from 'clsx';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
@@ -49,6 +47,7 @@ import isEmpty from '../../../utils/isEmpty';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
+import { exportRecords } from '../../../utils/exportRecords'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -103,6 +102,10 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: '#AEC7C0',
             padding: '0px 5px',
             textAlign: 'center',
+            lineHeight: '1 !important',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
             borderRadius: theme.spacing(1)
         },
 
@@ -111,7 +114,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     active: {
-        borderBottom: '2px solid #1E6262'
+        borderBottom: '2px solid #1E6262',
     },
 
     table: {
@@ -162,9 +165,15 @@ const useStyles = makeStyles((theme) => ({
     },
 
     selected: {
-        color: 'red',
+        borderBottom: '2px solid #1E6262',
         fontWeight: 600,
-        fontSize: '2vw'
+        fontSize: '1.4vw'
+    },
+
+    pageList: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-end'
     }
 }));
 
@@ -203,7 +212,7 @@ const columns = [
     }
 ];
 
-const gridColumns = '0.15fr 1fr 1fr 1.2fr 1.2fr .8fr 1fr 0.3fr';
+const gridColumns = 'minmax(0, 0.15fr) repeat(2, minmax(0, 1fr)) repeat(2, minmax(0, 1.2fr)) .8fr 1fr 0.3fr';
 const pages = [20, 50, 75, 100]
 
 const Customers = (props) => {
@@ -227,7 +236,7 @@ const Customers = (props) => {
 
     const { ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
     
-    const [page, setPage] = useState(0);
+    // const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     const [customerCount, setCustomerCount] = useState(0);
     const [error, setError] = useState('');
@@ -235,16 +244,15 @@ const Customers = (props) => {
     const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState(ALL_CUSTOMERS);
     const [anchorEl, setAnchorEl] = useState(null);
-    const [pageNumber, setPageNumber] = useState(0)
     const [pageNumberList, setPageNumberList] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
+    const [customerStatus, setStatus] = useState(customer.customerStatus)
     // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
 
 
-    const [ lastPage ] = useState(pageNumberList?.length - 1)
+    const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
 
     const handleClick = (event) => {
-        console.log('event', event.currentTarget)
         setAnchorEl(event.currentTarget);
     };
 
@@ -268,13 +276,14 @@ const Customers = (props) => {
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = []
-        if (pageNumber >= 1) {
-            for (let i=1; i<=pageNumber; i++) {
+        setLastPage(customerCount)
+        if (customerCount >= 1) {
+            for (let i=1; i<=customerCount; i++) {
                 pageNumArr.push(i)
             }
         }
         setPageNumberList(pageNumArr)
-    }, [pageNumber])
+    }, [customerCount])
 
 
     const onNextPage = () => {
@@ -285,48 +294,7 @@ const Customers = (props) => {
         setCurrentPage(currentPage - 1)
     }
 
-    useEffect(() => {
-        console.log('test', lastPage)
-        // if (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) return null
-    }, [currentPage, lastPage])
-
-    // NEXT PAGE BUTTON
-    // const nextPage = useCallback(() => {
-    //     switch (filter) {
-    //         case CONFIRMED:
-    //             setCustomerCount(confirmed.totalItemCount || 0);
-    //             break;
-
-    //         case PENDING:
-    //             setCustomerCount(pending.totalItemCount || 0);
-    //             break;
-
-    //         case REJECTED:
-    //             setCustomerCount(rejected.totalItemCount || 0);
-    //             break;
-
-    //         case SUSPENDED:
-    //             setCustomerCount(suspended.totalItemCount || 0);
-    //             break;
-
-    //         case NO_PROFILE:
-    //             setCustomerCount(noProfile.totalItemCount || 0);
-    //             break;
-            
-    //         case ALL_CUSTOMERS:
-    //             setPage(page + 1)
-    //             getCustomers({
-    //                 pageSize: pages[0] += pages[0] + 5,
-    //                 pageNumber: page
-    //             });
-    //             break;
-
-    //         default:
-    //             setCustomerCount(0);
-    //             break;
-    //     }
-    // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.totalItemCount, filter, getCustomers, noProfile.totalItemCount, page, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount])
-
+    
     useEffect(() => {
         handleSetTitle('Customers');
         if (isEmpty(noProfile)) {
@@ -341,17 +309,21 @@ const Customers = (props) => {
     // Reset page number when filter changes
     useEffect(() => {
         if (filter) {
-            setPage(0);
+            setCurrentPage(1);
         }
-    }, [filter]);
+
+        if (!customerStatus) {
+            setStatus(customer.customerStatus);
+        }
+    }, [filter, customer.customerStatus, customerStatus]);
 
     // Set page number for search when page number changes
     useEffect(() => {
         dispatch({
             type: SET_PAGE_NUMBER,
-            payload: page
+            payload: currentPage
         });
-    }, [dispatch, page]);
+    }, [dispatch, currentPage]);
 
     // Set page size for search when page size changes
     useEffect(() => {
@@ -391,34 +363,34 @@ const Customers = (props) => {
     const getCount = useCallback(() => {
         switch (filter) {
             case CONFIRMED:
-                setCustomerCount(confirmed.totalItemCount || 0);
+                setCustomerCount(confirmed.totalPageCount || 0);
                 break;
 
             case PENDING:
-                setCustomerCount(pending.totalItemCount || 0);
+                setCustomerCount(pending.totalPageCount || 0);
                 break;
 
             case REJECTED:
-                setCustomerCount(rejected.totalItemCount || 0);
+                setCustomerCount(rejected.totalPageCount || 0);
                 break;
 
             case SUSPENDED:
-                setCustomerCount(suspended.totalItemCount || 0);
+                setCustomerCount(suspended.totalPageCount || 0);
                 break;
 
             case NO_PROFILE:
-                setCustomerCount(noProfile.totalItemCount || 0);
+                setCustomerCount(noProfile.totalPageCount || 0);
                 break;
             
             case ALL_CUSTOMERS:
-                setCustomerCount(customers.totalItemCount || 0);
+                setCustomerCount(customers.totalPageCount || 0);
                 break;
 
             default:
                 setCustomerCount(0);
                 break;
         }
-    }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED, NO_PROFILE, customers.totalItemCount, confirmed.totalItemCount, pending.totalItemCount, rejected.totalItemCount, suspended.totalItemCount, noProfile.totalItemCount]);
+    }, [filter, ALL_CUSTOMERS, CONFIRMED, PENDING, REJECTED, SUSPENDED, NO_PROFILE, customers.totalPageCount, confirmed.totalPageCount, pending.totalPageCount, rejected.totalPageCount, suspended.totalPageCount, noProfile.totalPageCount]);
 
     // const getMore = useCallback(() => {
     //     setLoading(true);
@@ -485,57 +457,56 @@ const Customers = (props) => {
             case CONFIRMED:
                 getVerifiedCustomers({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
                 break;
 
             case PENDING:
                 getNewCustomers({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
                 break;
 
             case REJECTED:
                 getRejectedCustomers({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
                 break;
 
             case SUSPENDED:
                 getSuspendedCustomers({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
                 break;
 
             case NO_PROFILE:
                 getCustomersWithoutProfile({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
                 break;
             
             case ALL_CUSTOMERS:
                 getCustomers({
                     pageSize: rowsPerPage,
-                    pageNumber: page
+                    pageNumber: currentPage
                 });
-                setPageNumber(Math.ceil(customerCount/20))
-                handlePageNUmberList()
                 break;
             default:
                 break;
         }
-    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, page, handlePageNUmberList, customerCount]);
+        handlePageNUmberList()
+    }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, currentPage, handlePageNUmberList]);
 
     // Get customers when page number changes
     useEffect(() => {
-        if (page > 0) {
+        if (currentPage > 0) {
             fetchCustomers();
         }
-    }, [fetchCustomers, page]);
+    }, [fetchCustomers, currentPage]);
 
     useEffect(() => {
         getCount();
@@ -549,16 +520,6 @@ const Customers = (props) => {
     }, [fetchCustomers, rowsPerPage]);
 
 
-    // const handleChangePage = (event, newPage) => {
-    //     setPage(newPage);
-    // };
-
-    // const handleChangeRowsPerPage = (event) => {
-    //     setRowsPerPage(+event.target.value);
-    //     setPage(1);
-    // };
-
-
     const handleSetFilter = (filter) => {
         setFilter(filter);
         setRowsPerPage(pages[0]);
@@ -566,68 +527,26 @@ const Customers = (props) => {
             type: SET_CATEGORY,
             payload: filter
         });
-        switch (filter) {
-            case CONFIRMED:
-                getVerifiedCustomers({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case PENDING:
-                getNewCustomers({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case REJECTED:
-                getRejectedCustomers({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case ALL_CUSTOMERS:
-                getCustomers({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-
-                break;
-
-            case SUSPENDED:
-                getSuspendedCustomers({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            case NO_PROFILE:
-                getCustomersWithoutProfile({
-                    pageNumber: 1,
-                    pageSize: rowsPerPage
-                });
-                break;
-
-            default:
-                break;
-        }  
     };
 
     const downloadRecords = () => {
-        setError('');
-        const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
-        const fileExtension = '.xlsx';
-        let data = [];
-
+        let data = []        
+        let exportErrors = {}
         switch (filter) {
             case CONFIRMED:
                 data = [...confirmed.items];
                 break;
 
+            case SUSPENDED:
+                data = [...suspended.items];
+                break;
+
             case PENDING:
                 data = [...pending.items];
+                break;
+
+            case NO_PROFILE:
+                data = [...noProfile.items];
                 break;
 
             case REJECTED:
@@ -642,40 +561,13 @@ const Customers = (props) => {
                 break;
         }
 
-        if (data.length === 0) {
-            return setError('Cannot an empty list');
-        }
+        const { errors } = exportRecords(data, admin, filter)
+        exportErrors = errors
 
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wsCols = [
-            {wpx: 40},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250},
-            {wpx: 250}
-        ];
-        ws['!cols'] = wsCols;
-        // ws['!protect'] = {
-        //     selectLockedCells: false
-        // };
-        // ws['A1'].v = 'This is a test header';
-        // const customProps = {
-        //     Exported: new Date().toISOString(),
-        //     Category: filter,
-        //     Admin: `${admin.firstName} ${admin.lastName}`
-        // };
-        const wb = { Sheets: { 'data': ws }, SheetNames: ['data'] }; 
-    
-        const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array', Props: {
-            Owner: 'FXBLOOMS.com',
-            Date: new Date().toISOString(),
-            Category: filter,
-            Admin: `${admin.firstName} ${admin.lastName}`
-        }});
-    
-        const usersData = new Blob([excelBuffer], { type: fileType });
-        FileSaver.saveAs(usersData, `FXBLOOMS Customers - ${new Date().toISOString()}${fileExtension}`);
+        if (!isEmpty(exportErrors)) {
+            // setErrors()
+            return
+        }
     };
 
     const viewDetails = () => {
@@ -695,7 +587,7 @@ const Customers = (props) => {
 
     const suspend = (e) => {
         handleClose();
-        if (customer.customerStatus !== SUSPENDED) {
+        if (customerStatus !== SUSPENDED && customerStatus === CONFIRMED) {
             setCustomerStatus({
                 customerID: customer.id,
                 newStatus: SUSPENDED,
@@ -742,7 +634,7 @@ const Customers = (props) => {
                     </Grid>
                     <Grid item>
                         <Box component="div">
-                            <GenericButton buttonName="Export" onClick={downloadRecords}>
+                            <GenericButton buttonName="Export" clickAction={downloadRecords}>
                                 <ArrowTopRight />
                             </GenericButton>
                         </Box>
@@ -896,7 +788,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customerStatus === REJECTED || customerStatus === "NO_PROFILE"}>{ customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>
@@ -906,7 +798,7 @@ const Customers = (props) => {
                     loading ? '' :
                     <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
                         <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                            <Typography component="span">{'20'} results</Typography>
+                            {/* <Typography component="span">{'20'} results</Typography> */}
                         </Box>
 
                         <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -917,7 +809,7 @@ const Customers = (props) => {
                             <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
                                 {
                                     pageNumberList && pageNumberList.map((pageNUmber, i) => (
-                                        <Typography className={clsx(pageNUmber === currentPage && classes.active)} onClick={() => setCurrentPage(pageNumber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
+                                        <Typography className={clsx(classes.pageList, pageNUmber === currentPage && classes.selected)} onClick={() => setCurrentPage(pageNUmber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
                                     ))
                                 }
                             </Box>
