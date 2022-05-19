@@ -4,10 +4,12 @@ import {
     ACTIVATE_USD_WALLET,
     ACTIVATE_GPB_WALLET,
     SET_WALLET,
-    SET_WALLETS
+    SET_WALLETS,
+    SET_FUNDING_DETAILS
 } from '../actions/types';
 
 const initialState = {
+    fundingDetails: {},
     wallet: {},
     wallets: [],
     eurActive: true,
@@ -82,6 +84,12 @@ const walletsReducer = (state = initialState, action) => {
             }
             
             return state;
+
+        case SET_FUNDING_DETAILS:
+            return {
+                ...state,
+                fundingDetails: action.payload
+            };
 
         default:
             return state;

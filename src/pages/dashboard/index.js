@@ -30,6 +30,7 @@ import clsx from 'clsx';
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
+import AlertNotification from './notifications/AlertNotification';
 
 import {
     Badge,
@@ -53,9 +54,9 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    // Security,
+    Security,
     TwoFactorAuthentication,
-    // Wallet
+    Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -64,13 +65,14 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    // PIN, 
+    PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE,
-    // WALLETS
+    WALLETS
 } from '../../routes';
 import { 
+    ADD_ALERT_NOTIFICATION,
     ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
@@ -107,6 +109,24 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('md')]: {
             display: 'block'
         }
+    },
+
+    alertContainerClose: {
+        marginLeft: theme.spacing(9) + 1,
+        width: `calc(100% - ${theme.spacing(9) + 1}px)`,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        })
+    },
+
+    alertContainerOpen: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        })
     },
     
     appBarContent: {
@@ -366,8 +386,8 @@ const Dashboard = (props) => {
 
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
-    const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName, idVerificationLink, residencePermitUrl } = useSelector(state => state.customer);
+    const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
@@ -389,7 +409,7 @@ const Dashboard = (props) => {
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        // { url: WALLETS, text:'Wallets', icon: <Wallet /> },
+        { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
@@ -398,7 +418,7 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        // { url : PIN, text: 'Set PIN', icon: <Security /> },
+        { url : PIN, text: 'PIN Management', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
@@ -447,6 +467,7 @@ const Dashboard = (props) => {
         }
 
         if (!_.isEmpty(stats)) {
+            setAlertNotifications();
             const { residencePermitStatus, idStatus } = stats;
             if (residencePermitStatus === NOT_SUBMITTED) {
                 dispatch({
@@ -514,6 +535,70 @@ const Dashboard = (props) => {
 
     const toggleDrawer = () => {
         setOpen(!open);
+    };
+
+    const verifyEuId = () => {
+        window.open(residencePermitUrl);
+    };
+
+    const verifyOtherId = () => {
+        window.open(idVerificationLink);
+    };
+
+    const setAlertNotifications = () => {
+        console.log('Setting alert notification');
+        const { APPROVED } = ID_STATUS;
+        if (stats.residencePermitStatus !== APPROVED) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Verify your EU Government Issued ID',
+                    buttonText: 'Verify ID',
+                    buttonAction: verifyEuId
+                }
+            });
+        }
+        
+        if ((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Verify Other Government Issued ID',
+                    buttonText: 'Verify ID',
+                    buttonAction: verifyOtherId
+                }
+            });
+        }
+            
+
+        if (!hasSetup2FA) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Add extra layer of Security',
+                    buttonText: 'Setup 2FA',
+                    buttonAction: () => navigate(TWO_FACTOR)
+                }
+            });
+        }
+    
+        if (!isPhoneNumberVerified) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Required to receive SMS notifications. Click Verify Phone to proceed',
+                    buttonText: 'Verify Phone',
+                    buttonAction: () => navigate(PROFILE)
+                }
+            });
+        }
+        
+        {/* <Notification 
+            title="Set PIN"
+            message="Required for wallet withdrawals.. Click Set PIN to proceed."
+            buttonText="Set PIN"
+            buttonAction={setPin}
+        /> */}
     };
 
     // Logout user if he tries to beat 2FA
@@ -779,15 +864,24 @@ const Dashboard = (props) => {
             }
             <Toaster />
             {/* <HideOnScroll direction="down" {...props}> */}
-                <AppBar position="fixed" elevation={1} className={classes.appBar}>
-                    <Toolbar className={classes.appBarContent}>
-                        <IconButton onClick={toggleDrawer}>
-                            <Menu />
-                        </IconButton>
-                        <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
-                        <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
-                    </Toolbar>
-                </AppBar>
+            {alertNotifications.length > 0 && 
+                <Box className={clsx(({ [classes.alertContainerOpen]: open, [classes.alertContainerClose]: !open}))}>
+                    <AlertNotification 
+                        message={alertNotifications[0].message}
+                        buttonText={alertNotifications[0].buttonText}
+                        buttoonAction={alertNotifications[0].buttonAction}
+                    />
+                </Box>
+            }
+            <AppBar position="fixed" elevation={1} className={classes.appBar}>
+                <Toolbar className={classes.appBarContent}>
+                    <IconButton onClick={toggleDrawer}>
+                        <Menu />
+                    </IconButton>
+                    <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
+                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
+                </Toolbar>
+            </AppBar>
             {/* </HideOnScroll> */}
             <Box component="section" className={classes.root}>
                 <Drawer 

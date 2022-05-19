@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
 import { fundWallet } from '../../../actions/wallets';
-import { GET_ERRORS } from '../../../actions/types';
+import { GET_ERRORS, SET_FUNDING_DETAILS } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
@@ -30,6 +30,7 @@ import getAccountId from '../../../utils/getAccountId';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
+import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
 import yapily from '../../../assets/img/yapily.png';
@@ -160,6 +161,11 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
         if (institutions.length === 0) {
             getInstitutions()
         }
+
+        dispatch({
+            type: SET_FUNDING_DETAILS,
+            payload: {}
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -205,9 +211,8 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid funding data!' });
         }
-        console.log(data);
         setLoading(true);
-        fundWallet(data);
+        fundWallet(data, navigate);
     };
 
     return (
@@ -221,6 +226,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                     type="error"
                 />
             }
+            {loading && <Spinner />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
