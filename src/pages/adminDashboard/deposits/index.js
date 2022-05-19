@@ -231,7 +231,7 @@ const Deposits = () => {
           <Typography variant="h6" >Deposits</Typography>
           <Box component="div" className={classes.depositCard}>
             <Typography variant="h6" className={classes.depositCardTitle} >Total Deposit</Typography>
-            <Typography compoennt="span" variant="span" className={classes.selectBtn}>
+            <Typography component="span" variant="body2" className={classes.selectBtn}>
                 <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={depositFilter} setOnChange={setDepositFilter} loading={loadingDeposit}/>
             </Typography>
             

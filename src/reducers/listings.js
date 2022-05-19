@@ -4,7 +4,11 @@ import {
     ADDED_LISTING, 
     DELETED_LISTING,
     SET_BID,
-    SET_LISTINGS, 
+    SET_LISTINGS,
+    SET_DELETED_LISTINGS,
+    SET_FINALISED_LISTINGS,
+    SET_INPROGRESS_LISTINGS,
+    SET_ACTIVE_LISTINGS, 
     SET_MORE_LISTINGS,
     GET_LISTING,
     SET_LISTING,
@@ -31,6 +35,10 @@ const initialState = {
     updatedListing: false,
     listing: {},
     listings: [],
+    activeListings: [],
+    finalisedListings: [],
+    inProgressListings: [],
+    deletedListings: [],
     loading: false,
     msg: null,
     recommendedRate: null
@@ -138,6 +146,30 @@ const listingsReducer = (state = initialState, action) => {
                 listings,
                 ...rest
             };
+
+        case SET_ACTIVE_LISTINGS: 
+            return {
+                ...state,
+                activeListings: action.payload
+            };
+
+        case SET_INPROGRESS_LISTINGS: 
+            return {
+                ...state,
+                inProgressListings: action.payload
+            }
+
+        case SET_FINALISED_LISTINGS: 
+            return {
+                ...state,
+                finalisedListings: action.payload
+            }
+
+        case SET_DELETED_LISTINGS: 
+            return {
+                ...state,
+                deletedListings: action.payload
+            }
 
         case GET_LISTING:
             return {

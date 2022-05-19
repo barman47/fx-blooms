@@ -1,24 +1,23 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMemo } from 'react';
+import { useSelector } from 'react-redux';
 import { LISTING_COLUMNS } from '../../../utils/constants';
 // import { getAllListings } from '../../../actions/adminListings'
-import { getCustomers } from '../../../actions/customer'
+// import { getCustomers } from '../../../actions/customer'
 import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
-import { getNewCustomers } from '../../../actions/customer';
+// import { getNewCustomers } from '../../../actions/customer';
+import PropTypes from 'prop-types';
 
 
 
 const gridColumns = '.2fr 1fr 1fr .8fr .5fr .8fr .5fr 1fr .3fr';
 
-const AllTransactions = ({ handleClick, }) => {
-  const dispatch = useDispatch()
+const AllOpen = ({ handleClick, }) => {
+  // const dispatch = useDispatch()
 
 //   const pages = [10, 25, 100]
 
 //   const { listings: { listings } } = useSelector(state => state)
 const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
-
-console.log('hello', verifiedCustomers)
 
 //   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 //   const [page, setPage] = useState(0);
@@ -26,30 +25,36 @@ console.log('hello', verifiedCustomers)
 //   console.log('ITEMS', items)
 //   console.log('listings', listings)
 
-  useEffect(() => {
-    // dispatch(getAllListings())
-    dispatch(getNewCustomers())
-  }, [dispatch])
+  // useEffect(() => {
+  //   // dispatch(getAllListings())
+  //   dispatch(getNewCustomers())
+  // }, [dispatch])
 
 
-  useEffect(() => {
-    dispatch(getCustomers({
-        pageNumber: 1,
-        pageSize: 15
-    }))
+  // useEffect(() => {
+  //   dispatch(getCustomers({
+  //       pageNumber: 1,
+  //       pageSize: 15
+  //   }))
 
-    // console.log('listings', items)
-  }, [dispatch])
+  //   // console.log('listings', items)
+  // }, [dispatch])
     
 
 
-  return (
+  const OpenListings = useMemo(() => (
     <>
         <GenericTableBody gridColumns={gridColumns} addColumn={true} data={verifiedCustomers} handleClick={handleClick} columnList={LISTING_COLUMNS} />
     </>
-  )
+  ), [handleClick, verifiedCustomers])
+
+  return OpenListings
 }
 
-export default AllTransactions
+AllOpen.propTypes = {
+  handleClick: PropTypes.func.isRequired,
+}
+
+export default AllOpen
 
 

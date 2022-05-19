@@ -31,8 +31,8 @@ import {
     getCustomersWithoutProfile,
     setCustomerStatus
 } from '../../../actions/customer';
-import { getStats } from '../../../actions/admin';
-import { CLEAR_CUSTOMER_STATUS_MSG, SET_CATEGORY, SET_CUSTOMER, SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+import { getStats, exportAllRecords } from '../../../actions/admin';
+import { CLEAR_CUSTOMER_STATUS_MSG, SET_CATEGORY, SET_CUSTOMER } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { CUSTOMERS } from '../../../routes';
@@ -60,6 +60,29 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(12),
     },
 
+    exportBox: {
+        position: 'absolute',
+        top: 45,
+        right: -8,
+        borderRadius: 5,
+        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
+        width: 'max-content',
+
+        '& button': {
+            outline: 'none',
+            border: 'none',
+            fontSize: '.9vw',
+            backgroundColor: 'white',
+            padding: '10px 20px',
+            width: '100%',
+
+            '&:hover': {
+                backgroundColor: '#1E6262',
+                color: 'white'
+            }
+        }
+    },
+
     title: {
         fontWeight: 600,
         fontSize: theme.spacing(3)
@@ -77,7 +100,7 @@ const useStyles = makeStyles((theme) => ({
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
         borderBottom: '1px solid #E3E8EE',
-        width: '70%'
+        width: '90%'
     },
 
     filter: {
@@ -87,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         // padding: theme.spacing(1),
-        width: 'fit-content',
+        width: 'max-content',
         // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
@@ -248,6 +271,7 @@ const Customers = (props) => {
     const [ currentPage, setCurrentPage ] = useState(1)
     const [customerStatus, setStatus] = useState(customer.customerStatus)
     // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
+    const [openXport, closeXport] = useState(false);
 
 
     const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
@@ -318,25 +342,49 @@ const Customers = (props) => {
     }, [filter, customer.customerStatus, customerStatus]);
 
     // Set page number for search when page number changes
-    useEffect(() => {
-        dispatch({
-            type: SET_PAGE_NUMBER,
-            payload: currentPage
-        });
-    }, [dispatch, currentPage]);
+    // useEffect(() => {
+    //     dispatch({
+    //         type: SET_PAGE_NUMBER,
+    //         payload: currentPage
+    //     });
+    // }, [dispatch, currentPage]);
 
-    // Set page size for search when page size changes
-    useEffect(() => {
-        dispatch({
-            type: SET_PAGE_SIZE,
-            payload: rowsPerPage
-        });
-    }, [dispatch, rowsPerPage]);
+    // // Set page size for search when page size changes
+    // useEffect(() => {
+    //     dispatch({
+    //         type: SET_PAGE_SIZE,
+    //         payload: rowsPerPage
+    //     });
+    // }, [dispatch, rowsPerPage]);
 
     useEffect(() => {
         getStats();
-        setLoading(false);
-    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items, getStats]);
+        
+        if (filter === CONFIRMED && confirmed.items?.length > 0) {
+            setLoading(false)
+            return
+        }
+
+        if (filter === ALL_CUSTOMERS && customers.items?.length > 0) {
+            setLoading(false)
+            return
+        }
+
+        if (filter === REJECTED && rejected.items?.length > 0) {
+            setLoading(false)
+            return
+        }
+
+        if (filter === SUSPENDED && suspended.items?.length > 0) {
+            setLoading(false)
+            return
+        }
+
+        if (filter === NO_PROFILE && noProfile.items?.length > 0) {
+            setLoading(false)
+            return
+        }
+    }, [confirmed.items, customers.items, noProfile.items, pending.items, rejected.items, suspended.items, getStats, ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, SUSPENDED,REJECTED, filter]);
 
     useEffect(() => {
         if (msg && customer) {
@@ -451,7 +499,7 @@ const Customers = (props) => {
     //     }
     // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.currentPageNumber, confirmed.hasNext, customers.currentPageNumber, customers.hasNext, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, noProfile.currentPageNumber, pending.currentPageNumber, pending.hasNext, rejected.currentPageNumber, rejected.hasNext, rowsPerPage, suspended.currentPageNumber]);
     
-    const fetchCustomers = useCallback(() => {
+    useEffect(() => {
         setLoading(true);
         switch (filter) {
             case CONFIRMED:
@@ -502,22 +550,22 @@ const Customers = (props) => {
     }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, rowsPerPage, currentPage, handlePageNUmberList]);
 
     // Get customers when page number changes
-    useEffect(() => {
-        if (currentPage > 0) {
-            fetchCustomers();
-        }
-    }, [fetchCustomers, currentPage]);
+    // useEffect(() => {
+    //     if (currentPage > 0) {
+    //         fetchCustomers();
+    //     }
+    // }, [fetchCustomers, currentPage]);
 
     useEffect(() => {
         getCount();
     }, [filter, getCount]);
 
     // Get customers whenever rows per page changes
-    useEffect(() => {
-        if (rowsPerPage > 0) {
-            fetchCustomers();
-        }
-    }, [fetchCustomers, rowsPerPage]);
+    // useEffect(() => {
+    //     if (rowsPerPage > 0) {
+    //         fetchCustomers();
+    //     }
+    // }, [fetchCustomers, rowsPerPage]);
 
 
     const handleSetFilter = (filter) => {
@@ -531,7 +579,6 @@ const Customers = (props) => {
 
     const downloadRecords = () => {
         let data = []        
-        let exportErrors = {}
         switch (filter) {
             case CONFIRMED:
                 data = [...confirmed.items];
@@ -561,14 +608,19 @@ const Customers = (props) => {
                 break;
         }
 
-        const { errors } = exportRecords(data, admin, filter)
-        exportErrors = errors
-
-        if (!isEmpty(exportErrors)) {
-            // setErrors()
+        if (exportRecords(data, admin, filter)?.errors) {
             return
         }
     };
+
+    const downloadAll = async () => {
+        const data = await exportAllRecords()
+        console.log(data)
+
+        // if (exportRecords(data, admin)?.errors) {
+        //     return
+        // }
+    }
 
     const viewDetails = () => {
         handleClose();
@@ -633,9 +685,16 @@ const Customers = (props) => {
                         <Typography variant="body1" className={classes.title}>All Users</Typography>
                     </Grid>
                     <Grid item>
-                        <Box component="div">
-                            <GenericButton buttonName="Export" clickAction={downloadRecords}>
+                        <Box component="div" sx={{ display: 'flex', position: 'relative', flexDirection: 'row', gap: '10px'}}>
+                            <GenericButton buttonName="Export" clickAction={() => closeXport(!openXport)}>
                                 <ArrowTopRight />
+                                {
+                                    openXport ? 
+                                    <Box className={classes.exportBox} component="div">
+                                        <Typography onClick={downloadAll} component="button">Export All</Typography>
+                                        <Typography onClick={downloadRecords} component="button">Export Page</Typography>
+                                    </Box> : ''
+                                }
                             </GenericButton>
                         </Box>
                     </Grid>

@@ -233,7 +233,7 @@ const Withdrawals = () => {
           <Typography variant="h6" >Withdrawals</Typography>
           <Box component="div" className={classes.withdrawalCard}>
             <Typography variant="h6" className={classes.withdrawalCardTitle} >Total Withdrawals</Typography>
-            <Typography compoennt="span" variant="span" className={classes.selectBtn}>
+            <Typography component="span" variant="body2" className={classes.selectBtn}>
                 <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={withdrawalFilter} setOnChange={setDepositFilter} loading={loadingDeposit}/>
             </Typography>
             

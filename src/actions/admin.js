@@ -12,6 +12,7 @@ import {
     SET_CUSTOMERS,
     SET_TRANSACTION_VOLUME,
     SET_STATS,
+    SET_TRANSACTIONS,
     SET_ACTIVE_CUSTOMER_COUNT, 
     UPDATED_CUSTOMER 
 } from './types';
@@ -120,6 +121,34 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
         return dispatch({
             type: UPDATED_CUSTOMER,
             payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const exportAllRecords = async () => {
+    try {
+        await reIssueAdminToken();
+        console.log('hello')
+        const res = await axios.get(`${api}/DownloadAllUserData`);
+        console.log('hi',res)
+        console.log('q',res.data.data)
+        return res.data.data
+    } catch (err) {
+        return err
+    }
+}
+
+export const getTransactions = (query) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        console.log('res')
+        const res = await axios.get(`${api}/GetAllTransaction`, query);
+        console.log('res', res)
+        return dispatch({
+            type: SET_TRANSACTIONS,
+            payload: res.data.data            
         });
     } catch (err) {
         return handleError(err, dispatch);

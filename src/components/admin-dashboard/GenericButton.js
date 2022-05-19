@@ -11,17 +11,16 @@ const useStyles = makeStyles(theme => ({
       display: 'flex',
       gap: '10px',
       outline: 'none',
-      padding: '4px 10px',
-      boxShadow: '1px 1px 1px #dbdddd',
+      padding: '5px 10px',
+      width: 'max-content',
       // border: 'none',
-      border: '1px solid #ACAFB7',
       borderRadius: '5px',
       cursor: 'pointer',
 
       '& p': {
-        fontWeight: 500,
+        fontWeight: 400,
         textAlign: 'center',
-      }
+      },
     }
   },
 
@@ -31,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const GenericButton = ({  buttonName, children, isDisabled, clickAction, fontColor, bgColor, fontsize }) => {
+const GenericButton = ({ padding, buttonName, children, isDisabled, clickAction, fontColor, bgColor, fontsize, bxShadw, bdaColor }) => {
 
   const classes = useStyles()
 
@@ -41,7 +40,17 @@ const GenericButton = ({  buttonName, children, isDisabled, clickAction, fontCol
 
   return (
     <Box component="span" className={classes.btn}>
-      <button onClick={clickAction} type="button"  style={{ color: fontColor ?? '#3C4257', backgroundColor: bgColor ?? 'white' }} disabled={isDisabled} className={handleDisabled}>
+      <button
+      onClick={clickAction} 
+      type="button" 
+      style={{  border: `1px solid ${bdaColor ? bdaColor : '#ACAFB7'}`, 
+      color: fontColor ?? '#3C4257', 
+      backgroundColor: bgColor ?? 'white', 
+      boxShadow: !bxShadw ?'1px 1px 1px #dbdddd' : 'none',
+      padding: padding ? padding : '' 
+    }} 
+      disabled={isDisabled} className={handleDisabled}
+      >
         { children ? <Typography>{ children }</Typography> : ''}
         <Typography style={{ fontSize: fontsize ?? '17.6px'}} >{ buttonName }</Typography>     
       </button>

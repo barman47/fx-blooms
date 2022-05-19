@@ -34,6 +34,7 @@ import {
 	USER_AGREEMENT,
 	ADD_USERNAME,
 	LISTINGS,
+	TRANSACTION_LISTS,
 	EDIT_LISTING,
 	TRANSACTION_STATUS,
 	WITHDRAWALS,
@@ -107,6 +108,7 @@ const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
 const AdminHome = lazy(() => import('./pages/adminDashboard/home/Home'));
 const Customers = lazy(() => import('./pages/adminDashboard/customers/'));
 const Listings = lazy(() => import('./pages/adminDashboard/listings/'));
+const TransactionLists = lazy(() => import('./pages/adminDashboard/transactions/'));
 const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
 const Withdrawals = lazy(() => import('./pages/adminDashboard/withdrawals/'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
@@ -221,6 +223,7 @@ const App = () => {
 								<Route path={`${ADMIN_HOME}`} element={<AdminHome handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}`} element={<Customers handleSetTitle={handleSetTitle} />} />
 								<Route path={`${LISTINGS}`} element={<Listings handleSetTitle={handleSetTitle} />} />
+								<Route path={`${TRANSACTION_LISTS}`} element={<TransactionLists handleSetTitle={handleSetTitle} />} />
 								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WITHDRAWALS}`} element={<Withdrawals handleSetTitle={handleSetTitle} />} />

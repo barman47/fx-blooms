@@ -1,23 +1,22 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCustomer } from '../../../actions/customer';
-// import { getListingByStatus } from '../../../actions/adminListings';
+// import { getCustomer } from '../../../actions/customer';
+import { getTransactions } from '../../../actions/admin';
 import clsx from 'clsx';
-import { Box, Typography, Grid, Checkbox, FormControlLabel, Slider } from '@material-ui/core';
+import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
-import AllListings from './AllListings'
-import AllOpen from './AllOpen';
-import AllNegotiations from './AllNegotiations';
-import AllRemoved from './AllRemoved';
-import AllCompleted from './AllCompleted';
+// import AllListings from './AllListings'
+// import AllOpen from './AllOpen';
+// import AllNegotiations from './AllNegotiations';
+// import AllRemoved from './AllRemoved';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter, CloseCircleOutline } from 'mdi-material-ui';
 // import { getStats } from '../../../actions/admin';
-import { getAllListings, getActiveListings, getListingsInProgress, getFinalisedListings, getDeletedListings } from '../../../actions/adminListings';
-// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+import { getAllListings } from '../../../actions/adminListings';
+import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 import { exportRecords } from '../../../utils/exportRecords'
 import isEmpty from '../../../utils/isEmpty';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard';
@@ -38,111 +37,6 @@ const useStyles = makeStyles((theme) => ({
         position: 'relative',
     },
 
-    exportBox: {
-        position: 'absolute',
-        top: 45,
-        right: -8,
-        borderRadius: 5,
-        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
-
-        '& button': {
-            outline: 'none',
-            border: 'none',
-            fontSize: '.9vw',
-            backgroundColor: 'white',
-            padding: '10px 20px',
-            width: '100%',
-
-            '&:hover': {
-                backgroundColor: '#1E6262',
-                color: 'white'
-            }
-        }
-    },
-
-    filterBoxContainer: {
-        position: 'absolute',
-        top: 50,
-        right: 150,
-        zIndex: 1000,
-        width: '100%',
-        height: '100%',
-    },
-
-    filterBoxContent: {
-        width: 400,
-        // height: 200,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
-    },
-
-    filterBoxHeader: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 0px',
-        padding: '.7rem 1.5rem',
-        borderBottom: '1px solid #CBCBCB',
-        alignItems: 'center',
-
-        '& span': {
-            fontSize: '1rem',
-            cursor: 'pointer'
-        }
-    },
-
-    filterBoxMain: {
-        // padding: '1rem 1.5rem',
-    },
-
-    filterContentDate: {
-        marginTop: '.6rem',
-        // marginBottom: '1.5rem',
-        padding: '1rem 1.5rem',
-
-        '& label': {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-
-            fontSize: '1rem',
-
-            '& input': {
-                height: 30,
-                borderRadius: 5,
-                outline: 'none',
-                border: '1px solid #C4C4C4',
-                padding: 5
-            }
-        }
-    },
-
-    filterTransactionType: {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        padding: '1rem 1.5rem',
-        gap: '.5rem',
-
-        // marginBottom: '1.5rem'
-    },
-
-    filterAmount: {
-        padding: '1rem 1.5rem',
-        borderBottom: '1px solid #C4C4C4'
-    },
-
-    amountRange: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)'
-    },
-
-    filterButton: {
-        display: 'flex',
-        gap: 15,
-        justifyContent: 'flex-end',
-        marginRight: 10,
-        padding: '1.5rem 1.5rem',
-    },
-
     title: {
         fontWeight: 600,
         fontSize: theme.spacing(3)
@@ -160,7 +54,7 @@ const useStyles = makeStyles((theme) => ({
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
         borderBottom: '1px solid #E3E8EE',
-        width: '90%'
+        width: '70%'
     },
 
     filter: {
@@ -170,7 +64,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         // padding: theme.spacing(1),
-        width: 'max-content',
+        width: 'fit-content',
         // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
@@ -437,11 +331,6 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function valuetext(value) {
-    console.log('valueText', value)
-    return `${value}°C`;
-  }
-
 const columns = [
     { id: 'id', label: ''},
     {
@@ -485,14 +374,14 @@ const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .5fr';
 
 const pages = [15, 25, 50, 100]
 
-const Listings = () => {
+const Transactions = () => {
     const classes = useStyles()
     const dispatch = useDispatch();
 
     const { admin } = useSelector(state => state);
     const { customer } = useSelector(state => state.customers);
 
-    const { ALL_LISTINGS, ALL_DELETED, ALL_NEGOTIATIONS, ALL_COMPLETED, ALL_OPEN } = LISTING_DETAILS;
+    const { ALL_LISTINGS, ALL_DELETED, ALL_NEGOTIATIONS, ALL_OPEN } = LISTING_DETAILS;
     const [tab, setTab] = useState(ALL_LISTINGS);
     const [loading, setLoading] = useState(true)
     const [pageNumberList, setPageNumberList] = useState([])
@@ -503,23 +392,14 @@ const Listings = () => {
 
     const [customerName, setCustomerName] = useState('')
 
-    const [viewMoreData, setViewMoreData] = useState({})
+    // const [viewMoreData, setViewMoreData] = useState({})
+    const [viewMoreData] = useState({})
     const [openViewMore, setOpenViewMore] = useState(false)
-    const [openFilterBx, setOpenFilterBx] = useState(false)
-    const [openXport, closeXport] = useState(false);
 
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
     const { totalListings } = useSelector(state => state.stats)
     const { totalPageCount, listings } = useSelector(state => state.listings)
-
-    const [value, setValue] = useState([1, 70]);
-
-    const handleChange = (event, newValue) => {
-        console.log('new', newValue)
-      setValue(newValue);
-    };
-  
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = []
@@ -546,19 +426,19 @@ const Listings = () => {
         }
     }, [tab]);
 
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_SIZE,
-    //         payload: rowsPerPage
-    //     });
-    // }, [dispatch, rowsPerPage]);
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_SIZE,
+            payload: rowsPerPage
+        });
+    }, [dispatch, rowsPerPage]);
     
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_NUMBER,
-    //         payload: currentPage
-    //     });
-    // }, [dispatch, currentPage]);
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_NUMBER,
+            payload: currentPage
+        });
+    }, [dispatch, currentPage]);
 
     useEffect(() => {
         if (listings.length > 0)  {
@@ -570,7 +450,7 @@ const Listings = () => {
         setLoading(true)
         switch (tab) {
             case ALL_LISTINGS:
-                dispatch(getAllListings({
+                dispatch(getTransactions({
                     pageSize: rowsPerPage,
                     pageNumber: currentPage
                 }))
@@ -578,34 +458,10 @@ const Listings = () => {
                 break;
 
             case ALL_OPEN:
-                dispatch(getActiveListings({
+                getAllListings({
                     pageSize: rowsPerPage,
                     pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_COMPLETED:
-                dispatch(getFinalisedListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_NEGOTIATIONS:
-                dispatch(getListingsInProgress({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_DELETED:
-                dispatch(getDeletedListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
+                })
                 setPageCount(totalPageCount || 0);
                 break;
 
@@ -613,7 +469,7 @@ const Listings = () => {
                 break;
         }
         handlePageNUmberList()
-    }, [ALL_LISTINGS, ALL_OPEN, ALL_COMPLETED, ALL_NEGOTIATIONS, ALL_DELETED, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount, ])
+    }, [ALL_LISTINGS, ALL_OPEN, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount])
 
     const downloadRecords = () => {
         let data = []        
@@ -630,18 +486,10 @@ const Listings = () => {
                 break;
         }
 
-        if (exportRecords(data, admin, tab)?.errors) {
+        if ( exportRecords(data, admin, tab)?.errors) {
             return
         }
     };
-
-    const downloadAll = () => {
-        const data = []
-
-        if (exportRecords(data, admin)?.errors) {
-            return
-        }
-    }
 
     // useEffect(() => {
     //     if (currentPage > 0) {
@@ -656,18 +504,17 @@ const Listings = () => {
     // }, [fetchData, rowsPerPage]);
 
     const handleSetTab = (tab) => {
-        console.log('hhh')
         setTab(tab);
         setRowsPerPage(pages[0]);
     }
 
-    const viewTableRow = (listing) => {
-        console.log('listing', listing)
-        dispatch(getCustomer(listing.customerId))
-        setViewMoreData(listing)
-        setOpenViewMore(true)
+    // const viewTableRow = (listing) => {
+    //     console.log('listing', listing)
+    //     dispatch(getCustomer(listing.customerId))
+    //     setViewMoreData(listing)
+    //     setOpenViewMore(true)
         
-    }
+    // }
 
     useEffect(() => {
         if (!isEmpty(customer)) {
@@ -718,81 +565,19 @@ const Listings = () => {
         <section className={classes.root}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
-                    {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
+                    {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
                     {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>All Open</Typography>}
                     {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>All Negotiations</Typography>}
                     {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>All Removed</Typography>}
-                    {tab === ALL_COMPLETED && <Typography variant="body1" className={classes.title}>All Completed</Typography>}
                 </Grid>
                 <Grid item>
-                    <Box component="div" sx={{ display: 'flex', position: 'relative', flexDirection: 'row', gap: '10px'}}>
-                        <GenericButton clickAction={() => setOpenFilterBx(!openFilterBx)} buttonName="Filter">
+                    <Box component="div" sx={{ display: 'flex', flexDirection: 'row', gap: '10px'}}>
+                        <GenericButton buttonName="Filter">
                             <Filter />
                         </GenericButton>
-                        <GenericButton clickAction={() => closeXport(!openXport)} buttonName="Export">
+                        <GenericButton clickAction={downloadRecords} buttonName="Export">
                             <ArrowTopRight />
-                            {
-                                openXport ? 
-                                <Box className={classes.exportBox} component="div">
-                                    <Typography onClick={downloadAll} component="button">Export All</Typography>
-                                    <Typography onClick={downloadRecords} component="button">Export Page</Typography>
-                                </Box> : ''
-                            }
                         </GenericButton>
-                        {
-                            openFilterBx ? 
-                            <Box component="div" className={classes.filterBoxContainer}>
-                            <Box component="div" className={classes.filterBoxContent}>
-                                <Box component="div" className={classes.filterBoxHeader}>
-                                    <Typography component="h6" variant="h6">Filter</Typography>
-                                    <Typography component="span" onClick={() => setOpenFilterBx(false)}>x</Typography>
-                                </Box>
-                                <Box component="div" className={classes.filterBoxMain}>
-                                    <Box component="div" className={classes.filterContentDate}>
-                                        <label>
-                                            Date
-                                            <input type="date" />
-                                        </label>
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterTransactionType}>
-                                        <Typography variant="body1">Transaction Type</Typography>
-                                        <Box component="div" className={classes.checkBoxContainer}>
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Wallet Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Deposit" />
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Direct Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Withdrawal" />
-                                        </Box>
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterAmount}>
-                                        <Typography variant="body1">Amount</Typography>
-                                        <Box component="span" className={classes.amountRange}>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                        </Box>
-                                        <Slider
-                                        getAriaLabel={() => 'Temperature range'}
-                                        value={value}
-                                        onChange={handleChange}
-                                        valueLabelDisplay="auto"
-                                        getAriaValueText={valuetext}
-                                        />
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterButton}>
-                                        <GenericButton clickAction={() => setOpenFilterBx(false)} bdaColor="#1E6262" bxShadw="none" fontColor="#1E6262" buttonName="Cancel"/>
-                                        <GenericButton bdaColor="#1E6262" bxShadw="none" fontColor="white" bgColor="#1E6262" buttonName="Apply filter" />
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box> : ''
-                        }
                         {/* <Menu
                             id="customer-menu"
                             anchorEl={anchorEl}
@@ -812,12 +597,6 @@ const Listings = () => {
                     <Typography variant="subtitle2" component="span">All Listings</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
-
-                <div className={clsx(classes.filter, tab === ALL_COMPLETED && classes.active)} onClick={() => handleSetTab(ALL_COMPLETED)}>
-                    <Typography variant="subtitle2" component="span">All Completed</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
-                </div>
-
                 <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
                     <Typography variant="subtitle2" component="span">All Open</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
@@ -835,11 +614,10 @@ const Listings = () => {
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
-                {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
+                {/* {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
                 {tab === ALL_OPEN && <AllOpen />}
                 {tab === ALL_NEGOTIATIONS && <AllNegotiations />}
-                {tab === ALL_DELETED && <AllRemoved />}
-                {tab === ALL_COMPLETED && <AllCompleted />}
+                {tab === ALL_DELETED && <AllRemoved />} */}
             </Box>
 
 
@@ -919,6 +697,10 @@ const Listings = () => {
                                 })
                             }
                         </Box>
+
+                        <Box component="div" className={classes.filterBoxContainer}>
+                            <Typography component=""></Typography>
+                        </Box>
                     </Box>
                 </Box> :
                 ''
@@ -928,4 +710,4 @@ const Listings = () => {
     )
 }
 
-export default Listings;
+export default Transactions;
