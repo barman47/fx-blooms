@@ -188,7 +188,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                     {customer[columnList[7]]}
                   </Typography> : ''
                 }
-                <Typography style={{ textAlign: 'center' }} component="span" className={classes.tableCell} variant="subtitle1">
+                <Typography style={{ textAlign: viewMore ? 'left' : 'center' }} component="span" className={classes.tableCell} variant="subtitle1">
                     {
                       viewMore && viewMore 
                       ? <button onClick={() => handleButtonClick()} className={classes.viewBtn}>view more</button> :

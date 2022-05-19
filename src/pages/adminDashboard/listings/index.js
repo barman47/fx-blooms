@@ -481,7 +481,7 @@ const columns = [
     },
 ];
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .5fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .5fr 1fr .5fr';
 
 const pages = [15, 25, 50, 100]
 
@@ -733,7 +733,7 @@ const Listings = () => {
                             <ArrowTopRight />
                             {
                                 openXport ? 
-                                <Box className={classes.exportBox} component="div">
+                                <Box className={classes.exportBox} component="span">
                                     <Typography onClick={downloadAll} component="button">Export All</Typography>
                                     <Typography onClick={downloadRecords} component="button">Export Page</Typography>
                                 </Box> : ''

@@ -847,7 +847,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={customerStatus === REJECTED || customerStatus === "NO_PROFILE"}>{ customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED || customer.customerStatus === "NO_PROFILE"}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>

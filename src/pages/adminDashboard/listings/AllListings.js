@@ -7,7 +7,7 @@ import GenericTableBody from '../../../components/admin-dashboard/GenericTableBo
 import PropTypes from 'prop-types';
 
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .5fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .5fr 1fr .5fr';
 
 const AllListings = ({ loadingListings, viewRow }) => {
 
