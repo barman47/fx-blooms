@@ -13,10 +13,9 @@ export const getWallets = (customerId) => async (dispatch)  => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${WALLETS_API}/customers/${customerId}/wallets`);
-        console.log('Wallets ', res);
         dispatch({
             type: SET_WALLETS,
-            payload: res.data
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

@@ -396,6 +396,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 </Box>
                             </Box>
                         </Grid>
+                        <Grid item xs={3}></Grid>
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 
