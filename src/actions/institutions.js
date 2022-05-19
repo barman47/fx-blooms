@@ -13,7 +13,7 @@ export const getInstitutions = () => async (dispatch) => {
         const res = await axios.get(`${api}/institutions`);
         return dispatch({
             type: SET_INSTITUTIONS,
-            payload: res.data.data
+            payload: res.data.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
