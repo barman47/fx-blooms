@@ -31,7 +31,7 @@ import {
     getCustomersWithoutProfile,
     setCustomerStatus
 } from '../../../actions/customer';
-import { getStats, exportAllRecords } from '../../../actions/admin';
+import { getStats, exportAllUserRecords } from '../../../actions/admin';
 import { CLEAR_CUSTOMER_STATUS_MSG, SET_CATEGORY, SET_CUSTOMER } from '../../../actions/types';
 
 import { COLORS, CUSTOMER_CATEGORY } from '../../../utils/constants';
@@ -335,11 +335,13 @@ const Customers = (props) => {
         if (filter) {
             setCurrentPage(1);
         }
+    }, [filter]);
 
-        if (!customerStatus) {
+    useEffect(() => {
+        if (!customerStatus || anchorEl) {
             setStatus(customer.customerStatus);
         }
-    }, [filter, customer.customerStatus, customerStatus]);
+    }, [customer.customerStatus, customerStatus, anchorEl]);
 
     // Set page number for search when page number changes
     // useEffect(() => {
@@ -614,13 +616,8 @@ const Customers = (props) => {
     };
 
     const downloadAll = async () => {
-        const data = await exportAllRecords()
-        console.log(data)
-
-        // if (exportRecords(data, admin)?.errors) {
-        //     return
-        // }
-    }
+        await exportAllUserRecords(admin)
+     }
 
     const viewDetails = () => {
         handleClose();
@@ -645,6 +642,7 @@ const Customers = (props) => {
                 newStatus: SUSPENDED,
                 currentStatus: filter
             });
+            setCurrentPage(currentPage)
         }
     };
 
@@ -847,7 +845,7 @@ const Customers = (props) => {
                     <Divider />
                     <MenuItem onClick={contact}>Contact</MenuItem>
                     <Divider />
-                    <MenuItem onClick={suspend} disabled={customer.customerStatus === REJECTED || customer.customerStatus === "NO_PROFILE"}>{ customer.customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
+                    <MenuItem onClick={suspend} disabled={customerStatus === REJECTED || customerStatus === "NO_PROFILE"}>{ customerStatus === SUSPENDED ? 'UnSuspend' : 'Suspend' }</MenuItem>
                     <Divider />
                     <MenuItem onClick={changeRiskProfile}>Change Risk Profile</MenuItem>
                 </Menu>

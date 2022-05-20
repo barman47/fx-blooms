@@ -8,14 +8,14 @@ import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
 import AllListings from './AllListings'
-import AllOpen from './AllOpen';
-import AllNegotiations from './AllNegotiations';
-import AllRemoved from './AllRemoved';
-import AllCompleted from './AllCompleted';
+import ActiveListings from './ActiveListings';
+import InProgressListings from './InProgressListings';
+import RemovedListings from './RemovedListings';
+import CompletedListings from './CompletedListings';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter, CloseCircleOutline } from 'mdi-material-ui';
-// import { getStats } from '../../../actions/admin';
+import { exportAllUserRecords } from '../../../actions/admin';
 import { getAllListings, getActiveListings, getListingsInProgress, getFinalisedListings, getDeletedListings } from '../../../actions/adminListings';
 // import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 import { exportRecords } from '../../../utils/exportRecords'
@@ -481,7 +481,7 @@ const columns = [
     },
 ];
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .5fr 1fr .5fr';
+const gridColumns = '.3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr';
 
 const pages = [15, 25, 50, 100]
 
@@ -511,7 +511,7 @@ const Listings = () => {
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
     const { totalListings } = useSelector(state => state.stats)
-    const { totalPageCount, listings } = useSelector(state => state.listings)
+    const { totalPageCount, listings, activeListings, finalisedListings, inProgressListings, deletedListings } = useSelector(state => state.listings)
 
     const [value, setValue] = useState([1, 70]);
 
@@ -519,7 +519,6 @@ const Listings = () => {
         console.log('new', newValue)
       setValue(newValue);
     };
-  
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = []
@@ -561,10 +560,41 @@ const Listings = () => {
     // }, [dispatch, currentPage]);
 
     useEffect(() => {
-        if (listings.length > 0)  {
-            setLoading(false)
+        switch (tab) {
+            case ALL_LISTINGS:
+                if (!!listings)  {
+                    setLoading(false)
+                }
+                break;
+
+            case ALL_OPEN:
+                if (!!activeListings.items)  {
+                    setLoading(false)
+                }
+                break;
+            
+            case ALL_COMPLETED:
+                if (!!finalisedListings)  {
+                    setLoading(false)
+                }
+                break;
+
+            case ALL_NEGOTIATIONS:
+                if (!!inProgressListings)  {
+                    setLoading(false)
+                }
+                break;
+
+            case ALL_DELETED:
+                if (!!deletedListings)  {
+                    setLoading(false)
+                }
+                break;
+
+            default:
+                break;
         }
-    }, [listings])
+    }, [tab, ALL_LISTINGS, ALL_OPEN, ALL_COMPLETED, ALL_NEGOTIATIONS, ALL_DELETED, activeListings, inProgressListings, finalisedListings, deletedListings, listings])
 
     useEffect(() => {
         setLoading(true)
@@ -623,7 +653,19 @@ const Listings = () => {
                 break;
 
             case ALL_OPEN:
-                data = [...listings];
+                data = [...activeListings];
+                break;
+            
+            case ALL_COMPLETED:
+                data = [...finalisedListings];
+                break;
+
+            case ALL_NEGOTIATIONS:
+                data = [...inProgressListings];
+                break;
+
+            case ALL_DELETED:
+                data = [...deletedListings];
                 break;
 
             default:
@@ -635,12 +677,8 @@ const Listings = () => {
         }
     };
 
-    const downloadAll = () => {
-        const data = []
-
-        if (exportRecords(data, admin)?.errors) {
-            return
-        }
+    const downloadAll = async () => {
+        await exportAllUserRecords(admin)
     }
 
     // useEffect(() => {
@@ -656,13 +694,11 @@ const Listings = () => {
     // }, [fetchData, rowsPerPage]);
 
     const handleSetTab = (tab) => {
-        console.log('hhh')
         setTab(tab);
         setRowsPerPage(pages[0]);
     }
 
     const viewTableRow = (listing) => {
-        console.log('listing', listing)
         dispatch(getCustomer(listing.customerId))
         setViewMoreData(listing)
         setOpenViewMore(true)
@@ -719,10 +755,10 @@ const Listings = () => {
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
                     {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
-                    {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>All Open</Typography>}
-                    {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>All Negotiations</Typography>}
-                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>All Removed</Typography>}
-                    {tab === ALL_COMPLETED && <Typography variant="body1" className={classes.title}>All Completed</Typography>}
+                    {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>Open</Typography>}
+                    {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>In progess</Typography>}
+                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>Removed</Typography>}
+                    {tab === ALL_COMPLETED && <Typography variant="body1" className={classes.title}>Finalized</Typography>}
                 </Grid>
                 <Grid item>
                     <Box component="div" sx={{ display: 'flex', position: 'relative', flexDirection: 'row', gap: '10px'}}>
@@ -814,32 +850,32 @@ const Listings = () => {
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_COMPLETED && classes.active)} onClick={() => handleSetTab(ALL_COMPLETED)}>
-                    <Typography variant="subtitle2" component="span">All Completed</Typography>
+                    <Typography variant="subtitle2" component="span">Finalized</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
-                    <Typography variant="subtitle2" component="span">All Open</Typography>
+                    <Typography variant="subtitle2" component="span">Open</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_NEGOTIATIONS && classes.active)} onClick={() => handleSetTab(ALL_NEGOTIATIONS)}>
-                    <Typography variant="subtitle2" component="span">All Negotiations</Typography>
+                    <Typography variant="subtitle2" component="span">In progress</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_DELETED && classes.active)} onClick={() => handleSetTab(ALL_DELETED)}>
-                    <Typography variant="subtitle2" component="span">All Removed</Typography>
+                    <Typography variant="subtitle2" component="span">Removed</Typography>
                     <Typography variant="subtitle2" component="span">{totalListings}</Typography>
                 </div>
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
                 {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
-                {tab === ALL_OPEN && <AllOpen />}
-                {tab === ALL_NEGOTIATIONS && <AllNegotiations />}
-                {tab === ALL_DELETED && <AllRemoved />}
-                {tab === ALL_COMPLETED && <AllCompleted />}
+                {tab === ALL_OPEN && <ActiveListings viewRow={viewTableRow} loadingListings={loading} />}
+                {tab === ALL_NEGOTIATIONS && <InProgressListings viewRow={viewTableRow} loadingListings={loading}/>}
+                {tab === ALL_DELETED && <RemovedListings viewRow={viewTableRow} loadingListings={loading} />}
+                {tab === ALL_COMPLETED && <CompletedListings viewRow={viewTableRow} loadingListings={loading} />}
             </Box>
 
 

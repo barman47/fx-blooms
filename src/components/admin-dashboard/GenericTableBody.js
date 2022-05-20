@@ -6,6 +6,7 @@ import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 import { CUSTOMER_CATEGORY } from '../../utils/constants';
+import handleStatusStyle from '../../utils/statusDisplay';
 import formatId from '../../utils/formatId';
 import CircularProgressBar from './CircularProgressBar'
 import clsx from 'clsx';
@@ -84,7 +85,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
   const classes = useStyles();
 
   const dispatch = useDispatch();
-  const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
+  const { CONFIRMED } = CUSTOMER_CATEGORY;
   // const [ isDisabled ] = useState(true)
 
   const handleButtonClick = (customer, e) => {    
@@ -100,25 +101,11 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     }
   };
 
-  const handleStatus = useCallback((status) => {
-    // console.log('status', status)
-    switch (status) {
-      case CONFIRMED:
-        return classes.verified
-      case PENDING:
-        return classes.pending
-      case "OPEN":
-        return classes.verified
-      case REJECTED:
-        return classes.rejected
-      case "REMOVED":
-        return classes.rejected
-      case SUSPENDED:
-        return classes.suspended
-      default:
-        return
-    }
-  }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, classes.pending, classes.suspended, classes.verified, classes.rejected])
+  // const handleStatus = useCallback((status) => {
+  //   // console.log('status', status)
+
+  //   const statusUi = handleStatusStyle(status, classes, CONFIRMED, REJECTED, SUSPENDED, PENDING)    
+  // }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, handleStatusStyle, classes])
 
   const handleDisplayStatus = useCallback((status) => {
     switch (status) {
@@ -172,7 +159,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
                     {handleDisplayRow(customer[columnList[4]] ? customer[columnList[4]] : '')}
                 </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatus(customer[columnList[5]]))} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatusStyle(customer[columnList[5]], classes))} variant="subtitle1">
                 { handleDisplayStatus(customer[columnList[5]]) }
                 </Typography>
                 {

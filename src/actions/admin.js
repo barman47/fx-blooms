@@ -16,6 +16,7 @@ import {
     SET_ACTIVE_CUSTOMER_COUNT, 
     UPDATED_CUSTOMER 
 } from './types';
+import { exportRecords } from '../utils/exportRecords'
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Admin`;
@@ -127,13 +128,22 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
     }
 };
 
-export const exportAllRecords = async () => {
+export const exportAllUserRecords = async (admin) => {
     try {
         await reIssueAdminToken();
-        console.log('hello')
         const res = await axios.get(`${api}/DownloadAllUserData`);
-        console.log('hi',res)
-        console.log('q',res.data.data)
+        exportRecords(res.data.data, admin)
+        return res.data.data
+    } catch (err) {
+        return err
+    }
+}
+
+export const exportAllTransactionRecords = async (admin) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/DownloadAllTransactionData`);
+        exportRecords(res.data.data, admin)
         return res.data.data
     } catch (err) {
         return err
@@ -143,9 +153,8 @@ export const exportAllRecords = async () => {
 export const getTransactions = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        console.log('res')
-        const res = await axios.get(`${api}/GetAllTransaction`, query);
-        console.log('res', res)
+        const res = await axios.post(`${api}/GetAllTransactions`, query);
+        console.log(res.data.data)
         return dispatch({
             type: SET_TRANSACTIONS,
             payload: res.data.data            

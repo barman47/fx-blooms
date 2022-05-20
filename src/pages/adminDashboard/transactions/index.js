@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 // import { getCustomer } from '../../../actions/customer';
-import { getTransactions } from '../../../actions/admin';
+import { getTransactions, exportAllTransactionRecords } from '../../../actions/admin';
 import clsx from 'clsx';
 import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
-import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
-// import AllListings from './AllListings'
+import { COLORS, TRANSACTION_DETAILS } from '../../../utils/constants';
+import AllTransactions from './AllTransactions'
 // import AllOpen from './AllOpen';
 // import AllNegotiations from './AllNegotiations';
 // import AllRemoved from './AllRemoved';
@@ -15,7 +15,6 @@ import GenericTableHeader from '../../../components/admin-dashboard/GenericTable
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter, CloseCircleOutline } from 'mdi-material-ui';
 // import { getStats } from '../../../actions/admin';
-import { getAllListings } from '../../../actions/adminListings';
 import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 import { exportRecords } from '../../../utils/exportRecords'
 import isEmpty from '../../../utils/isEmpty';
@@ -35,6 +34,28 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(12),
 
         position: 'relative',
+    },
+
+    exportBox: {
+        position: 'absolute',
+        top: 116,
+        right: 65,
+        borderRadius: 5,
+        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
+
+        '& span': {
+            outline: 'none',
+            border: 'none',
+            fontSize: '.9vw',
+            backgroundColor: 'white',
+            padding: '10px 20px',
+            width: '100%',
+
+            '&:hover': {
+                backgroundColor: '#1E6262',
+                color: 'white'
+            }
+        }
     },
 
     title: {
@@ -332,15 +353,15 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const columns = [
-    { id: 'id', label: ''},
+    // { id: 'id', label: ''},
     {
-      id: 'listing ID',
-      label: 'Listing ID',
+      id: 'transaction type',
+      label: 'Transaction Type',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'owner',
-      label: 'Owner',
+      id: 'payer',
+      label: 'Payer',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
@@ -349,28 +370,33 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'rate',
-      label: 'Rate',
+      id: 'receiver',
+      label: 'Receiver',
       format: (value) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'transaction ID',
+        label: 'Transaction ID',
+        format: (value) => value.toLocaleString('en-US'),
     },
     {
         id: 'status',
         label: 'Status',
         format: (value) => value.toLocaleString('en-US'),
-      },
-    {
-        id: 'timeStamp',
-        label: 'Timestamp',
-        format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'action',
-      label: 'Action',
+      id: 'timestamp',
+      label: 'Timestamp',
       format: (value) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'action',
+        label: 'Action',
+        format: (value) => value.toLocaleString('en-US'),
     },
 ];
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .8fr 1fr .5fr';
+const gridColumns = '1fr 1fr 1fr 1fr 1fr .8fr 1fr .6fr';
 
 const pages = [15, 25, 50, 100]
 
@@ -381,25 +407,24 @@ const Transactions = () => {
     const { admin } = useSelector(state => state);
     const { customer } = useSelector(state => state.customers);
 
-    const { ALL_LISTINGS, ALL_DELETED, ALL_NEGOTIATIONS, ALL_OPEN } = LISTING_DETAILS;
-    const [tab, setTab] = useState(ALL_LISTINGS);
+    const { ALL_TRANSACTIONS } = TRANSACTION_DETAILS
+    const [tab, setTab] = useState(ALL_TRANSACTIONS);
     const [loading, setLoading] = useState(true)
     const [pageNumberList, setPageNumberList] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
     const [pageCount, setPageCount] = useState(0);
     const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-
+    const [openXport, closeXport] = useState(false);
     const [customerName, setCustomerName] = useState('')
 
-    // const [viewMoreData, setViewMoreData] = useState({})
-    const [viewMoreData] = useState({})
+    const [viewMoreData, setViewMoreData] = useState({})
     const [openViewMore, setOpenViewMore] = useState(false)
 
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
-    const { totalListings } = useSelector(state => state.stats)
-    const { totalPageCount, listings } = useSelector(state => state.listings)
+    const { totalTransactions } = useSelector(state => state.stats)
+    const { totalPageCount, transactions } = useSelector(state => state.transactions)
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = []
@@ -441,15 +466,16 @@ const Transactions = () => {
     }, [dispatch, currentPage]);
 
     useEffect(() => {
-        if (listings.length > 0)  {
+        console.log('tre')
+        if (!!transactions)  {
             setLoading(false)
         }
-    }, [listings])
+    }, [transactions])
 
     useEffect(() => {
         setLoading(true)
         switch (tab) {
-            case ALL_LISTINGS:
+            case ALL_TRANSACTIONS:
                 dispatch(getTransactions({
                     pageSize: rowsPerPage,
                     pageNumber: currentPage
@@ -457,30 +483,30 @@ const Transactions = () => {
                 setPageCount(totalPageCount || 0);
                 break;
 
-            case ALL_OPEN:
-                getAllListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                })
-                setPageCount(totalPageCount || 0);
-                break;
+            // case ALL_OPEN:
+            //     getAllTransactions({
+            //         pageSize: rowsPerPage,
+            //         pageNumber: currentPage
+            //     })
+            //     setPageCount(totalPageCount || 0);
+            //     break;
 
             default:
                 break;
         }
         handlePageNUmberList()
-    }, [ALL_LISTINGS, ALL_OPEN, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount])
+    }, [ALL_TRANSACTIONS, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount])
 
     const downloadRecords = () => {
         let data = []        
         switch (tab) {
-            case ALL_LISTINGS:
-                data = [...listings];
+            case ALL_TRANSACTIONS:
+                data = [...transactions];
                 break;
 
-            case ALL_OPEN:
-                data = [...listings];
-                break;
+            // case ALL_OPEN:
+            //     data = [...transactions];
+            //     break;
 
             default:
                 break;
@@ -490,6 +516,10 @@ const Transactions = () => {
             return
         }
     };
+
+    const downloadAll = async () => {
+        await exportAllTransactionRecords(admin)
+    }
 
     // useEffect(() => {
     //     if (currentPage > 0) {
@@ -508,13 +538,10 @@ const Transactions = () => {
         setRowsPerPage(pages[0]);
     }
 
-    // const viewTableRow = (listing) => {
-    //     console.log('listing', listing)
-    //     dispatch(getCustomer(listing.customerId))
-    //     setViewMoreData(listing)
-    //     setOpenViewMore(true)
-        
-    // }
+    const viewTableRow = (transaction) => {
+        setViewMoreData(transaction)
+        setOpenViewMore(true)
+    }
 
     useEffect(() => {
         if (!isEmpty(customer)) {
@@ -543,7 +570,7 @@ const Transactions = () => {
     }
 
     const handleStatus = useCallback((status) => {
-        if (ALL_LISTINGS) {
+        if (ALL_TRANSACTIONS) {
             switch (status) {
                 case "COMPLETED":
                   return classes.verified
@@ -552,31 +579,40 @@ const Transactions = () => {
                 default:
                   return 
             }
-        } else if (ALL_OPEN) {
-            return
-        } else {
+        } 
+        // else if (ALL_OPEN) {
+        //     return
+        // } 
+        else {
             return ''
         }
 
-      }, [ALL_LISTINGS, ALL_OPEN, classes.rejected, classes.verified])
+      }, [ALL_TRANSACTIONS, classes.rejected, classes.verified])
 
     return (
     <>
         <section className={classes.root}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
-                    {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
-                    {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>All Open</Typography>}
+                    {tab === ALL_TRANSACTIONS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
+                    {/* {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>All Open</Typography>}
                     {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>All Negotiations</Typography>}
-                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>All Removed</Typography>}
+                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>All Removed</Typography>} */}
                 </Grid>
                 <Grid item>
                     <Box component="div" sx={{ display: 'flex', flexDirection: 'row', gap: '10px'}}>
                         <GenericButton buttonName="Filter">
                             <Filter />
                         </GenericButton>
-                        <GenericButton clickAction={downloadRecords} buttonName="Export">
+                        <GenericButton clickAction={() => closeXport(!openXport)} buttonName="Export">
                             <ArrowTopRight />
+                            {
+                                openXport ? 
+                                <Box className={classes.exportBox} component="span">
+                                    <Typography onClick={downloadAll} component="span">Export All</Typography>
+                                    <Typography onClick={downloadRecords} component="span">Export Page</Typography>
+                                </Box> : ''
+                            }
                         </GenericButton>
                         {/* <Menu
                             id="customer-menu"
@@ -593,31 +629,31 @@ const Transactions = () => {
                 </Grid>
             </Grid>
             <Box component="section" className={classes.filterContainer}>
-                <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => handleSetTab(ALL_LISTINGS)}>
-                    <Typography variant="subtitle2" component="span">All Listings</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => handleSetTab(ALL_TRANSACTIONS)}>
+                    <Typography variant="subtitle2" component="span">All Transactions</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
-                <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
+                {/* <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
                     <Typography variant="subtitle2" component="span">All Open</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_NEGOTIATIONS && classes.active)} onClick={() => handleSetTab(ALL_NEGOTIATIONS)}>
                     <Typography variant="subtitle2" component="span">All Negotiations</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_DELETED && classes.active)} onClick={() => handleSetTab(ALL_DELETED)}>
                     <Typography variant="subtitle2" component="span">All Removed</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
-                </div>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
+                </div> */}
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
-                {/* {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
-                {tab === ALL_OPEN && <AllOpen />}
-                {tab === ALL_NEGOTIATIONS && <AllNegotiations />}
-                {tab === ALL_DELETED && <AllRemoved />} */}
+                {tab === ALL_TRANSACTIONS && <AllTransactions viewRow={viewTableRow} loadingTransactions={loading} />}
+                {/* {tab === ALL_OPEN && <AllOpen />} */}
+                {/* {tab === ALL_NEGOTIATIONS && <AllNegotiations />} */}
+                {/* {tab === ALL_DELETED && <AllRemoved />} */}
             </Box>
 
 
@@ -667,16 +703,16 @@ const Transactions = () => {
                         </Box>
                         <Box component="div" className={classes.viewMoreBidsContainer}>
                             {
-                                viewMoreData.bids.map((listing, index) => {
+                                viewMoreData.bids.map((transaction, index) => {
                                 return (
                                 <Box key={index} component="div" className={classes.viewMoreBids}>
                                     <Box component="div" className={classes.circleDesign}>
-                                        <Box component="div" className={clsx(classes.circle, classes.status, handleStatus(listing.status))}></Box>
+                                        <Box component="div" className={clsx(classes.circle, classes.status, handleStatus(transaction.status))}></Box>
                                         <Box component="div" className={classes.line}></Box>    
                                     </Box>  
                                     <Box component="div" className={classes.statusContainer}>
-                                        <Typography variant="h6" className={clsx(classes.userStatusTitle, classes.status, handleStatus(listing.status))}>
-                                            {listing.status}
+                                        <Typography variant="h6" className={clsx(classes.userStatusTitle, classes.status, handleStatus(transaction.status))}>
+                                            {transaction.status}
                                         </Typography>
                                         <Box component="span"  className={classes.subStatus}>
                                             <Typography component='span'>Test: </Typography>
