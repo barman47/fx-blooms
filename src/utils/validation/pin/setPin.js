@@ -5,12 +5,34 @@ const setPin = (data) => {
     let errors = {};
     data.first = !isEmpty(data.first) ?  data.first : '';
     data.second = !isEmpty(data.second) ?  data.second : '';
-    data.thrid = !isEmpty(data.thrid) ?  data.thrid : '';
+    data.third = !isEmpty(data.third) ?  data.third : '';
     data.fourth = !isEmpty(data.fourth) ?  data.fourth : '';
+
     data.fifth = !isEmpty(data.fifth) ?  data.fifth : '';
     data.sixth = !isEmpty(data.sixth) ?  data.sixth : '';
     data.seventh = !isEmpty(data.seventh) ?  data.seventh : '';
     data.eight = !isEmpty(data.eight) ?  data.eight : '';
+    
+    data.ninth = !isEmpty(data.ninth) ?  data.ninth : '';
+    data.tenth = !isEmpty(data.tenth) ?  data.tenth : '';
+    data.eleventh = !isEmpty(data.eleventh) ?  data.eleventh : '';
+    data.twelveth = !isEmpty(data.twelveth) ?  data.twelveth : '';
+
+    console.log(data);
+
+    // Placing 9th to 12th validation first for a reason. I don't have strength to explain it. To understand why, alter the code and see.
+    if (Validator.isEmpty(data.ninth)) {
+        errors.ninth = 'OTP is required!';
+    }
+    if (Validator.isEmpty(data.tenth)) {
+        errors.tenth = 'OTP is required!';
+    }
+    if (Validator.isEmpty(data.eleventh)) {
+        errors.eleventh = 'OTP is required!';
+    }
+    if (Validator.isEmpty(data.twelveth)) {
+        errors.twelveth = 'OTP is required!';
+    }
 
     if (Validator.isEmpty(data.first)) {
         errors.first = 'Pin is required!';

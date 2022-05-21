@@ -91,7 +91,7 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
     return (
         <Box component="section" className={classes.root}>
             <Typography variant="h6" color="primary" className={classes.pageTitle}>Funding Details</Typography>
-            <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back in you need to make changes.</Typography>
+            <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back in you need to make any changes.</Typography>
             <Box component="div" className={classes.content}>
                 <Box component="div" className={classes.fundingDetails}>
                     <Box component="section">
@@ -133,10 +133,12 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
                         <Typography variant="body2" component="p">Institution</Typography>
                         <Typography variant="body2" component="p">{account.bankName}</Typography>
                     </Box>
+                    <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Reference</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.reference}</Typography>
                     </Box>
+                    <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Status</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.status.replace('_', ' ')}</Typography>
@@ -161,7 +163,7 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
                             variant="contained" 
                             color="primary"
                             fullWidth
-                            onClick={() => window.open(fundingDetails.authorisationUrl)}
+                            onClick={() => window.open(fundingDetails.authorisationUrl, '_self')}
                         >
                             Authorize Funding
                         </Button>

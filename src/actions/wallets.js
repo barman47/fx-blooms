@@ -26,12 +26,13 @@ export const fundWallet = (data, navigate) => async (dispatch)  => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/fund`, data);
+        console.log(res);
         const {
             authorisationUrl,
             institutionId,
             qrCodeUrl,
             status
-        } = res.data.data;
+        } = res.data.data.data;
         
         const fundindDetails = {
             fundingMethod: 'Open Banking',
@@ -50,6 +51,16 @@ export const fundWallet = (data, navigate) => async (dispatch)  => {
             payload: fundindDetails
         });
         return navigate(FUND_CONFIRMATION);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const withdraw = (data) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${YAPILY_API}/withdraw`, data);
+        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }

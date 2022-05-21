@@ -1,7 +1,8 @@
+import { useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
 import { Box, makeStyles } from '@material-ui/core';
-import { useEffect } from 'react';
 
-import PinOtpModal from './PinOtpModal';
+import VerifyPhoneModal from './VerifyPhoneModal';
 import SetPin from './SetPin';
 
 const useStyles = makeStyles(theme => ({
@@ -22,15 +23,25 @@ const useStyles = makeStyles(theme => ({
 
 const Pin = ({ handleSetTitle }) => {
     const classes = useStyles();
+    const { isPhoneNumberVerified } = useSelector(state => state.customer);
+
+    const verifyPhoneModal = useRef();
 
     useEffect(() => {
         handleSetTitle('Set Pin'); // Make this dynamic to change dependinng on whether PIN is being set or changed
+        checkPhoneNumber();
         // eslint-disable-next-line
     }, []);
 
+    const checkPhoneNumber = () => {
+        if (!isPhoneNumberVerified) {
+            verifyPhoneModal.current.openModal();
+        }
+    };
+
     return (
         <>
-            {/* <PinOtpModal /> */}
+            <VerifyPhoneModal ref={verifyPhoneModal} />
             <Box component="section" className={classes.root}>
                 <SetPin />
             </Box>

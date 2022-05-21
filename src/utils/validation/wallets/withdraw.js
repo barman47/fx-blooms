@@ -1,11 +1,11 @@
 import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
-const addBankAccount = (data) => {
+const withdraw = (data) => {
     let errors = {};
-    data.AccountName = !isEmpty(data.AccountName) ?  data.AccountName : '';
-    data.AccountNumber = !isEmpty(data.AccountNumber) ?  data.AccountNumber : '';
-    data.BankName = !isEmpty(data.BankName) ?  data.BankName : '';
+    data.institutionId = !isEmpty(data.institutionId) ?  data.institutionId : '';
+    data.amount = !isEmpty(data.amount) ?  data.amount : '';
+    data.accountId = !isEmpty(data.accountId) ?  data.accountId : '';
 
     data.first = !isEmpty(data.first) ?  data.first : '';
     data.second = !isEmpty(data.second) ?  data.second : '';
@@ -25,16 +25,16 @@ const addBankAccount = (data) => {
         errors.fourth = 'Pin is required!';
     }
 
-    if (Validator.isEmpty(data.AccountName)) {
-        errors.AccountName = 'Account name is required!';
+    if (Validator.isEmpty(data.institutionId)) {
+        errors.institution = 'Financial institution is required!';
     }
 
-    if (Validator.isEmpty(data.AccountNumber)) {
-        errors.AccountNumber = 'Account number is required!';
+    if (Validator.isEmpty(data.amount.toString())) {
+        errors.amount = 'Please provide an amount!';
     }
 
-    if (Validator.isEmpty(data.BankName)) {
-        errors.BankName = 'Bank name is required!';
+    if (Validator.isEmpty(data.accountId)) {
+        errors.sourceAccount = 'Please select a receiving account!';
     }
    
     return {
@@ -43,4 +43,4 @@ const addBankAccount = (data) => {
     };
 };
 
-export default addBankAccount;
+export default withdraw;

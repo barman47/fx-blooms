@@ -2,6 +2,7 @@ import Validator from 'validator';
 import isEmpty from '../../isEmpty';
 
 const fundWallet = (data) => {
+    console.log(data);
     let errors = {};
     data.institutionId = !isEmpty(data.institutionId) ?  data.institutionId : '';
     data.amount = !isEmpty(data.amount) ?  data.amount : '';

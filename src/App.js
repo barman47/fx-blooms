@@ -26,10 +26,12 @@ import {
 	TERMS,
 	FAQS,
 	PRIVACY_POLICY,
+	REQUEST_WITHDRAWAL,
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
 	WALLETS,
 	FUND_WALLET,
+	FUND_AUTHORIZATION_SUCCESS,
 	FUND_CONFIRMATION,
 	CONTACT_US,
 	USER_AGREEMENT,
@@ -56,7 +58,6 @@ const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
 // const Private404 = lazy(() => import('./elements/common/Private404'));
 
 const Home = lazy(() => import('./pages/home'));
-// import Landing from './pages/landing/Landing';
 
 const AddUsername = lazy(() => import('./pages/auth/AddUsername'));
 const Login = lazy(() => import('./pages/auth/Login'));
@@ -103,6 +104,8 @@ const BankAccounts = lazy(() => import('./pages/dashboard/bankAccount'));
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
 const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 const FundConfirmation = lazy(() => import('./pages/dashboard/wallet/FundConfirmation'));
+const FundAuthorizationSuccess = lazy(() => import('./pages/dashboard/wallet/FundAuthorizationSuccess'));
+const RequestWithdrawal = lazy(() => import('./pages/dashboard/wallet/RequestWithdrawal'));
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/adminDashboard'));
@@ -125,7 +128,7 @@ const theme = createTheme({
 				paddingTop: '14px',
 				textTransform: 'capitalize'
 		  	},
-		},
+		}
 	},
 	
 	palette: {
@@ -201,32 +204,34 @@ const App = () => {
 							<Route path={USER_AGREEMENT} element={<UserAgreement />} />
 							
 							<Route path={DASHBOARD} element={<PrivateRoute><Dashboard title={title} /></PrivateRoute>}>
-								<Route index path={`${DASHBOARD_HOME}`} element={<AllListings handleSetTitle={handleSetTitle} />} />
-								<Route path={`${EDIT_LISTING}`} element={<EditListing handleSetTitle={handleSetTitle} />} />
-								<Route path={`${MAKE_LISTING}`} element={<MakeListing handleSetTitle={handleSetTitle} />} />
+								<Route index path={DASHBOARD_HOME} element={<AllListings handleSetTitle={handleSetTitle} />} />
+								<Route path={EDIT_LISTING} element={<EditListing handleSetTitle={handleSetTitle} />} />
+								<Route path={MAKE_LISTING} element={<MakeListing handleSetTitle={handleSetTitle} />} />
 								<Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle} />} />
-								<Route path={`${PROFILE}`} element={<Profile handleSetTitle={handleSetTitle} />} />
-								<Route path={`${ID_VERIFICATION}`} element={<IdVerification handleSetTitle={handleSetTitle} />} />
-								<Route path={`${TWO_FACTOR}`} element={<TwoFactor handleSetTitle={handleSetTitle} />} />
-								<Route path={`${BANK_ACCOUNTS}`} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
-								<Route path={`${NOTIFICATIONS}`} element={<Notifications handleSetTitle={handleSetTitle} />} />
-								<Route path={`${TRANSACTIONS}`} element={<Transactions handleSetTitle={handleSetTitle} />} />
-								<Route path={`${TRANSACTION_STATUS}`} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
-								<Route path={`${WALLETS}`} element={<Wallet handleSetTitle={handleSetTitle} />} />
-								<Route path={`${FUND_WALLET}`} element={<FundWallet handleSetTitle={handleSetTitle} />} />
-								<Route path={`${FUND_CONFIRMATION}`} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
-								<Route path={`${VERIFF}`} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
-								<Route path={`${PIN}`} element={<Pin handleSetTitle={handleSetTitle} />} />
+								<Route path={PROFILE} element={<Profile handleSetTitle={handleSetTitle} />} />
+								<Route path={ID_VERIFICATION} element={<IdVerification handleSetTitle={handleSetTitle} />} />
+								<Route path={TWO_FACTOR} element={<TwoFactor handleSetTitle={handleSetTitle} />} />
+								<Route path={BANK_ACCOUNTS} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
+								<Route path={NOTIFICATIONS} element={<Notifications handleSetTitle={handleSetTitle} />} />
+								<Route path={TRANSACTIONS} element={<Transactions handleSetTitle={handleSetTitle} />} />
+								<Route path={TRANSACTION_STATUS} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
+								<Route path={WALLETS} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
+								<Route path={`${FUND_AUTHORIZATION_SUCCESS}/:id/type/credit`} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
+								<Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
+								<Route path={REQUEST_WITHDRAWAL} element={<RequestWithdrawal handleSetTitle={handleSetTitle} />} />
+								<Route path={VERIFF} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
+								<Route path={PIN} element={<Pin handleSetTitle={handleSetTitle} />} />
 							</Route>
 							
 							<Route path={ADMIN_LOGIN} element={<AdminLogin />} />
 							<Route path={ADMIN_DASHBOARD} element={<AdminRoute><AdminDashboard title={title} /></AdminRoute>}>
-								<Route path={`${ADMIN_HOME}`} element={<AdminHome handleSetTitle={handleSetTitle} />} />
-								<Route path={`${CUSTOMERS}`} element={<Customers handleSetTitle={handleSetTitle} />} />
-								<Route path={`${LISTINGS}`} element={<Listings handleSetTitle={handleSetTitle} />} />
-								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
+								<Route path={ADMIN_HOME} element={<AdminHome handleSetTitle={handleSetTitle} />} />
+								<Route path={CUSTOMERS} element={<Customers handleSetTitle={handleSetTitle} />} />
+								<Route path={LISTINGS} element={<Listings handleSetTitle={handleSetTitle} />} />
+								<Route path={DEPOSITS} element={<Deposits handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
-								<Route path={`${WITHDRAWALS}`} element={<Withdrawals handleSetTitle={handleSetTitle} />} />
+								<Route path={WITHDRAWALS} element={<Withdrawals handleSetTitle={handleSetTitle} />} />
 							</Route>
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>

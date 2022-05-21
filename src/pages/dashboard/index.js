@@ -88,6 +88,7 @@ import {
 
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
+import { checkPin } from '../../actions/pin';
 import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
@@ -422,7 +423,7 @@ const Dashboard = (props) => {
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
+    const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
@@ -434,6 +435,7 @@ const Dashboard = (props) => {
 
     useEffect(() => {
         getNotificationCount(customerId);
+        checkPin(customerId);
         if (matches) {
             setOpen(false);
         }
@@ -1100,10 +1102,11 @@ const Dashboard = (props) => {
 };
 
 Dashboard.propTypes = {
+    checkPin: PropTypes.func.isRequired,
     getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     markNotificationAsRead: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);
+export default connect(undefined, { checkPin, getNotificationCount, logout, markNotificationAsRead })(Dashboard);

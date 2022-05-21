@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
 import { Button, Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -46,6 +47,11 @@ const useStyle = makeStyles(theme => ({
 
 const PageNotFound = () => {
     const classes = useStyle();
+    const location = useLocation();
+    useEffect(() => {
+        console.log('location', location);
+        console.log(location);
+    }, []);
 
     return (
         <>

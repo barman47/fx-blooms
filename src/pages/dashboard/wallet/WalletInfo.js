@@ -7,7 +7,7 @@ import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
-import { FUND_WALLET } from '../../../routes';
+import { FUND_WALLET, REQUEST_WITHDRAWAL } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -105,7 +105,7 @@ const WalletInfo = ({ toggleWithdrawalDrawer }) => {
                 </Button>
                 <Button 
                     component={Link}
-                    to={FUND_WALLET}
+                    to={REQUEST_WITHDRAWAL}
                     variant="outlined" 
                     color="primary" 
                     disableFocusRipple

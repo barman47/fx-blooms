@@ -146,7 +146,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     const [sourceAccount, setSourceAccount] = useState('');
     const [institution, setInstitution] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    // eslint-disable-next-line
+
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -396,7 +396,6 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 </Box>
                             </Box>
                         </Grid>
-                        <Grid item xs={3}></Grid>
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 

@@ -10,8 +10,9 @@ const URL = `${API}/account-management`;
 
 export const addAccount = (account) => async (dispatch) => {
     try {
+        const { first, second, third, fourth, ...rest } = account;
         await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/accounts/add`, account);
+        const res = await axios.post(`${URL}/accounts/add`, { ...rest, pin: `${first}${second}${third}${fourth}`});
         dispatch({
             type: ADDED_ACCOUNT,
             payload: {
