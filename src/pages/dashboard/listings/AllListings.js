@@ -16,7 +16,8 @@ import {
 	useMediaQuery
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
+import { Magnify } from 'mdi-material-ui';
+// import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
@@ -496,7 +497,7 @@ const AllListings = (props) => {
 				
 			</section>
 			<Box component="section" className={classes.root}>
-				<Box component="div" className={classes.walletToggleContainer}>
+				{/* <Box component="div" className={classes.walletToggleContainer}>
 					<Button
 						variant="text"
 						size="small"
@@ -508,7 +509,7 @@ const AllListings = (props) => {
 						>
 						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
 					</Button>
-				</Box>
+				</Box> */}
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
 						<section className={classes.wallets}>

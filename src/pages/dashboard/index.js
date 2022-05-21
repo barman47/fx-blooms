@@ -54,9 +54,9 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    Security,
+    // Security,
     TwoFactorAuthentication,
-    Wallet
+    // Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -65,11 +65,11 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    PIN, 
+    // PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE,
-    WALLETS
+    // WALLETS
 } from '../../routes';
 import { 
     ADD_ALERT_NOTIFICATION,
@@ -409,7 +409,7 @@ const Dashboard = (props) => {
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        { url: WALLETS, text:'Wallets', icon: <Wallet /> },
+        // { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
@@ -418,7 +418,7 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        { url : PIN, text: 'PIN Management', icon: <Security /> },
+        // { url : PIN, text: 'PIN Management', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 

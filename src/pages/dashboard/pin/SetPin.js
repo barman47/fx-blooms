@@ -61,7 +61,6 @@ const SetPin = ({ generatePinOtp }) => {
     const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.customer);
 
-    const [hasSetPin, setHasSetPin] = useState(false);
     const [showSetPin, setShowSetPin] = useState(false);
 
 

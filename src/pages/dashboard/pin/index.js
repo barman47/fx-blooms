@@ -1,7 +1,6 @@
 import { Box, makeStyles } from '@material-ui/core';
 import { useEffect } from 'react';
 
-import PinOtpModal from './PinOtpModal';
 import SetPin from './SetPin';
 
 const useStyles = makeStyles(theme => ({
@@ -30,7 +29,6 @@ const Pin = ({ handleSetTitle }) => {
 
     return (
         <>
-            {/* <PinOtpModal /> */}
             <Box component="section" className={classes.root}>
                 <SetPin />
             </Box>
