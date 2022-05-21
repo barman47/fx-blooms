@@ -25,6 +25,7 @@ export const ADMIN_DASHBOARD = `/admin`;
 export const ADMIN_HOME = `${ADMIN_DASHBOARD}/dashboard`;
 export const CUSTOMERS = `${ADMIN_DASHBOARD}/customers`;
 export const LISTINGS = `${ADMIN_DASHBOARD}/listings`;
+export const TRANSACTION_LISTS = `${ADMIN_DASHBOARD}/transactions`;
 export const DEPOSITS = `${ADMIN_DASHBOARD}/deposits`;
 export const WITHDRAWALS = `${ADMIN_DASHBOARD}/withdrawals`;
 export const HISTORY = `${ADMIN_DASHBOARD}/history`;

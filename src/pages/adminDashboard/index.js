@@ -40,7 +40,9 @@ import {
     CashMinus,
     Headset,
     History,
+    CashMultiple,
     Magnify,
+    Logout
 } from 'mdi-material-ui';
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import logo from '../../assets/img/logowhite.svg';
@@ -57,6 +59,7 @@ import {
     ADMIN_HOME,
     CUSTOMERS,
     LISTINGS,
+    TRANSACTION_LISTS,
     DEPOSITS,
     WITHDRAWALS,
     HISTORY,
@@ -342,6 +345,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
         { url : ADMIN_HOME, text:'Dashboard', icon: <ViewDashboard /> },
         { url : CUSTOMERS, text:'Users', icon: <AccountMultiple /> },
         { url : LISTINGS, text:'Listings', icon: <CurrencyCny /> },
+        { url : TRANSACTION_LISTS, text:'Transactions', icon: <CashMultiple /> },
         { url : DEPOSITS, text:'Deposits', icon: <BagChecked /> },
         { url : WITHDRAWALS, text:'Withdrawals', icon: <CashMinus /> },
         { url : HISTORY, text:'History', icon: <History /> },
@@ -510,6 +514,26 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                                 {open && <ListItemText primary={link.text} />}
                             </ListItem>
                         ))}
+                        <ListItem 
+                            className={classes.linkItem} 
+                            button 
+                            disableRipple
+                            onClick={() => logout(navigate,)}
+                        >
+                            {
+                                open ?
+                                <ListItemIcon className={classes.icon}>
+                                    <Logout />
+                                </ListItemIcon>
+                                :
+                                <Tooltip title="Log Out" placement="right" arrow>
+                                    <ListItemIcon className={classes.icon}>
+                                        <Logout />
+                                    </ListItemIcon>
+                                </Tooltip>
+                            }
+                            {open && <ListItemText primary="Log out" />}
+                        </ListItem>
                     </List>
                 </Drawer>
                 <div className={clsx(classes.content, {

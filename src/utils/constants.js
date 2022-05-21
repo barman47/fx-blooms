@@ -77,8 +77,15 @@ export const USER_DETAILS = {
 
 export const LISTING_DETAILS = {
     ALL_LISTINGS: 'ALL LISTINGS',
-    ALL_TRANSACTIONS: 'ALL TRANSACTIONS',
+    ALL_OPEN: 'ALL OPEN',
+    ALL_NEGOTIATIONS: 'ALL NEGOTIATIONS',
+    ALL_DELETED: 'ALL DELETED',
+    ALL_COMPLETED: 'ALL COMPLETED',
 };
+
+export const TRANSACTION_DETAILS = {
+  ALL_TRANSACTIONS: "ALL TRANSACTIONS"
+}
 
 export const ID_STATUS = {
     APPROVED: 'APPROVED',
@@ -191,6 +198,16 @@ export const olimpicMedals = [{
     3: 'amountNeeded',
     4: 'exchangeRate',
     5: 'status',
+    6: 'dateCreated',
+  }
+
+  export const TRANSACTION_COLUMNS = {
+    0: 'buyer',
+    1: 'buyer',
+    2: 'buyer',
+    3: 'seller',
+    4: 'id',
+    5: 'buyer',
     6: 'dateCreated',
   }
 

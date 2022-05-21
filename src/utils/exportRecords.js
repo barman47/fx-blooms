@@ -2,12 +2,11 @@ import * as FileSaver from 'file-saver';
 import * as XLSX from 'xlsx';
 
 
-export const exportRecords = (data, admin, filter) => {
+export const exportRecords = (data, admin, filter='') => {
   // setError('');
   const fileType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
   const fileExtension = '.xlsx';
   let errors = {};
-  console.log('hello')
 
   if (data.length === 0) {
     errors.msg = 'Cannot an empty list'
@@ -44,6 +43,4 @@ export const exportRecords = (data, admin, filter) => {
 
   const usersData = new Blob([excelBuffer], { type: fileType });
   FileSaver.saveAs(usersData, `FXBLOOMS ${filter} - ${new Date().toISOString()}${fileExtension}`);
-
-  return {errors}
 }
