@@ -92,7 +92,6 @@ export const getTransactionVolume = (timeframe) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetTransactionVolume?timeframe=${timeframe}`);
-        console.log('hello')
         return dispatch({
             type: SET_TRANSACTION_VOLUME,
             payload: res.data.data
@@ -154,7 +153,6 @@ export const getTransactions = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.post(`${api}/GetAllTransactions`, query);
-        console.log(res.data.data)
         return dispatch({
             type: SET_TRANSACTIONS,
             payload: res.data.data            

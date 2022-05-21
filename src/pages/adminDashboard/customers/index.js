@@ -11,15 +11,7 @@ import {
     Grid,
     Menu,
     MenuItem,
-    // Paper,
-    // Table,
-    // TableBody,
-    // TableCell,
-    // TableContainer,
-    // TableHead,
-    // TablePagination,
-    // TableRow,
-    Typography
+    Typography,
 } from '@material-ui/core';
 
 import { 
@@ -48,6 +40,7 @@ import GenericTableHeader from '../../../components/admin-dashboard/GenericTable
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
 import { exportRecords } from '../../../utils/exportRecords'
+import CircularProgressBar from '../../../components/admin-dashboard/CircularProgressBar'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -58,23 +51,40 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: theme.spacing(5),
         paddingTop: theme.spacing(9),
         paddingBottom: theme.spacing(12),
+        position: 'relative',
+    },
+
+    exportLoader: {
+        position: 'fixed',
+        top: 0,
+        right: '-5%',
+        zIndex: 1000,
+        backdropFilter: 'blur(3px)',
+        // backgroundColor: 'rgba(0,0,0,0.3)',
+        width: '100%',
+        height: '100vh',
+        transform: 'translate(0, 84px)',
+
+        display: 'flex',
+        justifyContent: 'center',
+        // alignItems: 'center'
     },
 
     exportBox: {
         position: 'absolute',
-        top: 45,
-        right: -8,
+        top: 47,
+        right: 1,
         borderRadius: 5,
         boxShadow: '1px 1px 1px 1.3px #c7c7c7',
-        width: 'max-content',
+        display: 'flex',
+        flexDirection: 'column',
+        
 
-        '& button': {
-            outline: 'none',
-            border: 'none',
+        '& span': {
             fontSize: '.9vw',
             backgroundColor: 'white',
             padding: '10px 20px',
-            width: '100%',
+            width: '6vw',
 
             '&:hover': {
                 backgroundColor: '#1E6262',
@@ -272,6 +282,7 @@ const Customers = (props) => {
     const [customerStatus, setStatus] = useState(customer.customerStatus)
     // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
     const [openXport, closeXport] = useState(false);
+    const [exportAllLoader, setExportAllLoader] = useState(false);
 
 
     const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
@@ -616,7 +627,9 @@ const Customers = (props) => {
     };
 
     const downloadAll = async () => {
+        setExportAllLoader(true)
         await exportAllUserRecords(admin)
+        setExportAllLoader(false)
      }
 
     const viewDetails = () => {
@@ -688,9 +701,9 @@ const Customers = (props) => {
                                 <ArrowTopRight />
                                 {
                                     openXport ? 
-                                    <Box className={classes.exportBox} component="div">
-                                        <Typography onClick={downloadAll} component="button">Export All</Typography>
-                                        <Typography onClick={downloadRecords} component="button">Export Page</Typography>
+                                    <Box className={classes.exportBox} component="span">
+                                        <Typography onClick={downloadAll} component="span">Export All</Typography>
+                                        <Typography onClick={downloadRecords} component="span">Export Page</Typography>
                                     </Box> : ''
                                 }
                             </GenericButton>
@@ -872,6 +885,13 @@ const Customers = (props) => {
                             </Box>
                         </Box>                    
                     </Box>
+                }
+
+                {
+                    exportAllLoader ?
+                    <Box component="div" className={classes.exportLoader}>
+                        <CircularProgressBar newWidth="40px" newHeight="40px" topMargin="50px" />
+                    </Box> : ''
                 }
             </section>
         </>

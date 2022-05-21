@@ -7,6 +7,7 @@ import handleStatusStyle from '../../utils/statusDisplay';
 import formatId from '../../utils/formatId';
 import CircularProgressBar from './CircularProgressBar'
 import clsx from 'clsx';
+import { BankOutline } from 'mdi-material-ui';
 
 
 const useStyles = makeStyles(theme =>({
@@ -36,6 +37,14 @@ const useStyles = makeStyles(theme =>({
     }
   },
 
+  tableCell: {
+    '&:first-child': {
+      display: 'flex',
+      // justifyContent: 'center',
+      alignItems: 'center',
+      gap: '5px'
+    }
+  },
 
   status: {
     color: 'white',
@@ -108,14 +117,14 @@ const TransactionTable = ({ data, handleClick, viewCustomerProfile, gridColumns,
     return transTime + ' | ' + transDate
   }
 
-  // const handleDisplayStatus = useCallback((status) => {
-  //   switch (status) {
-  //     case CONFIRMED:
-  //       return 'VERIFIED'
-  //     default:
-  //       return status
-  //   }
-  // }, [CONFIRMED])
+  const handleDisplayStatus = (status) => {
+    switch (status) {
+      case true:
+        return 'SUCCESSFUL'
+      default:
+        return 'ONHOLD'
+    }
+  }
 
   // const handleDisplayRow = (value) => {
   //   if (typeof value === 'string') {
@@ -134,7 +143,8 @@ const TransactionTable = ({ data, handleClick, viewCustomerProfile, gridColumns,
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: gridColumns, padding: '1px 0px' }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                  {customer[columnList[0]].accountName}
+                  <BankOutline className={classes.recentIcon} color="primary" style={{ color: 'purple', fontSize: 15 }}/>
+                  Direct Transfer
                 </Typography>
 
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
@@ -150,11 +160,11 @@ const TransactionTable = ({ data, handleClick, viewCustomerProfile, gridColumns,
                 </Typography>
 
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    {formatId(customer[columnList[4]])}
+                    {formatId(customer[columnList[4]], 'TID', 10)}
                 </Typography>
 
                 <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatusStyle(customer[columnList[5]], classes))} variant="subtitle1">
-                  { customer[columnList[5]].currency }
+                  { handleDisplayStatus(customer[columnList[5]]) }
                 </Typography>
 
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">

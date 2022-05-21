@@ -16,6 +16,10 @@ const handleStatusStyle = (status, classes) => {
       return classes.rejected
     case SUSPENDED:
       return classes.suspended
+    case true:
+      return classes.verified
+    case false:
+      return classes.suspended
     default:
       return
   }
