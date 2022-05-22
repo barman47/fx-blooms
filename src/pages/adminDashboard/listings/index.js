@@ -40,18 +40,19 @@ const useStyles = makeStyles((theme) => ({
 
     exportBox: {
         position: 'absolute',
-        top: 45,
-        right: -8,
+        top: 47,
+        right: 1,
         borderRadius: 5,
-        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
+        boxShadow: '1px 1px 1px 1.5px #c7c7c7',
+        display: 'flex',
+        flexDirection: 'column',
+        
 
-        '& button': {
-            outline: 'none',
-            border: 'none',
+        '& span': {
             fontSize: '.9vw',
             backgroundColor: 'white',
             padding: '10px 20px',
-            width: '100%',
+            width: '6vw',
 
             '&:hover': {
                 backgroundColor: '#1E6262',
@@ -770,8 +771,8 @@ const Listings = () => {
                             {
                                 openXport ? 
                                 <Box className={classes.exportBox} component="span">
-                                    <Typography onClick={downloadAll} component="button">Export All</Typography>
-                                    <Typography onClick={downloadRecords} component="button">Export Page</Typography>
+                                    <Typography onClick={downloadAll} component="span">Export All</Typography>
+                                    <Typography onClick={downloadRecords} component="span">Export Page</Typography>
                                 </Box> : ''
                             }
                         </GenericButton>

@@ -42,14 +42,15 @@ const useStyles = makeStyles((theme) => ({
         right: 65,
         borderRadius: 5,
         boxShadow: '1px 1px 1px 1.3px #c7c7c7',
+        display: 'flex',
+        flexDirection: 'column',
+        
 
         '& span': {
-            outline: 'none',
-            border: 'none',
             fontSize: '.9vw',
             backgroundColor: 'white',
             padding: '10px 20px',
-            width: '100%',
+            width: '6vw',
 
             '&:hover': {
                 backgroundColor: '#1E6262',
@@ -466,7 +467,6 @@ const Transactions = () => {
     }, [dispatch, currentPage]);
 
     useEffect(() => {
-        console.log('tre')
         if (!!transactions)  {
             setLoading(false)
         }
@@ -520,18 +520,6 @@ const Transactions = () => {
     const downloadAll = async () => {
         await exportAllTransactionRecords(admin)
     }
-
-    // useEffect(() => {
-    //     if (currentPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, currentPage]);
-
-    // useEffect(() => {
-    //     if (rowsPerPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, rowsPerPage]);
 
     const handleSetTab = (tab) => {
         setTab(tab);

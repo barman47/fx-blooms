@@ -207,7 +207,7 @@ export const olimpicMedals = [{
     2: 'buyer',
     3: 'seller',
     4: 'id',
-    5: 'buyer',
+    5: 'isClosed',
     6: 'dateCreated',
   }
 
