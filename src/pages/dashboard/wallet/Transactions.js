@@ -15,14 +15,11 @@ const useStyles = makeStyles(theme => ({
             display: 'none'
         },
 
-        '& header': {
-            marginBottom: theme.spacing(2),
-
-            '& h6': {
-                color: COLORS.offBlack,
-                fontWeight: '600',
-                margin: 0,
-            }
+        '& h6': {
+            color: COLORS.offBlack,
+            fontWeight: '600',
+            margin: theme.spacing(2, 0, 1, 0),
+            textAlign: 'center'
         }
     },
     transactions: {
@@ -38,10 +35,7 @@ const Transactions = () => {
 
     return (
         <section className={classes.root}>
-            <header>
-                <Typography variant="h6" className={classes.header}>Transaction History</Typography>
-                <Typography variant="body2" component="p" className={classes.header}>Here are the recent transactions on your wallets</Typography>
-            </header>
+            <Typography variant="h6" className={classes.header}>Transaction History</Typography>
             <div className={classes.transactions}>
                 <Transaction 
                     date="19/09/2021"

@@ -30,7 +30,7 @@ import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/typ
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getAccountId from '../../../utils/getAccountId';
+import getAccount from '../../../utils/getAccount';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 import PendingIdModal from './PendingIdModal';
@@ -474,7 +474,7 @@ const MakeListing = (props) => {
                 // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
             Bank,
-            accountID: getAccountId(ReceivingAccount, accounts),
+            accountID: getAccount(ReceivingAccount, accounts).accountID,
             reference
         };
 

@@ -20,13 +20,13 @@ import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
-import { fundWallet } from '../../../actions/wallets';
+import { requestWalletFunding } from '../../../actions/wallets';
 import { GET_ERRORS, SET_FUNDING_DETAILS } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS } from '../../../utils/constants';
-import getAccountId from '../../../utils/getAccountId';
+import getAccount from '../../../utils/getAccount';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
@@ -131,7 +131,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -145,6 +145,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
     const [institution, setInstitution] = useState('');
+    const [institutionId, setInstitutionId] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
     const [loading, setLoading] = useState(false);
@@ -196,13 +197,17 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+        const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
         const data = {
-            institutionId: institution,
+            institutionId: institutionId,
+            institution: institution,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
             walletId: wallet.id,
-            accountId: sourceAccount ? getAccountId(sourceAccount, accounts) : '',
+            accountId: sourceAccount ? accountID : '',
+            accountName: sourceAccount ? accountName : '',
+            accountNumber: sourceAccount ? accountNumber : '',
             reference: "WALLET FUNDING"
         };
 
@@ -212,7 +217,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
             return setErrors({ ...errors, msg: 'Invalid funding data!' });
         }
         setLoading(true);
-        fundWallet(data, navigate);
+        requestWalletFunding(data, navigate);
     };
 
     return (
@@ -319,7 +324,8 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 autoHighlight
                                 disableClearable
                                 getOptionLabel={(option) => {
-                                    setInstitution(option.id);
+                                    setInstitutionId(option.id);
+                                    setInstitution(option.fullName);
                                     return option.fullName;
                                 }}
                                 renderOption={(option) => (
@@ -434,7 +440,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
     getInstitutions: PropTypes.func.isRequired,
-    fundWallet: PropTypes.func.isRequired
+    requestWalletFunding: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { fundWallet, getCurrencies, getInstitutions })(FundWallet);
+export default connect(undefined, { requestWalletFunding, getCurrencies, getInstitutions })(FundWallet);

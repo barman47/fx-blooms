@@ -217,7 +217,7 @@ const App = () => {
 								<Route path={TRANSACTION_STATUS} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={WALLETS} element={<Wallet handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
-								<Route path={`${FUND_AUTHORIZATION_SUCCESS}/:id/type/credit`} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
+								<Route path={FUND_AUTHORIZATION_SUCCESS} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
 								<Route path={REQUEST_WITHDRAWAL} element={<RequestWithdrawal handleSetTitle={handleSetTitle} />} />
 								<Route path={VERIFF} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />

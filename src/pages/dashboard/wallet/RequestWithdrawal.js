@@ -8,7 +8,6 @@ import {
     FormHelperText,
     Grid,
     MenuItem,
-    Radio,
     Select,
     TextField,
     Typography 
@@ -17,22 +16,21 @@ import { makeStyles } from '@material-ui/core/styles';
 import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 
-import { getCurrencies } from '../../../actions/currencies';
-import { getInstitutions } from '../../../actions/institutions';
-import { fundWallet } from '../../../actions/wallets';
-import { GET_ERRORS, SET_FUNDING_DETAILS } from '../../../actions/types';
+import { getWallets, requestWithdrawal } from '../../../actions/wallets';
+import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
-import { COLORS } from '../../../utils/constants';
-import getAccountId from '../../../utils/getAccountId';
+import getAccountId from '../../../utils/getAccount';
 import validateRequestWithdrawal from '../../../utils/validation/wallets/withdraw';
-import moveToNextField from '../../../utils/moveToNextField';
+// import moveToNextField from '../../../utils/moveToNextField';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
+import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import formatNumber from '../../../utils/formatNumber';
+import { DASHBOARD_HOME } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -43,7 +41,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(0, 5, 2, 5),
 
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0, 1, 1, 1),
+            padding: theme.spacing(0)
         },
 
         '& form': {
@@ -75,14 +73,14 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const RequestWithdrawal = ({ handleSetTitle }) => {
+const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
-    const { customer } = useSelector(state => state);
+    const { customerId, firstName, lastName, msg } = useSelector(state => state.customer);
     const { wallet } = useSelector(state => state.wallets);
 
     const [currency] = useState('EUR');
@@ -91,20 +89,20 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
     const [reference, setReference] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [withdrawalFee, setWithdrawalFee] = useState(0);
-    const [first, setFirst] = useState('');
-    const [second, setSecond] = useState('');
-    const [third, setThird] = useState('');
-    const [fourth, setFourth] = useState('');
+    // const [first, setFirst] = useState('');
+    // const [second, setSecond] = useState('');
+    // const [third, setThird] = useState('');
+    // const [fourth, setFourth] = useState('');
 
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
-    const firstField = useRef();
-    const secondField = useRef();
-    const thirdField = useRef();
-    const fourthField = useRef();
+    // const firstField = useRef();
+    // const secondField = useRef();
+    // const thirdField = useRef();
+    // const fourthField = useRef();
 
+    const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
@@ -115,9 +113,17 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
     // Set withdrawal fee when user enters amount
     useEffect(() => {
         if (amount) {
-            setWithdrawalFee((1/100) * amount);
+            setWithdrawalFee(((1/100) * amount).toFixed(2));
         }
     }, [amount]);
+
+    useEffect(() => {
+        if (msg) {
+            setLoading(false);
+            successModal.current.setModalText(msg);
+            successModal.current.openModal();
+        }
+    }, [msg]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -146,17 +152,18 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+
         const data = {
-            fullName: `${customer.firstName} ${customer.lastName}`,
+            fullName: `${firstName} ${lastName}`,
             type: 2,
             amount: amount ? Number(amount) : '',
             walletId: wallet.id,
-            accountId: sourceAccount ? getAccountId(sourceAccount, accounts) : '',
+            accountId: sourceAccount ? getAccountId(sourceAccount, accounts).accountID : '',
             reference,
-            first,
-            second,
-            third,
-            fourth
+            // first,
+            // second,
+            // third,
+            // fourth
         };
 
         const { errors, isValid } = validateRequestWithdrawal(data);
@@ -164,7 +171,21 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid withdrawal data!' });
         }
+
+        if (data.amount > wallet.balance.available) {
+            return setErrors({ ...errors, amount: `Wallet balance (EUR ${formatNumber(wallet.balance.available, 2)}) not enough for withdrawal`, msg: 'Insufficient wallet balance!' });
+        }
         setLoading(true);
+        requestWithdrawal(data);
+    };
+
+    const dismissAction = () => {
+        dispatch({
+            type: SET_CUSTOMER_MSG,
+            payload: null
+        });
+        getWallets(customerId);
+        navigate(DASHBOARD_HOME);
     };
 
     return (
@@ -180,6 +201,7 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
             }
             {loading && <Spinner />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="h6" color="primary" className={classes.pageTitle}>Request Withdrawal</Typography>
@@ -257,7 +279,7 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
                                 fullWidth 
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Typography variant="body2" component="p">Enter PIN</Typography>
                         </Grid>
                         <Grid item xs={3}>
@@ -332,7 +354,7 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
                                 ref={fourthField}
                                 disabled={loading}
                             />
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 
@@ -365,7 +387,8 @@ const RequestWithdrawal = ({ handleSetTitle }) => {
 };
 
 RequestWithdrawal.propTypes = {
-    
+    getWallets: PropTypes.func.isRequired,
+    requestWithdrawal: PropTypes.func.isRequired
 };
 
-export default connect(undefined, {  })(RequestWithdrawal);
+export default connect(undefined, { getWallets, requestWithdrawal })(RequestWithdrawal);
