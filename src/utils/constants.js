@@ -217,3 +217,9 @@ export const olimpicMedals = [{
     DECLINED: 'declined',
     ACCEPTED: 'approved'
   }
+
+  export const LISTING_CATEGORY = {
+    OPEN: 'OPEN',
+    CANCELED: 'CANCELED',
+    REMOVED: 'REMOVED'
+  }

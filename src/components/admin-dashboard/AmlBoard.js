@@ -6,7 +6,7 @@ import {
 import clsx from 'clsx'
 
 
-const AmlBoard = ({ amlTitle, amlNumber, classes, editable, formField, clsxAmlTitleStyles, clsxAmlNumStyles }) => {
+const AmlBoard = ({ amlTitle, amlNumber, classes, editable, formField, clsxAmlTitleStyles, otherStyles }) => {
 
   const AMLBoard = useMemo(() => {
     return (
@@ -15,12 +15,12 @@ const AmlBoard = ({ amlTitle, amlNumber, classes, editable, formField, clsxAmlTi
         <Typography className={clsx(classes.amlTitle, clsxAmlTitleStyles)} variant="subtitle1">{amlTitle}</Typography>
         {
           !!editable ? formField : 
-          <Typography className={clsx(classes.amlNumber, clsxAmlNumStyles)} variant="subtitle1">{amlNumber}</Typography>
+          <Typography className={clsx(classes.amlNumber, otherStyles)} variant="subtitle1">{amlNumber}</Typography>
         }
       </Box>
     </>
     )
-  }, [amlTitle, amlNumber, classes, editable, formField, clsxAmlTitleStyles, clsxAmlNumStyles])
+  }, [amlTitle, amlNumber, classes, editable, formField, clsxAmlTitleStyles, otherStyles])
 
   
   return AMLBoard

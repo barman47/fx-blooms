@@ -21,6 +21,7 @@ import isEmpty from '../../../utils/isEmpty';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard';
 // import Status from '../../../components/admin-dashboard/Status';
 import formatId from '../../../utils/formatId';
+import ExportAllLoader from '../../../components/admin-dashboard/ExportAllLoader'
 
 
 
@@ -421,6 +422,7 @@ const Transactions = () => {
 
     const [viewMoreData, setViewMoreData] = useState({})
     const [openViewMore, setOpenViewMore] = useState(false)
+    const [exportAllLoader, setExportAllLoader] = useState(false);
 
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
@@ -518,7 +520,9 @@ const Transactions = () => {
     };
 
     const downloadAll = async () => {
+        setExportAllLoader(true)
         await exportAllTransactionRecords(admin)
+        setExportAllLoader(false)
     }
 
     const handleSetTab = (tab) => {
@@ -682,7 +686,7 @@ const Transactions = () => {
                                 <AmlBoard  classes={classes} amlTitle={"Bank:"} amlNumber={viewMoreData.bank} />
                             </Box>
                             <Box component="div">
-                                <AmlBoard  classes={classes} amlTitle={"Current Status"} clsxAmlNumStyles={handleStatus(viewMoreData.status)} amlNumber={viewMoreData.status} />
+                                <AmlBoard  classes={classes} amlTitle={"Current Status"} amlNumber={viewMoreData.status} />
                                 <AmlBoard  classes={classes} amlTitle={"Listed Time"} amlNumber={handleDate(viewMoreData.dateCreated).time + handleDate(viewMoreData.dateCreated).space + handleDate(viewMoreData.dateCreated).date} />
                                 <AmlBoard  classes={classes} amlTitle={"Work Flow"} amlNumber={'BUY ' + currentAmount(viewMoreData.amountNeeded).currencyType} />
                                 <AmlBoard  classes={classes} amlTitle={"Current Rate"} amlNumber={viewMoreData.exchangeRate} />
@@ -728,6 +732,12 @@ const Transactions = () => {
                     </Box>
                 </Box> :
                 ''
+            }
+
+            {
+                exportAllLoader ?
+                <ExportAllLoader loader={exportAllLoader} />
+                : ''
             }
         </section>
     </>

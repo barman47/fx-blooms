@@ -40,7 +40,7 @@ import GenericTableHeader from '../../../components/admin-dashboard/GenericTable
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight } from 'mdi-material-ui';
 import { exportRecords } from '../../../utils/exportRecords'
-import CircularProgressBar from '../../../components/admin-dashboard/CircularProgressBar'
+import ExportAllLoader from '../../../components/admin-dashboard/ExportAllLoader'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -889,9 +889,8 @@ const Customers = (props) => {
 
                 {
                     exportAllLoader ?
-                    <Box component="div" className={classes.exportLoader}>
-                        <CircularProgressBar newWidth="40px" newHeight="40px" topMargin="50px" />
-                    </Box> : ''
+                    <ExportAllLoader loader={exportAllLoader} />
+                    : ''
                 }
             </section>
         </>

@@ -1,6 +1,7 @@
-import { CUSTOMER_CATEGORY } from './constants';
+import { CUSTOMER_CATEGORY, LISTING_CATEGORY } from './constants';
 
 const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
+const { OPEN, CANCELED, REMOVED } = LISTING_CATEGORY
 
 const handleStatusStyle = (status, classes) => {
   switch (status) {
@@ -8,14 +9,16 @@ const handleStatusStyle = (status, classes) => {
       return classes.verified
     case PENDING:
       return classes.pending
-    case "OPEN":
+    case OPEN:
       return classes.verified
     case REJECTED:
       return classes.rejected
-    case "REMOVED":
+    case REMOVED:
       return classes.rejected
     case SUSPENDED:
       return classes.suspended
+    case CANCELED:
+      return classes.rejected
     case true:
       return classes.verified
     case false:

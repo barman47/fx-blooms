@@ -33,7 +33,7 @@ const GenericGridAuth = ({ statusName, bgColor, textColor, twoFactorName, mb, bt
   return (
     <Box component="div" sx={{ marginBottom: mb, gridTemplateColumns: gridColumns ?? '2fr 1fr', }} className={classes.btnGroup}>
       <Typography style={{ width: btnWidth ?? '10.8vw'}} className={classes.btnLeft} component="div">{ twoFactorName } &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Typography>
-      <Status extraStyles={conditionalStyles} wdth="fit-content" fontSz=".9vw" statusName={statusName} bgColor={bgColor} textColor={textColor} />
+      <Status extraStyles={conditionalStyles} wdth="max-content" fontSz=".9vw" statusName={statusName} bgColor={bgColor} textColor={textColor} />
     </Box>
   )
 }

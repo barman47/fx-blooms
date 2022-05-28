@@ -239,8 +239,6 @@ const TransactionDetails = () => {
   // useEffect(() => {
   //   dispatch(getCustomer(customer.id))
   // }, [dispatch, customer])
-
-  console.log('trans')
   
   return (
     <>
