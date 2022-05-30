@@ -1,29 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCustomer } from '../../../actions/customer';
-// import { getListingByStatus } from '../../../actions/adminListings';
+// import { getCustomer } from '../../../actions/customer';
+import { getTransactions, exportAllTransactionRecords } from '../../../actions/admin';
 import clsx from 'clsx';
-import { Box, Typography, Grid, Checkbox, FormControlLabel, Slider } from '@material-ui/core';
+import { Box, Typography, Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
-import { COLORS, LISTING_DETAILS } from '../../../utils/constants';
-import AllListings from './AllListings'
-import ActiveListings from './ActiveListings';
-import InProgressListings from './InProgressListings';
-import RemovedListings from './RemovedListings';
-import CompletedListings from './CompletedListings';
+import { COLORS, TRANSACTION_DETAILS } from '../../../utils/constants';
+import AllTransactions from './AllTransactions'
+// import AllOpen from './AllOpen';
+// import AllNegotiations from './AllNegotiations';
+// import AllRemoved from './AllRemoved';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter, CloseCircleOutline } from 'mdi-material-ui';
-import { exportAllUserRecords } from '../../../actions/admin';
-import { getAllListings, getActiveListings, getListingsInProgress, getFinalisedListings, getDeletedListings } from '../../../actions/adminListings';
-// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+// import { getStats } from '../../../actions/admin';
+import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 import { exportRecords } from '../../../utils/exportRecords'
 import isEmpty from '../../../utils/isEmpty';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard';
 // import Status from '../../../components/admin-dashboard/Status';
 import formatId from '../../../utils/formatId';
-import handleStatusStyle from '../../../utils/statusDisplay'
+import ExportAllLoader from '../../../components/admin-dashboard/ExportAllLoader'
 
 
 
@@ -41,10 +39,10 @@ const useStyles = makeStyles((theme) => ({
 
     exportBox: {
         position: 'absolute',
-        top: 47,
-        right: 1,
+        top: 116,
+        right: 65,
         borderRadius: 5,
-        boxShadow: '1px 1px 1px 1.5px #c7c7c7',
+        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
         display: 'flex',
         flexDirection: 'column',
         
@@ -60,89 +58,6 @@ const useStyles = makeStyles((theme) => ({
                 color: 'white'
             }
         }
-    },
-
-    filterBoxContainer: {
-        position: 'absolute',
-        top: 50,
-        right: 150,
-        zIndex: 1000,
-        width: '100%',
-        height: '100%',
-    },
-
-    filterBoxContent: {
-        width: 400,
-        // height: 200,
-        backgroundColor: 'white',
-        borderRadius: 10,
-        boxShadow: '1px 1px 1px 1.3px #c7c7c7',
-    },
-
-    filterBoxHeader: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 0px',
-        padding: '.7rem 1.5rem',
-        borderBottom: '1px solid #CBCBCB',
-        alignItems: 'center',
-
-        '& span': {
-            fontSize: '1rem',
-            cursor: 'pointer'
-        }
-    },
-
-    filterBoxMain: {
-        // padding: '1rem 1.5rem',
-    },
-
-    filterContentDate: {
-        marginTop: '.6rem',
-        // marginBottom: '1.5rem',
-        padding: '1rem 1.5rem',
-
-        '& label': {
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 10,
-
-            fontSize: '1rem',
-
-            '& input': {
-                height: 30,
-                borderRadius: 5,
-                outline: 'none',
-                border: '1px solid #C4C4C4',
-                padding: 5
-            }
-        }
-    },
-
-    filterTransactionType: {
-        display: 'grid',
-        gridTemplateColumns: '1fr',
-        padding: '1rem 1.5rem',
-        gap: '.5rem',
-
-        // marginBottom: '1.5rem'
-    },
-
-    filterAmount: {
-        padding: '1rem 1.5rem',
-        borderBottom: '1px solid #C4C4C4'
-    },
-
-    amountRange: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(7, 1fr)'
-    },
-
-    filterButton: {
-        display: 'flex',
-        gap: 15,
-        justifyContent: 'flex-end',
-        marginRight: 10,
-        padding: '1.5rem 1.5rem',
     },
 
     title: {
@@ -162,7 +77,7 @@ const useStyles = makeStyles((theme) => ({
         // gap: theme.spacing(4),
         marginTop: theme.spacing(3),
         borderBottom: '1px solid #E3E8EE',
-        width: '90%'
+        width: '70%'
     },
 
     filter: {
@@ -172,7 +87,7 @@ const useStyles = makeStyles((theme) => ({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         // padding: theme.spacing(1),
-        width: 'max-content',
+        width: 'fit-content',
         // gap: theme.spacing(1),
         color: '#697386',
         padding: '5px',
@@ -308,8 +223,6 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: '600 !important',
         justifySelf: 'self-start',
         fontSize: '1vw',
-        padding: '.1rem .5rem',
-        borderRadius: 6,
 
         '& p:first-child': {
             fontWeight: '600 !important',
@@ -321,15 +234,13 @@ const useStyles = makeStyles((theme) => ({
         height: '42%',
         width: '70%',
         overflowX: 'hidden',
-        // display: 'flex',
-        // flexDirection: 'column-reverse',
     },
 
     viewMoreBids: {
         display: 'grid',
         gridTemplateColumns: 'repeat(3, max-content)',
         padding: '.5rem .5rem .5rem 2rem',
-        marginTop: '2rem',
+        marginTop: '1.5rem',
         columnGap: '1rem',
         rowGap: '1.7rem',
         alignItems: 'center'
@@ -381,7 +292,7 @@ const useStyles = makeStyles((theme) => ({
     userStatusTitle: {
         // backgroundColor: '#DDF2E5',
         color: '#1E6262',
-        width: 'max-content',
+        width: 'fit-content',
         borderRadius: '5px',
         fontSize: '.9vw',
         textAlign: 'center',
@@ -443,21 +354,16 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-function valuetext(value) {
-    // console.log('valueText', value)
-    return `${value}°C`;
-  }
-
 const columns = [
-    { id: 'id', label: ''},
+    // { id: 'id', label: ''},
     {
-      id: 'listing ID',
-      label: 'Listing ID',
+      id: 'transaction type',
+      label: 'Transaction Type',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'owner',
-      label: 'Owner',
+      id: 'payer',
+      label: 'Payer',
       format: (value) => value.toLocaleString('en-US'),
     },
     {
@@ -466,64 +372,62 @@ const columns = [
       format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'rate',
-      label: 'Rate',
+      id: 'receiver',
+      label: 'Receiver',
       format: (value) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'transaction ID',
+        label: 'Transaction ID',
+        format: (value) => value.toLocaleString('en-US'),
     },
     {
         id: 'status',
         label: 'Status',
         format: (value) => value.toLocaleString('en-US'),
-      },
-    {
-        id: 'timeStamp',
-        label: 'Timestamp',
-        format: (value) => value.toLocaleString('en-US'),
     },
     {
-      id: 'action',
-      label: 'Action',
+      id: 'timestamp',
+      label: 'Timestamp',
       format: (value) => value.toLocaleString('en-US'),
+    },
+    {
+        id: 'action',
+        label: 'Action',
+        format: (value) => value.toLocaleString('en-US'),
     },
 ];
 
-const gridColumns = '.3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr';
+const gridColumns = '1fr 1fr 1fr 1fr 1fr .8fr 1fr .6fr';
 
 const pages = [15, 25, 50, 100]
 
-const Listings = () => {
+const Transactions = () => {
     const classes = useStyles()
     const dispatch = useDispatch();
 
     const { admin } = useSelector(state => state);
     const { customer } = useSelector(state => state.customers);
 
-    const { ALL_LISTINGS, ALL_DELETED, ALL_NEGOTIATIONS, ALL_COMPLETED, ALL_OPEN } = LISTING_DETAILS;
-    const [tab, setTab] = useState(ALL_LISTINGS);
+    const { ALL_TRANSACTIONS } = TRANSACTION_DETAILS
+    const [tab, setTab] = useState(ALL_TRANSACTIONS);
     const [loading, setLoading] = useState(true)
     const [pageNumberList, setPageNumberList] = useState([])
     const [ currentPage, setCurrentPage ] = useState(1)
     const [pageCount, setPageCount] = useState(0);
     const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-
+    const [openXport, closeXport] = useState(false);
     const [customerName, setCustomerName] = useState('')
 
     const [viewMoreData, setViewMoreData] = useState({})
     const [openViewMore, setOpenViewMore] = useState(false)
-    const [openFilterBx, setOpenFilterBx] = useState(false)
-    const [openXport, closeXport] = useState(false);
+    const [exportAllLoader, setExportAllLoader] = useState(false);
 
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
-    const { totalListings } = useSelector(state => state.stats)
-    const { totalPageCount, listings, activeListings, finalisedListings, inProgressListings, deletedListings } = useSelector(state => state.listings)
-
-    const [value, setValue] = useState([1, 70]);
-
-    const handleChange = (event, newValue) => {
-      setValue(newValue);
-    };
+    const { totalTransactions } = useSelector(state => state.stats)
+    const { totalPageCount, transactions } = useSelector(state => state.transactions)
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = []
@@ -550,164 +454,85 @@ const Listings = () => {
         }
     }, [tab]);
 
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_SIZE,
-    //         payload: rowsPerPage
-    //     });
-    // }, [dispatch, rowsPerPage]);
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_SIZE,
+            payload: rowsPerPage
+        });
+    }, [dispatch, rowsPerPage]);
     
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_NUMBER,
-    //         payload: currentPage
-    //     });
-    // }, [dispatch, currentPage]);
+    useEffect(() => {
+        dispatch({
+            type: SET_PAGE_NUMBER,
+            payload: currentPage
+        });
+    }, [dispatch, currentPage]);
 
     useEffect(() => {
-        switch (tab) {
-            case ALL_LISTINGS:
-                if (!!listings)  {
-                    setLoading(false)
-                }
-                break;
-
-            case ALL_OPEN:
-                if (!!activeListings.items)  {
-                    setLoading(false)
-                }
-                break;
-            
-            case ALL_COMPLETED:
-                if (!!finalisedListings)  {
-                    setLoading(false)
-                }
-                break;
-
-            case ALL_NEGOTIATIONS:
-                if (!!inProgressListings)  {
-                    setLoading(false)
-                }
-                break;
-
-            case ALL_DELETED:
-                if (!!deletedListings)  {
-                    setLoading(false)
-                }
-                break;
-
-            default:
-                break;
+        if (!!transactions)  {
+            setLoading(false)
         }
-    }, [tab, ALL_LISTINGS, ALL_OPEN, ALL_COMPLETED, ALL_NEGOTIATIONS, ALL_DELETED, activeListings, inProgressListings, finalisedListings, deletedListings, listings])
+    }, [transactions])
 
     useEffect(() => {
         setLoading(true)
         switch (tab) {
-            case ALL_LISTINGS:
-                dispatch(getAllListings({
+            case ALL_TRANSACTIONS:
+                dispatch(getTransactions({
                     pageSize: rowsPerPage,
                     pageNumber: currentPage
                 }))
                 setPageCount(totalPageCount || 0);
                 break;
 
-            case ALL_OPEN:
-                dispatch(getActiveListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_COMPLETED:
-                dispatch(getFinalisedListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_NEGOTIATIONS:
-                dispatch(getListingsInProgress({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
-
-            case ALL_DELETED:
-                dispatch(getDeletedListings({
-                    pageSize: rowsPerPage,
-                    pageNumber: currentPage
-                }))
-                setPageCount(totalPageCount || 0);
-                break;
+            // case ALL_OPEN:
+            //     getAllTransactions({
+            //         pageSize: rowsPerPage,
+            //         pageNumber: currentPage
+            //     })
+            //     setPageCount(totalPageCount || 0);
+            //     break;
 
             default:
                 break;
         }
         handlePageNUmberList()
-    }, [ALL_LISTINGS, ALL_OPEN, ALL_COMPLETED, ALL_NEGOTIATIONS, ALL_DELETED, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount, ])
+    }, [ALL_TRANSACTIONS, tab, handlePageNUmberList, currentPage, rowsPerPage, dispatch, totalPageCount])
 
     const downloadRecords = () => {
         let data = []        
         switch (tab) {
-            case ALL_LISTINGS:
-                data = [...listings];
+            case ALL_TRANSACTIONS:
+                data = [...transactions];
                 break;
 
-            case ALL_OPEN:
-                data = [...activeListings];
-                break;
-            
-            case ALL_COMPLETED:
-                data = [...finalisedListings];
-                break;
-
-            case ALL_NEGOTIATIONS:
-                data = [...inProgressListings];
-                break;
-
-            case ALL_DELETED:
-                data = [...deletedListings];
-                break;
+            // case ALL_OPEN:
+            //     data = [...transactions];
+            //     break;
 
             default:
                 break;
         }
 
-        if (exportRecords(data, admin, tab)?.errors) {
+        if ( exportRecords(data, admin, tab)?.errors) {
             return
         }
     };
 
     const downloadAll = async () => {
-        await exportAllUserRecords(admin)
+        setExportAllLoader(true)
+        await exportAllTransactionRecords(admin)
+        setExportAllLoader(false)
     }
-
-    // useEffect(() => {
-    //     if (currentPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, currentPage]);
-
-    // useEffect(() => {
-    //     if (rowsPerPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, rowsPerPage]);
 
     const handleSetTab = (tab) => {
         setTab(tab);
         setRowsPerPage(pages[0]);
     }
 
-    const viewTableRow = (listing) => {
-        dispatch(getCustomer(listing.customerId))
-        setViewMoreData(listing)
+    const viewTableRow = (transaction) => {
+        setViewMoreData(transaction)
         setOpenViewMore(true)
-        
     }
 
     useEffect(() => {
@@ -737,30 +562,38 @@ const Listings = () => {
     }
 
     const handleStatus = useCallback((status) => {
-        if (ALL_LISTINGS) {
-            return handleStatusStyle(status, classes)
-        } else if (ALL_OPEN) {
-            return handleStatusStyle(status, classes)
-        } else {
+        if (ALL_TRANSACTIONS) {
+            switch (status) {
+                case "COMPLETED":
+                  return classes.verified
+                case "CANCELED":
+                  return classes.rejected
+                default:
+                  return 
+            }
+        } 
+        // else if (ALL_OPEN) {
+        //     return
+        // } 
+        else {
             return ''
         }
 
-      }, [ALL_LISTINGS, ALL_OPEN, classes])
+      }, [ALL_TRANSACTIONS, classes.rejected, classes.verified])
 
     return (
     <>
         <section className={classes.root}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
-                    {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
-                    {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>Open</Typography>}
-                    {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>In progess</Typography>}
-                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>Removed</Typography>}
-                    {tab === ALL_COMPLETED && <Typography variant="body1" className={classes.title}>Finalized</Typography>}
+                    {tab === ALL_TRANSACTIONS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
+                    {/* {tab === ALL_OPEN && <Typography variant="body1" className={classes.title}>All Open</Typography>}
+                    {tab === ALL_NEGOTIATIONS && <Typography variant="body1" className={classes.title}>All Negotiations</Typography>}
+                    {tab === ALL_DELETED && <Typography variant="body1" className={classes.title}>All Removed</Typography>} */}
                 </Grid>
                 <Grid item>
-                    <Box component="div" sx={{ display: 'flex', position: 'relative', flexDirection: 'row', gap: '10px'}}>
-                        <GenericButton clickAction={() => setOpenFilterBx(!openFilterBx)} buttonName="Filter">
+                    <Box component="div" sx={{ display: 'flex', flexDirection: 'row', gap: '10px'}}>
+                        <GenericButton buttonName="Filter">
                             <Filter />
                         </GenericButton>
                         <GenericButton clickAction={() => closeXport(!openXport)} buttonName="Export">
@@ -773,60 +606,6 @@ const Listings = () => {
                                 </Box> : ''
                             }
                         </GenericButton>
-                        {
-                            openFilterBx ? 
-                            <Box component="div" className={classes.filterBoxContainer}>
-                            <Box component="div" className={classes.filterBoxContent}>
-                                <Box component="div" className={classes.filterBoxHeader}>
-                                    <Typography component="h6" variant="h6">Filter</Typography>
-                                    <Typography component="span" onClick={() => setOpenFilterBx(false)}>x</Typography>
-                                </Box>
-                                <Box component="div" className={classes.filterBoxMain}>
-                                    <Box component="div" className={classes.filterContentDate}>
-                                        <label>
-                                            Date
-                                            <input type="date" />
-                                        </label>
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterTransactionType}>
-                                        <Typography variant="body1">Transaction Type</Typography>
-                                        <Box component="div" className={classes.checkBoxContainer}>
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Wallet Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Deposit" />
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Direct Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Withdrawal" />
-                                        </Box>
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterAmount}>
-                                        <Typography variant="body1">Amount</Typography>
-                                        <Box component="span" className={classes.amountRange}>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                        </Box>
-                                        <Slider
-                                        getAriaLabel={() => 'Temperature range'}
-                                        value={value}
-                                        onChange={handleChange}
-                                        valueLabelDisplay="auto"
-                                        getAriaValueText={valuetext}
-                                        />
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterButton}>
-                                        <GenericButton clickAction={() => setOpenFilterBx(false)} bdaColor="#1E6262" bxShadw="none" fontColor="#1E6262" buttonName="Cancel"/>
-                                        <GenericButton bdaColor="#1E6262" bxShadw="none" fontColor="white" bgColor="#1E6262" buttonName="Apply filter" />
-                                    </Box>
-                                </Box>
-                            </Box>
-                        </Box> : ''
-                        }
                         {/* <Menu
                             id="customer-menu"
                             anchorEl={anchorEl}
@@ -842,38 +621,31 @@ const Listings = () => {
                 </Grid>
             </Grid>
             <Box component="section" className={classes.filterContainer}>
-                <div className={clsx(classes.filter, tab === ALL_LISTINGS && classes.active)} onClick={() => handleSetTab(ALL_LISTINGS)}>
-                    <Typography variant="subtitle2" component="span">All Listings</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                <div className={clsx(classes.filter, tab === ALL_TRANSACTIONS && classes.active)} onClick={() => handleSetTab(ALL_TRANSACTIONS)}>
+                    <Typography variant="subtitle2" component="span">All Transactions</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
-
-                <div className={clsx(classes.filter, tab === ALL_COMPLETED && classes.active)} onClick={() => handleSetTab(ALL_COMPLETED)}>
-                    <Typography variant="subtitle2" component="span">Finalized</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
-                </div>
-
-                <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
-                    <Typography variant="subtitle2" component="span">Open</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                {/* <div className={clsx(classes.filter, tab === ALL_OPEN && classes.active)} onClick={() => handleSetTab(ALL_OPEN)}>
+                    <Typography variant="subtitle2" component="span">All Open</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_NEGOTIATIONS && classes.active)} onClick={() => handleSetTab(ALL_NEGOTIATIONS)}>
-                    <Typography variant="subtitle2" component="span">In progress</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
+                    <Typography variant="subtitle2" component="span">All Negotiations</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
                 </div>
 
                 <div className={clsx(classes.filter, tab === ALL_DELETED && classes.active)} onClick={() => handleSetTab(ALL_DELETED)}>
-                    <Typography variant="subtitle2" component="span">Removed</Typography>
-                    <Typography variant="subtitle2" component="span">{totalListings}</Typography>
-                </div>
+                    <Typography variant="subtitle2" component="span">All Removed</Typography>
+                    <Typography variant="subtitle2" component="span">{totalTransactions}</Typography>
+                </div> */}
             </Box>
             <Box component="div" className={classes.table}>
                 <GenericTableHeader columns={columns} gridColumns={gridColumns}/>
-                {tab === ALL_LISTINGS && <AllListings viewRow={viewTableRow} loadingListings={loading} />}
-                {tab === ALL_OPEN && <ActiveListings viewRow={viewTableRow} loadingListings={loading} />}
-                {tab === ALL_NEGOTIATIONS && <InProgressListings viewRow={viewTableRow} loadingListings={loading}/>}
-                {tab === ALL_DELETED && <RemovedListings viewRow={viewTableRow} loadingListings={loading} />}
-                {tab === ALL_COMPLETED && <CompletedListings viewRow={viewTableRow} loadingListings={loading} />}
+                {tab === ALL_TRANSACTIONS && <AllTransactions viewRow={viewTableRow} loadingTransactions={loading} />}
+                {/* {tab === ALL_OPEN && <AllOpen />} */}
+                {/* {tab === ALL_NEGOTIATIONS && <AllNegotiations />} */}
+                {/* {tab === ALL_DELETED && <AllRemoved />} */}
             </Box>
 
 
@@ -914,7 +686,7 @@ const Listings = () => {
                                 <AmlBoard  classes={classes} amlTitle={"Bank:"} amlNumber={viewMoreData.bank} />
                             </Box>
                             <Box component="div">
-                                <AmlBoard  classes={classes} amlTitle={"Current Status"} otherStyles={handleStatusStyle(viewMoreData.status, classes)} amlNumber={viewMoreData.status} />
+                                <AmlBoard  classes={classes} amlTitle={"Current Status"} amlNumber={viewMoreData.status} />
                                 <AmlBoard  classes={classes} amlTitle={"Listed Time"} amlNumber={handleDate(viewMoreData.dateCreated).time + handleDate(viewMoreData.dateCreated).space + handleDate(viewMoreData.dateCreated).date} />
                                 <AmlBoard  classes={classes} amlTitle={"Work Flow"} amlNumber={'BUY ' + currentAmount(viewMoreData.amountNeeded).currencyType} />
                                 <AmlBoard  classes={classes} amlTitle={"Current Rate"} amlNumber={viewMoreData.exchangeRate} />
@@ -923,16 +695,16 @@ const Listings = () => {
                         </Box>
                         <Box component="div" className={classes.viewMoreBidsContainer}>
                             {
-                                viewMoreData.bids.map((listing, index) => {
+                                viewMoreData.bids.map((transaction, index) => {
                                 return (
                                 <Box key={index} component="div" className={classes.viewMoreBids}>
                                     <Box component="div" className={classes.circleDesign}>
-                                        <Box component="div" className={clsx(classes.circle, classes.status, handleStatus(listing.status))}></Box>
+                                        <Box component="div" className={clsx(classes.circle, classes.status, handleStatus(transaction.status))}></Box>
                                         <Box component="div" className={classes.line}></Box>    
                                     </Box>  
                                     <Box component="div" className={classes.statusContainer}>
-                                        <Typography variant="h6" className={clsx(classes.userStatusTitle, classes.status, handleStatus(listing.status))}>
-                                            {listing.status}
+                                        <Typography variant="h6" className={clsx(classes.userStatusTitle, classes.status, handleStatus(transaction.status))}>
+                                            {transaction.status}
                                         </Typography>
                                         <Box component="span"  className={classes.subStatus}>
                                             <Typography component='span'>Test: </Typography>
@@ -953,13 +725,23 @@ const Listings = () => {
                                 })
                             }
                         </Box>
+
+                        <Box component="div" className={classes.filterBoxContainer}>
+                            <Typography component=""></Typography>
+                        </Box>
                     </Box>
                 </Box> :
                 ''
+            }
+
+            {
+                exportAllLoader ?
+                <ExportAllLoader loader={exportAllLoader} />
+                : ''
             }
         </section>
     </>
     )
 }
 
-export default Listings;
+export default Transactions;

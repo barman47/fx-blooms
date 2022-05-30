@@ -6,6 +6,7 @@ import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 // import { CUSTOMER_CATEGORY } from '../../utils/constants';
+import clsx from 'clsx'
 
 
 const useStyles = makeStyles(theme =>({
@@ -94,13 +95,13 @@ const DepositAndWithdrawalTable = ({ data, handleClick, otherRows }) => {
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer.email ? customer.email : ''} lines={1} />
                 </Typography>
-                <Typography component="span" className={[classes.tableCell, classes.status]} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
                 { customer.customerStatus }
                 </Typography>
-                <Typography component="span" className={[classes.tableCell, classes.status]} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
                 { customer.customerStatus }
                 </Typography>
-                <Typography component="span" className={[classes.tableCell, classes.status]} variant="subtitle1">
+                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
                 { customer.customerStatus }
                 </Typography>
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">

@@ -239,8 +239,6 @@ const TransactionDetails = () => {
   // useEffect(() => {
   //   dispatch(getCustomer(customer.id))
   // }, [dispatch, customer])
-
-  console.log('trans')
   
   return (
     <>
@@ -270,7 +268,7 @@ const TransactionDetails = () => {
               </FormControl>
             </Box>
           </div> */}
-          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
+          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle="true">
             <Box component="div" className={classes.transactionHeader}>
               <Typography component="h6">LISTINGS</Typography>
                 {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
@@ -322,7 +320,7 @@ const TransactionDetails = () => {
                   </div>
             </div>
           </Paper>
-          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
+          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle="true">
           <Box component="div" className={classes.transactionHeader}>
               <Typography variant="h6">Transactions</Typography>
                 {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
@@ -367,7 +365,7 @@ const TransactionDetails = () => {
 
           </Paper>
 
-          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
+          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle="true">
           <Box component="div" className={classes.transactionHeader}>
               <Typography component="h6" >Volume</Typography>
                 {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
@@ -412,7 +410,7 @@ const TransactionDetails = () => {
 
           </Paper>
 
-          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle>
+          <Paper className={classes.paperBx} elevation={2} variant="outlined" rectangle="true">
           <Box component="div" className={classes.transactionHeader}>
               <Typography variant="h6">Fees</Typography>
                 {/* <GenericSelect selectFilterName={filterName} FILTERS={ADMIN_FILTERS} selectValue={filterType} setOnChange={handleOnChange} loading={loading} /> */}
@@ -455,7 +453,7 @@ const TransactionDetails = () => {
           <div className={classes.subDetailTitle}>
             <Typography color="primary" variant="h6">Wallets</Typography>
           </div>
-          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle>
+          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle="true">
             <div className={classes.cardLeftContent}>
               <Typography className={classes.walletCurrency} variant="subtitle2">
                 <img className={classes.walletIcon} alt="icon" src={icon} />
@@ -470,7 +468,7 @@ const TransactionDetails = () => {
               <img className={classes.walletDesign} src={Shape} alt="wallet design" />
             </Box>
           </Paper>
-          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle>
+          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle="true">
             <div className={classes.cardLeftContent}>
               <Typography className={classes.walletCurrency} variant="subtitle2">
                 <img className={classes.walletIcon} alt="icon" src={icon} />

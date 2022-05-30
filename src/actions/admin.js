@@ -12,9 +12,11 @@ import {
     SET_CUSTOMERS,
     SET_TRANSACTION_VOLUME,
     SET_STATS,
+    SET_TRANSACTIONS,
     SET_ACTIVE_CUSTOMER_COUNT, 
     UPDATED_CUSTOMER 
 } from './types';
+import { exportRecords } from '../utils/exportRecords'
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Admin`;
@@ -90,7 +92,6 @@ export const getTransactionVolume = (timeframe) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.get(`${api}/GetTransactionVolume?timeframe=${timeframe}`);
-        console.log('hello')
         return dispatch({
             type: SET_TRANSACTION_VOLUME,
             payload: res.data.data
@@ -120,6 +121,41 @@ export const updateCustomerProfile = (data) => async (dispatch) => {
         return dispatch({
             type: UPDATED_CUSTOMER,
             payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const exportAllUserRecords = async (admin) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/DownloadAllUserData`);
+        exportRecords(res.data.data, admin)
+        return res.data.data
+    } catch (err) {
+        return err
+    }
+}
+
+export const exportAllTransactionRecords = async (admin) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${api}/DownloadAllTransactionData`);
+        exportRecords(res.data.data, admin)
+        return res.data.data
+    } catch (err) {
+        return err
+    }
+}
+
+export const getTransactions = (query) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.post(`${api}/GetAllTransactions`, query);
+        return dispatch({
+            type: SET_TRANSACTIONS,
+            payload: res.data.data            
         });
     } catch (err) {
         return handleError(err, dispatch);

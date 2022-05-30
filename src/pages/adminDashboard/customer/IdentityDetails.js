@@ -304,11 +304,13 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
 
     const handleApproveId = () => {
         setLoading(true);
+        handleClose()
         approveIdCard(customer.id);
     };
 
     const handleApproveResidencePermit = () => {
         setLoading(true);
+        handleClose()
         approveResidencePermit(customer.id);
     };
 

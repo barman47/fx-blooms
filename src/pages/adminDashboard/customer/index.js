@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Box, Typography, Grid } from '@material-ui/core';
+import { Box, Typography, Grid, Switch  } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import clsx from 'clsx';
 
@@ -29,6 +29,16 @@ const useStyles = makeStyles(theme =>({
         }
     },
 
+    header: {
+        display: 'flex',
+        gap: 10,
+        alignItems: 'center',
+
+        '& + span': {
+            marginTop: 8
+        }
+    },
+
     content: {
         display: 'grid',
         gridTemplateColumns: '1fr 1.27fr',
@@ -43,6 +53,12 @@ const useStyles = makeStyles(theme =>({
         display: 'grid',
         gridTemplateColumns: '1fr',
         gap: theme.spacing(2)
+    },
+
+    userTitle: {
+        marginTop: '1.5rem',
+        marginBottom: '1rem',
+        fontWeight: 'bold'
     }
 
 }));
@@ -112,7 +128,15 @@ const Customer = () => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             {loading && <Spinner />}
             <Grid container direction="row" spacing={3} className={classes.root}>
-                <Typography variant="h5" >User Details</Typography>
+                <Box component="div" className={classes.header}>
+                    <Typography className={classes.userTitle} variant="h5" >User Details</Typography>
+                    <Switch
+                    label="AML"
+                    // checked={checked}
+                    // onChange={handleChange}
+                    // inputProps={{ 'aria-label': 'controlled' }}
+                    />
+                </Box>
                 <Grid item xs={12} className={classes.content}>
                     <Box component="div" className={classes.personalDetails}>
                         <PersonalDetails  />
