@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
+import { connect, useSelector } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+
+import { getWalletTransactions } from '../../../actions/wallets';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -30,8 +35,15 @@ const useStyles = makeStyles(theme => ({
      
 }));
 
-const Transactions = () => {
+const Transactions = ({ getWalletTransactions }) => {
     const classes = useStyles();
+    
+    const { wallet } = useSelector(state => state.wallets);
+
+    useEffect(() => {
+        getWalletTransactions(wallet.id);
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <section className={classes.root}>
@@ -122,4 +134,8 @@ const Transactions = () => {
     );
 };
 
-export default Transactions;
+Transactions.propTypes = {
+    getWalletTransactions: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getWalletTransactions })(Transactions);

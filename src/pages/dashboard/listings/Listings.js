@@ -15,6 +15,7 @@ import IDVerificationModal from '../listings/IDVerificationModal';
 import PendingIdModal from './PendingIdModal';
 import BuyerPaymentDrawer from './BuyerPaymentDrawer';
 import Listing from './Listing';
+import CreateWalletModal from '../wallet/CreateWalletModal';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 import AcceptOfferDrawer from './AcceptOfferDrawer';
@@ -60,6 +61,7 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [openAcceptOfferDrawer, setOpenAcceptOfferDrawer] = useState(false);
     const [openBuyerPaymentDrawer, setOpenBuyerPaymentDrawer] = useState(false);
+    const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -141,6 +143,10 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
         }
     }, [addedBid, dispatch, toggleBuyerPaymentDrawer]);
 
+    const showToastError = (msg) => {
+        setErrors({ msg });
+    };
+
     const verifyUserId = () => {
         idVerificationModal.current.openModal();
     };
@@ -217,6 +223,8 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
         }
     };
 
+    const toggleCreateWalletModal = () => setShowCreateWalletModal(!showCreateWalletModal);
+
     const dismissAction = () => {
         window.location.href = idVerificationLink;
     };
@@ -244,8 +252,10 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
             {loading && <Spinner />}
             {openAcceptOfferDrawer && <AcceptOfferDrawer drawerOpen={openAcceptOfferDrawer} toggleDrawer={toggleAcceptOfferDrawer} />}
             {openBuyerPaymentDrawer && <BuyerPaymentDrawer drawerOpen={openBuyerPaymentDrawer} toggleDrawer={toggleBuyerPaymentDrawer} />}
+            {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletModal={toggleCreateWalletModal} />}
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
             <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
+            
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
                     <Listing 
@@ -254,7 +264,9 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
                         handleAcceptOffer={handleAcceptOffer} 
                         handleAddBid={handleAddBid} 
                         checkIdStatus={checkIdStatus} 
-                        handleEditListing={handleEditListing} 
+                        handleEditListing={handleEditListing}
+                        toggleCreateWalletModal={toggleCreateWalletModal}
+                        showError={showToastError}
                     />
                 ))
                 :

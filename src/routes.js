@@ -38,6 +38,7 @@ export const EDIT_LISTING = `${DASHBOARD}/listings/edit`;
 export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
 export const WALLETS = `${DASHBOARD}/wallets`;
+export const WALLET_TRANSACTION_STATUS = `${WALLETS}/transactionStatus`;
 export const FUND_WALLET = `${WALLETS}/fundWallet`;
 export const FUND_CONFIRMATION = `${WALLETS}/fundingDetails`;
 export const FUND_AUTHORIZATION_SUCCESS = `${WALLETS}/fundingAuthorizationSuccess`;

@@ -5,7 +5,10 @@ import {
     ACTIVATE_GPB_WALLET,
     SET_WALLET,
     SET_WALLETS,
-    SET_FUNDING_DETAILS
+    SET_FUNDING_DETAILS,
+    SET_WALLET_MSG,
+    SET_WALLET_TRANSACTION,
+    SET_WALLET_TRANSACTIONS
 } from '../actions/types';
 
 const initialState = {
@@ -15,7 +18,10 @@ const initialState = {
     eurActive: true,
     ngnActive: false,
     usdActive: false,
-    gbpActive: false
+    gbpActive: false,
+    msg: null,
+    transactions: [],
+    transaction: {}
 };
 
 const walletsReducer = (state = initialState, action) => {
@@ -89,6 +95,24 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 fundingDetails: action.payload
+            };
+
+        case SET_WALLET_MSG:
+            return {
+                ...state,
+                msg: action.payload
+            };
+
+        case SET_WALLET_TRANSACTION:
+            return {
+                ...state,
+                transaction: action.payload
+            };
+
+        case SET_WALLET_TRANSACTIONS:
+            return {
+                ...state,
+                transactions: action.payload ? action.payload : []
             };
 
         default:

@@ -66,13 +66,13 @@ const addListing = (data) => {
     //     errors.ListingFee = 'Listing fee is required!';
     // }
 
-    if (Validator.isEmpty(data.ReceivingAccount)) {
+    if (data.AvailableCurrency === 'EUR' && Validator.isEmpty(data.ReceivingAccount)) {
         errors.ReceivingAccount = 'Please provide a bank account!';
     }
 
-    if (data.AvailableCurrency === 'EUR' && Validator.isEmpty(data.Bank)) {
-        errors.Bank = 'Payment method is required!';
-    }
+    // if (data.AvailableCurrency === 'EUR' && Validator.isEmpty(data.Bank)) {
+    //     errors.Bank = 'Payment method is required!';
+    // }
    
     return {
         errors,

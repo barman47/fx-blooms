@@ -30,6 +30,7 @@ import {
 	VERIFY_EMAIL,
 	PENDING_VERIFICATION,
 	WALLETS,
+	WALLET_TRANSACTION_STATUS,
 	FUND_WALLET,
 	FUND_AUTHORIZATION_SUCCESS,
 	FUND_CONFIRMATION,
@@ -102,6 +103,7 @@ const Transactions = lazy(() => import('./pages/dashboard/transactions'));
 const BankAccounts = lazy(() => import('./pages/dashboard/bankAccount'));
 
 const Wallet = lazy(() => import('./pages/dashboard/wallet'));
+const WalletTransactionStatus = lazy(() => import('./pages/dashboard/wallet/TransactionStatus'));
 const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 const FundConfirmation = lazy(() => import('./pages/dashboard/wallet/FundConfirmation'));
 const FundAuthorizationSuccess = lazy(() => import('./pages/dashboard/wallet/FundAuthorizationSuccess'));
@@ -216,6 +218,7 @@ const App = () => {
 								<Route path={TRANSACTIONS} element={<Transactions handleSetTitle={handleSetTitle} />} />
 								<Route path={TRANSACTION_STATUS} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={WALLETS} element={<Wallet handleSetTitle={handleSetTitle} />} />
+								<Route path={WALLET_TRANSACTION_STATUS} element={<WalletTransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_AUTHORIZATION_SUCCESS} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />

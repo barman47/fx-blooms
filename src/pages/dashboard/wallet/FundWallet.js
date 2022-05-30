@@ -278,6 +278,9 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                             />
                         </Grid>
                         <Grid item xs={12}>
+                            <FormHelperText>Transaction Fee, &#8364;1</FormHelperText>
+                        </Grid>
+                        <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Select Source Account</Typography>
                             <FormControl 
                                 variant="outlined" 

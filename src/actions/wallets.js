@@ -3,11 +3,25 @@ import { FUND_CONFIRMATION } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
-import { SET_CUSTOMER_MSG, SET_FUNDING_DETAILS, SET_WALLETS } from './types';
+import { SET_CUSTOMER_MSG, SET_FUNDING_DETAILS, SET_WALLETS, SET_WALLET_MSG, SET_WALLET_TRANSACTIONS } from './types';
 
 const API = `${process.env.REACT_APP_WALLET_API}`;
 const WALLETS_API = `${API}/wallet-management`;
 const YAPILY_API = `${API}/Yapily`;
+
+export const createWallet = (data) => async (dispatch)  => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${WALLETS_API}/wallets/create`, data);
+        console.log(res);
+        return dispatch({
+            type: SET_WALLET_MSG,
+            payload: 'Wallet created successfully'
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const getWallets = (customerId) => async (dispatch)  => {
     try {
@@ -15,6 +29,19 @@ export const getWallets = (customerId) => async (dispatch)  => {
         const res = await axios.get(`${WALLETS_API}/customers/${customerId}/wallets`);
         dispatch({
             type: SET_WALLETS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getWalletTransactions = (walletId) => async (dispatch)  => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${WALLETS_API}/wallets/${walletId}/transactions`);
+        return dispatch({
+            type: SET_WALLET_TRANSACTIONS,
             payload: res.data.data
         });
     } catch (err) {
