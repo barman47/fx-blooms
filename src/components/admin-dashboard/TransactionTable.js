@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme =>({
 
     '& span': {
         fontWeight: '300',
-        padding: '4.6px 0',
+        padding: '10px 0',
         fontSize: '.8vw',
         fontStretch: '50%',
         // borderLeft: `1px solid red`
@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme =>({
     fontSize: '11px !important',
     borderRadius: '3.4px',
     backgroundColor: '#C4C4C4',
-    padding: '3px',
+    padding: '2px 3px !important',
     width: '87px',
     fontWeight: "500 !important",
     textAlign: 'center'
@@ -152,7 +152,7 @@ const TransactionTable = ({ data, handleClick, viewCustomerProfile, gridColumns,
                 </Typography>
 
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[columnList[2]].currency + ' ' + customer[columnList[2]].amountTransfered.toLocaleString()} lines={1} />
+                    <TextClamp text={customer[columnList[2]].currency + customer[columnList[2]].amountTransfered.toLocaleString()} lines={1} />
                 </Typography>
 
                 <Typography component="span" className={classes.tableCell} variant="subtitle1">

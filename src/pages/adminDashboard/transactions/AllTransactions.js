@@ -27,7 +27,7 @@ const AllTransaction = ({ loadingTransactions, viewRow }) => {
 
 AllTransaction.propTypes = {
   viewRow: PropTypes.func.isRequired,
-  loadingListings: PropTypes.bool.isRequired,
+  loadingTransactions: PropTypes.bool.isRequired,
 };
 
 export default AllTransaction;

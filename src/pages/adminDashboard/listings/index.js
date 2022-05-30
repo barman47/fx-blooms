@@ -23,6 +23,7 @@ import isEmpty from '../../../utils/isEmpty';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard';
 // import Status from '../../../components/admin-dashboard/Status';
 import formatId from '../../../utils/formatId';
+import handleStatusStyle from '../../../utils/statusDisplay'
 
 
 
@@ -307,6 +308,8 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: '600 !important',
         justifySelf: 'self-start',
         fontSize: '1vw',
+        padding: '.1rem .5rem',
+        borderRadius: 6,
 
         '& p:first-child': {
             fontWeight: '600 !important',
@@ -318,13 +321,15 @@ const useStyles = makeStyles((theme) => ({
         height: '42%',
         width: '70%',
         overflowX: 'hidden',
+        // display: 'flex',
+        // flexDirection: 'column-reverse',
     },
 
     viewMoreBids: {
         display: 'grid',
         gridTemplateColumns: 'repeat(3, max-content)',
         padding: '.5rem .5rem .5rem 2rem',
-        marginTop: '1.5rem',
+        marginTop: '2rem',
         columnGap: '1rem',
         rowGap: '1.7rem',
         alignItems: 'center'
@@ -376,7 +381,7 @@ const useStyles = makeStyles((theme) => ({
     userStatusTitle: {
         // backgroundColor: '#DDF2E5',
         color: '#1E6262',
-        width: 'fit-content',
+        width: 'max-content',
         borderRadius: '5px',
         fontSize: '.9vw',
         textAlign: 'center',
@@ -439,7 +444,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function valuetext(value) {
-    console.log('valueText', value)
+    // console.log('valueText', value)
     return `${value}°C`;
   }
 
@@ -517,7 +522,6 @@ const Listings = () => {
     const [value, setValue] = useState([1, 70]);
 
     const handleChange = (event, newValue) => {
-        console.log('new', newValue)
       setValue(newValue);
     };
 
@@ -734,21 +738,14 @@ const Listings = () => {
 
     const handleStatus = useCallback((status) => {
         if (ALL_LISTINGS) {
-            switch (status) {
-                case "COMPLETED":
-                  return classes.verified
-                case "CANCELED":
-                  return classes.rejected
-                default:
-                  return 
-            }
+            return handleStatusStyle(status, classes)
         } else if (ALL_OPEN) {
-            return
+            return handleStatusStyle(status, classes)
         } else {
             return ''
         }
 
-      }, [ALL_LISTINGS, ALL_OPEN, classes.rejected, classes.verified])
+      }, [ALL_LISTINGS, ALL_OPEN, classes])
 
     return (
     <>
@@ -917,7 +914,7 @@ const Listings = () => {
                                 <AmlBoard  classes={classes} amlTitle={"Bank:"} amlNumber={viewMoreData.bank} />
                             </Box>
                             <Box component="div">
-                                <AmlBoard  classes={classes} amlTitle={"Current Status"} clsxAmlNumStyles={handleStatus(viewMoreData.status)} amlNumber={viewMoreData.status} />
+                                <AmlBoard  classes={classes} amlTitle={"Current Status"} otherStyles={handleStatusStyle(viewMoreData.status, classes)} amlNumber={viewMoreData.status} />
                                 <AmlBoard  classes={classes} amlTitle={"Listed Time"} amlNumber={handleDate(viewMoreData.dateCreated).time + handleDate(viewMoreData.dateCreated).space + handleDate(viewMoreData.dateCreated).date} />
                                 <AmlBoard  classes={classes} amlTitle={"Work Flow"} amlNumber={'BUY ' + currentAmount(viewMoreData.amountNeeded).currencyType} />
                                 <AmlBoard  classes={classes} amlTitle={"Current Rate"} amlNumber={viewMoreData.exchangeRate} />
