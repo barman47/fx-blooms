@@ -40,7 +40,6 @@ import isEmpty from '../../../utils/isEmpty';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-import WalletInfoModal from '../wallet/WalletInfoModal';
 import FundWalletDrawer from '../wallet/FundWalletDrawer';
 import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
@@ -262,7 +261,6 @@ const AllListings = (props) => {
 	const [showWallets, setShowWallets] = useState(false);
 
 	let loadedEvent = useRef();
-    const walletInfoModal = useRef();
 
 	const { REJECTED } = CUSTOMER_CATEGORY;
 	const { NOT_SUBMITTED } = ID_STATUS;
@@ -325,7 +323,7 @@ const AllListings = (props) => {
 			dispatch({
 				type: SET_WALLET,
 				payload: { currency: 'EUR' }
-			});	
+			});
 		}
 	}, [dispatch, wallets]);
 
@@ -478,7 +476,6 @@ const AllListings = (props) => {
 			<RiskNoticeModal />
 			{fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
             {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
-            <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 

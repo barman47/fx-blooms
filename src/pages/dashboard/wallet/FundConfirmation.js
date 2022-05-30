@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { connect, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { 
     Box,
     Button,
@@ -9,10 +9,7 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
-
-import { getAccount } from '../../../actions/bankAccounts';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -60,11 +57,10 @@ const useStyles = makeStyles(theme => ({
 
 
 
-const FundConfirmation = ({ getAccount, handleSetTitle }) => {
+const FundConfirmation = ({ handleSetTitle }) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
-    const { account } = useSelector(state => state.bankAccounts);
     const { wallets, fundingDetails } = useSelector(state => state.wallets);
 
 
@@ -77,12 +73,6 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (fundingDetails.accountId) {
-            getAccount(fundingDetails.accountId);
-        }
-    }, [fundingDetails.accountId, getAccount]);
-
     const getWalletCurrency = (walletId) => {
         const wallet = wallets.find(wallet => wallet.id === walletId);
         return wallet.currency.value;
@@ -91,22 +81,17 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
     return (
         <Box component="section" className={classes.root}>
             <Typography variant="h6" color="primary" className={classes.pageTitle}>Funding Details</Typography>
-            <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back in you need to make changes.</Typography>
+            <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
             <Box component="div" className={classes.content}>
                 <Box component="div" className={classes.fundingDetails}>
                     <Box component="section">
                         <Typography variant="body2" component="p">Method</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.fundingMethod}</Typography>
+                        <Typography variant="body2" component="p">{fundingDetails.fundingMethod.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Customer</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.customer}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Funding Method</Typography>
-                        <Typography variant="body2" component="p">Funding Method</Typography>
+                        <Typography variant="body2" component="p">{fundingDetails.customer.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
@@ -121,22 +106,24 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Account Name</Typography>
-                        <Typography variant="body2" component="p">{account.accountName}</Typography>
+                        <Typography variant="body2" component="p">{fundingDetails.accountName.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Account Number</Typography>
-                        <Typography variant="body2" component="p">{account.accountNumber}</Typography>
+                        <Typography variant="body2" component="p">{fundingDetails.accountNumber}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Institution</Typography>
-                        <Typography variant="body2" component="p">{account.bankName}</Typography>
+                        <Typography variant="body2" component="p">{fundingDetails.institution}</Typography>
                     </Box>
+                    <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Reference</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.reference}</Typography>
                     </Box>
+                    <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Status</Typography>
                         <Typography variant="body2" component="p">{fundingDetails.status.replace('_', ' ')}</Typography>
@@ -161,7 +148,7 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
                             variant="contained" 
                             color="primary"
                             fullWidth
-                            onClick={() => window.open(fundingDetails.authorisationUrl)}
+                            onClick={() => window.open(fundingDetails.authorisationUrl, '_self')}
                         >
                             Authorize Funding
                         </Button>
@@ -172,8 +159,4 @@ const FundConfirmation = ({ getAccount, handleSetTitle }) => {
     );
 };
 
-FundConfirmation.propTypes = {
-    getAccount: PropTypes.func.isRequired
-};
-
-export default connect(undefined, { getAccount })(FundConfirmation);
+export default FundConfirmation;

@@ -13,6 +13,7 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
@@ -252,7 +253,10 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
             type: REMOVE_NOTIFICATION,
             payload: notificationId
         });
-
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: 'Payment made successfully'
+        });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
         return handleError(err, dispatch);
@@ -287,9 +291,15 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
-        dispatch({
-            type: REMOVE_NOTIFICATION,
-            payload: notificationId
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'Payment confirmed successfully'
+            });
+            dispatch({
+                type: REMOVE_NOTIFICATION,
+                payload: notificationId
+            });
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {

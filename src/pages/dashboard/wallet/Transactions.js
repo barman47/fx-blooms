@@ -1,5 +1,10 @@
+import { useEffect } from 'react';
+import { connect, useSelector } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+
+import { getWalletTransactions } from '../../../actions/wallets';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -15,14 +20,11 @@ const useStyles = makeStyles(theme => ({
             display: 'none'
         },
 
-        '& header': {
-            marginBottom: theme.spacing(2),
-
-            '& h6': {
-                color: COLORS.offBlack,
-                fontWeight: '600',
-                margin: 0,
-            }
+        '& h6': {
+            color: COLORS.offBlack,
+            fontWeight: '600',
+            margin: theme.spacing(2, 0, 1, 0),
+            textAlign: 'center'
         }
     },
     transactions: {
@@ -33,15 +35,19 @@ const useStyles = makeStyles(theme => ({
      
 }));
 
-const Transactions = () => {
+const Transactions = ({ getWalletTransactions }) => {
     const classes = useStyles();
+    
+    const { wallet } = useSelector(state => state.wallets);
+
+    useEffect(() => {
+        getWalletTransactions(wallet.id);
+        // eslint-disable-next-line
+    }, []);
 
     return (
         <section className={classes.root}>
-            <header>
-                <Typography variant="h6" className={classes.header}>Transaction History</Typography>
-                <Typography variant="body2" component="p" className={classes.header}>Here are the recent transactions on your wallets</Typography>
-            </header>
+            <Typography variant="h6" className={classes.header}>Transaction History</Typography>
             <div className={classes.transactions}>
                 <Transaction 
                     date="19/09/2021"
@@ -128,4 +134,8 @@ const Transactions = () => {
     );
 };
 
-export default Transactions;
+Transactions.propTypes = {
+    getWalletTransactions: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getWalletTransactions })(Transactions);

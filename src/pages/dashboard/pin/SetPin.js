@@ -1,16 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react'; 
+import { useNavigate } from 'react-router-dom'; 
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Box, Button, Grid, TextField, Typography, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
 
 import { generatePinOtp } from '../../../actions/notifications';
+import { createPin, resetPin } from '../../../actions/pin';
 
 import isEmpty from '../../../utils/isEmpty';
 import validateSetPin from '../../../utils/validation/pin/setPin';
 import { COLORS } from '../../../utils/constants';
 import moveToNextField from '../../../utils/moveToNextField';
 import handleSetValue from '../../../utils/handleSetValue';
+import { DASHBOARD_HOME } from '../../../routes';
 
+import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
@@ -52,17 +56,17 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SetPin = ({ generatePinOtp }) => {
+const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const matches = useMediaQuery(theme.breakpoints.down('sm'));
+    const navigate = useNavigate();
 
     const errorsState = useSelector(state => state.errors);
-    const { msg } = useSelector(state => state.customer);
+    const { customerId, hasSetPin, msg } = useSelector(state => state.customer);
 
     const [showSetPin, setShowSetPin] = useState(false);
-
 
     const [first, setFirst] = useState('');
     const [second, setSecond] = useState('');
@@ -135,8 +139,56 @@ const SetPin = ({ generatePinOtp }) => {
         if (msg) {
             successModal.current.openModal();
             successModal.current.setModalText(msg);
+            setLoading(false);
         }
     }, [msg]);
+
+    const handleFormSubmit = useCallback((e) => {
+        if (e) {
+            e.preventDefault();
+        }
+        setErrors({});
+        const data = {
+            first,
+            second,
+            third,
+            fourth,
+            fifth,
+            sixth,
+            seventh,
+            eighth,
+            ninth,
+            tenth,
+            eleventh,
+            twelveth
+        };
+
+        const { errors, isValid } = validateSetPin(data);
+
+        if (!isValid) {
+            return setErrors(errors);
+        }
+        setLoading(true);
+        if (hasSetPin) {
+            return resetPin({
+                otp: data.ninth + data.tenth + data.eleventh + data.twelveth,
+                pin: data.first + data.second + data.third + data.fourth,
+                customerId
+            });
+        }
+        return createPin({
+            otp: data.ninth + data.tenth + data.eleventh + data.twelveth,
+            pin: data.first + data.second + data.third + data.fourth,
+            customerId
+        });
+    }, [createPin, resetPin, hasSetPin, customerId, first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelveth]);
+
+    // Automatically submit form when all fields are filled
+    useEffect(() => {
+        if (first && second && third && fourth && fifth && sixth && seventh && eighth && ninth && tenth && eleventh && twelveth) {
+            handleFormSubmit();
+        }
+    }, [first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelveth, handleFormSubmit]);
 
     useEffect(() => {
         if (timeToResend === 0) {
@@ -159,40 +211,34 @@ const SetPin = ({ generatePinOtp }) => {
         generatePinOtp();
     };
 
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        setErrors({});
-        const data = {
-            first,
-            second,
-            third,
-            fourth,
-            fifth,
-            sixth,
-            seventh,
-            eighth,
-            ninth,
-            tenth,
-            eleventh,
-            twelveth
-        };
-
-        const { errors, isValid } = validateSetPin(data);
-
-        if (!isValid) {
-            return setErrors(errors);
-        }
-
-        // const pin = `${first}${second}${third}${fourth}`;
-    };
-
     const handleResendOtp = () => {
         setResendable(false);
         setTimeToResend(60);
         generatePinOtp();
     };
 
+    const resetForm = () => {
+        setFirst('');
+        setSecond('');
+        setThird('');
+        setFourth('');
+
+        setFifth('');
+        setSixth('');
+        setSeventh('');
+        setEighth('');
+
+        setNinth('');
+        setTenth('');
+        setEleventh('');
+        setTwelveth('');
+
+        setResendable(false);
+        setTimeToResend(0);
+    };
+
     const dismissAction = () => {
+        resetForm();
         dispatch({
             type: SET_CUSTOMER_MSG,
             payload: null
@@ -200,6 +246,11 @@ const SetPin = ({ generatePinOtp }) => {
 
         if (!resendable) {
             startResendTimer();
+        }
+
+        if (sessionStorage.getItem('pin')) {
+            sessionStorage.removeItem('pin');
+            navigate(DASHBOARD_HOME);
         }
     };
     
@@ -215,10 +266,13 @@ const SetPin = ({ generatePinOtp }) => {
                 />
             }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            {loading && <Spinner />}
             <Box component="section" className={classes.root}>
                 {!showSetPin && 
                     <>
-                        <Typography variant="h6" color="primary" className={classes.title}>PIN not Set-up</Typography>
+                        <Typography variant="h6" color="primary" className={classes.title}>
+                            {hasSetPin ? 'Reset your PIN' : 'PIN not Set-up'}
+                        </Typography>
                         <Button 
                             color="primary"
                             variant="contained"
@@ -227,7 +281,7 @@ const SetPin = ({ generatePinOtp }) => {
                             disableTouchRipple
                             onClick={setupPin}
                         >
-                            Setup PIN
+                            {hasSetPin ? 'Reset PIN' : 'Setup PIN'}
                         </Button>
                     </>
                 }
@@ -246,7 +300,6 @@ const SetPin = ({ generatePinOtp }) => {
                                         value={first}
                                         onChange={(e) => {
                                             handleSetValue(e.target.value, setFirst);
-                                            // setFirst(e.target.value)
                                         }}
                                         onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
                                         type="text"
@@ -375,7 +428,7 @@ const SetPin = ({ generatePinOtp }) => {
                                         className={classes.input}
                                         value={eighth}
                                         onChange={(e) => setEighth(e.target.value)}
-                                        onKeyUp={(e) => moveToNextField(e.target, null, seventhField.current)}
+                                        onKeyUp={(e) => moveToNextField(e.target, ninthField.current, seventhField.current)}
                                         type="text"
                                         variant="outlined" 
                                         inputProps={{
@@ -398,7 +451,7 @@ const SetPin = ({ generatePinOtp }) => {
                                         onChange={(e) => {
                                             handleSetValue(e.target.value, setNinth);
                                         }}
-                                        onKeyUp={(e) => moveToNextField(e.target, tenthField.current, null)}
+                                        onKeyUp={(e) => moveToNextField(e.target, tenthField.current, eighthField.current)}
                                         type="text"
                                         variant="outlined" 
                                         inputProps={{
@@ -496,7 +549,9 @@ const SetPin = ({ generatePinOtp }) => {
 };
 
 SetPin.propTypes = {
+    createPin: PropTypes.func.isRequired,
+    resetPin: PropTypes.func.isRequired,
     generatePinOtp: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { generatePinOtp })(SetPin);
+export default connect(undefined, { createPin, resetPin, generatePinOtp })(SetPin);

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
@@ -88,6 +88,7 @@ import {
 
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
+import { checkPin } from '../../actions/pin';
 import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
@@ -95,6 +96,7 @@ import HideOnScroll from '../../components/layout/HideOnScroll';
 import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
+import CreateWalletModal from './wallet/CreateWalletModal';
 
 import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
@@ -418,13 +420,15 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        // { url : PIN, text: 'PIN Management', icon: <Security /> },
+        { url : PIN, text: 'PIN', icon: <Security /> },
+        { url : TWO_FACTOR, text: '2FA', icon: <TwoFactorAuthentication /> }
         { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
+    const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
+    const createWalletModal = useRef();
     const customToast = useRef();
     const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
@@ -434,6 +438,7 @@ const Dashboard = (props) => {
 
     useEffect(() => {
         getNotificationCount(customerId);
+        checkPin(customerId);
         if (matches) {
             setOpen(false);
         }
@@ -467,7 +472,6 @@ const Dashboard = (props) => {
         }
 
         if (!_.isEmpty(stats)) {
-            setAlertNotifications();
             const { residencePermitStatus, idStatus } = stats;
             if (residencePermitStatus === NOT_SUBMITTED) {
                 dispatch({
@@ -484,68 +488,15 @@ const Dashboard = (props) => {
         // eslint-disable-next-line
     }, []);
 
-    useEffect(() => {
-        if (!_.isEmpty(stats)) {
-            if (!sessionStorage.getItem('checkedIdStatus')) {
-                sessionStorage.setItem('checkedIdStatus', 'true');
-                const { idStatus, residencePermitStatus } = stats;
-                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
-                    accountSetupModal.current.openModal();
-                }
-            }
-        }
-    }, [NOT_SUBMITTED, stats]);
-
-    useEffect(() => {
-        switch (connectionStatus) {
-            case CONNECTED:
-                if (customToast.current) {
-                    toast.success('Connected!');
-                    setToastAction(null);
-                }
-                break;
-
-            case RECONNECTING:
-                setToastTitle('NETWORK ERROR');
-                setToastMessage('Reconnecting . . .');
-                setToastDuration(null);
-                setToastType('error');
-                setToastAction(null);
-                customToast.current.handleClick();
-                break;
-                
-            case RECONNECTED:
-                customToast.current.close();
-                toast.success('Reconnected!');
-                break;
-
-            case DISCONNECTED:
-                setToastTitle('ERROR');
-                setToastMessage('Network Disconnected');
-                setToastType('error');
-                setToastDuration(null);
-                setToastAction(<ToastAction />);
-                customToast.current.handleClick();
-                break;
-
-            default:
-                break;
-        }
-    }, [connectionStatus]);
-
-    const toggleDrawer = () => {
-        setOpen(!open);
-    };
-
-    const verifyEuId = () => {
+    const verifyEuId = useCallback(() => {
         window.open(residencePermitUrl);
-    };
-
-    const verifyOtherId = () => {
+    }, [residencePermitUrl]);
+        
+    const verifyOtherId = useCallback(() => {
         window.open(idVerificationLink);
-    };
+    }, [idVerificationLink]);
 
-    const setAlertNotifications = () => {
+    const setAlertNotifications = useCallback(() => {
         console.log('Setting alert notification');
         const { APPROVED } = ID_STATUS;
         if (stats.residencePermitStatus !== APPROVED) {
@@ -592,13 +543,60 @@ const Dashboard = (props) => {
                 }
             });
         }
-        
-        {/* <Notification 
-            title="Set PIN"
-            message="Required for wallet withdrawals.. Click Set PIN to proceed."
-            buttonText="Set PIN"
-            buttonAction={setPin}
-        /> */}
+    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyEuId, verifyOtherId]);
+
+    useEffect(() => {
+        if (!_.isEmpty(stats)) {
+            if (!sessionStorage.getItem('checkedIdStatus')) {
+                sessionStorage.setItem('checkedIdStatus', 'true');
+                const { idStatus, residencePermitStatus } = stats;
+                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
+                    accountSetupModal.current.openModal();
+                }
+            }
+            setAlertNotifications();
+        }
+    }, [NOT_SUBMITTED, stats, setAlertNotifications]);
+
+    useEffect(() => {
+        switch (connectionStatus) {
+            case CONNECTED:
+                if (customToast.current) {
+                    toast.success('Connected!');
+                    setToastAction(null);
+                }
+                break;
+
+            case RECONNECTING:
+                setToastTitle('NETWORK ERROR');
+                setToastMessage('Reconnecting . . .');
+                setToastDuration(null);
+                setToastType('error');
+                setToastAction(null);
+                customToast.current.handleClick();
+                break;
+                
+            case RECONNECTED:
+                customToast.current.close();
+                toast.success('Reconnected!');
+                break;
+
+            case DISCONNECTED:
+                setToastTitle('ERROR');
+                setToastMessage('Network Disconnected');
+                setToastType('error');
+                setToastDuration(null);
+                setToastAction(<ToastAction />);
+                customToast.current.handleClick();
+                break;
+
+            default:
+                break;
+        }
+    }, [connectionStatus]);
+
+    const toggleDrawer = () => {
+        setOpen(!open);
     };
 
     // Logout user if he tries to beat 2FA
@@ -851,6 +849,7 @@ const Dashboard = (props) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
+            <CreateWalletModal ref={createWalletModal} />
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -864,12 +863,12 @@ const Dashboard = (props) => {
             }
             <Toaster />
             {/* <HideOnScroll direction="down" {...props}> */}
-            {alertNotifications.length > 0 && 
+            {(alertNotifications.length > 0 && location.pathname === DASHBOARD_HOME) && 
                 <Box className={clsx(({ [classes.alertContainerOpen]: open, [classes.alertContainerClose]: !open}))}>
                     <AlertNotification 
                         message={alertNotifications[0].message}
                         buttonText={alertNotifications[0].buttonText}
-                        buttoonAction={alertNotifications[0].buttonAction}
+                        buttonAction={alertNotifications[0].buttonAction}
                     />
                 </Box>
             }
@@ -1100,10 +1099,11 @@ const Dashboard = (props) => {
 };
 
 Dashboard.propTypes = {
+    checkPin: PropTypes.func.isRequired,
     getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     markNotificationAsRead: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);
+export default connect(undefined, { checkPin, getNotificationCount, logout, markNotificationAsRead })(Dashboard);

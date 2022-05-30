@@ -13,14 +13,12 @@ import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import { PROFILE, TWO_FACTOR } from '../../../routes';
 
 import Notification from './Notification';
-import BuyerSendEurDrawer from './BuyerSendEurDrawer';
-import SellerSendEurDrawer from './SellerSendEurDrawer';
 import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -103,12 +101,16 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
+    // eslint-disable-next-line
     const [amount, setAmount] = useState(0);
+    // eslint-disable-next-line
     const [sellerUsername, setSellerUsername] = useState('');
+    // eslint-disable-next-line
     const [buyerSendEurDrawerOpen, setBuyerSendEurDrawerOpen] = useState(false);
     const [sellerSendEurDrawerOpen, setSellerSendEurDrawerOpen] = useState(false);
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
+    // eslint-disable-next-line
     const [transactionId, setTransactionId] = useState(null);
     const [notificationId, setNotificationId] = useState(null);
     const [countryCode, setCountryCode] = useState('');
@@ -117,7 +119,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
-    const { BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
+    const { BUYER_MADE_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
     
     useEffect(() => {
         getNotifications();
@@ -131,7 +133,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         }
 
         return () => {
-            console.log('Clearing errors');
             dispatch({
                 type: GET_ERRORS,
                 payload: {}
@@ -160,17 +161,17 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }, [dispatch, sellerSendEurDrawerOpen]);
     
     // accounName typo is deliberate and should not be fixed
-    const setAccount = (accounName, accountNumber, bankName, reference) => {
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: {
-                accounName,
-                accountNumber,
-                bankName,
-                reference
-            }
-        });
-    };
+    // const setAccount = (accounName, accountNumber, bankName, reference) => {
+    //     dispatch({
+    //         type: SET_ACCOUNT,
+    //         payload: {
+    //             accounName,
+    //             accountNumber,
+    //             bankName,
+    //             reference
+    //         }
+    //     });
+    // };
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
         const data = {
@@ -183,60 +184,60 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         completeTransaction(data, notificationId);
     };
 
-    const setBuyerAccount = (notification, notificationId) => {
-        const { Buyer, Seller } = notification;
-        setTransactionId(notification.Id);
-        setSellerUsername(Seller.UserName);
+    // const setBuyerAccount = (notification, notificationId) => {
+    //     const { Buyer, Seller } = notification;
+    //     setTransactionId(notification.Id);
+    //     setSellerUsername(Seller.UserName);
         
-        const buyerAccount = {
-            accounName: Buyer.AccountName,
-            accountNumber: Buyer.AccountNumber,
-            bankName: Buyer.BankName,
-            reference: Buyer.TransferReference
-        };
+    //     const buyerAccount = {
+    //         accounName: Buyer.AccountName,
+    //         accountNumber: Buyer.AccountNumber,
+    //         bankName: Buyer.BankName,
+    //         reference: Buyer.TransferReference
+    //     };
 
-        setAmount(Number(Seller.AmountTransfered));
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: buyerAccount
-        });
-        setNotificationId(notificationId);
-        getTransaction(notification.Id);
-        toggleSellerSendEurDrawer();
-    };
+    //     setAmount(Number(Seller.AmountTransfered));
+    //     dispatch({
+    //         type: SET_ACCOUNT,
+    //         payload: buyerAccount
+    //     });
+    //     setNotificationId(notificationId);
+    //     getTransaction(notification.Id);
+    //     toggleSellerSendEurDrawer();
+    // };
 
-    const setSellerAccount = (notification, notificationId) => {
-        const { Buyer, Seller } = notification;
-        setTransactionId(notification.Id);
-        setAmount(Number(Buyer.AmountTransfered));
-        setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
-        setNotificationId(notificationId);
-        getTransaction(notification.Id);
-        toggleBuyerSendEurDrawer();
-    };
+    // const setSellerAccount = (notification, notificationId) => {
+    //     const { Buyer, Seller } = notification;
+    //     setTransactionId(notification.Id);
+    //     setAmount(Number(Buyer.AmountTransfered));
+    //     setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
+    //     setNotificationId(notificationId);
+    //     getTransaction(notification.Id);
+    //     toggleBuyerSendEurDrawer();
+    // };
 
-    const toggleBuyerSendEurDrawer = () => {
-        setBuyerSendEurDrawerOpen(!buyerSendEurDrawerOpen);
+    // const toggleBuyerSendEurDrawer = () => {
+    //     setBuyerSendEurDrawerOpen(!buyerSendEurDrawerOpen);
 
-        // clear message if drawer is open and being closed
-        if (buyerSendEurDrawerOpen) {
-            dispatch({
-                type: SET_NOTIFICATION_MSG,
-                payload: null
-            });
-        }
-    };
+    //     // clear message if drawer is open and being closed
+    //     if (buyerSendEurDrawerOpen) {
+    //         dispatch({
+    //             type: SET_NOTIFICATION_MSG,
+    //             payload: null
+    //         });
+    //     }
+    // };
 
-    const toggleSellerSendEurDrawer = () => {
-        // clear message if drawer is open and being closed
-        if (sellerSendEurDrawerOpen) {
-            dispatch({
-                type: SET_NOTIFICATION_MSG,
-                payload: null
-            });
-        }
-        setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
-    };
+    // const toggleSellerSendEurDrawer = () => {
+    //     // clear message if drawer is open and being closed
+    //     if (sellerSendEurDrawerOpen) {
+    //         dispatch({
+    //             type: SET_NOTIFICATION_MSG,
+    //             payload: null
+    //         });
+    //     }
+    //     setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
+    // };
 
     const setMessage = (notification) => {
         const { Buyer, Seller } = notification;
@@ -272,30 +273,29 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const handleButtonAction = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
         if (customerId === Seller.CustomerId) {
-            if (Seller.HasReceivedPayment && Seller.HasMadePayment === false) {
-                // Set Buyer Account so Seller can make payment without needing to confirm receipt
-                return setBuyerAccount(notification, notificationId);
-            }
-            if (Seller.HasReceivedPayment === false && Seller.HasMadePayment === false) {
-                // Seller should receive buyers payment and make payment to seller
-                setBuyerAccount(notification, notificationId);
-                return handlePaymentReceived(notification.Id, notificationId);
-            }
+            // if (Seller.HasReceivedPayment && Seller.HasMadePayment === false) {
+            //     // Set Buyer Account so Seller can make payment without needing to confirm receipt
+            //     return setBuyerAccount(notification, notificationId);
+            // }
+            // if (Seller.HasReceivedPayment === false && Seller.HasMadePayment === false) {
+            //     // Seller should receive buyers payment and make payment to seller
+            //     setBuyerAccount(notification, notificationId);
+            //     return handlePaymentReceived(notification.Id, notificationId);
+            // }
             // End Transaction
             return handlePaymentReceived(notification.Id, notificationId);
         }
 
-
         if (customerId === Buyer.CustomerId) {
-            if (Buyer.HasReceivedPayment && Buyer.HasMadePayment === false) {
-                // Set Seller Account so Buyer can make payment without needing to confirm receipt
-                return setSellerAccount(notification, notificationId);
-            } 
-            if (Buyer.HasReceivedPayment === false && Buyer.HasMadePayment === false) {
-                // Buyer should confirm seller's payment and make his own payment
-                setSellerAccount(notification, notificationId);
-                return handlePaymentReceived(notification.Id, notificationId); // Confirming payment
-            } 
+            // if (Buyer.HasReceivedPayment && Buyer.HasMadePayment === false) {
+            //     // Set Seller Account so Buyer can make payment without needing to confirm receipt
+            //     return setSellerAccount(notification, notificationId);
+            // } 
+            // if (Buyer.HasReceivedPayment === false && Buyer.HasMadePayment === false) {
+            //     // Buyer should confirm seller's payment and make his own payment
+            //     setSellerAccount(notification, notificationId);
+            //     return handlePaymentReceived(notification.Id, notificationId); // Confirming payment
+            // } 
             // End Transaction
             return handlePaymentReceived(notification.Id, notificationId);
         }
@@ -336,16 +336,18 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
             payload: bid
         });
 
-        if (data.Buyer.HasReceivedPayment && !data.Buyer.HasMadePayment) {
-            setAmount(Number(data.Buyer.AmountTransfered));
-            setTransactionId(data.Id); // Double check
-            setAccount(data.Seller.AccountName, data.Seller.AccountNumber, data.Seller.BankName, data.Seller.TransferReference);
-            toggleBuyerSendEurDrawer();
-            getTransaction(data.Id);
-        } else {
-            toggleSellerSendNgnDrawer();
-            getTransaction(data.Id);
-        }
+        // if (data.Buyer.HasReceivedPayment && !data.Buyer.HasMadePayment) {
+        //     setAmount(Number(data.Buyer.AmountTransfered));
+        //     setTransactionId(data.Id); // Double check
+        //     setAccount(data.Seller.AccountName, data.Seller.AccountNumber, data.Seller.BankName, data.Seller.TransferReference);
+        //     toggleBuyerSendEurDrawer();
+        //     getTransaction(data.Id);
+        // } else {
+        //     toggleSellerSendNgnDrawer();
+        //     getTransaction(data.Id);
+        // }
+        toggleSellerSendNgnDrawer();
+        getTransaction(data.Id);
     };
 
     const dismissAction = () => {
@@ -369,25 +371,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                 <SellerSendNgnDrawer 
                     drawerOpen={sellerSendNgnDrawerOpen} 
                     toggleDrawer={toggleSellerSendNgnDrawer} 
-                    notificationId={notificationId}
-                />
-            }
-            {sellerSendEurDrawerOpen && 
-                <SellerSendEurDrawer 
-                    toggleDrawer={toggleSellerSendEurDrawer} 
-                    drawerOpen={sellerSendEurDrawerOpen} 
-                    amount={amount} 
-                    transactionId={transactionId}
-                    notificationId={notificationId}
-                    sellerUsername={sellerUsername}
-                />
-            }
-            {buyerSendEurDrawerOpen && 
-                <BuyerSendEurDrawer 
-                    toggleDrawer={toggleBuyerSendEurDrawer} 
-                    drawerOpen={buyerSendEurDrawerOpen} 
-                    amount={amount} 
-                    transactionId={transactionId}
                     notificationId={notificationId}
                 />
             }
@@ -449,38 +432,27 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
                                 )
                             }
 
-                            if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
-                                return (
-                                    <Notification 
-                                        key={index}
-                                        title="Credit (Exchange)"
-                                        message={setMessage(notification.data)}
-                                        buttonText={`Pay ${notification.data.Buyer.Currency}`}
-                                        buttonAction={() => handleBuyerPayment(notification)}
-                                        date={notification.dateLogged}
-                                    />
-                                )
-                            }
-
-                            if (notification.eventType === SELLER_CONFIRMED_PAYMENT && customerId === notification.data.Seller.CustomerId) {
-                                return (
-                                    <Notification 
-                                        key={index}
-                                        title="Credit (Exchange)"
-                                        message={setMessage(notification.data)}
-                                        buttonText={`Pay ${notification.data.Seller.Currency}`}
-                                        buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
-                                        date={notification.dateLogged}
-                                    />
-                                )
-                            }
-
-                            // if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Seller.CustomerId && notification.data.Buyer.HasMadePayment === false) {
+                            // if (notification.eventType === BUYER_CONFIRMED_PAYMENT && customerId === notification.data.Buyer.CustomerId) {
                             //     return (
                             //         <Notification 
                             //             key={index}
-                            //             title="Payment Confirmed"
-                            //             message={setBuyerConfirmedMessage(notification.data)}
+                            //             title="Credit (Exchange)"
+                            //             message={setMessage(notification.data)}
+                            //             buttonText={`Pay ${notification.data.Buyer.Currency}`}
+                            //             buttonAction={() => handleBuyerPayment(notification)}
+                            //             date={notification.dateLogged}
+                            //         />
+                            //     )
+                            // }
+
+                            // if (notification.eventType === SELLER_CONFIRMED_PAYMENT && customerId === notification.data.Seller.CustomerId) {
+                            //     return (
+                            //         <Notification 
+                            //             key={index}
+                            //             title="Credit (Exchange)"
+                            //             message={setMessage(notification.data)}
+                            //             buttonText={`Pay ${notification.data.Seller.Currency}`}
+                            //             buttonAction={() => handleButtonAction(notification.data, notification.notificationId)}
                             //             date={notification.dateLogged}
                             //         />
                             //     )

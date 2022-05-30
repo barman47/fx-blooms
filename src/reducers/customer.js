@@ -16,7 +16,8 @@ import {
     SET_EMAIL,
     PROFILE_UPDATED,
     VERIFIED_PHONE_NUMBER,
-    RESET_CUSTOMER_SESSION
+    RESET_CUSTOMER_SESSION,
+    SETUP_PIN
 } from '../actions/types';
 
 const initialState = {
@@ -141,6 +142,12 @@ const customerReducer =  (state = initialState, action) => {
                 phoneNo: action.payload.phoneNumber,
                 isPhoneNumberVerified: true
 
+            };
+
+        case SETUP_PIN:
+            return {
+                ...state,
+                hasSetPin: action.payload
             };
 
         case RESET_CUSTOMER_SESSION:

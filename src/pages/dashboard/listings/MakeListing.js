@@ -4,9 +4,11 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Button,
+    Checkbox,
     CircularProgress,
     Divider,
-    FormControl, 
+    FormControl,
+    FormControlLabel,
     FormHelperText,
     Grid, 
     MenuItem,
@@ -26,20 +28,23 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
 import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
+import { getWallets } from '../../../actions/wallets';
 import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
-import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getAccountId from '../../../utils/getAccountId';
+import getAccount from '../../../utils/getAccount';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
+
 import PendingIdModal from './PendingIdModal';
 import ResidencePermitModal from './ResidencePermitModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
+import CreateWalletModal from '../wallet/CreateWalletModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
-        height: '100%',
+        height: '100vh',
         padding: theme.spacing(0, 5),
 
         [theme.breakpoints.down('sm')]: {
@@ -120,6 +125,11 @@ const useStyles = makeStyles(theme => ({
         justifySelf: 'flex-end'
     },
 
+    checkboxLabel: {
+        color: COLORS.grey,
+        fontWeight: '300 !important'
+    },
+
     noListing: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
@@ -165,12 +175,15 @@ const MakeListing = (props) => {
     const { customerId, residencePermitUrl } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
+    const { wallet, wallets } = useSelector(state => state.wallets);
 
-    const { addListing, getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle } = props;
+    const { addListing, getAccounts, getCurrencies, getResidencePermitLink, getWallets, handleSetTitle } = props;
 
+    const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
+    const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
     const [ExchangeAmount, setExchangeAmount] = useState('');
@@ -186,7 +199,6 @@ const MakeListing = (props) => {
     // eslint-disable-next-line
     const [ListingFee, setListingFee] = useState('');
 
-    const [Bank, setBank] = useState('');
     const [reference, setReference] = useState('');
 
     const [previousListings, setPreviousListings] = useState([]);
@@ -196,6 +208,7 @@ const MakeListing = (props) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+
     const successModal = useRef();
     const toast = useRef();
 
@@ -204,6 +217,7 @@ const MakeListing = (props) => {
 
     useEffect(() => {
         handleSetTitle('Add Listing');
+        checkForWallets();
         setPresetSelectedCurrency();
         if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
             getResidencePermitLink();
@@ -362,6 +376,14 @@ const MakeListing = (props) => {
     //     setOpenAccountModal(true);
     // };
 
+    const toggleShowCreateWalletModal = () => setShowCreateWalletModal(!showCreateWalletModal);
+
+    const checkForWallets = () => {
+        if (wallets.length === 0) {
+            toggleShowCreateWalletModal();
+        }
+    };
+
     const setPresetSelectedCurrency = () => {
         if (location.state.eur) {
             setAvailableCurrency('EUR');
@@ -421,10 +443,12 @@ const MakeListing = (props) => {
             type: SET_LISTING_MSG,
             payload: null
         });
+        setShowCreateWalletModal(false);
         if (addedListing) {
             dispatch({
                 type: ADDED_LISTING
             });
+            getWallets(customerId);
             navigate(DASHBOARD_HOME);
         }
     };
@@ -441,8 +465,7 @@ const MakeListing = (props) => {
             // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
-            ListingFee,
-            Bank
+            ListingFee
         };
 
         const { errors, isValid } = validateAddListing(data);
@@ -453,6 +476,14 @@ const MakeListing = (props) => {
 
         if (residencePermitStatus !== APPROVED) {
             return checkResidencePermitStatus();
+        }
+
+        if (wallets.length === 0) {
+            return setShowCreateWalletModal(wallets, setShowCreateWalletModal)
+        }
+
+        if (AvailableCurrency === 'EUR' && ExchangeAmount > wallet.balance.available) {
+            return setErrors({ ExchangeAmount: `Wallet balance (${wallet.currency.value}: ${formatNumber(wallet.balance.available, 2)}) is below the exchange amount`, msg: 'Insufficient wallet balance.' });
         }
 
         // if (customer.profile.listings >= 2) { // and there is no account number
@@ -473,9 +504,9 @@ const MakeListing = (props) => {
                 Amount: 0
                 // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
-            Bank,
-            accountID: getAccountId(ReceivingAccount, accounts),
-            reference
+            accountID: getAccount(ReceivingAccount, accounts).accountID,
+            reference,
+            walletId: wallet.id
         };
 
         addListing(listing);
@@ -500,6 +531,7 @@ const MakeListing = (props) => {
                 />
             }
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={AvailableCurrency === 'NGN' ? false : true} eur={AvailableCurrency === 'EUR' ? false : true} />}
+            {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleShowCreateWalletModal} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
@@ -516,7 +548,7 @@ const MakeListing = (props) => {
                         <form onSubmit={onSubmit} noValidate>
                             <Grid container direction="row" spacing={1}>
                                 <Grid item xs={4}>
-                                    <br />
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.AvailableCurrency ? true : false } 
@@ -539,7 +571,7 @@ const MakeListing = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
+                                    <br />
                                     <Tooltip title="This is the amount you wish to change." aria-label="Exchange Amount" arrow>
                                         <TextField
                                             value={ExchangeAmount}
@@ -559,8 +591,13 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
+                                {!isEmpty(wallet) && 
+                                    <Grid item xs={12}>
+                                        <FormHelperText>Wallet Balance: {`${wallet.currency.value} ${formatNumber(wallet.balance.available, 2)}`}</FormHelperText>
+                                    </Grid>
+                                }
                                 <Grid item xs={4}>
-                                    <br />
+                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
                                     <FormControl 
                                         variant="outlined" 
                                         error={errors.RequiredCurrency ? true : false } 
@@ -584,7 +621,7 @@ const MakeListing = (props) => {
                                     </FormControl>
                                 </Grid>
                                 <Grid item xs={8}>
-                                <Typography variant="subtitle2" component="span" className={classes.helperText}>Exchange Rate</Typography>
+                                    <br />
                                     <Tooltip title="This is the exchange rate you want." aria-label="Exchange Rate" arrow>
                                         <TextField
                                             value={ExchangeRate}
@@ -604,89 +641,48 @@ const MakeListing = (props) => {
                                     </Tooltip>
                                     {recommendedRate && <FormHelperText color="primary">Recomended Rate: 1EUR to <span style={{ color: COLORS.red }}>{recommendedRate}NGN</span></FormHelperText>}
                                 </Grid>
-                                {/* <Grid item xs={4}>
-                                    <br />
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.AvailableCurrency ? true : false } 
-                                        fullWidth 
-                                        required
-                                        // disabled={loading ? true : false}
-                                        disabled
-                                    >
-                                        <Select
-                                            labelId="AvailableCurrency"
-                                            value={AvailableCurrency}
-                                            onChange={(e) => setAvailableCurrency(e.target.value)}
-                                        
-                                        >
-                                            <MenuItem value="" disabled>Select Currency</MenuItem>
-                                            {currencies.length > 0 && currencies.map((currency, index) => (
-                                                <MenuItem key={index} value={currency.value} disabled={currency.value === RequiredCurrency}>{currency.value}</MenuItem>
-                                            ))}
-                                        </Select>
-                                        <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
-                                    </FormControl>
-                                </Grid>
-                                <Grid item xs={8}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Min. Exchange Amount</Typography>
-                                    <Tooltip title="This is the minimum amount you wish to change." aria-label="Exchange Amount" arrow>
-                                        <TextField
-                                            value={MinExchangeAmount}
-                                            onChange={(e) => setMinExchangeAmount(e.target.value)}
-                                            type="text"
-                                            variant="outlined" 
-                                            placeholder="Enter Amount"
-                                            helperText={errors.MinExchangeAmount}
-                                            fullWidth
-                                            disabled={loading ? true : false}
-                                            error={errors.MinExchangeAmount ? true : false}
-                                            inputProps={{
-                                                maxLength: 12
-                                            }}
-                                        />
-                                    </Tooltip>
-                                </Grid> */}
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.ReceivingAccount ? true : false } 
-                                        fullWidth 
-                                        required
-                                        disabled={loading ? true : false}
-                                    >
-                                        <Select
-                                            labelId="ReceivingAccount"
-                                            value={ReceivingAccount}
-                                            onChange={(e) => setReceivingAccount(e.target.value)}
-                                        >
-                                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            {AvailableCurrency === 'EUR' ?
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'NGN') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                             : 
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'EUR') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                            }
-                                        </Select>
-                                        <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
-                                    </FormControl>
-                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                                </Grid>
                                 {AvailableCurrency === 'EUR' && 
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
+                                        <FormControl 
+                                            variant="outlined" 
+                                            error={errors.ReceivingAccount ? true : false } 
+                                            fullWidth 
+                                            required
+                                            disabled={loading ? true : false}
+                                        >
+                                            <Select
+                                                labelId="ReceivingAccount"
+                                                value={ReceivingAccount}
+                                                onChange={(e) => setReceivingAccount(e.target.value)}
+                                            >
+                                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                                {AvailableCurrency === 'EUR' ?
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'NGN') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                : 
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'EUR') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                }
+                                            </Select>
+                                            <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
+                                        </FormControl>
+                                        <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                                    </Grid>
+                                }
+                                {/* {AvailableCurrency === 'EUR' && 
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
                                         <FormControl 
@@ -710,20 +706,22 @@ const MakeListing = (props) => {
                                             <FormHelperText>{errors.Bank}</FormHelperText>
                                         </FormControl>
                                     </Grid>
+                                } */}
+                                {AvailableCurrency === 'EUR' &&
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                                        <TextField 
+                                            value={reference}
+                                            placeholder="Enter Payment Reference"
+                                            onChange={(e) => setReference(e.target.value)}
+                                            disabled={loading ? true : false}
+                                            type="text"
+                                            variant="outlined" 
+                                            fullWidth
+                                        />
+                                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                                    </Grid>
                                 }
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                                    <TextField 
-                                        value={reference}
-                                        placeholder="Enter Payment Reference"
-                                        onChange={(e) => setReference(e.target.value)}
-                                        disabled={loading ? true : false}
-                                        type="text"
-                                        variant="outlined" 
-                                        fullWidth
-                                    />
-                                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                                </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I will receive</Typography>
                                     <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
@@ -743,15 +741,31 @@ const MakeListing = (props) => {
                                             error={errors.ReceiptAmount ? true : false}
                                         />
                                     </Tooltip>
-                                    <FormHelperText>Listing Fee: EUR 0.00</FormHelperText>
+                                    {/* <FormHelperText>Listing Fee: EUR 0.00</FormHelperText> */}
                                 </Grid>
-
+                                {AvailableCurrency === 'NGN' && 
+                                    <Grid item xs={12}>
+                                        <FormControlLabel 
+                                            control={
+                                                <Checkbox
+                                                    color="primary"
+                                                    checked={checked}
+                                                    onChange={() => setChecked(!checked)}
+                                                    inputProps={{ 'aria-label': 'primary checkbox' }}
+                                                    
+                                                />
+                                            }
+                                            label="I agree to transfer the NGN to the buyer within 30mins once my offer is accepted."
+                                            classes={{ root: classes.checkboxLabel }}
+                                        />
+                                    </Grid>
+                                }
                                 <Grid item xs={12}>
                                     <Button 
                                         type="submit" 
                                         variant="contained" 
                                         color="primary" 
-                                        disabled={loading ? true : false}
+                                        disabled={(loading) || (AvailableCurrency === 'NGN' && !checked) ? true : false}
                                         fullWidth
                                     >
                                         {!loading ? 'Submit' : <CircularProgress style={{ color: '#f8f8f8' }} />}
@@ -789,7 +803,8 @@ MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired
+    getResidencePermitLink: PropTypes.func.isRequired,
+    getWallets: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink })(MakeListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink, getWallets })(MakeListing);
