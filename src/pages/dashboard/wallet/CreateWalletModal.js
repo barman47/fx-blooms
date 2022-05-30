@@ -15,7 +15,7 @@ import toast from 'react-hot-toast';
 import { createWallet, getWallets } from '../../../actions/wallets';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
-import { GET_ERRORS, SET_WALLET, SET_WALLET_MSG } from '../../../actions/types';
+import { SET_WALLET, SET_WALLET_MSG } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -62,11 +62,11 @@ const CreateWalletModal = ({ createWallet, getWallets, open, toggleCreateWalletD
     const dispatch = useDispatch();
 
     const { customerId, firstName, lastName, email, phoneNo } = useSelector(state => state.customer);
-    const errorsState = useSelector(state => state.errors);
+    // const errorsState = useSelector(state => state.errors);
     const { msg } = useSelector(state => state.wallets);
 
     const [isOpen, setIsOpen] = useState(false);
-    const [errors, setErrors] = useState({});
+    const [errors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const successModal = useRef();

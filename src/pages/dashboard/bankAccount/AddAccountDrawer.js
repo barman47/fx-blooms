@@ -134,6 +134,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
+    // eslint-disable-next-line
     const [isIbanValid, setIsIbanValid] = useState(false);
 
     const [first, setFirst] = useState('');

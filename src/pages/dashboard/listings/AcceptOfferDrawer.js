@@ -113,6 +113,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const [reference, setReference] = useState('');
 
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line no-unused-vars
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 

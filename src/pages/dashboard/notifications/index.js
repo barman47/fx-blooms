@@ -13,7 +13,7 @@ import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG, SET_NOTIFICATION_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import { PROFILE, TWO_FACTOR } from '../../../routes';
@@ -101,12 +101,16 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
+    // eslint-disable-next-line
     const [amount, setAmount] = useState(0);
+    // eslint-disable-next-line
     const [sellerUsername, setSellerUsername] = useState('');
+    // eslint-disable-next-line
     const [buyerSendEurDrawerOpen, setBuyerSendEurDrawerOpen] = useState(false);
     const [sellerSendEurDrawerOpen, setSellerSendEurDrawerOpen] = useState(false);
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
+    // eslint-disable-next-line
     const [transactionId, setTransactionId] = useState(null);
     const [notificationId, setNotificationId] = useState(null);
     const [countryCode, setCountryCode] = useState('');
@@ -115,7 +119,7 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     const successModal = useRef();
 
     const { APPROVED } = ID_STATUS;
-    const { BUYER_MADE_PAYMENT, BUYER_CONFIRMED_PAYMENT, SELLER_MADE_PAYMENT, SELLER_CONFIRMED_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
+    const { BUYER_MADE_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
     
     useEffect(() => {
         getNotifications();
@@ -157,17 +161,17 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     }, [dispatch, sellerSendEurDrawerOpen]);
     
     // accounName typo is deliberate and should not be fixed
-    const setAccount = (accounName, accountNumber, bankName, reference) => {
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: {
-                accounName,
-                accountNumber,
-                bankName,
-                reference
-            }
-        });
-    };
+    // const setAccount = (accounName, accountNumber, bankName, reference) => {
+    //     dispatch({
+    //         type: SET_ACCOUNT,
+    //         payload: {
+    //             accounName,
+    //             accountNumber,
+    //             bankName,
+    //             reference
+    //         }
+    //     });
+    // };
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
         const data = {
@@ -180,60 +184,60 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
         completeTransaction(data, notificationId);
     };
 
-    const setBuyerAccount = (notification, notificationId) => {
-        const { Buyer, Seller } = notification;
-        setTransactionId(notification.Id);
-        setSellerUsername(Seller.UserName);
+    // const setBuyerAccount = (notification, notificationId) => {
+    //     const { Buyer, Seller } = notification;
+    //     setTransactionId(notification.Id);
+    //     setSellerUsername(Seller.UserName);
         
-        const buyerAccount = {
-            accounName: Buyer.AccountName,
-            accountNumber: Buyer.AccountNumber,
-            bankName: Buyer.BankName,
-            reference: Buyer.TransferReference
-        };
+    //     const buyerAccount = {
+    //         accounName: Buyer.AccountName,
+    //         accountNumber: Buyer.AccountNumber,
+    //         bankName: Buyer.BankName,
+    //         reference: Buyer.TransferReference
+    //     };
 
-        setAmount(Number(Seller.AmountTransfered));
-        dispatch({
-            type: SET_ACCOUNT,
-            payload: buyerAccount
-        });
-        setNotificationId(notificationId);
-        getTransaction(notification.Id);
-        toggleSellerSendEurDrawer();
-    };
+    //     setAmount(Number(Seller.AmountTransfered));
+    //     dispatch({
+    //         type: SET_ACCOUNT,
+    //         payload: buyerAccount
+    //     });
+    //     setNotificationId(notificationId);
+    //     getTransaction(notification.Id);
+    //     toggleSellerSendEurDrawer();
+    // };
 
-    const setSellerAccount = (notification, notificationId) => {
-        const { Buyer, Seller } = notification;
-        setTransactionId(notification.Id);
-        setAmount(Number(Buyer.AmountTransfered));
-        setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
-        setNotificationId(notificationId);
-        getTransaction(notification.Id);
-        toggleBuyerSendEurDrawer();
-    };
+    // const setSellerAccount = (notification, notificationId) => {
+    //     const { Buyer, Seller } = notification;
+    //     setTransactionId(notification.Id);
+    //     setAmount(Number(Buyer.AmountTransfered));
+    //     setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
+    //     setNotificationId(notificationId);
+    //     getTransaction(notification.Id);
+    //     toggleBuyerSendEurDrawer();
+    // };
 
-    const toggleBuyerSendEurDrawer = () => {
-        setBuyerSendEurDrawerOpen(!buyerSendEurDrawerOpen);
+    // const toggleBuyerSendEurDrawer = () => {
+    //     setBuyerSendEurDrawerOpen(!buyerSendEurDrawerOpen);
 
-        // clear message if drawer is open and being closed
-        if (buyerSendEurDrawerOpen) {
-            dispatch({
-                type: SET_NOTIFICATION_MSG,
-                payload: null
-            });
-        }
-    };
+    //     // clear message if drawer is open and being closed
+    //     if (buyerSendEurDrawerOpen) {
+    //         dispatch({
+    //             type: SET_NOTIFICATION_MSG,
+    //             payload: null
+    //         });
+    //     }
+    // };
 
-    const toggleSellerSendEurDrawer = () => {
-        // clear message if drawer is open and being closed
-        if (sellerSendEurDrawerOpen) {
-            dispatch({
-                type: SET_NOTIFICATION_MSG,
-                payload: null
-            });
-        }
-        setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
-    };
+    // const toggleSellerSendEurDrawer = () => {
+    //     // clear message if drawer is open and being closed
+    //     if (sellerSendEurDrawerOpen) {
+    //         dispatch({
+    //             type: SET_NOTIFICATION_MSG,
+    //             payload: null
+    //         });
+    //     }
+    //     setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
+    // };
 
     const setMessage = (notification) => {
         const { Buyer, Seller } = notification;

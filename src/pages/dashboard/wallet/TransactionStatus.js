@@ -17,7 +17,6 @@ import PropTypes from 'prop-types';
 import { getBid } from '../../../actions/listings';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
-import formatNumber from '../../../utils/formatNumber';
 import returnLastThreeCharacters from '../../../utils/returnLastThreeCharacters';
 
 import { convertToLocalTime } from '../../../utils/getTime';
@@ -89,7 +88,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
 
     const { transaction } = useSelector(state => state.wallets);
 
-    const [customer, setCustomer] = useState({});
+    const [customer] = useState({});
 
     useEffect(() => {
         handleSetTitle('Transaction Status');
