@@ -26,7 +26,6 @@ import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
-import { getResidencePermitLink } from '../../../actions/customer';
 import { addListing } from '../../../actions/listings';
 import { getWallets } from '../../../actions/wallets';
 import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
@@ -38,7 +37,7 @@ import { DASHBOARD_HOME } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 
 import PendingIdModal from './PendingIdModal';
-import ResidencePermitModal from './ResidencePermitModal';
+import IDVerificationModal from './IDVerificationModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import CreateWalletModal from '../wallet/CreateWalletModal';
 
@@ -169,19 +168,18 @@ const MakeListing = (props) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { residencePermitStatus } = useSelector(state => state.customer.stats);
+    const { idStatus } = useSelector(state => state.customer.stats);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { currencies } = useSelector(state => state);
-    const { customerId, residencePermitUrl } = useSelector(state => state.customer);
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
     const { wallet, wallets } = useSelector(state => state.wallets);
 
-    const { addListing, getAccounts, getCurrencies, getResidencePermitLink, getWallets, handleSetTitle } = props;
+    const { addListing, getAccounts, getCurrencies, getWallets, handleSetTitle } = props;
 
     const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
 
@@ -203,12 +201,11 @@ const MakeListing = (props) => {
 
     const [previousListings, setPreviousListings] = useState([]);
 
-    const [permitUrl, setPermitUrl] = useState('');
-
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
 
+    const idVerificationModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
@@ -219,12 +216,9 @@ const MakeListing = (props) => {
         handleSetTitle('Add Listing');
         checkForWallets();
         setPresetSelectedCurrency();
-        if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
-            getResidencePermitLink();
-        }
 
-        if (residencePermitStatus !== APPROVED) {
-            checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            idVerificationModal.current.openModal();
         }
 
         if (accounts.length === 0) {
@@ -232,14 +226,6 @@ const MakeListing = (props) => {
         }
         // eslint-disable-next-line
     }, []);
-
-    // useEffect(() => {
-    //     if (residencePermitStatus) {
-    //         if (residencePermitStatus !== APPROVED) {
-    //             return checkResidencePermitStatus();
-    //         }
-    //     }
-    // }, []);
 
     useEffect(() => {
         // Automatically select newly added account
@@ -264,12 +250,6 @@ const MakeListing = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
-
-    useEffect(() => {
-        if (residencePermitUrl) {
-            setPermitUrl(residencePermitUrl);
-        }
-    }, [residencePermitUrl]);
 
     useEffect(() => {
         if (currencies.length === 0) {
@@ -393,8 +373,8 @@ const MakeListing = (props) => {
         }
     };
 
-    const checkResidencePermitStatus = () => {
-        switch (residencePermitStatus) {
+    const checkIdStatus = () => {
+        switch (idStatus) {
             case APPROVED:
                 break;
 
@@ -403,11 +383,11 @@ const MakeListing = (props) => {
                 break;
 
             case REJECTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.openModal();
                 break;
 
             case NOT_SUBMITTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.openModal();
                 break;
 
             default:
@@ -418,10 +398,6 @@ const MakeListing = (props) => {
     // const handleCloseAccountModalModal = () => {
     //     setOpenAccountModal(false);
     // };
-
-    const handleCloseResidencePermitModal = () => {
-        setShowResidencePermitModal(false);
-    };
     
     const handleClosePendingIdModal = () => {
         setShowPendingIdModal(false);
@@ -474,8 +450,8 @@ const MakeListing = (props) => {
             return setErrors({ ...errors, msg: 'Invalid listing data' });
         }
 
-        if (residencePermitStatus !== APPROVED) {
-            return checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            return checkIdStatus();
         }
 
         if (wallets.length === 0) {
@@ -534,7 +510,7 @@ const MakeListing = (props) => {
             {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleShowCreateWalletModal} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
+                <IDVerificationModal ref={idVerificationModal} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
@@ -803,8 +779,7 @@ MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired,
     getWallets: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink, getWallets })(MakeListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, getWallets })(MakeListing);

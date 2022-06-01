@@ -52,7 +52,6 @@ import {
 } from './routes';
 
 import FallBack from './components/common/FallBack';
-import VeriffVerify from './pages/dashboard/profile/Veriff';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -91,6 +90,7 @@ const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'))
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
 const IdVerification = lazy(() => import('./pages/dashboard/idVerification'));
+const VeriffVerify = lazy(() => import('./pages/dashboard/idVerification/Veriff'));
 
 const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 

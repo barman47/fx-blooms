@@ -127,7 +127,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
 
     const [BankName, setBankName] = useState('');
     const [AccountNumber, setAccountNumber] = useState('');
-    const [AccountName, setAccountName] = useState(`${firstName} ${lastName}`);
+    const [AccountName, setAccountName] = useState(`${firstName ?? ''} ${lastName ?? ''}`);
     const [bic, setBic] = useState('');
     const [nickName, setNickName] = useState('');
     const [errors, setErrors] = useState({});

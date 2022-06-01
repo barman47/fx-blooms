@@ -23,7 +23,6 @@ import Toast from '../../../components/common/Toast';
 import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
-import { getResidencePermitLink } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, updateListing } from '../../../actions/listings';
 import { UPDATED_LISTING, GET_ERRORS } from '../../../actions/types';
@@ -33,7 +32,7 @@ import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateEditListing from '../../../utils/validation/listing/edit';
 import PendingIdModal from './PendingIdModal';
-import ResidencePermitModal from './ResidencePermitModal';
+import IDVerificationModal from './IDVerificationModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
@@ -155,17 +154,16 @@ const EditListing = (props) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { residencePermitStatus } = useSelector(state => state.customer.stats);
+    const { idStatus } = useSelector(state => state.customer.stats);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { currencies } = useSelector(state => state);
-    const { customerId, residencePermitUrl } = useSelector(state => state.customer);
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { editedListing, listing, listings, msg, recommendedRate } = useSelector(state => state.listings);
 
-    const { getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle, updateListing } = props;
+    const { getAccounts, getCurrencies, handleSetTitle, updateListing } = props;
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
     const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
@@ -187,11 +185,10 @@ const EditListing = (props) => {
 
     const [previousListings, setPreviousListings] = useState([]);
 
-    const [permitUrl, setPermitUrl] = useState('');
-
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const idVerificationModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
@@ -201,12 +198,8 @@ const EditListing = (props) => {
     useEffect(() => {
         handleSetTitle('Edit Listing');
 
-        if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
-            getResidencePermitLink();
-        }
-
-        if (residencePermitStatus !== APPROVED) {
-            checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            checkIdStatus();
         }
 
         if (accounts.length === 0) {
@@ -238,12 +231,6 @@ const EditListing = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
-
-    useEffect(() => {
-        if (residencePermitUrl) {
-            setPermitUrl(residencePermitUrl);
-        }
-    }, [residencePermitUrl]);
 
     useEffect(() => {
         if (currencies.length === 0) {
@@ -370,8 +357,8 @@ const EditListing = (props) => {
     //     setOpenAccountModal(true);
     // };
 
-    const checkResidencePermitStatus = () => {
-        switch (residencePermitStatus) {
+    const checkIdStatus = () => {
+        switch (idStatus) {
             case APPROVED:
                 break;
 
@@ -380,24 +367,16 @@ const EditListing = (props) => {
                 break;
 
             case REJECTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.opneModal();
                 break;
 
             case NOT_SUBMITTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.opneModal();
                 break;
 
             default:
                 break;
         }
-    };
-
-    // const handleCloseAccountModalModal = () => {
-    //     setOpenAccountModal(false);
-    // };
-
-    const handleCloseResidencePermitModal = () => {
-        setShowResidencePermitModal(false);
     };
     
     const handleClosePendingIdModal = () => {
@@ -450,8 +429,8 @@ const EditListing = (props) => {
             return setErrors({ ...errors, msg: 'Invalid data' });
         }
 
-        if (residencePermitStatus !== APPROVED) {
-            return checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            return checkIdStatus();
         }
 
         setErrors({});
@@ -499,7 +478,7 @@ const EditListing = (props) => {
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
+                <IDVerificationModal ref={idVerificationModal} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
@@ -787,8 +766,7 @@ EditListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired,
     updateListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink, updateListing })(EditListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, updateListing })(EditListing);

@@ -69,7 +69,8 @@ import {
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE,
-    WALLETS
+    WALLETS,
+    VERIFF
 } from '../../routes';
 import { 
     ADD_ALERT_NOTIFICATION,
@@ -388,7 +389,7 @@ const Dashboard = (props) => {
 
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName, idVerificationLink, residencePermitUrl } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
@@ -421,7 +422,7 @@ const Dashboard = (props) => {
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
         { url : PIN, text: 'PIN', icon: <Security /> },
-        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
+        { url : TWO_FACTOR, text: '2FA', icon: <TwoFactorAuthentication /> }
     ];
 
     const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
@@ -486,36 +487,20 @@ const Dashboard = (props) => {
         }
         // eslint-disable-next-line
     }, []);
-
-    const verifyEuId = useCallback(() => {
-        window.open(residencePermitUrl);
-    }, [residencePermitUrl]);
         
-    const verifyOtherId = useCallback(() => {
-        window.open(idVerificationLink);
-    }, [idVerificationLink]);
+    const verifyId = useCallback(() => {
+        navigate(VERIFF);
+    }, [navigate]);
 
     const setAlertNotifications = useCallback(() => {
-        console.log('Setting alert notification');
         const { APPROVED } = ID_STATUS;
-        if (stats.residencePermitStatus !== APPROVED) {
+        if (stats.idStatus !== APPROVED) {
             dispatch({
                 type: ADD_ALERT_NOTIFICATION,
                 payload: {
-                    message: 'Verify your EU Government Issued ID',
+                    message: 'Verify your Identity',
                     buttonText: 'Verify ID',
-                    buttonAction: verifyEuId
-                }
-            });
-        }
-        
-        if ((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) {
-            dispatch({
-                type: ADD_ALERT_NOTIFICATION,
-                payload: {
-                    message: 'Verify Other Government Issued ID',
-                    buttonText: 'Verify ID',
-                    buttonAction: verifyOtherId
+                    buttonAction: verifyId
                 }
             });
         }
@@ -542,14 +527,14 @@ const Dashboard = (props) => {
                 }
             });
         }
-    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyEuId, verifyOtherId]);
+    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyId]);
 
     useEffect(() => {
         if (!_.isEmpty(stats)) {
             if (!sessionStorage.getItem('checkedIdStatus')) {
                 sessionStorage.setItem('checkedIdStatus', 'true');
-                const { idStatus, residencePermitStatus } = stats;
-                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
+                const { idStatus } = stats;
+                if (idStatus === NOT_SUBMITTED) {
                     accountSetupModal.current.openModal();
                 }
             }

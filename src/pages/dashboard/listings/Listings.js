@@ -8,7 +8,7 @@ import { FormatListText } from 'mdi-material-ui';
 
 import { BID_STATUS, COLORS, ID_STATUS, LISTING_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
-import { acceptOffer, addBid, checkListingEditable } from '../../../actions/listings';
+import { addBid, checkListingEditable } from '../../../actions/listings';
 import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_ACCEPT_OFFER, TOGGLE_BID_STATUS } from '../../../actions/types';
 
 import IDVerificationModal from '../listings/IDVerificationModal';
@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
+const Listings = ({ addBid, checkListingEditable }) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
@@ -55,7 +55,6 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
     const { customerId, stats } = useSelector(state => state.customer);
     const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
-    const idVerificationLink = useSelector(state => state.customer.idVerificationLink);
     const { addedBid, acceptedOffer, listings, msg } = useSelector(state => state.listings);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
@@ -225,10 +224,6 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
 
     const toggleCreateWalletModal = () => setShowCreateWalletModal(!showCreateWalletModal);
 
-    const dismissAction = () => {
-        window.location.href = idVerificationLink;
-    };
-
     const handleClosePendingIdModal = () => {
         setShowPendingIdModal(false);
     };
@@ -254,7 +249,7 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
             {openBuyerPaymentDrawer && <BuyerPaymentDrawer drawerOpen={openBuyerPaymentDrawer} toggleDrawer={toggleBuyerPaymentDrawer} />}
             {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletModal={toggleCreateWalletModal} />}
             <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
-            <IDVerificationModal ref={idVerificationModal} dismissAction={dismissAction} />
+            <IDVerificationModal ref={idVerificationModal} />
             
             {listings.length > 0 ? 
                 listings.map((listing, index) => (
@@ -280,9 +275,8 @@ const Listings = ({ acceptOffer, addBid, checkListingEditable }) => {
 }
 
 Listings.propTypes = {
-    acceptOffer: PropTypes.func.isRequired,
     addBid: PropTypes.func.isRequired,
     checkListingEditable: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { acceptOffer, addBid, checkListingEditable })(Listings);
+export default connect(undefined, { addBid, checkListingEditable })(Listings);

@@ -9,7 +9,6 @@ import { Key, PhoneCheck, Passport } from 'mdi-material-ui';
 import { COLORS, ID_STATUS, NOTIFICATION_TYPES } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
-import { getIdVerificationLink, getResidencePermitLink } from '../../../actions/customer';
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
@@ -94,7 +93,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitLink, getTransaction, getNotifications, generateOtp, handleSetTitle }) => {
+const Index = ({ completeTransaction, getTransaction, getNotifications, generateOtp, handleSetTitle }) => {
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
@@ -124,13 +123,6 @@ const Index = ({ completeTransaction, getIdVerificationLink, getResidencePermitL
     useEffect(() => {
         getNotifications();
         handleSetTitle('Notifications');
-
-        if (!residencePermitUrl && stats.residencePermitStatus !== APPROVED) {
-            getResidencePermitLink()
-        }
-        if (!residencePermitUrl && stats.idStatus !== APPROVED) {
-            getIdVerificationLink();
-        }
 
         return () => {
             dispatch({
@@ -527,4 +519,4 @@ Index.propTypes = {
     generateOtp: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { completeTransaction, getIdVerificationLink, getResidencePermitLink, getTransaction, getNotifications, generateOtp })(Index);
+export default connect(undefined, { completeTransaction, getTransaction, getNotifications, generateOtp })(Index);

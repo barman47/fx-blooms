@@ -20,7 +20,7 @@ import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
-import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
+import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getWallets } from '../../../actions/wallets';
@@ -33,7 +33,6 @@ import {
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
-import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
@@ -231,7 +230,6 @@ const AllListings = (props) => {
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
-	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
 	const { eurActive, wallets } = useSelector(state => state.wallets);
 
@@ -239,7 +237,6 @@ const AllListings = (props) => {
 		getAccounts, 
 		getCustomerInformation, 
 		getCustomerStats, 
-		getIdVerificationLink, 
 		getListingsOpenForBid, 
 		getMoreListings, 
 		getNotifications,
@@ -256,13 +253,9 @@ const AllListings = (props) => {
 	const [dataLength, setDataLength] = useState(0);
 	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
     const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
-	// eslint-disable-next-line
 	const [showWallets, setShowWallets] = useState(false);
 
 	let loadedEvent = useRef();
-
-	const { REJECTED } = CUSTOMER_CATEGORY;
-	const { NOT_SUBMITTED } = ID_STATUS;
 
     const toggleFundDrawer = () => {
         setFundDrawerOpen(!fundDrawerOpen);
@@ -345,12 +338,6 @@ const AllListings = (props) => {
 			});
 		}
 	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
-
-	useEffect(() => {
-		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
-            getIdVerificationLink();
-        }
-	}, [getIdVerificationLink, idStatus, NOT_SUBMITTED, REJECTED]);
 
 	useEffect(() => {
 		setDataLength(listings.length);
@@ -664,7 +651,6 @@ AllListings.propTypes = {
 	getAccounts: PropTypes.func.isRequired,
 	getCustomerInformation: PropTypes.func.isRequired,
 	getCustomerStats: PropTypes.func.isRequired,
-	getIdVerificationLink: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
@@ -674,7 +660,6 @@ AllListings.propTypes = {
 
 export default connect(undefined, { 
 	getAccounts, 
-	getIdVerificationLink, 
 	getCustomerInformation, 
 	getCustomerStats, 
 	getListingsOpenForBid, 
