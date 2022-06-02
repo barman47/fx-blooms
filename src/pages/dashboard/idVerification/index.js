@@ -179,8 +179,8 @@ const IDVerification = () => {
                         <div>
                             <CardAccountDetailsOutline className={classes.icon} />
                         </div>
-                        <Typography variant="h6" color="primary">EU issued ID</Typography>
-                        <Typography variant="body2" component="p" color="primary">Required to SELL and BUY.</Typography>
+                        <Typography variant="h6" color="primary">Government Issued ID</Typography>
+                        <Typography variant="body2" component="p" color="primary">For KYC, kindly verify your government-issued ID.</Typography>
                         <div>
                             {residencePermitStatus !== APPROVED ? 
                                 <>

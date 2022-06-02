@@ -82,6 +82,8 @@ export const requestWalletFunding = (data, navigate) => async (dispatch)  => {
         });
         return navigate(FUND_CONFIRMATION);
     } catch (err) {
+        console.log(err.response);
+        console.log(err);
         return handleError(err, dispatch);
     }
 };

@@ -154,7 +154,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
         if (eur && ngn) {
             setValue(0);
         } else if (eur) {
-            setValue(1);
+            setValue(0);
         } else if (ngn) {
             setValue(0);
         }
@@ -238,7 +238,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     };
 
     const handleChange = (event, newValue) => {
-        setValue(newValue);
+        setValue(parseInt(newValue));
     };
 
     const handleSetCurrency = () => {
@@ -498,7 +498,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                         </Grid>
                     </form>
                 </TabPanel>
-                <TabPanel value={value} index={ngn && eur ? 1 : !ngn && eur ? 0 : 1}>
+                <TabPanel value={value} index={ngn && eur ? 1 : 0}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={matches ? 2 : 1}>
                             <Grid item xs={12}>

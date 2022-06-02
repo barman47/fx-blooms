@@ -11,7 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import _ from 'lodash';
 
-import { COLORS } from '../../../utils/constants';
+import { AUTH_TOKEN, COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 
 const useStyles = makeStyles(theme => ({
@@ -65,6 +65,8 @@ const FundConfirmation = ({ handleSetTitle }) => {
 
 
     useEffect(() => {
+        // Set token to localStorage from sessionStorage
+        localStorage.setItem(AUTH_TOKEN, sessionStorage.getItem(AUTH_TOKEN));
         handleSetTitle('Funding Details');
 
         if (_.isEmpty(fundingDetails)) {

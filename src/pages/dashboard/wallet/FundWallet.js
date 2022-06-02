@@ -141,7 +141,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
     const { institutions, currencies, customer } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
-    const [currency, setCurrency] = useState('EUR');
+    const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
     const [institution, setInstitution] = useState('');
@@ -249,13 +249,14 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                                 <Select
                                     labelId="currency"
                                     value={currency}
-                                    onChange={(e) => setCurrency(e.target.value)}
+                                    // onChange={(e) => setCurrency(e.target.value)}
                                 
                                 >
-                                    <MenuItem value="" disabled>Select Currency</MenuItem>
-                                    {currencies.length > 0 && currencies.map((currency, index) => (
+                                    {/* <MenuItem value="" disabled>Select Currency</MenuItem> */}
+                                    <MenuItem value={currency} selected>{currency}</MenuItem>
+                                    {/* {currencies.length > 0 && currencies.map((currency, index) => (
                                         <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
-                                    ))}
+                                    ))} */}
                                 </Select>
                                 <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                             </FormControl>

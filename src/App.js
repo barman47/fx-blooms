@@ -1,5 +1,7 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { createTheme, ThemeProvider } from '@material-ui/core';
 
 import { 
@@ -51,7 +53,11 @@ import {
 	PIN
 } from './routes';
 
+import { getCustomerInformation } from './actions/customer';
+
 import FallBack from './components/common/FallBack';
+import { AUTH_TOKEN } from './utils/constants';
+import setAuthToken from './utils/setAuthToken';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -175,10 +181,22 @@ const theme = createTheme({
 	}
 });
 
-const App = () => {
+const App = ({ getCustomerInformation }) => {
 	const [title, setTitle] = useState('');
 
 	const handleSetTitle = (title) => setTitle(title);
+
+	useEffect(() => {
+		const token = localStorage.getItem(AUTH_TOKEN);
+
+		if (token) {
+			setAuthToken(token);
+			// localStorage.removeItem(AUTH_TOKEN);
+			getCustomerInformation();
+		}
+
+		// eslint-disable-next-line
+	}, []);
 
 	return (
 		<ThemeProvider theme={theme}> 
@@ -252,4 +270,8 @@ const App = () => {
 	);
 }
 
-export default App;
+App.propTypes = {
+	getCustomerInformation: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getCustomerInformation })(App);

@@ -38,12 +38,8 @@ import isEmpty from '../../../utils/isEmpty';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-import FundWalletDrawer from '../wallet/FundWalletDrawer';
-import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
-// import NewNotification from '../notifications/NewNotification';
-// import RiskNoticeModal from './RiskNoticeModal';
 
 import EUFlag from '../../../assets/img/EU-flag.svg';
 // import NGNFlag from '../../../assets/img/NGN-flag.svg';
@@ -251,19 +247,9 @@ const AllListings = (props) => {
 	const [errors, setErrors] = useState({});
 
 	const [dataLength, setDataLength] = useState(0);
-	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
-    const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
-	const [showWallets, setShowWallets] = useState(false);
+	const [showWallets, setShowWallets] = useState(true);
 
 	let loadedEvent = useRef();
-
-    const toggleFundDrawer = () => {
-        setFundDrawerOpen(!fundDrawerOpen);
-    };
-
-    const toggleWithdrawalDrawer = () => {
-        setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
-    };
 
 	useEffect(() => {
 		removeExpiredListings();
@@ -460,8 +446,6 @@ const AllListings = (props) => {
 	return (
 		<>
 			<RiskNoticeModal />
-			{fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
-            {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
@@ -502,33 +486,8 @@ const AllListings = (props) => {
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-							{/* <Wallet
-								type="NGN"
-								flag={NGNFlag}
-								active={ngnActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_NGN_WALLET })}
-							/>
-							<Wallet 
-								type="USD"
-								flag={USFlag}
-								active={usdActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_USD_WALLET })}
-							/>
-							<Wallet 
-								type="GPB"
-								flag={GBPFlag}
-								active={gbpActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_GPB_WALLET })}
-							/> */}
-
 						</section>
-
-						<WalletInfo 
-							availableBalance="EUR2500.62"
-							escrowedBalance="1000"
-							toggleFundDrawer={toggleFundDrawer}
-							toggleWithdrawalDrawer={toggleWithdrawalDrawer}
-						/>
+						<WalletInfo />
 					</section>
 				</Collapse>
 				<section className={classes.listings} id="scrollableParent">

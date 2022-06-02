@@ -3,13 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { Box, Button, Divider, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import PropTypes from 'prop-types';
 import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import { FUND_WALLET, REQUEST_WITHDRAWAL } from '../../../routes';
 import CreateWalletModal from './CreateWalletModal';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -101,54 +101,52 @@ const WalletInfo = () => {
     return (
         <>
             {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />}
-            <Box component="section" className={classes.root} >
-                <Box component="div" className={classes.balance}>
-                    <Box component="div">
-                        <Typography variant="h6" className={classes.title}>Available Balance</Typography>
-                        <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.available, 2)}</Typography>
-                    </Box>
-                    <Divider orientation="vertical" flexItem light />
-                    <Box component="div">
-                        <Typography variant="h6" className={classes.title}>Escrowed Balance</Typography>
-                        <Typography variant="h6" className={classes.label}>{formatNumber(wallet?.balance?.lien, 2)}</Typography>
+            {!isEmpty(wallet) && 
+                <Box component="section" className={classes.root} >
+                    <Box component="div" className={classes.balance}>
+                        <Box component="div">
+                            <Typography variant="h6" className={classes.title}>Available Balance</Typography>
+                            <Typography variant="h6" className={classes.label}>{`${wallet.currency.value}${formatNumber(wallet.balance.available, 2)}`}</Typography>
+                        </Box>
+                        <Divider orientation="vertical" flexItem light />
+                        <Box component="div">
+                            <Typography variant="h6" className={classes.title}>Escrowed Balance</Typography>
+                            <Typography variant="h6" className={classes.label}>{`${wallet.currency.value}${formatNumber(wallet.balance.lien, 2)}`}</Typography>
+                        </Box>
+                    </Box>   
+                    <Box component="section" className={classes.buttonContainer}>
+                        <Button 
+                            to={FUND_WALLET}
+                            underline="none"
+                            component={Link}
+                            variant="outlined" 
+                            color="primary" 
+                            disableFocusRipple
+                            disableRipple
+                            startIcon={<ArrowBottomLeftThinCircleOutline style={{ backgroundColor: '#00A389', borderRadius: '50%', color: COLORS.offWhite }} />}
+                            className={classes.button}
+                            onClick={(e) => handleAddFund(e, FUND_WALLET)}
+                        >
+                            Add Fund
+                        </Button>
+                        <Button 
+                            component={Link}
+                            to={REQUEST_WITHDRAWAL}
+                            variant="outlined" 
+                            color="primary" 
+                            disableFocusRipple
+                            disableRipple
+                            startIcon={<ArrowTopRightThinCircleOutline style={{ backgroundColor: '#FF7880', borderRadius: '50%', color: COLORS.offWhite }} />}
+                            className={classes.button}
+                            onClick={(e) => handleWithdraw(e, REQUEST_WITHDRAWAL)}
+                        >
+                            Withdraw
+                        </Button>
                     </Box>
                 </Box>
-                <Box component="section" className={classes.buttonContainer}>
-                    <Button 
-                        to={FUND_WALLET}
-                        underline="none"
-                        component={Link}
-                        variant="outlined" 
-                        color="primary" 
-                        disableFocusRipple
-                        disableRipple
-                        startIcon={<ArrowBottomLeftThinCircleOutline style={{ backgroundColor: '#00A389', borderRadius: '50%', color: COLORS.offWhite }} />}
-                        className={classes.button}
-                        onClick={(e) => handleAddFund(e, FUND_WALLET)}
-                    >
-                        Add Fund
-                    </Button>
-                    <Button 
-                        component={Link}
-                        to={REQUEST_WITHDRAWAL}
-                        variant="outlined" 
-                        color="primary" 
-                        disableFocusRipple
-                        disableRipple
-                        startIcon={<ArrowTopRightThinCircleOutline style={{ backgroundColor: '#FF7880', borderRadius: '50%', color: COLORS.offWhite }} />}
-                        className={classes.button}
-                        onClick={(e) => handleWithdraw(e, REQUEST_WITHDRAWAL)}
-                    >
-                        Withdraw
-                    </Button>
-                </Box>
-            </Box>
+            }
         </>
     );
-};
-
-WalletInfo.propTypes = {
-    toggleWithdrawalDrawer: PropTypes.func.isRequired
 };
 
 export default WalletInfo;

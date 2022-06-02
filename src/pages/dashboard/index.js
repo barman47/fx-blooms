@@ -97,7 +97,7 @@ import HideOnScroll from '../../components/layout/HideOnScroll';
 import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
-import CreateWalletModal from './wallet/CreateWalletModal';
+// import CreateWalletModal from './wallet/CreateWalletModal';
 
 import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
@@ -428,7 +428,6 @@ const Dashboard = (props) => {
     const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
-    const createWalletModal = useRef();
     const customToast = useRef();
     const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
@@ -833,7 +832,7 @@ const Dashboard = (props) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
-            <CreateWalletModal ref={createWalletModal} />
+            {/* {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />} */}
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
