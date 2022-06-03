@@ -103,7 +103,7 @@ export const requestWithdrawal = (data) => async (dispatch) => {
 export const payment = ({ paymentRequestId, consentToken, type }) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`,);
+        const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`);
         console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
