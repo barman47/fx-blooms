@@ -53,7 +53,6 @@ export const requestWalletFunding = (data, navigate) => async (dispatch)  => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/fund`, data);
-        console.log(res);
         const {
             authorisationUrl,
             institutionId,
@@ -82,8 +81,6 @@ export const requestWalletFunding = (data, navigate) => async (dispatch)  => {
         });
         return navigate(FUND_CONFIRMATION);
     } catch (err) {
-        console.log(err.response);
-        console.log(err);
         return handleError(err, dispatch);
     }
 };
@@ -103,10 +100,10 @@ export const requestWithdrawal = (data) => async (dispatch) => {
     }
 };
 
-export const payment = (data) => async (dispatch) => {
+export const payment = ({ paymentRequestId, consentToken, type }) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.post(`${YAPILY_API}/payment`, data);
+        const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`,);
         console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
