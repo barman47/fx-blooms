@@ -861,7 +861,7 @@ const Dashboard = (props) => {
                         <Menu />
                     </IconButton>
                     <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
-                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
+                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName?.charAt(0)?.toUpperCase()}</Avatar>
                 </Toolbar>
             </AppBar>
             {/* </HideOnScroll> */}
