@@ -35,6 +35,7 @@ import {
 	WALLET_TRANSACTION_STATUS,
 	FUND_WALLET,
 	FUND_AUTHORIZATION_SUCCESS,
+	FUNDING_REQUEST_STATUS,
 	FUND_CONFIRMATION,
 	CONTACT_US,
 	USER_AGREEMENT,
@@ -114,6 +115,7 @@ const WalletTransactionStatus = lazy(() => import('./pages/dashboard/wallet/Tran
 const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 const FundConfirmation = lazy(() => import('./pages/dashboard/wallet/FundConfirmation'));
 const FundAuthorizationSuccess = lazy(() => import('./pages/dashboard/wallet/FundAuthorizationSuccess'));
+const FundingRequestStatus = lazy(() => import('./pages/dashboard/wallet/FundingRequestStatus'));
 const RequestWithdrawal = lazy(() => import('./pages/dashboard/wallet/RequestWithdrawal'));
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
@@ -191,7 +193,7 @@ const App = ({ getCustomerInformation }) => {
 
 		if (token) {
 			setAuthToken(token);
-			// localStorage.removeItem(AUTH_TOKEN);
+			localStorage.removeItem(AUTH_TOKEN);
 			getCustomerInformation();
 		}
 
@@ -241,6 +243,7 @@ const App = ({ getCustomerInformation }) => {
 								<Route path={WALLET_TRANSACTION_STATUS} element={<WalletTransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_AUTHORIZATION_SUCCESS} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
+								<Route path={FUNDING_REQUEST_STATUS} element={<FundingRequestStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
 								<Route path={REQUEST_WITHDRAWAL} element={<RequestWithdrawal handleSetTitle={handleSetTitle} />} />
 								<Route path={VERIFF} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />

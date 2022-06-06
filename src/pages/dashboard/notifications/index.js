@@ -514,8 +514,6 @@ Index.propTypes = {
     completeTransaction: PropTypes.func.isRequired,
     getTransaction: PropTypes.func.isRequired,
     getNotifications: PropTypes.func.isRequired,
-    getIdVerificationLink: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired,
     generateOtp: PropTypes.func.isRequired
 };
 

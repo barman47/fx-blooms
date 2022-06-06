@@ -1,9 +1,17 @@
 import axios from 'axios';
-import { FUND_CONFIRMATION } from '../routes';
+import { batch } from 'react-redux';
+import { FUNDING_REQUEST_STATUS, FUND_CONFIRMATION } from '../routes';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
-import { SET_CUSTOMER_MSG, SET_FUNDING_DETAILS, SET_WALLETS, SET_WALLET_MSG, SET_WALLET_TRANSACTIONS } from './types';
+import { 
+    SET_CUSTOMER_MSG,
+    SET_FUNDING_DETAILS,
+    SET_WALLETS,
+    SET_WALLET_MSG,
+    SET_WALLET_TRANSACTIONS,
+    SET_WITHDRAWAL_DETAILS
+} from './types';
 
 const API = `${process.env.REACT_APP_WALLET_API}`;
 const WALLETS_API = `${API}/wallet-management`;
@@ -100,11 +108,63 @@ export const requestWithdrawal = (data) => async (dispatch) => {
     }
 };
 
-export const payment = ({ paymentRequestId, consentToken, type }) => async (dispatch) => {
+export const payment = ({ paymentRequestId, consentToken, type }, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`);
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'Funding request created successfully'
+            });
+            dispatch({
+                type: SET_FUNDING_DETAILS,
+                payload: res.data.data
+            });
+        });
+        return navigate(FUNDING_REQUEST_STATUS);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCreditDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
         console.log(res);
+        dispatch({
+            type: SET_FUNDING_DETAILS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getDebitDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/debit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
+        console.log(res);
+        dispatch({
+            type: SET_WITHDRAWAL_DETAILS,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getCreditRequests = (walletId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/creditrequests?walletId=${walletId}`);
+        console.log(res);
+        // dispatch({
+        //     type: SET_FUNDING_DETAILS,
+        //     payload: res.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

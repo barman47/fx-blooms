@@ -31,12 +31,7 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-evenly',
-        alignItems: 'center',
-
-        [theme.breakpoints.down('sm')]: {
-            display: 'grid',
-            gridTemplateColumns: '1fr 0.2fr 1fr'
-        }
+        alignItems: 'center'
     },
 
     buttonContainer: {
@@ -48,7 +43,7 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr 1fr',
+            gridTemplateColumns: '1fr 1fr',
             gap: theme.spacing(1)
         }
     },
@@ -62,7 +57,11 @@ const useStyles = makeStyles(theme => ({
     title: {
         color: COLORS.darkGrey,
         fontWeight: 300,
-        textTransform: 'uppercase'
+        textTransform: 'uppercase',
+
+        [theme.breakpoints.down('sm')]: {
+            fontSize: theme.spacing(1.5)
+        }
     },
 
     label: {

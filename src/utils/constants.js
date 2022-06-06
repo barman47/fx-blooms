@@ -218,8 +218,13 @@ export const olimpicMedals = [{
     ACCEPTED: 'approved'
   }
 
-  export const LISTING_CATEGORY = {
-    OPEN: 'OPEN',
-    CANCELED: 'CANCELED',
-    REMOVED: 'REMOVED'
-  }
+export const LISTING_CATEGORY = {
+  OPEN: 'OPEN',
+  CANCELED: 'CANCELED',
+  REMOVED: 'REMOVED'
+}
+
+export const FUNDING_STATUS = {
+	PENDING: 'PENDING',
+	COMPLETED: 'COMPLETED',
+};

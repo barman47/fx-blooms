@@ -55,10 +55,10 @@ const useStyles = makeStyles(theme => ({
     },
 
     identity: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 0.1fr 1fr',
-        gap: theme.spacing(10),
-
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
+        
         [theme.breakpoints.down('sm')]: {
             gridTemplateColumns: '1fr',
         },

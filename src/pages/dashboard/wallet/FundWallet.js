@@ -237,7 +237,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Amount to fund wallet with</Typography>
-                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={2}>
+                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={1}>
                         <Grid item xs={4} lg={3}>
                             <FormControl 
                                 variant="outlined" 
@@ -433,7 +433,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                     </Grid>
                     <Grid item xs={12} className={classes.note}>
                         <Security className={classes.icon} />
-                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily. Your information is used for indetity verification only and will be kept secure by Yapily.</Typography>
+                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
                     </Grid>
                 </form>
             </Box>

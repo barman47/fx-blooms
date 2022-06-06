@@ -183,7 +183,7 @@ const MakeListing = (props) => {
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
+    const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
@@ -194,8 +194,7 @@ const MakeListing = (props) => {
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
-    // eslint-disable-next-line
-    const [ListingFee, setListingFee] = useState('');
+    const [ListingFee] = useState('');
 
     const [reference, setReference] = useState('');
 

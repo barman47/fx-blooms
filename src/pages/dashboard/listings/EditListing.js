@@ -166,7 +166,7 @@ const EditListing = (props) => {
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
+    const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
@@ -177,8 +177,7 @@ const EditListing = (props) => {
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
-    // eslint-disable-next-line
-    const [ListingFee, setListingFee] = useState('');
+    const [ListingFee,] = useState('');
 
     const [Bank, setBank] = useState('');
     const [reference, setReference] = useState('');
@@ -624,46 +623,48 @@ const EditListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid> */}
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.ReceivingAccount ? true : false } 
-                                        fullWidth 
-                                        required
-                                        disabled={loading ? true : false}
-                                    >
-                                        <Select
-                                            labelId="ReceivingAccount"
-                                            value={ReceivingAccount}
-                                            onChange={(e) => setReceivingAccount(e.target.value)}
-                                        >
-                                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            {AvailableCurrency === 'EUR' ?
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'NGN') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                             : 
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'EUR') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                            }
-                                        </Select>
-                                        <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
-                                    </FormControl>
-                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                                </Grid>
                                 {AvailableCurrency === 'EUR' && 
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
+                                        <FormControl 
+                                            variant="outlined" 
+                                            error={errors.ReceivingAccount ? true : false } 
+                                            fullWidth 
+                                            required
+                                            disabled={loading ? true : false}
+                                        >
+                                            <Select
+                                                labelId="ReceivingAccount"
+                                                value={ReceivingAccount}
+                                                onChange={(e) => setReceivingAccount(e.target.value)}
+                                            >
+                                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                                {AvailableCurrency === 'EUR' ?
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'NGN') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                : 
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'EUR') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                }
+                                            </Select>
+                                            <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
+                                        </FormControl>
+                                        <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                                    </Grid>
+                                }
+                                {/* {AvailableCurrency === 'EUR' && 
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
                                         <FormControl 
@@ -687,20 +688,22 @@ const EditListing = (props) => {
                                             <FormHelperText>{errors.Bank}</FormHelperText>
                                         </FormControl>
                                     </Grid>
+                                } */}
+                                {AvailableCurrency === 'EUR' &&
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                                        <TextField 
+                                            value={reference}
+                                            placeholder="Enter Payment Reference"
+                                            onChange={(e) => setReference(e.target.value)}
+                                            disabled={loading ? true : false}
+                                            type="text"
+                                            variant="outlined" 
+                                            fullWidth
+                                        />
+                                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                                    </Grid>
                                 }
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                                    <TextField 
-                                        value={reference}
-                                        placeholder="Enter Payment Reference"
-                                        onChange={(e) => setReference(e.target.value)}
-                                        disabled={loading ? true : false}
-                                        type="text"
-                                        variant="outlined" 
-                                        fullWidth
-                                    />
-                                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                                </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I will receive</Typography>
                                     <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>

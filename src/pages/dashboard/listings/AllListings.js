@@ -266,9 +266,7 @@ const AllListings = (props) => {
 			getListings();
 		}
 
-		if (wallets.length === 0) {
-			getWallets(customerId);
-		}
+		getWallets(customerId);
 
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
