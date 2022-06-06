@@ -47,6 +47,7 @@ const Transactions = ({ getWalletTransactions }) => {
     const { wallet } = useSelector(state => state.wallets);
 
     const [filter, setFilter] = useState(FILTERS.HISTORY);
+    // eslint-disable-next-line no-unused-vars
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
