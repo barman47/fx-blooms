@@ -19,6 +19,7 @@ export const getAllListings = (query) => async (dispatch) => {
         await reIssueAdminToken();
         const res = await axios.post(`${URL}/GetAllListings`, query);
         const { items, ...rest } = res.data.data;
+        console.log(items)
 
         dispatch({
             type: SET_LISTINGS,

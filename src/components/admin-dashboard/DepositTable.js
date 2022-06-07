@@ -1,6 +1,6 @@
 // import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
-import { Box, Typography, IconButton, } from '@material-ui/core';
+import { Box, Typography, IconButton, FormControlLabel, Checkbox } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme =>({
 
   tableBodyRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr',
+    gridTemplateColumns: '.3fr 1fr 1fr 1fr 1fr .8fr 1fr 0.5fr',
     borderBottom: '1px solid #E8E8E8',
     alignItems: 'center',
     cursor: 'pointer',
@@ -75,10 +75,10 @@ const DepositAndWithdrawalTable = ({ data, handleClick, otherRows }) => {
     handleClick(e);
   };
 
-  // const handleCheckBox = (e) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // }
+  const handleCheckBox = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  }
 
 
   return (
@@ -86,37 +86,40 @@ const DepositAndWithdrawalTable = ({ data, handleClick, otherRows }) => {
       {
         data && data.map((customer, i) => (
             <Box component="div" className={classes.tableBodyRow} key={i} >
-                <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} />
-                </Typography>
-                <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.email ? customer.email : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <IconButton 
-                            variant="text" 
-                            size="small" 
-                            className={classes.button} 
-                            aria-controls="customer-menu" 
-                            aria-haspopup="true" 
-                            onClick={(e) => handleButtonClick(customer, e)}
-                            disableRipple
-                        >
-                            <DotsHorizontal />
-                        </IconButton>
-                </Typography>
+              <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
+                <FormControlLabel  onClick={(e) => handleCheckBox(e)}  control={<Checkbox name="checked" className={classes.tableCell} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
+              </Typography>
+              <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
+                  <TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} />
+              </Typography>
+              <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
+                  <TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} />
+              </Typography>
+              <Typography component="span" className={classes.tableCell} variant="subtitle1">
+                  <TextClamp text={customer.email ? customer.email : ''} lines={1} />
+              </Typography>
+              <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
+              { customer.customerStatus }
+              </Typography>
+              <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
+              { customer.customerStatus }
+              </Typography>
+              <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
+              { customer.customerStatus }
+              </Typography>
+              <Typography component="span" className={classes.tableCell} variant="subtitle1">
+                  <IconButton 
+                          variant="text" 
+                          size="small" 
+                          className={classes.button} 
+                          aria-controls="customer-menu" 
+                          aria-haspopup="true" 
+                          onClick={(e) => handleButtonClick(customer, e)}
+                          disableRipple
+                      >
+                          <DotsHorizontal />
+                      </IconButton>
+              </Typography>
                 {/* <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer.user ? customer.user : ''} lines={1} />
                 </Typography>

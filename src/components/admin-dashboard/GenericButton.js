@@ -43,11 +43,11 @@ const GenericButton = ({ padding, buttonName, children, isDisabled, clickAction,
       <button
       onClick={clickAction} 
       type="button" 
-      style={{  border: `1px solid ${bdaColor ? bdaColor : '#ACAFB7'}`, 
+      style={{  border: `1px solid ${bdaColor ?? '#ACAFB7'}`, 
       color: fontColor ?? '#3C4257', 
       backgroundColor: bgColor ?? 'white', 
-      boxShadow: !bxShadw ?'1px 1px 1px #dbdddd' : 'none',
-      padding: padding ? padding : '' 
+      boxShadow: bxShadw ?? '1px 1px 1px #dbdddd',
+      padding: padding ?? '' 
     }} 
       disabled={isDisabled} className={handleDisabled}
       >

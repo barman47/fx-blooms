@@ -42,7 +42,8 @@ import {
     History,
     CashMultiple,
     Magnify,
-    Logout
+    Logout,
+    BankOutline
 } from 'mdi-material-ui';
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import logo from '../../assets/img/logowhite.svg';
@@ -64,7 +65,8 @@ import {
     WITHDRAWALS,
     HISTORY,
     SUPPORT,
-    RISK_PROFILE 
+    RISK_PROFILE,
+    FXBACCOUNTS 
 } from '../../routes';
 import { SET_CATEGORY, SET_CUSTOMER } from '../../actions/types';
 import AccordionSearch from '../../components/admin-dashboard/AccordionSearch'
@@ -264,7 +266,10 @@ const useStyles = makeStyles((theme) => ({
     },
 
     links: {
-        marginTop: theme.spacing(4.5)
+        marginTop: theme.spacing(2.5),
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%'
     },
 
     linkItem: {
@@ -276,6 +281,10 @@ const useStyles = makeStyles((theme) => ({
         '&:hover': {
             backgroundColor: 'rgba(255, 255, 255, 0.58)'
         }
+    },
+
+    bottomItem: {
+        marginTop: 'auto'
     },
 
     activeLink: {
@@ -514,6 +523,19 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                                 {open && <ListItemText primary={link.text} />}
                             </ListItem>
                         ))}
+
+                        <ListItem 
+                            className={clsx(classes.linkItem, classes.bottomItem)} 
+                            button 
+                            disableRipple
+                            onClick={() => handleLinkClick(FXBACCOUNTS)}
+                        >
+                            
+                            <ListItemIcon className={classes.icon}>
+                                <BankOutline />
+                            </ListItemIcon>
+                            {open && <ListItemText primary="FXB Accounts" />}
+                        </ListItem>
                         <ListItem 
                             className={classes.linkItem} 
                             button 

@@ -4,10 +4,10 @@ import { Box, Typography, Menu, MenuItem, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
-import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
 import DepositAndWithdrawalTable from '../../../components/admin-dashboard/DepositTable'
-import { ADMIN_FILTERS } from '../../../utils/constants';
-import { Triangle } from 'mdi-material-ui';
+// import { ADMIN_FILTERS } from '../../../utils/constants';
+// import { Triangle } from 'mdi-material-ui';
+import WithdrawalCard from '../../../components/admin-dashboard/WithdrawalCard'
 
 
 
@@ -136,77 +136,11 @@ const gridColumns = '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr';
 const Deposits = () => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [ depositFilter, setDepositFilter ] = useState('')
-  const [ loadingDeposit ] = useState(false)
+  // const [ depositFilter, setDepositFilter ] = useState('')
+  // const [ loadingDeposit ] = useState(false)
 
-
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-
-//   const handleChangePage = (event, newPage) => {
-//     setPage(newPage);
-//   };
-
-  
-//   const handleChangeRowsPerPage = (event) => {
-//     setRowsPerPage(+event.target.value);
-//     setPage(1);
-//   };
-
-    // const dispatch = useDispatch();
 
     const customers = useSelector(state => state.customers?.customers?.items);
-
-    // const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
-    //     const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-    //     switch (switchType) {
-    //         case TWENTY_FOUR_HOURS:
-    //             getFunction('1');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case SEVEN_DAYS:
-    //             getFunction('7');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case THIRTY_DAYS:
-    //             getFunction('30');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case THREE_MONTHS:
-    //             getFunction('90');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case ALL:
-    //             setFilterType(total);
-    //             break;
-            
-    //         default:
-    //             break;
-    //     }
-    // }
-
-    // const handleVolumeFilter = useCallback((timeframe) => {
-    //     handleSwitchCase(timeframe)
-    // }, []);
-
-    // useEffect(() => {
-    //     // handleSetTitle('All Customers');
-    //     getCustomers({
-    //         pageNumber: 1,
-    //         pageSize: 25
-    //     });
-    //     // eslint-disable-next-line
-    // }, []);
-
-    // useEffect(() => {
-    //     if (depositFilter) {
-    //         handleUsersFilter(depositFilter)
-    //     }
-    // }, [handleUsersFilter, usersFilter]);
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget);
@@ -216,54 +150,36 @@ const Deposits = () => {
         setAnchorEl(null);
     };
 
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch({ type: CLEAR_ALL_CUSTOMERS });
-    //     };
-
-    //     // eslint-disable-next-line
-    // }, []);
 
   return (
     <>
       <section className={classes.root}>
 
-          <Typography variant="h6" >Deposits</Typography>
-          <Box component="div" className={classes.depositCard}>
-            <Typography variant="h6" className={classes.depositCardTitle} >Total Deposit</Typography>
-            <Typography component="span" variant="body2" className={classes.selectBtn}>
-                <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={depositFilter} setOnChange={setDepositFilter} loading={loadingDeposit}/>
-            </Typography>
-            
-            <Typography variant="h6" className={classes.depositCardAmount}>EUR 350000000.00</Typography>
-            <Typography component="span" className={classes.percentage}>
-                <Triangle />
-                <Typography component="span" variant="subtitle2">4.5%</Typography>
-            </Typography>
-          </Box>
-        
-          <Box component="div" className={classes.table}>
-            <GenericTableHeader columns={columns} gridColumns={gridColumns} headerPadding="11px 15px" />
-            <DepositAndWithdrawalTable data={customers} handleClick={handleClick} />
-          </Box>
-          <Menu
-            id="customer-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            classes={{ paper: classes.menu }}
-            disableScrollLock={ true }
+        <Typography variant="h6" >Deposits</Typography>
+        <WithdrawalCard cardTitle="Total Deposts" />
+      
+        <Box component="div" className={classes.table}>
+          <GenericTableHeader columns={columns} gridColumns={gridColumns} headerPadding="11px 15px" />
+          <DepositAndWithdrawalTable data={customers} handleClick={handleClick} />
+        </Box>
+        <Menu
+          id="customer-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          classes={{ paper: classes.menu }}
+          disableScrollLock={ true }
         >
-            <MenuItem>View Details</MenuItem>
-            <Divider />
-            <MenuItem >Edit Profile</MenuItem>
-            <Divider />
-            <MenuItem>Contact</MenuItem>
-            <Divider />
-            <MenuItem>Suspend</MenuItem>
-            <Divider />
-            <MenuItem>Change Risk Profile</MenuItem>
+          <MenuItem>View Details</MenuItem>
+          <Divider />
+          <MenuItem >Edit Profile</MenuItem>
+          <Divider />
+          <MenuItem>Contact</MenuItem>
+          <Divider />
+          <MenuItem>Suspend</MenuItem>
+          <Divider />
+          <MenuItem>Change Risk Profile</MenuItem>
         </Menu>
       </section>
     </>

@@ -212,6 +212,7 @@ export const olimpicMedals = [{
   }
 
   export const VERIFF_HOST = "https://stationapi.veriff.com"
+  export const CALLBACK = "https://fxblooms.com/dashboard/home"
 
   export const ID_STATUS_CATEGORY = {
     DECLINED: 'declined',

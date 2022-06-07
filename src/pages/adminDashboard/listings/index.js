@@ -760,10 +760,16 @@ const Listings = () => {
                 </Grid>
                 <Grid item>
                     <Box component="div" sx={{ display: 'flex', position: 'relative', flexDirection: 'row', gap: '10px'}}>
-                        <GenericButton clickAction={() => setOpenFilterBx(!openFilterBx)} buttonName="Filter">
+                        <GenericButton clickAction={() => setOpenFilterBx(() => {
+                            closeXport(false)
+                            return !openFilterBx
+                        })} buttonName="Filter">
                             <Filter />
                         </GenericButton>
-                        <GenericButton clickAction={() => closeXport(!openXport)} buttonName="Export">
+                        <GenericButton clickAction={() => closeXport(() => {
+                            setOpenFilterBx(false)
+                            return !openXport
+                        })} buttonName="Export">
                             <ArrowTopRight />
                             {
                                 openXport ? 
@@ -776,56 +782,56 @@ const Listings = () => {
                         {
                             openFilterBx ? 
                             <Box component="div" className={classes.filterBoxContainer}>
-                            <Box component="div" className={classes.filterBoxContent}>
-                                <Box component="div" className={classes.filterBoxHeader}>
-                                    <Typography component="h6" variant="h6">Filter</Typography>
-                                    <Typography component="span" onClick={() => setOpenFilterBx(false)}>x</Typography>
-                                </Box>
-                                <Box component="div" className={classes.filterBoxMain}>
-                                    <Box component="div" className={classes.filterContentDate}>
-                                        <label>
-                                            Date
-                                            <input type="date" />
-                                        </label>
+                                <Box component="div" className={classes.filterBoxContent}>
+                                    <Box component="div" className={classes.filterBoxHeader}>
+                                        <Typography component="h6" variant="h6">Filter</Typography>
+                                        <Typography component="span" onClick={() => setOpenFilterBx(false)}>x</Typography>
                                     </Box>
+                                    <Box component="div" className={classes.filterBoxMain}>
+                                        <Box component="div" className={classes.filterContentDate}>
+                                            <label>
+                                                Date
+                                                <input type="date" />
+                                            </label>
+                                        </Box>
 
-                                    <Box component="div" className={classes.filterTransactionType}>
-                                        <Typography variant="body1">Transaction Type</Typography>
-                                        <Box component="div" className={classes.checkBoxContainer}>
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Wallet Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Deposit" />
-                                            <FormControlLabel control={<Checkbox defaultChecked />} label="Direct Transfer" />
-                                            <FormControlLabel control={<Checkbox />} label="Withdrawal" />
+                                        <Box component="div" className={classes.filterTransactionType}>
+                                            <Typography variant="body1">Transaction Type</Typography>
+                                            <Box component="div" className={classes.checkBoxContainer}>
+                                                <FormControlLabel control={<Checkbox defaultChecked />} label="Wallet Transfer" />
+                                                <FormControlLabel control={<Checkbox />} label="Deposit" />
+                                                <FormControlLabel control={<Checkbox defaultChecked />} label="Direct Transfer" />
+                                                <FormControlLabel control={<Checkbox />} label="Withdrawal" />
+                                            </Box>
+                                        </Box>
+
+                                        <Box component="div" className={classes.filterAmount}>
+                                            <Typography variant="body1">Amount</Typography>
+                                            <Box component="span" className={classes.amountRange}>
+                                                <Typography>$1</Typography>
+                                                <Typography>-</Typography>
+                                                <Typography>$1</Typography>
+                                                <Typography>-</Typography>
+                                                <Typography>$1</Typography>
+                                                <Typography>-</Typography>
+                                                <Typography>$1</Typography>
+                                            </Box>
+                                            <Slider
+                                            getAriaLabel={() => 'Temperature range'}
+                                            value={value}
+                                            onChange={handleChange}
+                                            valueLabelDisplay="auto"
+                                            getAriaValueText={valuetext}
+                                            />
+                                        </Box>
+
+                                        <Box component="div" className={classes.filterButton}>
+                                            <GenericButton clickAction={() => setOpenFilterBx(false)} bdaColor="#1E6262" bxShadw="none" fontColor="#1E6262" buttonName="Cancel"/>
+                                            <GenericButton bdaColor="#1E6262" bxShadw="none" fontColor="white" bgColor="#1E6262" buttonName="Apply filter" />
                                         </Box>
                                     </Box>
-
-                                    <Box component="div" className={classes.filterAmount}>
-                                        <Typography variant="body1">Amount</Typography>
-                                        <Box component="span" className={classes.amountRange}>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                            <Typography>-</Typography>
-                                            <Typography>$1</Typography>
-                                        </Box>
-                                        <Slider
-                                        getAriaLabel={() => 'Temperature range'}
-                                        value={value}
-                                        onChange={handleChange}
-                                        valueLabelDisplay="auto"
-                                        getAriaValueText={valuetext}
-                                        />
-                                    </Box>
-
-                                    <Box component="div" className={classes.filterButton}>
-                                        <GenericButton clickAction={() => setOpenFilterBx(false)} bdaColor="#1E6262" bxShadw="none" fontColor="#1E6262" buttonName="Cancel"/>
-                                        <GenericButton bdaColor="#1E6262" bxShadw="none" fontColor="white" bgColor="#1E6262" buttonName="Apply filter" />
-                                    </Box>
                                 </Box>
-                            </Box>
-                        </Box> : ''
+                            </Box> : ''
                         }
                         {/* <Menu
                             id="customer-menu"
@@ -904,7 +910,7 @@ const Listings = () => {
                 !!openViewMore ? 
                 <Box component="div" className={classes.viewMoreContainer}>
                     <Box component="div" className={classes.viewMoreContent}>
-                        <Typography variant="h6" className={classes.viewMoreTitle}>Listing Details <CloseCircleOutline onClick={() => setOpenViewMore(false)} /></Typography>
+                        <Typography variant="h6" className={classes.viewMoreTitle}>Listing Details <CloseCircleOutline style={{ cursor: 'pointer' }} onClick={() => setOpenViewMore(false)} /></Typography>
                         <Box component="div" className={classes.viewMoreData}>
                             <Box component="div">
                                 <AmlBoard  classes={classes} amlTitle={"Listing ID:"} amlNumber={formatId(viewMoreData.id)} />

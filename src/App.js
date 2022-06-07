@@ -38,6 +38,8 @@ import {
 	EDIT_LISTING,
 	TRANSACTION_STATUS,
 	WITHDRAWALS,
+	FXBACCOUNTS,
+	PAYMENT_AUTHORIZATION,
 	VERIFF,
 	TRANSACTIONS,
 	BANK_ACCOUNTS,
@@ -52,6 +54,7 @@ import VeriffVerify from './pages/dashboard/profile/Veriff';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
+const PaymentAuthRoute = lazy(() => import('./components/common/PaymentRoute'));
 const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
 // const Private404 = lazy(() => import('./elements/common/Private404'));
 
@@ -111,6 +114,8 @@ const Listings = lazy(() => import('./pages/adminDashboard/listings/'));
 const TransactionLists = lazy(() => import('./pages/adminDashboard/transactions/'));
 const Deposits = lazy(() => import('./pages/adminDashboard/deposits/'));
 const Withdrawals = lazy(() => import('./pages/adminDashboard/withdrawals/'));
+const FXBAcounts = lazy(() => import('./pages/adminDashboard/fxbaccounts/'));
+const PaymentAuth = lazy(() => import('./pages/adminDashboard/withdrawals/PaymentAuth'));
 const Customer = lazy(() => import('./pages/adminDashboard/customer/'));
 
 const PageNotFound = lazy(() => import('./pages/PageNotFound'));
@@ -227,6 +232,8 @@ const App = () => {
 								<Route path={`${DEPOSITS}`} element={<Deposits handleSetTitle={handleSetTitle} />} />
 								<Route path={`${CUSTOMERS}/:id`} element={<Customer handleSetTitle={handleSetTitle} />} />
 								<Route path={`${WITHDRAWALS}`} element={<Withdrawals handleSetTitle={handleSetTitle} />} />
+								<Route path={`${FXBACCOUNTS}`} element={<FXBAcounts handleSetTitle={handleSetTitle} />} />
+								<Route path={`${PAYMENT_AUTHORIZATION}`} element={<PaymentAuthRoute><PaymentAuth handleSetTitle={handleSetTitle} /></PaymentAuthRoute>} />
 							</Route>
 							<Route path="*" element={<PageNotFound />} />
 						</Routes>
