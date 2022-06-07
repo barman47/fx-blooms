@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
 import { requestWalletFunding } from '../../../actions/wallets';
-import { GET_ERRORS, SET_FUNDING_DETAILS } from '../../../actions/types';
+import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
@@ -164,7 +164,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
         }
 
         dispatch({
-            type: SET_FUNDING_DETAILS,
+            type: SET_FUNDING_REQUEST,
             payload: {}
         });
         // eslint-disable-next-line

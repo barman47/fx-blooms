@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { connect, useSelector } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button,
     ButtonGroup,
@@ -8,11 +8,13 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
-import { getWalletTransactions } from '../../../actions/wallets';
+import { getFundingRequests, getWalletTransactions } from '../../../actions/wallets';
+import { SET_FUNDING_REQUESTS, SET_WALLET_FILTER, SET_WALLET_TRANSACTIONS } from '../../../actions/types';
 
-import { COLORS } from '../../../utils/constants';
+import { COLORS, WALLET_FILTER } from '../../../utils/constants';
 
 import Transaction from './Transaction';
+import Spinner from '../../../components/common/Spinner';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -35,174 +37,213 @@ const useStyles = makeStyles(theme => ({
     } 
 }));
 
-const FILTERS = {
-    HISTORY: 'HISTORY',
-    FUNDING: 'FUNDING',
-    WITHDRAWAL: 'WITHDRAWAL'
-};
+const { HISTORY, FUNDING } = WALLET_FILTER;
 
-const Transactions = ({ getWalletTransactions }) => {
+const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
     const classes = useStyles();
+    const dispatch = useDispatch();
     
-    const { wallet } = useSelector(state => state.wallets);
+    const { filter, fundingRequests, wallet, transactions } = useSelector(state => state.wallets);
 
-    const [filter, setFilter] = useState(FILTERS.HISTORY);
-    // eslint-disable-next-line no-unused-vars
+    const [currentFilter, setCurrentFilter] = useState(HISTORY);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
-        getWalletTransactions(wallet.id);
-        // eslint-disable-next-line
-    }, []);
+        setLoading(false);
+    }, [fundingRequests, transactions]);
 
-    useEffect(() => {
-        // setLoading(true);
-        handleFilter(filter);
-    }, [filter]);
-
-    const handleFilter = (filter) => {
-        switch (filter) {
-            case FILTERS.HISTORY:
-                // Get wallet history
+    const handleFilter = useCallback((currentFilter) => {
+        switch (currentFilter) {
+            case HISTORY:
+                if (filter !== HISTORY) {
+                    batch(() => {
+                        dispatch({
+                            type: SET_WALLET_FILTER,
+                            payload: HISTORY
+                        });
+                        dispatch({
+                            type: SET_FUNDING_REQUESTS,
+                            payload: []
+                        });
+                    });
+                    setLoading(true);
+                    getWalletTransactions({
+                        pageNumber: 1, 
+                        pageSize: 15,
+                        walletId: wallet.id
+                    });
+                }
                 break;
 
-            case FILTERS.FUNDING:
+            case FUNDING:
+                if (filter !== FUNDING) {
+                    batch(() => {
+                        dispatch({
+                            type: SET_WALLET_FILTER,
+                            payload: FUNDING
+                        });
+                        dispatch({
+                            type: SET_WALLET_TRANSACTIONS,
+                            payload: []
+                        });
+                    });
+                    
+                    setLoading(true);
+                    getFundingRequests(wallet.id);
+                }
                 break;
 
-            case FILTERS.WITHDRAWAL:
-                break;
+            // case WITHDRAWAL:
+            //     if (filter !== WITHDRAWAL) {
+            //         dispatch({
+            //             type: SET_WALLET_FILTER,
+            //             payload: WITHDRAWAL
+            //         });
+            //         // Get wallet history
+            //     }
+            //     break;
 
             default:
                 break;
         }
-    };
+    }, [dispatch, filter, getFundingRequests, getWalletTransactions, wallet.id]);
+
+    useEffect(() => {
+        handleFilter(currentFilter);
+    }, [currentFilter, handleFilter]);
 
     return (
-        <section className={classes.root}>
-            <Typography variant="h6" className={classes.header}>Transaction History</Typography>
-            <ButtonGroup disableElevation className={classes.filterButtons}>
-                <Button
-                    color="primary"
-                    size="small"
-                    disableRipple
-                    disableFocusRipple
-                    onClick={() => setFilter(FILTERS.HISTORY)}
-                    variant={filter === FILTERS.HISTORY ? 'contained' : 'outlined'}
-                    disabled={loading ? true : false}
-                >
-                    History
-                </Button>
-                <Button
-                    color="primary"
-                    size="small"
-                    disableRipple
-                    disableFocusRipple
-                    onClick={() => setFilter(FILTERS.FUNDING)}
-                    variant={filter === FILTERS.FUNDING ? 'contained' : 'outlined'}
-                    disabled={loading ? true : false}
-                >
-                    Funding
-                </Button>
-                <Button
-                    color="primary"
-                    size="small"
-                    disableRipple
-                    disableFocusRipple
-                    onClick={() => setFilter(FILTERS.WITHDRAWAL)}
-                    variant={filter === FILTERS.WITHDRAWAL ? 'contained' : 'outlined'}
-                    disabled={loading ? true : false}
-                >
-                    Withdrawal
-                </Button>
-            </ButtonGroup>
-            <div className={classes.transactions}>
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-                <Transaction 
-                    date="19/09/2021"
-                    time="10:34 PM"
-                    type="Fund"
-                    bank="Revolute"
-                    amount={1000}
-                    walletId="854584594"
-                />
-            </div>
-        </section>
+        <>
+            {loading && <Spinner />}
+            <section className={classes.root}>
+                <Typography variant="h6" className={classes.header}>
+                    {filter === HISTORY ? 'Transaction History' : 'Funding Requests'}
+                </Typography>
+                <ButtonGroup disableElevation className={classes.filterButtons}>
+                    <Button
+                        color="primary"
+                        size="small"
+                        disableRipple
+                        disableFocusRipple
+                        onClick={() => setCurrentFilter(HISTORY)}
+                        variant={filter === HISTORY ? 'contained' : 'outlined'}
+                        disabled={loading ? true : false}
+                    >
+                        History
+                    </Button>
+                    <Button
+                        color="primary"
+                        size="small"
+                        disableRipple
+                        disableFocusRipple
+                        onClick={() => setCurrentFilter(FUNDING)}
+                        variant={filter === FUNDING ? 'contained' : 'outlined'}
+                        disabled={loading ? true : false}
+                    >
+                        Funding
+                    </Button>
+                    {/* <Button
+                        color="primary"
+                        size="small"
+                        disableRipple
+                        disableFocusRipple
+                        onClick={() => setCurrentFilter(WITHDRAWAL)}
+                        variant={filter === WITHDRAWAL ? 'contained' : 'outlined'}
+                        disabled={loading ? true : false}
+                    >
+                        Withdrawal
+                    </Button> */}
+                </ButtonGroup>
+                <div className={classes.transactions}>
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                    <Transaction 
+                        date="19/09/2021"
+                        time="10:34 PM"
+                        type="Fund"
+                        bank="Revolute"
+                        amount={1000}
+                        walletId="854584594"
+                    />
+                </div>
+            </section>
+        </>
     );
 };
 
 Transactions.propTypes = {
+    getFundingRequests: PropTypes.func.isRequired,
     getWalletTransactions: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getWalletTransactions })(Transactions);
+export default connect(undefined, { getFundingRequests, getWalletTransactions })(Transactions);

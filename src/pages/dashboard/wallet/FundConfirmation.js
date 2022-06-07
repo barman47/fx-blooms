@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
         // justifyContent: 'center',
     },
 
-    fundingDetails: {
+    fundingRequest: {
         border: `1px solid ${COLORS.borderColor}`,
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
@@ -61,7 +61,7 @@ const FundConfirmation = ({ handleSetTitle }) => {
     const classes = useStyles();
     const navigate = useNavigate();
 
-    const { wallets, fundingDetails } = useSelector(state => state.wallets);
+    const { wallets, fundingRequest } = useSelector(state => state.wallets);
 
 
     useEffect(() => {
@@ -69,7 +69,7 @@ const FundConfirmation = ({ handleSetTitle }) => {
         localStorage.setItem(AUTH_TOKEN, sessionStorage.getItem(AUTH_TOKEN));
         handleSetTitle('Funding Details');
 
-        if (_.isEmpty(fundingDetails)) {
+        if (_.isEmpty(fundingRequest)) {
             navigate(-1);
         }
         // eslint-disable-next-line
@@ -85,50 +85,50 @@ const FundConfirmation = ({ handleSetTitle }) => {
             <Typography variant="h6" color="primary" className={classes.pageTitle}>Funding Details</Typography>
             <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
             <Box component="div" className={classes.content}>
-                <Box component="div" className={classes.fundingDetails}>
+                <Box component="div" className={classes.fundingRequest}>
                     <Box component="section">
                         <Typography variant="body2" component="p">Method</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.fundingMethod.toUpperCase()}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.fundingMethod.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Customer</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.customer.toUpperCase()}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.customer.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Currency</Typography>
-                        <Typography variant="body2" component="p">{getWalletCurrency(fundingDetails.walletId)}</Typography>
+                        <Typography variant="body2" component="p">{getWalletCurrency(fundingRequest.walletId)}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Amount</Typography>
-                        <Typography variant="body2" component="p">{formatNumber(fundingDetails.amount, 2)}</Typography>
+                        <Typography variant="body2" component="p">{formatNumber(fundingRequest.amount, 2)}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Account Name</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.accountName.toUpperCase()}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.accountName.toUpperCase()}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Account Number</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.accountNumber}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.accountNumber}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Institution</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.institution}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.institution}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Reference</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.reference}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.reference}</Typography>
                     </Box>
                     <Divider />
                     <Box component="section">
                         <Typography variant="body2" component="p">Status</Typography>
-                        <Typography variant="body2" component="p">{fundingDetails.status.replace('_', ' ')}</Typography>
+                        <Typography variant="body2" component="p">{fundingRequest.status.replace('_', ' ')}</Typography>
                     </Box>
                 </Box>
                 <Grid container direction="row" spacing={2}>
@@ -150,7 +150,7 @@ const FundConfirmation = ({ handleSetTitle }) => {
                             variant="contained" 
                             color="primary"
                             fullWidth
-                            onClick={() => window.open(fundingDetails.authorisationUrl, '_self')}
+                            onClick={() => window.open(fundingRequest.authorisationUrl, '_self')}
                         >
                             Authorize Funding
                         </Button>

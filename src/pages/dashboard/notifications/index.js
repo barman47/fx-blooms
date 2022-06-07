@@ -12,16 +12,17 @@ import formatNumber from '../../../utils/formatNumber';
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
-import { PROFILE, TWO_FACTOR } from '../../../routes';
+import getCurrencySymbol from '../../../utils/getCurrencySymbol';
+import { PROFILE, PIN, TWO_FACTOR } from '../../../routes';
 
 import Notification from './Notification';
 import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
+import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
-import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -100,18 +101,10 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
-    // eslint-disable-next-line
-    const [amount, setAmount] = useState(0);
-    // eslint-disable-next-line
-    const [sellerUsername, setSellerUsername] = useState('');
-    // eslint-disable-next-line
-    const [buyerSendEurDrawerOpen, setBuyerSendEurDrawerOpen] = useState(false);
-    const [sellerSendEurDrawerOpen, setSellerSendEurDrawerOpen] = useState(false);
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
     const [open, setOpen] = useState(false);
-    // eslint-disable-next-line
-    const [transactionId, setTransactionId] = useState(null);
     const [notificationId, setNotificationId] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [countryCode, setCountryCode] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
@@ -135,37 +128,14 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     useEffect(() => {
         if (msg) {
+            setLoading(false);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
     }, [msg]);
 
-    useEffect(() => {
-        if (!sellerSendEurDrawerOpen) {
-            setAmount(0);
-            setTransactionId(null);
-            setSellerUsername('');
-            dispatch({
-                type: SET_ACCOUNT,
-                payload: {}
-            });
-        }
-    }, [dispatch, sellerSendEurDrawerOpen]);
-    
-    // accounName typo is deliberate and should not be fixed
-    // const setAccount = (accounName, accountNumber, bankName, reference) => {
-    //     dispatch({
-    //         type: SET_ACCOUNT,
-    //         payload: {
-    //             accounName,
-    //             accountNumber,
-    //             bankName,
-    //             reference
-    //         }
-    //     });
-    // };
-
     const handlePaymentReceived = (tranactionId, notificationId) => {
+        setLoading(true);
         const data = {
             transactionSessionId: tranactionId,
             message: '',
@@ -175,61 +145,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
         };
         completeTransaction(data, notificationId);
     };
-
-    // const setBuyerAccount = (notification, notificationId) => {
-    //     const { Buyer, Seller } = notification;
-    //     setTransactionId(notification.Id);
-    //     setSellerUsername(Seller.UserName);
-        
-    //     const buyerAccount = {
-    //         accounName: Buyer.AccountName,
-    //         accountNumber: Buyer.AccountNumber,
-    //         bankName: Buyer.BankName,
-    //         reference: Buyer.TransferReference
-    //     };
-
-    //     setAmount(Number(Seller.AmountTransfered));
-    //     dispatch({
-    //         type: SET_ACCOUNT,
-    //         payload: buyerAccount
-    //     });
-    //     setNotificationId(notificationId);
-    //     getTransaction(notification.Id);
-    //     toggleSellerSendEurDrawer();
-    // };
-
-    // const setSellerAccount = (notification, notificationId) => {
-    //     const { Buyer, Seller } = notification;
-    //     setTransactionId(notification.Id);
-    //     setAmount(Number(Buyer.AmountTransfered));
-    //     setAccount(Seller.AccountName, Seller.AccountNumber, Seller.BankName, Seller.TransferReference);
-    //     setNotificationId(notificationId);
-    //     getTransaction(notification.Id);
-    //     toggleBuyerSendEurDrawer();
-    // };
-
-    // const toggleBuyerSendEurDrawer = () => {
-    //     setBuyerSendEurDrawerOpen(!buyerSendEurDrawerOpen);
-
-    //     // clear message if drawer is open and being closed
-    //     if (buyerSendEurDrawerOpen) {
-    //         dispatch({
-    //             type: SET_NOTIFICATION_MSG,
-    //             payload: null
-    //         });
-    //     }
-    // };
-
-    // const toggleSellerSendEurDrawer = () => {
-    //     // clear message if drawer is open and being closed
-    //     if (sellerSendEurDrawerOpen) {
-    //         dispatch({
-    //             type: SET_NOTIFICATION_MSG,
-    //             payload: null
-    //         });
-    //     }
-    //     setSellerSendEurDrawerOpen(!sellerSendEurDrawerOpen);        
-    // };
 
     const setMessage = (notification) => {
         const { Buyer, Seller } = notification;
@@ -264,31 +179,12 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     const handleButtonAction = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
+        setLoading(true);
         if (customerId === Seller.CustomerId) {
-            // if (Seller.HasReceivedPayment && Seller.HasMadePayment === false) {
-            //     // Set Buyer Account so Seller can make payment without needing to confirm receipt
-            //     return setBuyerAccount(notification, notificationId);
-            // }
-            // if (Seller.HasReceivedPayment === false && Seller.HasMadePayment === false) {
-            //     // Seller should receive buyers payment and make payment to seller
-            //     setBuyerAccount(notification, notificationId);
-            //     return handlePaymentReceived(notification.Id, notificationId);
-            // }
-            // End Transaction
             return handlePaymentReceived(notification.Id, notificationId);
         }
 
         if (customerId === Buyer.CustomerId) {
-            // if (Buyer.HasReceivedPayment && Buyer.HasMadePayment === false) {
-            //     // Set Seller Account so Buyer can make payment without needing to confirm receipt
-            //     return setSellerAccount(notification, notificationId);
-            // } 
-            // if (Buyer.HasReceivedPayment === false && Buyer.HasMadePayment === false) {
-            //     // Buyer should confirm seller's payment and make his own payment
-            //     setSellerAccount(notification, notificationId);
-            //     return handlePaymentReceived(notification.Id, notificationId); // Confirming payment
-            // } 
-            // End Transaction
             return handlePaymentReceived(notification.Id, notificationId);
         }
     };
@@ -344,9 +240,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     const dismissAction = () => {
         setOpen(false);
-        setSellerSendEurDrawerOpen(false);
         setSellerSendNgnDrawerOpen(false);
-        setBuyerSendEurDrawerOpen(false);
         dispatch({
             type: SET_LISTING_MSG,
             payload: null
@@ -359,6 +253,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     return (
         <>
+            {loading && <Spinner />}
             {sellerSendNgnDrawerOpen && 
                 <SellerSendNgnDrawer 
                     drawerOpen={sellerSendNgnDrawerOpen} 
@@ -492,12 +387,12 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 						        iconBackgroundColor="#2893EB"
                             />
                         }
-                        {/* <Notification 
+                        <Notification 
                             title="Set PIN"
                             message="Required for wallet withdrawals.. Click Set PIN to proceed."
                             buttonText="Set PIN"
-                            buttonAction={setPin}
-                        /> */}
+                            buttonAction={() => navigate(PIN)}
+                        />
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>

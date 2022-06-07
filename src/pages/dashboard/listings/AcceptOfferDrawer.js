@@ -107,6 +107,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
     const { listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
+    const { wallet } = useSelector(state => state.wallets);
 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
@@ -227,7 +228,8 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
         acceptOffer({
             listingId: listing.id,
             accountId: getAccountId(receivingAccount),
-            reference
+            reference,
+            walletId: wallet.id
         }, listing);
     };
 

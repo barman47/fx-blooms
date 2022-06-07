@@ -6,11 +6,12 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 import { 
     SET_CUSTOMER_MSG,
-    SET_FUNDING_DETAILS,
+    SET_FUNDING_REQUEST,
     SET_WALLETS,
     SET_WALLET_MSG,
     SET_WALLET_TRANSACTIONS,
-    SET_WITHDRAWAL_DETAILS
+    SET_WITHDRAWAL_DETAILS,
+    SET_FUNDING_REQUESTS
 } from './types';
 
 const API = `${process.env.REACT_APP_WALLET_API}`;
@@ -19,9 +20,10 @@ const YAPILY_API = `${API}/Yapily`;
 
 export const createWallet = (data) => async (dispatch)  => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${WALLETS_API}/wallets/create`, data);
-        console.log(res);
+        await Promise.all([
+            reIssueCustomerToken(),
+            await axios.post(`${WALLETS_API}/wallets/create`, data)
+        ]);
         return dispatch({
             type: SET_WALLET_MSG,
             payload: 'Wallet created successfully'
@@ -44,10 +46,10 @@ export const getWallets = (customerId) => async (dispatch)  => {
     }
 };
 
-export const getWalletTransactions = (walletId) => async (dispatch)  => {
+export const getWalletTransactions = ({ pageNumber, pageSize, walletId }) => async (dispatch)  => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.get(`${WALLETS_API}/wallets/${walletId}/transactions`);
+        const res = await axios.get(`${WALLETS_API}/wallets/${walletId}/transactions?pageNumber=${pageNumber}&pageSize=${pageSize}`);
         return dispatch({
             type: SET_WALLET_TRANSACTIONS,
             payload: res.data.data
@@ -84,7 +86,7 @@ export const requestWalletFunding = (data, navigate) => async (dispatch)  => {
             status
         };
         dispatch({
-            type: SET_FUNDING_DETAILS,
+            type: SET_FUNDING_REQUEST,
             payload: fundindDetails
         });
         return navigate(FUND_CONFIRMATION);
@@ -118,7 +120,7 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
                 payload: 'Funding request created successfully'
             });
             dispatch({
-                type: SET_FUNDING_DETAILS,
+                type: SET_FUNDING_REQUEST,
                 payload: res.data.data
             });
         });
@@ -128,13 +130,13 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
     }
 };
 
-export const getCreditDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
         console.log(res);
         dispatch({
-            type: SET_FUNDING_DETAILS,
+            type: SET_FUNDING_REQUEST,
             payload: res.data.data
         });
     } catch (err) {
@@ -142,11 +144,10 @@ export const getCreditDetails = (paymentId, paymentRequestId) => async (dispatch
     }
 };
 
-export const getDebitDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+export const getWithdrawalDetails = (paymentId, paymentRequestId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${YAPILY_API}/debit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
-        console.log(res);
         dispatch({
             type: SET_WITHDRAWAL_DETAILS,
             payload: res.data.data
@@ -156,15 +157,15 @@ export const getDebitDetails = (paymentId, paymentRequestId) => async (dispatch)
     }
 };
 
-export const getCreditRequests = (walletId) => async (dispatch) => {
+export const getFundingRequests = (walletId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${YAPILY_API}/creditrequests?walletId=${walletId}`);
         console.log(res);
-        // dispatch({
-        //     type: SET_FUNDING_DETAILS,
-        //     payload: res.data.data
-        // });
+        dispatch({
+            type: SET_FUNDING_REQUESTS,
+            payload: res.data.data
+        });
     } catch (err) {
         return handleError(err, dispatch);
     }

@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/styles';
 import { Refresh } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
-import { getCreditDetails } from '../../../actions/wallets';
+import { getFundingDetails } from '../../../actions/wallets';
 import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import { COLORS, FUNDING_STATUS } from '../../../utils/constants';
@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    fundingDetails: {
+    fundingRequest: {
         border: `1px solid ${COLORS.borderColor}`,
         borderRadius: theme.shape.borderRadius,
         display: 'grid',
@@ -77,13 +77,13 @@ const useStyles = makeStyles(theme => ({
 
 const loadingText = 'Refreshing Status . . . ';
 
-const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
+const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
     const { msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { fundingDetails } = useSelector(state => state.wallets);
+    const { fundingRequest } = useSelector(state => state.wallets);
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
@@ -98,7 +98,7 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
 
     useEffect(() => {
         setLoading(false);
-    }, [fundingDetails]);
+    }, [fundingRequest]);
 
     useEffect(() => {
         if (msg) {
@@ -127,7 +127,7 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
 
     const handleRefreshStatus = () => {
         setLoading(true);
-        getCreditDetails(fundingDetails.id);
+        getFundingDetails(fundingRequest.id);
     };
 
     const dismissSuccessModal = () => {
@@ -153,10 +153,10 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
             <Box component="section" className={classes.root}>
                 <Typography variant="h4" color="primary" gutterBottom>Funding Request Status</Typography>
                 <Box component="div" className={classes.content}>
-                    <Box component="div" className={classes.fundingDetails}>
+                    <Box component="div" className={classes.fundingRequest}>
                         <Box component="section">
                             <Typography variant="body2" component="p">Transaction ID</Typography>
-                            <Typography variant="body2" component="p">{fundingDetails.id}</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.id}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -176,22 +176,22 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Reference</Typography>
-                            <Typography variant="body2" component="p">{fundingDetails.reference}</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.reference}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount</Typography>
-                            <Typography variant="body2" component="p">{formatNumber(fundingDetails.amountDetails.amount, 2)}</Typography>
+                            <Typography variant="body2" component="p">{formatNumber(fundingRequest.amountDetails.amount, 2)}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Currency</Typography>
-                            <Typography variant="body2" component="p">{fundingDetails.amountDetails.currency}</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.amountDetails.currency}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Date</Typography>
-                            <Typography variant="body2" component="p">{getTime(fundingDetails.createdAt)}</Typography>
+                            <Typography variant="body2" component="p">{getTime(fundingRequest.createdAt)}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -200,14 +200,14 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
                                 variant="body2"
                                 component="p"
                                 style={{
-                                    color: fundingDetails.status === FUNDING_STATUS.PENDING ? COLORS.orange : COLORS.primary,
+                                    color: fundingRequest.status === FUNDING_STATUS.PENDING ? COLORS.orange : COLORS.primary,
                                     fontWeight: 600
                                 }}
                             >
-                                {fundingDetails.status}
+                                {fundingRequest.status}
                             </Typography>
                         </Box>
-                        {fundingDetails.status !== FUNDING_STATUS.COMPLETED && 
+                        {fundingRequest.status !== FUNDING_STATUS.COMPLETED && 
                             <>
                                 <Divider />
                                 <Box component="section" className={classes.buttonContainer}>
@@ -233,7 +233,7 @@ const FundingRequestStatus = ({ handleSetTitle, getCreditDetails }) => {
 };
 
 FundingRequestStatus.propTypes = {
-    getCreditDetails: PropTypes.func.isRequired
+    getFundingDetails: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCreditDetails })(FundingRequestStatus);
+export default connect(undefined, { getFundingDetails })(FundingRequestStatus);

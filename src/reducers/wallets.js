@@ -5,16 +5,22 @@ import {
     ACTIVATE_GPB_WALLET,
     SET_WALLET,
     SET_WALLETS,
-    SET_FUNDING_DETAILS,
+    SET_FUNDING_REQUEST,
     SET_WALLET_MSG,
     SET_WALLET_TRANSACTION,
-    SET_WALLET_TRANSACTIONS
+    SET_WALLET_TRANSACTIONS,
+    SET_WALLET_FILTER,
+    SET_FUNDING_REQUESTS
 } from '../actions/types';
 
+import { WALLET_FILTER } from '../utils/constants';
+
 const initialState = {
-    fundingDetails: {},
+    fundingRequest: {},
+    fundingRequests: [],
     wallet: {},
     wallets: [],
+    filter: WALLET_FILTER.HISTORY,
     eurActive: true,
     ngnActive: false,
     usdActive: false,
@@ -91,10 +97,10 @@ const walletsReducer = (state = initialState, action) => {
             
             return state;
 
-        case SET_FUNDING_DETAILS:
+        case SET_FUNDING_REQUEST:
             return {
                 ...state,
-                fundingDetails: action.payload
+                fundingRequest: action.payload
             };
 
         case SET_WALLET_MSG:
@@ -113,6 +119,18 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 transactions: action.payload ? action.payload : []
+            };
+
+        case SET_WALLET_FILTER:
+            return {
+                ...state,
+                filter: action.payload
+            };
+
+        case SET_FUNDING_REQUESTS:
+            return {
+                ...state,
+                fundingRequests: action.payload
             };
 
         default:

@@ -56,6 +56,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
     const { idStatus } = useSelector(state => state.customer.stats);
     const errorsState = useSelector(state => state.errors);
     const { addedBid, acceptedOffer, listings, msg } = useSelector(state => state.listings);
+    const { wallet } = useSelector(state => state.wallets);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [openAcceptOfferDrawer, setOpenAcceptOfferDrawer] = useState(false);
@@ -183,7 +184,7 @@ const Listings = ({ addBid, checkListingEditable }) => {
         toggleAcceptOfferDrawer();
     };
 
-    const handleAddBid = (listing) => {
+    const handleAddBid = (listing, ) => {
         if (stats.idStatus === NOT_SUBMITTED && stats.residencePermitStatus === NOT_SUBMITTED) {
             return checkIdStatus();
         }
@@ -195,7 +196,8 @@ const Listings = ({ addBid, checkListingEditable }) => {
                 amount: {
                     currencyType: listing.amountAvailable.currencyType,
                     amount: listing.amountAvailable.amount
-                }
+                },
+                walletId: wallet.id
             }, listing);
         }
 

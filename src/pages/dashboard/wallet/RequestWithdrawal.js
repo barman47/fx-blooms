@@ -23,7 +23,7 @@ import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
 import getAccountId from '../../../utils/getAccount';
 import validateRequestWithdrawal from '../../../utils/validation/wallets/withdraw';
-// import moveToNextField from '../../../utils/moveToNextField';
+import moveToNextField from '../../../utils/moveToNextField';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
@@ -89,18 +89,18 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     const [reference, setReference] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [withdrawalFee, setWithdrawalFee] = useState(0);
-    // const [first, setFirst] = useState('');
-    // const [second, setSecond] = useState('');
-    // const [third, setThird] = useState('');
-    // const [fourth, setFourth] = useState('');
+    const [first, setFirst] = useState('');
+    const [second, setSecond] = useState('');
+    const [third, setThird] = useState('');
+    const [fourth, setFourth] = useState('');
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    // const firstField = useRef();
-    // const secondField = useRef();
-    // const thirdField = useRef();
-    // const fourthField = useRef();
+    const firstField = useRef();
+    const secondField = useRef();
+    const thirdField = useRef();
+    const fourthField = useRef();
 
     const successModal = useRef();
     const toast = useRef();
@@ -160,10 +160,10 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
             walletId: wallet.id,
             accountId: sourceAccount ? getAccountId(sourceAccount, accounts).accountID : '',
             reference,
-            // first,
-            // second,
-            // third,
-            // fourth
+            first,
+            second,
+            third,
+            fourth
         };
 
         const { errors, isValid } = validateRequestWithdrawal(data);
@@ -279,7 +279,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
                                 fullWidth 
                             />
                         </Grid>
-                        {/* <Grid item xs={12}>
+                        <Grid item xs={12}>
                             <Typography variant="body2" component="p">Enter PIN</Typography>
                         </Grid>
                         <Grid item xs={3}>
@@ -354,7 +354,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
                                 ref={fourthField}
                                 disabled={loading}
                             />
-                        </Grid> */}
+                        </Grid>
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 
