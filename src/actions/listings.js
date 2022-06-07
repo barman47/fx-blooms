@@ -152,6 +152,7 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
+        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({
@@ -237,9 +238,15 @@ export const addBid = (bid, listing) => async (dispatch) => {
 export const madePayment = (data) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
-        return dispatch({
-            type: SET_AS_ACCEPTED,
-            payload: data.listingId
+        batch(() => {
+            dispatch({
+                type: SET_AS_ACCEPTED,
+                payload: data.listingId
+            });
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: 'Payment made successfully'
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

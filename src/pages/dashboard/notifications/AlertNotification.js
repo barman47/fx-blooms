@@ -10,16 +10,10 @@ import { REMOVE_ALERT_NOTIFICATION } from '../../../actions/types';
 const useStyles = makeStyles(theme => ({
     root: {
         backgroundColor: COLORS.lightTeal,
-        border: `1px solid ${theme.palette.primary.main}`,
-        borderRadius: theme.shape.borderRadius,
         display: 'flex',
         flexDirecton: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        // display: 'grid',
-        // gridTemplateColumns: '5fr 1fr',
-        // gap: theme.spacing(2),
-        // alignItems: 'center',
         padding: theme.spacing(0.5, 2),
 
         [theme.breakpoints.down('md')]: {

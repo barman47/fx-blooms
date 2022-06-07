@@ -1,4 +1,5 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
@@ -12,6 +13,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Information } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
+import { VERIFF } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -102,11 +104,33 @@ const IDVerificationModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <Information className={classes.icon} />
                         <Typography variant="subtitle1">
-                            To ensure utmost security on our platform, all first time BUYERS of EUR are required to verify their identity.
+                            To ensure utmost security, all users are required to verify their identity.
                             <br />
                             <strong>N.B We only accept international passport, drivers licenses.</strong>
                         </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
+                        <Grid container direction="row">
+                            <Grid item xs={6}>
+                                <Button 
+                                    variant="contained"
+                                    color="primary"
+                                    size="large"
+                                    component={RouterLink}
+                                    to={VERIFF}
+                                >   
+                                    Verify My ID
+                                </Button>        
+                            </Grid>
+                            <Grid item xs={6}>
+                                <Button 
+                                    variant="contained"
+                                    color="secondary"
+                                    size="large"
+                                    onClick={closeModal}
+                                >   
+                                    Cancel
+                                </Button>
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
             </Fade>

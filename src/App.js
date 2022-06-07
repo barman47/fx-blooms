@@ -1,5 +1,7 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { createTheme, ThemeProvider } from '@material-ui/core';
 
 import { 
@@ -33,6 +35,7 @@ import {
 	WALLET_TRANSACTION_STATUS,
 	FUND_WALLET,
 	FUND_AUTHORIZATION_SUCCESS,
+	FUNDING_REQUEST_STATUS,
 	FUND_CONFIRMATION,
 	CONTACT_US,
 	USER_AGREEMENT,
@@ -51,8 +54,11 @@ import {
 	PIN
 } from './routes';
 
+import { getCustomerInformation } from './actions/customer';
+
 import FallBack from './components/common/FallBack';
-import VeriffVerify from './pages/dashboard/profile/Veriff';
+import { AUTH_TOKEN } from './utils/constants';
+import setAuthToken from './utils/setAuthToken';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -91,6 +97,7 @@ const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails'))
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
 const IdVerification = lazy(() => import('./pages/dashboard/idVerification'));
+const VeriffVerify = lazy(() => import('./pages/dashboard/idVerification/Veriff'));
 
 const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 
@@ -108,6 +115,7 @@ const WalletTransactionStatus = lazy(() => import('./pages/dashboard/wallet/Tran
 const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 const FundConfirmation = lazy(() => import('./pages/dashboard/wallet/FundConfirmation'));
 const FundAuthorizationSuccess = lazy(() => import('./pages/dashboard/wallet/FundAuthorizationSuccess'));
+const FundingRequestStatus = lazy(() => import('./pages/dashboard/wallet/FundingRequestStatus'));
 const RequestWithdrawal = lazy(() => import('./pages/dashboard/wallet/RequestWithdrawal'));
 
 const AdminLogin = lazy(() => import('./pages/auth/AdminLogin'));
@@ -175,10 +183,22 @@ const theme = createTheme({
 	}
 });
 
-const App = () => {
+const App = ({ getCustomerInformation }) => {
 	const [title, setTitle] = useState('');
 
 	const handleSetTitle = (title) => setTitle(title);
+
+	useEffect(() => {
+		const token = localStorage.getItem(AUTH_TOKEN);
+
+		if (token) {
+			setAuthToken(token);
+			localStorage.removeItem(AUTH_TOKEN);
+			getCustomerInformation();
+		}
+
+		// eslint-disable-next-line
+	}, []);
 
 	return (
 		<ThemeProvider theme={theme}> 
@@ -223,6 +243,7 @@ const App = () => {
 								<Route path={WALLET_TRANSACTION_STATUS} element={<WalletTransactionStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_AUTHORIZATION_SUCCESS} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
+								<Route path={FUNDING_REQUEST_STATUS} element={<FundingRequestStatus handleSetTitle={handleSetTitle} />} />
 								<Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
 								<Route path={REQUEST_WITHDRAWAL} element={<RequestWithdrawal handleSetTitle={handleSetTitle} />} />
 								<Route path={VERIFF} element={<VeriffVerify handleSetTitle={handleSetTitle} />} />
@@ -252,4 +273,8 @@ const App = () => {
 	);
 }
 
-export default App;
+App.propTypes = {
+	getCustomerInformation: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getCustomerInformation })(App);

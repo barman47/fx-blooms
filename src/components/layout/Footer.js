@@ -16,7 +16,7 @@ import { BLOG, DISCLAIMER, TERMS, PRIVACY_POLICY, FAQS, ABOUT_US, LOGIN, SIGN_UP
 import { COLORS } from '../../utils/constants';
 
 import logo from '../../assets/img/logo-white.svg';
-import septemLogo from '../../assets/img/septem-logo.png';
+// import septemLogo from '../../assets/img/septem-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -115,15 +115,9 @@ const useStyles = makeStyles(theme => ({
     },
 
     copyrightContainer: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-
-        [theme.breakpoints.down('md')]: {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center'
-        }
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'center',
     },
 
     copyright: {
@@ -158,7 +152,7 @@ const Footer = () => {
                 <div>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
-                        FXBLOOMS OÜ (Registry code: 16262446) is a company acting as a Commercial Agent and located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia.
+                        FXBLOOMS OÜ (Registry code: 16262446) is a company acting as a Commercial Agent and located at Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia.
                     </Typography>
                 </div>
                 <div>
@@ -232,7 +226,7 @@ const Footer = () => {
                 <Typography variant="subtitle2" component="span" className={classes.copyright}>
                     FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
                 </Typography>  
-                <div className={classes.septem}>
+                {/* <div className={classes.septem}>
                     <Typography variant="body2">
                         Powered by &nbsp;&nbsp;
                     </Typography>
@@ -246,7 +240,7 @@ const Footer = () => {
                             }}
                         />
                     </Tooltip>
-                </div>
+                </div> */}
             </section>
         </footer>
     );

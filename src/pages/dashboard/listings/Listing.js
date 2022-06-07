@@ -207,13 +207,13 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
         if (wallets.length === 0) {
             return toggleCreateWalletModal();
         }
-        if (listing.amountAvailable.currencyType === 'EUR') {
-            if (wallet.balance.available < listing.amountAvailable.amount) {
+        if (listing.amountAvailable.currencyType === 'NGN') {
+            if (wallet.balance.available < listing.amountNeeded.amount) {
                 return showError('Insufficient wallet balance');
             }
-            return handleAddBid(listing);
+            return handleAcceptOffer(listing);
         }
-        return handleAcceptOffer(listing);
+        return handleAddBid(listing);
     };
     
     return (

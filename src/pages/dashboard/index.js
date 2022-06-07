@@ -54,9 +54,9 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    // Security,
+    Security,
     TwoFactorAuthentication,
-    // Wallet
+    Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -65,11 +65,12 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    // PIN, 
+    PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE,
-    // WALLETS
+    WALLETS,
+    VERIFF
 } from '../../routes';
 import { 
     ADD_ALERT_NOTIFICATION,
@@ -96,7 +97,7 @@ import HideOnScroll from '../../components/layout/HideOnScroll';
 import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
-import CreateWalletModal from './wallet/CreateWalletModal';
+// import CreateWalletModal from './wallet/CreateWalletModal';
 
 import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
@@ -388,7 +389,7 @@ const Dashboard = (props) => {
 
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName, idVerificationLink, residencePermitUrl } = useSelector(state => state.customer);
+    const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
@@ -411,7 +412,7 @@ const Dashboard = (props) => {
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        // { url: WALLETS, text:'Wallets', icon: <Wallet /> },
+        { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
@@ -422,13 +423,11 @@ const Dashboard = (props) => {
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
         { url : PIN, text: 'PIN', icon: <Security /> },
         { url : TWO_FACTOR, text: '2FA', icon: <TwoFactorAuthentication /> }
-        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
     ];
 
     const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
-    const createWalletModal = useRef();
     const customToast = useRef();
     const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
@@ -487,36 +486,20 @@ const Dashboard = (props) => {
         }
         // eslint-disable-next-line
     }, []);
-
-    const verifyEuId = useCallback(() => {
-        window.open(residencePermitUrl);
-    }, [residencePermitUrl]);
         
-    const verifyOtherId = useCallback(() => {
-        window.open(idVerificationLink);
-    }, [idVerificationLink]);
+    const verifyId = useCallback(() => {
+        navigate(VERIFF);
+    }, [navigate]);
 
     const setAlertNotifications = useCallback(() => {
-        console.log('Setting alert notification');
         const { APPROVED } = ID_STATUS;
-        if (stats.residencePermitStatus !== APPROVED) {
+        if (stats.idStatus !== APPROVED) {
             dispatch({
                 type: ADD_ALERT_NOTIFICATION,
                 payload: {
-                    message: 'Verify your EU Government Issued ID',
+                    message: 'Verify your Identity',
                     buttonText: 'Verify ID',
-                    buttonAction: verifyEuId
-                }
-            });
-        }
-        
-        if ((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) {
-            dispatch({
-                type: ADD_ALERT_NOTIFICATION,
-                payload: {
-                    message: 'Verify Other Government Issued ID',
-                    buttonText: 'Verify ID',
-                    buttonAction: verifyOtherId
+                    buttonAction: verifyId
                 }
             });
         }
@@ -543,14 +526,14 @@ const Dashboard = (props) => {
                 }
             });
         }
-    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyEuId, verifyOtherId]);
+    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyId]);
 
     useEffect(() => {
         if (!_.isEmpty(stats)) {
             if (!sessionStorage.getItem('checkedIdStatus')) {
                 sessionStorage.setItem('checkedIdStatus', 'true');
-                const { idStatus, residencePermitStatus } = stats;
-                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
+                const { idStatus } = stats;
+                if (idStatus === NOT_SUBMITTED) {
                     accountSetupModal.current.openModal();
                 }
             }
@@ -849,7 +832,7 @@ const Dashboard = (props) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
-            <CreateWalletModal ref={createWalletModal} />
+            {/* {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />} */}
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -878,7 +861,7 @@ const Dashboard = (props) => {
                         <Menu />
                     </IconButton>
                     <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
-                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
+                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName?.charAt(0)?.toUpperCase()}</Avatar>
                 </Toolbar>
             </AppBar>
             {/* </HideOnScroll> */}

@@ -2,10 +2,11 @@
 
 // Serverless Veriff JS SDK and Incontext SDK integration example using React.JS
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Veriff } from '@veriff/js-sdk';
 import { createVeriffFrame } from '@veriff/incontext-sdk';
+import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { VERIFF_HOST } from '../../../utils/constants'
 
@@ -16,8 +17,21 @@ const implementationType = 'INCONTEXT_SDK';
 
 const useStyles = makeStyles(theme => ({
   app: {
-    marginTop: theme.spacing(42)
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: '90vh',
+
+    [theme.breakpoints.down('sm')]: {
+      justifyContent: 'flex-start',
+    }
   },
+
+  text: {
+    fontWeight: 300,
+    marginBottom: theme.spacing(2)
+  }
 }))
 
 const VERIFF_API = `${process.env.REACT_APP_VERIFF_API}`
@@ -72,7 +86,10 @@ function VeriffVerify() {
 
   return (
     <div className={classes.app}>
-      <div id="veriff-root" style={{ margin: '0 auto'}} />
+      <Box component="div">
+        <Typography variant="body2" component="p" className={classes.text}>Kindly provide your name below to begin the verification process.</Typography>
+        <div id="veriff-root" style={{ margin: '0 auto'}} />
+      </Box>
     </div>
   );
 }

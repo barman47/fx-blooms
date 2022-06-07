@@ -18,7 +18,6 @@ import setAuthToken from '../utils/setAuthToken';
 
 import { 
     RESET_STORE,
-    SET_ID_VERIFICATION_LINK,
     SET_CURRENT_CUSTOMER, 
     SET_CUSTOMER_PROFILE,
     SET_CONFIRMED_CUSTOMERS,
@@ -39,8 +38,6 @@ import {
     SHOW_PHONE_NUMBER,
     SET_NEW_CUSTOMERS,
     SET_MORE_NEW_CUSTOMERS,
-    SET_RESIDENCE_PERMIT,
-    SET_PERMIT_URL,
     SET_EMAIL,
     GET_ERRORS
  } from './types';
@@ -168,19 +165,6 @@ export const verifyEmail = ({ externalid, token }) => async (dispatch) => {
     }
 };
 
-export const getIdVerificationLink = () => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${api}/IDCardVerificationLink`);
-        return dispatch({
-            type: SET_ID_VERIFICATION_LINK,
-            payload: res.data.data
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
 export const login = (data, navigate) => async (dispatch) => {
     try {
         const res = await axios.post(`${api}/Login`, data);
@@ -234,36 +218,6 @@ export const getCustomerStats = () => async (dispatch) => {
         dispatch({
             type: SET_CUSTOMER_STATS,
             payload: res.data.data
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getResidencePermitLink = () => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${api}/GetLinkForResidencePermitUpload`);
-        dispatch({
-            type: SET_PERMIT_URL,
-            payload: res.data.data
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const addResidentPermit = (data) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.post(`${api}/AddResidencePermit`, data);
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: res.data.data
-        });
-        dispatch({
-            type: SET_RESIDENCE_PERMIT,
-            payload: true
         });
     } catch (err) {
         return handleError(err, dispatch);

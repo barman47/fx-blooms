@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
@@ -48,12 +48,11 @@ const FundAuthorizationSuccess = ({ payment, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const location = useLocation();
+    const navigate = useNavigate();
 
     const errorsState = useSelector(state => state.errors);
 
-    const [loadingText, setLoadingText] = useState('Processing Payment . . .');
-    const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
+    const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState({});
 
     const toast = useRef();
@@ -74,7 +73,6 @@ const FundAuthorizationSuccess = ({ payment, handleSetTitle }) => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
             setLoading(false);
-            setLoadingText('');
             dispatch({
                 type: GET_ERRORS,
                 payload: {}
@@ -93,11 +91,10 @@ const FundAuthorizationSuccess = ({ payment, handleSetTitle }) => {
     };
 
     const makePayment = (paymentRequestId, consentToken, type) => {
-        payment({ paymentRequestId, consentToken, type });
+        payment({ paymentRequestId, consentToken, type }, navigate);
     };
 
     const handleRetry = () => {
-        setLoadingText('Processing Payment . . .');
         setLoading(true);
         handlePaymentRequest();
     };
@@ -113,7 +110,7 @@ const FundAuthorizationSuccess = ({ payment, handleSetTitle }) => {
                     type="error"
                 />
             }
-            {loading && <Spinner text={loadingText} />}
+            {loading && <Spinner />}
             <Box component="section" className={classes.root}>
                 {!loading && 
                     <Box component="div">

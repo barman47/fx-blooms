@@ -182,7 +182,7 @@ export const olimpicMedals = [{
       country: 'Germany', hydro: 6.1, oil: 123.6, gas: 77.3, coal: 85.7, nuclear: 37.8,
     }];
 
-  export const USER_COLUMNS = {
+export const USER_COLUMNS = {
     1: 'firstName',
     2: 'lastName',
     3: 'email',
@@ -190,18 +190,18 @@ export const olimpicMedals = [{
     5: 'customerStatus',
     6: '',
     7: 'riskProfile'
-  }
+};
 
-  export const LISTING_COLUMNS = {
+export const LISTING_COLUMNS = {
     1: 'id',
     2: 'listedBy',
     3: 'amountNeeded',
     4: 'exchangeRate',
     5: 'status',
     6: 'dateCreated',
-  }
+};
 
-  export const TRANSACTION_COLUMNS = {
+export const TRANSACTION_COLUMNS = {
     0: 'buyer',
     1: 'buyer',
     2: 'buyer',
@@ -209,17 +209,28 @@ export const olimpicMedals = [{
     4: 'id',
     5: 'isClosed',
     6: 'dateCreated',
-  }
+};
 
-  export const VERIFF_HOST = "https://stationapi.veriff.com"
+export const VERIFF_HOST = "https://stationapi.veriff.com"
 
-  export const ID_STATUS_CATEGORY = {
+export const ID_STATUS_CATEGORY = {
     DECLINED: 'declined',
     ACCEPTED: 'approved'
-  }
+};
 
-  export const LISTING_CATEGORY = {
-    OPEN: 'OPEN',
-    CANCELED: 'CANCELED',
-    REMOVED: 'REMOVED'
-  }
+export const LISTING_CATEGORY = {
+	OPEN: 'OPEN',
+	CANCELED: 'CANCELED',
+	REMOVED: 'REMOVED'
+};
+
+export const FUNDING_STATUS = {
+	PENDING: 'PENDING',
+	COMPLETED: 'COMPLETED',
+};
+
+export const WALLET_FILTER = {
+	HISTORY: 'HISTORY',
+	FUNDING: 'FUNDING',
+	WITHDRAWAL: 'WITHDRAWAL'
+};

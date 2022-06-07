@@ -29,11 +29,12 @@ export const editAccount = (account, accountId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/accounts/${accountId}/edit`, account);
+        console.log(res);
         dispatch({
             type: EDITED_ACCOUNT,
             payload: {
                 msg: 'Bank account has been updated successfully!',
-                account: res.data
+                account: res.data.data
             }
         });
     } catch (err) {
@@ -60,7 +61,7 @@ export const getAccount = (accountId) => async (dispatch) => {
         const res = await axios.get(`${URL}/accounts/${accountId}`);
         dispatch({
             type: SET_ACCOUNT,
-            payload: res.data
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

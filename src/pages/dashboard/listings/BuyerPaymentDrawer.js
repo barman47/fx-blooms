@@ -220,6 +220,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     useEffect(() => {
         if (msg) {
+            clearInterval(interval.current);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
             setLoading(false);
@@ -287,14 +288,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
             setErrors({});
         }
     }, [dispatch, drawerOpen]);
-
-    useEffect(() => {
-        if (msg) {
-            successModal.current.setModalText(msg);
-            successModal.current.openModal();
-            clearInterval(interval.current);
-        }
-    }, [msg]);
 
     useEffect(() => {
         setLoading(false);

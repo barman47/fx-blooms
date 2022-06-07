@@ -21,7 +21,7 @@ import PropTypes from 'prop-types';
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
 import { requestWalletFunding } from '../../../actions/wallets';
-import { GET_ERRORS, SET_FUNDING_DETAILS } from '../../../actions/types';
+import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
@@ -141,7 +141,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
     const { institutions, currencies, customer } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
-    const [currency, setCurrency] = useState('EUR');
+    const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
     const [institution, setInstitution] = useState('');
@@ -164,7 +164,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
         }
 
         dispatch({
-            type: SET_FUNDING_DETAILS,
+            type: SET_FUNDING_REQUEST,
             payload: {}
         });
         // eslint-disable-next-line
@@ -237,7 +237,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Amount to fund wallet with</Typography>
-                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={2}>
+                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={1}>
                         <Grid item xs={4} lg={3}>
                             <FormControl 
                                 variant="outlined" 
@@ -249,13 +249,14 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                                 <Select
                                     labelId="currency"
                                     value={currency}
-                                    onChange={(e) => setCurrency(e.target.value)}
+                                    // onChange={(e) => setCurrency(e.target.value)}
                                 
                                 >
-                                    <MenuItem value="" disabled>Select Currency</MenuItem>
-                                    {currencies.length > 0 && currencies.map((currency, index) => (
+                                    {/* <MenuItem value="" disabled>Select Currency</MenuItem> */}
+                                    <MenuItem value={currency} selected>{currency}</MenuItem>
+                                    {/* {currencies.length > 0 && currencies.map((currency, index) => (
                                         <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
-                                    ))}
+                                    ))} */}
                                 </Select>
                                 <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                             </FormControl>
@@ -432,7 +433,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                     </Grid>
                     <Grid item xs={12} className={classes.note}>
                         <Security className={classes.icon} />
-                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily. Your information is used for indetity verification only and will be kept secure by Yapily.</Typography>
+                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
                     </Grid>
                 </form>
             </Box>

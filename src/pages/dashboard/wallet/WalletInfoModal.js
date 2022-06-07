@@ -1,17 +1,14 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
-import PropTypes from 'prop-types';
 import { 
     Backdrop,
-	Button,
     Fade,
 	Grid,
     Modal,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CheckboxMarkedCircle } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS, SHADOW } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -23,21 +20,18 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
-        width: '35vw',
-        height: '25vw',
+        width: '30vw',
+        height: '25vh',
         boxShadow: SHADOW,
-        padding: theme.spacing(5, 10),
-
-        [theme.breakpoints.down('md')]: {
-            height: '50vw',
-            width: '50vw',
-        },
+        padding: theme.spacing(5),
         
+        [theme.breakpoints.down('md')]: {
+            width: '35vw',
+        },
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(5, 2),
-            height: '40vh',
-            width: '90vw'
-        }
+            width: '80vw',
+        },
     },
 
     item: {
@@ -45,29 +39,18 @@ const useStyles = makeStyles(theme => ({
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
-        textAlign: 'center'
-    },
+        textAlign: 'center',
 
-    icon: {
-        color: theme.palette.primary.main,
-        fontSize: theme.spacing(5)
+        '& p': {
+            fontWeight: 300
+        }
     }
 }));
 
-const SuccessModal = forwardRef((props, ref) => {
+const WalletInfoModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
-    const [text, setText] = useState('');
-
-    const { dismissAction } = props;
-
-    const closeModal = () => {
-        setOpen(false);
-        if (dismissAction) {
-            dismissAction();
-        }
-    };
 
     useImperativeHandle(ref, () => ({
         openModal: () => {
@@ -76,22 +59,8 @@ const SuccessModal = forwardRef((props, ref) => {
 
         closeModal: () => {
             setOpen(false);
-        },
-
-        setModalText: (text) => {
-            setText(text);
         }
     }));
-
-    const handleOnClose = (e, reason) => {
-        if (reason === 'backdropClick') {
-            return;
-        }
-        // if (reason === 'clickaway') {
-        //     return;
-        // }
-        closeModal();
-    }
 
 	return (
         <Modal
@@ -99,8 +68,7 @@ const SuccessModal = forwardRef((props, ref) => {
             aria-describedby="transition-modal-description"
             className={classes.modal}
             open={open}
-            disableEscapeKeyDown
-            onClose={handleOnClose}
+            onClose={() => setOpen(false)}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{
@@ -110,11 +78,9 @@ const SuccessModal = forwardRef((props, ref) => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
-                        <Typography variant="subtitle1">
-                            {text}
+                        <Typography variant="subtitle1" component="p">
+                            Use this ID as your reference anytime you want to fund your wallet via Bank transfer.
                         </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
                     </Grid>
                 </Grid>
             </Fade>
@@ -122,8 +88,4 @@ const SuccessModal = forwardRef((props, ref) => {
 	);
 });
 
-SuccessModal.propTypes = {
-    dismissAction: PropTypes.func
-};
-
-export default SuccessModal;
+export default WalletInfoModal;

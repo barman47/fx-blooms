@@ -11,7 +11,7 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 
 import { COLORS, SHADOW } from '../../utils/constants';
-import { ID_VERIFICATION } from '../../routes';
+import { VERIFF } from '../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -69,7 +69,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
 
     const handleVerifyId = () => {
         setOpen(false);
-        navigate(ID_VERIFICATION);
+        navigate(VERIFF);
     };
 
 	return (
@@ -95,7 +95,7 @@ const AccountSetupModal = forwardRef((props, ref) => {
                                 <Button variant="text" size="small" color="secondary" onClick={() => setOpen(false)}>Skip</Button>
                             </Grid>
                             <Grid item xs={6}>
-                                <Button variant="contained" size="small" color="primary" onClick={handleVerifyId}>Okay, Verify Me</Button>
+                                <Button variant="contained" onClick={handleVerifyId} size="small" color="primary">Okay, Verify Me</Button>
                             </Grid>
                         </Grid>
                     </Grid>

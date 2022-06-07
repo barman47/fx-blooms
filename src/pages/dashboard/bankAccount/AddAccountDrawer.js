@@ -20,11 +20,8 @@ import { addAccount, validateIban } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
-import moveToNextField from '../../../utils/moveToNextField';
-import handleSetValue from '../../../utils/handleSetValue';
 
 import SuccessModal from '../../../components/common/SuccessModal';
-// import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 import isEmpty from '../../../utils/isEmpty';
 
@@ -127,7 +124,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
 
     const [BankName, setBankName] = useState('');
     const [AccountNumber, setAccountNumber] = useState('');
-    const [AccountName, setAccountName] = useState(`${firstName} ${lastName}`);
+    const [AccountName, setAccountName] = useState(`${firstName ?? ''} ${lastName ?? ''}`);
     const [bic, setBic] = useState('');
     const [nickName, setNickName] = useState('');
     const [errors, setErrors] = useState({});
@@ -137,16 +134,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     // eslint-disable-next-line
     const [isIbanValid, setIsIbanValid] = useState(false);
 
-    const [first, setFirst] = useState('');
-    const [second, setSecond] = useState('');
-    const [third, setThird] = useState('');
-    const [fourth, setFourth] = useState('');
-
-    const firstField = useRef();
-    const secondField = useRef();
-    const thirdField = useRef();
-    const fourthField = useRef();
-
     const successModal = useRef();
     const toast = useRef();
 
@@ -154,7 +141,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
         if (eur && ngn) {
             setValue(0);
         } else if (eur) {
-            setValue(1);
+            setValue(0);
         } else if (ngn) {
             setValue(0);
         }
@@ -238,7 +225,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     };
 
     const handleChange = (event, newValue) => {
-        setValue(newValue);
+        setValue(parseInt(newValue));
     };
 
     const handleSetCurrency = () => {
@@ -279,10 +266,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
             AccountNumber,
             Currency: handleSetCurrency(),
             bic,
-            first,
-            second,
-            third,
-            fourth,
             CustomerId: customerId
         };
 
@@ -407,82 +390,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                                 />
                             </Grid>
                             <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">PIN</Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={first}
-                                    onChange={(e) => {
-                                        handleSetValue(e.target.value, setFirst);
-                                    }}
-                                    onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    required
-                                    error={errors.first ? true : false}
-                                    ref={firstField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={second}
-                                    onChange={(e) => setSecond(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.second ? true : false}
-                                    ref={secondField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={third}
-                                    onChange={(e) => setThird(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.third ? true : false}
-                                    ref={thirdField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={fourth}
-                                    onChange={(e) => setFourth(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, null, thirdField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.fourth ? true : false}
-                                    ref={fourthField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
                                 <Button 
                                     type="submit" 
                                     variant="contained" 
@@ -498,7 +405,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                         </Grid>
                     </form>
                 </TabPanel>
-                <TabPanel value={value} index={ngn && eur ? 1 : !ngn && eur ? 0 : 1}>
+                <TabPanel value={value} index={ngn && eur ? 1 : 0}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={matches ? 2 : 1}>
                             <Grid item xs={12}>
@@ -567,82 +474,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                                     required
                                     error={errors.nickName ? true : false}
                                     disabled={loading ? true : false}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <Typography variant="subtitle2" component="span">PIN</Typography>
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={first}
-                                    onChange={(e) => {
-                                        handleSetValue(e.target.value, setFirst);
-                                    }}
-                                    onKeyUp={(e) => moveToNextField(e.target, secondField.current, null)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    required
-                                    error={errors.first ? true : false}
-                                    ref={firstField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={second}
-                                    onChange={(e) => setSecond(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, thirdField.current, firstField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.second ? true : false}
-                                    ref={secondField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={third}
-                                    onChange={(e) => setThird(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, fourthField.current, secondField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.third ? true : false}
-                                    ref={thirdField}
-                                    disabled={loading}
-                                />
-                            </Grid>
-                            <Grid item xs={3}>
-                                <TextField
-                                    className={classes.input}
-                                    value={fourth}
-                                    onChange={(e) => setFourth(e.target.value)}
-                                    onKeyUp={(e) => moveToNextField(e.target, null, thirdField.current)}
-                                    type="text"
-                                    variant="outlined" 
-                                    inputProps={{
-                                        maxLength: 1
-                                    }}
-                                    max={1}
-                                    required
-                                    error={errors.fourth ? true : false}
-                                    ref={fourthField}
-                                    disabled={loading}
                                 />
                             </Grid>
                             <Grid item xs={12}>

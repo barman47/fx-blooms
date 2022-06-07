@@ -77,11 +77,6 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
     const [sixth, setSixth] = useState('');
     const [seventh, setSeventh] = useState('');
     const [eighth, setEighth] = useState('');
-
-    const [ninth, setNinth] = useState('');
-    const [tenth, setTenth] = useState('');
-    const [eleventh, setEleventh] = useState('');
-    const [twelveth, setTwelveth] = useState('');
     
     const [loading, setLoading] = useState(false);
 
@@ -94,11 +89,6 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
     const sixthField = useRef();
     const seventhField = useRef();
     const eighthField = useRef();
-
-    const ninthField = useRef();
-    const tenthField = useRef();
-    const eleventhField = useRef();
-    const twelvethField = useRef();
 
     const [resendable, setResendable] = useState(false);
     const [timeToResend, setTimeToResend] = useState(60);
@@ -156,39 +146,41 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
             fifth,
             sixth,
             seventh,
-            eighth,
-            ninth,
-            tenth,
-            eleventh,
-            twelveth
+            eighth
         };
 
-        const { errors, isValid } = validateSetPin(data);
+        const { errors, isValid } = validateSetPin(data, hasSetPin);
 
         if (!isValid) {
-            return setErrors(errors);
+            return setErrors({ msg: 'Invalid data', ...errors});
         }
         setLoading(true);
         if (hasSetPin) {
             return resetPin({
-                otp: data.ninth + data.tenth + data.eleventh + data.twelveth,
                 pin: data.first + data.second + data.third + data.fourth,
+                otp: data.fifth + data.sixth + data.seventh + data.eighth,
                 customerId
             });
         }
         return createPin({
-            otp: data.ninth + data.tenth + data.eleventh + data.twelveth,
             pin: data.first + data.second + data.third + data.fourth,
             customerId
         });
-    }, [createPin, resetPin, hasSetPin, customerId, first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelveth]);
+    }, [createPin, resetPin, hasSetPin, customerId, first, second, third, fourth, fifth, sixth, seventh, eighth]);
 
-    // Automatically submit form when all fields are filled
+    // Automatically submit form when all fields are filled forn PIN Creation
     useEffect(() => {
-        if (first && second && third && fourth && fifth && sixth && seventh && eighth && ninth && tenth && eleventh && twelveth) {
+        if (first && second && third && fourth && !hasSetPin) {
             handleFormSubmit();
         }
-    }, [first, second, third, fourth, fifth, sixth, seventh, eighth, ninth, tenth, eleventh, twelveth, handleFormSubmit]);
+    }, [first, second, third, fourth, hasSetPin, handleFormSubmit]);
+
+    // Automatically submit form when all fields are filled for PIN reset
+    useEffect(() => {
+        if (first && second && third && fourth && fifth && sixth && seventh && eighth && hasSetPin) {
+            handleFormSubmit();
+        }
+    }, [first, second, third, fourth, fifth, sixth, seventh, eighth, hasSetPin, handleFormSubmit]);
 
     useEffect(() => {
         if (timeToResend === 0) {
@@ -208,7 +200,9 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
 
     const setupPin = () => {
         setShowSetPin(true);
-        generatePinOtp();
+        if (hasSetPin) {
+            generatePinOtp();
+        }
     };
 
     const handleResendOtp = () => {
@@ -227,11 +221,6 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
         setSixth('');
         setSeventh('');
         setEighth('');
-
-        setNinth('');
-        setTenth('');
-        setEleventh('');
-        setTwelveth('');
 
         setResendable(false);
         setTimeToResend(0);
@@ -367,167 +356,97 @@ const SetPin = ({ createPin, resetPin, generatePinOtp }) => {
                                         disabled={loading}
                                     />
                                 </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="body2" component="p">Re-enter PIN</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={fifth}
-                                        onChange={(e) => setFifth(e.target.value)}
-                                        onKeyUp={(e) => moveToNextField(e.target, sixthField.current, fourthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={fifthField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={sixth}
-                                        onChange={(e) => setSixth(e.target.value)}
-                                        onKeyUp={(e) => moveToNextField(e.target, seventhField.current, fifthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={sixthField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={seventh}
-                                        onChange={(e) => setSeventh(e.target.value)}
-                                        onKeyUp={(e) => moveToNextField(e.target, eighthField.current, sixthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={seventhField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={eighth}
-                                        onChange={(e) => setEighth(e.target.value)}
-                                        onKeyUp={(e) => moveToNextField(e.target, ninthField.current, seventhField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={eighthField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="body2" component="p">Enter OTP</Typography>
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={ninth}
-                                        onChange={(e) => {
-                                            handleSetValue(e.target.value, setNinth);
-                                        }}
-                                        onKeyUp={(e) => moveToNextField(e.target, tenthField.current, eighthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={ninthField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={tenth}
-                                        onChange={(e) => {
-                                            handleSetValue(e.target.value, setTenth);
-                                        }}
-                                        onKeyUp={(e) => moveToNextField(e.target, eleventhField.current, ninthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={tenthField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={eleventh}
-                                        onChange={(e) => {
-                                            handleSetValue(e.target.value, setEleventh);
-                                        }}
-                                        onKeyUp={(e) => moveToNextField(e.target, twelvethField.current, tenthField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={eleventhField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Grid item xs={3}>
-                                    <TextField
-                                        className={classes.input}
-                                        value={twelveth}
-                                        onChange={(e) => {
-                                            handleSetValue(e.target.value, setTwelveth);
-                                        }}
-                                        onKeyUp={(e) => moveToNextField(e.target, null, eleventhField.current)}
-                                        type="text"
-                                        variant="outlined" 
-                                        inputProps={{
-                                            maxLength: 1
-                                        }}
-                                        max={1}
-                                        required
-                                        error={!isEmpty(errors) ? true : false}
-                                        ref={twelvethField}
-                                        disabled={loading}
-                                    />
-                                </Grid>
-                                <Typography variant="body2" component="p" className={classes.label}>
-                                    Didn't receive the code? 
-                                    <Button variant="text" color="primary" disabled={resendable ? false : true} onClick={handleResendOtp}>Resend</Button>
-                                    {!resendable && `in ${timeToResend}s`}
-                                </Typography>
+                                {hasSetPin &&
+                                    <>
+                                        <Grid item xs={12}>
+                                            <Typography variant="body2" component="p">Enter OTP</Typography>
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <TextField
+                                                className={classes.input}
+                                                value={fifth}
+                                                onChange={(e) => {
+                                                    handleSetValue(e.target.value, setFifth);
+                                                }}
+                                                onKeyUp={(e) => moveToNextField(e.target, sixthField.current, fourthField.current)}
+                                                type="text"
+                                                variant="outlined" 
+                                                inputProps={{
+                                                    maxLength: 1
+                                                }}
+                                                required
+                                                error={!isEmpty(errors) ? true : false}
+                                                ref={sixthField}
+                                                disabled={loading}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <TextField
+                                                className={classes.input}
+                                                value={sixth}
+                                                onChange={(e) => {
+                                                    handleSetValue(e.target.value, setSixth);
+                                                }}
+                                                onKeyUp={(e) => moveToNextField(e.target, seventhField.current, sixthField.current)}
+                                                type="text"
+                                                variant="outlined" 
+                                                inputProps={{
+                                                    maxLength: 1
+                                                }}
+                                                max={1}
+                                                required
+                                                error={!isEmpty(errors) ? true : false}
+                                                ref={sixthField}
+                                                disabled={loading}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <TextField
+                                                className={classes.input}
+                                                value={seventh}
+                                                onChange={(e) => {
+                                                    handleSetValue(e.target.value, setSeventh);
+                                                }}
+                                                onKeyUp={(e) => moveToNextField(e.target, eighth.current, sixthField.current)}
+                                                type="text"
+                                                variant="outlined" 
+                                                inputProps={{
+                                                    maxLength: 1
+                                                }}
+                                                max={1}
+                                                required
+                                                error={!isEmpty(errors) ? true : false}
+                                                ref={seventhField}
+                                                disabled={loading}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={3}>
+                                            <TextField
+                                                className={classes.input}
+                                                value={eighth}
+                                                onChange={(e) => {
+                                                    handleSetValue(e.target.value, setEighth);
+                                                }}
+                                                onKeyUp={(e) => moveToNextField(e.target, null, seventhField.current)}
+                                                type="text"
+                                                variant="outlined" 
+                                                inputProps={{
+                                                    maxLength: 1
+                                                }}
+                                                max={1}
+                                                required
+                                                error={!isEmpty(errors) ? true : false}
+                                                ref={eighthField}
+                                                disabled={loading}
+                                            />
+                                        </Grid>
+                                        <Typography variant="body2" component="p" className={classes.label}>
+                                            Didn't receive the code? 
+                                            <Button variant="text" color="primary" disabled={resendable ? false : true} onClick={handleResendOtp}>Resend</Button>
+                                            {!resendable && `in ${timeToResend}s`}
+                                        </Typography>
+                                    </>
+                                }
                                 <Grid item xs={12}>
                                     <Button 
                                         type="submit"
