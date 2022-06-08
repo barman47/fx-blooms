@@ -152,7 +152,10 @@ const Footer = () => {
                 <div>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
-                        FXBLOOMS OÜ (Registry code: 16262446) is a company acting as a Commercial Agent and located at Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia.
+                        FXBLOOMS OÜ (registry code: 16262446) offers its products and services in partnership with SafeConnect (Yapilly) UAB, a payment institution service provider supervised by the Bank of Lithuanian with authorization number LB002045.
+                    </Typography>
+                    <Typography variant="subtitle2" component="span">
+                        FXBLOOMS OÜ is located in Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia.
                     </Typography>
                 </div>
                 <div>

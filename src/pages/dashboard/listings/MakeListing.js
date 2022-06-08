@@ -475,7 +475,7 @@ const MakeListing = (props) => {
                 Amount: 0
                 // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
-            accountID: getAccount(ReceivingAccount, accounts).accountID,
+            accountID: AvailableCurrency === 'EUR' ? getAccount(ReceivingAccount, accounts).accountID : '',
             reference,
             walletId: wallet.id
         };
