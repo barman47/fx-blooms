@@ -35,7 +35,7 @@ import Toast from '../../../components/common/Toast';
 
 import yapily from '../../../assets/img/yapily.png';
 import bankTransfer from '../../../assets/img/bank-transfer.png';
-import cardPayment from '../../../assets/img/card-payment.png';
+import cardPayment from '../../../assets/img/card-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -208,7 +208,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
             accountId: sourceAccount ? accountID : '',
             accountName: sourceAccount ? accountName : '',
             accountNumber: sourceAccount ? accountNumber : '',
-            reference: "WALLET FUNDING"
+            reference: "FXBLOOMS"
         };
 
         const { errors, isValid } = validateFundWallet(data);
@@ -278,9 +278,9 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                                 helperText={errors.amount}
                             />
                         </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <FormHelperText>Transaction Fee, &#8364;1</FormHelperText>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Select Source Account</Typography>
                             <FormControl 

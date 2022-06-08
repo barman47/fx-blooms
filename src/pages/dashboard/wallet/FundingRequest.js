@@ -1,15 +1,15 @@
 import { connect } from 'react-redux';
-import { Box, Button, Typography } from '@material-ui/core';
+import { Box, Button, Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import { Refresh } from 'mdi-material-ui';
-// import moment from 'moment';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import { getFundingDetails } from '../../../actions/wallets';
 
-// import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
-// import { convertToLocalTime } from '../../../utils/getTime';
+import { convertToLocalTime } from '../../../utils/getTime';
+import { COLORS, FUNDING_STATUS } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     fundingRequest: {
@@ -47,7 +47,7 @@ const useStyles = makeStyles(theme => ({
 
             '& h6': {
                 fontSize: theme.spacing(1.7),
-                fontWeight: 500,
+                fontWeight: 600,
                 margin: 0,
 
                 [theme.breakpoints.down('md')]: {
@@ -72,11 +72,21 @@ const FundingRequest = ({ date, amount, status, currency, paymentId, paymentRequ
         getFundingDetails(paymentId, paymentRequestId);
     };
 
+    const { PENDING } = FUNDING_STATUS;
+
     return (
         <section className={classes.fundingRequest}>
             <Box component="section">
                 <Typography variant="body2" component="p">Status</Typography>
-                <Typography variant="h6">{status}</Typography>
+                <Typography 
+                    variant="h6"
+                    style={{
+                        color: status === PENDING ? COLORS.orange : COLORS.primary,
+                        fontWeight: 600
+                    }}
+                >
+                    {status}
+                </Typography>
             </Box>
             <Box component="section">
                 <Typography variant="body2" component="p">Amount</Typography>
@@ -84,10 +94,9 @@ const FundingRequest = ({ date, amount, status, currency, paymentId, paymentRequ
             </Box>
             <Box component="section">
                 <Typography variant="body2" component="p">Time</Typography>
-                <Typography variant="h6">20/20/2022</Typography>
-                {/* <Tooltip title={`${moment(convertToLocalTime(date)).format('DD/MM/YYYY by H:mm a')}`} arrow placement="bottom" style={{ cursor: 'pointer' }}>
+                <Tooltip title={`${moment(convertToLocalTime(date)).format('DD/MM/YYYY by H:mm a')}`} arrow placement="bottom" style={{ cursor: 'pointer' }}>
                     <Typography variant="h6">{moment(convertToLocalTime(date)).fromNow()}</Typography>
-                </Tooltip> */}
+                </Tooltip>
             </Box>
             <Box component="section">
                 <Typography variant="body2" component="p">Currency</Typography>
@@ -104,6 +113,7 @@ const FundingRequest = ({ date, amount, status, currency, paymentId, paymentRequ
                     disableFocusRipple
                     disableTouchRipple
                     onClick={handleRefreshStatus}
+                    disabled={status.toUpperCase() === FUNDING_STATUS.COMPLETED ? true : false}
                 >
                     Refresh
                 </Button>

@@ -10,7 +10,8 @@ import {
     SET_WALLET_TRANSACTION,
     SET_WALLET_TRANSACTIONS,
     SET_WALLET_FILTER,
-    SET_FUNDING_REQUESTS
+    SET_FUNDING_REQUESTS,
+    UPDATE_FUNDING_REQUEST
 } from '../actions/types';
 
 import { WALLET_FILTER } from '../utils/constants';
@@ -131,6 +132,17 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 fundingRequests: action.payload
+            };
+
+        case UPDATE_FUNDING_REQUEST:
+            const fundingRequests = state.fundingRequests;
+            const index = fundingRequests.findIndex(request => request.paymentRequestId === action.payload.paymentRequestId);
+            fundingRequests[index] = action.payload;
+
+            return {
+                ...state,
+                fundingRequests: [...fundingRequests],
+                fundingRequest: action.payload
             };
 
         default:

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import $ from "jquery";
+import $ from 'jquery';
 
 import handleError from '../utils/handleError';
 import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_VALIDATION, GET_ERRORS } from './types';
