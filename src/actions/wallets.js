@@ -134,10 +134,9 @@ export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatc
     try {
         await reIssueCustomerToken();
         const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
-        console.log(res);
         dispatch({
             type: SET_FUNDING_REQUEST,
-            payload: res.data.data
+            payload: res.data
         });
     } catch (err) {
         return handleError(err, dispatch);

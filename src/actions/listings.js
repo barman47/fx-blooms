@@ -29,29 +29,6 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
-// export const getAllListings = () => async (dispatch) => {
-//     try {
-//         console.log('getting all listings');
-//         await reIssueCustomerToken();
-//         const res = await axios.post(`${URL}/GetAllListings`, {
-//             pageNumber: 0,
-//             pageSize: 15,
-//             currencyNeeded: 'NGN',
-//             currencyAvailable: 'NGN',
-//             minimumExchangeAmount: 0,
-//             useCurrencyFilter: false
-//         });
-//         const { items, ...rest } = res.data.data;
-
-//         dispatch({
-//             type: SET_LISTINGS,
-//             payload: { listings: items, ...rest }
-//         });
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
-
 export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
@@ -152,7 +129,6 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
-        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({

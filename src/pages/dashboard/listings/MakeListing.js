@@ -393,10 +393,6 @@ const MakeListing = (props) => {
                 break;
         }
     };
-
-    // const handleCloseAccountModalModal = () => {
-    //     setOpenAccountModal(false);
-    // };
     
     const handleClosePendingIdModal = () => {
         setShowPendingIdModal(false);
