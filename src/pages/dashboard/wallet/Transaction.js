@@ -88,18 +88,8 @@ const Transaction = ({ date, amount, status, type, destinationAccount, sourceAcc
     const classes = useStyles();
 
     return (
-        <section className={classes.transaction}>
+        <Box component="section" className={classes.transaction}>
             <Box component="div">
-                <Box component="section">
-                    <Typography variant="body2" component="p">Time</Typography>
-                    <Tooltip title={`${moment(convertToLocalTime(date)).format('DD/MM/YYYY by H:mm a')}`} arrow placement="bottom" style={{ cursor: 'pointer' }}>
-                        <Typography variant="h6">{moment(convertToLocalTime(date)).fromNow()}</Typography>
-                    </Tooltip>
-                </Box>
-                <Box component="section">
-                    <Typography variant="body2" component="p">Amount</Typography>
-                    <Typography variant="h6">{formatNumber(amount, 2)}</Typography>
-                </Box>
                 <Box component="section">
                     <Typography variant="body2" component="p">Type</Typography>
                     <Tooltip title={type} arrow placement="bottom" style={{ justifySelf: 'center' }} className={classes.iconContainer}>
@@ -109,6 +99,16 @@ const Transaction = ({ date, amount, status, type, destinationAccount, sourceAcc
                             <ArrowTopRightThick className={classes.debitIcon} />
                         }
                     </Tooltip> 
+                </Box>
+                <Box component="section">
+                    <Typography variant="body2" component="p">Time</Typography>
+                    <Tooltip title={`${moment(convertToLocalTime(date)).format('DD/MM/YYYY by H:mm a')}`} arrow placement="bottom" style={{ cursor: 'pointer' }}>
+                        <Typography variant="h6">{moment(convertToLocalTime(date)).fromNow()}</Typography>
+                    </Tooltip>
+                </Box>
+                <Box component="section">
+                    <Typography variant="body2" component="p">Amount</Typography>
+                    <Typography variant="h6">{formatNumber(amount, 2)}</Typography>
                 </Box>
                 <Box component="section">
                     <Typography variant="body2" component="p">Account</Typography>
@@ -132,7 +132,7 @@ const Transaction = ({ date, amount, status, type, destinationAccount, sourceAcc
                     </Tooltip>
                 </Box>
             </Box>
-        </section>
+        </Box>
     );
 };
 

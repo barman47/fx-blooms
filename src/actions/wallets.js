@@ -110,11 +110,11 @@ export const requestWalletFunding = (data, navigate) => async (dispatch)  => {
     }
 };
 
-export const requestWithdrawal = (data) => async (dispatch) => {
+export const requestWithdrawal = ({ first, second, third, fourth, ...rest}) => async (dispatch) => {
     try {
         await Promise.all([
             await reIssueCustomerToken(),
-            axios.post(`${YAPILY_API}/withdraw`, data)
+            axios.post(`${YAPILY_API}/withdraw`, { pin: `${first}${second}${third}${fourth}`, ...rest })
         ]);
         dispatch({
             type: SET_CUSTOMER_MSG,
