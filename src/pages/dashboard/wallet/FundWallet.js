@@ -25,13 +25,15 @@ import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
-import { COLORS } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import getAccount from '../../../utils/getAccount';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+import IDVerificationModal from '../idVerification/IDVerificationModal';
+import PendingIdModal from '../idVerification/PendingIdModal';
 
 import yapily from '../../../assets/img/yapily.png';
 import bankTransfer from '../../../assets/img/bank-transfer.png';
@@ -138,6 +140,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
+    const { idStatus } = useSelector(state => state.customer.stats);
     const { institutions, currencies, customer } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
@@ -148,14 +151,24 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
     const [institutionId, setInstitutionId] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
+    const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
 
+    const idVerificationModal = useRef();
     const toast = useRef();
+
+    const { APPROVED, NOT_SUBMITTED } = ID_STATUS;
+    const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
     useEffect(() => {
         handleSetTitle('Fund Wallet');
+
+        if (idStatus !== APPROVED) {
+            checkIdStatus();
+        }
+
         if (currencies.length === 0) {
             getCurrencies()
         }
@@ -187,6 +200,28 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
         }
     }, [dispatch, errorsState, errors]);
 
+    const checkIdStatus = () => {
+        switch (idStatus) {
+            case APPROVED:
+                break;
+
+            case PENDING:
+                setShowPendingIdModal(true);
+                break;
+
+            case REJECTED:
+                idVerificationModal.current.openModal();
+                break;
+
+            case NOT_SUBMITTED:
+                idVerificationModal.current.openModal();
+                break;
+
+            default:
+                break;
+        }
+    };
+
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
         setSourceAccount('');
@@ -194,9 +229,16 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
+    const handleClosePendingIdModal = () => {
+        setShowPendingIdModal(false);
+    };
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+        if (sourceAccount) {
+            
+        }
         const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
         const data = {
             institutionId: institutionId,
@@ -216,6 +258,11 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid funding data!' });
         }
+
+        if (idStatus !== APPROVED) {
+            return checkIdStatus();
+        }
+
         setLoading(true);
         requestWalletFunding(data, navigate);
     };
@@ -232,6 +279,8 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                 />
             }
             {loading && <Spinner />}
+            <IDVerificationModal ref={idVerificationModal} />
+            {showPendingIdModal && <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>

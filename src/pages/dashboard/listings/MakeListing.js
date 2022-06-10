@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -11,6 +11,7 @@ import {
     FormControlLabel,
     FormHelperText,
     Grid, 
+    Link,
     MenuItem,
     Select,
     TextField,
@@ -33,13 +34,14 @@ import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import getAccount from '../../../utils/getAccount';
-import { DASHBOARD_HOME } from '../../../routes';
+import { DASHBOARD_HOME, FUND_WALLET } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 
-import PendingIdModal from './PendingIdModal';
-import IDVerificationModal from './IDVerificationModal';
+import PendingIdModal from '../idVerification/PendingIdModal';
+import IDVerificationModal from '../idVerification/IDVerificationModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import CreateWalletModal from '../wallet/CreateWalletModal';
+import ZeroBalanceModal from '../wallet/ZeroBalanceModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -207,6 +209,7 @@ const MakeListing = (props) => {
     const idVerificationModal = useRef();
     const successModal = useRef();
     const toast = useRef();
+    const zeroBalanceModal = useRef();
 
     const { APPROVED, NOT_SUBMITTED } = ID_STATUS;
     const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
@@ -225,6 +228,12 @@ const MakeListing = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if ((AvailableCurrency && AvailableCurrency === 'EUR') && (!isEmpty(wallet) && wallet.balance.available === 0)) {
+            zeroBalanceModal.current.openModal();
+        }
+    }, [AvailableCurrency, wallet]);
 
     useEffect(() => {
         // Automatically select newly added account
@@ -503,6 +512,7 @@ const MakeListing = (props) => {
             }
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
             {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleShowCreateWalletModal} />}
+            <ZeroBalanceModal ref={zeroBalanceModal} />
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
                 <IDVerificationModal ref={idVerificationModal} />
@@ -564,7 +574,7 @@ const MakeListing = (props) => {
                                 </Grid>
                                 {!isEmpty(wallet) && 
                                     <Grid item xs={12}>
-                                        <FormHelperText>Wallet Balance: {`${wallet.currency.value} ${formatNumber(wallet.balance.available, 2)}`}</FormHelperText>
+                                        <FormHelperText>Wallet balance is too low! <Link to={FUND_WALLET} underline="always" component={RouterLink}>Fund Wallet</Link></FormHelperText>
                                     </Grid>
                                 }
                                 <Grid item xs={4}>

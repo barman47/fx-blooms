@@ -433,7 +433,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                                 <TextField 
                                     className={classes.input}
                                     value={BankName}
-                                    // onChange={(e) => setBankName(e.target.value)}
+                                    onChange={(e) => setBankName('')}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Bank Name"

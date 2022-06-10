@@ -25,7 +25,7 @@ import { getCustomerInformation, getCustomerStats } from '../../../actions/custo
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getWallets } from '../../../actions/wallets';
 import { 
-	ACTIVATE_EUR_WALLET,
+	// ACTIVATE_EUR_WALLET,
 	// ACTIVATE_NGN_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
 	SET_WALLET,
@@ -38,10 +38,10 @@ import isEmpty from '../../../utils/isEmpty';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-import Wallet from '../wallet/Wallet';
+// import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
 
-import EUFlag from '../../../assets/img/EU-flag.svg';
+// import EUFlag from '../../../assets/img/EU-flag.svg';
 // import NGNFlag from '../../../assets/img/NGN-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
@@ -117,15 +117,15 @@ const useStyles = makeStyles(theme => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
-		marginRight: theme.spacing(7)
+		marginRight: theme.spacing(7),
+
+		[theme.breakpoints.down('md')]: {
+			marginRight: 0
+		}
 	},
 
 	walletToggle: {
 		color: theme.palette.primary.main,
-
-		[theme.breakpoints.down('md')]: {
-			display: 'none'
-		},
 
 		'&:hover': {
 			backgroundColor: 'transparent'
@@ -227,7 +227,7 @@ const AllListings = (props) => {
 	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { eurActive, wallets } = useSelector(state => state.wallets);
+	const { wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -477,14 +477,14 @@ const AllListings = (props) => {
 				</Box>
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
-						<section className={classes.wallets}>
+						{/* <section className={classes.wallets}>
 							<Wallet 
 								type="EUR"
 								flag={EUFlag}
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-						</section>
+						</section> */}
 						<WalletInfo />
 					</section>
 				</Collapse>
