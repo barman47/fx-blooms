@@ -202,6 +202,7 @@ const MakeListing = (props) => {
 
     const [previousListings, setPreviousListings] = useState([]);
 
+    const [zeroBalance, setZeroBalance] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -463,7 +464,7 @@ const MakeListing = (props) => {
         }
 
         if (AvailableCurrency === 'EUR' && ExchangeAmount > wallet.balance.available) {
-            return setErrors({ ExchangeAmount: `Wallet balance (${wallet.currency.value}: ${formatNumber(wallet.balance.available, 2)}) is below the exchange amount`, msg: 'Insufficient wallet balance.' });
+            return setErrors({ zeroBalance: true, ExchangeAmount: `Wallet balance (${wallet.currency.value}: ${formatNumber(wallet.balance.available, 2)}) is below the exchange amount`, msg: 'Insufficient wallet balance.' });
         }
 
         // if (customer.profile.listings >= 2) { // and there is no account number
@@ -576,7 +577,7 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                {!isEmpty(wallet) && wallet.balance.available === 0 && AvailableCurrency === 'EUR' &&
+                                {errors.zeroBalance &&
                                     <Grid item xs={12}>
                                         <FormHelperText>Wallet balance is too low! <Link to={FUND_WALLET} underline="always" component={RouterLink}>Fund Wallet</Link></FormHelperText>
                                     </Grid>
