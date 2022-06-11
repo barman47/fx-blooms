@@ -202,7 +202,6 @@ const MakeListing = (props) => {
 
     const [previousListings, setPreviousListings] = useState([]);
 
-    const [zeroBalance, setZeroBalance] = useState(false);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
