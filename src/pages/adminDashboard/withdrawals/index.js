@@ -526,8 +526,8 @@ const Withdrawals = () => {
     }, [batchId, dispatch]);
 
     useEffect(() => {
+        console.log("walletreq", walletReqs);
         if (!isEmpty(walletReqs)) {
-            console.log("walletreq", walletReqs);
             dispatch(getInstitutions());
             // dispatch({
             //   type: SET_BATCH_ID,

@@ -324,15 +324,15 @@ export const autoBatch =
 export const getBatchById = (id) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        // console.log("bat");
+        console.log("bat", id);
         const res = await axios.get(`${YAPILY_API}/batch/${id}`);
-        console.log(res.data);
 
         dispatch({
             type: SET_WALLET_REQS,
             payload: res.data,
         });
     } catch (err) {
+        console.log("bat");
         return handleError(err, dispatch);
     }
 };
