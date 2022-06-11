@@ -15,8 +15,6 @@ import { makeStyles } from '@material-ui/core/styles';
 // import { getCustomer } from '../../../actions/customer';
 // import { getAllListings } from '../../../actions/adminListings'
 // import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
-import Shape from '../../../assets/img/Shape.svg'
-import icon from '../../../assets/img/icon.png'
 
 
 const useStyles = makeStyles(theme =>({
@@ -99,7 +97,7 @@ const useStyles = makeStyles(theme =>({
   },
 
   paperBx: {
-    marginRight: theme.spacing(5),
+    // marginRight: theme.spacing(5),
     // padding: [[theme.spacing(1), theme.spacing(2)]],
     border: `1px solid #E8E9EA`,
     outline: 'none',
@@ -190,10 +188,10 @@ const useStyles = makeStyles(theme =>({
     width: '50%',
     alignSelf: 'flex-start',
     paddingTop: '20px',
-    paddingLeft: '25px',
+    paddingLeft: '15px',
 
     '& h6:not(:last-child)': {
-      marginBottom: '25px'
+      marginBottom: '20px'
     },
   },
 
@@ -205,19 +203,20 @@ const useStyles = makeStyles(theme =>({
   },
 
   walletIcon: {
-    width: 40,
+    width: '1.2vw',
   },
 
   walletCurrency: {
     display: 'flex',
     alignItems: 'center',
-    gap: theme.spacing(2),
-    color: 'black'
+    gap: theme.spacing(1.2),
+    color: 'black',
+    fontSize: '.6vw'
   },
 
   walletAmount: {
-    paddingLeft: 51,
-    fontSize: '1.5rem',
+    paddingLeft: 30,
+    fontSize: '1vw',
     fontWeight: 'bold',
 
   },
@@ -445,45 +444,6 @@ const TransactionDetails = () => {
             </div>
 
           </Paper>
-        </Box>
-
-        {/* <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} />  */}
-        
-        <Box component="div" className={classes.detail}>
-          <div className={classes.subDetailTitle}>
-            <Typography color="primary" variant="h6">Wallets</Typography>
-          </div>
-          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle="true">
-            <div className={classes.cardLeftContent}>
-              <Typography className={classes.walletCurrency} variant="subtitle2">
-                <img className={classes.walletIcon} alt="icon" src={icon} />
-                EUR WALLET
-              </Typography>
-
-              <Typography className={classes.walletAmount} variant="h6">
-                EUR 5000
-              </Typography>
-            </div>
-            <Box component="div">
-              <img className={classes.walletDesign} src={Shape} alt="wallet design" />
-            </Box>
-          </Paper>
-          <Paper className={classes.paperWalletCard} elevation={3} variant="outlined" rectangle="true">
-            <div className={classes.cardLeftContent}>
-              <Typography className={classes.walletCurrency} variant="subtitle2">
-                <img className={classes.walletIcon} alt="icon" src={icon} />
-                EUR WALLET
-              </Typography>
-
-              <Typography className={classes.walletAmount} variant="h6">
-                EUR 5000
-              </Typography>
-            </div>
-            <Box component="div">
-              <img className={classes.walletDesign} src={Shape} alt="wallet design" />
-            </Box>
-          </Paper>
-
         </Box>
       </Box>
     </Box>

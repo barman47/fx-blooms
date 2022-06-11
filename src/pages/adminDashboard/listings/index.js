@@ -444,7 +444,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function valuetext(value) {
-    // console.log('valueText', value)
     return `${value}°C`;
   }
 
@@ -749,7 +748,7 @@ const Listings = () => {
 
     return (
     <>
-        <section className={classes.root}>
+        <section className={clsx(classes.root, 'animate__animated animate__fadeInLeft')}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
                     {tab === ALL_LISTINGS && <Typography variant="body1" className={classes.title}>All Listings</Typography>}
@@ -931,7 +930,7 @@ const Listings = () => {
                             {
                                 viewMoreData.bids.map((listing, index) => {
                                 return (
-                                <Box key={index} component="div" className={classes.viewMoreBids}>
+                                <Box key={index} component="div" className={clsx(classes.viewMoreBids, 'animate__animated animate__zoomIn')}>
                                     <Box component="div" className={classes.circleDesign}>
                                         <Box component="div" className={clsx(classes.circle, classes.status, handleStatus(listing.status))}></Box>
                                         <Box component="div" className={classes.line}></Box>    

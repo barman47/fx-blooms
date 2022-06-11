@@ -1,7 +1,8 @@
 import axios from 'axios';
+import $ from "jquery";
 
 import handleError from '../utils/handleError';
-import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS } from './types';
+import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_VALIDATION, GET_ERRORS } from './types';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const API = `${process.env.REACT_APP_WALLET_API}`;
@@ -9,8 +10,9 @@ const URL = `${API}/account-management`;
 
 export const addAccount = (account) => async (dispatch) => {
     try {
+        const { first, second, third, fourth, ...rest } = account;
         await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/accounts/add`, account);
+        const res = await axios.post(`${URL}/accounts/add`, { ...rest, pin: `${first}${second}${third}${fourth}`});
         dispatch({
             type: ADDED_ACCOUNT,
             payload: {
@@ -27,11 +29,12 @@ export const editAccount = (account, accountId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/accounts/${accountId}/edit`, account);
+        console.log(res);
         dispatch({
             type: EDITED_ACCOUNT,
             payload: {
                 msg: 'Bank account has been updated successfully!',
-                account: res.data
+                account: res.data.data
             }
         });
     } catch (err) {
@@ -45,7 +48,7 @@ export const getAccounts = (customerId) => async (dispatch) => {
         const res = await axios.get(`${URL}/customers/${customerId}/accounts`);
         dispatch({
             type: SET_ACCOUNTS,
-            payload: res.data
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -58,7 +61,7 @@ export const getAccount = (accountId) => async (dispatch) => {
         const res = await axios.get(`${URL}/accounts/${accountId}`);
         dispatch({
             type: SET_ACCOUNT,
-            payload: res.data
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -74,5 +77,39 @@ export const deleteAccount = (accountId) => async (dispatch) => {
         });
     } catch (err) {
         return handleError(err, dispatch);
+    }
+}
+
+export const validateIban = (iban) => async (dispatch) => {
+    try {
+        $.ajax({
+            url: `https://api.ibanapi.com/v1/validate/${iban}?api_key=${process.env.REACT_APP_IBAN_API_KEY}`,
+            dataType: 'jsonp',
+            success: function (res) {
+                const validationData = {
+                    message: res.message,
+                    valid: res.result === 200 ? true : false,
+                    bank: res.result === 200 ? res.data.bank : {},
+                };
+                return dispatch({
+                    type: SET_ACCOUNT_VALIDATION,
+                    payload: validationData
+                });
+            },
+            error: function (err) {
+                console.error(err);
+                return dispatch({
+                    type: GET_ERRORS,
+                    payload: {  msg: 'Something went wrong.' }
+                });
+            },
+            method: 'get',
+        });
+    } catch (err) {
+        console.error(err);
+        return dispatch({
+            type: GET_ERRORS,
+            payload: {  msg: 'Something went wrong. Please try again.' }
+        });
     }
 }

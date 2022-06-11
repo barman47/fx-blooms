@@ -278,7 +278,7 @@ const Customers = (props) => {
     const [filter, setFilter] = useState(ALL_CUSTOMERS);
     const [anchorEl, setAnchorEl] = useState(null);
     const [pageNumberList, setPageNumberList] = useState([])
-    const [ currentPage, setCurrentPage ] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1)
     const [customerStatus, setStatus] = useState(customer.customerStatus)
     // const paginationRange  = usePagination({pageNumber, currentPage, siblingCount, pageSize})
     const [openXport, closeXport] = useState(false);
@@ -690,7 +690,7 @@ const Customers = (props) => {
                 </Alert>
             }
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <section className={classes.root}>
+            <section className={clsx(classes.root, 'animate__animated animate__fadeInLeft')}>
                 <Grid container direction="row" justifyContent="space-between">
                     <Grid item>
                         <Typography variant="body1" className={classes.title}>All Users</Typography>
@@ -776,73 +776,7 @@ const Customers = (props) => {
                         />
                     }
                 </Box>
-                {/* <TableContainer className={classes.table}>
-                    <Table stickyHeader aria-label="sticky table" style={{ width: '100%' }}>
-                        <TableHead>
-                            <TableRow className={classes.tableHeader}>
-                                {columns.map((column, i) => (
-                                    <TableCell
-                                        key={i}
-                                        // align={column.align}
-                                        style={{ background: 'transparent', minWidth: column.minWidth, fontWeight: 'bold',  }}
-                                    >
-                                        {column.label}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        </TableHead>
-                        <TableBody className={classes.content}>
-                            {filter === NO_PROFILE && 
-                                <NoProfileCustomers 
-                                    handleClick={handleClick} 
-                                    handleSetTitle={handleSetTitle} 
-                                    viewCustomerProfile={viewCustomerProfile} 
-                                />
-                            }
-                            {filter === SUSPENDED && 
-                                <SuspendedCustomers 
-                                    handleClick={handleClick} 
-                                    handleSetTitle={handleSetTitle} 
-                                    viewCustomerProfile={viewCustomerProfile}
-                                />
-                            }
-                            {filter === CONFIRMED && 
-                                <VerifiedCustomers 
-                                    handleClick={handleClick} 
-                                    handleSetTitle={handleSetTitle} 
-                                    viewCustomerProfile={viewCustomerProfile}
-                                />
-                            }
-                            {filter === REJECTED && 
-                                <RejectedCustomers 
-                                    handleClick={handleClick} 
-                                    handleSetTitle={handleSetTitle} 
-                                    viewCustomerProfile={viewCustomerProfile}
-                                />
-                            }
-                            {filter === ALL_CUSTOMERS && 
-                                <AllCustomers 
-                                    handleClick={handleClick} 
-                                    handleSetTitle={handleSetTitle}
-                                    viewCustomerProfile={viewCustomerProfile}
-                                />
-                            }
-                        </TableBody>
-                    </Table>
-                </TableContainer> */}
-                    {/* <TablePagination
-                        rowsPerPageOptions={pages}
-                        component="div"
-                        count={customerCount}
-                        rowsPerPage={rowsPerPage}
-                        page={page}
-                        onPageChange={handleChangePage}
-                        onRowsPerPageChange={handleChangeRowsPerPage}
-                        classes={{
-                            root: classes.pagination
-                        }}
-                    /> */}
-                {/* </Paper> */}
+                
                 <Menu
                     id="customer-menu"
                     anchorEl={anchorEl}

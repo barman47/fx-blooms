@@ -12,7 +12,7 @@ import {
     MenuItem,
     // Select,
     // Switch,
-    // TextField,
+    TextField,
     Typography, 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -386,7 +386,6 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
         if (!editable) {
             setAddress(address);
             setStatus(customer.customerStatus);
-            // setRemarks('')
             setOccupation(occupation);
             setRiskProfile(riskProfile);
             setRemarks(remarks);
@@ -589,7 +588,7 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                     <AmlBoard classes={classes} amlTitle={"Middle Name"} amlNumber={middleName} />
                     <AmlBoard classes={classes} amlTitle={"Last Name"} amlNumber={lastName} />
                     <AmlBoard classes={classes} amlTitle={"Date of Birth"} amlNumber={dateOfBirth} />
-                    <AmlBoard editable={editable} classes={classes} amlTitle={"Phone Number"} amlNumber={phoneNumber} formField={<GenericTextField textTitle="phoneNumber" inputValue={phoneNumber} handleOnChange={setPhoneNumber} errors={errors} errorValue={phoneNumber} placeHolder={phoneNumber} />} />
+                    <AmlBoard editable={editable} classes={classes} amlTitle={"Phone Number"} amlNumber={phoneNumber} formField={<GenericTextField textTitle="phoneNumber" inputType="number" inputValue={phoneNumber} handleOnChange={setPhoneNumber} errors={errors} errorValue={phoneNumber} placeHolder={phoneNumber} />} />
                     <AmlBoard classes={classes} amlTitle={"Email"} amlNumber={email} />
                     <AmlBoard classes={classes} amlTitle={"Client since"} amlNumber={'20.04.2020'} />
                     <AmlBoard classes={classes} amlTitle={"Nationality"} amlNumber={nationality} />
@@ -615,259 +614,19 @@ const PersonalDetails = ({ getIdCardValidationResponse, getResidencePermitValida
                 <Typography variant="h5">Remarks</Typography>
 
                 <Typography component="p">Previous remarks go here</Typography>
-
-                <textarea disabled={!editable} id="txtid" name="txtname" rows="10" cols="60" className={classes.remarkArea}></textarea>
-            </Box>
-
-
-            {/* <Box component="section" className={classes.root}>
-                <form onSubmit={onSubmit} noValidate className={classes.form}>
-                    <Box component="div" className={classes.box}>
-                        <Box component="header">
-                            <FormControlLabel
-                                value="top"
-                                control={<Switch color="primary" />}
-                                label="Personal Details"
-                                labelPlacement="start"
-                            />
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="h6">User Status</Typography>
-                            {status === CONFIRMED ? (
-                                <Box component="div" className={classes.statusButtonContainer}>
-                                    <Typography variant="h5" color="primary" style={{ fontWeight: 600 }}>{status}</Typography> 
-                                    {(status === CONFIRMED || status === NO_PROFILE) &&
-                                        <Button 
-                                            variant="outlined" 
-                                            color="secondary" 
-                                            size="small" 
-                                            disableRipple 
-                                            disableFocusRipple 
-                                            disableTouchRipple
-                                            onClick={suspendCustomer}
-                                        >
-                                            Suspend Customer
-                                        </Button>
-                                    }
-                                </Box>
-                                )
-                                :
-                                <Box component="div" className={classes.statusButtonContainer}>
-                                    <Typography variant="h5" color="error" style={{ fontWeight: 600 }}>{status}</Typography>
-                                    <Button 
-                                        variant="contained" 
-                                        color="primary" 
-                                        size="small" 
-                                        disableRipple 
-                                        disableFocusRipple 
-                                        disableTouchRipple
-                                        onClick={confirmCustomer}
-                                    >
-                                        Unsuspend Customer
-                                    </Button> 
-                                </Box>
-                            }
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>First Name</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{firstName}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Last Name</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{lastName}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Username</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{userName}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Occupation</Typography>
-                            {editable ? 
-                                <TextField 
-                                    className={classes.input}
-                                    value={occupation || ''}
-                                    onChange={(e) => setOccupation(e.target.value)}
-                                    type="text"
-                                    variant="outlined" 
-                                    placeholder="Enter Occupation"
-                                    helperText={errors.occupation}
-                                    fullWidth
-                                    required
-                                    error={errors.occupation ? true : false}
-                                />
-                                :
-                                <Typography variant="subtitle2" className={classes.info}>{occupation}</Typography>    
-                            }
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Address</Typography>
-                            {editable ? 
-                                <TextField 
-                                    className={classes.input}
-                                    value={address || ''}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    type="text"
-                                    variant="outlined" 
-                                    placeholder="Enter Address"
-                                    helperText={errors.address}
-                                    fullWidth
-                                    required
-                                    error={errors.address ? true : false}
-                                />
-                                :
-                                <Typography variant="subtitle2" className={classes.info}>{address}</Typography>    
-                            }
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Postal Code</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{postalCode}</Typography>    
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.box}>
-                        <Box component="div" className={classes.buttonContainer}>
-                            <Button 
-                                variant="outlined" 
-                                color="primary" 
-                                size="small" 
-                                className={classes.button}
-                                disabled={loading}
-                            >
-                                CONTACT
-                            </Button>
-                            <Button 
-                                variant="outlined" 
-                                color="primary" 
-                                size="small" 
-                                className={classes.button}
-                                onClick={() =>setEditable(true)}
-                                disabled={loading || editable ? true : false}
-                            >
-                                EDIT
-                            </Button>
-                            <Button 
-                                variant="outlined" 
-                                color="primary" 
-                                size="small" 
-                                className={classes.button}
-                                disabled={loading || !editable ? true : false}
-                                onClick={onSubmit}
-                                type="submit"
-                            >
-                                SAVE
-                            </Button>
-                        </Box>
-                        <br />
-                        <br />
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Middle Names</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{middleName}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Date of Birth</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{dateOfBirth}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Email</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{email}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Nationality</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{nationality}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>City</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{city}</Typography>    
-                        </Box>
-                    </Box>
-                    <Box component="div" className={classes.box}>
-                        <Avatar variant="square" alt="Avatar" src={avatar} className={classes.avatar} />
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Phone Number</Typography>
-                            {editable ? 
-                                <TextField 
-                                    className={classes.input}
-                                    value={phoneNumber || ''}
-                                    onChange={(e) => setPhoneNumber(e.target.value)}
-                                    type="text"
-                                    variant="outlined" 
-                                    placeholder="Enter Phone Number"
-                                    helperText={errors.phoneNumber}
-                                    fullWidth
-                                    required
-                                    error={errors.phoneNumber ? true : false}
-                                />
-                                :
-                                <Typography variant="subtitle2" className={classes.info}>{phoneNumber}</Typography>    
-                            }
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Client Since</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{moment(customer?.createdOn).format('DD.MM.YYYY')}</Typography>    
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Risk Profile</Typography>
-                            {editable ? 
-                                <FormControl 
-                                    variant="outlined" 
-                                    error={errors.riskProfile ? true : false } 
-                                    fullWidth 
-                                    required
-                                    disabled={loading ? true : false}
-                                >
-                                    <Select
-                                        labelId="riskProfile"
-                                        value={riskProfile}
-                                        onChange={(e) => setRiskProfile(e.target.value)}
-                                    
-                                    >
-                                        <MenuItem value="" disabled selected>Select Risk Profile</MenuItem>
-                                        {RISK_PROFILES.map((item, index) => (
-                                            <MenuItem key={index} value={item}>{item}</MenuItem>
-                                        ))}
-                                    </Select>
-                                    <FormHelperText>{errors.riskProfile}</FormHelperText>
-                                </FormControl>
-                                :
-                                <Typography variant="subtitle2" className={classes.info}>{riskProfile}</Typography>    
-                            }
-                        </Box>
-                        <Box component="div">
-                            <Typography variant="subtitle2" component="span" className={classes.label}>Country</Typography>
-                            <Typography variant="subtitle2" className={classes.info}>{country}</Typography>    
-                        </Box>
-                    </Box>
-                </form>
-                <form className={classes.remarkContainer} noValidate>
-                    <Typography variant="subtitle2" className={classes.info}>Remark</Typography>
-                    <br />
-                    {customer.remarks}
-                    <br /><br />
-                    <TextField 
-                        className={classes.input}
-                        value={remarks || ''}
-                        onChange={(e) => setRemarks(e.target.value)}
-                        type="text"
-                        multiline
-                        minRows={3}
-                        variant="outlined" 
-                        placeholder="Add new remark"
-                        helperText={errors.remarks}
-                        fullWidth
-                        required
-                        error={errors.remarks ? true : false}
+        
+                <GenericTextField 
+                    textTitle="Remarks" 
+                    inputValue={remarks} 
+                    handleOnChange={setRemarks} 
+                    errors={errors} 
+                    errorValue={remarks} 
+                    placeHolder="Remarks" 
+                    isMultiline={true}
+                    mnRows={15}
+                    isReadOnly={!editable}
                     />
-                    <Button 
-                        variant="outlined" 
-                        type="submit" 
-                        color="primary" 
-                        onClick={saveRemark} 
-                        className={classes.saveRemarkButton}
-                        disabled={loading || !editable ? true : false}
-                    >
-                        Save
-                    </Button>
-                </form>
-            </Box> */}
+            </Box>
         </>
     );
 };

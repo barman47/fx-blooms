@@ -12,7 +12,7 @@ const useStyles = makeStyles(theme => ({
       gap: '10px',
       outline: 'none',
       padding: '5px 10px',
-      width: 'max-content',
+      
       // border: 'none',
       borderRadius: '5px',
       cursor: 'pointer',
@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   }
 }))
 
-const GenericButton = ({ padding, buttonName, children, isDisabled, clickAction, fontColor, bgColor, fontsize, bxShadw, bdaColor }) => {
+const GenericButton = ({ center, padding, textalign, btnHeight, btnWidth="max-content", buttonName, children, isDisabled, clickAction, fontColor, bgColor, fontsize, bxShadw, bdaColor }) => {
 
   const classes = useStyles()
 
@@ -47,12 +47,16 @@ const GenericButton = ({ padding, buttonName, children, isDisabled, clickAction,
       color: fontColor ?? '#3C4257', 
       backgroundColor: bgColor ?? 'white', 
       boxShadow: bxShadw ?? '1px 1px 1px #dbdddd',
-      padding: padding ?? '' 
+      padding: padding ?? '',
+      width: btnWidth,
+      height: btnHeight,
+      alignItems: center ? 'center' : '',
+      justifyContent: center ? 'center' : ''
     }} 
       disabled={isDisabled} className={handleDisabled}
       >
         { children ? <Typography>{ children }</Typography> : ''}
-        <Typography style={{ fontSize: fontsize ?? '17.6px'}} >{ buttonName }</Typography>     
+        <Typography component="span" style={{ fontSize: fontsize ?? '17.6px', textAlign: textalign }} >{ buttonName }</Typography>     
       </button>
     </Box>
   )

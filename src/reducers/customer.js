@@ -10,13 +10,11 @@ import {
     SET_CUSTOMER,
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
-    SET_RESIDENCE_PERMIT,
-    SET_ID_VERIFICATION_LINK,
-    SET_PERMIT_URL,
     SET_EMAIL,
     PROFILE_UPDATED,
     VERIFIED_PHONE_NUMBER,
-    RESET_CUSTOMER_SESSION
+    RESET_CUSTOMER_SESSION,
+    SETUP_PIN
 } from '../actions/types';
 
 const initialState = {
@@ -108,24 +106,6 @@ const customerReducer =  (state = initialState, action) => {
                 msg: 'Now other users can see your telephone number'
             };
 
-        case SET_RESIDENCE_PERMIT:
-            return {
-                ...state,
-                hasProvidedResidencePermit: true
-            };
-
-        case SET_PERMIT_URL:
-            return {
-                ...state,
-                residencePermitUrl: action.payload
-            };
-
-        case SET_ID_VERIFICATION_LINK:
-            return {
-                ...state,
-                idVerificationLink: action.payload
-            };
-
         case PROFILE_UPDATED:
             return {
                 ...state,
@@ -141,6 +121,12 @@ const customerReducer =  (state = initialState, action) => {
                 phoneNo: action.payload.phoneNumber,
                 isPhoneNumberVerified: true
 
+            };
+
+        case SETUP_PIN:
+            return {
+                ...state,
+                hasSetPin: action.payload
             };
 
         case RESET_CUSTOMER_SESSION:

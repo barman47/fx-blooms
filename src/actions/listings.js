@@ -13,6 +13,7 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
@@ -147,12 +148,11 @@ export const deleteListing = (listingId) => async (dispatch) => {
     }
 };
 
-
-
 export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
+        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({
@@ -238,9 +238,15 @@ export const addBid = (bid, listing) => async (dispatch) => {
 export const madePayment = (data) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
-        return dispatch({
-            type: SET_AS_ACCEPTED,
-            payload: data.listingId
+        batch(() => {
+            dispatch({
+                type: SET_AS_ACCEPTED,
+                payload: data.listingId
+            });
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: 'Payment made successfully'
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -254,7 +260,10 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
             type: REMOVE_NOTIFICATION,
             payload: notificationId
         });
-
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: 'Payment made successfully'
+        });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
         return handleError(err, dispatch);
@@ -289,9 +298,15 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
-        dispatch({
-            type: REMOVE_NOTIFICATION,
-            payload: notificationId
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'Payment confirmed successfully'
+            });
+            dispatch({
+                type: REMOVE_NOTIFICATION,
+                payload: notificationId
+            });
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {

@@ -20,16 +20,17 @@ import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getInstitutions } from '../../../actions/institutions';
-import { fundWallet } from '../../../actions/wallets';
-import { GET_ERRORS } from '../../../actions/types';
+import { requestWalletFunding } from '../../../actions/wallets';
+import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
 import { COLORS } from '../../../utils/constants';
-import getAccountId from '../../../utils/getAccountId';
+import getAccount from '../../../utils/getAccount';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
+import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 
 import yapily from '../../../assets/img/yapily.png';
@@ -130,7 +131,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -140,12 +141,13 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     const { institutions, currencies, customer } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
-    const [currency, setCurrency] = useState('EUR');
+    const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
     const [institution, setInstitution] = useState('');
+    const [institutionId, setInstitutionId] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    // eslint-disable-next-line
+
     const [loading, setLoading] = useState(false);
     // eslint-disable-next-line
     const [errors, setErrors] = useState({});
@@ -160,6 +162,11 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
         if (institutions.length === 0) {
             getInstitutions()
         }
+
+        dispatch({
+            type: SET_FUNDING_REQUEST,
+            payload: {}
+        });
         // eslint-disable-next-line
     }, []);
 
@@ -190,13 +197,17 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+        const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
         const data = {
-            institutionId: institution,
+            institutionId: institutionId,
+            institution: institution,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
             walletId: wallet.id,
-            accountId: sourceAccount ? getAccountId(sourceAccount, accounts) : '',
+            accountId: sourceAccount ? accountID : '',
+            accountName: sourceAccount ? accountName : '',
+            accountNumber: sourceAccount ? accountNumber : '',
             reference: "WALLET FUNDING"
         };
 
@@ -205,9 +216,8 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid funding data!' });
         }
-        console.log(data);
         setLoading(true);
-        fundWallet(data);
+        requestWalletFunding(data, navigate);
     };
 
     return (
@@ -221,12 +231,13 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                     type="error"
                 />
             }
+            {loading && <Spinner />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Amount to fund wallet with</Typography>
-                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={2}>
+                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={1}>
                         <Grid item xs={4} lg={3}>
                             <FormControl 
                                 variant="outlined" 
@@ -238,13 +249,14 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 <Select
                                     labelId="currency"
                                     value={currency}
-                                    onChange={(e) => setCurrency(e.target.value)}
+                                    // onChange={(e) => setCurrency(e.target.value)}
                                 
                                 >
-                                    <MenuItem value="" disabled>Select Currency</MenuItem>
-                                    {currencies.length > 0 && currencies.map((currency, index) => (
+                                    {/* <MenuItem value="" disabled>Select Currency</MenuItem> */}
+                                    <MenuItem value={currency} selected>{currency}</MenuItem>
+                                    {/* {currencies.length > 0 && currencies.map((currency, index) => (
                                         <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
-                                    ))}
+                                    ))} */}
                                 </Select>
                                 <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                             </FormControl>
@@ -265,6 +277,9 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 fullWidth 
                                 helperText={errors.amount}
                             />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <FormHelperText>Transaction Fee, &#8364;1</FormHelperText>
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Select Source Account</Typography>
@@ -313,7 +328,8 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 autoHighlight
                                 disableClearable
                                 getOptionLabel={(option) => {
-                                    setInstitution(option.id);
+                                    setInstitutionId(option.id);
+                                    setInstitution(option.fullName);
                                     return option.fullName;
                                 }}
                                 renderOption={(option) => (
@@ -417,7 +433,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                     </Grid>
                     <Grid item xs={12} className={classes.note}>
                         <Security className={classes.icon} />
-                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily. Your information is used for indetity verification only and will be kept secure by Yapily.</Typography>
+                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
                     </Grid>
                 </form>
             </Box>
@@ -428,7 +444,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
     getInstitutions: PropTypes.func.isRequired,
-    fundWallet: PropTypes.func.isRequired
+    requestWalletFunding: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { fundWallet, getCurrencies, getInstitutions })(FundWallet);
+export default connect(undefined, { requestWalletFunding, getCurrencies, getInstitutions })(FundWallet);

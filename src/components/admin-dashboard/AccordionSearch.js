@@ -36,7 +36,7 @@ const AccordionSearch = ({ viewCustomerProfile, searchText, customers, loading }
               loading ? <CircularProgressBar topMargin="10px" /> :
               customers.items && customers.items.map((custmer, i) => (
                   <AccordionDetails key={i} onClick={() => viewCustomerProfile(custmer)} >
-                      <Typography>
+                      <Typography style={{ cursor: 'pointer' }}>
                           { custmer.firstName ? custmer.firstName : custmer.email }
                       </Typography>
                   </AccordionDetails>

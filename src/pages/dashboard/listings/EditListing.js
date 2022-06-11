@@ -23,7 +23,6 @@ import Toast from '../../../components/common/Toast';
 import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
-import { getResidencePermitLink } from '../../../actions/customer';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, updateListing } from '../../../actions/listings';
 import { UPDATED_LISTING, GET_ERRORS } from '../../../actions/types';
@@ -33,7 +32,7 @@ import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateEditListing from '../../../utils/validation/listing/edit';
 import PendingIdModal from './PendingIdModal';
-import ResidencePermitModal from './ResidencePermitModal';
+import IDVerificationModal from './IDVerificationModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
@@ -155,20 +154,19 @@ const EditListing = (props) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const { residencePermitStatus } = useSelector(state => state.customer.stats);
+    const { idStatus } = useSelector(state => state.customer.stats);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { currencies } = useSelector(state => state);
-    const { customerId, residencePermitUrl } = useSelector(state => state.customer);
+    const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { editedListing, listing, listings, msg, recommendedRate } = useSelector(state => state.listings);
 
-    const { getAccounts, getCurrencies, getResidencePermitLink, handleSetTitle, updateListing } = props;
+    const { getAccounts, getCurrencies, handleSetTitle, updateListing } = props;
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    const [showResidencePermitModal, setShowResidencePermitModal] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('EUR');
+    const [AvailableCurrency, setAvailableCurrency] = useState('');
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
@@ -179,19 +177,17 @@ const EditListing = (props) => {
     const [ReceivingAccount, setReceivingAccount] = useState('');
 
     const [ReceiptAmount, setReceiptAmount] = useState('');
-    // eslint-disable-next-line
-    const [ListingFee, setListingFee] = useState('');
+    const [ListingFee,] = useState('');
 
     const [Bank, setBank] = useState('');
     const [reference, setReference] = useState('');
 
     const [previousListings, setPreviousListings] = useState([]);
 
-    const [permitUrl, setPermitUrl] = useState('');
-
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const idVerificationModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
@@ -201,12 +197,8 @@ const EditListing = (props) => {
     useEffect(() => {
         handleSetTitle('Edit Listing');
 
-        if (residencePermitStatus === REJECTED || residencePermitStatus === NOT_SUBMITTED) {
-            getResidencePermitLink();
-        }
-
-        if (residencePermitStatus !== APPROVED) {
-            checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            checkIdStatus();
         }
 
         if (accounts.length === 0) {
@@ -238,12 +230,6 @@ const EditListing = (props) => {
             });
         }
     }, [dispatch, errorsState, errors]);
-
-    useEffect(() => {
-        if (residencePermitUrl) {
-            setPermitUrl(residencePermitUrl);
-        }
-    }, [residencePermitUrl]);
 
     useEffect(() => {
         if (currencies.length === 0) {
@@ -370,8 +356,8 @@ const EditListing = (props) => {
     //     setOpenAccountModal(true);
     // };
 
-    const checkResidencePermitStatus = () => {
-        switch (residencePermitStatus) {
+    const checkIdStatus = () => {
+        switch (idStatus) {
             case APPROVED:
                 break;
 
@@ -380,24 +366,16 @@ const EditListing = (props) => {
                 break;
 
             case REJECTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.opneModal();
                 break;
 
             case NOT_SUBMITTED:
-                setShowResidencePermitModal(true);
+                idVerificationModal.current.opneModal();
                 break;
 
             default:
                 break;
         }
-    };
-
-    // const handleCloseAccountModalModal = () => {
-    //     setOpenAccountModal(false);
-    // };
-
-    const handleCloseResidencePermitModal = () => {
-        setShowResidencePermitModal(false);
     };
     
     const handleClosePendingIdModal = () => {
@@ -450,8 +428,8 @@ const EditListing = (props) => {
             return setErrors({ ...errors, msg: 'Invalid data' });
         }
 
-        if (residencePermitStatus !== APPROVED) {
-            return checkResidencePermitStatus();
+        if (idStatus !== APPROVED) {
+            return checkIdStatus();
         }
 
         setErrors({});
@@ -499,7 +477,7 @@ const EditListing = (props) => {
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={true} />}
             <section className={classes.root}>
                 <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-                <ResidencePermitModal open={showResidencePermitModal} handleCloseModal={handleCloseResidencePermitModal} url={permitUrl} />
+                <IDVerificationModal ref={idVerificationModal} />
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
@@ -645,46 +623,48 @@ const EditListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid> */}
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
-                                    <FormControl 
-                                        variant="outlined" 
-                                        error={errors.ReceivingAccount ? true : false } 
-                                        fullWidth 
-                                        required
-                                        disabled={loading ? true : false}
-                                    >
-                                        <Select
-                                            labelId="ReceivingAccount"
-                                            value={ReceivingAccount}
-                                            onChange={(e) => setReceivingAccount(e.target.value)}
-                                        >
-                                            <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                            {AvailableCurrency === 'EUR' ?
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'NGN') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                             : 
-                                                accounts.map((account) => {
-                                                    if (account.currency === 'EUR') {
-                                                        return (
-                                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                                        );
-                                                    }
-                                                    return null;
-                                                })
-                                            }
-                                        </Select>
-                                        <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
-                                    </FormControl>
-                                    <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                                </Grid>
                                 {AvailableCurrency === 'EUR' && 
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span" className={classes.helperText}>Receiving Account</Typography>
+                                        <FormControl 
+                                            variant="outlined" 
+                                            error={errors.ReceivingAccount ? true : false } 
+                                            fullWidth 
+                                            required
+                                            disabled={loading ? true : false}
+                                        >
+                                            <Select
+                                                labelId="ReceivingAccount"
+                                                value={ReceivingAccount}
+                                                onChange={(e) => setReceivingAccount(e.target.value)}
+                                            >
+                                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
+                                                {AvailableCurrency === 'EUR' ?
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'NGN') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                : 
+                                                    accounts.map((account) => {
+                                                        if (account.currency === 'EUR') {
+                                                            return (
+                                                                <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
+                                                            );
+                                                        }
+                                                        return null;
+                                                    })
+                                                }
+                                            </Select>
+                                            <FormHelperText>{errors.ReceivingAccount}</FormHelperText>
+                                        </FormControl>
+                                        <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
+                                    </Grid>
+                                }
+                                {/* {AvailableCurrency === 'EUR' && 
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
                                         <FormControl 
@@ -708,20 +688,22 @@ const EditListing = (props) => {
                                             <FormHelperText>{errors.Bank}</FormHelperText>
                                         </FormControl>
                                     </Grid>
+                                } */}
+                                {AvailableCurrency === 'EUR' &&
+                                    <Grid item xs={12}>
+                                        <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
+                                        <TextField 
+                                            value={reference}
+                                            placeholder="Enter Payment Reference"
+                                            onChange={(e) => setReference(e.target.value)}
+                                            disabled={loading ? true : false}
+                                            type="text"
+                                            variant="outlined" 
+                                            fullWidth
+                                        />
+                                        <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
+                                    </Grid>
                                 }
-                                <Grid item xs={12}>
-                                    <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
-                                    <TextField 
-                                        value={reference}
-                                        placeholder="Enter Payment Reference"
-                                        onChange={(e) => setReference(e.target.value)}
-                                        disabled={loading ? true : false}
-                                        type="text"
-                                        variant="outlined" 
-                                        fullWidth
-                                    />
-                                    <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                                </Grid>
                                 <Grid item xs={12}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I will receive</Typography>
                                     <Tooltip title="This is the amount you will receive in your bank account." aria-label="Amount to Receive" arrow>
@@ -787,8 +769,7 @@ EditListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
-    getResidencePermitLink: PropTypes.func.isRequired,
     updateListing: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getResidencePermitLink, updateListing })(EditListing);
+export default connect(undefined, { addListing, getAccounts, getCurrencies, updateListing })(EditListing);

@@ -348,7 +348,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
     // const [loadingText, setLoadingText] = useState('One Moment . . .');
     const [open, setOpen] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [errors, setErrors] = useState({});
+    // const [errors, setErrors] = useState({});
 
     const links = [
         { url : ADMIN_HOME, text:'Dashboard', icon: <ViewDashboard /> },
@@ -412,7 +412,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
         e.preventDefault();
         setSearchText(e.target.value)
         if (isEmpty(searchText)) {
-            return setErrors({ searchText: 'Please enter a search term' });
+            // return setErrors({ searchText: 'Please enter a search term' });
             // return
         }
         // setLoading(true);
@@ -449,7 +449,7 @@ const AdminDashboard = ({ title, getCustomers, getStats, searchForCustomer, logo
                                     placeholder="Search . . ."
                                     value={searchText}
                                     onChange={handleSearch}
-                                    helperText={errors.searchText}
+                                    // helperText={errors.searchText}
                                     // error={errors.searchText ? true : false}
                                     InputProps={{
                                         startAdornment: (

@@ -16,12 +16,11 @@ import {
 	useMediaQuery
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { Magnify } from 'mdi-material-ui';
-// import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
+import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
-import { getCustomerInformation, getIdVerificationLink, getCustomerStats } from '../../../actions/customer';
+import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getWallets } from '../../../actions/wallets';
@@ -34,19 +33,13 @@ import {
 	SET_REQUIRED_CURRENCY 
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
-import { CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import isEmpty from '../../../utils/isEmpty';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-import WalletInfoModal from '../wallet/WalletInfoModal';
-import FundWalletDrawer from '../wallet/FundWalletDrawer';
-import WalletWithdrawalDrawer from '../wallet/WalletWithdrawalDrawer';
 import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
-// import NewNotification from '../notifications/NewNotification';
-// import RiskNoticeModal from './RiskNoticeModal';
 
 import EUFlag from '../../../assets/img/EU-flag.svg';
 // import NGNFlag from '../../../assets/img/NGN-flag.svg';
@@ -233,7 +226,6 @@ const AllListings = (props) => {
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
-	const { idStatus } = useSelector(state => state.customer.stats);
 	const { unreadNotifications } = useSelector(state => state.notifications);
 	const { eurActive, wallets } = useSelector(state => state.wallets);
 
@@ -241,7 +233,6 @@ const AllListings = (props) => {
 		getAccounts, 
 		getCustomerInformation, 
 		getCustomerStats, 
-		getIdVerificationLink, 
 		getListingsOpenForBid, 
 		getMoreListings, 
 		getNotifications,
@@ -256,24 +247,9 @@ const AllListings = (props) => {
 	const [errors, setErrors] = useState({});
 
 	const [dataLength, setDataLength] = useState(0);
-	const [fundDrawerOpen, setFundDrawerOpen] = useState(false);
-    const [withdrawalDrawerOpen, setWithdrawalDrawerOpen] = useState(false);
-	// eslint-disable-next-line
-	const [showWallets, setShowWallets] = useState(false);
+	const [showWallets, setShowWallets] = useState(true);
 
 	let loadedEvent = useRef();
-    const walletInfoModal = useRef();
-
-	const { REJECTED } = CUSTOMER_CATEGORY;
-	const { NOT_SUBMITTED } = ID_STATUS;
-
-    const toggleFundDrawer = () => {
-        setFundDrawerOpen(!fundDrawerOpen);
-    };
-
-    const toggleWithdrawalDrawer = () => {
-        setWithdrawalDrawerOpen(!withdrawalDrawerOpen);
-    };
 
 	useEffect(() => {
 		removeExpiredListings();
@@ -290,9 +266,7 @@ const AllListings = (props) => {
 			getListings();
 		}
 
-		if (wallets.length === 0) {
-			getWallets(customerId);
-		}
+		getWallets(customerId);
 
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
@@ -325,7 +299,7 @@ const AllListings = (props) => {
 			dispatch({
 				type: SET_WALLET,
 				payload: { currency: 'EUR' }
-			});	
+			});
 		}
 	}, [dispatch, wallets]);
 
@@ -348,12 +322,6 @@ const AllListings = (props) => {
 			});
 		}
 	}, [Amount, dispatch, getListingsOpenForBid, availableCurrency, requiredCurrency]);
-
-	useEffect(() => {
-		if (idStatus === REJECTED || idStatus === NOT_SUBMITTED) {
-            getIdVerificationLink();
-        }
-	}, [getIdVerificationLink, idStatus, NOT_SUBMITTED, REJECTED]);
 
 	useEffect(() => {
 		setDataLength(listings.length);
@@ -476,9 +444,6 @@ const AllListings = (props) => {
 	return (
 		<>
 			<RiskNoticeModal />
-			{fundDrawerOpen && <FundWalletDrawer toggleDrawer={toggleFundDrawer} drawerOpen={fundDrawerOpen} />}
-            {withdrawalDrawerOpen && <WalletWithdrawalDrawer toggleDrawer={toggleWithdrawalDrawer} drawerOpen={withdrawalDrawerOpen} />}
-            <WalletInfoModal ref={walletInfoModal} />
 			<section className={classes.header}>
 				<div>
 					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
@@ -497,7 +462,7 @@ const AllListings = (props) => {
 				
 			</section>
 			<Box component="section" className={classes.root}>
-				{/* <Box component="div" className={classes.walletToggleContainer}>
+				<Box component="div" className={classes.walletToggleContainer}>
 					<Button
 						variant="text"
 						size="small"
@@ -509,7 +474,7 @@ const AllListings = (props) => {
 						>
 						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
 					</Button>
-				</Box> */}
+				</Box>
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
 						<section className={classes.wallets}>
@@ -519,33 +484,8 @@ const AllListings = (props) => {
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-							{/* <Wallet
-								type="NGN"
-								flag={NGNFlag}
-								active={ngnActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_NGN_WALLET })}
-							/>
-							<Wallet 
-								type="USD"
-								flag={USFlag}
-								active={usdActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_USD_WALLET })}
-							/>
-							<Wallet 
-								type="GPB"
-								flag={GBPFlag}
-								active={gbpActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_GPB_WALLET })}
-							/> */}
-
 						</section>
-
-						<WalletInfo 
-							availableBalance="EUR2500.62"
-							escrowedBalance="1000"
-							toggleFundDrawer={toggleFundDrawer}
-							toggleWithdrawalDrawer={toggleWithdrawalDrawer}
-						/>
+						<WalletInfo />
 					</section>
 				</Collapse>
 				<section className={classes.listings} id="scrollableParent">
@@ -668,7 +608,6 @@ AllListings.propTypes = {
 	getAccounts: PropTypes.func.isRequired,
 	getCustomerInformation: PropTypes.func.isRequired,
 	getCustomerStats: PropTypes.func.isRequired,
-	getIdVerificationLink: PropTypes.func.isRequired,
 	getListingsOpenForBid: PropTypes.func.isRequired,
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
@@ -678,7 +617,6 @@ AllListings.propTypes = {
 
 export default connect(undefined, { 
 	getAccounts, 
-	getIdVerificationLink, 
 	getCustomerInformation, 
 	getCustomerStats, 
 	getListingsOpenForBid, 

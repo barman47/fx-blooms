@@ -107,12 +107,14 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
     const { listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
+    const { wallet } = useSelector(state => state.wallets);
 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [reference, setReference] = useState('');
 
     const [errors, setErrors] = useState({});
+    // eslint-disable-next-line no-unused-vars
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
@@ -226,7 +228,8 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
         acceptOffer({
             listingId: listing.id,
             accountId: getAccountId(receivingAccount),
-            reference
+            reference,
+            walletId: wallet.id
         }, listing);
     };
 
@@ -241,7 +244,8 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 }}
                 PaperProps={{ className: classes.drawer }} 
                 anchor="right" 
-                open={loading ? true : open} 
+                open={true} 
+                // open={loading ? true : open} 
                 onClose={toggleDrawer}
             >
                 <Box component="header">
@@ -266,6 +270,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 <ol>
                     <li><Typography variant="body2" component="p">Provide an NGN receiving account.</Typography></li>
                     <li><Typography variant="body2" component="p">Enter a payment reference (OPTIONAL)</Typography></li>
+                    <li><Typography variant="body2" component="p">Accept NGN offer</Typography></li>
                 </ol>
                 <Grid container direction="row">
                     <Grid item xs={12}>

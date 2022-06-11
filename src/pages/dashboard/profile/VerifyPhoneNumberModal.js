@@ -187,6 +187,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
     };
 
     const closeModal = () => {
+        clearInterval(resendTimer.current);
         setOpen(false);
         if (dismissAction) {
             dismissAction();
@@ -249,6 +250,13 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
         startResendTimer();
     };
 
+    const handleClose = (e, reason) => {
+        if (reason === 'backdropClick') {
+            return;
+        }
+        closeModal();
+    };
+
 	return (
         <>
             {!isEmpty(errors) && 
@@ -267,7 +275,7 @@ const VerifyPhoneNumberModal = ({ dismissAction, generateOtp, isOpen, validatePh
                 open={open}
                 disableBackdropClick
                 disableEscapeKeyDown
-                onClose={() => setOpen(false)}
+                onClose={handleClose}
                 closeAfterTransition
                 BackdropComponent={Backdrop}
                 BackdropProps={{

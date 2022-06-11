@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useNavigate, Link, Outlet, useLocation } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
@@ -30,6 +30,7 @@ import clsx from 'clsx';
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
 import Toast from '../../components/common/Toast';
+import AlertNotification from './notifications/AlertNotification';
 
 import {
     Badge,
@@ -53,9 +54,9 @@ import {
     Logout, 
     MessageOutline, 
     Menu,
-    // Security,
+    Security,
     TwoFactorAuthentication,
-    // Wallet
+    Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
@@ -64,13 +65,15 @@ import {
     NOTIFICATIONS, 
     SECURITY,
     ID_VERIFICATION, 
-    // PIN, 
+    PIN, 
     TWO_FACTOR, 
     TRANSACTIONS, 
     PROFILE,
-    // WALLETS
+    WALLETS,
+    VERIFF
 } from '../../routes';
 import { 
+    ADD_ALERT_NOTIFICATION,
     ADD_NOTIFICATION,
     CUSTOMER_CANCELED, 
     PAYMENT_NOTIFICATION_BUYER_PAID, 
@@ -86,6 +89,7 @@ import {
 
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
+import { checkPin } from '../../actions/pin';
 import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
@@ -93,6 +97,7 @@ import HideOnScroll from '../../components/layout/HideOnScroll';
 import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
+// import CreateWalletModal from './wallet/CreateWalletModal';
 
 import audioFile from '../../assets/sounds/notification.mp3';
 import logo from '../../assets/img/logo.svg';
@@ -107,6 +112,24 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.down('md')]: {
             display: 'block'
         }
+    },
+
+    alertContainerClose: {
+        marginLeft: theme.spacing(9) + 1,
+        width: `calc(100% - ${theme.spacing(9) + 1}px)`,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        })
+    },
+
+    alertContainerOpen: {
+        marginLeft: drawerWidth,
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create('width', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.enteringScreen,
+        })
     },
     
     appBarContent: {
@@ -367,7 +390,7 @@ const Dashboard = (props) => {
     const matches = useMediaQuery(theme.breakpoints.down('md'));
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
-    const { connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
     const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
@@ -389,7 +412,7 @@ const Dashboard = (props) => {
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
-        // { url: WALLETS, text:'Wallets', icon: <Wallet /> },
+        { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
@@ -398,11 +421,11 @@ const Dashboard = (props) => {
 
     const securityLinks = [
         { url : ID_VERIFICATION, text: 'ID Verification', icon: <CardAccountDetailsOutline /> },
-        // { url : PIN, text: 'Set PIN', icon: <Security /> },
-        { url : TWO_FACTOR, text: '2FA Authentication', icon: <TwoFactorAuthentication /> }
+        { url : PIN, text: 'PIN', icon: <Security /> },
+        { url : TWO_FACTOR, text: '2FA', icon: <TwoFactorAuthentication /> }
     ];
 
-    const { getNotificationCount, logout, markNotificationAsRead, title } = props;
+    const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
     const customToast = useRef();
@@ -414,6 +437,7 @@ const Dashboard = (props) => {
 
     useEffect(() => {
         getNotificationCount(customerId);
+        checkPin(customerId);
         if (matches) {
             setOpen(false);
         }
@@ -462,18 +486,60 @@ const Dashboard = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+        
+    const verifyId = useCallback(() => {
+        navigate(VERIFF);
+    }, [navigate]);
+
+    const setAlertNotifications = useCallback(() => {
+        const { APPROVED } = ID_STATUS;
+        if (stats.idStatus !== APPROVED) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Verify your Identity',
+                    buttonText: 'Verify ID',
+                    buttonAction: verifyId
+                }
+            });
+        }
+            
+
+        if (!hasSetup2FA) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Add extra layer of Security',
+                    buttonText: 'Setup 2FA',
+                    buttonAction: () => navigate(TWO_FACTOR)
+                }
+            });
+        }
+    
+        if (!isPhoneNumberVerified) {
+            dispatch({
+                type: ADD_ALERT_NOTIFICATION,
+                payload: {
+                    message: 'Required to receive SMS notifications. Click Verify Phone to proceed',
+                    buttonText: 'Verify Phone',
+                    buttonAction: () => navigate(PROFILE)
+                }
+            });
+        }
+    }, [dispatch, hasSetup2FA, isPhoneNumberVerified, stats, navigate, verifyId]);
 
     useEffect(() => {
         if (!_.isEmpty(stats)) {
             if (!sessionStorage.getItem('checkedIdStatus')) {
                 sessionStorage.setItem('checkedIdStatus', 'true');
-                const { idStatus, residencePermitStatus } = stats;
-                if (residencePermitStatus === NOT_SUBMITTED && idStatus === NOT_SUBMITTED) {
+                const { idStatus } = stats;
+                if (idStatus === NOT_SUBMITTED) {
                     accountSetupModal.current.openModal();
                 }
             }
+            setAlertNotifications();
         }
-    }, [NOT_SUBMITTED, stats]);
+    }, [NOT_SUBMITTED, stats, setAlertNotifications]);
 
     useEffect(() => {
         switch (connectionStatus) {
@@ -766,6 +832,7 @@ const Dashboard = (props) => {
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
+            {/* {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />} */}
             <SessionModal />
             {connectionStatus !== CONNECTED && 
                 <Toast 
@@ -779,15 +846,24 @@ const Dashboard = (props) => {
             }
             <Toaster />
             {/* <HideOnScroll direction="down" {...props}> */}
-                <AppBar position="fixed" elevation={1} className={classes.appBar}>
-                    <Toolbar className={classes.appBarContent}>
-                        <IconButton onClick={toggleDrawer}>
-                            <Menu />
-                        </IconButton>
-                        <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
-                        <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName.charAt(0).toUpperCase()}</Avatar>
-                    </Toolbar>
-                </AppBar>
+            {(alertNotifications.length > 0 && location.pathname === DASHBOARD_HOME) && 
+                <Box className={clsx(({ [classes.alertContainerOpen]: open, [classes.alertContainerClose]: !open}))}>
+                    <AlertNotification 
+                        message={alertNotifications[0].message}
+                        buttonText={alertNotifications[0].buttonText}
+                        buttonAction={alertNotifications[0].buttonAction}
+                    />
+                </Box>
+            }
+            <AppBar position="fixed" elevation={1} className={classes.appBar}>
+                <Toolbar className={classes.appBarContent}>
+                    <IconButton onClick={toggleDrawer}>
+                        <Menu />
+                    </IconButton>
+                    <Typography variant="body2" component="span" className={classes.title}>{title}</Typography>
+                    <Avatar className={classes.avatar} onClick={() => navigate(PROFILE)}>{userName?.charAt(0)?.toUpperCase()}</Avatar>
+                </Toolbar>
+            </AppBar>
             {/* </HideOnScroll> */}
             <Box component="section" className={classes.root}>
                 <Drawer 
@@ -1006,10 +1082,11 @@ const Dashboard = (props) => {
 };
 
 Dashboard.propTypes = {
+    checkPin: PropTypes.func.isRequired,
     getNotificationCount: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
     markNotificationAsRead: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
 };
 
-export default connect(undefined, { getNotificationCount, logout, markNotificationAsRead })(Dashboard);
+export default connect(undefined, { checkPin, getNotificationCount, logout, markNotificationAsRead })(Dashboard);

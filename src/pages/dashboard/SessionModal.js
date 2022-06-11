@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { connect} from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -63,10 +63,12 @@ const SessionModal = ({ logout }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { resetSession } = useSelector(state => state.customer);
 
     const [open, setOpen] = useState(false);
+    const [path, setPath] = useState('');
     const [expired, setExpired] = useState(false);
     const [inactiveTime, setInActiveTime] = useState(0);
     const [timeToLogout, setTimeToLogout] = useState(60);
@@ -119,9 +121,10 @@ const SessionModal = ({ logout }) => {
             clearInterval(logoutTimer.current);
             logoutTimer.current = undefined;
             setExpired(true);
+            setPath(location.pathname);
             sessionStorage.setItem(LOGOUT, 'true');
         }
-    }, [timeToLogout]);
+    }, [location.pathname, timeToLogout]);
 
     useEffect(() => {
         if (resetSession === true) {
@@ -132,6 +135,14 @@ const SessionModal = ({ logout }) => {
             });
         }
     }, [dispatch, resetSession, resetSessionTimer]);
+
+    // Logout customer if he tries to navigate to another page
+    useEffect(() => {
+        if (expired && location.pathname !== path) {
+            setPath('');
+            logout(navigate, 'Your session expired due to inactivity.');
+        }
+    }, [expired, location.pathname, logout, navigate, open, path]);
 
     const startSessionTimer = () => {
         if (!sessionTimer.current) {
