@@ -43,7 +43,7 @@ import {
  } from './types';
 import extractIdDetails from '../utils/extractIdDetails';
 
- const { APPROVED } = ID_STATUS;
+const { APPROVED } = ID_STATUS;
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Customer`;
 

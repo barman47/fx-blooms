@@ -335,9 +335,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     };
 
     const handleMadepayment = () => {
-        if (isEmpty(receivingAccount)) {
-            return setErrors({ receivingAccount: 'Please select a bank account' });
-        }
         setLoading(true);
         madePayment({
             bidId: bid.id,
