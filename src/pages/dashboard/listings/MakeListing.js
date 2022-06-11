@@ -489,6 +489,10 @@ const MakeListing = (props) => {
             walletId: wallet.id
         };
 
+        if (AvailableCurrency === 'NGN') {
+            delete listing.accountID
+        }
+
         addListing(listing);
     };
 
@@ -572,7 +576,7 @@ const MakeListing = (props) => {
                                         />
                                     </Tooltip>
                                 </Grid>
-                                {!isEmpty(wallet) && 
+                                {!isEmpty(wallet) && wallet.balance.available === 0 && AvailableCurrency === 'EUR' &&
                                     <Grid item xs={12}>
                                         <FormHelperText>Wallet balance is too low! <Link to={FUND_WALLET} underline="always" component={RouterLink}>Fund Wallet</Link></FormHelperText>
                                     </Grid>
