@@ -7,9 +7,9 @@ const insitutionsReducer =  (state = initialState, action) => {
     switch (action.type) {
         case SET_INSTITUTIONS:
             return action.payload;
-            
-            default:
-                return state;
+
+        default:
+            return state;
     }
 };
 

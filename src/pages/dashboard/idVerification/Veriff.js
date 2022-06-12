@@ -8,7 +8,7 @@ import { Veriff } from '@veriff/js-sdk';
 import { createVeriffFrame } from '@veriff/incontext-sdk';
 import { Box, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { VERIFF_HOST } from '../../../utils/constants'
+import { VERIFF_HOST, CALLBACK } from '../../../utils/constants'
 
 // In this example both Web SDKs are covered. You can use either of implementations
 
@@ -71,7 +71,8 @@ function VeriffVerify() {
       //   givenName: 'egg',
       //   lastName: 'eg '
       // },
-      vendorData: customerId
+      vendorData: customerId,
+      callback: CALLBACK
     });
 
     veriff.mount({

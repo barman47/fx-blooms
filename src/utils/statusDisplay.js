@@ -1,7 +1,10 @@
-import { CUSTOMER_CATEGORY, LISTING_CATEGORY } from './constants';
+import { CUSTOMER_CATEGORY, LISTING_CATEGORY, PAYMENT_TYPE, PAYMENT_STATUS } from './constants';
 
 const { CONFIRMED, PENDING, REJECTED, SUSPENDED } = CUSTOMER_CATEGORY;
 const { OPEN, CANCELED, REMOVED } = LISTING_CATEGORY
+
+const { WITHDRAWAL, FUND } = PAYMENT_TYPE
+const { IN_PROGRESS, FAILED, COMPLETED } = PAYMENT_STATUS
 
 const handleStatusStyle = (status, classes) => {
   switch (status) {
@@ -23,6 +26,18 @@ const handleStatusStyle = (status, classes) => {
       return classes.verified
     case false:
       return classes.suspended
+    case FUND:
+      return classes.verified
+    case FAILED:
+      return classes.rejected
+    case COMPLETED:
+      return classes.verified
+    case IN_PROGRESS:
+      return classes.suspended
+    case WITHDRAWAL:
+      return classes.rejected
+    case 'Completed':
+      return classes.verified
     default:
       return
   }

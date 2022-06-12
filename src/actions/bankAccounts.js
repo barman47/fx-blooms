@@ -111,6 +111,5 @@ export const validateIban = (iban) => async (dispatch) => {
             type: GET_ERRORS,
             payload: {  msg: 'Something went wrong. Please try again.' }
         });
-        // return handleError(err, dispatch);
     }
 }

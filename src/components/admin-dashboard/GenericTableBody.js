@@ -87,6 +87,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
   const dispatch = useDispatch();
   const { CONFIRMED } = CUSTOMER_CATEGORY;
   // const [ isDisabled ] = useState(true)
+  // const [check, setCheck] = useState(false)
 
   const handleButtonClick = (customer, e) => {    
     if (!viewMore) {
@@ -100,6 +101,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
       handleClick(e);
     }
   };
+
 
   // const handleStatus = useCallback((status) => {
   //   // console.log('status', status)
@@ -123,10 +125,19 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
     return gridColumns
   }, [gridColumns])
 
-  const handleCheckBox = (e) => {
+  const handleCheckBox = (e, customer) => {
     e.preventDefault();
     e.stopPropagation();
+    // setCheck(!check)
+    // console.log(e.target.checked)
+    // console.log(customer)
   }
+
+  // const handleCheck = (e) => {
+  //   // setCheck(!check)
+  //   console.log(e)
+  // }
+
 
   const handleDisplayRow = (value) => {
     if (typeof value === 'string') {
@@ -145,7 +156,7 @@ const GenericTableBody = ({ data, handleClick, viewCustomerProfile, gridColumns,
         data && data.map((customer, i) => (
             <Box component="div" sx={{ gridTemplateColumns: handleGridColumns, padding: '1px 0px' }} className={classes.tableBodyRow} key={i} onClick={() => viewCustomerProfile(customer)} >
                 <Typography onClick={(e) => handleCheckBox(e)} component="span" className={classes.tableCell} variant="subtitle1">
-                  <FormControlLabel  onClick={(e) => handleCheckBox(e)}  control={<Checkbox name="checked" className={classes.tableCell} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
+                  <FormControlLabel control={<Checkbox name="checked" className={classes.tableCell} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
                 </Typography>
                 <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer[columnList[1]] ? formatId(customer[columnList[1]]) : ''} lines={1} />

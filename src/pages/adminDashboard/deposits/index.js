@@ -1,105 +1,74 @@
-import { useState, } from 'react';
-import { useSelector } from 'react-redux';
+import { useState, useEffect, useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Box, Typography, Menu, MenuItem, Divider } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from '../../../components/admin-dashboard/GenericTableHeader'
-import GenericSelect from '../../../components/admin-dashboard/GenericSelect'
 import DepositAndWithdrawalTable from '../../../components/admin-dashboard/DepositTable'
-import { ADMIN_FILTERS } from '../../../utils/constants';
-import { Triangle } from 'mdi-material-ui';
+// import { ADMIN_FILTERS } from '../../../utils/constants';
+// import { Triangle } from 'mdi-material-ui';
+import WithdrawalCard from '../../../components/admin-dashboard/WithdrawalCard';
+import GenericButton from '../../../components/admin-dashboard/GenericButton'
+import { getAllDeposits } from '../../../actions/wallets'
+// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 
+import clsx from 'clsx'
 
 
 const useStyles = makeStyles(theme =>({
-    root: {
-        // padding: [[theme.spacing(2), theme.spacing(3)]],
-        paddingRight: theme.spacing(8),
-        paddingLeft: theme.spacing(5),
-        paddingTop: theme.spacing(3),
-        paddingBottom: theme.spacing(12),
-  
-        [theme.breakpoints.down('sm')]: {
-            padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
-        },
-  
-        '& h6': {
-            fontWeight: 600
-        },
-        backgroundColor: '#F7F8F9'
-    },
-  
-    title: {
-      fontWeight: 600
-    },
+  root: {
+      // padding: [[theme.spacing(2), theme.spacing(3)]],
+      paddingRight: theme.spacing(8),
+      paddingLeft: theme.spacing(5),
+      paddingTop: theme.spacing(3),
+      paddingBottom: theme.spacing(12),
 
-    table: {
-        borderRadius: theme.spacing(1),
-        boxShadow: '3px 2px 3px white',
-        border: '1px solid white',
-        backgroundColor: '#FEFEFE',
-        paddingBottom: '50px'
-    },
+      [theme.breakpoints.down('sm')]: {
+          padding: [[theme.spacing(1), theme.spacing(2), theme.spacing(5), theme.spacing(2)]],
+      },
 
-    depositCard: {
-        padding: theme.spacing(5),
-        backgroundColor: 'white',
-        display: 'grid',
-        gridTemplateColumns: '5fr 1fr',
-        marginBottom: theme.spacing(5),
-        width: '30vw',
-        margin: '0 auto',
-        borderRadius: theme.spacing(1),
-        boxShadow: '8px 6px 8px #E5E5E5',
+      '& h6': {
+          fontWeight: 600
+      },
+      backgroundColor: '#F7F8F9',
+      height: '100vh'
+  },
 
-    },
+  title: {
+    fontWeight: 600
+  },
 
-    depositCardTitle: {
-        fontSize: theme.spacing(3.5),
-        color: '#A0AEC0',
-        marginBottom: theme.spacing(3),
-        fontStretch: '50%'
-    },
+  table: {
+      borderRadius: theme.spacing(1),
+      boxShadow: '3px 2px 3px white',
+      border: '1px solid white',
+      backgroundColor: '#FEFEFE',
+      paddingBottom: '50px'
+  },
 
-    depositCardAmount: {
-        fontSize: theme.spacing(5),
-        color: '#1E6262',
-        fontWeight: '900 !important',
-        fontStretch: '50%'
-    },
+  selected: {
+    borderBottom: '2px solid #1E6262',
+    fontWeight: 600,
+    fontSize: '1.4vw'
+  },
 
-    percentage: {
-        display: 'grid',
-        gridTemplateColumns: '25px 25px',
-        color: '#1E6262',
-        alignSelf: 'flex-end',
-        
-        '& svg': {
-            fontSize: theme.spacing(2),
-            marginTop: '13px'
-        },
-
-        '& span': {
-            fontSize: theme.spacing(3)
-        }
-    },
-
-    selectBtn: {
-        justifySelf: 'flex-end',
-        marginTop: theme.spacing(-3)
-    }
+  pageList: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-end'
+  },
 }));
 
 const columns = [
 //   { id: 'id', label: '', maxWidth: 10 },
   {
-    id: 'user',
-    label: 'User',
+    id: 'name',
+    label: 'Name',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
-    id: 'transactionID',
-    label: 'Transaction ID',
+    id: 'account',
+    label: 'Account',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
@@ -108,13 +77,13 @@ const columns = [
     format: (value) => value.toLocaleString('en-US'),
   },
   {
-    id: 'method',
-    label: 'Method',
+    id: 'paymentstatus',
+    label: 'Payment Status',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
-    id: 'time',
-    label: 'Time',
+    id: 'paymenttype',
+    label: 'Payment Type',
     format: (value) => value.toLocaleString('en-US'),
   },
   {
@@ -131,139 +100,123 @@ const columns = [
 
 // const pages = [10, 25, 50, 100]
 
-const gridColumns = '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr';
+const gridColumns = '1fr 1fr .7fr 1fr 1fr 1fr 0.5fr';
+const pages = [15, 50, 75, 100]
 
 const Deposits = () => {
   const classes = useStyles();
+
+  const dispatch = useDispatch();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [ depositFilter, setDepositFilter ] = useState('')
-  const [ loadingDeposit ] = useState(false)
+  // const [ depositFilter, setDepositFilter ] = useState('')
+  // const [ loadingDeposit ] = useState(false)
+  // const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
+  const [rowsPerPage] = useState(pages[0]);
+  const [currentPage, setCurrentPage] = useState(1)
+  const [pageNumberList, setPageNumberList] = useState([])
+  const [lastPage, setLastPage] = useState(pageNumberList?.length)
+  const [pageCount, setPageCount] = useState(0);
 
+  const [loading, setLoading] = useState(true)
+  const { fundingRequests, totalPageCount } = useSelector(state => state.wallets);
 
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
+  const handleClick = (event) => {
+      setAnchorEl(event.currentTarget);
+  };
 
-//   const handleChangePage = (event, newPage) => {
-//     setPage(newPage);
-//   };
+  const handleClose = () => {
+      setAnchorEl(null);
+  };
 
-  
-//   const handleChangeRowsPerPage = (event) => {
-//     setRowsPerPage(+event.target.value);
-//     setPage(1);
-//   };
+  const handlePageNUmberList = useCallback(() => {
+    const pageNumArr = []
+    if (pageCount >= 1) {
+        for (let i=1; i<=pageCount; i++) {
+            pageNumArr.push(i)
+        }
+    }
+    setPageNumberList(pageNumArr)
+    setLastPage(pageCount)
+  }, [pageCount])
 
-    // const dispatch = useDispatch();
+  useEffect(() => {
+    if (!!fundingRequests.items) {
+    setLoading(false)
+    handlePageNUmberList()
+    }
+  }, [fundingRequests.items, handlePageNUmberList])
 
-    const customers = useSelector(state => state.customers?.customers?.items);
+  useEffect(() => {
+    setLoading(true)
+    dispatch(getAllDeposits({
+      pageSize: rowsPerPage,
+      pageNumber: currentPage
+    }))
 
-    // const handleSwitchCase = (switchType, getFunction, setLoadingType, setFilterType, total) => {
-    //     const { TWENTY_FOUR_HOURS, SEVEN_DAYS, THIRTY_DAYS, THREE_MONTHS, ALL } = ADMIN_FILTERS;
-    //     switch (switchType) {
-    //         case TWENTY_FOUR_HOURS:
-    //             getFunction('1');
-    //             setLoadingType(true);
-    //             break;
+    setPageCount(totalPageCount || 0);
+  }, [currentPage, dispatch, rowsPerPage, totalPageCount])
 
-    //         case SEVEN_DAYS:
-    //             getFunction('7');
-    //             setLoadingType(true);
-    //             break;
+  const onNextPage = () => {
+    setCurrentPage(currentPage + 1)
+  }
 
-    //         case THIRTY_DAYS:
-    //             getFunction('30');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case THREE_MONTHS:
-    //             getFunction('90');
-    //             setLoadingType(true);
-    //             break;
-
-    //         case ALL:
-    //             setFilterType(total);
-    //             break;
-            
-    //         default:
-    //             break;
-    //     }
-    // }
-
-    // const handleVolumeFilter = useCallback((timeframe) => {
-    //     handleSwitchCase(timeframe)
-    // }, []);
-
-    // useEffect(() => {
-    //     // handleSetTitle('All Customers');
-    //     getCustomers({
-    //         pageNumber: 1,
-    //         pageSize: 25
-    //     });
-    //     // eslint-disable-next-line
-    // }, []);
-
-    // useEffect(() => {
-    //     if (depositFilter) {
-    //         handleUsersFilter(depositFilter)
-    //     }
-    // }, [handleUsersFilter, usersFilter]);
-
-    const handleClick = (event) => {
-        setAnchorEl(event.currentTarget);
-    };
-
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
-
-    // useEffect(() => {
-    //     return () => {
-    //         dispatch({ type: CLEAR_ALL_CUSTOMERS });
-    //     };
-
-    //     // eslint-disable-next-line
-    // }, []);
+  const onPrevPage = () => {
+      setCurrentPage(currentPage - 1)
+  }
 
   return (
     <>
-      <section className={classes.root}>
+      <section className={clsx(classes.root, 'animate__animated animate__fadeInLeft')}>
 
-          <Typography variant="h6" >Deposits</Typography>
-          <Box component="div" className={classes.depositCard}>
-            <Typography variant="h6" className={classes.depositCardTitle} >Total Deposit</Typography>
-            <Typography component="span" variant="body2" className={classes.selectBtn}>
-                <GenericSelect FILTERS={ADMIN_FILTERS} selectValue={depositFilter} setOnChange={setDepositFilter} loading={loadingDeposit}/>
-            </Typography>
-            
-            <Typography variant="h6" className={classes.depositCardAmount}>EUR 350000000.00</Typography>
-            <Typography component="span" className={classes.percentage}>
-                <Triangle />
-                <Typography component="span" variant="subtitle2">4.5%</Typography>
-            </Typography>
-          </Box>
-        
-          <Box component="div" className={classes.table}>
-            <GenericTableHeader columns={columns} gridColumns={gridColumns} headerPadding="11px 15px" />
-            <DepositAndWithdrawalTable data={customers} handleClick={handleClick} />
-          </Box>
-          <Menu
-            id="customer-menu"
-            anchorEl={anchorEl}
-            keepMounted
-            open={Boolean(anchorEl)}
-            onClose={handleClose}
-            classes={{ paper: classes.menu }}
-            disableScrollLock={ true }
+        <Typography variant="h6" >Deposits</Typography>
+        <WithdrawalCard cardTitle="Total Deposts" />
+      
+        <Box component="div" className={classes.table}>
+          <GenericTableHeader columns={columns} gridColumns={gridColumns} headerPadding="11px 15px" />
+          <DepositAndWithdrawalTable loading={loading} displayChck={false} data={fundingRequests.items} handleClick={handleClick} />
+
+
+          {
+            loading ? '' :
+              <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
+                  <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                      {/* <Typography component="span">{'20'} results</Typography> */}
+                  </Box>
+
+                  <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
+                          <GenericButton clickAction={onPrevPage} isDisabled={currentPage === 1} buttonName="Previous" />
+                          <GenericButton clickAction={onNextPage} isDisabled={currentPage === lastPage} buttonName="Next" />
+                      </Box> 
+                      <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
+                          {
+                            pageNumberList && pageNumberList.map((pageNUmber, i) => (
+                                <Typography className={clsx(classes.pageList, pageNUmber === currentPage && classes.selected)} onClick={() => setCurrentPage(pageNUmber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
+                            ))
+                          }
+                      </Box>
+                  </Box>                    
+              </Box>
+          }
+        </Box>
+        <Menu
+          id="customer-menu"
+          anchorEl={anchorEl}
+          keepMounted
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+          classes={{ paper: classes.menu }}
+          disableScrollLock={ true }
         >
-            <MenuItem>View Details</MenuItem>
-            <Divider />
-            <MenuItem >Edit Profile</MenuItem>
-            <Divider />
-            <MenuItem>Contact</MenuItem>
-            <Divider />
-            <MenuItem>Suspend</MenuItem>
-            <Divider />
-            <MenuItem>Change Risk Profile</MenuItem>
+          <MenuItem>View Details</MenuItem>
+          <Divider />
+          <MenuItem >Edit Profile</MenuItem>
+          <Divider />
+          <MenuItem>Contact</MenuItem>
+          <Divider />
+          <MenuItem>Suspend</MenuItem>
+          <Divider />
+          <MenuItem>Change Risk Profile</MenuItem>
         </Menu>
       </section>
     </>
