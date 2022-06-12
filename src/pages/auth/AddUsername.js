@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { Link as RouterLink, useNavigate, useLocation} from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button, 
@@ -21,7 +21,6 @@ import { addUsername } from '../../actions/customer';
 import { GET_ERRORS } from '../../actions/types';
 
 import { COLORS } from '../../utils/constants';
-import { LOGIN } from '../../routes';
 
 import logo from '../../assets/img/logo.svg';
 
@@ -78,7 +77,6 @@ const AddUsername = ({ addUsername }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const location = useLocation();
     const errorsState = useSelector(state => state.errors);
 
     const [Username, setUsername] = useState('');
@@ -86,13 +84,6 @@ const AddUsername = ({ addUsername }) => {
     const [open, setOpen] = useState(false);
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-
-    useEffect(() => {
-        if (!location?.state?.addUsername) {
-            return navigate(LOGIN);
-        }
-        // eslint-disable-next-line
-    }, []);
 
     useEffect(() => {
         if (errorsState?.msg) {

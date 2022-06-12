@@ -99,7 +99,7 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }) => {
+const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -121,9 +121,9 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const successModal = useRef();
 
     useEffect(() => {
-        if (isEmpty(account) && !isEmpty(listing)) {
-            getAccount(listing.sellersAccountId);
-        }
+        // if (isEmpty(account) && !isEmpty(listing)) {
+        //     getAccount(listing.sellersAccountId);
+        // }
         // eslint-disable-next-line
     }, []);
 

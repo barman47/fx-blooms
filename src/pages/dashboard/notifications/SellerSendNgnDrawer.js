@@ -158,7 +158,8 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
+    // const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
+    const THIRTY_MINUTES = 600000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
