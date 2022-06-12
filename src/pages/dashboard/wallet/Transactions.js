@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Button,
@@ -8,13 +8,16 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
-import { getFundingRequests, getWalletTransactions } from '../../../actions/wallets';
-import { SET_FUNDING_REQUESTS, SET_WALLET_FILTER, SET_WALLET_TRANSACTIONS } from '../../../actions/types';
+import { getFundingRequests, getWallets, getWalletTransactions } from '../../../actions/wallets';
+import { GET_ERRORS, SET_FUNDING_REQUESTS, SET_WALLET, SET_WALLET_FILTER, SET_WALLET_TRANSACTIONS } from '../../../actions/types';
 
 import { COLORS, WALLET_FILTER } from '../../../utils/constants';
+import isEmpty from '../../../utils/isEmpty';
 
 import Transaction from './Transaction';
 import Spinner from '../../../components/common/Spinner';
+import Toast from '../../../components/common/Toast';
+import FundingRequest from './FundingRequest';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -39,23 +42,62 @@ const useStyles = makeStyles(theme => ({
 
 const { HISTORY, FUNDING } = WALLET_FILTER;
 
-const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
+const Transactions = ({ getFundingRequests, getWallets, getWalletTransactions }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     
-    const { filter, fundingRequests, wallet, transactions } = useSelector(state => state.wallets);
+    const { customerId } = useSelector(state => state.customer);
+    const { filter, fundingRequests, wallet, wallets, transactions } = useSelector(state => state.wallets);
+    const errorsState = useSelector(state => state.errors);
 
     const [currentFilter, setCurrentFilter] = useState(HISTORY);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+
+    const toast = useRef();
+
+    // useEffect(() => {
+    //     if (wallet.id) {
+    //         handleFilter(currentFilter);
+    //     }
+    //     // eslint-disable-next-line
+    // }, []);
+
+    useEffect(() => {
+		if (wallets.length > 0) {
+			dispatch({
+				type: SET_WALLET,
+				payload: { currency: 'EUR' }
+			});
+		}
+	}, [dispatch, wallets]);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
         setLoading(false);
-    }, [fundingRequests, transactions]);
+        getWallets(customerId);
+    }, [customerId, getWallets, fundingRequests, transactions]);
 
     const handleFilter = useCallback((currentFilter) => {
         switch (currentFilter) {
             case HISTORY:
-                if (filter !== HISTORY) {
+                // if (filter !== HISTORY) {
                     batch(() => {
                         dispatch({
                             type: SET_WALLET_FILTER,
@@ -72,11 +114,11 @@ const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
                         pageSize: 15,
                         walletId: wallet.id
                     });
-                }
+                // }
                 break;
 
             case FUNDING:
-                if (filter !== FUNDING) {
+                // if (filter !== FUNDING) {
                     batch(() => {
                         dispatch({
                             type: SET_WALLET_FILTER,
@@ -89,8 +131,8 @@ const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
                     });
                     
                     setLoading(true);
-                    getFundingRequests(wallet.id);
-                }
+                    getFundingRequests(wallet?.id);
+                // }
                 break;
 
             // case WITHDRAWAL:
@@ -106,14 +148,47 @@ const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
             default:
                 break;
         }
-    }, [dispatch, filter, getFundingRequests, getWalletTransactions, wallet.id]);
+    }, [dispatch, getFundingRequests, getWalletTransactions, wallet?.id]);
 
     useEffect(() => {
-        handleFilter(currentFilter);
-    }, [currentFilter, handleFilter]);
+        if (wallet?.id) {
+            handleFilter(currentFilter);
+        }
+    }, [currentFilter, handleFilter, wallet?.id]);
+
+    const handleGetNextTransactions = () => {
+        setLoading(true);
+        getWalletTransactions({
+            pageNumber: transactions.currentPageNumber + 1,
+            pageSize: 15,
+            walletId: wallet.id
+        });
+    };
+
+    const handleGetPreviousTransactions = () => {
+        setLoading(true);
+        getWalletTransactions({
+            pageNumber: transactions.currentPageNumber - 1,
+            pageSize: 15,
+            walletId: wallet.id
+        });
+    };
+
+    const handleSetLoading = (loadingState) => {
+        setLoading(loadingState);
+    };
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }  
             {loading && <Spinner />}
             <section className={classes.root}>
                 <Typography variant="h6" className={classes.header}>
@@ -155,86 +230,56 @@ const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
                     </Button> */}
                 </ButtonGroup>
                 <div className={classes.transactions}>
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
-                    <Transaction 
-                        date="19/09/2021"
-                        time="10:34 PM"
-                        type="Fund"
-                        bank="Revolute"
-                        amount={1000}
-                        walletId="854584594"
-                    />
+                    {transactions?.items?.length > 0 && transactions.items.map(transaction => (
+                        <Transaction 
+                            key={transaction.id}
+                            date={transaction.dateCreated}
+                            amount={Number(transaction.amount)}
+                            status={transaction.status.toUpperCase()}
+                            type={transaction.type}
+                            destinationAccount={`${transaction.destinationAccountNumber} ${transaction.destinationBank}`}
+                            sourceAccount={`${transaction.sourceAccountNumber} ${transaction.sourceAccountName}`}
+                            id={transaction.id}
+                        />
+                    ))}
+                    {fundingRequests.length > 0 && fundingRequests.map((request, index) => (
+                        <FundingRequest 
+                            key={index}
+                            date={request.dateCreated}
+                            amount={Number(request.amount)}
+                            status={request.status.toUpperCase()}
+                            currency={request.currency}
+                            paymentId={request.paymentId}
+                            paymentRequestId={request.paymentRequestId}
+                            handleSetLoading={handleSetLoading}
+                        />
+                    ))}
+                    {filter === HISTORY && 
+                        <ButtonGroup disableElevation className={classes.filterButtons}>
+                            <Button
+                                color="primary"
+                                size="small"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={handleGetPreviousTransactions}
+                                variant="outlined"
+                                disabled={loading || transactions?.hasPrevious === false ? true : false}
+                            >
+                                Previous Page
+                            </Button>
+                            <Button
+                                color="primary"
+                                size="small"
+                                disableRipple
+                                disableFocusRipple
+                                onClick={handleGetNextTransactions}
+                                variant="outlined"
+                                disabled={loading || transactions?.hasNext === false ? true : false}
+                            >
+                                Next Page
+                            </Button>
+                        </ButtonGroup>
+                    }
                 </div>
             </section>
         </>
@@ -243,7 +288,8 @@ const Transactions = ({ getFundingRequests, getWalletTransactions }) => {
 
 Transactions.propTypes = {
     getFundingRequests: PropTypes.func.isRequired,
+    getWallets: PropTypes.func.isRequired,
     getWalletTransactions: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getFundingRequests, getWalletTransactions })(Transactions);
+export default connect(undefined, { getFundingRequests, getWallets, getWalletTransactions })(Transactions);

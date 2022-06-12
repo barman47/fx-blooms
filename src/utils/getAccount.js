@@ -1,6 +1,3 @@
-const getAccount = (account, accounts) => {
-    const bank = accounts.find(item => item.bankName === account || item.nicKName === account);
-    return bank;
-};
+const getAccount = (account, accounts) =>  account ? accounts.find(item => item.bankName === account || item.nicKName === account) : {};
 
 export default getAccount;

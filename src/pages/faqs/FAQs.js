@@ -5,9 +5,6 @@ import {
     AccordionSummary, 
     Box, 
     Link,
-    List,
-    ListItem,
-    ListItemText, 
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -15,7 +12,7 @@ import { ChevronUp } from 'mdi-material-ui';
 
 import Layout from '../../components/layout';
 
-import { SIGN_UP } from '../../routes';
+import { LOGIN, SIGN_UP } from '../../routes';
 
 import { COLORS } from '../../utils/constants';
 import background from '../../assets/img/patterns-black.jpg';
@@ -179,96 +176,75 @@ const FAQs = () => {
                 <Box component="section" className={classes.container}>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How do I register for an account?</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.accordionContent}>
-                        <Typography className={classes.text}>Here are the steps required to get an account.</Typography>
-                        <Typography className={classes.text}>Click on <br /><Link to={SIGN_UP} component={RouterLink} className={classes.strong}>Get Started</Link></Typography>
-                        <List component="ol">
-                            <ListItem>
-                                <ListItemText primary="1. Provide your profile details - email, username and password" />
-                            </ListItem>
-                            <ListItem>
-                                <ListItemText primary="2. Verify your email address" />
-                            </ListItem>
-                        </List>
-                        <Typography className={classes.strong}>Viola! Welcome to FXBLOOMS.</Typography>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>What comes with the transaction name?</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.accordionContent}>
-                            <Typography className={classes.text}>We make use of usernames to protect privacy but allow tracking of users.</Typography>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How does it work?</Typography>
+                            <Typography className={classes.heading}>How do I sign up on FXBLOOMS?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>Only registered and verified users can BUY and SELL on the FXBLOOMS platform.</Typography>
-                            <Typography className={classes.text}><Typography className={classes.strong}>To Sell:</Typography> You need to post the amount, a desired rate and a receiving account. Your posting will be added to other seller’s listings on the dashboard for willing buyers to see. An interested buyer can then accept your offer and send you the NGN, confirming the NGN payment in the APP will give you access to the account provided by the buyer, then you proceed and send the EUR to it.</Typography>
-                            <Typography className={classes.text}><Typography className={classes.strong}>To buy:</Typography> Simply accept a seller listing by clicking on BUY EUR, then you input the amount you want to buy, your receiving account and place a bid. A successful bid will show you the seller’s receiving account, then transfer the NGN equivalent and the seller will be notified. Once the seller confirms receiving the NGN, he/she then transfers the EUR equivalent to the account you provided.</Typography>
-                            <Typography className={classes.strong}>Please note: We strongly advise the seller to confirm the NGN payment on his banking APP, before sending the EUR equivalent. </Typography>
+                            <Typography className={classes.text}>Click on <Link component={RouterLink} to={SIGN_UP}>Get Started</Link> (You'll be redirected to the create account page)</Typography>
+                            <ul>
+                                <li>Input your email, username, and password.</li>
+                                <li>Read and agree to the terms and conditions.</li>
+                                <li>Click on create an account ( a verification link will be sent to your email)</li>
+                                <li>Verify your email address with the verification link</li>
+                            </ul>
+                            <Typography className={classes.text}>Alternatively, you may sign up with Google account by:</Typography>
+                            <ul>
+                                <li>Read and agree to the terms and conditions.</li>
+                                <li>Click on Sign up with Google</li>
+                                <li>You will be taken to a page to provide a unique username</li>
+                            </ul>
+                            <Typography className={classes.text}>Voila! Welcome to FXBLOOMS.</Typography>
+                            <Typography className={classes.text}><Typography className={classes.strong}>Note</Typography>: If you already have an FXBLOOMS account. Click <Link component={RouterLink} to={LOGIN}>'Sign in'</Link> instead.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>What is the transaction limit?</Typography>
+                            <Typography className={classes.heading}>How do I change my personal details on FXBLOOMS?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>For now the daily limit is set at 5000 EUR or its equivalent.</Typography>
+                            <Typography className={classes.text}>To change your personal details, like (name, date of birth, address), kindly send a mail to us at <a href="mailto:support@fxblooms.com">support@fxblooms.com</a>.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>Does the Other User Get to Know Me?</Typography>
+                            <Typography className={classes.heading}>How do I reset my password?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>No other users will not see any of your private information you do not want them to see. Be rest assured your data is safe with us.</Typography>
+                            <Typography className={classes.text}>If you cannot remember your account password:</Typography>
+                            <ul>
+                                <li>Go to Login on the FXBLOOMS app</li>
+                                <li>Click on ‘Forgotten password?'</li>
+                                <li>You will be redirected to a page for you to enter your email address.</li>
+                                <li>Once you fill in your email address, you will receive an email containing a password reset link.</li>
+                                <li>Click on the link and create a new password.</li>
+                            </ul>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>Which currency can be traded?</Typography>
+                            <Typography className={classes.heading}>How do I reset my password?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>FXBLOOMS support EUR and NGN exchange. More currency pairs will be added in the future.</Typography>
+                            <Typography className={classes.text}>If you cannot remember your account password:</Typography>
+                            <ol>
+                                <li>Go to Login on the FXBLOOMS app</li>
+                                <li>Click on ‘Forgotten password?'</li>
+                                <li>You will be redirected to a page for you to enter your email address.</li>
+                                <li>Once you fill in your email address, you will receive an email containing a password reset link.</li>
+                                <li>Click on the link and create a new password.</li>
+                            </ol>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How do I log in a complaint?</Typography>
+                            <Typography className={classes.heading}>How do I change my PIN?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>Kindly raise a support ticket by sending an email to support@fxblooms.com, and we will get back to you.</Typography>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How does the Pricing work per transaction?</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>FXBLOOMS is a 100% free platform. Any future change in pricing will be communicated out beforehand.</Typography>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How long does it take to purchase a currency?</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>As long as you have a willing accept your *ask* rate and amount, you will get the NGN in the account provided in less than 5 minutes. And as a seller, the speed of getting the equivalent EUR depends on the seller's transfer method, your receiving bank and how fast the seller sends the money.</Typography>
-                            <Typography className={classes.text}>We know speed of exchange is important to you, and we are tirelessly working on processes and products to expedite the exchange process. We envision exchanges with a click of a button.</Typography>
-                        </AccordionDetails>
-                    </Accordion>
-                    <Accordion className={classes.accordion}>
-                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>Is there instant transfer?</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>Yes, we recommend sellers to use the instant transfer option when possible.</Typography>
+                            <ol>
+                                <li>Click on change PIN under the security menu.</li>
+                                <li>Enter your new PIN.</li>
+                                <li>You will receive an OTP on your registered number.</li>
+                                <li>Enter the OTP received and click on update.</li>
+                            </ol>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
@@ -276,62 +252,237 @@ const FAQs = () => {
                             <Typography className={classes.heading}>How to disable an account?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>By simply contacting us on <Typography className={classes.strong} style={{ cursor: 'pointer', color: '#1a73e8' }} onClick={() => window.open('mailto:support@fxblooms.com')}>support@fxblooms.com</Typography>. You can also reactivate it when you change your mind.</Typography>
+                            <Typography className={classes.text}>By simply contacting us on <a href="mailto:support@fxblooms.com">support@fxblooms.com</a>. You can also reactivate it when you change your mind.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>What are the documents needed for Identity verification?</Typography>
+                            <Typography className={classes.heading}>How do I make a complaint?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>We accept international passports, drivers licénse and national ID for users on boarding.</Typography>
+                            <Typography className={classes.text}>By simply contacting us on <a href="mailto:support@fxblooms.com">support@fxblooms.com</a> We’ll do our best to resolve the issue immediately.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How to buy on FXBLOOMS?</Typography>
+                            <Typography className={classes.heading}>Which documents can I use for the Identity verification process?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>After signing up and completing the identity verification, a user is ready to BUY EUR on the FXBLOOMS platform.</Typography>
-                            <Typography className={classes.text}>
-                                A buyer simply chooses the most suitable offer among  sellers listing, he/she then clicks on BUY EUR, then input the amount to buy, a receiving account and place a bid. A successful bid will show the seller’s receiving account the buyer is expected to transfer the NGN to, and the seller is then notified. 
-                                Once the seller confirms receiving the NGN, he/she then transfers the EUR equivalent to the account provided by you (buyer).  
-                            </Typography>
+                            <Typography className={classes.text}>We accept international passports, drivers licénse, resident permits and national ID cards.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How can I report malicious users?</Typography>
+                            <Typography className={classes.heading}>How do I verify my ID?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>Kindly send a complaint or malicious user to us by emailing <Typography className={classes.strong} style={{ cursor: 'pointer', color: '#1a73e8' }} onClick={() => window.open('mailto:support@fxblooms.com')}>support@fxblooms.com</Typography>.</Typography>
-                            <Typography className={classes.text}>You can also flag the user. When you do so, we commence an investigation and take necessary actions.</Typography>
-                            <Typography className={classes.text}>When you send us an email, please provide as many details as possible for example, transaction ID, your username, and the username of the person you want to report.</Typography>
+                            <ol>
+                                <li>Click on ID verification under the security tab.</li>
+                                <li>Kindly fill the requested information and proceed</li>
+                                <li>Then take the picture of your ID, and a selfie of yourself to finalise</li>
+                                <li>A success/ failed status notification will be displayed.</li>
+                            </ol>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How do I protect myself against fraud?</Typography>
+                            <Typography className={classes.heading}>What happens to my personal information and documents?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>As one of the several internal controls put in place, we strongly recommend the seller of EUR to confirm NGN payment in their account before transferring the EUR.</Typography>
+                            <Typography className={classes.text}>Your information and/or documents are stored on our secured servers. We only use them when we are completing our Know Your Customer (KYC) checks.</Typography>
                         </AccordionDetails>
                     </Accordion>
                     <Accordion className={classes.accordion}>
                         <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
-                            <Typography className={classes.heading}>How SELL on FXBLOOMS?</Typography>
+                            <Typography className={classes.heading}>What is FXBLOOMS wallet?</Typography>
                         </AccordionSummary>
                         <AccordionDetails className={classes.details}>
-                            <Typography className={classes.text}>After signing up and completing the identity verification you are ready to sell EUR on the FXBLOOMS platform.</Typography>
+                            <Typography className={classes.text}>Your Wallet is your secure account storing your money electronically on the FXBLOOMS platform. You can fund and withdraw from your wallet so you can consider it as another bank account for your transactions.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How many wallets can I have?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>At the moment, we only power Euro wallets but we are working towards supporting multiple wallets for more currencies in the future.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How do I fund my wallet?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <ol>
+                                <li>Click on Add fund on the wallet</li>
+                                <li>Input the amount</li>
+                                <li>Select the account you wish to pay with from a list of saved accounts  (N.B If your the account is not yet saved on FXBLOOMS, click on the Add account button to save it)</li>
+                                <li>Proceed to authorise the payment via your banking app.</li>
+                            </ol>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>Can I fund my wallet with a Card?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Not at the moment, we are presently working on other payment options like card payments and direct transfer.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How long does it take for the funds to reflect?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Payments to your wallet should reflect immediately or within 30 minutes in a few cases.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>Why has my fund not reflected in my wallet?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>This may be due to bank processing delays. If the funds sent have not been reflected in your wallet within 6 hours, kindly reach out to us at <a href="mailto:support@fxblooms.com">support@fxblooms.com</a></Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>What is FXBLOOMS marketplace?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>FXBLOOMS marketplace is a secure peer-peer currency exchange marketplace where buyers and sellers meet. All offers created appear here and users can accept the offer that interests them.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>What currencies can be exchanged on the FXBLOOMS marketplace?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Currently, we support  NGN and EUR only. However, we are tirelessly working on introducing more currency pairs.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How to buy EUR on FXBLOOMS</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>A user can BUY EUR by accepting an offer or creating a new offer- SELL NGN.</Typography>
+                            <Typography className={classes.text}>Accepting Offer - BUY EUR</Typography>
                             <ul>
-                                <li>Post the EUR you want to sell on the Make A Listing page input the total amount you want to sell, the rate you desire and the NGN receiving account. This process allows a buyer to see your listing among others sellers listing.</li>
-                                <li>A buyer is then able to place a bid by clicking on BUY EUR.</li>
-                                <li>Successful bid allows the buyer to see the account to send the NGN to (as provided by you).</li>
-                                <li>Once the buyer sends the NGN, a notification is sent to you.</li>
-                                <li>You confirming the NGN payment gives you access to the account to send EUR to (as provided by the buyer).</li>
-                                <li>The buyer confirms receiving the EUR, and the transaction is considered complete.</li>
+                                <li>Access all Buy EUR offers by clicking on the BUY EUR button on the dashboard.</li>
+                                <li>Accept a suitable offer from all options by clicking on BUY EUR on the preferred offer.</li>
+                                <li>The NGN receiving account will prompt up, transfer the NGN amount and click on <Typography className={classes.strong}>Payment Made.</Typography></li>
+                                <li>The EUR amount will automatically be moved to your wallet.</li>
+                                <li>Withdraw the EUR to your preferred account (pending the seller’s confirmation).</li>
                             </ul>
-                            <Typography className={classes.strong}>PLEASE DO NOT TRANSFER MONEY TO BUYER UNTIL YOU CONFIRM THE NGN IN YOUR ACCOUNT.</Typography>
+                            <Typography className={classes.text}>Creating New Offer - SELL NGN</Typography>
+                            <ul>
+                                <li>From the dashboard, click on 'Make a Listing'</li>
+                                <li>Select the currency you wish to sell -  NGN in this case.</li>
+                                <li>Input the amount you want to sell, your desired exchange rate and submit.</li>
+                                <li>Your listing will appear on the dashboard and made available for willing buyers.</li>
+                            </ul>
+                            <Typography className={classes.text}>Once a buyer accepts your offer, you will be notified and required to transfer the NGN within 30 mins. Then your wallet will be credited with the EUR equivalent, and you will be able to withdraw (pending sellers confirmation).</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How do I buy NGN on FXBLOOMS</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>A user can BUY NGN by accepting an offer or creating a new offer- SELL EUR.</Typography>
+                            <Typography className={classes.text}>Accepting Offer - BUY NGN</Typography>
+                            <ul>
+                                <li>Fund your wallet with the EUR equivalent.</li>
+                                <li>Access all Buy NGN offers by clicking on BUY NGN on the dashboard.</li>
+                                <li>Accept a suitable offer from all options by clicking on BUY NGN on the preferred offer.</li>
+                                <li>A notification will be sent to the SELLER to transfer the NGN within 30 minutes.</li>
+                                <li>Once the NGN is sent, your wallet will be debited with the EUR amount.</li>
+                                <li>Once you receive the NGN, proceed to the FXBLOOMS to confirm so we can release the EUR for the seller.</li>
+                            </ul>
+                            <Typography className={classes.text}>Creating New Offer - SELL EUR</Typography>
+                            <ul>
+                                <li>Fund your wallet with the EUR amount </li>
+                                <li>Click on 'Make a Listing' </li>
+                                <li>Select the currency you wish to sell -  EUR in this case. </li>
+                                <li>Input the amount you want to sell, your desired exchange rate, NGN receiving account and submit.</li>
+                                <li>Your listing will appear on the dashboard and made available for willing buyers.</li>
+                            </ul>
+                            <Typography className={classes.text}>Once your offer is accepted, the user will transfer NGN to your account. Please proceed to FXBLOOMS to confirm once you have received the NGN in your bank.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How long does it take to purchase currency?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>A user can exchange by either accepting an offer or creating a new offer. For offer acceptance the exchanges take between seconds to 30 mins depending on the currency.</Typography>
+                            <Typography className={classes.text}>For creation of a new offer, the exchange time depends on how fast a buyer accepts your offer.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>What is the transaction limit?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>For now the daily limit is set at EUR5000 or its equivalent.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How many offers can I have on the Marketplace?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>As many offers as your wallet balance can take!</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>Can the beneficiary of the exchanged funds be anyone even if they are not on FXBLOOMS?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Yes, the beneficiary of the exchanged funds doesn’t have to be on FXBLOOMS to receive the money. Just provide their correct account details during the wallet withdrawal and let us do the rest.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>Can I withdraw an offer?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Yes, as long as it is not yet accepted.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>Am I known to other users?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>No, FXBLOOMS prioritises users' privacy. Other users only see whatever information you choose to share.</Typography>
+                            <Typography className={classes.text}><Typography className={classes.strong}>NB</Typography>: You may decide to make your phone number visible to other users.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>How much do you charge per transaction?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>FXBLOOMS is 100% free for now.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>What other charges are involved?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>No listing fee, No withdrawal fee, No processing fee. FXBLOOMS is 100% free for now.</Typography>
+                        </AccordionDetails>
+                    </Accordion>
+                    <Accordion className={classes.accordion}>
+                        <AccordionSummary className={classes.summary} expandIcon={<ChevronUp />}>
+                            <Typography className={classes.heading}>What comes with the transaction name?</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className={classes.details}>
+                            <Typography className={classes.text}>Only the username.</Typography>
                         </AccordionDetails>
                     </Accordion>
                 </Box>

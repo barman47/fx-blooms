@@ -152,7 +152,7 @@ const Footer = () => {
                 <div>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
-                        FXBLOOMS OÜ (Registry code: 16262446) is a company acting as a Commercial Agent and located at Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia.
+                        FXBLOOMS O&#220; (registry code: 16262446) offers its products and services in partnership with Safe Connect UAB, a Yapily Ltd subsidiary regulated by the Bank of Lithuania as an Authorised Payment Institution (Company Code: 305602679, Licence No. 53).
                     </Typography>
                 </div>
                 <div>
@@ -224,7 +224,7 @@ const Footer = () => {
             <Divider className={classes.divider} />
             <section className={classes.copyrightContainer}>
                 <Typography variant="subtitle2" component="span" className={classes.copyright}>
-                    FXBLOOMS O&#220; 16262446, Estonia. &copy; {new Date().getFullYear()} All rights reserved.
+                    &copy; {new Date().getFullYear()} FXBLOOMS O&#220;, Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia. All Rights Reserved.
                 </Typography>  
                 {/* <div className={classes.septem}>
                     <Typography variant="body2">

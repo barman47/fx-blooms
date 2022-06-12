@@ -20,7 +20,8 @@ import {
     AUTHORIZE_WITHDRAWAL,
     CLEAR_WALLET_MSG,
     SET_WITHDRAWAL_REQUEST,
-} from "../actions/types";
+    UPDATE_FUNDING_REQUEST
+} from '../actions/types';
 
 import { WALLET_FILTER } from "../utils/constants";
 
@@ -195,6 +196,18 @@ const walletsReducer = (state = initialState, action) => {
                 ...state,
                 msg: null,
             };
+
+        case UPDATE_FUNDING_REQUEST:
+            const fundingRequests = state.fundingRequests;
+            const index = fundingRequests.findIndex(request => request.paymentRequestId === action.payload.paymentRequestId);
+            fundingRequests[index] = action.payload;
+
+            return {
+                ...state,
+                fundingRequests: [...fundingRequests],
+                fundingRequest: action.payload
+            };
+
         default:
             return state;
     }

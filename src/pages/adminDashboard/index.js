@@ -46,7 +46,7 @@ import {
     BankOutline
 } from 'mdi-material-ui';
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
-import logo from '../../assets/img/logowhite.svg';
+import logo from '../../assets/img/logo-white.svg';
 import avatar from '../../assets/img/avatar.jpg';
 import { getStats, logout, searchForCustomer } from '../../actions/admin';
 import { getCustomers } from '../../actions/customer';

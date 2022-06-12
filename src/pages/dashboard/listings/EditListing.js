@@ -31,8 +31,8 @@ import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD_HOME } from '../../../routes';
 import validateEditListing from '../../../utils/validation/listing/edit';
-import PendingIdModal from './PendingIdModal';
-import IDVerificationModal from './IDVerificationModal';
+import PendingIdModal from '../idVerification/PendingIdModal';
+import IDVerificationModal from '../idVerification/IDVerificationModal';
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 
 const useStyles = makeStyles(theme => ({
