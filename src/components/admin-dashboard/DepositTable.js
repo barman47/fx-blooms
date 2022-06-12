@@ -1,11 +1,16 @@
-// import { useCallback } from 'react';
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Box, Typography, IconButton, } from '@material-ui/core';
+import { Box, Typography, IconButton, FormControlLabel, Checkbox } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import TextClamp from 'react-string-clamp';
 import { DotsHorizontal } from 'mdi-material-ui';
 import { SET_CUSTOMER } from '../../actions/types';
 // import { CUSTOMER_CATEGORY } from '../../utils/constants';
+// import getTime from '../../utils/getTime'
+import { PAYMENT_TYPE, PAYMENT_STATUS } from '../../utils/constants'
+import handleStatusStyle from '../../utils/statusDisplay'
+import formatDate from '../../utils/formatDate'
+import CircularProgressBar from './CircularProgressBar'
 import clsx from 'clsx'
 
 
@@ -13,7 +18,6 @@ const useStyles = makeStyles(theme =>({
 
   tableBodyRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 1fr 1fr 1fr .8fr 1fr 0.5fr',
     borderBottom: '1px solid #E8E8E8',
     alignItems: 'center',
     cursor: 'pointer',
@@ -54,14 +58,20 @@ const useStyles = makeStyles(theme =>({
     backgroundColor: '#FFCECE',
     color: '#FF0000',
   },
+
+  noShow: {
+    display: 'none'
+  }
 }));
+const { WITHDRAWAL, FUND } = PAYMENT_TYPE
+const { IN_PROGRESS, FAILED, COMPLETED, PENDING } = PAYMENT_STATUS
 
-
-const DepositAndWithdrawalTable = ({ data, handleClick, otherRows }) => {
+const DepositAndWithdrawalTable = ({ data, handleClick, otherRows, displayChck=true, loading, gridColumns='1fr 1fr .7fr 1fr 1fr 1fr 0.5fr', handleBatch }) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
   // const { fourthRow, fifthRow, sixthRow } = otherRows
+  const [check, setCheck] = useState({})
 
   const handleButtonClick = (customer, e) => {
     console.log('mennnuuu')
@@ -75,48 +85,77 @@ const DepositAndWithdrawalTable = ({ data, handleClick, otherRows }) => {
     handleClick(e);
   };
 
-  // const handleCheckBox = (e) => {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  // }
+  const handlePaymentStatus = (num, type='T') => {
+    switch(num) {
+      case 1:
+        return type === 'S' ? PENDING : FUND
+      case 2:
+        return type === 'S' ? COMPLETED : WITHDRAWAL
+      case 3:
+        return FAILED
+      case 4:
+        return IN_PROGRESS
+      default:
+        return
+    }
+  }
 
+  const handleCheckBox = (i) => e => {
+    e.preventDefault()
+    e.stopPropagation();
+    const { checked } = e.target;
+    setCheck((values) => ({
+      ...values,
+      [i]: checked
+    }))
+  }
 
   return (
     <>
-      {
+      { loading ? <CircularProgressBar newWidth="40px" newHeight="40px" topMargin="50px" /> :
         data && data.map((customer, i) => (
-            <Box component="div" className={classes.tableBodyRow} key={i} >
-                <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.firstName ? customer.firstName : ''} lines={1} />
-                </Typography>
-                <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.lastName ? customer.lastName : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.email ? customer.email : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={clsx(classes.tableCell, classes.status)} variant="subtitle1">
-                { customer.customerStatus }
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <IconButton 
-                            variant="text" 
-                            size="small" 
-                            className={classes.button} 
-                            aria-controls="customer-menu" 
-                            aria-haspopup="true" 
-                            onClick={(e) => handleButtonClick(customer, e)}
-                            disableRipple
-                        >
-                            <DotsHorizontal />
-                        </IconButton>
-                </Typography>
+            <Box style={{ gridTemplateColumns: gridColumns }} component="div" className={classes.tableBodyRow} key={i} >
+              <Typography onClick={() => handleBatch(customer.id)} component="span" className={clsx(classes.tableCell, !displayChck && classes.noShow)} variant="subtitle1">
+                <FormControlLabel  onClick={(e) => handleCheckBox(i)}  control={<Checkbox name="checked" checked={check[i]} className={classes.tableCell} color="primary" disableFocusRipple disableTouchRipple disableRipple />} /> 
+              </Typography>
+
+              <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
+                  <TextClamp text={customer.customerFullName ?? '' } lines={1} />
+              </Typography>
+
+              <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
+                {customer.account ?? ''}
+              </Typography>
+
+              <Typography component="span" className={classes.tableCell} variant="subtitle1">
+                {customer.amount ?? ''}
+              </Typography>
+
+              <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatusStyle(handlePaymentStatus(customer.paymentStatus, 'S'), classes))} variant="subtitle1">
+                { customer.paymentStatus ? handlePaymentStatus(customer.paymentStatus, 'S') : '' }
+              </Typography>
+
+              <Typography component="span" className={clsx(classes.tableCell, classes.status, handleStatusStyle(handlePaymentStatus(customer.paymentType), classes))} variant="subtitle1">
+              { customer.paymentType ? handlePaymentStatus(customer.paymentType) : '' }
+              </Typography>
+
+              <Typography component="span" className={clsx(classes.tableCell)} variant="subtitle1">
+              { formatDate(customer.dateCreated) }
+              </Typography>
+
+              <Typography component="span" className={clsx(classes.tableCell, displayChck && classes.noShow)} variant="subtitle1">
+                  <IconButton 
+                          variant="text" 
+                          size="small" 
+                          className={classes.button} 
+                          aria-controls="customer-menu" 
+                          aria-haspopup="true" 
+                          onClick={(e) => handleButtonClick(customer, e)}
+                          disableRipple
+                      >
+                          <DotsHorizontal />
+                      </IconButton>
+              </Typography>
                 {/* <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
                     <TextClamp text={customer.user ? customer.user : ''} lines={1} />
                 </Typography>

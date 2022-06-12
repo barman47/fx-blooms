@@ -15,7 +15,7 @@ import GenericTableHeader from '../../../components/admin-dashboard/GenericTable
 import GenericButton from '../../../components/admin-dashboard/GenericButton'
 import { ArrowTopRight, Filter, CloseCircleOutline } from 'mdi-material-ui';
 // import { getStats } from '../../../actions/admin';
-import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 import { exportRecords } from '../../../utils/exportRecords'
 import isEmpty from '../../../utils/isEmpty';
 import AmlBoard from '../../../components/admin-dashboard/AmlBoard';
@@ -413,9 +413,9 @@ const Transactions = () => {
     const [tab, setTab] = useState(ALL_TRANSACTIONS);
     const [loading, setLoading] = useState(true)
     const [pageNumberList, setPageNumberList] = useState([])
-    const [ currentPage, setCurrentPage ] = useState(1)
+    const [currentPage, setCurrentPage] = useState(1)
     const [pageCount, setPageCount] = useState(0);
-    const [ lastPage, setLastPage ] = useState(pageNumberList?.length)
+    const [lastPage, setLastPage] = useState(pageNumberList?.length)
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     const [openXport, closeXport] = useState(false);
     const [customerName, setCustomerName] = useState('')
@@ -454,19 +454,19 @@ const Transactions = () => {
         }
     }, [tab]);
 
-    useEffect(() => {
-        dispatch({
-            type: SET_PAGE_SIZE,
-            payload: rowsPerPage
-        });
-    }, [dispatch, rowsPerPage]);
+    // useEffect(() => {
+    //     dispatch({
+    //         type: SET_PAGE_SIZE,
+    //         payload: rowsPerPage
+    //     });
+    // }, [dispatch, rowsPerPage]);
     
-    useEffect(() => {
-        dispatch({
-            type: SET_PAGE_NUMBER,
-            payload: currentPage
-        });
-    }, [dispatch, currentPage]);
+    // useEffect(() => {
+    //     dispatch({
+    //         type: SET_PAGE_NUMBER,
+    //         payload: currentPage
+    //     });
+    // }, [dispatch, currentPage]);
 
     useEffect(() => {
         if (!!transactions)  {
@@ -583,7 +583,7 @@ const Transactions = () => {
 
     return (
     <>
-        <section className={classes.root}>
+        <section className={clsx(classes.root, 'animate__animated animate__fadeInLeft')}>
             <Grid container direction="row" justifyContent="space-between">
                 <Grid item>
                     {tab === ALL_TRANSACTIONS && <Typography variant="body1" className={classes.title}>All Transactions</Typography>}
@@ -670,7 +670,7 @@ const Transactions = () => {
                             </Box>
                         </Box>                    
                     </Box>
-                }
+            }
 
             {
                 !!openViewMore ? 

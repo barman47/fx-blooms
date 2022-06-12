@@ -11,6 +11,7 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 // import clsx from 'clsx';
+import _ from 'lodash';
 
 import { ID_STATUS_CATEGORY } from '../../../utils/constants';
 import { approveIdCard, approveResidencePermit, getIdCardValidationResponse, getResidencePermitValidationResponse } from '../../../actions/customer';
@@ -40,72 +41,6 @@ const useStyles = makeStyles(theme =>({
             paddingBottom: theme.spacing(4)
         }
     },
-
-    // content: {
-    //     display: 'grid',
-    //     gridTemplateColumns: '1fr 0.2fr 1fr'
-    // },
-
-    // details: {
-    //     display: 'grid',
-    //     gridTemplateColumns: '1fr 1fr',
-    //     marginTop: theme.spacing(2),
-
-    //     '& p:first-child': {
-    //         color: COLORS.offBlack,
-    //         fontWeight: 300
-    //     },
-
-    //     '& p:last-child': {
-    //         color: theme.palette.primary.main
-    //     }
-    // },
-
-    // detail: {
-    //     marginBottom: theme.spacing(2),
-
-    //     '& h6:first-child': {
-    //         margin: theme.spacing(2, 0)
-    //     }
-    // },
-
-    // button: {
-    //     marginBottom: theme.spacing(2)
-    // },
-
-    // infoButton: {
-    //     cursor: 'auto',
-    //     marginBottom: theme.spacing(2),
-
-    //     '&:hover': {
-    //         backgroundColor: 'transparent'
-    //     }
-    // },
-
-    // errorButton: {
-    //     color: theme.palette.error.main
-    // },
-
-    // label: {
-    //     fontWeight: 300
-    // },
-
-    // divider: {
-    //     backgroundColor: theme.palette.primary.main,
-    //     width: theme.spacing(0.5)
-    // },
-
-    // noDocument: {
-    //     display: 'flex',
-    //     flexDirection: 'column',
-    //     justifyContent: 'space-evenly',
-    //     alignItems: 'center'
-    // },
-
-    // noDocumentIcon: {
-    //     color: theme.palette.primary.main,
-    //     fontSize: theme.spacing(10)
-    // }
 
     //NEW STYLE
     header: {
@@ -353,144 +288,19 @@ const IdentityDetails = ({ approveIdCard, approveResidencePermit, getIdCardValid
                     </Menu>
                 </Box>
 
-                <Box component="div" className={classes.idDetails}>
-                    <AmlBoard  classes={classes} amlTitle={"Status"} amlNumber={<Status extraStyles={handleStatus(docStatus)} statusName={docStatus?.toUpperCase()} />} />
-                    <AmlBoard classes={classes} amlTitle={"Document Type"} amlNumber={docType} />
-                    <AmlBoard classes={classes} amlTitle={"Document Number"} amlNumber={docNumber} />
-                    <AmlBoard classes={classes} amlTitle={"Issue Country"} amlNumber={issueCountry} />
-                    <AmlBoard classes={classes} amlTitle={"Date of Issue"} amlNumber={dateOfIssue} />
-                    <AmlBoard classes={classes} amlTitle={"Date of Expiry"} amlNumber={dateOfExpiry} />
-                </Box>
-            </Box>
-            {/* <Box component="section" className={classes.root}>
-                <Typography variant="h6" color="primary">ID Details</Typography>
-                <Box component="section" className={classes.content}>
-                    <Box component="div" className={classes.detail}>
-                        <Typography variant="h6">SELL and BUY</Typography>
-                        {profileCheckData ?
-                            <>
-                                <Typography variant="subtitle2" component="p">Status</Typography>
-                                <Box component="div" className={classes.details}>
-                                    <Box component="div">
-                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() === APPROVED ? 
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, classes.errorButton)}>{profileCheckData?.status}</Button>
-                                            :
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: profileCheckData?.status?.toUpperCase() !== APPROVED })}>{profileCheckData?.status}</Button>
-                                        }
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.documentType}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Issue Country</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.issueCountry}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Expiry</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.expiryDate}</Typography>
-                                        </Box>
-                                    </Box>
-                                    <Box component="div">
-                                        {profileCheckData?.status && profileCheckData?.status.toUpperCase() !== APPROVED ?
-                                            <Button 
-                                                variant="outlined" 
-                                                disableFocusRipple 
-                                                disableTouchRipple 
-                                                disableRipple 
-                                                color="primary" 
-                                                className={classes.button}
-                                                onClick={handleApproveResidencePermit}
-                                            >
-                                                Approve ID
-                                            </Button>
-                                            :
-                                            <>
-                                                <br /><br />
-                                            </>
-                                        }
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.documentNumber}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{profileCheckData?.dateOfIssue}</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </>
-                            :
-                            <Box component="div" className={classes.noDocument}>
-                                <IdCard className={classes.noDocumentIcon} />
-                                <Typography variant="h6" color="primary">No Document Submited</Typography>
-                            </Box>
-                        }
+                {
+                    _.isEmpty(idCheckData) ? 
+                    <CircularProgressBar topMargin="15px" newWidth="25px" newHeight="25px" /> :
+                    <Box component="div" className={classes.idDetails}>
+                        <AmlBoard  classes={classes} amlTitle={"Status"} amlNumber={<Status extraStyles={handleStatus(docStatus)} statusName={docStatus?.toUpperCase()} />} />
+                        <AmlBoard classes={classes} amlTitle={"Document Type"} amlNumber={docType} />
+                        <AmlBoard classes={classes} amlTitle={"Document Number"} amlNumber={docNumber} />
+                        <AmlBoard classes={classes} amlTitle={"Issue Country"} amlNumber={issueCountry} />
+                        <AmlBoard classes={classes} amlTitle={"Date of Issue"} amlNumber={dateOfIssue} />
+                        <AmlBoard classes={classes} amlTitle={"Date of Expiry"} amlNumber={dateOfExpiry} />
                     </Box>
-                    <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} />       
-                    <Box component="div" className={classes.detail}>
-                        <Typography variant="h6">BUY Only</Typography>
-                        {idCheckData ? 
-                            <>
-                                <Typography variant="subtitle2" component="p">Status</Typography>
-                                <Box component="div" className={classes.details}>
-                                    <Box component="div">
-                                        {idCheckData?.status && idCheckData?.status.toUpperCase() === APPROVED ? 
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple color="primary" className={clsx(classes.infoButton, classes.erroButton)}>{idCheckData?.status}</Button>
-                                            :
-                                            <Button variant="outlined" disableFocusRipple disableTouchRipple disableRipple className={clsx(classes.infoButton, { [classes.errorButton]: idCheckData?.status?.toUpperCase() !== APPROVED })}>{idCheckData?.status}</Button>
-                                        }
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Type</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentType}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Issue Country</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.issueCountry}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Expiry</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>20-12-2023</Typography>
-                                        </Box>
-                                    </Box>
-                                    <Box component="div">
-                                        {idCheckData?.status && idCheckData?.status.toUpperCase() !== APPROVED ?
-                                            <Button 
-                                                variant="outlined" 
-                                                disableFocusRipple 
-                                                disableTouchRipple 
-                                                disableRipple 
-                                                color="primary" 
-                                                className={classes.button}
-                                                onClick={handleApproveId}
-                                            >
-                                                Approve ID
-                                            </Button>
-                                            :
-                                            <>
-                                                <br /><br />
-                                            </>
-                                        }
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Document Number</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.documentNumber}</Typography>
-                                        </Box>
-                                        <Box component="div" className={classes.detail}>
-                                            <Typography variant="subtitle2" component="p" className={classes.label}>Date of Issue</Typography>
-                                            <Typography variant="subtitle2" component="p" className={classes.content}>{idCheckData?.dateOfIssue}</Typography>
-                                        </Box>
-                                    </Box>
-                                </Box>
-                            </>
-                            :
-                            <Box component="div" className={classes.noDocument}>
-                                <IdCard className={classes.noDocumentIcon} />
-                                <Typography variant="h6" color="primary">No Document Submited</Typography>
-                            </Box>
-                        }
-                        
-                    </Box>     
-                </Box>
-            </Box> */}
+                }
+            </Box>
         </>
     );
 };

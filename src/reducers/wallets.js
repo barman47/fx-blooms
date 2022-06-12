@@ -10,10 +10,19 @@ import {
     SET_WALLET_TRANSACTION,
     SET_WALLET_TRANSACTIONS,
     SET_WALLET_FILTER,
-    SET_FUNDING_REQUESTS
-} from '../actions/types';
+    SET_FUNDING_REQUESTS,
+    SET_BANK_ACCOUNT,
+    SET_BANK_ACCOUNTS,
+    SET_BANK_ACCOUNT_MSG,
+    SET_WALLET_REQS,
+    SET_BATCH_ID,
+    SET_INSTITUTION_ID,
+    AUTHORIZE_WITHDRAWAL,
+    CLEAR_WALLET_MSG,
+    SET_WITHDRAWAL_REQUEST,
+} from "../actions/types";
 
-import { WALLET_FILTER } from '../utils/constants';
+import { WALLET_FILTER } from "../utils/constants";
 
 const initialState = {
     fundingRequest: {},
@@ -27,112 +36,165 @@ const initialState = {
     gbpActive: false,
     msg: null,
     transactions: [],
-    transaction: {}
+    transaction: {},
+    bankAccount: {},
+    bankAccounts: [],
+    walletReqs: undefined,
+    batchId: null,
+    institutionId: null,
+    authorizeRequest: {},
+    withdrawalSuccess: {},
 };
 
 const walletsReducer = (state = initialState, action) => {
-    switch (action.type) {  
+    switch (action.type) {
         case SET_WALLET:
             return {
                 ...state,
-                wallet: state.wallets.find(wallet => wallet.currency.value === action.payload.currency)
+                wallet: state.wallets.find(
+                    (wallet) =>
+                        wallet.currency.value === action.payload.currency
+                ),
             };
 
         case SET_WALLETS:
             return {
                 ...state,
-                wallets: action.payload
+                wallets: action.payload,
             };
 
-        case ACTIVATE_EUR_WALLET:  
+        case ACTIVATE_EUR_WALLET:
             if (!state.eurActive) {
                 return {
                     ...state,
                     eurActive: true,
                     ngnActive: false,
                     usdActive: false,
-                    gbpActive: false
-                }; 
+                    gbpActive: false,
+                };
             }
-            
-            return state;
-            
 
-        case ACTIVATE_NGN_WALLET:  
+            return state;
+
+        case ACTIVATE_NGN_WALLET:
             if (!state.ngnActive) {
                 return {
                     ...state,
                     eurActive: false,
                     ngnActive: true,
                     usdActive: false,
-                    gbpActive: false
-                };  
+                    gbpActive: false,
+                };
             }
-            
+
             return state;
 
-        case ACTIVATE_USD_WALLET:  
+        case ACTIVATE_USD_WALLET:
             if (!state.usdActive) {
                 return {
                     ...state,
                     eurActive: false,
                     ngnActive: false,
                     usdActive: true,
-                    gbpActive: false
-                };  
+                    gbpActive: false,
+                };
             }
-            
+
             return state;
 
-        case ACTIVATE_GPB_WALLET:  
+        case ACTIVATE_GPB_WALLET:
             if (!state.gbpActive) {
                 return {
                     ...state,
                     eurActive: false,
                     ngnActive: false,
                     usdActive: false,
-                    gbpActive: true
-                };  
+                    gbpActive: true,
+                };
             }
-            
+
             return state;
 
         case SET_FUNDING_REQUEST:
             return {
                 ...state,
-                fundingRequest: action.payload
+                fundingRequest: action.payload,
             };
 
         case SET_WALLET_MSG:
             return {
                 ...state,
-                msg: action.payload
+                msg: action.payload,
             };
 
         case SET_WALLET_TRANSACTION:
             return {
                 ...state,
-                transaction: action.payload
+                transaction: action.payload,
             };
 
         case SET_WALLET_TRANSACTIONS:
             return {
                 ...state,
-                transactions: action.payload ? action.payload : []
+                transactions: action.payload ? action.payload : [],
             };
 
         case SET_WALLET_FILTER:
             return {
                 ...state,
-                filter: action.payload
+                filter: action.payload,
             };
 
         case SET_FUNDING_REQUESTS:
             return {
                 ...state,
-                fundingRequests: action.payload
+                fundingRequests: action.payload,
             };
-
+        case SET_BANK_ACCOUNTS:
+            return {
+                ...state,
+                bankAccounts: action.payload,
+            };
+        case SET_BANK_ACCOUNT:
+            return {
+                ...state,
+                bankAccount: action.payload,
+            };
+        case SET_BANK_ACCOUNT_MSG:
+            return {
+                ...state,
+                msg: action.payload,
+            };
+        case SET_WALLET_REQS:
+            return {
+                ...state,
+                walletReqs: action.payload,
+            };
+        case SET_BATCH_ID:
+            return {
+                ...state,
+                batchId: action.payload,
+            };
+        case SET_INSTITUTION_ID:
+            return {
+                ...state,
+                institutionId: action.payload,
+            };
+        case AUTHORIZE_WITHDRAWAL:
+            return {
+                ...state,
+                authorizeRequest: action.payload,
+            };
+        case SET_WITHDRAWAL_REQUEST:
+            return {
+                ...state,
+                withdrawalSuccess: action.payload,
+            };
+        case CLEAR_WALLET_MSG:
+            return {
+                ...state,
+                msg: null,
+            };
         default:
             return state;
     }

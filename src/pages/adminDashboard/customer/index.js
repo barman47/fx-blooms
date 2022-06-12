@@ -14,6 +14,9 @@ import PersonalDetails from './PersonalDetails';
 import IdentityDetails from './IdentityDetails';
 import AuthenticationDetails from './AuthenticationDetails';
 import TransactionDetails from './TransactionDetails';
+import WalletDetails from './WalletDetails';
+import clsx from 'clsx';
+
 
 const useStyles = makeStyles(theme =>({
     root: {
@@ -127,7 +130,7 @@ const Customer = () => {
         <>
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             {loading && <Spinner />}
-            <Grid container direction="row" spacing={3} className={classes.root}>
+            <Grid container direction="row" spacing={3} className={clsx(classes.root, 'animate__animated animate__backInRight')}>
                 <Box component="div" className={classes.header}>
                     <Typography className={classes.userTitle} variant="h5" >User Details</Typography>
                     <Switch
@@ -144,6 +147,7 @@ const Customer = () => {
                     <Box component="div" className={classes.container}>
                         <IdentityDetails />
                         <AuthenticationDetails />
+                        <WalletDetails />
                         <TransactionDetails />
                     </Box>
                 </Grid>
