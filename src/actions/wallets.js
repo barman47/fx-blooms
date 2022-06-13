@@ -100,8 +100,7 @@ export const requestWalletFunding = (data, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/fund`, data);
-        const { authorisationUrl, institutionId, qrCodeUrl, status } =
-            res.data.data.data;
+        const { authorisationUrl, institutionId, qrCodeUrl, status } = res.data.data.data;
 
         const fundindDetails = {
             fundingMethod: "Open Banking",
