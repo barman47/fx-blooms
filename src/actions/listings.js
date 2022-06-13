@@ -13,6 +13,7 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_BIDS,
     SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
@@ -28,6 +29,20 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
+
+export const getBids = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${URL}/GetAllBidsbyListingId?listingId=${listingId}`, { pageNumber: 1, pageSize: 50 });
+        const bids = res.data.data.result.items;
+        return dispatch({
+            type: SET_BIDS,
+            payload: bids
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const addListing = (listing) => async (dispatch) => {
     try {

@@ -147,7 +147,16 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`);
-        
+        const { data } = res.data;
+        const fundingRequest = {
+            id: data.id,
+            paymentRequestId,
+            status: data.status,
+            currency: data.amountDetails.currency,
+            date: data.createdAt,
+            amount: data.amountDetails.amount,
+            reference: data.reference,
+        };
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
@@ -155,10 +164,10 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
             });
             dispatch({
                 type: SET_FUNDING_REQUEST,
-                payload: res.data.data,
+                payload: fundingRequest
             });
         });
-        return navigate(FUNDING_REQUEST_STATUS);
+        return navigate(FUNDING_REQUEST_STATUS, { state: { paymentRequestId } });
     } catch (err) {
 
     }
@@ -178,7 +187,6 @@ export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatc
             amount: data.amountDetails.amount,
             reference: data.reference,
         };
-        console.log(res);
         dispatch({
             type: SET_FUNDING_REQUEST,
             payload: fundingRequest
@@ -209,7 +217,6 @@ export const getFundingRequests = (walletId) => async (dispatch) => {
         const res = await axios.get(
             `${YAPILY_API}/creditrequests?walletId=${walletId}`
         );
-        // console.log(res);
         dispatch({
             type: SET_FUNDING_REQUESTS,
             payload: res.data.data,
@@ -223,7 +230,6 @@ export const getAllDeposits = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllDeposits`, query);
-        // console.log(res)
         dispatch({
             type: SET_FUNDING_REQUESTS,
             payload: res.data,

@@ -12,9 +12,9 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
-import { cancelBid, madePaymentV2 } from '../../../actions/listings';
+import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';
 import { markNotificationAsRead } from '../../../actions/notifications';
-import { GET_ERRORS, GET_LISTING, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -138,15 +138,14 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         margin: theme.spacing(2, 0),
-    },
+    }
 }));
 
-const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { account } = useSelector(state => state.bankAccounts);
-    const { bid, listing, msg } = useSelector(state => state.listings);
+    const { bid, bids, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
@@ -159,22 +158,15 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
     const [loading, setLoading] = useState(false);
 
     // const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
-    const THIRTY_MINUTES = 600000; // 30 minutes in milliseconds
+    const THIRTY_MINUTES = 60000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
     const errorToast = useRef();
 
     useEffect(() => {
+        getBids(bid.data.ListingId);
         startExpiryTimer();
-        dispatch({
-            type: GET_LISTING,
-            payload: bid.data.ListingId
-        });
-        if (isEmpty(account) && !isEmpty(listing)) {
-            getAccount(listing.sellersAccountId);
-        }
-
         return () => {
             clearInterval(interval.current);
         };
@@ -223,6 +215,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
     const getBidIds = (bids) => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
+        console.log(bidIds);
         return bidIds;
     };
 
@@ -233,10 +226,10 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
             payload: notificationId
         });
         
-        cancelBid(getBidIds(listing.bids));
         markNotificationAsRead(notificationId);
+        cancelBid(getBidIds(bids));
         toggleDrawer();
-    }, [cancelBid, dispatch, listing, markNotificationAsRead, notificationId, toggleDrawer]);
+    }, [cancelBid, dispatch, bids, markNotificationAsRead, notificationId, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
@@ -407,6 +400,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
 
 SellerSendNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
+    getBids: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
@@ -415,4 +409,4 @@ SellerSendNgnDrawer.propTypes = {
     notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, getBids, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);

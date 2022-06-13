@@ -286,6 +286,11 @@ const AllListings = (props) => {
 		// eslint-disable-next-line
 	}, []);
 
+	// Refetch Wallets to update balance when listings change due to deletion
+    useEffect(() => {
+		getWallets(customerId);
+	}, [customerId, getWallets, listings]);
+
 	// Only allow numbers on search
 	const handleSetAmount = (value) => {
 		if (isNaN(value)) {
