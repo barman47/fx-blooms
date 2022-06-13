@@ -157,8 +157,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
-    const THIRTY_MINUTES = 60000; // 30 minutes in milliseconds
+    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
@@ -212,12 +211,11 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
         setErrors(errorsState);
     }, [errorsState]);
 
-    const getBidIds = (bids) => {
+    const getBidIds = useCallback(() => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
-        console.log(bidIds);
         return bidIds;
-    };
+    }, [bids]);
 
     const expireListing = useCallback(() => {
         clearInterval(interval.current);
@@ -227,9 +225,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
         });
         
         markNotificationAsRead(notificationId);
-        cancelBid(getBidIds(bids));
+        cancelBid(getBidIds());
         toggleDrawer();
-    }, [cancelBid, dispatch, bids, markNotificationAsRead, notificationId, toggleDrawer]);
+    }, [cancelBid, dispatch, getBidIds, markNotificationAsRead, notificationId, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
