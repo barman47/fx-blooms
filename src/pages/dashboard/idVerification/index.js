@@ -145,14 +145,9 @@ const IDVerification = () => {
     const classes = useStyles();
     const navigate = useNavigate();
 
-    const { email, idVerificationLink, residencePermitUrl } = useSelector(state => state.customer);
-    const { idStatus, residencePermitStatus } = useSelector(state => state.customer.stats);
+    const { idStatus } = useSelector(state => state.customer.stats);
 
     const { APPROVED } = ID_STATUS;
-
-    useEffect(() => {
-        
-    }, [APPROVED, email, idVerificationLink, residencePermitUrl, idStatus, residencePermitStatus]);
 
     const verifyID = () => {
         // window.open(residencePermitUrl);
@@ -182,7 +177,7 @@ const IDVerification = () => {
                         <Typography variant="h6" color="primary">Government Issued ID</Typography>
                         <Typography variant="body2" component="p" color="primary">For KYC, kindly verify your government-issued ID.</Typography>
                         <div>
-                            {residencePermitStatus !== APPROVED ? 
+                            {idStatus !== APPROVED ? 
                                 <>
                                     <Typography variant="body2" component="p" className={classes.unverifiedButton}>Unverified</Typography>
                                     <Button size="small" variant="contained" color="primary" className={classes.verifyButton} startIcon={<ArrowRight className={classes.arrowIcon} />} onClick={verifyID}>Verify</Button>
