@@ -16,7 +16,7 @@ import {
     SET_BANK_ACCOUNT_MSG,
     SET_WALLET_REQS,
     SET_BATCH_ID,
-    SET_BANK_ACCOUNTS,
+    SET_ACCOUNT,
     AUTHORIZE_WITHDRAWAL,
     SET_INSTITUTIONS,
     SET_WITHDRAWAL_REQUEST,
@@ -294,7 +294,7 @@ export const getAllFXBAccounts = () => async (dispatch) => {
         );
 
         return dispatch({
-            type: SET_BANK_ACCOUNTS,
+            type: SET_ACCOUNT,
             payload: res.data.data,
         });
     } catch (err) {
