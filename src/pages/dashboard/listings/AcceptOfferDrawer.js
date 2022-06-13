@@ -103,7 +103,7 @@ const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { account, accounts } = useSelector(state => state.bankAccounts);
+    const { accounts } = useSelector(state => state.bankAccounts);
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
     const { listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
