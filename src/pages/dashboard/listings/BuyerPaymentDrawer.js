@@ -7,11 +7,8 @@ import {
     Collapse,
     Drawer,
     Grid,
-    FormControl,
     FormHelperText,
     IconButton,
-    Select,
-    MenuItem,
     TextField,
 	Typography 
 } from '@material-ui/core';
@@ -27,10 +24,10 @@ import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import getTime, { convertToLocalTime } from '../../../utils/getTime';
-import getBankAccount from '../../../utils/getAccount';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -194,6 +191,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     const interval = useRef();
     const successModal = useRef();
+    const toast = useRef();
 
     useEffect(() => {
         startExpiryTimer();
@@ -263,11 +261,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                 payload: listing.id
             });
         });
-    };
-
-    const handleAddAccount = () => {
-        setAddAccountDrawerOpen(true);
-        setReceivingAccount('');
     };
 
     useEffect(() => {
@@ -342,14 +335,10 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
     };
 
     const handleMadepayment = () => {
-        if (isEmpty(receivingAccount)) {
-            return setErrors({ receivingAccount: 'Please select a bank account' });
-        }
         setLoading(true);
         madePayment({
             bidId: bid.id,
             listingId: listing.id,
-            accountId: getBankAccount(receivingAccount, accounts).accountID,
             reference
         });
     };
@@ -358,6 +347,15 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
@@ -425,35 +423,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                                 </div>
                             </section>
                         </Collapse>              
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                        <FormControl 
-                            variant="outlined" 
-                            error={errors.receivingAccount ? true : false } 
-                            fullWidth 
-                            required
-                            disabled={loading ? true : false}
-                        >
-                            <Select
-                                labelId="ReceivingAccount"
-                                value={receivingAccount}
-                                onChange={(e) => setReceivingAccount(e.target.value)}
-                            >
-                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                {accounts.map((account) => {
-                                    if (account.currency === 'EUR') {
-                                        return (
-                                            // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                        )
-                                    }
-                                    return null;
-                                })}
-                            </Select>
-                            <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                            <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                        </FormControl>
                     </Grid>
                     <Grid item xs={12}>
                         <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>

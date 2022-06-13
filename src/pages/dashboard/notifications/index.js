@@ -16,7 +16,7 @@ import { GET_ERRORS, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../..
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import { PROFILE, PIN, TWO_FACTOR } from '../../../routes';
+import { PROFILE, PIN, TWO_FACTOR, VERIFF } from '../../../routes';
 
 import Notification from './Notification';
 import SellerSendNgnDrawer from './SellerSendNgnDrawer';
@@ -98,7 +98,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
+    const { customerId, hasSetPin, hasSetup2FA, isPhoneNumberVerified, phoneNo, stats, msg } = useSelector(state => state.customer);
     const { notifications } = useSelector(state => state.notifications);
 
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
@@ -187,14 +187,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
         if (customerId === Buyer.CustomerId) {
             return handlePaymentReceived(notification.Id, notificationId);
         }
-    };
-
-    const verifyEuId = () => {
-        window.open(residencePermitUrl);
-    };
-
-    const verifyOtherId = () => {
-        window.open(idVerificationLink);
     };
 
     const verifyPhone = () => {
@@ -346,27 +338,16 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
                             // }
                             return null;
                         })}
-                        {stats.residencePermitStatus !== APPROVED &&
+                        {stats.idStatus !== APPROVED &&
                             <Notification 
-                                title="Verify your EU Government Issued ID"
-                                message="Required to BUY and SELL. Click Verify ID to proceed."
+                                title="Verify  your Identity"
+                                message="Required to BUY only. Click Verify ID to proceed."
                                 buttonText="Verify ID"
-                                buttonAction={verifyEuId}
+                                buttonAction={() => navigate(VERIFF)}
                                 icon={<Passport />}
 						        iconBackgroundColor="#000100"
                             />
                         }
-                        {/* eslint-disable-next-line no-mixed-operators */}
-                        {((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) && (
-                            <Notification 
-                                title="Verify Other Government Issued ID"
-                                message="Required to BUY only. Click Verify ID to proceed."
-                                buttonText="Verify ID"
-                                buttonAction={verifyOtherId}
-                                icon={<Passport />}
-						        iconBackgroundColor="#000100"
-                            />
-                        )}
                         {!hasSetup2FA &&
                             <Notification 
                                 title="Set up 2FA"
@@ -387,12 +368,14 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 						        iconBackgroundColor="#2893EB"
                             />
                         }
-                        <Notification 
-                            title="Set PIN"
-                            message="Required for wallet withdrawals.. Click Set PIN to proceed."
-                            buttonText="Set PIN"
-                            buttonAction={() => navigate(PIN)}
-                        />
+                        {!hasSetPin && 
+                            <Notification 
+                                title="Set PIN"
+                                message="Required for wallet withdrawals. Click Set PIN to proceed."
+                                buttonText="Set PIN"
+                                buttonAction={() => navigate(PIN)}
+                            />
+                        }
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>

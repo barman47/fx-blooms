@@ -43,7 +43,7 @@ import {
  } from './types';
 import extractIdDetails from '../utils/extractIdDetails';
 
- const { APPROVED } = ID_STATUS;
+const { APPROVED } = ID_STATUS;
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const api = `${API}/Customer`;
 
@@ -189,7 +189,6 @@ export const externalLogin = (data, navigate) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: authResponse
         });
-        
         return isLinkedToProfile ? navigate(DASHBOARD_HOME) : navigate(ADD_USERNAME, { addUsername: true });
     } catch (err) {
         return handleError(err, dispatch);
