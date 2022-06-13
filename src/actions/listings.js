@@ -51,6 +51,19 @@ export const addListing = (listing) => async (dispatch) => {
     }
 };
 
+export const getListing = (id) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/GetListing/${id}`);
+        return dispatch({
+            type: SET_LISTING,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const checkListingEditable = (listing, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
@@ -248,7 +261,8 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
 
 export const cancelBid = (bidIds) => async (dispatch) => {
     try {
-        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        const res = await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        console.log(res);
     } catch (err) {
         return handleError(err, dispatch);
     }

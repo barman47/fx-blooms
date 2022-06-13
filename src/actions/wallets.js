@@ -14,7 +14,7 @@ import {
     SET_WITHDRAWAL_DETAILS,
     SET_FUNDING_REQUESTS,
     SET_WALLET,
-    UPDATE_FUNDING_REQUEST,
+    // UPDATE_FUNDING_REQUEST,
     SET_BANK_ACCOUNT_MSG,
     SET_WALLET_REQS,
     SET_BATCH_ID,
@@ -59,31 +59,11 @@ export const getWallet = (walletId) => async (dispatch)  => {
     }
 };
 
-export const getWallets = (customerId) => async (dispatch)  => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${WALLETS_API}/customers/${customerId}/wallets`);
-        dispatch({
-            type: SET_WALLETS,
-            payload: res.data.data
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getWallets = (customerId, tokenType = "") =>
-    async (dispatch) => {
+export const getWallets = (customerId, tokenType = "") => async (dispatch) => {
         try {
-            if (tokenType === "ADMIN") {
-                await reIssueAdminToken();
-            } else {
-                await reIssueCustomerToken();
-            }
-            const res = await axios.get(
-                `${WALLETS_API}/customers/${customerId}/wallets`
-            );
-            dispatch({
+            tokenType === "ADMIN" ? await reIssueAdminToken() : await reIssueCustomerToken();
+            const res = await axios.get(`${WALLETS_API}/customers/${customerId}/wallets`);
+            return dispatch({
                 type: SET_WALLETS,
                 payload: res.data.data,
             });
@@ -92,14 +72,10 @@ export const getWallets = (customerId, tokenType = "") =>
         }
     };
 
-export const getWalletTransactions =
-    ({ pageNumber, pageSize, walletId }) =>
-    async (dispatch) => {
+export const getWalletTransactions = ({ pageNumber, pageSize, walletId }) => async (dispatch) => {
         try {
             await reIssueCustomerToken();
-            const res = await axios.get(
-                `${WALLETS_API}/wallets/${walletId}/transactions?pageNumber=${pageNumber}&pageSize=${pageSize}`
-            );
+            const res = await axios.get(`${WALLETS_API}/wallets/${walletId}/transactions?pageNumber=${pageNumber}&pageSize=${pageSize}`);
             return dispatch({
                 type: SET_WALLET_TRANSACTIONS,
                 payload: res.data.data,
@@ -161,90 +137,57 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`);
-        const { data } = res.data;
-        const fundingRequest = {
-            id: data.id,
-            paymentRequestId,
-            status: data.status,
-            currency: data.amountDetails.currency,
-            date: data.createdAt,
-            amount: data.amountDetails.amount,
-            reference: data.reference,
-        };
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Funding request created successfully'
-export const payment =
-    ({ paymentRequestId, consentToken, type }, navigate) =>
-    async (dispatch) => {
-        try {
-            await reIssueCustomerToken();
-            const res = await axios.post(
-                `${YAPILY_API}/payment?type=${type}&consentToken=${consentToken}&paymentRequestId=${paymentRequestId}`
-            );
-            batch(() => {
-                dispatch({
-                    type: SET_CUSTOMER_MSG,
-                    payload: "Funding request created successfully",
-                });
-                dispatch({
-                    type: SET_FUNDING_REQUEST,
-                    payload: res.data.data,
-                });
+                payload: "Funding request created successfully",
             });
-            return navigate(FUNDING_REQUEST_STATUS);
-        } catch (err) {
-            return handleError(err, dispatch);
-        }
-    };
-
-export const getFundingDetails =
-    (paymentId, paymentRequestId) => async (dispatch) => {
-        try {
-            await reIssueCustomerToken();
-            const res = await axios.get(
-                `${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`
-            );
-            console.log(res);
             dispatch({
                 type: SET_FUNDING_REQUEST,
-                payload: fundingRequest
                 payload: res.data.data,
             });
-        } catch (err) {
-            return handleError(err, dispatch);
-        }
-    };
+        });
+        return navigate(FUNDING_REQUEST_STATUS);
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
-export const getWithdrawalDetails =
-    (paymentId, paymentRequestId) => async (dispatch) => {
-        try {
-            await reIssueCustomerToken();
-            const res = await axios.get(
-                `${YAPILY_API}/debit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`
-            );
-            dispatch({
-                type: SET_WITHDRAWAL_DETAILS,
-                payload: res.data.data,
-            });
-        } catch (err) {
-            return handleError(err, dispatch);
-        }
-    };
+export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
+        dispatch({
+            type: SET_FUNDING_REQUEST,
+            payload: res.data.data,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getWithdrawalDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/debit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
+        dispatch({
+            type: SET_WITHDRAWAL_DETAILS,
+            payload: res.data.data,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const getFundingRequests = (walletId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
-        const res = await axios.get(
-            `${YAPILY_API}/creditrequests?walletId=${walletId}`
-        );
+        const res = await axios.get(`${YAPILY_API}/creditrequests?walletId=${walletId}`);
         // console.log(res);
-        dispatch({
+        return dispatch({
             type: SET_FUNDING_REQUESTS,
             payload: res.data.data,
         });
-        return navigate(FUNDING_REQUEST_STATUS, { state: { paymentRequestId } });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -252,21 +195,6 @@ export const getFundingRequests = (walletId) => async (dispatch) => {
 
 export const getAllDeposits = (query) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentRequestId=${paymentRequestId}`);
-        const { data } = res.data;
-        const fundingRequest = {
-            id: data.id,
-            paymentRequestId,
-            status: data.status,
-            currency: data.amountDetails.currency,
-            date: data.createdAt,
-            amount: data.amountDetails.amount,
-            reference: data.reference,
-        };
-        return dispatch({
-            type: UPDATE_FUNDING_REQUEST,
-            payload: fundingRequest
         await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllDeposits`, query);
         // console.log(res)
@@ -281,15 +209,10 @@ export const getAllDeposits = (query) => async (dispatch) => {
 
 export const viewAllWalletRequests = (query) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${YAPILY_API}/debit/${paymentId}/details?paymentid=${paymentId}&paymentRequestId=${paymentRequestId}`);
         await reIssueAdminToken();
-        const res = await axios.post(
-            `${WALLET_HISTORY}/ViewAllWalletTransactions`,
-            query
-        );
+        const res = await axios.post(`${WALLET_HISTORY}/ViewAllWalletTransactions`, query);
 
-        dispatch({
+        return dispatch({
             type: SET_WALLET_TRANSACTIONS,
             payload: res.data.data,
         });
@@ -300,9 +223,6 @@ export const viewAllWalletRequests = (query) => async (dispatch) => {
 
 export const getAllWithdrawalReqs = (query) => async (dispatch) => {
     try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${YAPILY_API}/creditrequests?walletId=${walletId}`);
-        // console.log('res')
         await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllWithdrawals`, query);
         dispatch({
@@ -318,10 +238,7 @@ export const addAdminBankAccount = (query) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueAdminToken(),
-            await axios.post(
-                `${ACCOUNT_API}/accounts/add-admin-bank-account`,
-                query
-            ),
+            axios.post(`${ACCOUNT_API}/accounts/add-admin-bank-account`,query)
         ]);
 
         return dispatch({

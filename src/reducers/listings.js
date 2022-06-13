@@ -10,7 +10,6 @@ import {
     SET_INPROGRESS_LISTINGS,
     SET_ACTIVE_LISTINGS, 
     SET_MORE_LISTINGS,
-    GET_LISTING,
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_AS_ACCEPTED,
@@ -170,12 +169,6 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 deletedListings: action.payload
             }
-
-        case GET_LISTING:
-            return {
-                ...state,
-                listing: state.listings.find(listing => listing.id === action.payload)
-            };
 
         case HIDE_NEGOTIATION_LISTINGS:
             return {
