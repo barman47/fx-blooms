@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch, useSelector, batch } from "react-redux";
 import { getCustomer } from "../../../actions/customer";
 // import { getListingByStatus } from '../../../actions/adminListings';
 import clsx from "clsx";
@@ -10,6 +10,8 @@ import {
     Checkbox,
     FormControlLabel,
     Slider,
+    Menu,
+    MenuItem,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
@@ -21,8 +23,15 @@ import RemovedListings from "./RemovedListings";
 import CompletedListings from "./CompletedListings";
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
-import { ArrowTopRight, Filter, CloseCircleOutline } from "mdi-material-ui";
+import {
+    ArrowTopRight,
+    Filter,
+    CloseCircleOutline,
+    TrashCanOutline,
+    DotsHorizontal,
+} from "mdi-material-ui";
 import { exportAllUserRecords } from "../../../actions/admin";
+import { creditListing } from "../../../actions/wallets";
 import {
     getAllListings,
     getActiveListings,
@@ -30,13 +39,14 @@ import {
     getFinalisedListings,
     getDeletedListings,
 } from "../../../actions/adminListings";
-// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+import { CREDIT_LISTING, CLEAR_ERROR_MSG } from "../../../actions/types";
 import { exportRecords } from "../../../utils/exportRecords";
 import isEmpty from "../../../utils/isEmpty";
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 // import Status from '../../../components/admin-dashboard/Status';
 import formatId from "../../../utils/formatId";
 import handleStatusStyle from "../../../utils/statusDisplay";
+import Toast from "../../../components/common/Toast";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -261,6 +271,7 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1000,
         width: "100%",
         height: "100%",
+        overflowY: "hidden",
         // transform: "translate(0, 84px)",
     },
 
@@ -268,7 +279,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "white",
         width: "65%",
         height: "75vh",
-        margin: "2rem 8vw 0 auto",
+        margin: "2rem 15vw 0 auto",
         borderRadius: "3px",
         // paddingTop: '3rem',
         // paddingLeft: '1.5rem',
@@ -292,6 +303,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     viewMoreData: {
+        position: "relative",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         gap: "1rem",
@@ -319,6 +331,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1vw",
         padding: ".1rem .5rem",
         borderRadius: 6,
+        width: "max-content",
 
         "& p:first-child": {
             fontWeight: "600 !important",
@@ -330,13 +343,22 @@ const useStyles = makeStyles((theme) => ({
         height: "42%",
         width: "70%",
         overflowX: "hidden",
+        position: "relative",
         // display: 'flex',
         // flexDirection: 'column-reverse',
     },
 
+    hideCredBtn: {
+        display: "none",
+    },
+
+    creditOptions: {
+        position: "absolute",
+    },
+
     viewMoreBids: {
         display: "grid",
-        gridTemplateColumns: "repeat(3, max-content)",
+        gridTemplateColumns: "repeat(4, max-content)",
         padding: ".5rem .5rem .5rem 2rem",
         marginTop: "2rem",
         columnGap: "1rem",
@@ -450,6 +472,26 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#f5f7be",
         color: "#d1c70c",
     },
+
+    menu: {
+        backgroundColor: "white",
+        border: `none`,
+        borderRadius: theme.spacing(1.9),
+        marginRight: "10px",
+        cursor: "pointer",
+        // top: 474,
+        // riht: 248,
+        // left: '1695px !important',
+
+        "& ul": {
+            padding: "0",
+        },
+
+        "& li": {
+            padding: theme.spacing(2),
+            paddingLeft: theme.spacing(2.5),
+        },
+    },
 }));
 
 function valuetext(value) {
@@ -528,9 +570,23 @@ const Listings = () => {
     const [openFilterBx, setOpenFilterBx] = useState(false);
     const [openXport, closeXport] = useState(false);
 
+    //PC is PageCount
+    const [totalActivePC, setTotalActivePC] = useState(0);
+    const [totalFinalisedPC, setTotalFinalisedPC] = useState(0);
+    const [totalRemovedPC, setTotalRemovedPC] = useState(0);
+    const [totalInProgressPC, setTotalInProgressPC] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const ref = useRef();
+
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
-    const { totalListings } = useSelector((state) => state.stats);
+    const {
+        totalListings,
+        totalOpenListings,
+        totalRemovedListings,
+        totalListingsInProgress,
+        totalFinalisedListings,
+    } = useSelector((state) => state.stats);
     const {
         totalPageCount,
         listings,
@@ -538,9 +594,13 @@ const Listings = () => {
         finalisedListings,
         inProgressListings,
         deletedListings,
+        credit,
     } = useSelector((state) => state.listings);
+    const { msg } = useSelector((state) => state.errors);
 
     const [value, setValue] = useState([1, 70]);
+    const [toastMsg, setToastMsg] = useState("");
+    const [toastType, setToastType] = useState("");
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -595,24 +655,28 @@ const Listings = () => {
 
             case ALL_OPEN:
                 if (!!activeListings.items) {
+                    setTotalActivePC(activeListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_COMPLETED:
                 if (!!finalisedListings) {
+                    setTotalFinalisedPC(finalisedListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_NEGOTIATIONS:
                 if (!!inProgressListings) {
+                    setTotalInProgressPC(inProgressListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_DELETED:
                 if (!!deletedListings) {
+                    setTotalRemovedPC(deletedListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
@@ -654,7 +718,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalActivePC || 0);
                 break;
 
             case ALL_COMPLETED:
@@ -664,7 +728,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalFinalisedPC || 0);
                 break;
 
             case ALL_NEGOTIATIONS:
@@ -674,7 +738,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalInProgressPC || 0);
                 break;
 
             case ALL_DELETED:
@@ -684,7 +748,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalRemovedPC || 0);
                 break;
 
             default:
@@ -703,6 +767,10 @@ const Listings = () => {
         rowsPerPage,
         dispatch,
         totalPageCount,
+        totalInProgressPC,
+        totalActivePC,
+        totalRemovedPC,
+        totalFinalisedPC,
     ]);
 
     const downloadRecords = () => {
@@ -803,8 +871,64 @@ const Listings = () => {
         [ALL_LISTINGS, ALL_OPEN, classes]
     );
 
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleCredOption = (e) => {
+        setAnchorEl(e.currentTarget);
+    };
+
+    const handleCredit = (listing) => {
+        dispatch(
+            creditListing(listing.walletId, {
+                amount: listing.bidAmount.amount,
+                remark: "test",
+            })
+        );
+    };
+
+    useEffect(() => {
+        if (!!credit) {
+            setToastMsg(credit);
+            setToastType("success");
+            ref.current?.handleClick();
+            handleClose();
+        }
+    }, [credit]);
+
+    useEffect(() => {
+        if (!!msg) {
+            setToastType("error");
+            setToastMsg(msg);
+            ref.current?.handleClick();
+            handleClose();
+        }
+    }, [msg]);
+
+    const closeViewMoreModal = () => {
+        setViewMoreData({});
+        setOpenViewMore(false);
+        batch(() => {
+            dispatch({
+                type: CREDIT_LISTING,
+                payload: null,
+            });
+
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+        });
+    };
+
     return (
         <>
+            <Toast
+                ref={ref}
+                type={toastType}
+                msg={toastMsg}
+                title="Withdrawal Batch"
+            />
             <section
                 className={clsx(
                     classes.root,
@@ -914,7 +1038,10 @@ const Listings = () => {
                                 >
                                     <Box
                                         component="div"
-                                        className={classes.filterBoxContent}
+                                        className={clsx(
+                                            classes.filterBoxContent,
+                                            "animate__animated animate__fadeIn"
+                                        )}
                                     >
                                         <Box
                                             component="div"
@@ -1093,7 +1220,7 @@ const Listings = () => {
                             Finalized
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalFinalisedListings}
                         </Typography>
                     </div>
 
@@ -1108,7 +1235,7 @@ const Listings = () => {
                             Open
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalOpenListings}
                         </Typography>
                     </div>
 
@@ -1123,7 +1250,7 @@ const Listings = () => {
                             In progress
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalListingsInProgress}
                         </Typography>
                     </div>
 
@@ -1138,7 +1265,7 @@ const Listings = () => {
                             Removed
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalRemovedListings}
                         </Typography>
                     </div>
                 </Box>
@@ -1260,12 +1387,12 @@ const Listings = () => {
                         >
                             <Typography
                                 variant="h6"
-                                className={classes.viewMoreTitle}
+                                className={clsx(classes.viewMoreTitle)}
                             >
-                                Listing Details{" "}
+                                Listing Details
                                 <CloseCircleOutline
                                     style={{ cursor: "pointer" }}
-                                    onClick={() => setOpenViewMore(false)}
+                                    onClick={() => closeViewMoreModal()}
                                 />
                             </Typography>
                             <Box
@@ -1349,124 +1476,215 @@ const Listings = () => {
                                         amlNumber={viewMoreData.reference}
                                     />
                                 </Box>
+                                <Box
+                                    component="span"
+                                    className={
+                                        "animate__animated animate__bounce"
+                                    }
+                                    sx={{
+                                        position: "absolute",
+                                        top: 9,
+                                        right: 9,
+                                        color: "red",
+                                    }}
+                                >
+                                    <TrashCanOutline
+                                        style={{
+                                            fontSize: 20,
+                                        }}
+                                    />
+                                </Box>
                             </Box>
                             <Box
                                 component="div"
                                 className={classes.viewMoreBidsContainer}
                             >
-                                {viewMoreData.bids.map((listing, index) => {
-                                    return (
-                                        <Box
-                                            key={index}
-                                            component="div"
-                                            className={classes.viewMoreBids}
-                                        >
+                                {viewMoreData &&
+                                    viewMoreData.bids.map((listing, index) => {
+                                        return (
                                             <Box
+                                                key={index}
                                                 component="div"
-                                                className={classes.circleDesign}
+                                                className={classes.viewMoreBids}
                                             >
                                                 <Box
                                                     component="div"
-                                                    className={clsx(
-                                                        classes.circle,
-                                                        classes.status,
-                                                        handleStatus(
-                                                            listing.status
-                                                        )
-                                                    )}
-                                                ></Box>
-                                                <Box
-                                                    component="div"
-                                                    className={classes.line}
-                                                ></Box>
-                                            </Box>
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.statusContainer
-                                                }
-                                            >
-                                                <Typography
-                                                    variant="h6"
-                                                    className={clsx(
-                                                        classes.userStatusTitle,
-                                                        classes.status,
-                                                        handleStatus(
-                                                            listing.status
-                                                        )
-                                                    )}
-                                                >
-                                                    {listing.status}
-                                                </Typography>
-                                                <Box
-                                                    component="span"
                                                     className={
-                                                        classes.subStatus
+                                                        classes.circleDesign
                                                     }
                                                 >
-                                                    <Typography component="span">
-                                                        Test:{" "}
-                                                    </Typography>
-                                                    <Typography component="span">
-                                                        Another test:{" "}
-                                                    </Typography>
+                                                    <Box
+                                                        component="div"
+                                                        className={clsx(
+                                                            classes.circle,
+                                                            classes.status,
+                                                            handleStatus(
+                                                                listing.status
+                                                            )
+                                                        )}
+                                                    ></Box>
+                                                    <Box
+                                                        component="div"
+                                                        className={classes.line}
+                                                    ></Box>
                                                 </Box>
-                                            </Box>
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.dateTimeContainer
-                                                }
-                                            >
                                                 <Box
                                                     component="div"
-                                                    className={classes.dateTime}
-                                                >
-                                                    <Typography variant="body1">
-                                                        {
-                                                            handleDate(
-                                                                viewMoreData.dateCreated
-                                                            ).time
-                                                        }
-                                                    </Typography>
-                                                    <Typography variant="body1">
-                                                        {
-                                                            handleDate(
-                                                                viewMoreData.dateCreated
-                                                            ).date
-                                                        }
-                                                    </Typography>
-                                                </Box>
-                                                <Box
-                                                    component="span"
                                                     className={
-                                                        classes.subDateTime
+                                                        classes.statusContainer
                                                     }
                                                 >
-                                                    <Typography component="span">
-                                                        {customerName +
-                                                            " confirms " +
-                                                            currentAmount(
-                                                                viewMoreData.amountNeeded
-                                                            ).currencyType +
-                                                            currentAmount(
-                                                                viewMoreData.amountNeeded
-                                                            ).amount +
-                                                            ", " +
-                                                            currentAmount(
-                                                                viewMoreData.amountAvailable
-                                                            ).currencyType +
-                                                            currentAmount(
-                                                                viewMoreData.amountAvailable
-                                                            ).amount +
-                                                            " moved to Cubana's wallet"}
+                                                    <Typography
+                                                        variant="h6"
+                                                        className={clsx(
+                                                            classes.userStatusTitle,
+                                                            classes.status,
+                                                            handleStatus(
+                                                                listing.status
+                                                            )
+                                                        )}
+                                                    >
+                                                        {listing.status}
                                                     </Typography>
-                                                    {/* <Typography component='span'>Another test: </Typography> */}
+                                                    <Box
+                                                        component="span"
+                                                        className={
+                                                            classes.subStatus
+                                                        }
+                                                    >
+                                                        <Typography component="span">
+                                                            Test:{" "}
+                                                        </Typography>
+                                                        <Typography component="span">
+                                                            Another test:{" "}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Box
+                                                    component="div"
+                                                    className={
+                                                        classes.dateTimeContainer
+                                                    }
+                                                >
+                                                    <Box
+                                                        component="div"
+                                                        className={
+                                                            classes.dateTime
+                                                        }
+                                                    >
+                                                        <Typography variant="body1">
+                                                            {
+                                                                handleDate(
+                                                                    viewMoreData.dateCreated
+                                                                ).time
+                                                            }
+                                                        </Typography>
+                                                        <Typography variant="body1">
+                                                            {
+                                                                handleDate(
+                                                                    viewMoreData.dateCreated
+                                                                ).date
+                                                            }
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box
+                                                        component="span"
+                                                        className={
+                                                            classes.subDateTime
+                                                        }
+                                                    >
+                                                        <Typography component="span">
+                                                            {customerName +
+                                                                " confirms " +
+                                                                currentAmount(
+                                                                    viewMoreData.amountNeeded
+                                                                ).currencyType +
+                                                                currentAmount(
+                                                                    viewMoreData.amountNeeded
+                                                                ).amount +
+                                                                ", " +
+                                                                currentAmount(
+                                                                    viewMoreData.amountAvailable
+                                                                ).currencyType +
+                                                                currentAmount(
+                                                                    viewMoreData.amountAvailable
+                                                                ).amount +
+                                                                " moved to Cubana's wallet"}
+                                                        </Typography>
+                                                        {/* <Typography component='span'>Another test: </Typography> */}
+                                                    </Box>
+                                                </Box>
+                                                <Box
+                                                    component="div"
+                                                    id="basic-button"
+                                                    aria-controls={
+                                                        Boolean(anchorEl)
+                                                            ? "basic-menu"
+                                                            : undefined
+                                                    }
+                                                    // className={clsx(
+                                                    //     listing.status !==
+                                                    //         "OPEN" &&
+                                                    //         classes.hideCredBtn
+                                                    // )}
+                                                >
+                                                    <DotsHorizontal
+                                                        onClick={(e) =>
+                                                            handleCredOption(e)
+                                                        }
+                                                    />
+                                                    <Menu
+                                                        className={
+                                                            classes.creditOptions
+                                                        }
+                                                        id="basic-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        // classes={{
+                                                        //     paper: classes.menu,
+                                                        // }}
+                                                        aria-haspopup="true"
+                                                        aria-expanded={
+                                                            Boolean(anchorEl)
+                                                                ? "true"
+                                                                : undefined
+                                                        }
+                                                        MenuListProps={{
+                                                            "aria-labelledby":
+                                                                "basic-button",
+                                                        }}
+                                                        disableScrollLock={true}
+                                                    >
+                                                        <MenuItem
+                                                            onClick={() =>
+                                                                handleCredit(
+                                                                    listing
+                                                                )
+                                                            }
+                                                        >
+                                                            Transfer
+                                                        </MenuItem>
+                                                        <MenuItem
+                                                            onClick={
+                                                                handleClose
+                                                            }
+                                                        >
+                                                            TEst
+                                                        </MenuItem>
+                                                        <MenuItem
+                                                            onClick={
+                                                                handleClose
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </MenuItem>
+                                                    </Menu>
                                                 </Box>
                                             </Box>
-                                        </Box>
-                                    );
-                                })}
+                                        );
+                                    })}
                             </Box>
                         </Box>
                     </Box>

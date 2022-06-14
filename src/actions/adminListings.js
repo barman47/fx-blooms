@@ -1,14 +1,14 @@
-import axios from 'axios';
-import handleError from '../utils/handleError';
-import { 
-    SET_LISTINGS, 
+import axios from "axios";
+import handleError from "../utils/handleError";
+import {
+    SET_LISTINGS,
     SET_DELETED_LISTINGS,
     SET_FINALISED_LISTINGS,
     SET_INPROGRESS_LISTINGS,
-    SET_ACTIVE_LISTINGS
-} from './types';
-import reIssueAdminToken from '../utils/reIssueAdminToken';
-
+    SET_ACTIVE_LISTINGS,
+    DELETE_OPEN_LISTING,
+} from "./types";
+import reIssueAdminToken from "../utils/reIssueAdminToken";
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
@@ -23,7 +23,7 @@ export const getAllListings = (query) => async (dispatch) => {
 
         dispatch({
             type: SET_LISTINGS,
-            payload: { listings: items, ...rest }
+            payload: { listings: items, ...rest },
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -36,12 +36,12 @@ export const getListingByStatus = (status) => async (dispatch) => {
         const res = await axios.get(`${URL}/GetListingByStatus`);
         return dispatch({
             type: SET_LISTINGS,
-            payload: res.data.data
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
-}
+};
 
 export const getActiveListings = (query) => async (dispatch) => {
     try {
@@ -49,12 +49,12 @@ export const getActiveListings = (query) => async (dispatch) => {
         const res = await axios.post(`${api}/GetActiveListings`, query);
         return dispatch({
             type: SET_ACTIVE_LISTINGS,
-            payload: res.data.data
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
-}
+};
 
 export const getListingsInProgress = (query) => async (dispatch) => {
     try {
@@ -62,25 +62,25 @@ export const getListingsInProgress = (query) => async (dispatch) => {
         const res = await axios.post(`${api}/GetistingsInProgress`, query);
         return dispatch({
             type: SET_INPROGRESS_LISTINGS,
-            payload: res.data.data
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
-}
+};
 
 export const getFinalisedListings = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetActiveListings`, query);
+        const res = await axios.post(`${api}/GetCompletedListings`, query);
         return dispatch({
             type: SET_FINALISED_LISTINGS,
-            payload: res.data.data
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
-}
+};
 
 export const getDeletedListings = (query) => async (dispatch) => {
     try {
@@ -88,9 +88,22 @@ export const getDeletedListings = (query) => async (dispatch) => {
         const res = await axios.post(`${api}/GetRemovedListings`, query);
         return dispatch({
             type: SET_DELETED_LISTINGS,
-            payload: res.data.data
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
-}
+};
+
+export const deleteLisings = () => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        // const res = await axios.post(`${api}/DeleteListings`);
+
+        return dispatch({
+            type: DELETE_OPEN_LISTING,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

@@ -18,8 +18,8 @@ import {
     SET_BATCH_ID,
     SET_ACCOUNT,
     AUTHORIZE_WITHDRAWAL,
-    SET_INSTITUTIONS,
     SET_WITHDRAWAL_REQUEST,
+    CREDIT_LISTING,
 } from "./types";
 
 const API = `${process.env.REACT_APP_WALLET_API}`;
@@ -253,10 +253,7 @@ export const addAdminBankAccount = (query) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueAdminToken(),
-            await axios.post(
-                `${ACCOUNT_API}/accounts/add-admin-bank-account`,
-                query
-            ),
+            axios.post(`${ACCOUNT_API}/accounts/add-admin-bank-account`, query),
         ]);
 
         return dispatch({
@@ -272,9 +269,7 @@ export const deleteAdminBankAccount = (id) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueAdminToken(),
-            await axios.post(
-                `${ACCOUNT_API}/accounts/${id}/deleteAdminBankAccount`
-            ),
+            axios.post(`${ACCOUNT_API}/accounts/${id}/deleteAdminBankAccount`),
         ]);
 
         return dispatch({
@@ -337,21 +332,6 @@ export const getBatchById = (id) => async (dispatch) => {
     }
 };
 
-export const getInstitutions = () => async (dispatch) => {
-    try {
-        await reIssueAdminToken();
-        const res = await axios.get(`${YAPILY_API}/institutions`);
-        // console.log(res.data)
-
-        dispatch({
-            type: SET_INSTITUTIONS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
 export const authorizeWithdrawal = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
@@ -392,3 +372,21 @@ export const makeWithdrawalPayment =
             return handleError(err, dispatch);
         }
     };
+
+export const creditListing = (walletId, query) => async (dispatch) => {
+    try {
+        console.log(walletId);
+        console.log(query);
+        await Promise.all([
+            reIssueAdminToken(),
+            axios.post(`${WALLETS_API}/wallets/${walletId}/credit`, query),
+        ]);
+
+        dispatch({
+            type: CREDIT_LISTING,
+            payload: "Wallet credit successful",
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

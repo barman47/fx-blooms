@@ -1,14 +1,14 @@
-import { 
+import {
     SET_REQUIRED_CURRENCY,
     ADDED_BID,
-    ADDED_LISTING, 
+    ADDED_LISTING,
     DELETED_LISTING,
     SET_BID,
     SET_LISTINGS,
     SET_DELETED_LISTINGS,
     SET_FINALISED_LISTINGS,
     SET_INPROGRESS_LISTINGS,
-    SET_ACTIVE_LISTINGS, 
+    SET_ACTIVE_LISTINGS,
     SET_MORE_LISTINGS,
     GET_LISTING,
     SET_LISTING,
@@ -20,14 +20,15 @@ import {
     SET_RECOMMENDED_RATE,
     REMOVE_EXPIRED_LISTING,
     MAKE_LISTING_OPEN,
-    UPDATED_LISTING
-} from '../actions/types';
+    UPDATED_LISTING,
+    CREDIT_LISTING,
+} from "../actions/types";
 
-import { BID_STATUS, LISTING_STATUS } from '../utils/constants';
+import { BID_STATUS, LISTING_STATUS } from "../utils/constants";
 
 const initialState = {
-    availableCurrency: 'NGN',
-    requiredCurrency: 'EUR',
+    availableCurrency: "NGN",
+    requiredCurrency: "EUR",
     addedListing: false,
     editedListing: false,
     addedBid: false,
@@ -41,7 +42,8 @@ const initialState = {
     deletedListings: [],
     loading: false,
     msg: null,
-    recommendedRate: null
+    recommendedRate: null,
+    credit: null,
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -51,22 +53,24 @@ const listingsReducer = (state = initialState, action) => {
     let listing = {};
     let updatedListing = {};
 
-    switch (action.type) {   
+    switch (action.type) {
         case SET_REQUIRED_CURRENCY:
             return {
                 ...state,
                 availableCurrency: action.payload.availableCurrency,
-                requiredCurrency: action.payload.requiredCurrency  
+                requiredCurrency: action.payload.requiredCurrency,
             };
 
         case ADDED_BID:
             listingId = action.payload.listing.id;
-            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingIndex = state.listings.findIndex(
+                (listing) => listing.id === listingId
+            );
             listingsList = [...state.listings];
-            listing = { 
-                ...action.payload.listing, 
-                status: LISTING_STATUS.negotiation, 
-                bids: [...action.payload.listing.bids, action.payload.bid] 
+            listing = {
+                ...action.payload.listing,
+                status: LISTING_STATUS.negotiation,
+                bids: [...action.payload.listing.bids, action.payload.bid],
             };
             listingsList.splice(listingIndex, 1, listing);
             return {
@@ -74,124 +78,139 @@ const listingsReducer = (state = initialState, action) => {
                 bid: action.payload.bid,
                 addedBid: action.payload.addedBid,
                 listing,
-                listings: listingsList
+                listings: listingsList,
             };
 
         case SET_BID:
             return {
                 ...state,
-                bid: action.payload
+                bid: action.payload,
             };
 
         case SET_AS_ACCEPTED:
             listingId = action.payload;
-            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingIndex = state.listings.findIndex(
+                (listing) => listing.id === listingId
+            );
             listingsList = [...state.listings];
-            listing = { ...state.listings[listingIndex], status: LISTING_STATUS.negotiation };
+            listing = {
+                ...state.listings[listingIndex],
+                status: LISTING_STATUS.negotiation,
+            };
             listingsList.splice(listingIndex, 1, listing);
             return {
                 ...state,
-                listings: [...listingsList]
+                listings: [...listingsList],
             };
 
         case TOGGLE_BID_STATUS:
             return {
                 ...state,
-                addedBid: !state.addedBid
+                addedBid: !state.addedBid,
             };
 
         case ADDED_LISTING:
-            return action.payload ? {
-                ...state,
-                listings: [action.payload.listing, ...state.listings],
-                addedListing: !state.addedListing,
-                msg: action.payload.msg ? action.payload.msg : null
-            } : {
-                ...state,
-                addedListing: !state.addedListing,
-                msg: null
-            };
+            return action.payload
+                ? {
+                      ...state,
+                      listings: [action.payload.listing, ...state.listings],
+                      addedListing: !state.addedListing,
+                      msg: action.payload.msg ? action.payload.msg : null,
+                  }
+                : {
+                      ...state,
+                      addedListing: !state.addedListing,
+                      msg: null,
+                  };
 
         case UPDATED_LISTING:
-            return action.payload ? {
-                ...state,
-                editedListing: !state.editedListing,
-                msg: action.payload.msg ? action.payload.msg : null
-            } : {
-                ...state,
-                editedListing: !state.editedListing,
-                msg: null
-            };
-        
+            return action.payload
+                ? {
+                      ...state,
+                      editedListing: !state.editedListing,
+                      msg: action.payload.msg ? action.payload.msg : null,
+                  }
+                : {
+                      ...state,
+                      editedListing: !state.editedListing,
+                      msg: null,
+                  };
+
         case DELETED_LISTING:
             listingId = action.payload.id;
-            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingIndex = state.listings.findIndex(
+                (listing) => listing.id === listingId
+            );
             listingsList = [...state.listings];
             listingsList.splice(listingIndex, 1);
             return {
                 ...state,
-                listings: [...listingsList]
+                listings: [...listingsList],
             };
-        
+
         case SET_LISTING:
             return {
                 ...state,
-                listing: action.payload
+                listing: action.payload,
             };
-        
-        case SET_LISTINGS: 
+
+        case SET_LISTINGS:
             const { listings, ...rest } = action.payload;
             return {
                 ...state,
                 listings,
-                ...rest
+                ...rest,
             };
 
-        case SET_ACTIVE_LISTINGS: 
+        case SET_ACTIVE_LISTINGS:
             return {
                 ...state,
-                activeListings: action.payload
+                activeListings: action.payload,
             };
 
-        case SET_INPROGRESS_LISTINGS: 
+        case SET_INPROGRESS_LISTINGS:
             return {
                 ...state,
-                inProgressListings: action.payload
-            }
+                inProgressListings: action.payload,
+            };
 
-        case SET_FINALISED_LISTINGS: 
+        case SET_FINALISED_LISTINGS:
             return {
                 ...state,
-                finalisedListings: action.payload
-            }
+                finalisedListings: action.payload,
+            };
 
-        case SET_DELETED_LISTINGS: 
+        case SET_DELETED_LISTINGS:
             return {
                 ...state,
-                deletedListings: action.payload
-            }
+                deletedListings: action.payload,
+            };
 
         case GET_LISTING:
             return {
                 ...state,
-                listing: state.listings.find(listing => listing.id === action.payload)
+                listing: state.listings.find(
+                    (listing) => listing.id === action.payload
+                ),
             };
 
         case HIDE_NEGOTIATION_LISTINGS:
             return {
                 ...state,
-                listings: state.listings.filter(listing => listing.status === LISTING_STATUS.open)
+                listings: state.listings.filter(
+                    (listing) => listing.status === LISTING_STATUS.open
+                ),
             };
 
-        case SET_MORE_LISTINGS: 
+        case SET_MORE_LISTINGS:
             const {
                 currentPageNumber,
                 currentPageSize,
                 hasNext,
                 totalItemCount,
-                totalPageCount
+                totalPageCount,
             } = action.payload;
-            
+
             return {
                 ...state,
                 listings: [...state.listings, ...action.payload.listings],
@@ -199,14 +218,16 @@ const listingsReducer = (state = initialState, action) => {
                 currentPageSize,
                 hasNext,
                 totalItemCount,
-                totalPageCount
+                totalPageCount,
             };
 
         case CANCELED_NEGOTIATION:
             listingsList = [...state.listings];
-            listing = {...action.payload.listing};
+            listing = { ...action.payload.listing };
             listingId = listing.id;
-            listingIndex = listingsList.findIndex(item => item.id === listingId);
+            listingIndex = listingsList.findIndex(
+                (item) => item.id === listingId
+            );
             updatedListing = { ...listing };
             listingsList.splice(listingIndex, 1, updatedListing);
 
@@ -215,38 +236,55 @@ const listingsReducer = (state = initialState, action) => {
                 listing: {},
                 listings: [...listingsList],
                 updatedListing: !state.addedListing,
-                msg: action.payload.msg
+                msg: action.payload.msg,
             };
 
         case SET_LISTING_MSG:
             return {
                 ...state,
-                msg: action.payload
+                msg: action.payload,
+            };
+
+        case CREDIT_LISTING:
+            return {
+                ...state,
+                credit: action.payload,
             };
 
         case REMOVE_EXPIRED_LISTING:
             return {
                 ...state,
-                listings: state.listings.filter(listing => listing.id !== action.payload)
+                listings: state.listings.filter(
+                    (listing) => listing.id !== action.payload
+                ),
             };
 
         case SET_RECOMMENDED_RATE:
             return {
                 ...state,
-                recommendedRate: action.payload
+                recommendedRate: action.payload,
             };
 
         case MAKE_LISTING_OPEN:
             listingId = action.payload;
-            listingIndex = state.listings.findIndex(listing => listing.id === listingId);
+            listingIndex = state.listings.findIndex(
+                (listing) => listing.id === listingId
+            );
             listingsList = [...state.listings];
             listing = listingsList[listingIndex];
             const { status, bids, ...others } = listing;
-            const listingBids = bids.map(bid => ({ ...bid, status: BID_STATUS.CANCELED })); 
-            listingsList.splice(listingIndex, 1, { ...others, bids: listingBids, status: LISTING_STATUS.open });
+            const listingBids = bids.map((bid) => ({
+                ...bid,
+                status: BID_STATUS.CANCELED,
+            }));
+            listingsList.splice(listingIndex, 1, {
+                ...others,
+                bids: listingBids,
+                status: LISTING_STATUS.open,
+            });
             return {
                 ...state,
-                listings: [...listingsList]
+                listings: [...listingsList],
             };
 
         default:
