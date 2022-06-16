@@ -263,7 +263,8 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
 
 export const cancelBid = (bidIds) => async (dispatch) => {
     try {
-        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        const [res1, res2] = await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        console.log(res2);
     } catch (err) {
         return handleError(err, dispatch);
     }

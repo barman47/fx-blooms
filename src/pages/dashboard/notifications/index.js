@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,7 +12,7 @@ import formatNumber from '../../../utils/formatNumber';
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { GET_ERRORS, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_BID, SET_BIDS, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
@@ -211,9 +211,17 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const handleBuyerPayment = (bid) => {
         const { notificationId, data } = bid;
         setNotificationId(notificationId);
-        dispatch({
-            type: SET_BID,
-            payload: bid
+        batch(() => {
+            dispatch({
+                type: SET_BID,
+                payload: bid
+            });
+
+            // Clear bids before opening the drawer so as not to make the call to cancel bids when the drawer opens
+            dispatch({
+                type: SET_BIDS,
+                payload: []
+            });
         });
 
         // if (data.Buyer.HasReceivedPayment && !data.Buyer.HasMadePayment) {

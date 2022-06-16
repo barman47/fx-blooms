@@ -14,7 +14,7 @@ import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';
 import { markNotificationAsRead } from '../../../actions/notifications';
-import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_BIDS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
@@ -164,9 +164,12 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
     const errorToast = useRef();
 
     useEffect(() => {
-        getBids(bid.data.ListingId);
         startExpiryTimer();
         return () => {
+            dispatch({
+                type: SET_BIDS,
+                payload: []
+            });
             clearInterval(interval.current);
         };
         // eslint-disable-next-line
@@ -217,7 +220,16 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
         return bidIds;
     }, [bids]);
 
+    // Cancel bids once bids return from the endpoint
+    useEffect(() => {
+        if (bids.length > 0) {
+            cancelBid(getBidIds());
+            toggleDrawer();
+        }
+    }, [bids, cancelBid, getBidIds, toggleDrawer]);
+
     const expireListing = useCallback(() => {
+        getBids(bid.data.ListingId);
         clearInterval(interval.current);
         dispatch({
             type: REMOVE_NOTIFICATION,
@@ -225,9 +237,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
         });
         
         markNotificationAsRead(notificationId);
-        cancelBid(getBidIds());
-        toggleDrawer();
-    }, [cancelBid, dispatch, getBidIds, markNotificationAsRead, notificationId, toggleDrawer]);
+    }, [bid.data.ListingId, dispatch, getBids, markNotificationAsRead, notificationId]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
