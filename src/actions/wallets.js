@@ -9,6 +9,7 @@ import {
     SET_CUSTOMER_MSG,
     SET_FUNDING_REQUEST,
     SET_WALLETS,
+    SET_ONE_WALLET,
     SET_WALLET_MSG,
     SET_WALLET_TRANSACTIONS,
     SET_WITHDRAWAL_DETAILS,
@@ -48,7 +49,7 @@ export const getWallets =
     (customerId, tokenType = "") =>
     async (dispatch) => {
         try {
-            if (tokenType === "ADMIN") {
+            if (!!tokenType) {
                 await reIssueAdminToken();
             } else {
                 await reIssueCustomerToken();
@@ -375,8 +376,8 @@ export const makeWithdrawalPayment =
 
 export const creditListing = (walletId, query) => async (dispatch) => {
     try {
-        console.log(walletId);
-        console.log(query);
+        // console.log(walletId);
+        // console.log(query);
         await Promise.all([
             reIssueAdminToken(),
             axios.post(`${WALLETS_API}/wallets/${walletId}/credit`, query),
@@ -385,6 +386,21 @@ export const creditListing = (walletId, query) => async (dispatch) => {
         dispatch({
             type: CREDIT_LISTING,
             payload: "Wallet credit successful",
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getOneWallet = (walletId) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${WALLETS_API}/wallets/${walletId}`);
+        // console.log(res.data.data);
+
+        dispatch({
+            type: SET_ONE_WALLET,
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);

@@ -180,7 +180,11 @@ const WalletDetails = () => {
                             <Box component="div">
                                 <img
                                     className={classes.walletDesign}
-                                    src={blackWallet}
+                                    src={
+                                        eur?.currency?.value === "EUR"
+                                            ? blackWallet
+                                            : greenWallet
+                                    }
                                     alt="wallet design"
                                 />
                             </Box>
@@ -224,7 +228,11 @@ const WalletDetails = () => {
                             <Box component="div">
                                 <img
                                     className={classes.walletDesign}
-                                    src={greenWallet}
+                                    src={
+                                        ngn?.currency?.value === "EUR"
+                                            ? blackWallet
+                                            : greenWallet
+                                    }
                                     alt="wallet design"
                                 />
                             </Box>

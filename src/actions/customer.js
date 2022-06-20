@@ -37,6 +37,7 @@ import {
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER_STATS,
     SET_CUSTOMER,
+    SET_BUYER,
     SET_CUSTOMERS,
     SET_MORE_CUSTOMERS,
     SET_CUSTOMER_MSG,
@@ -293,19 +294,21 @@ export const getMoreCustomers = (query) => async (dispatch) => {
     }
 };
 
-export const getCustomer = (customerId) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.get(`${api}/GetCustomer/${customerId}`);
-        return dispatch({
-            type: SET_CUSTOMER,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
+export const getCustomer =
+    (customerId, buyer = "") =>
+    async (dispatch) => {
+        try {
+            // Issue admin token
+            await reIssueAdminToken();
+            const res = await axios.get(`${api}/GetCustomer/${customerId}`);
+            return dispatch({
+                type: !!buyer ? SET_BUYER : SET_CUSTOMER,
+                payload: res.data.data,
+            });
+        } catch (err) {
+            return handleError(err, dispatch);
+        }
+    };
 
 export const getCustomerStatus = (customerId) => async (dispatch) => {
     try {
@@ -502,6 +505,7 @@ export const setCustomerStatus =
             const res = await axios.post(
                 `${api}/CustomerStatus?customerID=${customerID}&status=${newStatus}`
             );
+            console.log(res);
             const msg = res.data.data;
             dispatch({
                 type: SET_CUSTOMER_STATUS,

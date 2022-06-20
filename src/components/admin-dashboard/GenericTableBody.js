@@ -14,6 +14,7 @@ import { SET_CUSTOMER } from "../../actions/types";
 import { CUSTOMER_CATEGORY } from "../../utils/constants";
 import handleStatusStyle from "../../utils/statusDisplay";
 import formatId from "../../utils/formatId";
+import formatDate from "../../utils/formatDate";
 import CircularProgressBar from "./CircularProgressBar";
 import clsx from "clsx";
 
@@ -279,14 +280,11 @@ const GenericTableBody = ({
                                 className={classes.tableCell}
                                 variant="subtitle1"
                             >
-                                <TextClamp
-                                    text={
-                                        customer[columnList[6]]
-                                            ? customer[columnList[6]]
-                                            : ""
-                                    }
-                                    lines={1}
-                                />
+                                {!!customer[columnList[6]].constructor
+                                    .toString()
+                                    .indexOf("Date") > -1
+                                    ? formatDate(customer[columnList[6]])
+                                    : customer[columnList[6]]}
                             </Typography>
                         ) : (
                             ""

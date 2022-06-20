@@ -7,15 +7,15 @@ import {
     Box,
     Typography,
     Grid,
-    Checkbox,
-    FormControlLabel,
+    // Checkbox,
+    // FormControlLabel,
     Slider,
     Menu,
     MenuItem,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
-import { COLORS, LISTING_DETAILS } from "../../../utils/constants";
+import { COLORS, LISTING_DETAILS, BID_STATUS } from "../../../utils/constants";
 import AllListings from "./AllListings";
 import ActiveListings from "./ActiveListings";
 import InProgressListings from "./InProgressListings";
@@ -29,9 +29,10 @@ import {
     CloseCircleOutline,
     TrashCanOutline,
     DotsHorizontal,
+    // SwapHorizontal,
 } from "mdi-material-ui";
 import { exportAllUserRecords } from "../../../actions/admin";
-import { creditListing } from "../../../actions/wallets";
+import { creditListing, getOneWallet } from "../../../actions/wallets";
 import {
     getAllListings,
     getActiveListings,
@@ -39,7 +40,12 @@ import {
     getFinalisedListings,
     getDeletedListings,
 } from "../../../actions/adminListings";
-import { CREDIT_LISTING, CLEAR_ERROR_MSG } from "../../../actions/types";
+import {
+    CREDIT_LISTING,
+    CLEAR_ERROR_MSG,
+    CLEAR_CUSTOMER,
+    CLEAR_WALLET,
+} from "../../../actions/types";
 import { exportRecords } from "../../../utils/exportRecords";
 import isEmpty from "../../../utils/isEmpty";
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
@@ -47,6 +53,8 @@ import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 import formatId from "../../../utils/formatId";
 import handleStatusStyle from "../../../utils/statusDisplay";
 import Toast from "../../../components/common/Toast";
+// import GenericPopUp from "../../../components/admin-dashboard/GenericPopUp";
+// import GenericTextField from "../../../components/admin-dashboard/GenericTextField";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -74,6 +82,30 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: "white",
             padding: "10px 20px",
             width: "6vw",
+
+            "&:hover": {
+                backgroundColor: "#1E6262",
+                color: "white",
+            },
+        },
+    },
+
+    reverseMenu: {
+        position: "absolute",
+        top: 47,
+        left: 1,
+        borderRadius: 5,
+        boxShadow: "1px 1px 1px 1.5px #c7c7c7",
+        display: "flex",
+        flexDirection: "column",
+        width: "41%",
+        textAlign: "left",
+
+        "& span": {
+            fontSize: ".9vw",
+            backgroundColor: "white",
+            padding: "10px 20px",
+            // width: "6vw",
 
             "&:hover": {
                 backgroundColor: "#1E6262",
@@ -313,7 +345,7 @@ const useStyles = makeStyles((theme) => ({
 
     amlTable: {
         display: "grid",
-        gridTemplateColumns: ".8fr 15vw",
+        gridTemplateColumns: "1fr 15vw",
         marginBottom: theme.spacing(2),
         // justifyContent: 'space-between',
         // width: '10vw',
@@ -323,6 +355,7 @@ const useStyles = makeStyles((theme) => ({
     amlTitle: {
         fontSize: "1vw",
         fontWeight: "400 !important",
+        width: "max-content",
     },
 
     amlNumber: {
@@ -341,8 +374,8 @@ const useStyles = makeStyles((theme) => ({
     viewMoreBidsContainer: {
         overflowY: "scroll",
         height: "42%",
-        width: "70%",
-        overflowX: "hidden",
+        width: "80%",
+        overflowX: "scroll",
         position: "relative",
         // display: 'flex',
         // flexDirection: 'column-reverse',
@@ -492,6 +525,31 @@ const useStyles = makeStyles((theme) => ({
             paddingLeft: theme.spacing(2.5),
         },
     },
+
+    reverseModalContent: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        // height: "70%",?
+        gap: 50,
+        marginTop: "20%",
+    },
+
+    reverseModalForm: {
+        display: "grid",
+        gridTemplateColumns: "300px 30px 300px",
+        justifyContent: "center",
+        alignItems: "center",
+        // height: "100%",
+        gap: 10,
+    },
+
+    txOption: {
+        position: "absolute",
+        right: 0,
+        top: 39,
+    },
 }));
 
 function valuetext(value) {
@@ -546,8 +604,9 @@ const Listings = () => {
     const dispatch = useDispatch();
 
     const { admin } = useSelector((state) => state);
-    const { customer } = useSelector((state) => state.customers);
+    const { customer, buyer } = useSelector((state) => state.customers);
 
+    const { IN_PROGRESS, CANCELED, COMPLETED } = BID_STATUS;
     const {
         ALL_LISTINGS,
         ALL_DELETED,
@@ -563,7 +622,8 @@ const Listings = () => {
     const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 
-    const [customerName, setCustomerName] = useState("");
+    const [workFlow, setWorkFlow] = useState("");
+    const [sellerName, setSellerName] = useState("");
 
     const [viewMoreData, setViewMoreData] = useState({});
     const [openViewMore, setOpenViewMore] = useState(false);
@@ -576,6 +636,8 @@ const Listings = () => {
     const [totalRemovedPC, setTotalRemovedPC] = useState(0);
     const [totalInProgressPC, setTotalInProgressPC] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
+    // const [openReverseMenu, closeReverseMenu] = useState(false);
+    const [buyerName, setBuyerName] = useState("");
     const ref = useRef();
 
     //   const [page, setPage] = useState(0);
@@ -597,6 +659,7 @@ const Listings = () => {
         credit,
     } = useSelector((state) => state.listings);
     const { msg } = useSelector((state) => state.errors);
+    const { wallet } = useSelector((state) => state.wallets);
 
     const [value, setValue] = useState([1, 70]);
     const [toastMsg, setToastMsg] = useState("");
@@ -827,27 +890,113 @@ const Listings = () => {
     };
 
     const viewTableRow = (listing) => {
-        dispatch(getCustomer(listing.customerId));
+        // console.log(listing.bids[0]?.customerId);
+        batch(() => {
+            dispatch(getCustomer(listing.customerId));
+            dispatch(getOneWallet(listing.walletId));
+        });
         setViewMoreData(listing);
         setOpenViewMore(true);
     };
 
     useEffect(() => {
-        if (!isEmpty(customer)) {
-            setCustomerName(customer.firstName);
+        if (!isEmpty(viewMoreData)) {
+            switch (viewMoreData?.amountNeeded?.currencyType) {
+                case "EUR":
+                    setWorkFlow(
+                        "BUY " + viewMoreData?.amountNeeded?.currencyType
+                    );
+                    break;
+                case "NGN":
+                    setWorkFlow(
+                        "BUY " + viewMoreData?.amountNeeded?.currencyType
+                    );
+                    break;
+                default:
+                    return;
+            }
+        }
+    }, [viewMoreData]);
+
+    useEffect(() => {
+        if (!isEmpty(customer?.username)) {
+            // console.log("cus", customer);
+            setSellerName(customer?.username);
         }
     }, [customer]);
 
-    const getCustomerName = useCallback(() => {
-        return customerName;
-    }, [customerName]);
+    useEffect(() => {
+        if (!isEmpty(viewMoreData?.bids)) {
+            dispatch(getCustomer(viewMoreData.bids[0]?.customerId, "BUYER"));
+        }
+    }, [viewMoreData, dispatch]);
+
+    useEffect(() => {
+        // console.log("buyer", buyer);
+        if (!isEmpty(buyer)) {
+            setBuyerName(buyer?.username);
+        }
+    }, [buyer]);
 
     const currentAmount = (amount) => {
+        // console.log("amount", amount);
         return {
             currencyType: amount.currencyType + " ",
             amount: amount.amount,
         };
     };
+
+    const bidsStatusBlueprint = useCallback(
+        (bids) => {
+            // console.log(sellerName);
+            const confirmed =
+                sellerName +
+                " confirms " +
+                currentAmount(bids.bidAmount)?.currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ", " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ` moved to ${buyerName}'s wallet`;
+
+            const cancelled =
+                sellerName +
+                " cancels " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                " listing.";
+
+            const inProgress =
+                buyerName +
+                " has bid for " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ` listing.`;
+
+            return {
+                confirmed,
+                cancelled,
+                inProgress,
+            };
+        },
+        [sellerName, buyerName]
+    );
+
+    const bidsStatusDetails = useCallback(
+        (bids) => {
+            switch (bids.status) {
+                case COMPLETED:
+                    return bidsStatusBlueprint(bids).confirmed;
+                case IN_PROGRESS:
+                    return bidsStatusBlueprint(bids).inProgress;
+                case CANCELED:
+                    return bidsStatusBlueprint(bids).cancelled;
+                default:
+                    return;
+            }
+        },
+        [COMPLETED, CANCELED, IN_PROGRESS, bidsStatusBlueprint]
+    );
 
     const handleDate = (dateTime) => {
         const time = new Date(dateTime);
@@ -882,7 +1031,7 @@ const Listings = () => {
     const handleCredit = (listing) => {
         dispatch(
             creditListing(listing.walletId, {
-                amount: listing.bidAmount.amount,
+                amount: listing.amountNeeded.amount,
                 remark: "test",
             })
         );
@@ -909,6 +1058,8 @@ const Listings = () => {
     const closeViewMoreModal = () => {
         setViewMoreData({});
         setOpenViewMore(false);
+        setWorkFlow("");
+        setSellerName("");
         batch(() => {
             dispatch({
                 type: CREDIT_LISTING,
@@ -917,6 +1068,12 @@ const Listings = () => {
 
             dispatch({
                 type: CLEAR_ERROR_MSG,
+            });
+            dispatch({
+                type: CLEAR_CUSTOMER,
+            });
+            dispatch({
+                type: CLEAR_WALLET,
             });
         });
     };
@@ -927,7 +1084,7 @@ const Listings = () => {
                 ref={ref}
                 type={toastType}
                 msg={toastMsg}
-                title="Withdrawal Batch"
+                title="Listing Error"
             />
             <section
                 className={clsx(
@@ -988,10 +1145,44 @@ const Listings = () => {
                                 gap: "10px",
                             }}
                         >
+                            {/* <GenericButton
+                                clickAction={() =>
+                                    closeReverseMenu(() => {
+                                        setOpenFilterBx(false);
+                                        closeXport(false);
+                                        return !openReverseMenu;
+                                    })
+                                }
+                                buttonName="Reverse Fund"
+                            > */}
+                            {/* <SwapHorizontal />
+                                {openReverseMenu ? (
+                                    <Box
+                                        className={classes.reverseMenu}
+                                        component="span"
+                                    >
+                                        <Typography
+                                            // onClick={() => }
+                                            component="span"
+                                        >
+                                            Lien
+                                        </Typography>
+                                        <Typography
+                                            // onClick={downloadRecords}
+                                            component="span"
+                                        >
+                                            Available
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    ""
+                                )}
+                            </GenericButton> */}
                             <GenericButton
                                 clickAction={() =>
                                     setOpenFilterBx(() => {
                                         closeXport(false);
+                                        // closeReverseMenu(false);
                                         return !openFilterBx;
                                     })
                                 }
@@ -1003,6 +1194,7 @@ const Listings = () => {
                                 clickAction={() =>
                                     closeXport(() => {
                                         setOpenFilterBx(false);
+                                        // closeReverseMenu(false);
                                         return !openXport;
                                     })
                                 }
@@ -1031,6 +1223,7 @@ const Listings = () => {
                                     ""
                                 )}
                             </GenericButton>
+
                             {openFilterBx ? (
                                 <Box
                                     component="div"
@@ -1073,51 +1266,14 @@ const Listings = () => {
                                                 }
                                             >
                                                 <label>
-                                                    Date
+                                                    Start Date
                                                     <input type="date" />
                                                 </label>
-                                            </Box>
 
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.filterTransactionType
-                                                }
-                                            >
-                                                <Typography variant="body1">
-                                                    Transaction Type
-                                                </Typography>
-                                                <Box
-                                                    component="div"
-                                                    className={
-                                                        classes.checkBoxContainer
-                                                    }
-                                                >
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                defaultChecked
-                                                            />
-                                                        }
-                                                        label="Wallet Transfer"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={<Checkbox />}
-                                                        label="Deposit"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                defaultChecked
-                                                            />
-                                                        }
-                                                        label="Direct Transfer"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={<Checkbox />}
-                                                        label="Withdrawal"
-                                                    />
-                                                </Box>
+                                                <label>
+                                                    End Date
+                                                    <input type="date" />
+                                                </label>
                                             </Box>
 
                                             <Box
@@ -1407,13 +1563,13 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Owner:"}
-                                        amlNumber={getCustomerName()}
+                                        amlTitle={"Seller:"}
+                                        amlNumber={sellerName}
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Expires:"}
-                                        amlNumber={getCustomerName()}
+                                        amlTitle={"Buyer:"}
+                                        amlNumber={buyerName}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1429,8 +1585,10 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Bank:"}
-                                        amlNumber={viewMoreData.bank}
+                                        amlTitle={"Lien Balance:"}
+                                        amlNumber={
+                                            wallet && wallet?.balance?.lien
+                                        }
                                     />
                                 </Box>
                                 <Box component="div">
@@ -1458,12 +1616,7 @@ const Listings = () => {
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Work Flow"}
-                                        amlNumber={
-                                            "BUY " +
-                                            currentAmount(
-                                                viewMoreData.amountNeeded
-                                            ).currencyType
-                                        }
+                                        amlNumber={workFlow}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1472,8 +1625,10 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Reference"}
-                                        amlNumber={viewMoreData.reference}
+                                        amlTitle={"Available Balance"}
+                                        amlNumber={
+                                            wallet && wallet?.balance?.available
+                                        }
                                     />
                                 </Box>
                                 <Box
@@ -1575,14 +1730,14 @@ const Listings = () => {
                                                         <Typography variant="body1">
                                                             {
                                                                 handleDate(
-                                                                    viewMoreData.dateCreated
+                                                                    listing.datePlaced
                                                                 ).time
                                                             }
                                                         </Typography>
                                                         <Typography variant="body1">
                                                             {
                                                                 handleDate(
-                                                                    viewMoreData.dateCreated
+                                                                    listing.datePlaced
                                                                 ).date
                                                             }
                                                         </Typography>
@@ -1594,22 +1749,9 @@ const Listings = () => {
                                                         }
                                                     >
                                                         <Typography component="span">
-                                                            {customerName +
-                                                                " confirms " +
-                                                                currentAmount(
-                                                                    viewMoreData.amountNeeded
-                                                                ).currencyType +
-                                                                currentAmount(
-                                                                    viewMoreData.amountNeeded
-                                                                ).amount +
-                                                                ", " +
-                                                                currentAmount(
-                                                                    viewMoreData.amountAvailable
-                                                                ).currencyType +
-                                                                currentAmount(
-                                                                    viewMoreData.amountAvailable
-                                                                ).amount +
-                                                                " moved to Cubana's wallet"}
+                                                            {bidsStatusDetails(
+                                                                listing
+                                                            )}
                                                         </Typography>
                                                         {/* <Typography component='span'>Another test: </Typography> */}
                                                     </Box>
@@ -1628,11 +1770,6 @@ const Listings = () => {
                                                     //         classes.hideCredBtn
                                                     // )}
                                                 >
-                                                    <DotsHorizontal
-                                                        onClick={(e) =>
-                                                            handleCredOption(e)
-                                                        }
-                                                    />
                                                     <Menu
                                                         className={
                                                             classes.creditOptions
@@ -1685,12 +1822,81 @@ const Listings = () => {
                                             </Box>
                                         );
                                     })}
+                                {isEmpty(viewMoreData.bids) ||
+                                viewMoreData?.bids[0]?.status === CANCELED ? (
+                                    ""
+                                ) : (
+                                    <Box
+                                        component="div"
+                                        className={classes.txOption}
+                                    >
+                                        <DotsHorizontal
+                                            onClick={(e) => handleCredOption(e)}
+                                        />
+                                    </Box>
+                                )}
                             </Box>
                         </Box>
                     </Box>
                 ) : (
                     ""
                 )}
+                {/* {openReverseMenu ? (
+                    <GenericPopUp
+                        component="div"
+                        containerWidth="69%"
+                        containerHeight="70vh"
+                        containerMargin="2rem 14vw 0 auto"
+                        onClick={() => closeReverseMenu()}
+                    >
+                        <Box
+                            component="div"
+                            className={classes.reverseModalContent}
+                        >
+                            <GenericButton />
+                            <Box
+                                component="div"
+                                className={classes.reverseModalForm}
+                            >
+                                <GenericTextField
+                                    textTitle="Receiver Wallet"
+                                    inputValue={remarks}
+                                    handleOnChange={setRemarks}
+                                    errors={errors}
+                                    errorValue={remarks}
+                                    label="Receiver Wallet ID"
+                                    placeHolder="Receiver"
+
+                                    isReadOnly={!editable}
+                                />
+                                <SwapHorizontal />
+                                <GenericTextField
+                                    textTitle="Destination Wallet"
+                                    inputValue={remarks}
+                                    handleOnChange={setRemarks}
+                                    errors={errors}
+                                    errorValue={remarks}
+                                    label="Destination Wallet ID"
+                                    placeHolder="Destination"
+
+                                    isReadOnly={!editable}
+                                />
+                            </Box>
+                            <GenericButton
+                                clickAction={() =>
+
+                                }
+                                buttonName="Reverse"
+                                fontColor="white"
+                                fontsize="15px"
+                                bxShadw="none"
+                                bgColor="#1E6262"
+                            />
+                        </Box>
+                    </GenericPopUp>
+                ) : (
+                    ""
+                )} */}
             </section>
         </>
     );

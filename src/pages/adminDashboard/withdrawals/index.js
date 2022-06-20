@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, batch } from "react-redux";
 import {
     Box,
     TablePagination,
@@ -784,8 +784,16 @@ const Withdrawals = () => {
         setLoadingAuth(false);
         setRequests({});
         clearWithdrawalReqs();
-        dispatch({
-            type: CLEAR_ERROR_MSG,
+        batch(() => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+            dispatch(
+                getAllWithdrawalReqs({
+                    pageSize: rowsPerPage,
+                    pageNumber: currentPage,
+                })
+            );
         });
     };
 
