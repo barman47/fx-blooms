@@ -1,41 +1,54 @@
-import { makeStyles } from '@material-ui/core/styles'
-import { Box } from '@material-ui/core'
-import clsx from 'clsx'
-
-
+import { makeStyles } from "@material-ui/core/styles";
+import { Box } from "@material-ui/core";
+import clsx from "clsx";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    position: 'fixed',
-    backgroundColor: 'rgba(0,0,0,0.3)',
-    backdropFilter: 'blur(1px)',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    right: 0,
-    zIndex: 1000,
-    // transform: 'translate(0, 84px)'
-  },
+    root: {
+        position: "fixed",
+        backgroundColor: "rgba(0,0,0,0.3)",
+        backdropFilter: "blur(1px)",
+        width: "100%",
+        height: "100%",
+        top: 0,
+        right: 0,
+        zIndex: 1000,
+        // transform: 'translate(0, 84px)'
+    },
 
-  container: {
-    backgroundColor: 'white',
-    margin: '2rem 22vw 0 auto',
-    borderRadius: 10,
-    paddingTop: 30
-  },
-}))
+    container: {
+        backgroundColor: "white",
 
-const GenericPopUp = ({ children, containerHeight='75vh', containerWidth='50%' }) => {
-  const classes = useStyles()
+        borderRadius: 10,
+        paddingTop: 30,
+    },
+}));
 
+const GenericPopUp = ({
+    children,
+    containerHeight = "75vh",
+    containerWidth = "50%",
+    containerMargin,
+}) => {
+    const classes = useStyles();
 
-  return (
-    <Box component="div" className={clsx(classes.root)}>
-      <Box component="div" className={clsx(classes.container, 'animate__animated animate__zoomIn')} sx={{ height: containerHeight, width: containerWidth }}>
-        { children }
-      </Box>
-    </Box>
-  )
-}
+    return (
+        <Box component="div" className={clsx(classes.root)}>
+            <Box
+                component="div"
+                className={clsx(
+                    classes.container,
+                    "animate__animated animate__zoomIn"
+                )}
+                sx={{
+                    height: containerHeight,
+                    width: containerWidth,
+                    margin: containerMargin ?? "2rem 22vw 0 auto",
+                }}
+            >
+                {children}
+            </Box>
+        </Box>
+    );
+};
 
-export default GenericPopUp
+export default GenericPopUp;
