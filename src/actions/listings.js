@@ -13,6 +13,7 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_BIDS,
     SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
@@ -29,28 +30,19 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
-// export const getAllListings = () => async (dispatch) => {
-//     try {
-//         console.log('getting all listings');
-//         await reIssueCustomerToken();
-//         const res = await axios.post(`${URL}/GetAllListings`, {
-//             pageNumber: 0,
-//             pageSize: 15,
-//             currencyNeeded: 'NGN',
-//             currencyAvailable: 'NGN',
-//             minimumExchangeAmount: 0,
-//             useCurrencyFilter: false
-//         });
-//         const { items, ...rest } = res.data.data;
-
-//         dispatch({
-//             type: SET_LISTINGS,
-//             payload: { listings: items, ...rest }
-//         });
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
+export const getBids = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${URL}/GetAllBidsbyListingId?listingId=${listingId}`, { pageNumber: 1, pageSize: 50 });
+        const bids = res.data.data.result.items;
+        return dispatch({
+            type: SET_BIDS,
+            payload: bids
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const addListing = (listing) => async (dispatch) => {
     try {
@@ -152,7 +144,6 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
-        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({
@@ -272,7 +263,8 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
 
 export const cancelBid = (bidIds) => async (dispatch) => {
     try {
-        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        const [res1, res2] = await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
+        console.log(res2);
     } catch (err) {
         return handleError(err, dispatch);
     }

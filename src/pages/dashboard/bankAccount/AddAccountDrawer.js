@@ -200,17 +200,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
 
     // Validate IBAN and get BIC
     useEffect(() => {
-        if (!isEmpty(accountValidation)) {
-            setLoading(false);
+        setLoading(false);
+        if (!isEmpty(accountValidation && accountValidation?.bank?.bank_name)) {
             setBankName(accountValidation.bank.bank_name);
             setBic(accountValidation.bank.bic);
-            setIsIbanValid(accountValidation.valid);
-
-            if (accountValidation.valid) {
-                setErrors({});
-            } else {
-                setErrors({ AccountNumber: accountValidation.message });
-            }
+            setIsIbanValid(accountValidation.valid)
+            setErrors({});
+        } else {
+            setErrors({ AccountNumber: accountValidation.message });
+            setIsIbanValid(false);
         }
         
     }, [accountValidation]);
@@ -433,7 +431,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                                 <TextField 
                                     className={classes.input}
                                     value={BankName}
-                                    // onChange={(e) => setBankName(e.target.value)}
+                                    onChange={(e) => setBankName('')}
                                     type="text"
                                     variant="outlined" 
                                     placeholder="Enter Bank Name"

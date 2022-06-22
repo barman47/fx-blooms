@@ -55,6 +55,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(10),
 
         '& p:first-child': {
+            fontWeight: 600,
             marginBottom: theme.spacing(5)
         },
 
@@ -80,11 +81,10 @@ const PrivacyPolicy = () => {
                 </Box>
                 <Box component="section" className={classes.container}>
                     <Box component="div" className={classes.item}>
-                        <Typography variant="body2" component="p">Processing of personal data</Typography>
                         <Typography variant="body2" component="p">
-                            FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia, email privacy@fxblooms.com (hereinafter referred to as the service provider), processes your personal data in accordance with the requirements of the Personal Data Protection Act of Estonia.
-                            The service provider processes personal information only for providing the service you have ordered. We do not transmit, sell, or disclose your data to third parties without your prior consent or in the cases provided by law.
+                            Last updated: June 15th, 2022
                         </Typography>
+                        <Typography variant="body2" component="p">FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia, email hello@fxblooms.com (hereinafter referred to as the service provider), processes your personal data in accordance with the requirements of the Personal Data Protection Act of Estonia. The service provider processes personal information only for providing the service you have ordered. We do not transmit, sell, or disclose your data to third parties without your prior consent or in the cases provided by law.</Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">1. Data we collect</Typography>
@@ -134,7 +134,7 @@ const PrivacyPolicy = () => {
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">5. How do we store your data</Typography>
-                        <Typography variant="body2" component="p">5.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider securely stores your data at www.fxblooms.com, by FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Lasnamäe linnaosa, Tuha tn 3, 11415 Estonia.</Typography>
+                        <Typography variant="body2" component="p">5.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider securely stores your data at www.fxblooms.com, by FXBLOOMS OÜ (registry code 16262446), located at Harju maakond, Tallinn, Kesklinna linnaosa, Narva mnt 7, 10117 Estonia email <a href="mailto:hello@fxblooms.com">hello@fxblooms.com</a></Typography>
                         <Typography variant="body2" component="p">5.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The Service Provider will retain User's personal data for a period of 5 years after termination of customer relationship with the User. Once this time-period has expired, we will delete the User's data by removing and erasing it from the company's database and records.</Typography>
                         <Typography variant="body2" component="p">5.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Accountancy related data (invoices and payment records) shall be retained for 7 years.</Typography>
                     </Box>
@@ -142,7 +142,8 @@ const PrivacyPolicy = () => {
                         <Typography variant="body2" component="p">6. Security</Typography>
                         <Typography variant="body2" component="p">6.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider is the holder and controller of the collected data. The access to customer's personal data is provided only to staff members of the service provider for processing orders and managing order related errors, refunds and feedback while taking the relevant precautions and measures in order to avoid disclosure, unauthorised access, loss and unlawful use of personal data by irrelevant third parties.</Typography>
                         <Typography variant="body2" component="p">6.2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider may and can transmit personal data to relevant third parties to process orders, manage service provider's accountancy operations, verification of User's identity and documents, proportionately to what is necessary to perform the relevant action.</Typography>
-                        <Typography variant="body2" component="p">6.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider transmits the personal data necessary for verification of User's identity and documents to GetID (https://getid.ee) which is a recognized identity verification service provider.</Typography>
+                        <Typography variant="body2" component="p">6.3&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider transmits the personal data necessary for verification of User's identity and documents to <a href="https://www.veriff.com" target="_blank" rel="noreferrer">Veriff</a> which is a recognized identity verification service provider.</Typography>
+                        <Typography variant="body2" component="p">6.4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;The service provider transmits the personal data necessary for payments encrypted to <a href="https://www.yapily.com" target="_blank" rel="noreferrer">Yapilly UAB</a>which is a regulated and recognized payment institution.</Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">7. Marketing</Typography>
@@ -172,13 +173,14 @@ const PrivacyPolicy = () => {
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">11. How to contact us?</Typography>
                         <Typography variant="body2" component="p">11.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;If you have any questions about the service provider's privacy policy, the data we hold on you, or you would like to exercise one of your data protection rights, please do not hesitate to contact us.</Typography>
-                        <Typography variant="body2" component="p">11.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email us at: privacy@fxblooms.com</Typography>
+                        <Typography variant="body2" component="p">11.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Email us at: <a href="mailto:privacy@fxblooms.com">privacy@fxblooms.com</a></Typography>
                         <Typography variant="body2" component="p">11.3.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;You have the right to have access to your personal data at any time and to have it corrected, closed or deletion, unless otherwise provided by law.</Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">12. How to contact us?</Typography>
                         <Typography variant="body2" component="p">12.1.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complaints and Disputes</Typography>
-                        <Typography variant="body2" component="p">12.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you wish to report a complaint or if you feel that the service provider has not addressed your concern in a satisfactory manner, you may contact the supervisory authority – Estonian Data Protection Inspectorate at info@aki.ee</Typography>
+                        <Typography variant="body2" component="p">12.2.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If you wish to report a complaint or if you feel that the service provider has not addressed your concern in a satisfactory manner, you may contact the supervisory authority – Estonian Data Protection Inspectorate at <a href="mailto:info@aki.ee">info@aki.ee</a></Typography>
+                        <Typography variant="body2" component="p">The service provider presumes that the customer has understood and accepted the terms of current "Privacy policy" and "Terms and conditions" before using the website and "User Agreement" before using the services.</Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">The service provider presumes that the customer has understood and accepted the terms of current "Privacy policy" and "Terms and conditions" before using the website and "User Agreement" before using the services.</Typography>
