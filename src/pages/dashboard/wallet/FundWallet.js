@@ -246,10 +246,10 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
         if (sourceAccount) {
             
         }
-        const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
+        const { accountID, accountName, accountNumber, bankName, institutionId } = getAccount(sourceAccount, accounts);
         const data = {
-            // institutionId: institutionId,
-            // institution: institution,
+            institutionId,
+            institution: bankName,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
