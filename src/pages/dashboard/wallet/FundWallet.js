@@ -4,22 +4,20 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
     Button,
+    Checkbox,
     FormControl,
     FormHelperText,
     Grid,
     MenuItem,
-    Radio,
     Select,
     TextField,
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Security } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
-import { getInstitutions } from '../../../actions/institutions';
 import { requestWalletFunding } from '../../../actions/wallets';
 import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
 
@@ -35,9 +33,9 @@ import Toast from '../../../components/common/Toast';
 import IDVerificationModal from '../idVerification/IDVerificationModal';
 import PendingIdModal from '../idVerification/PendingIdModal';
 
-import yapily from '../../../assets/img/yapily.png';
-import bankTransfer from '../../../assets/img/bank-transfer.png';
-import cardPayment from '../../../assets/img/card-logo.png';
+// import yapily from '../../../assets/img/yapily.png';
+// import bankTransfer from '../../../assets/img/bank-transfer.png';
+// import cardPayment from '../../../assets/img/card-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -90,17 +88,6 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 600
     },
 
-    option: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-
-        '& img': {
-            marginLeft: theme.spacing(2),
-            width: theme.spacing(3),
-        }
-    },
-
     text: {
         color: COLORS.grey,
         fontWeight: 300,
@@ -133,7 +120,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -141,19 +128,19 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { idStatus } = useSelector(state => state.customer.stats);
-    const { institutions, currencies, customer } = useSelector(state => state);
+    // eslint-disable-next-line
+    const { currencies, customer, institutions } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
     const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
-    const [institution, setInstitution] = useState('');
-    const [institutionId, setInstitutionId] = useState('');
+    const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
+
     const [errors, setErrors] = useState({});
 
     const idVerificationModal = useRef();
@@ -171,9 +158,6 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
 
         if (currencies.length === 0) {
             getCurrencies()
-        }
-        if (institutions.length === 0) {
-            getInstitutions()
         }
 
         dispatch({
@@ -199,6 +183,29 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    // Check if selected account supports instant payment when selected
+    // useEffect(() => {
+    //     if (sourceAccount) {
+    //         let supportsFunding = false;
+    //         const account = getAccount(sourceAccount, accounts);
+    //         let customerInstitution = null;
+    //         for (let insitution in institutions) {
+    //             if (insitution.id === account.insitutionId) {
+    //                 customerInstitution = insitution;
+    //                 break;
+    //             }
+    //         }
+
+    //         if (customerInstitution.features.includes('')) {
+    //             supportsFunding = true;
+    //         }
+
+    //         if (!supportsFunding) {
+    //             // Show not supported message and clear the bank state
+    //         }
+    //     }
+    // }, [accounts, institutions, sourceAccount]);
 
     const checkIdStatus = () => {
         switch (idStatus) {
@@ -241,8 +248,8 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
         }
         const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
         const data = {
-            institutionId: institutionId,
-            institution: institution,
+            // institutionId: institutionId,
+            // institution: institution,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
@@ -250,6 +257,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
             accountId: sourceAccount ? accountID : '',
             accountName: sourceAccount ? accountName : '',
             accountNumber: sourceAccount ? accountNumber : '',
+            useInstantPayment: checked,
             reference: "FXBLOOMS"
         };
 
@@ -369,42 +377,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                             </FormControl>
                             <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Financial Institution</Typography>
-                            <Autocomplete
-                                id="country-select"
-                                options={institutions}
-                                autoHighlight
-                                disableClearable
-                                getOptionLabel={(option) => {
-                                    setInstitutionId(option.id);
-                                    setInstitution(option.fullName);
-                                    return option.fullName;
-                                }}
-                                renderOption={(option) => (
-                                    <>
-                                        <div className={classes.option}>
-                                            <span>{option.fullName}</span>
-                                            <img src={option.media[0].source} alt={`${institution.fullName} Logo`} />
-                                        </div>
-                                    </>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        error={errors.institution ? true : false}
-                                        helperText={errors.institution}
-                                        {...params}
-                                        variant="outlined"
-                                        inputProps={{
-                                            ...params.inputProps,
-                                            // autoComplete: 'new-password',
-                                        }}
-                                        // onChange={(e) => setCountryCode(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Box component="section" className={classes.paymentMethod}>
                                 <Radio
                                     color="primary"
@@ -454,6 +427,18 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
                                     <Typography variant="subtitle2" component="span" className={classes.soon}>Coming soon</Typography>
                                 </Box>
                             </Box>
+                        </Grid> */}
+                        <Grid item xs={12}>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Use Instant Payment</Typography>
+                            <br />
+                            <Checkbox
+                                color="primary"
+                                checked={checked}
+                                onChange={() => setChecked(!checked)}
+                                inputProps={{ 'aria-label': 'primary checkbox' }}
+                                disabled={sourceAccount ? false : true}
+                            />
+                            <Typography variant="subtitle2" component="span" color="secondary">Please note: Instant payment may come with additional charges from your bank.</Typography>
                         </Grid>
                         <Grid item xs={12} md={6}>
                             <Button 
@@ -492,8 +477,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, getInstitutions, hand
 
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
-    getInstitutions: PropTypes.func.isRequired,
     requestWalletFunding: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { requestWalletFunding, getCurrencies, getInstitutions })(FundWallet);
+export default connect(undefined, { requestWalletFunding, getCurrencies })(FundWallet);

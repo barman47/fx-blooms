@@ -5,6 +5,7 @@ import {
     Box,
 	Button,
     CircularProgress,
+    FormHelperText,
     Grid,
     Drawer,
     IconButton,
@@ -13,17 +14,20 @@ import {
     TextField,
 	Typography 
 } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Close } from 'mdi-material-ui';
 
 import { addAccount, validateIban } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION } from '../../../actions/types';
+import { getInstitutions } from '../../../actions/wallets';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import isEmpty from '../../../utils/isEmpty';
+import SupportedFundingInstitutionsModal from './SupportedFundingInstitutionsModal';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -73,6 +77,27 @@ const useStyles = makeStyles(theme => ({
         top: '5px'
     },
 
+    option: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+
+        '& img': {
+            marginLeft: theme.spacing(2),
+            width: theme.spacing(3),
+        }
+    },
+
+    supportedList: {
+        color: theme.palette.primary.main,
+        cursor: 'pointer',
+        fontWeight: 600,
+
+        '&:hover': {
+            textDecoration: 'underline'
+        }
+    },
+
     button: {
         marginBottom: theme.spacing(4)
     }    
@@ -112,17 +137,19 @@ function a11yProps(index) {
 }
   
 
-const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, validateIban }) => {
+const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, validateIban, getInstitutions }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const matches = theme.breakpoints.down('md');
 
     const { customerId, firstName, lastName } = useSelector(state => state.customer);
+    const { institutions } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
     const { accountValidation, msg } = useSelector(state => state.bankAccounts);
 
     const [BankName, setBankName] = useState('');
+    const [institutionId, setInstitutionId] = useState('');
     const [AccountNumber, setAccountNumber] = useState('');
     const [AccountName, setAccountName] = useState(`${firstName ?? ''} ${lastName ?? ''}`);
     const [bic, setBic] = useState('');
@@ -135,7 +162,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const [isIbanValid, setIsIbanValid] = useState(false);
 
     const successModal = useRef();
+    const supportedBanks = useRef();
     const toast = useRef();
+
+    useEffect(() => {
+        if (institutions.length === 0) {
+            getInstitutions();
+        }
+        // eslint-disable-next-line
+    }, []);
 
     const setReceivingAccountType = useCallback(() => {
         if (eur && ngn) {
@@ -202,13 +237,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     useEffect(() => {
         setLoading(false);
         if (!isEmpty(accountValidation && accountValidation?.bank?.bank_name)) {
-            setBankName(accountValidation.bank.bank_name);
+            // setBankName(accountValidation.bank.bank_name);
             setBic(accountValidation.bank.bic);
             setIsIbanValid(accountValidation.valid)
             setErrors({});
         } else {
-            setErrors({ AccountNumber: accountValidation.message });
-            setIsIbanValid(false);
+            if (accountValidation.message) {
+                setErrors({ AccountNumber: accountValidation.message });
+                setIsIbanValid(false);
+            }
         }
         
     }, [accountValidation]);
@@ -258,13 +295,15 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
         e.preventDefault();
         setErrors({});
         const data = {
+            institutionId,
             BankName,
             AccountName,
             nickName,
             AccountNumber,
             Currency: handleSetCurrency(),
             bic,
-            CustomerId: customerId
+            CustomerId: customerId,
+            sortCode: ''
         };
 
         const { errors, isValid } = validateAddBankAccount(data);
@@ -291,6 +330,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                 />
             }
             {/* {loading && <Spinner />} */}
+            <SupportedFundingInstitutionsModal ref={supportedBanks} />
             <Drawer PaperProps={{ className: classes.drawer }} anchor="right" open={loading ? true : open} onClose={toggleDrawer}>
                 <Box component="header">
                     <Typography variant="h6" className={classes.header}>Add Account</Typography>
@@ -428,7 +468,39 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Bank Name</Typography>
-                                <TextField 
+                                <Autocomplete
+                                    options={institutions}
+                                    autoHighlight
+                                    disableClearable
+                                    getOptionLabel={(option) => {
+                                        setInstitutionId(option.id);
+                                        setBankName(option.fullName);
+                                        return option.fullName;
+                                    }}
+                                    renderOption={(option) => (
+                                        <>
+                                            <div className={classes.option}>
+                                                <span>{option.fullName}</span>
+                                                <img src={option.media[0].source} alt={`${BankName} Logo`} />
+                                            </div>
+                                        </>
+                                    )}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            error={errors.institution ? true : false}
+                                            helperText={errors.institution}
+                                            {...params}
+                                            variant="outlined"
+                                            inputProps={{
+                                                ...params.inputProps,
+                                                // autoComplete: 'new-password',
+                                            }}
+                                            // onChange={(e) => setCountryCode(e.target.value)}
+                                        />
+                                    )}
+                                />
+                                <FormHelperText>N.B: For funding, we do not support all banks. <span onClick={() => supportedBanks.current.openModal()} className={classes.supportedList}>View Supported Banks.</span></FormHelperText>
+                                {/* <TextField 
                                     className={classes.input}
                                     value={BankName}
                                     onChange={(e) => setBankName('')}
@@ -440,7 +512,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                                     required
                                     error={errors.BankName ? true : false}
                                     disabled={loading ? true : false}
-                                />
+                                /> */}
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Account Name</Typography>
@@ -501,7 +573,8 @@ AddAccountDrawer.propTypes = {
     drawerOpen: PropTypes.bool.isRequired,
     eur: PropTypes.bool.isRequired,
     ngn: PropTypes.bool.isRequired,
-    validateIban: PropTypes.func.isRequired
+    validateIban: PropTypes.func.isRequired,
+    getInstitutions: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addAccount, validateIban })(AddAccountDrawer);
+export default connect(undefined, { addAccount, getInstitutions, validateIban })(AddAccountDrawer);

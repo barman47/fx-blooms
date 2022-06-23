@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { 
@@ -13,6 +13,8 @@ import _ from 'lodash';
 
 import { AUTH_TOKEN, COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
+
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -74,6 +76,7 @@ const FundConfirmation = ({ handleSetTitle }) => {
 
     const { wallets, fundingRequest } = useSelector(state => state.wallets);
 
+    const successModal = useRef();
 
     useEffect(() => {
         // Set token to localStorage from sessionStorage
@@ -91,84 +94,96 @@ const FundConfirmation = ({ handleSetTitle }) => {
         return wallet.currency.value;
     };
 
+    const dismissAction = () => {
+        window.open(fundingRequest.authorisationUrl, '_self');            
+    };
+
+    const handlePaymentAuthorization = () => {
+        successModal.current.setModalText('Payments take between seconds to hours to reflect. Thus, kindly click on the refresh button to check the updated status or wait till we provide you an update via SMS and/or emails.');
+        successModal.current.openModal();
+    };
+
     return (
-        <Box component="section" className={classes.root}>
-            <Typography variant="h6" color="primary">Funding Details</Typography>
-            <Typography variant="body2" component="p" className={classes.text}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
-            <Box component="div" className={classes.content}>
-                <Box component="div" className={classes.fundingRequest}>
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Method</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.fundingMethod.toUpperCase()}</Typography>
+        <>
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <Box component="section" className={classes.root}>
+                <Typography variant="h6" color="primary">Funding Details</Typography>
+                <Typography variant="body2" component="p" className={classes.text}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
+                <Box component="div" className={classes.content}>
+                    <Box component="div" className={classes.fundingRequest}>
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Method</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.fundingMethod.toUpperCase()}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Customer</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.customer.toUpperCase()}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Currency</Typography>
+                            <Typography variant="body2" component="p">{getWalletCurrency(fundingRequest.walletId)}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Amount</Typography>
+                            <Typography variant="body2" component="p">{formatNumber(fundingRequest.amount, 2)}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Account Name</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.accountName.toUpperCase()}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Account Number</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.accountNumber}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Institution</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.institution}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Reference</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.reference}</Typography>
+                        </Box>
+                        <Divider />
+                        <Box component="section">
+                            <Typography variant="body2" component="p">Status</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.status.replace('_', ' ')}</Typography>
+                        </Box>
                     </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Customer</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.customer.toUpperCase()}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Currency</Typography>
-                        <Typography variant="body2" component="p">{getWalletCurrency(fundingRequest.walletId)}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Amount</Typography>
-                        <Typography variant="body2" component="p">{formatNumber(fundingRequest.amount, 2)}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Account Name</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.accountName.toUpperCase()}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Account Number</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.accountNumber}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Institution</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.institution}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Reference</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.reference}</Typography>
-                    </Box>
-                    <Divider />
-                    <Box component="section">
-                        <Typography variant="body2" component="p">Status</Typography>
-                        <Typography variant="body2" component="p">{fundingRequest.status.replace('_', ' ')}</Typography>
-                    </Box>
+                    <Grid container direction="row" spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <Button 
+                                variant="outlined" 
+                                size="large"
+                                color="primary"
+                                fullWidth
+                                onClick={() => navigate(-1)}
+                            >
+                                Go Back
+                            </Button>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <Button 
+                                type="submit"
+                                size="large"
+                                variant="contained" 
+                                color="primary"
+                                fullWidth
+                                onClick={handlePaymentAuthorization}
+                            >
+                                Authorize Funding
+                            </Button>
+                        </Grid>
+                    </Grid>
                 </Box>
-                <Grid container direction="row" spacing={2}>
-                    <Grid item xs={12} md={6}>
-                        <Button 
-                            variant="outlined" 
-                            size="large"
-                            color="primary"
-                            fullWidth
-                            onClick={() => navigate(-1)}
-                        >
-                            Go Back
-                        </Button>
-                    </Grid>
-                    <Grid item xs={12} md={6}>
-                        <Button 
-                            type="submit"
-                            size="large"
-                            variant="contained" 
-                            color="primary"
-                            fullWidth
-                            onClick={() => window.open(fundingRequest.authorisationUrl, '_self')}
-                        >
-                            Authorize Funding
-                        </Button>
-                    </Grid>
-                </Grid>
             </Box>
-        </Box>
+        </>
     );
 };
 

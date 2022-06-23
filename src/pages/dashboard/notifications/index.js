@@ -23,6 +23,8 @@ import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -99,6 +101,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { customerId, hasSetPin, hasSetup2FA, isPhoneNumberVerified, phoneNo, stats, msg } = useSelector(state => state.customer);
+    const errorsState = useSelector(state => state.errors);
     const { notifications } = useSelector(state => state.notifications);
 
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
@@ -107,8 +110,10 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const [loading, setLoading] = useState(false);
     const [countryCode, setCountryCode] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [errors, setErrors] = useState({});
 
     const successModal = useRef();
+    const toast = useRef();
 
     const { APPROVED } = ID_STATUS;
     const { BUYER_MADE_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
@@ -125,6 +130,23 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
         };
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
         if (msg) {
@@ -253,6 +275,15 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             {loading && <Spinner />}
             {sellerSendNgnDrawerOpen && 
                 <SellerSendNgnDrawer 

@@ -135,8 +135,7 @@ export const requestWithdrawal = ({ first, second, third, fourth, ...rest}) => a
         ]);
         dispatch({
             type: SET_CUSTOMER_MSG,
-            payload:
-                "Withdrawal request made successfully. You will receive your funds shortly.",
+            payload: 'Your withdrawal request is successful, you should receive the money in your account within 2 working days'
         });
     } catch (err) {
         return handleError(err, dispatch);

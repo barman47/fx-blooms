@@ -48,10 +48,11 @@ export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
+        const msg = listing.AmountAvailable.CurrencyType === 'EUR' ? 'Offer successfully created. The EUR amount is now temporarily unavailabe (escrowed)' : 'Offer successfully created. You will be notified once a buyer accepts your offer';
         return batch(() => {
             dispatch({
                 type: ADDED_LISTING,
-                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+                payload: { listing: res.data.data, msg }
             });
             dispatch({
                 type: SET_REQUIRED_CURRENCY,
@@ -201,7 +202,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.currencyNeeded}${listing.AmountAvailable.Amount} within 30 minutes`
             });
         });
     } catch (err) {
