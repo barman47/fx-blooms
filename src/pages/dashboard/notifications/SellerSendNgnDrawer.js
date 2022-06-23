@@ -217,6 +217,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
     const getBidIds = useCallback(() => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
+        console.log(bidIds);
         return bidIds;
     }, [bids]);
 
