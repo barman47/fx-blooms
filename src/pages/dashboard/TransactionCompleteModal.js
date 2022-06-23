@@ -176,7 +176,7 @@ const TransactionCompleteModal = forwardRef((_props, ref) => {
                     <Grid container className={classes.container}>
                         <Grid item xs={12} className={classes.item}>
                             <CheckboxMarkedCircle className={classes.icon} />
-                            <Typography variant="subtitle1" component="p">Your transaction is now completed, thanks for using FXBLOOMS.</Typography>
+                            <Typography variant="subtitle1" component="p">Transaction completed. Thanks for using FXBLOOMS. Kindly tell others about our service.</Typography>
                             <Typography variant="subtitle1" component="p">Kindly tell others about your experience.</Typography>
                             <Box component="div" className={classes.shareContainer}>
                                 {matches ? 

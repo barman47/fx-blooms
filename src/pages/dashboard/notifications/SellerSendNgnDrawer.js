@@ -12,9 +12,10 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
-import { cancelBid, getListing, madePaymentV2 } from '../../../actions/listings';
+import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';
 import { markNotificationAsRead } from '../../../actions/notifications';
-import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_BIDS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -137,14 +138,14 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         margin: theme.spacing(2, 0),
-    },
+    }
 }));
 
-const SellerSendNgnDrawer = ({ cancelBid, getListing, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { bid, listing, msg } = useSelector(state => state.listings);
+    const { bid, bids, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
@@ -156,8 +157,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getListing, madePaymentV2, markNotific
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    // const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
-    const THIRTY_MINUTES = 60000; // 30 minutes in milliseconds
+    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
@@ -165,9 +165,11 @@ const SellerSendNgnDrawer = ({ cancelBid, getListing, madePaymentV2, markNotific
 
     useEffect(() => {
         startExpiryTimer();
-        getListing(bid.data.ListingId);
-
         return () => {
+            dispatch({
+                type: SET_BIDS,
+                payload: []
+            });
             clearInterval(interval.current);
         };
         // eslint-disable-next-line
@@ -212,24 +214,31 @@ const SellerSendNgnDrawer = ({ cancelBid, getListing, madePaymentV2, markNotific
         setErrors(errorsState);
     }, [errorsState]);
 
-    const getBidIds = (bids) => {
+    const getBidIds = useCallback(() => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
         console.log(bidIds);
         return bidIds;
-    };
+    }, [bids]);
+
+    // Cancel bids once bids return from the endpoint
+    useEffect(() => {
+        if (bids.length > 0) {
+            cancelBid(getBidIds());
+            toggleDrawer();
+        }
+    }, [bids, cancelBid, getBidIds, toggleDrawer]);
 
     const expireListing = useCallback(() => {
+        getBids(bid.data.ListingId);
         clearInterval(interval.current);
         dispatch({
             type: REMOVE_NOTIFICATION,
             payload: notificationId
         });
         
-        cancelBid(getBidIds(listing.bids));
         markNotificationAsRead(notificationId);
-        toggleDrawer();
-    }, [cancelBid, dispatch, listing, markNotificationAsRead, notificationId, toggleDrawer]);
+    }, [bid.data.ListingId, dispatch, getBids, markNotificationAsRead, notificationId]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
@@ -400,7 +409,8 @@ const SellerSendNgnDrawer = ({ cancelBid, getListing, madePaymentV2, markNotific
 
 SellerSendNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
-    getListing: PropTypes.func.isRequired,
+    getBids: PropTypes.func.isRequired,
+    getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
     madePaymentV2: PropTypes.func.isRequired,
@@ -408,4 +418,4 @@ SellerSendNgnDrawer.propTypes = {
     notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getListing, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, getBids, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);

@@ -23,6 +23,7 @@ import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { getInstitutions } from '../../../actions/institutions';
 import { getWallets } from '../../../actions/wallets';
 import { 
 	// ACTIVATE_EUR_WALLET,
@@ -224,7 +225,7 @@ const AllListings = (props) => {
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
-	const { loading } = useSelector(state => state);
+	const { institutions, loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { unreadNotifications } = useSelector(state => state.notifications);
 	const { wallets } = useSelector(state => state.wallets);
@@ -238,6 +239,7 @@ const AllListings = (props) => {
 		getNotifications,
 		getWallets,
 		handleSetTitle,
+		getInstitutions,
 		removeExpiredListings 
 	} = props;
 
@@ -280,11 +282,20 @@ const AllListings = (props) => {
             getAccounts(customerId);
         }
 
+		if (institutions.length === 0) {
+            getInstitutions();
+        }
+
 		return () => {
 			window.removeEventListener('DOMContentLoaded', loadedEvent.current);
 		};
 		// eslint-disable-next-line
 	}, []);
+
+	// Refetch Wallets to update balance when listings change due to deletion
+    useEffect(() => {
+		getWallets(customerId);
+	}, [customerId, getWallets, listings]);
 
 	// Only allow numbers on search
 	const handleSetAmount = (value) => {
@@ -612,6 +623,7 @@ AllListings.propTypes = {
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
 	getWallets: PropTypes.func.isRequired,
+	getInstitutions: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
@@ -622,6 +634,7 @@ export default connect(undefined, {
 	getListingsOpenForBid, 
 	getMoreListings, 
 	getNotifications,
+	getInstitutions,
 	getWallets,
 	removeExpiredListings 
 })(AllListings);

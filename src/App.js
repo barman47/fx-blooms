@@ -68,7 +68,6 @@ const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
 const PaymentAuthRoute = lazy(() => import('./components/common/PaymentRoute'));
 const PrivateRoute = lazy(() => import('./components/common/PrivateRoute'));
 // const Private404 = lazy(() => import('./elements/common/Private404'));
-
 const Home = lazy(() => import('./pages/home'));
 
 const AddUsername = lazy(() => import('./pages/auth/AddUsername'));
@@ -169,23 +168,23 @@ const theme = createTheme({
         },
     },
 
-    breakpoints: {
-        values: {
-            xs: 0,
-            sm: 480,
-            md: 768,
-            lg: 1024,
-            xl: 1920,
-        },
+  breakpoints: {
+    values: {
+      xs: 0,
+      sm: 480,
+      md: 768,
+      lg: 1024,
+      xl: 1920,
     },
+  },
 
-    typography: {
-        fontFamily: "'BR Firma', sans-serif",
-        fontWeightLight: 300,
-        fontWeightRegular: 400,
-        fontWeightMedium: 500,
-        fontWeightBold: 600,
-    },
+  typography: {
+    fontFamily: "'BR Firma', sans-serif",
+    fontWeightLight: 300,
+    fontWeightRegular: 400,
+    fontWeightMedium: 500,
+    fontWeightBold: 600,
+  },
 });
 
 const App = ({ getCustomerInformation }) => {
@@ -295,7 +294,7 @@ const App = ({ getCustomerInformation }) => {
 };
 
 App.propTypes = {
-    getCustomerInformation: PropTypes.func.isRequired,
+  getCustomerInformation: PropTypes.func.isRequired,
 };
 
 export default connect(undefined, { getCustomerInformation })(App);

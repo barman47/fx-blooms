@@ -11,8 +11,9 @@ import {
     SET_WALLET_TRANSACTIONS,
     SET_WALLET_FILTER,
     SET_FUNDING_REQUESTS,
-    SET_BANK_ACCOUNT,
-    SET_BANK_ACCOUNTS,
+    // SET_BANK_ACCOUNT,
+    // SET_BANK_ACCOUNTS,
+    SET_ONE_WALLET,
     SET_BANK_ACCOUNT_MSG,
     SET_WALLET_REQS,
     SET_BATCH_ID,
@@ -20,8 +21,10 @@ import {
     AUTHORIZE_WITHDRAWAL,
     CLEAR_WALLET_MSG,
     SET_WITHDRAWAL_REQUEST,
-    UPDATE_FUNDING_REQUEST
-} from '../actions/types';
+    CLEAR_WITHDRAWAL_REQUESTS,
+    UPDATE_FUNDING_REQUEST,
+    CLEAR_WALLET,
+} from "../actions/types";
 
 import { WALLET_FILTER } from "../utils/constants";
 
@@ -38,13 +41,13 @@ const initialState = {
     msg: null,
     transactions: [],
     transaction: {},
-    bankAccount: {},
-    bankAccounts: [],
-    walletReqs: undefined,
+    // bankAccount: {},
+    // bankAccounts: [],
+    withdrawalRequests: null,
     batchId: null,
     institutionId: null,
-    authorizeRequest: {},
-    withdrawalSuccess: {},
+    authorizeRequests: null,
+    withdrawalSuccess: null,
 };
 
 const walletsReducer = (state = initialState, action) => {
@@ -62,6 +65,12 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 wallets: action.payload,
+            };
+
+        case SET_ONE_WALLET:
+            return {
+                ...state,
+                wallet: action.payload,
             };
 
         case ACTIVATE_EUR_WALLET:
@@ -151,16 +160,18 @@ const walletsReducer = (state = initialState, action) => {
                 ...state,
                 fundingRequests: action.payload,
             };
-        case SET_BANK_ACCOUNTS:
-            return {
-                ...state,
-                bankAccounts: action.payload,
-            };
-        case SET_BANK_ACCOUNT:
-            return {
-                ...state,
-                bankAccount: action.payload,
-            };
+        
+        // case SET_BANK_ACCOUNTS:
+        //     return {
+        //         ...state,
+        //         bankAccounts: action.payload,
+        //     };
+        // case SET_BANK_ACCOUNT:
+        //     return {
+        //         ...state,
+        //         bankAccount: action.payload,
+        //     };
+        
         case SET_BANK_ACCOUNT_MSG:
             return {
                 ...state,
@@ -169,8 +180,9 @@ const walletsReducer = (state = initialState, action) => {
         case SET_WALLET_REQS:
             return {
                 ...state,
-                walletReqs: action.payload,
+                withdrawalRequests: action.payload,
             };
+        
         case SET_BATCH_ID:
             return {
                 ...state,
@@ -184,17 +196,34 @@ const walletsReducer = (state = initialState, action) => {
         case AUTHORIZE_WITHDRAWAL:
             return {
                 ...state,
-                authorizeRequest: action.payload,
+                authorizeRequests: action.payload,
             };
         case SET_WITHDRAWAL_REQUEST:
             return {
                 ...state,
                 withdrawalSuccess: action.payload,
             };
+
+        case CLEAR_WITHDRAWAL_REQUESTS:
+            return {
+                ...state,
+                batchId: null,
+                institutionId: null,
+                authorizeRequests: null,
+                withdrawalSuccess: null,
+                withdrawalRequests: null,
+            };
+
         case CLEAR_WALLET_MSG:
             return {
                 ...state,
                 msg: null,
+            };
+
+        case CLEAR_WALLET:
+            return {
+                ...state,
+                wallet: {},
             };
 
         case UPDATE_FUNDING_REQUEST:

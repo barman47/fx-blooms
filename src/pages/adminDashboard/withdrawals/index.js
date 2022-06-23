@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useSelector, useDispatch, batch } from "react-redux";
 import {
     Box,
     TablePagination,
@@ -26,7 +26,12 @@ import GenericTableHeader from "../../../components/admin-dashboard/GenericTable
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
 import DepositAndWithdrawalTable from "../../../components/admin-dashboard/DepositTable";
 // import { ADMIN_FILTERS } from '../../../utils/constants';
-import { Filter, ArrowTopRight, CloseCircleOutline } from "mdi-material-ui";
+import {
+    Filter,
+    ArrowTopRight,
+    CloseCircleOutline,
+    CheckboxMarkedCircleOutline,
+} from "mdi-material-ui";
 import CircularProgressBar from "../../../components/admin-dashboard/CircularProgressBar";
 import WithdrawalCard from "../../../components/admin-dashboard/WithdrawalCard";
 import {
@@ -34,15 +39,17 @@ import {
     getAllFXBAccounts,
     autoBatch,
     getBatchById,
-    getInstitutions,
     authorizeWithdrawal,
 } from "../../../actions/wallets";
+import { getInstitutions } from "../../../actions/institutions";
 import clsx from "clsx";
 // import { SET_BATCH_ID } from '../../../actions/types';
 import isEmpty from "../../../utils/isEmpty";
 import {
     SET_INSTITUTION_ID,
-    AUTHORIZE_WITHDRAWAL,
+    // AUTHORIZE_WITHDRAWAL,
+    CLEAR_WITHDRAWAL_REQUESTS,
+    CLEAR_ERROR_MSG,
 } from "../../../actions/types";
 import formatDate from "../../../utils/formatDate";
 import { PAYMENT_TYPE, PAYMENT_STATUS } from "../../../utils/constants";
@@ -51,6 +58,8 @@ import {
     ADMIN_INFO,
     AUTH_TOKEN,
 } from "../../../utils/constants";
+import Toast from "../../../components/common/Toast";
+import modifyAmount from "../../../utils/modifyAmount";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -77,7 +86,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#F7F8F9",
         position: "relative",
 
-        height: "100vh",
+        height: "100%",
     },
 
     title: {
@@ -469,6 +478,8 @@ const Withdrawals = () => {
     const [page, setPage] = useState(0);
     const [tableRowsPerPage, setTableRowsPerPage] = useState(10);
     // const [inst, setInst] = useState('')
+    const [checkBxErrMsg, setCheckBxErrMsg] = useState("");
+    const [totalWithdrawal, setTotalWithdrawal] = useState(0);
 
     const [requests, setRequests] = useState({
         requestNumber: "",
@@ -478,16 +489,22 @@ const Withdrawals = () => {
     const { items, totalPageCount } = useSelector(
         (state) => state.wallets.transactions
     );
-    const { result } = useSelector((state) => state.wallets.bankAccounts);
-    const { batchId, institutionId } = useSelector((state) => state.wallets);
-    const { walletReqs } = useSelector((state) => state.wallets);
+    const { account } = useSelector((state) => state.bankAccounts);
+    const {
+        withdrawalRequests,
+        batchId,
+        institutionId,
+        authorizeRequest,
+        withdrawalSuccess,
+    } = useSelector((state) => state.wallets);
     const allInstitutions = useSelector((state) => state.institutions);
-    const { authorizeRequest } = useSelector((state) => state.wallets);
     const admin = useSelector((state) => state.admin);
+    const { msg } = useSelector((state) => state.errors);
 
     const [isMan, setIsMan] = useState(false);
 
     const { requestNumber, institutions } = requests;
+    const ref = useRef();
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -519,6 +536,16 @@ const Withdrawals = () => {
     };
 
     useEffect(() => {
+        // console.log(items);
+        if (!isEmpty(items)) {
+            const total = items
+                .filter((wd) => wd.paymentStatus === 2)
+                .reduce((acc, curr) => +acc + +curr.amount, 0);
+            setTotalWithdrawal(+total);
+        }
+    }, [items]);
+
+    useEffect(() => {
         if (!!batchId) {
             // console.log("vbatchId");
             dispatch(getBatchById(batchId));
@@ -526,18 +553,27 @@ const Withdrawals = () => {
     }, [batchId, dispatch]);
 
     useEffect(() => {
-        console.log("walletreq", walletReqs);
-        if (!isEmpty(walletReqs)) {
-            dispatch(getInstitutions());
+        if (!!batchId && !isEmpty(withdrawalRequests)) {
+            dispatch(getInstitutions("ADMIN"));
             // dispatch({
             //   type: SET_BATCH_ID,
             //   payload: null
             // })
         }
-    }, [walletReqs, dispatch]);
+    }, [withdrawalRequests, dispatch, batchId]);
 
     useEffect(() => {
-        if (!isEmpty(allInstitutions)) {
+        if (
+            !!batchId &&
+            isEmpty(withdrawalRequests) &&
+            withdrawalRequests !== null
+        ) {
+            setLoadingReqs(false);
+        }
+    }, [batchId, withdrawalRequests]);
+
+    useEffect(() => {
+        if (!!batchId && !isEmpty(allInstitutions)) {
             setLoadingReqs(false);
             const institution = allInstitutions.data.find((ins) =>
                 ins.name.includes(institutions)
@@ -547,7 +583,7 @@ const Withdrawals = () => {
                 payload: institution?.id,
             });
         }
-    }, [allInstitutions, dispatch, institutions]);
+    }, [allInstitutions, dispatch, institutions, batchId]);
 
     const handlePageNUmberList = useCallback(() => {
         const pageNumArr = [];
@@ -561,10 +597,10 @@ const Withdrawals = () => {
     }, [pageCount]);
 
     useEffect(() => {
-        if (isEmpty(result)) {
+        if (isEmpty(account.result)) {
             dispatch(getAllFXBAccounts());
         }
-    }, [dispatch, result]);
+    }, [dispatch, account]);
 
     useEffect(() => {
         if (!!items) {
@@ -623,13 +659,21 @@ const Withdrawals = () => {
         // }
     };
 
+    const handleBatchError = () => {
+        ref.current?.handleClick();
+        setCheckBxErrMsg(
+            "Can't add a request with a status of complete or in-progress"
+        );
+    };
+
     const manBatch = (cus) => {
+        // console.log(cus);
         setBatchList((values) => handleBatchFilter(cus, values));
     };
 
     const handleBatchFilter = (cus, values) => {
-        if (values.some((a) => a === cus)) {
-            return [...values.filter((a) => a !== cus)];
+        if (values?.some((a) => a === cus)) {
+            return [...values?.filter((a) => a !== cus)];
         }
         return [...values, cus];
     };
@@ -637,6 +681,8 @@ const Withdrawals = () => {
     const openManualScreen = () => {
         console.log(batchList);
         if (isEmpty(batchList)) {
+            setCheckBxErrMsg("Add a request");
+            ref.current.handleClick();
             return;
         }
         setIsMan(true);
@@ -669,7 +715,15 @@ const Withdrawals = () => {
             })
         );
         setLoadingAuth(true);
+        setLoadingReqs(true);
     };
+
+    useEffect(() => {
+        if (!!institutionId && !!msg) {
+            setLoadingAuth(false);
+            setLoadingReqs(false);
+        }
+    }, [institutionId, msg]);
 
     useEffect(() => {
         if (!isEmpty(authorizeRequest) && loadingAuth) {
@@ -684,17 +738,73 @@ const Withdrawals = () => {
         }
     }, [authorizeRequest, admin, loadingAuth]);
 
+    // useEffect(() => {
+    //   if (
+    //     !loadingAuth &&
+    //     !isEmpty(authorizeRequest) &&
+    //     authorizeRequest !== null
+    //   ) {
+    //     dispatch({
+    //       type: AUTHORIZE_WITHDRAWAL,
+    //       payload: {},
+    //     });
+    //   }
+    // }, [dispatch, loadingAuth, authorizeRequest]);
+
     useEffect(() => {
-        if (!loadingAuth && !isEmpty(authorizeRequest)) {
+        if (!loadingAuth && !isEmpty(authorizeRequest) && !!withdrawalSuccess) {
+            setLoadingReqs(false);
+            setWithdrawalScreen(!withdrawalScreen);
+            setIsMan(false);
+            setScreen(false);
+            setLoadingAuth(false);
+            setRequests({});
             dispatch({
-                type: AUTHORIZE_WITHDRAWAL,
-                payload: {},
+                type: CLEAR_WITHDRAWAL_REQUESTS,
             });
         }
-    }, [dispatch, loadingAuth, authorizeRequest]);
+    }, [
+        dispatch,
+        loadingAuth,
+        authorizeRequest,
+        withdrawalSuccess,
+        withdrawalScreen,
+    ]);
+
+    const clearWithdrawalReqs = () => {
+        dispatch({
+            type: CLEAR_WITHDRAWAL_REQUESTS,
+        });
+    };
+
+    const closeWithdrawalScreen = () => {
+        setWithdrawalScreen(!withdrawalScreen);
+        setIsMan(false);
+        setScreen(false);
+        setLoadingAuth(false);
+        setRequests({});
+        clearWithdrawalReqs();
+        batch(() => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+            dispatch(
+                getAllWithdrawalReqs({
+                    pageSize: rowsPerPage,
+                    pageNumber: currentPage,
+                })
+            );
+        });
+    };
 
     return (
         <>
+            <Toast
+                ref={ref}
+                type="error"
+                msg={checkBxErrMsg}
+                title="Withdrawal Batch"
+            />
             <section
                 className={clsx(
                     classes.root,
@@ -702,7 +812,10 @@ const Withdrawals = () => {
                 )}
             >
                 <Typography variant="h6">Withdrawals</Typography>
-                <WithdrawalCard cardTitle="Total Withdrawal" />
+                <WithdrawalCard
+                    totalAmount={totalWithdrawal}
+                    cardTitle="Total Withdrawal"
+                />
 
                 <Box
                     component="div"
@@ -924,9 +1037,9 @@ const Withdrawals = () => {
                 onClose={handleClose}
                 classes={{ paper: classes.menu }}
                 disableScrollLock={ true }
-            >
-                <MenuItem onClick={viewDetails}>Filter by staus</MenuItem>
-            </Menu> */}
+                >
+                    <MenuItem onClick={viewDetails}>Filter by staus</MenuItem>
+                </Menu> */}
                 </Box>
 
                 <Box component="div" className={classes.table}>
@@ -940,6 +1053,7 @@ const Withdrawals = () => {
                         gridColumns={gridColumns}
                         loading={loading}
                         data={items}
+                        handleCheckError={handleBatchError}
                     />
                 </Box>
 
@@ -958,7 +1072,7 @@ const Withdrawals = () => {
                         }}
                     >
                         <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                            {/* <Typography component="span">{'20'} results</Typography> */}
+                            {/* <Typography component="span">{'20'} account.results</Typography> */}
                         </Box>
 
                         <Box
@@ -1024,69 +1138,77 @@ const Withdrawals = () => {
                             component="div"
                             className={clsx(
                                 classes.withdrawalContainer,
-                                "animate__animated animate__zoomIn"
+                                // withdrawalAnime,
+                                {
+                                    "animate__animated animate__zoomOut":
+                                        !withdrawalScreen,
+                                    "animate__animated animate__zoomIn":
+                                        withdrawalScreen,
+                                }
                             )}
                         >
-                            <Box
-                                component="div"
-                                className={classes.withdrawHeader}
-                            >
-                                <Typography
-                                    onClick={() => setScreen(true)}
-                                    className={clsx(
-                                        classes.headerTitle,
-                                        screen && classes.headerTitleActive
-                                    )}
-                                    variant="h6"
+                            {!!withdrawalSuccess ? (
+                                ""
+                            ) : (
+                                <Box
+                                    component="div"
+                                    className={classes.withdrawHeader}
                                 >
                                     <Typography
-                                        component="span"
+                                        onClick={() =>
+                                            setScreen(() => {
+                                                clearWithdrawalReqs();
+                                                return true;
+                                            })
+                                        }
                                         className={clsx(
-                                            classes.headerNumber,
-                                            screen && classes.headerNumberActive
+                                            classes.headerTitle,
+                                            screen && classes.headerTitleActive
                                         )}
+                                        variant="h6"
                                     >
-                                        1
-                                    </Typography>{" "}
-                                    Withdrawal Request
-                                </Typography>
-                                <Typography
-                                    className={clsx(
-                                        classes.headerTitle,
-                                        !screen && classes.headerTitleActive
-                                    )}
-                                    variant="h6"
-                                >
-                                    <Typography
-                                        component="span"
-                                        className={clsx(
-                                            classes.headerNumber,
-                                            !screen &&
-                                                classes.headerNumberActive
-                                        )}
-                                    >
-                                        2
+                                        <Typography
+                                            component="span"
+                                            className={clsx(
+                                                classes.headerNumber,
+                                                screen &&
+                                                    classes.headerNumberActive
+                                            )}
+                                        >
+                                            1
+                                        </Typography>{" "}
+                                        Withdrawal Request
                                     </Typography>
-                                    Payment Authorization
-                                </Typography>
-                                <CloseCircleOutline
-                                    onClick={() =>
-                                        setWithdrawalScreen(() => {
-                                            setIsMan(false);
-                                            setScreen(false);
-                                            setLoadingAuth(false);
-                                            setRequests({});
-                                            return !withdrawalScreen;
-                                        })
-                                    }
-                                    style={{
-                                        cursor: "pointer",
-                                        position: "absolute",
-                                        top: -15,
-                                        right: 14,
-                                    }}
-                                />
-                            </Box>
+                                    <Typography
+                                        className={clsx(
+                                            classes.headerTitle,
+                                            !screen && classes.headerTitleActive
+                                        )}
+                                        variant="h6"
+                                    >
+                                        <Typography
+                                            component="span"
+                                            className={clsx(
+                                                classes.headerNumber,
+                                                !screen &&
+                                                    classes.headerNumberActive
+                                            )}
+                                        >
+                                            2
+                                        </Typography>
+                                        Payment Authorization
+                                    </Typography>
+                                    <CloseCircleOutline
+                                        onClick={() => closeWithdrawalScreen()}
+                                        style={{
+                                            cursor: "pointer",
+                                            position: "absolute",
+                                            top: -15,
+                                            right: 14,
+                                        }}
+                                    />
+                                </Box>
+                            )}
 
                             {screen ? (
                                 <>
@@ -1125,17 +1247,19 @@ const Withdrawals = () => {
                                                 label="Age"
                                                 onChange={handleOnChange}
                                             >
-                                                {result &&
-                                                    result.map((acct, i) => (
-                                                        <MenuItem
-                                                            key={i}
-                                                            value={
-                                                                acct.bankName
-                                                            }
-                                                        >
-                                                            {acct.bankName}
-                                                        </MenuItem>
-                                                    ))}
+                                                {account.result &&
+                                                    account.result.map(
+                                                        (acct, i) => (
+                                                            <MenuItem
+                                                                key={i}
+                                                                value={
+                                                                    acct.bankName
+                                                                }
+                                                            >
+                                                                {acct.bankName}
+                                                            </MenuItem>
+                                                        )
+                                                    )}
                                             </Select>
                                         </FormControl>
                                     </Box>
@@ -1157,6 +1281,96 @@ const Withdrawals = () => {
                                             newWidth="30px"
                                             newHeight="30px"
                                         />
+                                    ) : isEmpty(withdrawalRequests) &&
+                                      withdrawalRequests !== null &&
+                                      !!batchId ? (
+                                        <Box
+                                            component="div"
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                marginTop: "28%",
+                                            }}
+                                            className={clsx({
+                                                "animate__animated animate__shakeX":
+                                                    isEmpty(
+                                                        withdrawalRequests
+                                                    ) &&
+                                                    withdrawalRequests !==
+                                                        null &&
+                                                    !!batchId,
+                                            })}
+                                        >
+                                            <Typography variant="h6">
+                                                No batch Requests
+                                            </Typography>
+                                            <GenericButton
+                                                clickAction={() =>
+                                                    closeWithdrawalScreen()
+                                                }
+                                                buttonName="Exit"
+                                                fontColor="white"
+                                                fontsize="15px"
+                                                bxShadw="none"
+                                                bgColor="#1E6262"
+                                            />
+                                        </Box>
+                                    ) : !!withdrawalSuccess ? (
+                                        <Typography
+                                            style={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                marginTop: "28%",
+                                            }}
+                                            align="center"
+                                            component="span"
+                                            className="animate__animated animate__fadeIn"
+                                        >
+                                            <CheckboxMarkedCircleOutline
+                                                style={{
+                                                    width: 30,
+                                                    height: 30,
+                                                    color: "green",
+                                                }}
+                                            />
+                                            Success
+                                        </Typography>
+                                    ) : !!msg && !!institutionId ? (
+                                        <Box
+                                            component="div"
+                                            sx={{
+                                                display: "flex",
+                                                flexDirection: "column",
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                marginTop: "28%",
+                                            }}
+                                            className={clsx({
+                                                "animate__animated animate__shakeX":
+                                                    !!msg && !!institutionId,
+                                            })}
+                                        >
+                                            <Typography
+                                                variant="h6"
+                                                color="error"
+                                            >
+                                                {msg}
+                                            </Typography>
+                                            <GenericButton
+                                                clickAction={() =>
+                                                    closeWithdrawalScreen()
+                                                }
+                                                buttonName="Exit"
+                                                fontColor="white"
+                                                fontsize="15px"
+                                                bxShadw="none"
+                                                bgColor="#1E6262"
+                                            />
+                                        </Box>
                                     ) : (
                                         <>
                                             <TableContainer
@@ -1193,8 +1407,8 @@ const Withdrawals = () => {
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>
-                                                        {walletReqs &&
-                                                            walletReqs.map(
+                                                        {withdrawalRequests &&
+                                                            withdrawalRequests.map(
                                                                 (wallet, i) => (
                                                                     <TableRow
                                                                         sx={{
@@ -1276,15 +1490,17 @@ const Withdrawals = () => {
                                                                 ={" "}
                                                             </TableCell>
                                                             <TableCell>
-                                                                {walletReqs &&
-                                                                    walletReqs.reduce(
-                                                                        (
-                                                                            acc,
-                                                                            currValue
-                                                                        ) =>
-                                                                            +acc.amount +
-                                                                            +currValue.amount,
-                                                                        0
+                                                                {withdrawalRequests &&
+                                                                    modifyAmount(
+                                                                        withdrawalRequests.reduce(
+                                                                            (
+                                                                                acc,
+                                                                                currValue
+                                                                            ) =>
+                                                                                +acc +
+                                                                                +currValue.amount,
+                                                                            0
+                                                                        )
                                                                     )}
                                                             </TableCell>
                                                         </TableRow>
@@ -1296,7 +1512,9 @@ const Withdrawals = () => {
                                                     10, 15, 20,
                                                 ]}
                                                 component="div"
-                                                count={walletReqs?.length}
+                                                count={
+                                                    withdrawalRequests?.length
+                                                }
                                                 rowsPerPage={tableRowsPerPage}
                                                 page={page}
                                                 onPageChange={handleChangePage}
@@ -1326,8 +1544,8 @@ const Withdrawals = () => {
                                                         label="Institutions"
                                                         disabled
                                                     >
-                                                        {result &&
-                                                            result.map(
+                                                        {account.result &&
+                                                            account.result.map(
                                                                 (acct, i) => (
                                                                     <MenuItem
                                                                         key={i}

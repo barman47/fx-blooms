@@ -9,6 +9,7 @@ import {
     SET_CUSTOMER_MSG,
     SET_FUNDING_REQUEST,
     SET_WALLETS,
+    SET_ONE_WALLET,
     SET_WALLET_MSG,
     SET_WALLET_TRANSACTIONS,
     SET_WITHDRAWAL_DETAILS,
@@ -18,12 +19,11 @@ import {
     SET_BANK_ACCOUNT_MSG,
     SET_WALLET_REQS,
     SET_BATCH_ID,
-    SET_BANK_ACCOUNTS,
+    SET_ACCOUNT,
     AUTHORIZE_WITHDRAWAL,
-    SET_INSTITUTIONS,
     SET_WITHDRAWAL_REQUEST,
-} from './types';
-
+    CREDIT_LISTING,
+} from "./types";
 const API = `${process.env.REACT_APP_WALLET_API}`;
 const WALLETS_API = `${API}/wallet-management`;
 const YAPILY_API = `${API}/Yapily`;
@@ -59,11 +59,18 @@ export const getWallet = (walletId) => async (dispatch)  => {
     }
 };
 
-export const getWallets = (customerId, tokenType = "") => async (dispatch) => {
+export const getWallets = (customerId, tokenType = "") =>
+    async (dispatch) => {
         try {
-            tokenType === "ADMIN" ? await reIssueAdminToken() : await reIssueCustomerToken();
-            const res = await axios.get(`${WALLETS_API}/customers/${customerId}/wallets`);
-            return dispatch({
+            if (!!tokenType) {
+                await reIssueAdminToken();
+            } else {
+                await reIssueCustomerToken();
+            }
+            const res = await axios.get(
+                `${WALLETS_API}/customers/${customerId}/wallets`
+            );
+            dispatch({
                 type: SET_WALLETS,
                 payload: res.data.data,
             });
@@ -89,8 +96,7 @@ export const requestWalletFunding = (data, navigate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${YAPILY_API}/fund`, data);
-        const { authorisationUrl, institutionId, qrCodeUrl, status } =
-            res.data.data.data;
+        const { authorisationUrl, institutionId, qrCodeUrl, status } = res.data.data.data;
 
         const fundindDetails = {
             fundingMethod: "Open Banking",
@@ -125,8 +131,7 @@ export const requestWithdrawal = ({ first, second, third, fourth, ...rest}) => a
         ]);
         dispatch({
             type: SET_CUSTOMER_MSG,
-            payload:
-                "Withdrawal request made successfully. You will receive your funds shortly.",
+            payload: 'Your withdrawal request is successful, you should receive the money in your account within 2 working days'
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -148,19 +153,6 @@ export const payment = ({ paymentRequestId, consentToken, type }, navigate) => a
             });
         });
         return navigate(FUNDING_REQUEST_STATUS);
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatch) => {
-    try {
-        await reIssueCustomerToken();
-        const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
-        dispatch({
-            type: SET_FUNDING_REQUEST,
-            payload: res.data.data,
-        });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -189,6 +181,29 @@ export const getFundingRequests = (walletId) => async (dispatch) => {
             payload: res.data.data,
         });
     } catch (err) {
+
+    }
+};
+
+export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${YAPILY_API}/credit/${paymentId}/details?paymentid=${paymentId}&paymentrequestid=${paymentRequestId}`);
+        const { data } = res.data;
+        const fundingRequest = {
+            id: data.id,
+            paymentRequestId,
+            status: data.status,
+            currency: data.amountDetails.currency,
+            date: data.createdAt,
+            amount: data.amountDetails.amount,
+            reference: data.reference,
+        };
+        dispatch({
+            type: SET_FUNDING_REQUEST,
+            payload: fundingRequest
+        });
+    } catch (err) {
         return handleError(err, dispatch);
     }
 };
@@ -197,7 +212,6 @@ export const getAllDeposits = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllDeposits`, query);
-        // console.log(res)
         dispatch({
             type: SET_FUNDING_REQUESTS,
             payload: res.data,
@@ -238,7 +252,7 @@ export const addAdminBankAccount = (query) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueAdminToken(),
-            axios.post(`${ACCOUNT_API}/accounts/add-admin-bank-account`,query)
+            axios.post(`${ACCOUNT_API}/accounts/add-admin-bank-account`, query),
         ]);
 
         return dispatch({
@@ -254,9 +268,7 @@ export const deleteAdminBankAccount = (id) => async (dispatch) => {
     try {
         await Promise.all([
             reIssueAdminToken(),
-            await axios.post(
-                `${ACCOUNT_API}/accounts/${id}/deleteAdminBankAccount`
-            ),
+            axios.post(`${ACCOUNT_API}/accounts/${id}/deleteAdminBankAccount`),
         ]);
 
         return dispatch({
@@ -276,7 +288,7 @@ export const getAllFXBAccounts = () => async (dispatch) => {
         );
 
         return dispatch({
-            type: SET_BANK_ACCOUNTS,
+            type: SET_ACCOUNT,
             payload: res.data.data,
         });
     } catch (err) {
@@ -315,21 +327,6 @@ export const getBatchById = (id) => async (dispatch) => {
         });
     } catch (err) {
         console.log("bat");
-        return handleError(err, dispatch);
-    }
-};
-
-export const getInstitutions = () => async (dispatch) => {
-    try {
-        await reIssueAdminToken();
-        const res = await axios.get(`${YAPILY_API}/institutions`);
-        // console.log(res.data)
-
-        dispatch({
-            type: SET_INSTITUTIONS,
-            payload: res.data.data,
-        });
-    } catch (err) {
         return handleError(err, dispatch);
     }
 };
@@ -374,3 +371,36 @@ export const makeWithdrawalPayment =
             return handleError(err, dispatch);
         }
     };
+
+export const creditListing = (walletId, query) => async (dispatch) => {
+    try {
+        // console.log(walletId);
+        // console.log(query);
+        await Promise.all([
+            reIssueAdminToken(),
+            axios.post(`${WALLETS_API}/wallets/${walletId}/credit`, query),
+        ]);
+
+        dispatch({
+            type: CREDIT_LISTING,
+            payload: "Wallet credit successful",
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getOneWallet = (walletId) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${WALLETS_API}/wallets/${walletId}`);
+        // console.log(res.data.data);
+
+        dispatch({
+            type: SET_ONE_WALLET,
+            payload: res.data.data,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

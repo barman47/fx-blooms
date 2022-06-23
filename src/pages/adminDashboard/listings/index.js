@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useDispatch, useSelector, batch } from "react-redux";
 import { getCustomer } from "../../../actions/customer";
 // import { getListingByStatus } from '../../../actions/adminListings';
 import clsx from "clsx";
@@ -7,13 +7,15 @@ import {
     Box,
     Typography,
     Grid,
-    Checkbox,
-    FormControlLabel,
+    // Checkbox,
+    // FormControlLabel,
     Slider,
+    Menu,
+    MenuItem,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
-import { COLORS, LISTING_DETAILS } from "../../../utils/constants";
+import { COLORS, LISTING_DETAILS, BID_STATUS } from "../../../utils/constants";
 import AllListings from "./AllListings";
 import ActiveListings from "./ActiveListings";
 import InProgressListings from "./InProgressListings";
@@ -21,8 +23,16 @@ import RemovedListings from "./RemovedListings";
 import CompletedListings from "./CompletedListings";
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
-import { ArrowTopRight, Filter, CloseCircleOutline } from "mdi-material-ui";
+import {
+    ArrowTopRight,
+    Filter,
+    CloseCircleOutline,
+    TrashCanOutline,
+    DotsHorizontal,
+    // SwapHorizontal,
+} from "mdi-material-ui";
 import { exportAllUserRecords } from "../../../actions/admin";
+import { creditListing, getOneWallet } from "../../../actions/wallets";
 import {
     getAllListings,
     getActiveListings,
@@ -30,13 +40,21 @@ import {
     getFinalisedListings,
     getDeletedListings,
 } from "../../../actions/adminListings";
-// import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
+import {
+    CREDIT_LISTING,
+    CLEAR_ERROR_MSG,
+    CLEAR_CUSTOMER,
+    CLEAR_WALLET,
+} from "../../../actions/types";
 import { exportRecords } from "../../../utils/exportRecords";
 import isEmpty from "../../../utils/isEmpty";
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 // import Status from '../../../components/admin-dashboard/Status';
 import formatId from "../../../utils/formatId";
 import handleStatusStyle from "../../../utils/statusDisplay";
+import Toast from "../../../components/common/Toast";
+// import GenericPopUp from "../../../components/admin-dashboard/GenericPopUp";
+// import GenericTextField from "../../../components/admin-dashboard/GenericTextField";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -64,6 +82,30 @@ const useStyles = makeStyles((theme) => ({
             backgroundColor: "white",
             padding: "10px 20px",
             width: "6vw",
+
+            "&:hover": {
+                backgroundColor: "#1E6262",
+                color: "white",
+            },
+        },
+    },
+
+    reverseMenu: {
+        position: "absolute",
+        top: 47,
+        left: 1,
+        borderRadius: 5,
+        boxShadow: "1px 1px 1px 1.5px #c7c7c7",
+        display: "flex",
+        flexDirection: "column",
+        width: "41%",
+        textAlign: "left",
+
+        "& span": {
+            fontSize: ".9vw",
+            backgroundColor: "white",
+            padding: "10px 20px",
+            // width: "6vw",
 
             "&:hover": {
                 backgroundColor: "#1E6262",
@@ -261,6 +303,7 @@ const useStyles = makeStyles((theme) => ({
         zIndex: 1000,
         width: "100%",
         height: "100%",
+        overflowY: "hidden",
         // transform: "translate(0, 84px)",
     },
 
@@ -268,7 +311,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "white",
         width: "65%",
         height: "75vh",
-        margin: "2rem 8vw 0 auto",
+        margin: "2rem 15vw 0 auto",
         borderRadius: "3px",
         // paddingTop: '3rem',
         // paddingLeft: '1.5rem',
@@ -292,6 +335,7 @@ const useStyles = makeStyles((theme) => ({
     },
 
     viewMoreData: {
+        position: "relative",
         display: "grid",
         gridTemplateColumns: "1fr 1fr",
         gap: "1rem",
@@ -301,7 +345,7 @@ const useStyles = makeStyles((theme) => ({
 
     amlTable: {
         display: "grid",
-        gridTemplateColumns: ".8fr 15vw",
+        gridTemplateColumns: "1fr 15vw",
         marginBottom: theme.spacing(2),
         // justifyContent: 'space-between',
         // width: '10vw',
@@ -311,6 +355,7 @@ const useStyles = makeStyles((theme) => ({
     amlTitle: {
         fontSize: "1vw",
         fontWeight: "400 !important",
+        width: "max-content",
     },
 
     amlNumber: {
@@ -319,6 +364,7 @@ const useStyles = makeStyles((theme) => ({
         fontSize: "1vw",
         padding: ".1rem .5rem",
         borderRadius: 6,
+        width: "max-content",
 
         "& p:first-child": {
             fontWeight: "600 !important",
@@ -328,15 +374,24 @@ const useStyles = makeStyles((theme) => ({
     viewMoreBidsContainer: {
         overflowY: "scroll",
         height: "42%",
-        width: "70%",
-        overflowX: "hidden",
+        width: "80%",
+        overflowX: "scroll",
+        position: "relative",
         // display: 'flex',
         // flexDirection: 'column-reverse',
     },
 
+    hideCredBtn: {
+        display: "none",
+    },
+
+    creditOptions: {
+        position: "absolute",
+    },
+
     viewMoreBids: {
         display: "grid",
-        gridTemplateColumns: "repeat(3, max-content)",
+        gridTemplateColumns: "repeat(4, max-content)",
         padding: ".5rem .5rem .5rem 2rem",
         marginTop: "2rem",
         columnGap: "1rem",
@@ -450,6 +505,51 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#f5f7be",
         color: "#d1c70c",
     },
+
+    menu: {
+        backgroundColor: "white",
+        border: `none`,
+        borderRadius: theme.spacing(1.9),
+        marginRight: "10px",
+        cursor: "pointer",
+        // top: 474,
+        // riht: 248,
+        // left: '1695px !important',
+
+        "& ul": {
+            padding: "0",
+        },
+
+        "& li": {
+            padding: theme.spacing(2),
+            paddingLeft: theme.spacing(2.5),
+        },
+    },
+
+    reverseModalContent: {
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        // height: "70%",?
+        gap: 50,
+        marginTop: "20%",
+    },
+
+    reverseModalForm: {
+        display: "grid",
+        gridTemplateColumns: "300px 30px 300px",
+        justifyContent: "center",
+        alignItems: "center",
+        // height: "100%",
+        gap: 10,
+    },
+
+    txOption: {
+        position: "absolute",
+        right: 0,
+        top: 39,
+    },
 }));
 
 function valuetext(value) {
@@ -504,8 +604,9 @@ const Listings = () => {
     const dispatch = useDispatch();
 
     const { admin } = useSelector((state) => state);
-    const { customer } = useSelector((state) => state.customers);
+    const { customer, buyer } = useSelector((state) => state.customers);
 
+    const { IN_PROGRESS, CANCELED, COMPLETED } = BID_STATUS;
     const {
         ALL_LISTINGS,
         ALL_DELETED,
@@ -521,16 +622,33 @@ const Listings = () => {
     const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 
-    const [customerName, setCustomerName] = useState("");
+    const [workFlow, setWorkFlow] = useState("");
+    const [sellerName, setSellerName] = useState("");
 
     const [viewMoreData, setViewMoreData] = useState({});
     const [openViewMore, setOpenViewMore] = useState(false);
     const [openFilterBx, setOpenFilterBx] = useState(false);
     const [openXport, closeXport] = useState(false);
 
+    //PC is PageCount
+    const [totalActivePC, setTotalActivePC] = useState(0);
+    const [totalFinalisedPC, setTotalFinalisedPC] = useState(0);
+    const [totalRemovedPC, setTotalRemovedPC] = useState(0);
+    const [totalInProgressPC, setTotalInProgressPC] = useState(0);
+    const [anchorEl, setAnchorEl] = useState(null);
+    // const [openReverseMenu, closeReverseMenu] = useState(false);
+    const [buyerName, setBuyerName] = useState("");
+    const ref = useRef();
+
     //   const [page, setPage] = useState(0);
     // const [anchorEl, setAnchorEl] = useState(null);
-    const { totalListings } = useSelector((state) => state.stats);
+    const {
+        totalListings,
+        totalOpenListings,
+        totalRemovedListings,
+        totalListingsInProgress,
+        totalFinalisedListings,
+    } = useSelector((state) => state.stats);
     const {
         totalPageCount,
         listings,
@@ -538,9 +656,14 @@ const Listings = () => {
         finalisedListings,
         inProgressListings,
         deletedListings,
+        credit,
     } = useSelector((state) => state.listings);
+    const { msg } = useSelector((state) => state.errors);
+    const { wallet } = useSelector((state) => state.wallets);
 
     const [value, setValue] = useState([1, 70]);
+    const [toastMsg, setToastMsg] = useState("");
+    const [toastType, setToastType] = useState("");
 
     const handleChange = (event, newValue) => {
         setValue(newValue);
@@ -595,24 +718,28 @@ const Listings = () => {
 
             case ALL_OPEN:
                 if (!!activeListings.items) {
+                    setTotalActivePC(activeListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_COMPLETED:
                 if (!!finalisedListings) {
+                    setTotalFinalisedPC(finalisedListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_NEGOTIATIONS:
                 if (!!inProgressListings) {
+                    setTotalInProgressPC(inProgressListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
 
             case ALL_DELETED:
                 if (!!deletedListings) {
+                    setTotalRemovedPC(deletedListings.totalPageCount);
                     setLoading(false);
                 }
                 break;
@@ -654,7 +781,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalActivePC || 0);
                 break;
 
             case ALL_COMPLETED:
@@ -664,7 +791,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalFinalisedPC || 0);
                 break;
 
             case ALL_NEGOTIATIONS:
@@ -674,7 +801,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalInProgressPC || 0);
                 break;
 
             case ALL_DELETED:
@@ -684,7 +811,7 @@ const Listings = () => {
                         pageNumber: currentPage,
                     })
                 );
-                setPageCount(totalPageCount || 0);
+                setPageCount(totalRemovedPC || 0);
                 break;
 
             default:
@@ -703,6 +830,10 @@ const Listings = () => {
         rowsPerPage,
         dispatch,
         totalPageCount,
+        totalInProgressPC,
+        totalActivePC,
+        totalRemovedPC,
+        totalFinalisedPC,
     ]);
 
     const downloadRecords = () => {
@@ -759,27 +890,113 @@ const Listings = () => {
     };
 
     const viewTableRow = (listing) => {
-        dispatch(getCustomer(listing.customerId));
+        // console.log(listing.bids[0]?.customerId);
+        batch(() => {
+            dispatch(getCustomer(listing.customerId));
+            dispatch(getOneWallet(listing.walletId));
+        });
         setViewMoreData(listing);
         setOpenViewMore(true);
     };
 
     useEffect(() => {
-        if (!isEmpty(customer)) {
-            setCustomerName(customer.firstName);
+        if (!isEmpty(viewMoreData)) {
+            switch (viewMoreData?.amountNeeded?.currencyType) {
+                case "EUR":
+                    setWorkFlow(
+                        "BUY " + viewMoreData?.amountNeeded?.currencyType
+                    );
+                    break;
+                case "NGN":
+                    setWorkFlow(
+                        "BUY " + viewMoreData?.amountNeeded?.currencyType
+                    );
+                    break;
+                default:
+                    return;
+            }
+        }
+    }, [viewMoreData]);
+
+    useEffect(() => {
+        if (!isEmpty(customer?.username)) {
+            // console.log("cus", customer);
+            setSellerName(customer?.username);
         }
     }, [customer]);
 
-    const getCustomerName = useCallback(() => {
-        return customerName;
-    }, [customerName]);
+    useEffect(() => {
+        if (!isEmpty(viewMoreData?.bids)) {
+            dispatch(getCustomer(viewMoreData.bids[0]?.customerId, "BUYER"));
+        }
+    }, [viewMoreData, dispatch]);
+
+    useEffect(() => {
+        // console.log("buyer", buyer);
+        if (!isEmpty(buyer)) {
+            setBuyerName(buyer?.username);
+        }
+    }, [buyer]);
 
     const currentAmount = (amount) => {
+        // console.log("amount", amount);
         return {
             currencyType: amount.currencyType + " ",
             amount: amount.amount,
         };
     };
+
+    const bidsStatusBlueprint = useCallback(
+        (bids) => {
+            // console.log(sellerName);
+            const confirmed =
+                sellerName +
+                " confirms " +
+                currentAmount(bids.bidAmount)?.currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ", " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ` moved to ${buyerName}'s wallet`;
+
+            const cancelled =
+                sellerName +
+                " cancels " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                " listing.";
+
+            const inProgress =
+                buyerName +
+                " has bid for " +
+                currentAmount(bids.bidAmount).currencyType +
+                currentAmount(bids.bidAmount).amount +
+                ` listing.`;
+
+            return {
+                confirmed,
+                cancelled,
+                inProgress,
+            };
+        },
+        [sellerName, buyerName]
+    );
+
+    const bidsStatusDetails = useCallback(
+        (bids) => {
+            switch (bids.status) {
+                case COMPLETED:
+                    return bidsStatusBlueprint(bids).confirmed;
+                case IN_PROGRESS:
+                    return bidsStatusBlueprint(bids).inProgress;
+                case CANCELED:
+                    return bidsStatusBlueprint(bids).cancelled;
+                default:
+                    return;
+            }
+        },
+        [COMPLETED, CANCELED, IN_PROGRESS, bidsStatusBlueprint]
+    );
 
     const handleDate = (dateTime) => {
         const time = new Date(dateTime);
@@ -803,8 +1020,72 @@ const Listings = () => {
         [ALL_LISTINGS, ALL_OPEN, classes]
     );
 
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleCredOption = (e) => {
+        setAnchorEl(e.currentTarget);
+    };
+
+    const handleCredit = (listing) => {
+        dispatch(
+            creditListing(listing.walletId, {
+                amount: listing.amountNeeded.amount,
+                remark: "test",
+            })
+        );
+    };
+
+    useEffect(() => {
+        if (!!credit) {
+            setToastMsg(credit);
+            setToastType("success");
+            ref.current?.handleClick();
+            handleClose();
+        }
+    }, [credit]);
+
+    useEffect(() => {
+        if (!!msg) {
+            setToastType("error");
+            setToastMsg(msg);
+            ref.current?.handleClick();
+            handleClose();
+        }
+    }, [msg]);
+
+    const closeViewMoreModal = () => {
+        setViewMoreData({});
+        setOpenViewMore(false);
+        setWorkFlow("");
+        setSellerName("");
+        batch(() => {
+            dispatch({
+                type: CREDIT_LISTING,
+                payload: null,
+            });
+
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+            dispatch({
+                type: CLEAR_CUSTOMER,
+            });
+            dispatch({
+                type: CLEAR_WALLET,
+            });
+        });
+    };
+
     return (
         <>
+            <Toast
+                ref={ref}
+                type={toastType}
+                msg={toastMsg}
+                title="Listing Error"
+            />
             <section
                 className={clsx(
                     classes.root,
@@ -864,10 +1145,44 @@ const Listings = () => {
                                 gap: "10px",
                             }}
                         >
+                            {/* <GenericButton
+                                clickAction={() =>
+                                    closeReverseMenu(() => {
+                                        setOpenFilterBx(false);
+                                        closeXport(false);
+                                        return !openReverseMenu;
+                                    })
+                                }
+                                buttonName="Reverse Fund"
+                            > */}
+                            {/* <SwapHorizontal />
+                                {openReverseMenu ? (
+                                    <Box
+                                        className={classes.reverseMenu}
+                                        component="span"
+                                    >
+                                        <Typography
+                                            // onClick={() => }
+                                            component="span"
+                                        >
+                                            Lien
+                                        </Typography>
+                                        <Typography
+                                            // onClick={downloadRecords}
+                                            component="span"
+                                        >
+                                            Available
+                                        </Typography>
+                                    </Box>
+                                ) : (
+                                    ""
+                                )}
+                            </GenericButton> */}
                             <GenericButton
                                 clickAction={() =>
                                     setOpenFilterBx(() => {
                                         closeXport(false);
+                                        // closeReverseMenu(false);
                                         return !openFilterBx;
                                     })
                                 }
@@ -879,6 +1194,7 @@ const Listings = () => {
                                 clickAction={() =>
                                     closeXport(() => {
                                         setOpenFilterBx(false);
+                                        // closeReverseMenu(false);
                                         return !openXport;
                                     })
                                 }
@@ -907,6 +1223,7 @@ const Listings = () => {
                                     ""
                                 )}
                             </GenericButton>
+
                             {openFilterBx ? (
                                 <Box
                                     component="div"
@@ -914,7 +1231,10 @@ const Listings = () => {
                                 >
                                     <Box
                                         component="div"
-                                        className={classes.filterBoxContent}
+                                        className={clsx(
+                                            classes.filterBoxContent,
+                                            "animate__animated animate__fadeIn"
+                                        )}
                                     >
                                         <Box
                                             component="div"
@@ -946,51 +1266,14 @@ const Listings = () => {
                                                 }
                                             >
                                                 <label>
-                                                    Date
+                                                    Start Date
                                                     <input type="date" />
                                                 </label>
-                                            </Box>
 
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.filterTransactionType
-                                                }
-                                            >
-                                                <Typography variant="body1">
-                                                    Transaction Type
-                                                </Typography>
-                                                <Box
-                                                    component="div"
-                                                    className={
-                                                        classes.checkBoxContainer
-                                                    }
-                                                >
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                defaultChecked
-                                                            />
-                                                        }
-                                                        label="Wallet Transfer"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={<Checkbox />}
-                                                        label="Deposit"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={
-                                                            <Checkbox
-                                                                defaultChecked
-                                                            />
-                                                        }
-                                                        label="Direct Transfer"
-                                                    />
-                                                    <FormControlLabel
-                                                        control={<Checkbox />}
-                                                        label="Withdrawal"
-                                                    />
-                                                </Box>
+                                                <label>
+                                                    End Date
+                                                    <input type="date" />
+                                                </label>
                                             </Box>
 
                                             <Box
@@ -1093,7 +1376,7 @@ const Listings = () => {
                             Finalized
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalFinalisedListings}
                         </Typography>
                     </div>
 
@@ -1108,7 +1391,7 @@ const Listings = () => {
                             Open
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalOpenListings}
                         </Typography>
                     </div>
 
@@ -1123,7 +1406,7 @@ const Listings = () => {
                             In progress
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalListingsInProgress}
                         </Typography>
                     </div>
 
@@ -1138,7 +1421,7 @@ const Listings = () => {
                             Removed
                         </Typography>
                         <Typography variant="subtitle2" component="span">
-                            {totalListings}
+                            {totalRemovedListings}
                         </Typography>
                     </div>
                 </Box>
@@ -1260,12 +1543,12 @@ const Listings = () => {
                         >
                             <Typography
                                 variant="h6"
-                                className={classes.viewMoreTitle}
+                                className={clsx(classes.viewMoreTitle)}
                             >
-                                Listing Details{" "}
+                                Listing Details
                                 <CloseCircleOutline
                                     style={{ cursor: "pointer" }}
-                                    onClick={() => setOpenViewMore(false)}
+                                    onClick={() => closeViewMoreModal()}
                                 />
                             </Typography>
                             <Box
@@ -1280,13 +1563,13 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Owner:"}
-                                        amlNumber={getCustomerName()}
+                                        amlTitle={"Seller:"}
+                                        amlNumber={sellerName}
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Expires:"}
-                                        amlNumber={getCustomerName()}
+                                        amlTitle={"Buyer:"}
+                                        amlNumber={buyerName}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1302,8 +1585,10 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Bank:"}
-                                        amlNumber={viewMoreData.bank}
+                                        amlTitle={"Lien Balance:"}
+                                        amlNumber={
+                                            wallet && wallet?.balance?.lien
+                                        }
                                     />
                                 </Box>
                                 <Box component="div">
@@ -1331,12 +1616,7 @@ const Listings = () => {
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Work Flow"}
-                                        amlNumber={
-                                            "BUY " +
-                                            currentAmount(
-                                                viewMoreData.amountNeeded
-                                            ).currencyType
-                                        }
+                                        amlNumber={workFlow}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1345,8 +1625,28 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Reference"}
-                                        amlNumber={viewMoreData.reference}
+                                        amlTitle={"Available Balance"}
+                                        amlNumber={
+                                            wallet && wallet?.balance?.available
+                                        }
+                                    />
+                                </Box>
+                                <Box
+                                    component="span"
+                                    className={
+                                        "animate__animated animate__bounce"
+                                    }
+                                    sx={{
+                                        position: "absolute",
+                                        top: 9,
+                                        right: 9,
+                                        color: "red",
+                                    }}
+                                >
+                                    <TrashCanOutline
+                                        style={{
+                                            fontSize: 20,
+                                        }}
                                     />
                                 </Box>
                             </Box>
@@ -1354,125 +1654,249 @@ const Listings = () => {
                                 component="div"
                                 className={classes.viewMoreBidsContainer}
                             >
-                                {viewMoreData.bids.map((listing, index) => {
-                                    return (
-                                        <Box
-                                            key={index}
-                                            component="div"
-                                            className={classes.viewMoreBids}
-                                        >
+                                {viewMoreData &&
+                                    viewMoreData.bids.map((listing, index) => {
+                                        return (
                                             <Box
+                                                key={index}
                                                 component="div"
-                                                className={classes.circleDesign}
+                                                className={classes.viewMoreBids}
                                             >
                                                 <Box
                                                     component="div"
-                                                    className={clsx(
-                                                        classes.circle,
-                                                        classes.status,
-                                                        handleStatus(
-                                                            listing.status
-                                                        )
-                                                    )}
-                                                ></Box>
-                                                <Box
-                                                    component="div"
-                                                    className={classes.line}
-                                                ></Box>
-                                            </Box>
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.statusContainer
-                                                }
-                                            >
-                                                <Typography
-                                                    variant="h6"
-                                                    className={clsx(
-                                                        classes.userStatusTitle,
-                                                        classes.status,
-                                                        handleStatus(
-                                                            listing.status
-                                                        )
-                                                    )}
-                                                >
-                                                    {listing.status}
-                                                </Typography>
-                                                <Box
-                                                    component="span"
                                                     className={
-                                                        classes.subStatus
+                                                        classes.circleDesign
                                                     }
                                                 >
-                                                    <Typography component="span">
-                                                        Test:{" "}
-                                                    </Typography>
-                                                    <Typography component="span">
-                                                        Another test:{" "}
-                                                    </Typography>
+                                                    <Box
+                                                        component="div"
+                                                        className={clsx(
+                                                            classes.circle,
+                                                            classes.status,
+                                                            handleStatus(
+                                                                listing.status
+                                                            )
+                                                        )}
+                                                    ></Box>
+                                                    <Box
+                                                        component="div"
+                                                        className={classes.line}
+                                                    ></Box>
                                                 </Box>
-                                            </Box>
-                                            <Box
-                                                component="div"
-                                                className={
-                                                    classes.dateTimeContainer
-                                                }
-                                            >
                                                 <Box
                                                     component="div"
-                                                    className={classes.dateTime}
-                                                >
-                                                    <Typography variant="body1">
-                                                        {
-                                                            handleDate(
-                                                                viewMoreData.dateCreated
-                                                            ).time
-                                                        }
-                                                    </Typography>
-                                                    <Typography variant="body1">
-                                                        {
-                                                            handleDate(
-                                                                viewMoreData.dateCreated
-                                                            ).date
-                                                        }
-                                                    </Typography>
-                                                </Box>
-                                                <Box
-                                                    component="span"
                                                     className={
-                                                        classes.subDateTime
+                                                        classes.statusContainer
                                                     }
                                                 >
-                                                    <Typography component="span">
-                                                        {customerName +
-                                                            " confirms " +
-                                                            currentAmount(
-                                                                viewMoreData.amountNeeded
-                                                            ).currencyType +
-                                                            currentAmount(
-                                                                viewMoreData.amountNeeded
-                                                            ).amount +
-                                                            ", " +
-                                                            currentAmount(
-                                                                viewMoreData.amountAvailable
-                                                            ).currencyType +
-                                                            currentAmount(
-                                                                viewMoreData.amountAvailable
-                                                            ).amount +
-                                                            " moved to Cubana's wallet"}
+                                                    <Typography
+                                                        variant="h6"
+                                                        className={clsx(
+                                                            classes.userStatusTitle,
+                                                            classes.status,
+                                                            handleStatus(
+                                                                listing.status
+                                                            )
+                                                        )}
+                                                    >
+                                                        {listing.status}
                                                     </Typography>
-                                                    {/* <Typography component='span'>Another test: </Typography> */}
+                                                    <Box
+                                                        component="span"
+                                                        className={
+                                                            classes.subStatus
+                                                        }
+                                                    >
+                                                        <Typography component="span">
+                                                            Test:{" "}
+                                                        </Typography>
+                                                        <Typography component="span">
+                                                            Another test:{" "}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Box
+                                                    component="div"
+                                                    className={
+                                                        classes.dateTimeContainer
+                                                    }
+                                                >
+                                                    <Box
+                                                        component="div"
+                                                        className={
+                                                            classes.dateTime
+                                                        }
+                                                    >
+                                                        <Typography variant="body1">
+                                                            {
+                                                                handleDate(
+                                                                    listing.datePlaced
+                                                                ).time
+                                                            }
+                                                        </Typography>
+                                                        <Typography variant="body1">
+                                                            {
+                                                                handleDate(
+                                                                    listing.datePlaced
+                                                                ).date
+                                                            }
+                                                        </Typography>
+                                                    </Box>
+                                                    <Box
+                                                        component="span"
+                                                        className={
+                                                            classes.subDateTime
+                                                        }
+                                                    >
+                                                        <Typography component="span">
+                                                            {bidsStatusDetails(
+                                                                listing
+                                                            )}
+                                                        </Typography>
+                                                        {/* <Typography component='span'>Another test: </Typography> */}
+                                                    </Box>
+                                                </Box>
+                                                <Box
+                                                    component="div"
+                                                    id="basic-button"
+                                                    aria-controls={
+                                                        Boolean(anchorEl)
+                                                            ? "basic-menu"
+                                                            : undefined
+                                                    }
+                                                    // className={clsx(
+                                                    //     listing.status !==
+                                                    //         "OPEN" &&
+                                                    //         classes.hideCredBtn
+                                                    // )}
+                                                >
+                                                    <Menu
+                                                        className={
+                                                            classes.creditOptions
+                                                        }
+                                                        id="basic-menu"
+                                                        anchorEl={anchorEl}
+                                                        keepMounted
+                                                        open={Boolean(anchorEl)}
+                                                        onClose={handleClose}
+                                                        // classes={{
+                                                        //     paper: classes.menu,
+                                                        // }}
+                                                        aria-haspopup="true"
+                                                        aria-expanded={
+                                                            Boolean(anchorEl)
+                                                                ? "true"
+                                                                : undefined
+                                                        }
+                                                        MenuListProps={{
+                                                            "aria-labelledby":
+                                                                "basic-button",
+                                                        }}
+                                                        disableScrollLock={true}
+                                                    >
+                                                        <MenuItem
+                                                            onClick={() =>
+                                                                handleCredit(
+                                                                    listing
+                                                                )
+                                                            }
+                                                        >
+                                                            Transfer
+                                                        </MenuItem>
+                                                        <MenuItem
+                                                            onClick={
+                                                                handleClose
+                                                            }
+                                                        >
+                                                            TEst
+                                                        </MenuItem>
+                                                        <MenuItem
+                                                            onClick={
+                                                                handleClose
+                                                            }
+                                                        >
+                                                            Delete
+                                                        </MenuItem>
+                                                    </Menu>
                                                 </Box>
                                             </Box>
-                                        </Box>
-                                    );
-                                })}
+                                        );
+                                    })}
+                                {isEmpty(viewMoreData.bids) ||
+                                viewMoreData?.bids[0]?.status === CANCELED ? (
+                                    ""
+                                ) : (
+                                    <Box
+                                        component="div"
+                                        className={classes.txOption}
+                                    >
+                                        <DotsHorizontal
+                                            onClick={(e) => handleCredOption(e)}
+                                        />
+                                    </Box>
+                                )}
                             </Box>
                         </Box>
                     </Box>
                 ) : (
                     ""
                 )}
+                {/* {openReverseMenu ? (
+                    <GenericPopUp
+                        component="div"
+                        containerWidth="69%"
+                        containerHeight="70vh"
+                        containerMargin="2rem 14vw 0 auto"
+                        onClick={() => closeReverseMenu()}
+                    >
+                        <Box
+                            component="div"
+                            className={classes.reverseModalContent}
+                        >
+                            <GenericButton />
+                            <Box
+                                component="div"
+                                className={classes.reverseModalForm}
+                            >
+                                <GenericTextField
+                                    textTitle="Receiver Wallet"
+                                    inputValue={remarks}
+                                    handleOnChange={setRemarks}
+                                    errors={errors}
+                                    errorValue={remarks}
+                                    label="Receiver Wallet ID"
+                                    placeHolder="Receiver"
+
+                                    isReadOnly={!editable}
+                                />
+                                <SwapHorizontal />
+                                <GenericTextField
+                                    textTitle="Destination Wallet"
+                                    inputValue={remarks}
+                                    handleOnChange={setRemarks}
+                                    errors={errors}
+                                    errorValue={remarks}
+                                    label="Destination Wallet ID"
+                                    placeHolder="Destination"
+
+                                    isReadOnly={!editable}
+                                />
+                            </Box>
+                            <GenericButton
+                                clickAction={() =>
+
+                                }
+                                buttonName="Reverse"
+                                fontColor="white"
+                                fontsize="15px"
+                                bxShadw="none"
+                                bgColor="#1E6262"
+                            />
+                        </Box>
+                    </GenericPopUp>
+                ) : (
+                    ""
+                )} */}
             </section>
         </>
     );

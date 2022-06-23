@@ -13,6 +13,7 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_BIDS,
     SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
@@ -29,14 +30,29 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
+export const getBids = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${URL}/GetAllBidsbyListingId?listingId=${listingId}`, { pageNumber: 1, pageSize: 50 });
+        const bids = res.data.data.result.items;
+        return dispatch({
+            type: SET_BIDS,
+            payload: bids
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
 export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
+        const msg = listing.AmountAvailable.CurrencyType === 'EUR' ? 'Offer successfully created. The EUR amount is now temporarily unavailabe (escrowed)' : 'Offer successfully created. You will be notified once a buyer accepts your offer';
         return batch(() => {
             dispatch({
                 type: ADDED_LISTING,
-                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+                payload: { listing: res.data.data, msg }
             });
             dispatch({
                 type: SET_REQUIRED_CURRENCY,
@@ -199,7 +215,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.currencyNeeded}${listing.AmountAvailable.Amount} within 30 minutes`
             });
         });
     } catch (err) {
@@ -261,8 +277,7 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
 
 export const cancelBid = (bidIds) => async (dispatch) => {
     try {
-        const res = await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
-        console.log(res);
+        await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/CancelBid`, { bidIds })]);
     } catch (err) {
         return handleError(err, dispatch);
     }

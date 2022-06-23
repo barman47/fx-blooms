@@ -47,7 +47,7 @@ const Transactions = ({ getFundingRequests, getWallets, getWalletTransactions })
     const dispatch = useDispatch();
     
     const { customerId } = useSelector(state => state.customer);
-    const { filter, fundingRequests, wallet, wallets, transactions } = useSelector(state => state.wallets);
+    const { filter, fundingRequest, fundingRequests, wallet, wallets, transactions } = useSelector(state => state.wallets);
     const errorsState = useSelector(state => state.errors);
 
     const [currentFilter, setCurrentFilter] = useState(HISTORY);
@@ -62,6 +62,12 @@ const Transactions = ({ getFundingRequests, getWallets, getWalletTransactions })
     //     }
     //     // eslint-disable-next-line
     // }, []);
+
+    // Stop loading when there is a funding request
+    useEffect(() => {
+        console.log('Ending Request');
+        setLoading(false);
+    }, [fundingRequest]);
 
     useEffect(() => {
 		if (wallets.length > 0) {
