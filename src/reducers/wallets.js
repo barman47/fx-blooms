@@ -22,6 +22,7 @@ import {
     CLEAR_WALLET_MSG,
     SET_WITHDRAWAL_REQUEST,
     CLEAR_WITHDRAWAL_REQUESTS,
+    UPDATE_FUNDING_REQUEST,
     CLEAR_WALLET,
 } from "../actions/types";
 

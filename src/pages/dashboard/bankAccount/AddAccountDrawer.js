@@ -20,7 +20,7 @@ import { Close } from 'mdi-material-ui';
 
 import { addAccount, validateIban } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION } from '../../../actions/types';
-import { getInstitutions } from '../../../actions/wallets';
+import { getInstitutions } from '../../../actions/institutions';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
