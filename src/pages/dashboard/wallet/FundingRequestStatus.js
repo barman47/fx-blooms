@@ -23,6 +23,7 @@ import isEmpty from '../../../utils/isEmpty';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
+import FundingDisclaimerModal from './FundingDisclaimerModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -93,12 +94,13 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const disclaimerModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Funding Request Status');
-    
+        disclaimerModal.current.openModal();
         if (location?.state?.paymentRequestId) {
             setPaymentRequestId(location.state.paymentRequestId);   
         }
@@ -158,6 +160,7 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
                 />
             }
             {loading && <Spinner text={loadingText} />}
+            <FundingDisclaimerModal ref={disclaimerModal} />
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             <Box component="section" className={classes.root}>
                 <Typography variant="h4" color="primary" gutterBottom>Funding Request Status</Typography>

@@ -16,6 +16,7 @@ import { GET_ERRORS } from '../../../actions/types';
 import isEmpty from '../../../utils/isEmpty';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
+import { FUNDING_FAILURE } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -87,6 +88,9 @@ const FundAuthorizationSuccess = ({ payment, handleSetTitle }) => {
             urlParams[param[0]] = param[1];
         }
         const { request, consent, type } = urlParams;
+        if (!location.search || !request || !consent || !type) {
+            return navigate(FUNDING_FAILURE);
+        }
         makePayment(request, consent, type);
     };
 
