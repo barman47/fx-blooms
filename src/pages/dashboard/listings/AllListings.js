@@ -23,9 +23,10 @@ import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { getInstitutions } from '../../../actions/institutions';
 import { getWallets } from '../../../actions/wallets';
 import { 
-	ACTIVATE_EUR_WALLET,
+	// ACTIVATE_EUR_WALLET,
 	// ACTIVATE_NGN_WALLET,
 	HIDE_NEGOTIATION_LISTINGS, 
 	SET_WALLET,
@@ -38,10 +39,10 @@ import isEmpty from '../../../utils/isEmpty';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-import Wallet from '../wallet/Wallet';
+// import Wallet from '../wallet/Wallet';
 import WalletInfo from '../wallet/WalletInfo';
 
-import EUFlag from '../../../assets/img/EU-flag.svg';
+// import EUFlag from '../../../assets/img/EU-flag.svg';
 // import NGNFlag from '../../../assets/img/NGN-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
 
@@ -117,15 +118,15 @@ const useStyles = makeStyles(theme => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'flex-end',
-		marginRight: theme.spacing(7)
+		marginRight: theme.spacing(7),
+
+		[theme.breakpoints.down('md')]: {
+			marginRight: 0
+		}
 	},
 
 	walletToggle: {
 		color: theme.palette.primary.main,
-
-		[theme.breakpoints.down('md')]: {
-			display: 'none'
-		},
 
 		'&:hover': {
 			backgroundColor: 'transparent'
@@ -224,10 +225,10 @@ const AllListings = (props) => {
 
 	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
 	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
-	const { loading } = useSelector(state => state);
+	const { institutions, loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { eurActive, wallets } = useSelector(state => state.wallets);
+	const { wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -238,6 +239,7 @@ const AllListings = (props) => {
 		getNotifications,
 		getWallets,
 		handleSetTitle,
+		getInstitutions,
 		removeExpiredListings 
 	} = props;
 
@@ -280,11 +282,20 @@ const AllListings = (props) => {
             getAccounts(customerId);
         }
 
+		if (institutions.length === 0) {
+            getInstitutions();
+        }
+
 		return () => {
 			window.removeEventListener('DOMContentLoaded', loadedEvent.current);
 		};
 		// eslint-disable-next-line
 	}, []);
+
+	// Refetch Wallets to update balance when listings change due to deletion
+    useEffect(() => {
+		getWallets(customerId);
+	}, [customerId, getWallets, listings]);
 
 	// Only allow numbers on search
 	const handleSetAmount = (value) => {
@@ -477,14 +488,14 @@ const AllListings = (props) => {
 				</Box>
 				<Collapse in={showWallets}>
 					<section className={classes.walletsContainer}>
-						<section className={classes.wallets}>
+						{/* <section className={classes.wallets}>
 							<Wallet 
 								type="EUR"
 								flag={EUFlag}
 								active={eurActive}
 								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
 							/>
-						</section>
+						</section> */}
 						<WalletInfo />
 					</section>
 				</Collapse>
@@ -612,6 +623,7 @@ AllListings.propTypes = {
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
 	getWallets: PropTypes.func.isRequired,
+	getInstitutions: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
@@ -622,6 +634,7 @@ export default connect(undefined, {
 	getListingsOpenForBid, 
 	getMoreListings, 
 	getNotifications,
+	getInstitutions,
 	getWallets,
 	removeExpiredListings 
 })(AllListings);

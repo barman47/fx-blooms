@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
+import { connect, useSelector } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+
+import { getWallets } from '../../../actions/wallets';
 
 import { COLORS } from '../../../utils/constants';
 
@@ -39,9 +43,11 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ handleSetTitle }) => {
+const Index = ({ getWallets, handleSetTitle }) => {
     const classes = useStyles();
+    const { customerId } = useSelector(state => state.customer);
     useEffect(() => {
+        getWallets(customerId);
         handleSetTitle('Wallets');
         // eslint-disable-next-line
     }, []);
@@ -52,10 +58,13 @@ const Index = ({ handleSetTitle }) => {
             <Typography variant="body2" component="p">Here are your wallets</Typography>
             <WalletInfo />
             <Transactions />
-            {/* <div className={classes.container}>
-            </div> */}
         </section>
     );
 };
 
-export default Index;
+Index.propTypes = {
+    getWallets: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getWallets })(Index);

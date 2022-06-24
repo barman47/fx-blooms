@@ -22,6 +22,7 @@ import {
     CLEAR_WALLET_MSG,
     SET_WITHDRAWAL_REQUEST,
     CLEAR_WITHDRAWAL_REQUESTS,
+    UPDATE_FUNDING_REQUEST,
     CLEAR_WALLET,
 } from "../actions/types";
 
@@ -159,6 +160,7 @@ const walletsReducer = (state = initialState, action) => {
                 ...state,
                 fundingRequests: action.payload,
             };
+        
         // case SET_BANK_ACCOUNTS:
         //     return {
         //         ...state,
@@ -169,6 +171,7 @@ const walletsReducer = (state = initialState, action) => {
         //         ...state,
         //         bankAccount: action.payload,
         //     };
+        
         case SET_BANK_ACCOUNT_MSG:
             return {
                 ...state,
@@ -179,6 +182,7 @@ const walletsReducer = (state = initialState, action) => {
                 ...state,
                 withdrawalRequests: action.payload,
             };
+        
         case SET_BATCH_ID:
             return {
                 ...state,
@@ -199,6 +203,7 @@ const walletsReducer = (state = initialState, action) => {
                 ...state,
                 withdrawalSuccess: action.payload,
             };
+
         case CLEAR_WITHDRAWAL_REQUESTS:
             return {
                 ...state,
@@ -208,16 +213,30 @@ const walletsReducer = (state = initialState, action) => {
                 withdrawalSuccess: null,
                 withdrawalRequests: null,
             };
+
         case CLEAR_WALLET_MSG:
             return {
                 ...state,
                 msg: null,
             };
+
         case CLEAR_WALLET:
             return {
                 ...state,
                 wallet: {},
             };
+
+        case UPDATE_FUNDING_REQUEST:
+            const fundingRequests = state.fundingRequests;
+            const index = fundingRequests.findIndex(request => request.paymentRequestId === action.payload.paymentRequestId);
+            fundingRequests[index] = action.payload;
+
+            return {
+                ...state,
+                fundingRequests: [...fundingRequests],
+                fundingRequest: action.payload
+            };
+
         default:
             return state;
     }

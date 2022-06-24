@@ -164,7 +164,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 172800000; // number of milliseconds in 2 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;

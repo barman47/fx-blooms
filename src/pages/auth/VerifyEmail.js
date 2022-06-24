@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const VerifyEmail = (props) => {
+const VerifyEmail = ({ verifyEmail }) => {
     const classes = useStyles();
 
     const navigate = useNavigate();
@@ -58,8 +58,6 @@ const VerifyEmail = (props) => {
 
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
-
-    const { verifyEmail } = props;
 
     const successModal = useRef();
     const toast = useRef();

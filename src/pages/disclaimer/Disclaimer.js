@@ -55,6 +55,7 @@ const useStyles = makeStyles(theme => ({
         marginBottom: theme.spacing(10),
 
         '& p:first-child': {
+            fontWeight: 600,
             marginBottom: theme.spacing(5)
         },
 
@@ -82,10 +83,10 @@ const Disclaimer = () => {
                     <Box component="div" className={classes.item}>
                         <Typography variant="body2" component="p">
                             Disclaimer<br />
-                            Last updated: August 15th, 2021
+                            Last updated: June 15th, 2022
                         </Typography>
                         <Typography variant="body2" component="p">
-                            Interpretation and Definitions
+                            <strong>Interpretation and Definitions</strong>
                         </Typography>
                     </Box>
                     <Box component="div" className={classes.item}>
