@@ -9,9 +9,9 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { SUPPORTED_FUNDING_INSTITUTIONS } from '../../../utils/institutions';
+import { Information } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../../utils/constants';
+import { COLORS, SHADOW } from '../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -25,9 +25,8 @@ const useStyles = makeStyles(theme => ({
         borderRadius: theme.shape.borderRadius,
         width: '35vw',
         height: '25vw',
-        overflowY: 'auto',
         boxShadow: SHADOW,
-        padding: theme.spacing(2),
+        padding: theme.spacing(5, 10),
 
         [theme.breakpoints.down('md')]: {
             height: '50vw',
@@ -41,26 +40,32 @@ const useStyles = makeStyles(theme => ({
         }
     },
 
-    title: {
-        color: theme.palette.primary.main,
-        marginBottom: theme.spacing(1),
-        fontWeight: 600
+    item: {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        alignItems: 'center',
+        textAlign: 'center'
     },
 
-    insitution: {
-        fontWeight: 300,
-        marginBottom: theme.spacing(1)
-    },                    
-
+    icon: {
+        color: theme.palette.primary.main,
+        fontSize: theme.spacing(5)
+    }
 }));
 
-const SupportedFundingInstitutionsModal = forwardRef((props, ref) => {
+const TimeElapsedModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
 
+    const { dismissAction } = props;
+
     const closeModal = () => {
         setOpen(false);
+        if (dismissAction) {
+            dismissAction();
+        }
     };
 
     useImperativeHandle(ref, () => ({
@@ -74,9 +79,9 @@ const SupportedFundingInstitutionsModal = forwardRef((props, ref) => {
     }));
 
     const handleOnClose = (e, reason) => {
-        // if (reason === 'backdropClick') {
-        //     return;
-        // }
+        if (reason === 'backdropClick') {
+            return;
+        }
         closeModal();
     }
 
@@ -96,16 +101,12 @@ const SupportedFundingInstitutionsModal = forwardRef((props, ref) => {
         >
             <Fade in={open}>
                 <Grid container className={classes.container}>
-                    <Grid item xs={12}>
-                        <Typography variant="h6" className={classes.title}>Supported Funding Institutions</Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                        {SUPPORTED_FUNDING_INSTITUTIONS.map((insitution, index) => (
-                            <Typography key={index} variant="body2" component="p" className={classes.insitution}>{insitution.fullName}</Typography>
-                        ))}
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="contained" size="small" onClick={closeModal} color="primary">Okay</Button>
+                    <Grid item xs={12} className={classes.item}>
+                        <Information className={classes.icon} />
+                        <Typography variant="subtitle1">
+                            Sorry! the seller failed to transfer within the stipulated time. The Transaction has been cancelled. You may accept or create another offer.
+                        </Typography>
+                        <Button onClick={closeModal} color="primary">Okay</Button>
                     </Grid>
                 </Grid>
             </Fade>
@@ -113,8 +114,8 @@ const SupportedFundingInstitutionsModal = forwardRef((props, ref) => {
 	);
 });
 
-SupportedFundingInstitutionsModal.propTypes = {
+TimeElapsedModal.propTypes = {
     dismissAction: PropTypes.func
 };
 
-export default SupportedFundingInstitutionsModal;
+export default TimeElapsedModal;

@@ -36,6 +36,7 @@ import {
     WALLET_TRANSACTION_STATUS,
     FUND_WALLET,
     FUND_AUTHORIZATION_SUCCESS,
+    FUNDING_FAILURE,
     FUNDING_REQUEST_STATUS,
     FUND_CONFIRMATION,
     CONTACT_US,
@@ -62,6 +63,8 @@ import { getCustomerInformation } from './actions/customer';
 import FallBack from './components/common/FallBack';
 import { AUTH_TOKEN, ADMIN_AUTH_TOKEN, ADMIN_INFO } from './utils/constants';
 import setAuthToken from './utils/setAuthToken';
+// import supportedInstitutions from './supportedInstitutions.json';
+// import { SUPPORTED_FUNDING_INSTITUTIONS as institutions } from './utils/institutions-all';
 
 const ScrollToTop = lazy(() => import('./components/layout/ScrollToTop'));
 const AdminRoute = lazy(() => import('./components/common/AdminRoute'));
@@ -117,6 +120,7 @@ const WalletTransactionStatus = lazy(() => import('./pages/dashboard/wallet/Tran
 const FundWallet = lazy(() => import('./pages/dashboard/wallet/FundWallet'));
 const FundConfirmation = lazy(() => import('./pages/dashboard/wallet/FundConfirmation'));
 const FundAuthorizationSuccess = lazy(() => import('./pages/dashboard/wallet/FundAuthorizationSuccess'));
+const FundingFailure = lazy(() => import('./pages/dashboard/wallet/FundingFailure'));
 const FundingRequestStatus = lazy(() => import('./pages/dashboard/wallet/FundingRequestStatus'));
 const RequestWithdrawal = lazy(() => import('./pages/dashboard/wallet/RequestWithdrawal'));
 
@@ -193,7 +197,22 @@ const App = ({ getCustomerInformation }) => {
 
     const handleSetTitle = (title) => setTitle(title);
 
+    // const sortInsitutions = () => {
+    //     const sortedInstitutions = [];
+    //     for (let i = 0; i < supportedInstitutions.length; i++) {
+    //         for (let j = 0; j < institutions.length; j++) {
+    //             if (supportedInstitutions[i].institution === institutions[j].fullName) {
+    //         //         console.log(institution);
+    //                 sortedInstitutions.push(institutions[j]);
+    //                 break;
+    //             }
+    //         }
+    //     }
+    //     console.log(sortedInstitutions);
+    // };
+
     useEffect(() => {
+        // sortInsitutions();
         const customerToken = localStorage.getItem(AUTH_TOKEN);
         const adminToken = localStorage.getItem(ADMIN_AUTH_TOKEN);
         const adminInfo = localStorage.getItem(ADMIN_INFO);
@@ -261,6 +280,7 @@ const App = ({ getCustomerInformation }) => {
                                 <Route path={WALLET_TRANSACTION_STATUS} element={<WalletTransactionStatus handleSetTitle={handleSetTitle} />} />
                                 <Route path={FUND_WALLET} element={<FundWallet handleSetTitle={handleSetTitle} />} />
                                 <Route path={FUND_AUTHORIZATION_SUCCESS} element={<FundAuthorizationSuccess handleSetTitle={handleSetTitle} />} />
+                                <Route path={FUNDING_FAILURE} element={<FundingFailure handleSetTitle={handleSetTitle} />} />
                                 <Route path={FUNDING_REQUEST_STATUS} element={<FundingRequestStatus handleSetTitle={handleSetTitle} />} />
                                 <Route path={FUND_CONFIRMATION} element={<FundConfirmation handleSetTitle={handleSetTitle} />} />
                                 <Route path={REQUEST_WITHDRAWAL} element={<RequestWithdrawal handleSetTitle={handleSetTitle} />} />

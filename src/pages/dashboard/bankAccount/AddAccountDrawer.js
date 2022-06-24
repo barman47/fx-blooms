@@ -19,7 +19,7 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { Close } from 'mdi-material-ui';
 
 import { addAccount, validateIban } from '../../../actions/bankAccounts';
-import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION, SET_INSTITUTIONS } from '../../../actions/types';
 import { getInstitutions } from '../../../actions/institutions';
 import { COLORS } from '../../../utils/constants';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
@@ -165,13 +165,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const supportedBanks = useRef();
     const toast = useRef();
 
-    useEffect(() => {
-        if (institutions.length === 0) {
-            getInstitutions();
-        }
-        // eslint-disable-next-line
-    }, []);
-
     const setReceivingAccountType = useCallback(() => {
         if (eur && ngn) {
             setValue(0);
@@ -185,14 +178,23 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     useEffect(() => {
         setOpen(drawerOpen);
         if (drawerOpen) {
+            if (institutions.length === 0) {
+                getInstitutions();
+            }
             setReceivingAccountType();
         } else {
-            return dispatch({
-                type: SET_ACCOUNT_VALIDATION,
-                payload: {}
+            batch(() => {
+                dispatch({
+                    type: SET_ACCOUNT_VALIDATION,
+                    payload: {}
+                });
+                dispatch({
+                    type: SET_INSTITUTIONS,
+                    payload: []
+                });
             });
         }
-    }, [dispatch, drawerOpen, setReceivingAccountType]);
+    }, [dispatch, drawerOpen, getInstitutions, institutions.length, setReceivingAccountType]);
 
     useEffect(() => {
         if (!isEmpty(errorsState)) {

@@ -19,7 +19,8 @@ import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { requestWalletFunding } from '../../../actions/wallets';
-import { GET_ERRORS, SET_FUNDING_REQUEST } from '../../../actions/types';
+import { GET_ERRORS, SET_FUNDING_REQUEST, SET_INSTITUTIONS } from '../../../actions/types';
+import { getInstitutions } from '../../../actions/institutions';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
@@ -27,11 +28,15 @@ import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import getAccount from '../../../utils/getAccount';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
+import { BANK_ACCOUNTS } from '../../../routes';
+
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
 import Toast from '../../../components/common/Toast';
 import IDVerificationModal from '../idVerification/IDVerificationModal';
 import PendingIdModal from '../idVerification/PendingIdModal';
+import NoInsitutionModal from './NoInsitutionModal';
+import UnsupportedInstitutionModal from './UnsupportedInstitutionModal';
 
 // import yapily from '../../../assets/img/yapily.png';
 // import bankTransfer from '../../../assets/img/bank-transfer.png';
@@ -120,7 +125,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, getInstitutions, requestWalletFunding, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -128,13 +133,13 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
     const { idStatus } = useSelector(state => state.customer.stats);
-    // eslint-disable-next-line
     const { currencies, customer, institutions } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
     const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
+    const [toastTitle, setToastTitle] = useState('');
     const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
@@ -144,7 +149,9 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
     const [errors, setErrors] = useState({});
 
     const idVerificationModal = useRef();
+    const noInstitutionModal = useRef();
     const toast = useRef();
+    const unsupportedInstitutionModal = useRef();
 
     const { APPROVED, NOT_SUBMITTED } = ID_STATUS;
     const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
@@ -159,11 +166,21 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
         if (currencies.length === 0) {
             getCurrencies()
         }
+        if (institutions.length === 0) {
+            getInstitutions()
+        }
 
         dispatch({
             type: SET_FUNDING_REQUEST,
             payload: {}
         });
+
+        return () => {
+            dispatch({
+                type: SET_INSTITUTIONS,
+                payload: []
+            });
+        };
         // eslint-disable-next-line
     }, []);
 
@@ -176,6 +193,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
+            setToastTitle('ERROR');
             setLoading(false);
             dispatch({
                 type: GET_ERRORS,
@@ -185,27 +203,24 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
     }, [dispatch, errorsState, errors]);
 
     // Check if selected account supports instant payment when selected
-    // useEffect(() => {
-    //     if (sourceAccount) {
-    //         let supportsFunding = false;
-    //         const account = getAccount(sourceAccount, accounts);
-    //         let customerInstitution = null;
-    //         for (let insitution in institutions) {
-    //             if (insitution.id === account.insitutionId) {
-    //                 customerInstitution = insitution;
-    //                 break;
-    //             }
-    //         }
+    useEffect(() => {
+        if (checked) {
+            let supportsFunding = false;
+            const account = getAccount(sourceAccount, accounts);
+            const customerInstitution = institutions.find(institution => institution.id === account.institutionId);
 
-    //         if (customerInstitution.features.includes('')) {
-    //             supportsFunding = true;
-    //         }
+            if (customerInstitution.features.includes('INITIATE_DOMESTIC_SINGLE_INSTANT_PAYMENT')) {
+                supportsFunding = true;
+            }
 
-    //         if (!supportsFunding) {
-    //             // Show not supported message and clear the bank state
-    //         }
-    //     }
-    // }, [accounts, institutions, sourceAccount]);
+            if (!supportsFunding) {
+                // Show not supported message and clear the bank state
+                setToastTitle('Not Supported');
+                setErrors({ msg: 'Institution does not support instant payment', sourceAccount: 'Your selected institution does not support instant payment' });
+                setChecked(false);
+            }
+        }
+    }, [accounts, checked, institutions, sourceAccount]);
 
     const checkIdStatus = () => {
         switch (idStatus) {
@@ -243,13 +258,11 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
-        if (sourceAccount) {
-            
-        }
-        const { accountID, accountName, accountNumber } = getAccount(sourceAccount, accounts);
+        
+        const { accountID, accountName, accountNumber, bankName, institutionId } = getAccount(sourceAccount, accounts);
         const data = {
-            // institutionId: institutionId,
-            // institution: institution,
+            institutionId,
+            institution: bankName,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
@@ -260,6 +273,10 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
             useInstantPayment: checked,
             reference: "FXBLOOMS"
         };
+
+        if (!data.institutionId) {
+            return noInstitutionModal.current.openModal();
+        }
 
         const { errors, isValid } = validateFundWallet(data);
 
@@ -275,12 +292,16 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
         requestWalletFunding(data, navigate);
     };
 
+    const dismissAction = () => {
+        navigate(BANK_ACCOUNTS);
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
-                    title="ERROR"
+                    title={toastTitle || 'ERROR'}
                     duration={5000}
                     msg={errors.msg || ''}
                     type="error"
@@ -288,6 +309,8 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
             }
             {loading && <Spinner />}
             <IDVerificationModal ref={idVerificationModal} />
+            <NoInsitutionModal ref={noInstitutionModal} dismissAction={dismissAction} />
+            <UnsupportedInstitutionModal ref={unsupportedInstitutionModal} />
             {showPendingIdModal && <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
@@ -477,7 +500,8 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
 
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
+    getInstitutions: PropTypes.func.isRequired,
     requestWalletFunding: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { requestWalletFunding, getCurrencies })(FundWallet);
+export default connect(undefined, { getInstitutions, requestWalletFunding, getCurrencies })(FundWallet);

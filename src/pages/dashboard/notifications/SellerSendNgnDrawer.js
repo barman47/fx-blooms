@@ -141,7 +141,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -217,7 +217,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
     const getBidIds = useCallback(() => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
-        console.log(bidIds);
         return bidIds;
     }, [bids]);
 
@@ -225,9 +224,10 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, madePaymentV2, markNotificati
     useEffect(() => {
         if (bids.length > 0) {
             cancelBid(getBidIds());
+            handleOpenTimeElapsedModal();
             toggleDrawer();
         }
-    }, [bids, cancelBid, getBidIds, toggleDrawer]);
+    }, [bids, cancelBid, getBidIds, handleOpenTimeElapsedModal, toggleDrawer]);
 
     const expireListing = useCallback(() => {
         getBids(bid.data.ListingId);
