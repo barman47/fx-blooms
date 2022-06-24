@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
         borderBottom: "2px solid #E3E8EE",
         alignItems: "center",
         cursor: "pointer",
+        gap: 10,
         // justifyContent: 'flex-start',
 
         "& span": {

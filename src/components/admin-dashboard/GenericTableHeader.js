@@ -1,45 +1,53 @@
-import { Box, Typography, } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Typography } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
+const useStyles = makeStyles((theme) => ({
+    tableHeaderRow: {
+        display: "grid",
 
-const useStyles = makeStyles(theme =>({
+        color: "#3C3C3C",
+        borderBottom: "2px solid #E3E8EE",
+        alignItems: "center",
+        gap: 10,
 
-  tableHeaderRow: {
-      display: 'grid',
-
-      color: '#3C3C3C',
-      borderBottom: '2px solid #E3E8EE',
-      alignItems: 'center',
-
-      '& span': {
-          fontWeight: '600',
-          // paddingTop: theme.spacing(1),
-          // paddingBottom: theme.spacing(1),
-          fontSize: '1.1vw',
-          fontStretch: '50%',
-          // borderLeft: `1px solid red`
-      }
-  },
+        "& span": {
+            fontWeight: "600",
+            // paddingTop: theme.spacing(1),
+            // paddingBottom: theme.spacing(1),
+            fontSize: "1.1vw",
+            fontStretch: "50%",
+            // borderLeft: `1px solid red`
+        },
+    },
 }));
 
-
-
 const GenericTableHeader = ({ columns, gridColumns, headerPadding }) => {
-  const classes = useStyles();
+    const classes = useStyles();
 
-  return (
-    <>
-      <Box component="section" sx={{ gridTemplateColumns: gridColumns, padding: `${headerPadding ? headerPadding : '11.2px 0'}` }} className={classes.tableHeaderRow}>
-          {
-              columns && columns.map((column, i) => (
-                  <Typography component="span" key={i} className={classes.tableCell} variant="subtitle1">
-                          { column.label}
-                  </Typography>
-              ))
-          }
-      </Box>
-    </>
-  )
-}
+    return (
+        <>
+            <Box
+                component="section"
+                sx={{
+                    gridTemplateColumns: gridColumns,
+                    padding: `${headerPadding ? headerPadding : "11.2px 0"}`,
+                }}
+                className={classes.tableHeaderRow}
+            >
+                {columns &&
+                    columns.map((column, i) => (
+                        <Typography
+                            component="span"
+                            key={i}
+                            className={classes.tableCell}
+                            variant="subtitle1"
+                        >
+                            {column.label}
+                        </Typography>
+                    ))}
+            </Box>
+        </>
+    );
+};
 
 export default GenericTableHeader;

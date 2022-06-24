@@ -1,11 +1,5 @@
-import {
-    useRef,
-    useState,
-    useLayoutEffect,
-    useCallback,
-    useEffect,
-} from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { useSelector } from "react-redux";
 // import PropTypes from 'prop-types';
 import { Box, Typography, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -17,13 +11,6 @@ import {
     getResidencePermitValidationResponse,
     getCustomer,
 } from "../../../actions/customer";
-import { CLEAR_CUSTOMER_STATUS_MSG } from "../../../actions/types";
-// import { CLEAR_CUSTOMER_STATUS_MSG, GET_RRORS } from '../../../actions/types';
-// import isEmpty from '../../../utils/isEmpty';
-
-// import Spinner from '../../../components/common/Spinner';
-import SuccessModal from "../../../components/common/SuccessModal";
-// import Toast from '../../../components/common/Toast';
 import GenericGridAuth from "../../../components/admin-dashboard/GenericGridAuth";
 
 const useStyles = makeStyles((theme) => ({
@@ -92,7 +79,6 @@ const useStyles = makeStyles((theme) => ({
 
 const AuthenticationDetails = () => {
     const classes = useStyles();
-    const dispatch = useDispatch();
     const { customer, idCheckData, profileCheckData } = useSelector(
         (state) => state.customers
     );
@@ -112,7 +98,6 @@ const AuthenticationDetails = () => {
     // const [errors, setErrors] = useState({});
 
     // const toast = useRef();
-    const successModal = useRef();
     // console.log('auth', twoFactorEnabled)
 
     const isVerified = useCallback(
@@ -164,7 +149,6 @@ const AuthenticationDetails = () => {
     };
 
     useLayoutEffect(() => {
-        console.log("id", twoFactorEnabled);
         if (!idCheckData) {
             getIdCardValidationResponse(customer.id);
         }
@@ -201,13 +185,6 @@ const AuthenticationDetails = () => {
     //     }
     // }, [dispatch, msg]);
 
-    const dismissSuccessModal = () => {
-        dispatch({
-            type: CLEAR_CUSTOMER_STATUS_MSG,
-            payload: null,
-        });
-    };
-
     return (
         <>
             {/* {!isEmpty(errorsState) && 
@@ -220,10 +197,6 @@ const AuthenticationDetails = () => {
                 />
             } */}
             {/* {loading && <Spinner />} */}
-            <SuccessModal
-                ref={successModal}
-                dismissAction={dismissSuccessModal}
-            />
             <Box component="div" className={classes.root}>
                 <Typography className={classes.authName} variant="h5">
                     Authentications
@@ -306,64 +279,6 @@ const AuthenticationDetails = () => {
                     </Box>
                 </Box>
             </Box>
-            {/* <Box component="section" className={classes.root}>
-                <Box component="section" className={classes.content}>
-                    <Box component="div" className={classes.detail}>
-                        <Typography color="primary" variant="h6">2FA</Typography>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Google Authenticator &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
-                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
-                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
-                            </Button>
-                          </div>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">SMS OTP &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
-                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
-                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
-                            </Button>
-                          </div>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">EMAIL OTP &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={hasSetup2FASetup} variant="span" component="span">SETUP</Typography>
-                              <Typography className={handleAuthClass('twoFactorEnabled')} variant="span" component="span">ACTIVE</Typography>
-                              <Typography className={hasSetup2FAInactive} variant="span" component="span">INACTIVE</Typography>
-                            </Button>
-                          </div>
-                    </Box>
-                    <Divider orientation="vertical" flexItem classes={{ root: classes.divider }} />       
-                    <Box component="div" className={classes.detail}>
-                      <Box component="div" className={classes.detail}>
-                        <Typography color="primary" variant="h6">VERIFICATION</Typography>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Phone Number &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={handleAuthClass('phoneNo')} variant="span" component="span">PROVIDED</Typography>
-                              <Typography className={handleAuthClass('isPhoneNumberVerified')} variant="span" component="span">VERIFIED</Typography>
-                            </Button>
-                          </div>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Address &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={handleAuthClass('address')} variant="span" component="span">PROVIDED</Typography>
-                              <Typography className={handleAuthClass('residentialPermitVerificationResponse')} variant="span" component="span">VERIFIED</Typography>
-                            </Button>
-                          </div>
-                          <div className={classes.btnGroup}>
-                            <Button className={classes.btnLeft} variant="outlined">Email &nbsp; &nbsp; &nbsp; <DotsHorizontal /></Button>
-                            <Button className={classes.btn} variant="outlined">
-                              <Typography className={handleAuthClass('email')} variant="span" component="span">PROVIDED</Typography>
-                              <Typography className={handleAuthClass('isEmailVerified')} variant="span" component="span">VERIFIED</Typography>
-                            </Button>
-                          </div>
-                    </Box>
-                    </Box>     
-                </Box>
-            </Box> */}
         </>
     );
 };

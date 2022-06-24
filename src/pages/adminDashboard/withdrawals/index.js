@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch, batch } from "react-redux";
 import {
     Box,
@@ -21,6 +21,7 @@ import {
     TableRow,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Pagination from "@material-ui/lab/Pagination";
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
@@ -468,8 +469,8 @@ const Withdrawals = () => {
 
     const [rowsPerPage] = useState(pages[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageNumberList, setPageNumberList] = useState([]);
-    const [lastPage, setLastPage] = useState(pageNumberList?.length);
+    // const [pageNumberList, setPageNumberList] = useState([]);
+    // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [pageCount, setPageCount] = useState(0);
 
     const [loading, setLoading] = useState(true);
@@ -505,6 +506,15 @@ const Withdrawals = () => {
 
     const { requestNumber, institutions } = requests;
     const ref = useRef();
+
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -585,16 +595,16 @@ const Withdrawals = () => {
         }
     }, [allInstitutions, dispatch, institutions, batchId]);
 
-    const handlePageNUmberList = useCallback(() => {
-        const pageNumArr = [];
-        if (pageCount >= 1) {
-            for (let i = 1; i <= pageCount; i++) {
-                pageNumArr.push(i);
-            }
-        }
-        setPageNumberList(pageNumArr);
-        setLastPage(pageCount);
-    }, [pageCount]);
+    // const handlePageNUmberList = useCallback(() => {
+    //     const pageNumArr = [];
+    //     if (pageCount >= 1) {
+    //         for (let i = 1; i <= pageCount; i++) {
+    //             pageNumArr.push(i);
+    //         }
+    //     }
+    //     setPageNumberList(pageNumArr);
+    //     setLastPage(pageCount);
+    // }, [pageCount]);
 
     useEffect(() => {
         if (isEmpty(account.result)) {
@@ -605,9 +615,9 @@ const Withdrawals = () => {
     useEffect(() => {
         if (!!items) {
             setLoading(false);
-            handlePageNUmberList();
+            // handlePageNUmberList();
         }
-    }, [items, handlePageNUmberList]);
+    }, [items]);
 
     useEffect(() => {
         setLoading(true);
@@ -621,13 +631,13 @@ const Withdrawals = () => {
         setPageCount(totalPageCount || 0);
     }, [rowsPerPage, currentPage, dispatch, totalPageCount]);
 
-    const onNextPage = () => {
-        setCurrentPage(currentPage + 1);
-    };
+    // const onNextPage = () => {
+    //     setCurrentPage(currentPage + 1);
+    // };
 
-    const onPrevPage = () => {
-        setCurrentPage(currentPage - 1);
-    };
+    // const onPrevPage = () => {
+    //     setCurrentPage(currentPage - 1);
+    // };
 
     const downloadAll = async () => {
         // await exportAllUserRecords(admin)
@@ -1084,7 +1094,7 @@ const Withdrawals = () => {
                                 backgroundColor: "#F7F8F9",
                             }}
                         >
-                            <Box
+                            {/* <Box
                                 component="div"
                                 sx={{ display: "flex", gap: "15px" }}
                             >
@@ -1098,8 +1108,8 @@ const Withdrawals = () => {
                                     isDisabled={currentPage === lastPage}
                                     buttonName="Next"
                                 />
-                            </Box>
-                            <Box
+                            </Box> */}
+                            {/* <Box
                                 component="span"
                                 sx={{
                                     display: "flex",
@@ -1124,7 +1134,14 @@ const Withdrawals = () => {
                                             {pageNUmber}
                                         </Typography>
                                     ))}
-                            </Box>
+                            </Box> */}
+                            <Pagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={(event, value) =>
+                                    setCurrentPage(value)
+                                }
+                            />
                         </Box>
                     </Box>
                 )}

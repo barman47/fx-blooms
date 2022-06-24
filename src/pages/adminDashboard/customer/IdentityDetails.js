@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import {
@@ -20,12 +20,9 @@ import {
     getIdCardValidationResponse,
     getResidencePermitValidationResponse,
 } from "../../../actions/customer";
-// import { CLEAR_CUSTOMER_STATUS_MSG, GET_ERRORS } from '../../../actions/types';
-import { CLEAR_CUSTOMER_STATUS_MSG } from "../../../actions/types";
 // import isEmpty from '../../../utils/isEmpty';
 
 // import Spinner from '../../../components/common/Spinner';
-import SuccessModal from "../../../components/common/SuccessModal";
 // import Toast from '../../../components/common/Toast';
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 import Status from "../../../components/admin-dashboard/Status";
@@ -162,7 +159,6 @@ const IdentityDetails = ({
     // const [errors, setErrors] = useState({});
 
     // const toast = useRef();
-    const successModal = useRef();
 
     const handleStatus = useCallback(
         (status) => {
@@ -227,17 +223,8 @@ const IdentityDetails = ({
     useEffect(() => {
         if (msg) {
             setLoading(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
         }
     }, [dispatch, msg]);
-
-    const dismissSuccessModal = () => {
-        dispatch({
-            type: CLEAR_CUSTOMER_STATUS_MSG,
-            payload: null,
-        });
-    };
 
     // const handleCloseModal = () => {
     //     setModalImage('');
@@ -279,10 +266,6 @@ const IdentityDetails = ({
                 />
             } */}
             {/* {loading && <Spinner />} */}
-            <SuccessModal
-                ref={successModal}
-                dismissAction={dismissSuccessModal}
-            />
             <Box component="section" className={classes.root}>
                 <Box component="div" className={classes.header}>
                     <Typography variant="h6" className={classes.idHeader}>

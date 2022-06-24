@@ -13,6 +13,7 @@ import {
     Menu,
     MenuItem,
 } from "@material-ui/core";
+import Pagination from "@material-ui/lab/Pagination";
 import { makeStyles } from "@material-ui/core/styles";
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS, BID_STATUS } from "../../../utils/constants";
@@ -66,6 +67,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(12),
 
         position: "relative",
+        height: "100vh",
     },
 
     exportBox: {
@@ -152,6 +154,10 @@ const useStyles = makeStyles((theme) => ({
         marginTop: ".6rem",
         // marginBottom: '1.5rem',
         padding: "1rem 1.5rem",
+
+        "& label:first-child": {
+            marginBottom: "15px",
+        },
 
         "& label": {
             display: "flex",
@@ -616,10 +622,10 @@ const Listings = () => {
     } = LISTING_DETAILS;
     const [tab, setTab] = useState(ALL_LISTINGS);
     const [loading, setLoading] = useState(true);
-    const [pageNumberList, setPageNumberList] = useState([]);
+    // const [pageNumberList, setPageNumberList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
-    const [lastPage, setLastPage] = useState(pageNumberList?.length);
+    // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 
     const [workFlow, setWorkFlow] = useState("");
@@ -638,6 +644,7 @@ const Listings = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     // const [openReverseMenu, closeReverseMenu] = useState(false);
     const [buyerName, setBuyerName] = useState("");
+    const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
     const ref = useRef();
 
     //   const [page, setPage] = useState(0);
@@ -669,24 +676,24 @@ const Listings = () => {
         setValue(newValue);
     };
 
-    const handlePageNUmberList = useCallback(() => {
-        const pageNumArr = [];
-        if (pageCount >= 1) {
-            for (let i = 1; i <= pageCount; i++) {
-                pageNumArr.push(i);
-            }
-        }
-        setPageNumberList(pageNumArr);
-        setLastPage(pageCount);
-    }, [pageCount]);
+    // const handlePageNUmberList = useCallback(() => {
+    //     const pageNumArr = [];
+    //     if (pageCount >= 1) {
+    //         for (let i = 1; i <= pageCount; i++) {
+    //             pageNumArr.push(i);
+    //         }
+    //     }
+    //     setPageNumberList(pageNumArr);
+    //     setLastPage(pageCount);
+    // }, [pageCount]);
 
-    const onNextPage = () => {
-        setCurrentPage(currentPage + 1);
-    };
+    // const onNextPage = () => {
+    //     setCurrentPage(currentPage + 1);
+    // };
 
-    const onPrevPage = () => {
-        setCurrentPage(currentPage - 1);
-    };
+    // const onPrevPage = () => {
+    //     setCurrentPage(currentPage - 1);
+    // };
 
     useEffect(() => {
         if (tab) {
@@ -762,54 +769,76 @@ const Listings = () => {
     ]);
 
     useEffect(() => {
+        closeXport(false);
+        setOpenFilterBx(false);
         setLoading(true);
         switch (tab) {
             case ALL_LISTINGS:
                 dispatch(
-                    getAllListings({
-                        pageSize: rowsPerPage,
-                        pageNumber: currentPage,
-                    })
+                    getAllListings(
+                        {
+                            pageSize: rowsPerPage,
+                            pageNumber: currentPage,
+                        },
+                        dateFilter.start,
+                        dateFilter.end
+                    )
                 );
                 setPageCount(totalPageCount || 0);
                 break;
 
             case ALL_OPEN:
                 dispatch(
-                    getActiveListings({
-                        pageSize: rowsPerPage,
-                        pageNumber: currentPage,
-                    })
+                    getActiveListings(
+                        {
+                            pageSize: rowsPerPage,
+                            pageNumber: currentPage,
+                        },
+                        dateFilter.start,
+                        dateFilter.end
+                    )
                 );
                 setPageCount(totalActivePC || 0);
                 break;
 
             case ALL_COMPLETED:
                 dispatch(
-                    getFinalisedListings({
-                        pageSize: rowsPerPage,
-                        pageNumber: currentPage,
-                    })
+                    getFinalisedListings(
+                        {
+                            pageSize: rowsPerPage,
+                            pageNumber: currentPage,
+                        },
+                        dateFilter.start,
+                        dateFilter.end
+                    )
                 );
                 setPageCount(totalFinalisedPC || 0);
                 break;
 
             case ALL_NEGOTIATIONS:
                 dispatch(
-                    getListingsInProgress({
-                        pageSize: rowsPerPage,
-                        pageNumber: currentPage,
-                    })
+                    getListingsInProgress(
+                        {
+                            pageSize: rowsPerPage,
+                            pageNumber: currentPage,
+                        },
+                        dateFilter.start,
+                        dateFilter.end
+                    )
                 );
                 setPageCount(totalInProgressPC || 0);
                 break;
 
             case ALL_DELETED:
                 dispatch(
-                    getDeletedListings({
-                        pageSize: rowsPerPage,
-                        pageNumber: currentPage,
-                    })
+                    getDeletedListings(
+                        {
+                            pageSize: rowsPerPage,
+                            pageNumber: currentPage,
+                        },
+                        dateFilter.start,
+                        dateFilter.end
+                    )
                 );
                 setPageCount(totalRemovedPC || 0);
                 break;
@@ -817,7 +846,8 @@ const Listings = () => {
             default:
                 break;
         }
-        handlePageNUmberList();
+        // handlePageNUmberList();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         ALL_LISTINGS,
         ALL_OPEN,
@@ -825,7 +855,6 @@ const Listings = () => {
         ALL_NEGOTIATIONS,
         ALL_DELETED,
         tab,
-        handlePageNUmberList,
         currentPage,
         rowsPerPage,
         dispatch,
@@ -1078,6 +1107,104 @@ const Listings = () => {
         });
     };
 
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const filterDate = () => {
+        switch (tab) {
+            case ALL_LISTINGS:
+                if (!!dateFilter.start && !!dateFilter.end) {
+                    dispatch(
+                        getAllListings(
+                            {
+                                pageSize: rowsPerPage,
+                                pageNumber: currentPage,
+                            },
+                            dateFilter.start,
+                            dateFilter.end
+                        )
+                    );
+                }
+                break;
+            case ALL_OPEN:
+                if (!!dateFilter.start && !!dateFilter.end) {
+                    dispatch(
+                        getActiveListings(
+                            {
+                                pageSize: rowsPerPage,
+                                pageNumber: currentPage,
+                            },
+                            dateFilter.start,
+                            dateFilter.end
+                        )
+                    );
+                }
+                break;
+            case ALL_COMPLETED:
+                if (!!dateFilter.start && !!dateFilter.end) {
+                    dispatch(
+                        getFinalisedListings(
+                            {
+                                pageSize: rowsPerPage,
+                                pageNumber: currentPage,
+                            },
+                            dateFilter.start,
+                            dateFilter.end
+                        )
+                    );
+                }
+                break;
+            case ALL_NEGOTIATIONS:
+                if (!!dateFilter.start && !!dateFilter.end) {
+                    dispatch(
+                        getListingsInProgress(
+                            {
+                                pageSize: rowsPerPage,
+                                pageNumber: currentPage,
+                            },
+                            dateFilter.start,
+                            dateFilter.end
+                        )
+                    );
+                }
+                break;
+            case ALL_DELETED:
+                console.log("helo");
+                if (!!dateFilter.start && !!dateFilter.end) {
+                    dispatch(
+                        getDeletedListings(
+                            {
+                                pageSize: rowsPerPage,
+                                pageNumber: currentPage,
+                            },
+                            dateFilter.start,
+                            dateFilter.end
+                        )
+                    );
+                }
+                break;
+            default:
+                return;
+        }
+    };
+
+    const handleDateFilter = (e) => {
+        const { name, value } = e.target;
+
+        setDateFilter((dates) => ({ ...dates, [name]: value }));
+    };
+
+    const applyFilter = () => {
+        filterDate();
+        setOpenFilterBx(false);
+    };
+
     return (
         <>
             <Toast
@@ -1267,12 +1394,26 @@ const Listings = () => {
                                             >
                                                 <label>
                                                     Start Date
-                                                    <input type="date" />
+                                                    <input
+                                                        type="date"
+                                                        name="start"
+                                                        value={dateFilter.start}
+                                                        onChange={(e) =>
+                                                            handleDateFilter(e)
+                                                        }
+                                                    />
                                                 </label>
 
                                                 <label>
                                                     End Date
-                                                    <input type="date" />
+                                                    <input
+                                                        type="date"
+                                                        name="end"
+                                                        value={dateFilter.end}
+                                                        onChange={(e) =>
+                                                            handleDateFilter(e)
+                                                        }
+                                                    />
                                                 </label>
                                             </Box>
 
@@ -1327,6 +1468,9 @@ const Listings = () => {
                                                     fontColor="white"
                                                     bgColor="#1E6262"
                                                     buttonName="Apply filter"
+                                                    clickAction={() =>
+                                                        applyFilter()
+                                                    }
                                                 />
                                             </Box>
                                         </Box>
@@ -1485,9 +1629,10 @@ const Listings = () => {
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "15px",
+                                paddingBottom: 24,
                             }}
                         >
-                            <Box
+                            {/* <Box
                                 component="div"
                                 sx={{ display: "flex", gap: "15px" }}
                             >
@@ -1501,8 +1646,8 @@ const Listings = () => {
                                     isDisabled={currentPage === lastPage}
                                     buttonName="Next"
                                 />
-                            </Box>
-                            <Box
+                            </Box> */}
+                            {/* <Box
                                 component="span"
                                 sx={{
                                     display: "flex",
@@ -1527,7 +1672,14 @@ const Listings = () => {
                                             {pageNUmber}
                                         </Typography>
                                     ))}
-                            </Box>
+                            </Box> */}
+                            <Pagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={(event, value) =>
+                                    setCurrentPage(value)
+                                }
+                            />
                         </Box>
                     </Box>
                 )}

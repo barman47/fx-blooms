@@ -494,7 +494,7 @@ export const reportSeller = (message) => async (dispatch) => {
 };
 
 export const setCustomerStatus =
-    ({ customerID, newStatus, currentStatus }) =>
+    ({ customerID, newStatus, currentStatus, isPersonal = false }) =>
     async (dispatch) => {
         try {
             // Issue admin token
@@ -502,11 +502,17 @@ export const setCustomerStatus =
             const res = await axios.post(
                 `${api}/CustomerStatus?customerID=${customerID}&status=${newStatus}`
             );
-            console.log(res);
+            console.log("res", res);
             const msg = res.data.data;
             dispatch({
                 type: SET_CUSTOMER_STATUS,
-                payload: { customerID, newStatus, currentStatus, msg },
+                payload: {
+                    customerID,
+                    newStatus,
+                    currentStatus,
+                    msg,
+                    isPersonal,
+                },
             });
             return await axios.get(`${API}/admin/GetAppStatistics`);
         } catch (err) {
@@ -622,6 +628,7 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
 
         //     status: data.overallResult.status
         // };
+        console.log(res.data.data);
         dispatch({
             type: SET_ID_CHECK_DATA,
             payload: customerData,

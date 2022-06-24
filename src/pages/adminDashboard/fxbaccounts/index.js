@@ -21,7 +21,11 @@ import {
 } from "../../../actions/wallets";
 import { validateIban } from "../../../actions/bankAccounts";
 import CircularProgressBar from "../../../components/admin-dashboard/CircularProgressBar";
-import { CLEAR_WALLET_MSG, GET_ERRORS } from "../../../actions/types";
+import {
+    CLEAR_WALLET_MSG,
+    GET_ERRORS,
+    CLEAR_ERROR_MSG,
+} from "../../../actions/types";
 import isEmpty from "../../../utils/isEmpty";
 import clsx from "clsx";
 
@@ -208,6 +212,15 @@ const FXBAccounts = () => {
             });
         }
     }, [errors, dispatch]);
+
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         // console.log("test");
