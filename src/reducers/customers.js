@@ -266,19 +266,22 @@ const customersReducer = (state = initialState, action) => {
             };
 
         case SET_CUSTOMER_STATUS:
-            const { customerID, newStatus, currentStatus } = action.payload;
+            const { customerID, newStatus, currentStatus, isPersonal } =
+                action.payload;
 
             switch (currentStatus) {
                 case CONFIRMED:
-                    customers = [...state.confirmed.items];
-                    customerIndex = customers.findIndex(
-                        (customer) => customer.id === customerID
-                    );
+                    if (!isPersonal) {
+                        customers = [...state.confirmed.items];
+                        customerIndex = customers.findIndex(
+                            (customer) => customer.id === customerID
+                        );
+                        customers.splice(customerIndex, 1); // remove the customer from verified list
+                    }
                     updatedCustomer = {
                         ...state.customer,
                         customerStatus: newStatus,
                     };
-                    customers.splice(customerIndex, 1); // remove the customer from verified list
 
                     return {
                         ...state,
@@ -341,16 +344,18 @@ const customersReducer = (state = initialState, action) => {
                         msg: action.payload.msg,
                     };
                 case SUSPENDED:
-                    customers = [...state.suspended.items];
-                    customerIndex = customers.findIndex(
-                        (customer) => customer.id === customerID
-                    );
+                    if (!isPersonal) {
+                        customers = [...state.suspended.items];
+                        customerIndex = customers.findIndex(
+                            (customer) => customer.id === customerID
+                        );
+                        customers.splice(customerIndex, 1); // remove customer from suspended list
+                    }
                     updatedCustomer = {
                         ...state.customer,
                         customerStatus: newStatus,
                     };
-                    customers.splice(customerIndex, 1); // remove customer from suspended list
-                    console.log(action.payload.msg);
+
                     return {
                         ...state,
                         customer: updatedCustomer,

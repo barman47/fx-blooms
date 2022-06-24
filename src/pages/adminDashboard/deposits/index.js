@@ -1,15 +1,17 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Box, Typography, Menu, MenuItem, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import Pagination from "@material-ui/lab/Pagination";
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";
 import DepositAndWithdrawalTable from "../../../components/admin-dashboard/DepositTable";
 // import { ADMIN_FILTERS } from '../../../utils/constants';
 // import { Triangle } from 'mdi-material-ui';
 import WithdrawalCard from "../../../components/admin-dashboard/WithdrawalCard";
-import GenericButton from "../../../components/admin-dashboard/GenericButton";
+// import GenericButton from "../../../components/admin-dashboard/GenericButton";
 import { getAllDeposits } from "../../../actions/wallets";
+import { CLEAR_ERROR_MSG } from "../../../actions/types";
 // import { SET_PAGE_NUMBER, SET_PAGE_SIZE } from '../../../actions/types';
 
 import clsx from "clsx";
@@ -119,8 +121,8 @@ const Deposits = () => {
     // const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     const [rowsPerPage] = useState(pages[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [pageNumberList, setPageNumberList] = useState([]);
-    const [lastPage, setLastPage] = useState(pageNumberList?.length);
+    // const [pageNumberList, setPageNumberList] = useState([]);
+    // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [pageCount, setPageCount] = useState(0);
 
     const [loading, setLoading] = useState(true);
@@ -136,23 +138,32 @@ const Deposits = () => {
         setAnchorEl(null);
     };
 
-    const handlePageNUmberList = useCallback(() => {
-        const pageNumArr = [];
-        if (pageCount >= 1) {
-            for (let i = 1; i <= pageCount; i++) {
-                pageNumArr.push(i);
-            }
-        }
-        setPageNumberList(pageNumArr);
-        setLastPage(pageCount);
-    }, [pageCount]);
+    // const handlePageNUmberList = useCallback(() => {
+    //     const pageNumArr = [];
+    //     if (pageCount >= 1) {
+    //         for (let i = 1; i <= pageCount; i++) {
+    //             pageNumArr.push(i);
+    //         }
+    //     }
+    //     setPageNumberList(pageNumArr);
+    //     setLastPage(pageCount);
+    // }, [pageCount]);
 
     useEffect(() => {
         if (!!fundingRequests.items) {
             setLoading(false);
-            handlePageNUmberList();
+            // handlePageNUmberList();
         }
-    }, [fundingRequests.items, handlePageNUmberList]);
+    }, [fundingRequests.items]);
+
+    useEffect(() => {
+        return () => {
+            dispatch({
+                type: CLEAR_ERROR_MSG,
+            });
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         setLoading(true);
@@ -166,13 +177,13 @@ const Deposits = () => {
         setPageCount(totalPageCount || 0);
     }, [currentPage, dispatch, rowsPerPage, totalPageCount]);
 
-    const onNextPage = () => {
-        setCurrentPage(currentPage + 1);
-    };
+    // const onNextPage = () => {
+    //     setCurrentPage(currentPage + 1);
+    // };
 
-    const onPrevPage = () => {
-        setCurrentPage(currentPage - 1);
-    };
+    // const onPrevPage = () => {
+    //     setCurrentPage(currentPage - 1);
+    // };
 
     return (
         <>
@@ -196,82 +207,40 @@ const Deposits = () => {
                         displayChck={false}
                         data={fundingRequests.items}
                         handleClick={handleClick}
+                        fontsize={11}
                     />
-
-                    {loading ? (
-                        ""
-                    ) : (
+                </Box>
+                {loading ? (
+                    ""
+                ) : (
+                    <Box
+                        component="div"
+                        sx={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginTop: "60px",
+                            width: "100%",
+                        }}
+                    >
                         <Box
                             component="div"
                             sx={{
                                 display: "flex",
-                                justifyContent: "space-between",
-                                alignItems: "center",
-                                marginTop: "60px",
-                                width: "100%",
+                                flexDirection: "column",
+                                gap: "15px",
                             }}
                         >
-                            <Box
-                                component="div"
-                                sx={{ alignSelf: "flex-start" }}
-                            >
-                                {/* <Typography component="span">{'20'} results</Typography> */}
-                            </Box>
-
-                            <Box
-                                component="div"
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    gap: "15px",
-                                }}
-                            >
-                                <Box
-                                    component="div"
-                                    sx={{ display: "flex", gap: "15px" }}
-                                >
-                                    <GenericButton
-                                        clickAction={onPrevPage}
-                                        isDisabled={currentPage === 1}
-                                        buttonName="Previous"
-                                    />
-                                    <GenericButton
-                                        clickAction={onNextPage}
-                                        isDisabled={currentPage === lastPage}
-                                        buttonName="Next"
-                                    />
-                                </Box>
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        display: "flex",
-                                        justifyContent: "center",
-                                        gap: "10px",
-                                    }}
-                                >
-                                    {pageNumberList &&
-                                        pageNumberList.map((pageNUmber, i) => (
-                                            <Typography
-                                                className={clsx(
-                                                    classes.pageList,
-                                                    pageNUmber ===
-                                                        currentPage &&
-                                                        classes.selected
-                                                )}
-                                                onClick={() =>
-                                                    setCurrentPage(pageNUmber)
-                                                }
-                                                variant="subtitle2"
-                                                key={i}
-                                            >
-                                                {pageNUmber}
-                                            </Typography>
-                                        ))}
-                                </Box>
-                            </Box>
+                            <Pagination
+                                count={pageCount}
+                                page={currentPage}
+                                onChange={(event, value) =>
+                                    setCurrentPage(value)
+                                }
+                            />
                         </Box>
-                    )}
-                </Box>
+                    </Box>
+                )}
                 <Menu
                     id="customer-menu"
                     anchorEl={anchorEl}

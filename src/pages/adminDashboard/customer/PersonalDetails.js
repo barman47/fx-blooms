@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import {
     Avatar,
     Box,
@@ -25,7 +25,6 @@ import {
     setCustomerStatus,
 } from "../../../actions/customer";
 import { updateCustomerProfile } from "../../../actions/admin";
-import { CLEAR_CUSTOMER_STATUS_MSG } from "../../../actions/types";
 import PropTypes from "prop-types";
 import { CUSTOMER_CATEGORY } from "../../../utils/constants";
 import validateCustomerProfile from "../../../utils/validation/customer/validateCustomerProfile";
@@ -33,7 +32,6 @@ import isEmpty from "../../../utils/isEmpty";
 import avatar from "../../../assets/img/avatar.jpg";
 
 // import Spinner from '../../../components/common/Spinner';
-import SuccessModal from "../../../components/common/SuccessModal";
 import Toast from "../../../components/common/Toast";
 import { SquareEditOutline, CheckDecagram } from "mdi-material-ui";
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
@@ -41,6 +39,7 @@ import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
 import GenericTextField from "../../../components/admin-dashboard/GenericTextField";
 import CircularProgressBar from "../../../components/admin-dashboard/CircularProgressBar";
+import formatDate from "../../../utils/formatDate";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -254,7 +253,6 @@ const PersonalDetails = ({
     updateCustomerProfile,
 }) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
     const location = useLocation();
 
     const { customer, idCheckData, msg, profileCheckData } = useSelector(
@@ -283,12 +281,13 @@ const PersonalDetails = ({
     const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
     const [status, setStatus] = useState(customer.customerStatus);
+    const [dateJoined] = useState(customer.dateCreated);
 
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [saveLoader, setSaveLoader] = useState(false);
 
-    const successModal = useRef();
     const toast = useRef();
 
     const { CONFIRMED, SUSPENDED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
@@ -352,15 +351,6 @@ const PersonalDetails = ({
         status,
     ]);
 
-    useEffect(() => {
-        if (!!msg) {
-            setLoading(false);
-            setEditable(false);
-            successModal.current.openModal();
-            successModal.current.setModalText(msg);
-        }
-    }, [msg, loading]);
-
     const editMode = useCallback(() => {
         if (editable) {
             return classes.editMode;
@@ -378,9 +368,13 @@ const PersonalDetails = ({
                 customerID: customer.id,
                 newStatus: SUSPENDED,
                 currentStatus: status,
+                isPersonal: true,
             });
         } else {
-            setErrors({ msg: "User can not be suspended", ...errors });
+            setErrors({
+                msg: "Only verified Users can be suspended",
+                ...errors,
+            });
         }
     };
 
@@ -396,9 +390,13 @@ const PersonalDetails = ({
                 customerID: customer.id,
                 newStatus: CONFIRMED,
                 currentStatus: status,
+                isPersonal: true,
             });
         } else {
-            setErrors({ msg: "User can not be verified", ...errors });
+            setErrors({
+                msg: "Only suspended Users can be verified",
+                ...errors,
+            });
         }
         // setErrors({})
     };
@@ -442,16 +440,18 @@ const PersonalDetails = ({
         [CONFIRMED]
     );
 
-    const dismissAction = () => {
-        dispatch({
-            type: CLEAR_CUSTOMER_STATUS_MSG,
-        });
-    };
+    useEffect(() => {
+        if (!!msg) {
+            console.log("heloo p");
+            setLoading(false);
+            setEditable(false);
+        }
+    }, [msg]);
 
     const onSubmit = (e) => {
         e.preventDefault();
         setErrors({});
-        setLoading(true);
+        setSaveLoader(true);
         // setLoadingText('');
 
         const data = {
@@ -470,10 +470,12 @@ const PersonalDetails = ({
 
         const { updateErrors, isValid } = validateCustomerProfile(data);
         if (!isValid) {
-            setLoading(false);
+            console.log("data", data);
+            setSaveLoader(false);
             return setErrors({ msg: "Invalid customer data", ...updateErrors });
         }
         // setLoadingText('Updating Customer . . .');
+        console.log("data", data);
         setEditable(false);
         setErrors({});
         updateCustomerProfile(data);
@@ -532,7 +534,6 @@ const PersonalDetails = ({
                     type="error"
                 />
             )}
-            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <Box component="div" className={classes.userDetails}>
                     <Typography className={classes.headerTitle}>
@@ -592,18 +593,21 @@ const PersonalDetails = ({
                             classes={{ paper: classes.menu }}
                             disableScrollLock={true}
                         >
-                            <MenuItem onClick={confirmCustomer}>
+                            <MenuItem
+                                disabled={customer.customerStatus === CONFIRMED}
+                                onClick={confirmCustomer}
+                            >
                                 Verify
                             </MenuItem>
-                            <MenuItem>Pending</MenuItem>
+                            {/* <MenuItem>Pending</MenuItem> */}
                             <MenuItem
                                 onClick={suspendCustomer}
-                                disabled={customer.customerStatus === REJECTED}
+                                disabled={customer.customerStatus === SUSPENDED}
                             >
                                 Suspend
                             </MenuItem>
-                            <MenuItem>No Profile</MenuItem>
-                            <MenuItem>Rejected</MenuItem>
+                            {/* <MenuItem>No Profile</MenuItem>
+                            <MenuItem>Rejected</MenuItem> */}
                         </Menu>
                     </Typography>
                 </Box>
@@ -661,8 +665,8 @@ const PersonalDetails = ({
                     />
                     <AmlBoard
                         classes={classes}
-                        amlTitle={"Client since"}
-                        amlNumber={"20.04.2020"}
+                        amlTitle={"Date joined"}
+                        amlNumber={formatDate(dateJoined)}
                     />
                     <AmlBoard
                         classes={classes}
@@ -732,8 +736,11 @@ const PersonalDetails = ({
                 <GenericButton
                     isDisabled={!editable}
                     clickAction={onSubmit}
+                    btnWidth={63}
+                    btnHeight={39}
+                    center="center"
                     buttonName={
-                        loading ? (
+                        saveLoader ? (
                             <CircularProgressBar
                                 newWidth="15px"
                                 newHeight="15px"

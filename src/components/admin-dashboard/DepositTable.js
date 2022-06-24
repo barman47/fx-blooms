@@ -27,12 +27,13 @@ const useStyles = makeStyles((theme) => ({
         cursor: "pointer",
         paddingLeft: "15px",
         paddingRight: "15px",
+        gap: 10,
 
         "& span": {
             fontWeight: "300",
             paddingTop: theme.spacing(0.8),
             paddingBottom: theme.spacing(0.8),
-            fontSize: theme.spacing(1.9),
+            // fontSize: 13,
             fontStretch: "50%",
         },
     },
@@ -78,6 +79,7 @@ const DepositAndWithdrawalTable = ({
     gridColumns = "1fr 1fr .7fr 1fr 1fr 1fr 0.5fr",
     handleBatch,
     handleCheckError,
+    fontsize = 13,
 }) => {
     const classes = useStyles();
 
@@ -86,7 +88,7 @@ const DepositAndWithdrawalTable = ({
     const [check] = useState({});
 
     const handleButtonClick = (customer, e) => {
-        console.log("mennnuuu");
+        // console.log("mennnuuu");
         e.preventDefault();
         e.stopPropagation();
 
@@ -141,7 +143,10 @@ const DepositAndWithdrawalTable = ({
                 data &&
                 data.map((customer, i) => (
                     <Box
-                        style={{ gridTemplateColumns: gridColumns }}
+                        sx={{
+                            gridTemplateColumns: gridColumns,
+                            "& span": { fontSize: `${fontsize}px` },
+                        }}
                         component="div"
                         className={classes.tableBodyRow}
                         key={i}

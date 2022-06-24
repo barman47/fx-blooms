@@ -268,6 +268,7 @@ export const LISTING_CATEGORY = {
     OPEN: "OPEN",
     CANCELED: "CANCELED",
     REMOVED: "REMOVED",
+    NEGOTIATION: "NEGOTIATION",
 };
 
 export const FUNDING_STATUS = {
