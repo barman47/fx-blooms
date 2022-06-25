@@ -23,6 +23,7 @@ import {
     AUTHORIZE_WITHDRAWAL,
     SET_WITHDRAWAL_REQUEST,
     CREDIT_LISTING,
+    GET_ERRORS,
 } from "./types";
 const API = `${process.env.REACT_APP_WALLET_API}`;
 const WALLETS_API = `${API}/wallet-management`;
@@ -119,6 +120,12 @@ export const requestWalletFunding = (data, navigate) => async (dispatch) => {
         });
         return navigate(FUND_CONFIRMATION);
     } catch (err) {
+        if (parseInt(err.response.data.responseCode) === 99) {
+            return dispatch({
+                type: GET_ERRORS,
+                payload: { msg: err.response.data.message,  notSupported: true }
+            });
+        }
         return handleError(err, dispatch);
     }
 };

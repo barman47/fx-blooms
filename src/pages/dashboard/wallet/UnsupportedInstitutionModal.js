@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     icon: {
-        color: theme.palette.primary.main,
+        color: theme.palette.secondary.main,
         fontSize: theme.spacing(5)
     }
 }));
@@ -106,7 +106,7 @@ const UnsupportedInstitutionModal = forwardRef((props, ref) => {
                         <Typography variant="subtitle1">
                             Sorry! You can not fund with the selected bank. Here is a list of the banking institutions we support.
                         </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
+                        <Button onClick={closeModal} color="primary" size="small" variant="contained">View Supported Institutions</Button>
                     </Grid>
                 </Grid>
             </Fade>
