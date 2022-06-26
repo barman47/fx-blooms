@@ -215,7 +215,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.currencyNeeded}${listing.AmountAvailable.Amount} within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountNeeded.currencyType}${listing.amountAvailable.amount} within 30 minutes`
             });
         });
     } catch (err) {

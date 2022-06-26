@@ -359,9 +359,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
                     </Grid>
                 </Grid>
                 <ol>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
                     <li><Typography variant="body2" component="p">Transfer the {bid.data.Seller.Currency} to {`${bid.data.Buyer.UserName?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on <Typography variant="body2" component="span" color="primary" style={{ fontWeight: 600 }}>{bid.data.Seller.Currency}{formatNumber(bid.data.Seller.AmountTransfered, 2)} Payment Made</Typography></Typography></li>
+                    <li><Typography variant="body2" component="p">The EUR equivalent will be moved to your wallet immediately</Typography></li>
                 </ol>
                 <Grid item xs={12}>
                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>

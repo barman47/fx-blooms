@@ -13,7 +13,8 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import { getFundingDetails } from '../../../actions/wallets';
-import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
+import { GET_ERRORS } from '../../../actions/types';
+// import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import { COLORS, FUNDING_STATUS } from '../../../utils/constants';
 import { convertToLocalTime } from '../../../utils/getTime';
@@ -21,7 +22,7 @@ import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
-import SuccessModal from '../../../components/common/SuccessModal';
+// import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import FundingDisclaimerModal from './FundingDisclaimerModal';
 
@@ -95,12 +96,11 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     const [errors, setErrors] = useState({});
 
     const disclaimerModal = useRef();
-    const successModal = useRef();
+    // const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Funding Request Status');
-        disclaimerModal.current.openModal();
         if (location?.state?.paymentRequestId) {
             setPaymentRequestId(location.state.paymentRequestId);   
         }
@@ -114,8 +114,9 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     useEffect(() => {
         if (msg) {
             setLoading(false);
-            successModal.current.setModalText(msg);
-            successModal.current.openModal();
+            disclaimerModal.current.openModal();
+            // successModal.current.setModalText(msg);
+            // successModal.current.openModal();
         }
     }, [msg]);
 
@@ -141,12 +142,12 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
         getFundingDetails(fundingRequest.id, paymentRequestId);
     };
 
-    const dismissSuccessModal = () => {
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: null
-        });
-    };
+    // const dismissSuccessModal = () => {
+    //     dispatch({
+    //         type: SET_CUSTOMER_MSG,
+    //         payload: null
+    //     });
+    // };
 
     return (
         <>
@@ -161,7 +162,7 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
             }
             {loading && <Spinner text={loadingText} />}
             <FundingDisclaimerModal ref={disclaimerModal} />
-            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+            {/* <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} /> */}
             <Box component="section" className={classes.root}>
                 <Typography variant="h4" color="primary" gutterBottom>Funding Request Status</Typography>
                 <Box component="div" className={classes.content}>

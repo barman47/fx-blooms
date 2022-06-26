@@ -7,9 +7,9 @@ import {
     Collapse,
     Drawer,
     Grid,
-    FormHelperText,
+    // FormHelperText,
     IconButton,
-    TextField,
+    // TextField,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -177,7 +177,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    const [reference, setReference] = useState('');
+    // const [reference, setReference] = useState('');
 
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
@@ -339,7 +339,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         madePayment({
             bidId: bid.id,
             listingId: listing.id,
-            reference
+            reference: ''
         });
     };
 
@@ -388,9 +388,9 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                     </Grid>
                 </Grid>
                 <ol>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
                     <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
+                    <li><Typography variant="body2" component="p">The EUR equivalent will be moved to your wallet immediately</Typography></li>
                 </ol>
                 <Grid container direction="row">
                     <Grid item xs={12}>
@@ -424,7 +424,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                             </section>
                         </Collapse>              
                     </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
                         <TextField 
                             value={reference}
@@ -436,7 +436,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                             fullWidth
                         />
                         <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12} className={classes.timerContainer}>
                         <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
                         <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>

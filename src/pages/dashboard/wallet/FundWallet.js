@@ -4,7 +4,6 @@ import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
     Button,
-    Checkbox,
     FormControl,
     FormHelperText,
     Grid,
@@ -280,7 +279,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
             accountId: sourceAccount ? accountID : '',
             accountName: sourceAccount ? accountName : '',
             accountNumber: sourceAccount ? accountNumber : '',
-            useInstantPayment: checked,
+            useInstantPayment: false,
             reference: "FXBLOOMS"
         };
 
@@ -462,7 +461,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
                                 </Box>
                             </Box>
                         </Grid> */}
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Use Instant Payment</Typography>
                             <br />
                             <Checkbox
@@ -473,7 +472,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
                                 disabled={sourceAccount ? false : true}
                             />
                             <Typography variant="subtitle2" component="span" color="secondary">Please note: Instant payment may come with additional charges from your bank.</Typography>
-                        </Grid>
+                        </Grid> */}
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 
