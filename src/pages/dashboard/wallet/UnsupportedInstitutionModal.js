@@ -2,14 +2,15 @@ import { useState, forwardRef, useImperativeHandle } from 'react';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
+    Box,
 	Button,
     Fade,
-	Grid,
+    IconButton,
     Modal,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { Information } from 'mdi-material-ui';
+import { Close, Information } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../../utils/constants';
 
@@ -23,34 +24,39 @@ const useStyles = makeStyles(theme => ({
     container: {
         backgroundColor: COLORS.lightTeal,
         borderRadius: theme.shape.borderRadius,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         width: '35vw',
-        height: '25vw',
+        // height: '25vw',
         boxShadow: SHADOW,
-        padding: theme.spacing(5, 10),
+        padding: theme.spacing(2),
 
         [theme.breakpoints.down('md')]: {
-            height: '50vw',
+            // height: '50vw',
             width: '50vw',
         },
         
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(5, 2),
-            height: '40vh',
-            width: '90vw'
+            // padding: theme.spacing(5, 2),
+            // height: '40vh',
+            width: '80vw'
+        },
+
+        '& p': {
+            marginBottom: theme.spacing(2)
         }
     },
 
-    item: {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-evenly',
-        alignItems: 'center',
-        textAlign: 'center'
+    iconButton: {
+        alignSelf: 'flex-end'
     },
+
 
     icon: {
         color: theme.palette.secondary.main,
-        fontSize: theme.spacing(5)
+        fontSize: theme.spacing(5),
+        marginBottom: theme.spacing(2)
     }
 }));
 
@@ -100,15 +106,16 @@ const UnsupportedInstitutionModal = forwardRef((props, ref) => {
             }}
         >
             <Fade in={open}>
-                <Grid container className={classes.container}>
-                    <Grid item xs={12} className={classes.item}>
-                        <Information className={classes.icon} />
-                        <Typography variant="subtitle1">
-                            Sorry! You can not fund with the selected bank. Here is a list of the banking institutions we support.
-                        </Typography>
-                        <Button onClick={closeModal} color="primary" size="small" variant="contained">View Supported Institutions</Button>
-                    </Grid>
-                </Grid>
+                <Box component="section" className={classes.container}>
+                    <IconButton onClick={closeModal} className={classes.iconButton}>
+                        <Close />
+                    </IconButton>
+                    <Information className={classes.icon} />
+                    <Typography variant="subtitle1" component="p">
+                        Sorry! You can not fund with the selected bank. Here is a list of the banking institutions we support.
+                    </Typography>
+                    <Button onClick={closeModal} color="primary" size="small" variant="contained">View Supported Institutions</Button>
+                </Box>
             </Fade>
         </Modal>
 	);

@@ -26,7 +26,7 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, updateListing } from '../../../actions/listings';
 import { UPDATED_LISTING, GET_ERRORS } from '../../../actions/types';
-import { COLORS, CUSTOMER_CATEGORY, ID_STATUS, PAYMENT_METHODS } from '../../../utils/constants';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import { DASHBOARD_HOME } from '../../../routes';
@@ -179,7 +179,7 @@ const EditListing = (props) => {
     const [ReceiptAmount, setReceiptAmount] = useState('');
     const [ListingFee,] = useState('');
 
-    const [Bank, setBank] = useState('');
+    // const [Bank, setBank] = useState('');
     const [reference, setReference] = useState('');
 
     const [previousListings, setPreviousListings] = useState([]);
@@ -280,7 +280,7 @@ const EditListing = (props) => {
     // Prefill input fields
     useEffect(() => {
         if (!isEmpty(listing)) {
-            const { amountAvailable, exchangeRate, bank, reference } = listing;
+            const { amountAvailable, exchangeRate, reference } = listing;
 
             setAvailableCurrency(amountAvailable?.currencyType);
             setExchangeAmount(amountAvailable?.amount);
@@ -288,7 +288,7 @@ const EditListing = (props) => {
             setExchangeRate(exchangeRate);
             // setMinExchangeAmount(minExchangeAmount?.amount || '');
             setReference(reference || '');
-            handlePrefillBank(bank);
+            // handlePrefillBank(bank);
         }
     }, [customerId, listing.id, listing, listings]);
 
@@ -299,14 +299,14 @@ const EditListing = (props) => {
         }
     }, [customerId, listing.id, listings]);
 
-    const handlePrefillBank = (bank) => {
-        for (let paymentMethod of PAYMENT_METHODS) {
-            if (bank.toLowerCase() === paymentMethod.toLowerCase()) {
-                setBank(paymentMethod);
-                break;
-            }
-        }
-    };
+    // const handlePrefillBank = (bank) => {
+    //     for (let paymentMethod of PAYMENT_METHODS) {
+    //         if (bank.toLowerCase() === paymentMethod.toLowerCase()) {
+    //             setBank(paymentMethod);
+    //             break;
+    //         }
+    //     }
+    // };
 
     // Set Listing Fee
     // useEffect(() => {
@@ -419,8 +419,7 @@ const EditListing = (props) => {
             // MinExchangeAmount,
             // ReceiptAmount,
             ReceivingAccount,
-            ListingFee,
-            Bank
+            ListingFee
         };
 
         const { errors, isValid } = validateEditListing(data);
@@ -447,7 +446,7 @@ const EditListing = (props) => {
                 Amount: 0
                 // Amount: MinExchangeAmount ? parseFloat(MinExchangeAmount) : 0
             },
-            Bank,
+            // Bank,
             accountID: getAccountId(ReceivingAccount),
             reference
         };

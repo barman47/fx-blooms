@@ -234,7 +234,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         } else {
             setTransactionSteps([
                 `You accepted offer`, 
-                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
                 `You confirmed ${seller.currency ? seller.currency : ''} payment`,
                 `EUR moved to ${seller.userName}'s wallet`, 
                 'Transaction Completed',
@@ -253,7 +253,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
         } else {
             setTransactionSteps([
                 `${buyer.userName} accepted offer`, 
-                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
                 `${buyer.userName} confirmed the ${seller.currency ? seller.currency : ''} payment`,
                 'EUR moved to your EUR wallet',
                 'Transaction Completed' 

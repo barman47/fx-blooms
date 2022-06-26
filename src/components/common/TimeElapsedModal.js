@@ -104,7 +104,7 @@ const TimeElapsedModal = forwardRef((props, ref) => {
                     <Grid item xs={12} className={classes.item}>
                         <Information className={classes.icon} />
                         <Typography variant="subtitle1">
-                            Sorry! the seller failed to transfer within the stipulated time. The Transaction has been cancelled. You may accept or create another offer.
+                            Sorry! Offer has expired. The 30mins stipulated has lapsed.
                         </Typography>
                         <Button onClick={closeModal} color="primary">Okay</Button>
                     </Grid>
