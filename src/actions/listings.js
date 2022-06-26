@@ -203,6 +203,7 @@ export const getMoreListings = (query) => async (dispatch) => {
 
 export const acceptOffer = (data, listing) => async (dispatch) => {
     try {
+        console.log(listing);
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AcceptOffer`, data);
         batch(() => {
@@ -215,7 +216,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountNeeded.currencyType}${listing.amountAvailable.amount} within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within 30 minutes`
             });
         });
     } catch (err) {
