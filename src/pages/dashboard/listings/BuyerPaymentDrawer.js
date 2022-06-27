@@ -340,7 +340,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
             bidId: bid.id,
             listingId: listing.id,
             reference: ''
-        });
+        }, listing.listedBy);
     };
 
     const getSellerAccount = () => getAccount(listing.sellersAccountId);

@@ -241,7 +241,7 @@ export const addBid = (bid, listing) => async (dispatch) => {
     }
 };
 
-export const madePayment = (data) => async (dispatch) => {
+export const madePayment = (data, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
         batch(() => {
@@ -251,7 +251,7 @@ export const madePayment = (data) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: 'Payment made successfully'
+                payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
             });
         });
     } catch (err) {
@@ -259,7 +259,7 @@ export const madePayment = (data) => async (dispatch) => {
     }
 };
 
-export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
+export const madePaymentV2 = (data, notificationId, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
         dispatch({
@@ -268,7 +268,7 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
         });
         dispatch({
             type: SET_LISTING_MSG,
-            payload: 'Payment made successfully'
+            payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
