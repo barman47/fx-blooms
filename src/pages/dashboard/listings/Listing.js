@@ -305,7 +305,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                             disableFocusRipple
                             fullWidth
                         >
-                            <Button 
+                            {/* <Button 
                                 className={classes.buttons}
                                 color="primary"
                                 size="large"
@@ -316,7 +316,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                                 disabled={listing.status !== open}
                             >
                                 Edit
-                            </Button>
+                            </Button> */}
                             <Button 
                                 className={classes.buttons}
                                 color="secondary"

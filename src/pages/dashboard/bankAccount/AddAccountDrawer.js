@@ -297,13 +297,13 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
         e.preventDefault();
         setErrors({});
         const data = {
-            institutionId,
+            institutionId: institutionId ?? '',
             BankName,
             AccountName,
             nickName,
             AccountNumber,
             Currency: handleSetCurrency(),
-            bic,
+            bic: bic ?? '',
             CustomerId: customerId,
             sortCode: ''
         };
@@ -445,7 +445,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                         </Grid>
                     </form>
                 </TabPanel>
-                <TabPanel value={value} index={ngn && eur ? 1 : 0}>
+                <TabPanel value={value} index={ngn && eur ? 1 : eur && !ngn ? 0 : 1}>
                     <form className={classes.form} onSubmit={onSubmit} noValidate>
                         <Grid container direction="row" spacing={matches ? 2 : 1}>
                             <Grid item xs={12}>

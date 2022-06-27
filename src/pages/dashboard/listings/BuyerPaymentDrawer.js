@@ -331,7 +331,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                 payload: {}
             });
         });
-        
     };
 
     const handleMadepayment = () => {
