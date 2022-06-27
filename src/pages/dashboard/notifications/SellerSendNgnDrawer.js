@@ -313,7 +313,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
         madePaymentV2({
             bidId: bid.data.BidId,
             listingId: bid.data.ListingId
-        }, notificationId);
+        }, notificationId, bid.data.Buyer.UserName);
     };
 
     return (

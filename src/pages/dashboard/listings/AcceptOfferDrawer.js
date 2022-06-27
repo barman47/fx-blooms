@@ -236,7 +236,7 @@ const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
     return (
         <>
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={false} ngn={true} />}
             <Drawer 
                 ModalProps={{ 
                     // disableBackdropClick: true,
