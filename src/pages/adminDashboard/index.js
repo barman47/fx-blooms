@@ -48,7 +48,12 @@ import {
 // import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import logo from "../../assets/img/logowhite.svg";
 import avatar from "../../assets/img/avatar.jpg";
-import { getStats, logout, searchForCustomer } from "../../actions/admin";
+import {
+    getStats,
+    logout,
+    searchForCustomer,
+    searchForListings,
+} from "../../actions/admin";
 import { getCustomers } from "../../actions/customer";
 import {
     COLORS,
@@ -344,6 +349,7 @@ const AdminDashboard = ({
     getCustomers,
     getStats,
     searchForCustomer,
+    searchForListings,
     logout,
 }) => {
     const classes = useStyles();
@@ -352,7 +358,11 @@ const AdminDashboard = ({
     const location = useLocation();
 
     const { admin, customers } = useSelector((state) => state);
-    const { pageSize } = useSelector((state) => state.customers);
+    const {
+        pageSize,
+        customers: { items },
+    } = useSelector((state) => state.customers);
+    const { listings } = useSelector((state) => state.listings);
 
     const [searchText, setSearchText] = useState("");
     const [path, setPath] = useState("");
@@ -436,8 +446,13 @@ const AdminDashboard = ({
             // setLoadingText('Searching . . .');
             // const test = searchForCustomer({ searchText, pageNumber: 0, pageSize });
             searchForCustomer({ searchText, pageNumber: 0, pageSize });
+            if (!isEmpty(items)) {
+                // items.map((customer) =>
+                searchForListings(items[0]?.id, { pageNumber: 0, pageSize });
+                // );
+            }
         },
-        [searchText, pageSize, searchForCustomer]
+        [searchText, pageSize, searchForCustomer, items, searchForListings]
     );
 
     const viewCustomerProfile = (customer) => {
@@ -679,14 +694,14 @@ const AdminDashboard = ({
                                 viewCustomerProfile={viewCustomerProfile}
                                 accordionHeader="Customers"
                                 searchText={searchText}
-                                customers={customers.customers}
+                                data={items}
                                 loading={loading}
                             />
                             <AccordionSearch
                                 viewCustomerProfile={viewCustomerListing}
                                 accordionHeader="Listings"
                                 searchText={searchText}
-                                customers={customers.customers}
+                                data={listings}
                                 loading={loading}
                             />
                         </Box>
@@ -722,6 +737,7 @@ AdminDashboard.propTypes = {
     getCustomers: PropTypes.func.isRequired,
     getStats: PropTypes.func.isRequired,
     searchForCustomer: PropTypes.func.isRequired,
+    searchForListings: PropTypes.func.isRequired,
     logout: PropTypes.func.isRequired,
 };
 
@@ -729,5 +745,6 @@ export default connect(undefined, {
     getCustomers,
     getStats,
     searchForCustomer,
+    searchForListings,
     logout,
 })(AdminDashboard);

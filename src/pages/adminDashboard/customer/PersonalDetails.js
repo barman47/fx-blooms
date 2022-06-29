@@ -281,7 +281,7 @@ const PersonalDetails = ({
     const [remarks, setRemarks] = useState(customer.remarks);
     const [email] = useState(customer.email);
     const [status, setStatus] = useState(customer.customerStatus);
-    const [dateJoined] = useState(customer.dateCreated);
+    const [dateJoined] = useState(customer?.dateCreated ?? customer?.createdOn);
 
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);

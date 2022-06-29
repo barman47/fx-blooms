@@ -7,6 +7,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 import CircularProgressBar from "./CircularProgressBar";
 import { ChevronDown } from "mdi-material-ui";
+import formatId from "../../utils/formatId";
 
 const useStyles = makeStyles((theme) => ({
     accordion: {
@@ -27,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 const AccordionSearch = ({
     viewCustomerProfile,
     searchText,
-    customers,
+    data,
     loading,
     accordionHeader,
 }) => {
@@ -48,22 +49,24 @@ const AccordionSearch = ({
                     <Typography style={{ fontWeight: "bold" }} component="span">
                         {accordionHeader}
                     </Typography>{" "}
-                    ({customers.items.length ?? 0})
+                    ({data?.length ?? 0})
                 </Typography>
             </AccordionSummary>
             {loading ? (
                 <CircularProgressBar topMargin="10px" />
             ) : (
-                customers.items &&
-                customers.items.map((custmer, i) => (
+                data &&
+                data.map((custmer, i) => (
                     <AccordionDetails
                         key={i}
                         onClick={() => viewCustomerProfile(custmer)}
                     >
                         <Typography style={{ cursor: "pointer" }}>
-                            {custmer.firstName
+                            {accordionHeader === "Customers"
                                 ? custmer.firstName
-                                : custmer.email}
+                                    ? custmer.firstName
+                                    : custmer.email
+                                : formatId(custmer.id)}
                         </Typography>
                     </AccordionDetails>
                 ))

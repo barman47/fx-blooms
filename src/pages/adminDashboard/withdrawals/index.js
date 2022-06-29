@@ -41,6 +41,7 @@ import {
     autoBatch,
     getBatchById,
     authorizeWithdrawal,
+    completeWithdrawalRequest,
 } from "../../../actions/wallets";
 import { getInstitutions } from "../../../actions/institutions";
 import clsx from "clsx";
@@ -479,7 +480,7 @@ const Withdrawals = () => {
     const [page, setPage] = useState(0);
     const [tableRowsPerPage, setTableRowsPerPage] = useState(10);
     // const [inst, setInst] = useState('')
-    const [checkBxErrMsg, setCheckBxErrMsg] = useState("");
+    const [checkBoxMsg, setCheckBoxMsg] = useState("");
     const [totalWithdrawal, setTotalWithdrawal] = useState(0);
 
     const [requests, setRequests] = useState({
@@ -497,10 +498,13 @@ const Withdrawals = () => {
         institutionId,
         authorizeRequest,
         withdrawalSuccess,
+        withdrawalTrigger,
+        checkList,
     } = useSelector((state) => state.wallets);
     const allInstitutions = useSelector((state) => state.institutions);
     const admin = useSelector((state) => state.admin);
     const { msg } = useSelector((state) => state.errors);
+    const { toastType, setToastType } = useState("error");
 
     const [isMan, setIsMan] = useState(false);
 
@@ -614,6 +618,7 @@ const Withdrawals = () => {
 
     useEffect(() => {
         if (!!items) {
+            console.log("hello", items);
             setLoading(false);
             // handlePageNUmberList();
         }
@@ -671,13 +676,12 @@ const Withdrawals = () => {
 
     const handleBatchError = () => {
         ref.current?.handleClick();
-        setCheckBxErrMsg(
+        setCheckBoxMsg(
             "Can't add a request with a status of complete or in-progress"
         );
     };
 
     const manBatch = (cus) => {
-        // console.log(cus);
         setBatchList((values) => handleBatchFilter(cus, values));
     };
 
@@ -691,7 +695,7 @@ const Withdrawals = () => {
     const openManualScreen = () => {
         console.log(batchList);
         if (isEmpty(batchList)) {
-            setCheckBxErrMsg("Add a request");
+            setCheckBoxMsg("Add a request");
             ref.current.handleClick();
             return;
         }
@@ -781,6 +785,17 @@ const Withdrawals = () => {
         withdrawalScreen,
     ]);
 
+    useEffect(() => {
+        if (!!withdrawalTrigger) {
+            setToastType("success");
+            setCheckBoxMsg("withdrawalTrigger");
+            dispatch({
+                type: CLEAR_WITHDRAWAL_REQUESTS,
+            });
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, withdrawalTrigger]);
+
     const clearWithdrawalReqs = () => {
         dispatch({
             type: CLEAR_WITHDRAWAL_REQUESTS,
@@ -807,12 +822,27 @@ const Withdrawals = () => {
         });
     };
 
+    const triggerWithdrawal = () => {
+        console.log("bl", batchList);
+        if (batchList.length > 1) {
+            setCheckBoxMsg("One request at a time");
+            ref.current.handleClick();
+            return;
+        }
+        dispatch(
+            completeWithdrawalRequest({
+                id: batchList[0],
+                paymentStatus: 2,
+            })
+        );
+    };
+
     return (
         <>
             <Toast
                 ref={ref}
-                type="error"
-                msg={checkBxErrMsg}
+                type={toastType}
+                msg={checkBoxMsg}
                 title="Withdrawal Batch"
             />
             <section
@@ -838,6 +868,14 @@ const Withdrawals = () => {
                         marginBottom: 20,
                     }}
                 >
+                    <GenericButton
+                        clickAction={() => triggerWithdrawal()}
+                        buttonName="Complete Withdrawal"
+                        fontColor="#1E6262"
+                        fontsize="15px"
+                        bxShadw="none"
+                        bdaColor="#1E6262"
+                    />
                     <GenericButton
                         clickAction={() => openManualScreen()}
                         buttonName="Manual"
@@ -1063,6 +1101,7 @@ const Withdrawals = () => {
                         gridColumns={gridColumns}
                         loading={loading}
                         data={items}
+                        checkList={checkList}
                         handleCheckError={handleBatchError}
                     />
                 </Box>
@@ -1094,47 +1133,6 @@ const Withdrawals = () => {
                                 backgroundColor: "#F7F8F9",
                             }}
                         >
-                            {/* <Box
-                                component="div"
-                                sx={{ display: "flex", gap: "15px" }}
-                            >
-                                <GenericButton
-                                    clickAction={onPrevPage}
-                                    isDisabled={currentPage === 1}
-                                    buttonName="Previous"
-                                />
-                                <GenericButton
-                                    clickAction={onNextPage}
-                                    isDisabled={currentPage === lastPage}
-                                    buttonName="Next"
-                                />
-                            </Box> */}
-                            {/* <Box
-                                component="span"
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    gap: "10px",
-                                }}
-                            >
-                                {pageNumberList &&
-                                    pageNumberList.map((pageNUmber, i) => (
-                                        <Typography
-                                            className={clsx(
-                                                classes.pageList,
-                                                pageNUmber === currentPage &&
-                                                    classes.selected
-                                            )}
-                                            onClick={() =>
-                                                setCurrentPage(pageNUmber)
-                                            }
-                                            variant="subtitle2"
-                                            key={i}
-                                        >
-                                            {pageNUmber}
-                                        </Typography>
-                                    ))}
-                            </Box> */}
                             <Pagination
                                 count={pageCount}
                                 page={currentPage}

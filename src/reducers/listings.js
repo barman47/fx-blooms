@@ -41,6 +41,7 @@ const initialState = {
     inProgressListings: [],
     deletedListings: [],
     loading: false,
+    listingSearches: [],
     msg: null,
     recommendedRate: null,
     credit: null,
