@@ -1,16 +1,17 @@
 import {
     SET_REQUIRED_CURRENCY,
+    GET_LISTING,
     ADDED_BID,
     ADDED_LISTING,
     DELETED_LISTING,
     SET_BID,
+    SET_BIDS,
     SET_LISTINGS,
     SET_DELETED_LISTINGS,
     SET_FINALISED_LISTINGS,
     SET_INPROGRESS_LISTINGS,
     SET_ACTIVE_LISTINGS,
     SET_MORE_LISTINGS,
-    GET_LISTING,
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_AS_ACCEPTED,
@@ -33,6 +34,7 @@ const initialState = {
     editedListing: false,
     addedBid: false,
     bid: {},
+    bids: [],
     updatedListing: false,
     listing: {},
     listings: [],
@@ -86,6 +88,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 bid: action.payload,
+            };
+
+        case SET_BIDS:
+            return {
+                ...state,
+                bids: action.payload
             };
 
         case SET_AS_ACCEPTED:
@@ -186,7 +194,7 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 deletedListings: action.payload,
             };
-
+        
         case GET_LISTING:
             return {
                 ...state,

@@ -13,7 +13,7 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Alert from '@material-ui/lab/Alert';
+// import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 
 import { getWallets, requestWithdrawal } from '../../../actions/wallets';
@@ -88,6 +88,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     const [sourceAccount, setSourceAccount] = useState('');
     const [reference, setReference] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
+    // eslint-disable-next-line
     const [withdrawalFee, setWithdrawalFee] = useState(0);
     const [first, setFirst] = useState('');
     const [second, setSecond] = useState('');
@@ -111,11 +112,11 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     }, []);
 
     // Set withdrawal fee when user enters amount
-    useEffect(() => {
-        if (amount) {
-            setWithdrawalFee(((1/100) * amount).toFixed(2));
-        }
-    }, [amount]);
+    // useEffect(() => {
+    //     if (amount) {
+    //         setWithdrawalFee(((1/100) * amount).toFixed(2));
+    //     }
+    // }, [amount]);
 
     useEffect(() => {
         if (msg) {
@@ -206,7 +207,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="h6" color="primary" className={classes.pageTitle}>Request Withdrawal</Typography>
                     <Typography variant="body2" component="p" className={classes.subTitle}>Input your PIN to authenticate a withdrawal request to your bank account.</Typography>
-                    <Alert className={classes.alert} severity="info">Please note that you will be chanrged 1% of the withdrawal fee.</Alert>
+                    {/* <Alert className={classes.alert} severity="info">Please note that you will be chanrged 1% of the withdrawal fee.</Alert> */}
                     <Grid container direction="row" spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span">Select Receiving Account</Typography>
@@ -264,7 +265,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
                                 fullWidth 
                                 helperText={errors.amount}
                             />
-                            <FormHelperText>Withdrawal fee: EUR {formatNumber(withdrawalFee, 2)}</FormHelperText>
+                            {/* <FormHelperText>Withdrawal fee: EUR {formatNumber(withdrawalFee, 2)}</FormHelperText> */}
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Withdrawal Reference (OPTIONAL)</Typography>

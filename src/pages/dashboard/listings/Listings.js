@@ -11,8 +11,8 @@ import isEmpty from '../../../utils/isEmpty';
 import { addBid, checkListingEditable } from '../../../actions/listings';
 import { GET_ERRORS, SET_BID, SET_LISTING, TOGGLE_ACCEPT_OFFER, TOGGLE_BID_STATUS } from '../../../actions/types';
 
-import IDVerificationModal from '../listings/IDVerificationModal';
-import PendingIdModal from './PendingIdModal';
+import IDVerificationModal from '../idVerification/IDVerificationModal';
+import PendingIdModal from '../idVerification/PendingIdModal';
 import BuyerPaymentDrawer from './BuyerPaymentDrawer';
 import Listing from './Listing';
 import CreateWalletModal from '../wallet/CreateWalletModal';

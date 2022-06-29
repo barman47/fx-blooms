@@ -229,10 +229,7 @@ export const externalLogin = (data, navigate) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: authResponse,
         });
-
-        return isLinkedToProfile
-            ? navigate(DASHBOARD_HOME)
-            : navigate(ADD_USERNAME, { addUsername: true });
+        return isLinkedToProfile ? navigate(DASHBOARD_HOME) : navigate(ADD_USERNAME, { addUsername: true });
     } catch (err) {
         return handleError(err, dispatch);
     }

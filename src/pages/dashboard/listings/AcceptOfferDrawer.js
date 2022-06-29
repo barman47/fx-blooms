@@ -99,11 +99,11 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }) => {
+const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { account, accounts } = useSelector(state => state.bankAccounts);
+    const { accounts } = useSelector(state => state.bankAccounts);
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
     const { listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
@@ -121,9 +121,9 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const successModal = useRef();
 
     useEffect(() => {
-        if (isEmpty(account) && !isEmpty(listing)) {
-            getAccount(listing.sellersAccountId);
-        }
+        // if (isEmpty(account) && !isEmpty(listing)) {
+        //     getAccount(listing.sellersAccountId);
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -236,7 +236,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     return (
         <>
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={false} ngn={true} />}
             <Drawer 
                 ModalProps={{ 
                     // disableBackdropClick: true,

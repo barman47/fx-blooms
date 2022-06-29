@@ -9,9 +9,9 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CheckboxMarkedCircle } from 'mdi-material-ui';
+import { Information } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS, SHADOW } from '../../../utils/constants';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -54,11 +54,10 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SuccessModal = forwardRef((props, ref) => {
+const FundingDisclaimerModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
-    const [text, setText] = useState('');
 
     const { dismissAction } = props;
 
@@ -76,10 +75,6 @@ const SuccessModal = forwardRef((props, ref) => {
 
         closeModal: () => {
             setOpen(false);
-        },
-
-        setModalText: (text) => {
-            setText(text);
         }
     }));
 
@@ -107,10 +102,8 @@ const SuccessModal = forwardRef((props, ref) => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
-                        <Typography variant="subtitle1">
-                            {text}
-                        </Typography>
+                        <Information className={classes.icon} />
+                        <Typography variant="subtitle1">Payments take between seconds to hours to reflect. Thus, kindly click on the refresh button to check the updated status or wait till we provide you an update via SMS and/or emails.</Typography>
                         <Button onClick={closeModal} color="primary">Okay</Button>
                     </Grid>
                 </Grid>
@@ -119,8 +112,8 @@ const SuccessModal = forwardRef((props, ref) => {
 	);
 });
 
-SuccessModal.propTypes = {
+FundingDisclaimerModal.propTypes = {
     dismissAction: PropTypes.func
 };
 
-export default SuccessModal;
+export default FundingDisclaimerModal;

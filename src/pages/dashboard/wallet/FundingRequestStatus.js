@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { 
     Box,
@@ -8,32 +9,41 @@ import {
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 import { Refresh } from 'mdi-material-ui';
+import moment from 'moment';
 import PropTypes from 'prop-types';
 
 import { getFundingDetails } from '../../../actions/wallets';
-import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
+import { GET_ERRORS } from '../../../actions/types';
+// import { GET_ERRORS, SET_CUSTOMER_MSG } from '../../../actions/types';
 
 import { COLORS, FUNDING_STATUS } from '../../../utils/constants';
-import getTime from '../../../utils/getTime';
+import { convertToLocalTime } from '../../../utils/getTime';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 
 import Spinner from '../../../components/common/Spinner';
-import SuccessModal from '../../../components/common/SuccessModal';
+// import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
+import FundingDisclaimerModal from './FundingDisclaimerModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        padding: theme.spacing(2, 0),
-        width: '100%',
 
         [theme.breakpoints.down('sm')]: {
-            // padding: theme.spacing(0, 1, 1, 1),
             width: '90%',
         },
+
+        '& h4:first-child': {
+            textAlign: 'center',
+            width: '100%',
+
+            [theme.breakpoints.down('sm')]: {
+                fontSize: theme.spacing(2.5)
+            }
+        }
     },
 
     content: {
@@ -50,9 +60,8 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(1),
         padding: theme.spacing(2),
-        // margin: theme.spacing(2, ),
         margin: '10px  auto',
-        // width: '100%',
+        width: '100%',
 
         [theme.breakpoints.down('sm')]: {
             margin: 0,
@@ -67,11 +76,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     buttonContainer: {
-        border: '1px solid red',
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'flex-end',
-        alignItems: 'flex-end'
+        justifySelf: 'flex-end'
     }
 }));
 
@@ -80,19 +85,25 @@ const loadingText = 'Refreshing Status . . . ';
 const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const location = useLocation();
 
     const { msg } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
     const { fundingRequest } = useSelector(state => state.wallets);
 
+    const [paymentRequestId, setPaymentRequestId] = useState('');
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
-    const successModal = useRef();
+    const disclaimerModal = useRef();
+    // const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Funding Request Status');
+        if (location?.state?.paymentRequestId) {
+            setPaymentRequestId(location.state.paymentRequestId);   
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -103,8 +114,9 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
     useEffect(() => {
         if (msg) {
             setLoading(false);
-            successModal.current.setModalText(msg);
-            successModal.current.openModal();
+            disclaimerModal.current.openModal();
+            // successModal.current.setModalText(msg);
+            // successModal.current.openModal();
         }
     }, [msg]);
 
@@ -127,15 +139,15 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
 
     const handleRefreshStatus = () => {
         setLoading(true);
-        getFundingDetails(fundingRequest.id);
+        getFundingDetails(fundingRequest.id, paymentRequestId);
     };
 
-    const dismissSuccessModal = () => {
-        dispatch({
-            type: SET_CUSTOMER_MSG,
-            payload: null
-        });
-    };
+    // const dismissSuccessModal = () => {
+    //     dispatch({
+    //         type: SET_CUSTOMER_MSG,
+    //         payload: null
+    //     });
+    // };
 
     return (
         <>
@@ -149,31 +161,12 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
                 />
             }
             {loading && <Spinner text={loadingText} />}
-            <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
+            <FundingDisclaimerModal ref={disclaimerModal} />
+            {/* <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} /> */}
             <Box component="section" className={classes.root}>
                 <Typography variant="h4" color="primary" gutterBottom>Funding Request Status</Typography>
                 <Box component="div" className={classes.content}>
                     <Box component="div" className={classes.fundingRequest}>
-                        <Box component="section">
-                            <Typography variant="body2" component="p">Transaction ID</Typography>
-                            <Typography variant="body2" component="p">{fundingRequest.id}</Typography>
-                        </Box>
-                        <Divider />
-                        <Box component="section">
-                            <Typography variant="body2" component="p">Institution</Typography>
-                            <Typography variant="body2" component="p">Transaction ID</Typography>
-                        </Box>
-                        <Divider />
-                        <Box component="section">
-                            <Typography variant="body2" component="p">Account Name</Typography>
-                            <Typography variant="body2" component="p">Transaction ID</Typography>
-                        </Box>
-                        <Divider />
-                        <Box component="section">
-                            <Typography variant="body2" component="p">Account Number</Typography>
-                            <Typography variant="body2" component="p">Transaction ID</Typography>
-                        </Box>
-                        <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Reference</Typography>
                             <Typography variant="body2" component="p">{fundingRequest.reference}</Typography>
@@ -181,17 +174,17 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Amount</Typography>
-                            <Typography variant="body2" component="p">{formatNumber(fundingRequest.amountDetails.amount, 2)}</Typography>
+                            <Typography variant="body2" component="p">{formatNumber(fundingRequest.amount, 2)}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Currency</Typography>
-                            <Typography variant="body2" component="p">{fundingRequest.amountDetails.currency}</Typography>
+                            <Typography variant="body2" component="p">{fundingRequest.currency}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
                             <Typography variant="body2" component="p">Date</Typography>
-                            <Typography variant="body2" component="p">{getTime(fundingRequest.createdAt)}</Typography>
+                            <Typography variant="body2" component="p">{moment(convertToLocalTime(fundingRequest.date)).fromNow()}</Typography>
                         </Box>
                         <Divider />
                         <Box component="section">
@@ -204,10 +197,10 @@ const FundingRequestStatus = ({ handleSetTitle, getFundingDetails }) => {
                                     fontWeight: 600
                                 }}
                             >
-                                {fundingRequest.status}
+                                {fundingRequest.status.toUpperCase()}
                             </Typography>
                         </Box>
-                        {fundingRequest.status !== FUNDING_STATUS.COMPLETED && 
+                        {fundingRequest.status.toUpperCase() !== FUNDING_STATUS.COMPLETED && 
                             <>
                                 <Divider />
                                 <Box component="section" className={classes.buttonContainer}>
