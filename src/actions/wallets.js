@@ -17,6 +17,7 @@ import {
     SET_WALLET,
     // UPDATE_FUNDING_REQUEST,
     SET_BANK_ACCOUNT_MSG,
+    COMPLETE_WITHDRAWAL_REQ,
     SET_WALLET_REQS,
     SET_BATCH_ID,
     SET_ACCOUNT,
@@ -405,6 +406,24 @@ export const getOneWallet = (walletId) => async (dispatch) => {
 
         dispatch({
             type: SET_ONE_WALLET,
+            payload: res.data.data,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const completeWithdrawalRequest = (query, token) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        console.log(query, token);
+        const res = await axios.post(
+            `${PAYMENT_REQ}/CompleteWithdrawalRequest`,
+            query
+        );
+
+        dispatch({
+            type: COMPLETE_WITHDRAWAL_REQ,
             payload: res.data.data,
         });
     } catch (err) {

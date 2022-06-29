@@ -13,12 +13,14 @@ import {
     SET_FUNDING_REQUESTS,
     // SET_BANK_ACCOUNT,
     // SET_BANK_ACCOUNTS,
+    COMPLETE_WITHDRAWAL_REQ,
     SET_ONE_WALLET,
     SET_BANK_ACCOUNT_MSG,
     SET_WALLET_REQS,
     SET_BATCH_ID,
     SET_INSTITUTION_ID,
     AUTHORIZE_WITHDRAWAL,
+    SET_CHECKLIST,
     CLEAR_WALLET_MSG,
     SET_WITHDRAWAL_REQUEST,
     CLEAR_WITHDRAWAL_REQUESTS,
@@ -48,6 +50,8 @@ const initialState = {
     institutionId: null,
     authorizeRequests: null,
     withdrawalSuccess: null,
+    withdrawalTrigger: null,
+    checkList: {},
 };
 
 const walletsReducer = (state = initialState, action) => {
@@ -212,6 +216,7 @@ const walletsReducer = (state = initialState, action) => {
                 authorizeRequests: null,
                 withdrawalSuccess: null,
                 withdrawalRequests: null,
+                withdrawalTrigger: null,
             };
 
         case CLEAR_WALLET_MSG:
@@ -220,6 +225,17 @@ const walletsReducer = (state = initialState, action) => {
                 msg: null,
             };
 
+        case COMPLETE_WITHDRAWAL_REQ:
+            return {
+                ...state,
+                withdrawalTrigger: action.payload,
+            };
+        case SET_CHECKLIST:
+            return {
+                ...state,
+                checkList: action.payload,
+            };
+            
         case CLEAR_WALLET:
             return {
                 ...state,
