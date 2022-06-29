@@ -534,6 +534,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
     const gotoCustomersPage = (e) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log(e.target);
         if (e.target.name !== 'usersFilter' && !loadingCustomerCount) {
             navigate(CUSTOMERS);
         }
@@ -549,7 +550,7 @@ const Home = ({ getCustomerCount, getListingCount, getTransactionVolume, searchF
 
     return (
         <>
-            <Grid container direction="row" spacing={3} className={classes.root}>
+            <Grid container direction="row" spacing={3} className={clsx(classes.root, 'animate__animated animate__zoomIn')}>
                 <Grid item xs={12} className={classes.content}>
                     <GenericMiniCard 
                     goToPage={gotoCustomersPage}

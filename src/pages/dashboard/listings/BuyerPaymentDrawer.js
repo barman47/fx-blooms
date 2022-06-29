@@ -7,12 +7,9 @@ import {
     Collapse,
     Drawer,
     Grid,
-    FormControl,
-    FormHelperText,
+    // FormHelperText,
     IconButton,
-    Select,
-    MenuItem,
-    TextField,
+    // TextField,
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -27,10 +24,10 @@ import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import getTime, { convertToLocalTime } from '../../../utils/getTime';
-import getAccountId from '../../../utils/getAccountId';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -180,7 +177,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     const [receivingAccount, setReceivingAccount] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    const [reference, setReference] = useState('');
+    // const [reference, setReference] = useState('');
 
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
@@ -194,6 +191,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     const interval = useRef();
     const successModal = useRef();
+    const toast = useRef();
 
     useEffect(() => {
         startExpiryTimer();
@@ -220,6 +218,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
 
     useEffect(() => {
         if (msg) {
+            clearInterval(interval.current);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
             setLoading(false);
@@ -264,11 +263,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
         });
     };
 
-    const handleAddAccount = () => {
-        setAddAccountDrawerOpen(true);
-        setReceivingAccount('');
-    };
-
     useEffect(() => {
         if (receivingAccount) {
             setButtonDisabled(false);
@@ -287,14 +281,6 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
             setErrors({});
         }
     }, [dispatch, drawerOpen]);
-
-    useEffect(() => {
-        if (msg) {
-            successModal.current.setModalText(msg);
-            successModal.current.openModal();
-            clearInterval(interval.current);
-        }
-    }, [msg]);
 
     useEffect(() => {
         setLoading(false);
@@ -345,26 +331,30 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                 payload: {}
             });
         });
-        
     };
 
     const handleMadepayment = () => {
-        if (isEmpty(receivingAccount)) {
-            return setErrors({ receivingAccount: 'Please select a bank account' });
-        }
         setLoading(true);
         madePayment({
             bidId: bid.id,
             listingId: listing.id,
-            accountId: getAccountId(receivingAccount, accounts),
-            reference
-        });
+            reference: ''
+        }, listing.listedBy);
     };
 
     const getSellerAccount = () => getAccount(listing.sellersAccountId);
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
             <Drawer 
@@ -397,9 +387,9 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                     </Grid>
                 </Grid>
                 <ol>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
                     <li><Typography variant="body2" component="p">Transfer the {listing?.amountNeeded?.currencyType} to the {`${listing?.listedBy?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on {listing?.amountNeeded?.currencyType} Payment Made</Typography></li>
+                    <li><Typography variant="body2" component="p">The EUR equivalent will be moved to your wallet immediately</Typography></li>
                 </ol>
                 <Grid container direction="row">
                     <Grid item xs={12}>
@@ -433,36 +423,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                             </section>
                         </Collapse>              
                     </Grid>
-                    <Grid item xs={12}>
-                        <Typography variant="subtitle2" component="span">Receiving Account</Typography>
-                        <FormControl 
-                            variant="outlined" 
-                            error={errors.receivingAccount ? true : false } 
-                            fullWidth 
-                            required
-                            disabled={loading ? true : false}
-                        >
-                            <Select
-                                labelId="ReceivingAccount"
-                                value={receivingAccount}
-                                onChange={(e) => setReceivingAccount(e.target.value)}
-                            >
-                                <MenuItem value="" disabled>Select your receiving account</MenuItem>
-                                {accounts.map((account) => {
-                                    if (account.currency === 'EUR') {
-                                        return (
-                                            // <MenuItem key={account.accountID} value={account.bankName}>{account.bankName}</MenuItem>
-                                            <MenuItem key={account.accountID} value={account.nicKName || account.bankName}>{account.nicKName || account.bankName}</MenuItem>
-                                        )
-                                    }
-                                    return null;
-                                })}
-                            </Select>
-                            <FormHelperText>{errors.receivingAccount}</FormHelperText>
-                            <Button variant="text" color="primary" align="right" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
-                        </FormControl>
-                    </Grid>
-                    <Grid item xs={12}>
+                    {/* <Grid item xs={12}>
                         <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
                         <TextField 
                             value={reference}
@@ -474,7 +435,7 @@ const BuyerPaymentDrawer = ({ cancelBid, getAccount, madePayment, toggleDrawer, 
                             fullWidth
                         />
                         <FormHelperText>Enter the reference you want added to the payment</FormHelperText>
-                    </Grid>
+                    </Grid> */}
                     <Grid item xs={12} className={classes.timerContainer}>
                         <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {listing?.amountNeeded?.currencyType}{formatNumber((listing?.amountAvailable?.amount * listing?.exchangeRate), 2)} within...</Typography>
                         <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>

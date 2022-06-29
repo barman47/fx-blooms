@@ -2,9 +2,9 @@ import { Box, CircularProgress, } from '@material-ui/core';
 
 
 
-const CircularProgressBar = ({ topMargin, newWidth, newHeight }) => (
+const CircularProgressBar = ({ topMargin, newWidth, newHeight, iconColor }) => (
   <Box component="span" sx={{ display: 'flex', justifyContent: 'center', marginTop: topMargin ?? '' }}>
-    <CircularProgress style={{ width: newWidth, height: newHeight}} />
+    <CircularProgress style={{ width: newWidth, height: newHeight, color: iconColor }} />
   </Box>
 )
 

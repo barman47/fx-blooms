@@ -12,10 +12,13 @@ import {
     UPDATE_NOTIFICATION,
     REMOVE_NOTIFICATION,
     SET_NOTIFICATION_COUNT,
+    ADD_ALERT_NOTIFICATION,
+    REMOVE_ALERT_NOTIFICATION,
     SET_NOTIFICATION_MSG
 } from '../actions/types';
 
 const initialState = {
+    alertNotifications: [],
     notifications: [],
     notification: {},
     unreadNotifications: 0,
@@ -130,6 +133,20 @@ const notificationsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 unreadNotifications: action.payload
+            };
+
+        case ADD_ALERT_NOTIFICATION:
+            return {
+                ...state,
+                alertNotifications: [...state.alertNotifications, action.payload]
+            };
+
+        case REMOVE_ALERT_NOTIFICATION:
+            notifications = state.alertNotifications;
+            notifications.shift();
+            return {
+                ...state,
+                alertNotifications: notifications
             };
 
         case SET_NOTIFICATION_MSG:

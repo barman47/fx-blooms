@@ -8,33 +8,39 @@ import {
     FormHelperText,
     Grid,
     MenuItem,
-    Radio,
     Select,
     TextField,
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Security } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 
 import { getCurrencies } from '../../../actions/currencies';
-import { getInstitutions } from '../../../actions/institutions';
-import { fundWallet } from '../../../actions/wallets';
-import { GET_ERRORS } from '../../../actions/types';
+import { requestWalletFunding } from '../../../actions/wallets';
+import { GET_ERRORS, SET_FUNDING_REQUEST, SET_INSTITUTIONS } from '../../../actions/types';
 
 import handleSetValue from '../../../utils/handleSetValue';
 import isEmpty from '../../../utils/isEmpty';
-import { COLORS } from '../../../utils/constants';
-import getAccountId from '../../../utils/getAccountId';
+import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
+import getAccount from '../../../utils/getAccount';
+import { SUPPORTED_FUNDING_INSTITUTIONS } from '../../../utils/institutions';
 import validateFundWallet from '../../../utils/validation/wallets/fund';
 
-import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
-import Toast from '../../../components/common/Toast';
+import { BANK_ACCOUNTS } from '../../../routes';
 
-import yapily from '../../../assets/img/yapily.png';
-import bankTransfer from '../../../assets/img/bank-transfer.png';
-import cardPayment from '../../../assets/img/card-payment.png';
+import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
+import Spinner from '../../../components/common/Spinner';
+import Toast from '../../../components/common/Toast';
+import IDVerificationModal from '../idVerification/IDVerificationModal';
+import PendingIdModal from '../idVerification/PendingIdModal';
+import NoInsitutionModal from './NoInsitutionModal';
+import UnsupportedInstitutionModal from './UnsupportedInstitutionModal';
+import SupportedFundingInstitutionsModal from '../bankAccount/SupportedFundingInstitutionsModal';
+
+// import yapily from '../../../assets/img/yapily.png';
+// import bankTransfer from '../../../assets/img/bank-transfer.png';
+// import cardPayment from '../../../assets/img/card-logo.png';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -87,17 +93,6 @@ const useStyles = makeStyles(theme => ({
         fontWeight: 600
     },
 
-    option: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-
-        '& img': {
-            marginLeft: theme.spacing(2),
-            width: theme.spacing(3),
-        }
-    },
-
     text: {
         color: COLORS.grey,
         fontWeight: 300,
@@ -130,38 +125,68 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle }) => {
+const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
-    const { institutions, currencies, customer } = useSelector(state => state);
+    const { idStatus } = useSelector(state => state.customer.stats);
+    const { currencies, customer } = useSelector(state => state);
     const { wallet } = useSelector(state => state.wallets);
 
-    const [currency, setCurrency] = useState('EUR');
+    const [currency] = useState('EUR');
     const [amount, setAmount] = useState('');
     const [sourceAccount, setSourceAccount] = useState('');
-    const [institution, setInstitution] = useState('');
+    const [toastTitle, setToastTitle] = useState('');
+    const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
-    // eslint-disable-next-line
+
+    const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [loading, setLoading] = useState(false);
-    // eslint-disable-next-line
+
     const [errors, setErrors] = useState({});
 
+    const idVerificationModal = useRef();
+    const noInstitutionModal = useRef();
     const toast = useRef();
+    const supportedInstitutions = useRef();
+    const unsupportedInstitutionModal = useRef();
+
+    const { APPROVED, NOT_SUBMITTED } = ID_STATUS;
+    const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
     useEffect(() => {
         handleSetTitle('Fund Wallet');
+
+        if (idStatus !== APPROVED) {
+            checkIdStatus();
+        }
+
         if (currencies.length === 0) {
             getCurrencies()
         }
-        if (institutions.length === 0) {
-            getInstitutions()
-        }
+
+        dispatch({
+            type: SET_FUNDING_REQUEST,
+            payload: {}
+        });
+
+        return () => {
+            dispatch({
+                type: SET_INSTITUTIONS,
+                payload: []
+            });
+        };
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (errors.notSupported) {
+            unsupportedInstitutionModal.current.openModal();
+        }
+    }, [errors]);
 
     useEffect(() => {
         if (!isEmpty(errors)) {
@@ -172,6 +197,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
     useEffect(() => {
         if (errorsState?.msg) {
             setErrors({ ...errorsState });
+            setToastTitle('ERROR');
             setLoading(false);
             dispatch({
                 type: GET_ERRORS,
@@ -180,6 +206,53 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
         }
     }, [dispatch, errorsState, errors]);
 
+    // Check if selected account supports instant payment when selected
+    useEffect(() => {
+        if (checked) {
+            let supportsFunding = false;
+            const account = getAccount(sourceAccount, accounts);
+            const customerInstitution = SUPPORTED_FUNDING_INSTITUTIONS.find(institution => institution.id === account.institutionId);
+
+            if (customerInstitution.features.includes('INITIATE_DOMESTIC_SINGLE_INSTANT_PAYMENT')) {
+                supportsFunding = true;
+            }
+
+            if (!supportsFunding || customerInstitution.fullName === 'Revolut EU') {
+                // Show not supported message and clear the bank state
+                setToastTitle('Not Supported');
+                setErrors({ msg: 'Institution does not support instant payment', sourceAccount: 'Your selected institution does not support instant payment' });
+                setChecked(false);
+            }
+        }
+    }, [accounts, checked, errors, sourceAccount]);
+
+    const handleShowSupportedInstitutions = () => {
+        setErrors({});
+        supportedInstitutions.current.openModal();
+    };
+
+    const checkIdStatus = () => {
+        switch (idStatus) {
+            case APPROVED:
+                break;
+
+            case PENDING:
+                setShowPendingIdModal(true);
+                break;
+
+            case REJECTED:
+                idVerificationModal.current.openModal();
+                break;
+
+            case NOT_SUBMITTED:
+                idVerificationModal.current.openModal();
+                break;
+
+            default:
+                break;
+        }
+    };
+
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
         setSourceAccount('');
@@ -187,27 +260,49 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
 
+    const handleClosePendingIdModal = () => {
+        setShowPendingIdModal(false);
+    };
+
     const handleFormSubmit = (e) => {
         e.preventDefault();
         setErrors({});
+        
+        const { accountID, accountName, accountNumber, bankName, institutionId } = getAccount(sourceAccount, accounts);
         const data = {
-            institutionId: institution,
+            institutionId,
+            institution: bankName,
             fullName: `${customer.firstName} ${customer.lastName}`,
             type: 1,
             amount: amount ? Number(amount) : '',
             walletId: wallet.id,
-            accountId: sourceAccount ? getAccountId(sourceAccount, accounts) : '',
-            reference: "WALLET FUNDING"
+            accountId: sourceAccount ? accountID : '',
+            accountName: sourceAccount ? accountName : '',
+            accountNumber: sourceAccount ? accountNumber : '',
+            useInstantPayment: false,
+            reference: "FXBLOOMS"
         };
+
+        if (!data.institutionId) {
+            return noInstitutionModal.current.openModal();
+        }
 
         const { errors, isValid } = validateFundWallet(data);
 
         if (!isValid) {
             return setErrors({ ...errors, msg: 'Invalid funding data!' });
         }
-        console.log(data);
+
+        if (idStatus !== APPROVED) {
+            return checkIdStatus();
+        }
+
         setLoading(true);
-        fundWallet(data);
+        requestWalletFunding(data, navigate);
+    };
+
+    const dismissAction = () => {
+        navigate(BANK_ACCOUNTS);
     };
 
     return (
@@ -215,18 +310,24 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
             {!isEmpty(errors) && 
                 <Toast 
                     ref={toast}
-                    title="ERROR"
+                    title={toastTitle || 'ERROR'}
                     duration={5000}
                     msg={errors.msg || ''}
                     type="error"
                 />
             }
+            {loading && <Spinner />}
+            <IDVerificationModal ref={idVerificationModal} />
+            <NoInsitutionModal ref={noInstitutionModal} dismissAction={dismissAction} />
+            <UnsupportedInstitutionModal ref={unsupportedInstitutionModal} dismissAction={handleShowSupportedInstitutions} />
+            <SupportedFundingInstitutionsModal ref={supportedInstitutions} />
+            {showPendingIdModal && <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <Box component="section" className={classes.root}>
                 <Typography variant="h6" color="primary" className={classes.pageTitle}>Select a suitable medium of payment</Typography>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="subtitle2" component="span" className={classes.helperText}>Amount to fund wallet with</Typography>
-                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={2}>
+                    <Grid className={classes.inputs} container direction="row" alignItems="center" spacing={1}>
                         <Grid item xs={4} lg={3}>
                             <FormControl 
                                 variant="outlined" 
@@ -238,13 +339,14 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 <Select
                                     labelId="currency"
                                     value={currency}
-                                    onChange={(e) => setCurrency(e.target.value)}
+                                    // onChange={(e) => setCurrency(e.target.value)}
                                 
                                 >
-                                    <MenuItem value="" disabled>Select Currency</MenuItem>
-                                    {currencies.length > 0 && currencies.map((currency, index) => (
+                                    {/* <MenuItem value="" disabled>Select Currency</MenuItem> */}
+                                    <MenuItem value={currency} selected>{currency}</MenuItem>
+                                    {/* {currencies.length > 0 && currencies.map((currency, index) => (
                                         <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>
-                                    ))}
+                                    ))} */}
                                 </Select>
                                 <FormHelperText>{errors.AvailableCurrency}</FormHelperText>
                             </FormControl>
@@ -266,6 +368,9 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                 helperText={errors.amount}
                             />
                         </Grid>
+                        {/* <Grid item xs={12}>
+                            <FormHelperText>Transaction Fee, &#8364;1</FormHelperText>
+                        </Grid> */}
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Select Source Account</Typography>
                             <FormControl 
@@ -305,41 +410,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                             </FormControl>
                             <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                         </Grid>
-                        <Grid item xs={12}>
-                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Financial Institution</Typography>
-                            <Autocomplete
-                                id="country-select"
-                                options={institutions}
-                                autoHighlight
-                                disableClearable
-                                getOptionLabel={(option) => {
-                                    setInstitution(option.id);
-                                    return option.fullName;
-                                }}
-                                renderOption={(option) => (
-                                    <>
-                                        <div className={classes.option}>
-                                            <span>{option.fullName}</span>
-                                            <img src={option.media[0].source} alt={`${institution.fullName} Logo`} />
-                                        </div>
-                                    </>
-                                )}
-                                renderInput={(params) => (
-                                    <TextField
-                                        error={errors.institution ? true : false}
-                                        helperText={errors.institution}
-                                        {...params}
-                                        variant="outlined"
-                                        inputProps={{
-                                            ...params.inputProps,
-                                            // autoComplete: 'new-password',
-                                        }}
-                                        // onChange={(e) => setCountryCode(e.target.value)}
-                                    />
-                                )}
-                            />
-                        </Grid>
-                        <Grid item xs={12}>
+                        {/* <Grid item xs={12}>
                             <Box component="section" className={classes.paymentMethod}>
                                 <Radio
                                     color="primary"
@@ -389,7 +460,19 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                                     <Typography variant="subtitle2" component="span" className={classes.soon}>Coming soon</Typography>
                                 </Box>
                             </Box>
-                        </Grid>
+                        </Grid> */}
+                        {/* <Grid item xs={12}>
+                            <Typography variant="subtitle2" component="span" className={classes.helperText}>Use Instant Payment</Typography>
+                            <br />
+                            <Checkbox
+                                color="primary"
+                                checked={checked}
+                                onChange={() => setChecked(!checked)}
+                                inputProps={{ 'aria-label': 'primary checkbox' }}
+                                disabled={sourceAccount ? false : true}
+                            />
+                            <Typography variant="subtitle2" component="span" color="secondary">Please note: Instant payment may come with additional charges from your bank.</Typography>
+                        </Grid> */}
                         <Grid item xs={12} md={6}>
                             <Button 
                                 variant="outlined" 
@@ -417,7 +500,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
                     </Grid>
                     <Grid item xs={12} className={classes.note}>
                         <Security className={classes.icon} />
-                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily. Your information is used for indetity verification only and will be kept secure by Yapily.</Typography>
+                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
                     </Grid>
                 </form>
             </Box>
@@ -427,8 +510,7 @@ const FundWallet = ({ getCurrencies, fundWallet, getInstitutions, handleSetTitle
 
 FundWallet.propTypes = {
     getCurrencies: PropTypes.func.isRequired,
-    getInstitutions: PropTypes.func.isRequired,
-    fundWallet: PropTypes.func.isRequired
+    requestWalletFunding: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { fundWallet, getCurrencies, getInstitutions })(FundWallet);
+export default connect(undefined, { requestWalletFunding, getCurrencies })(FundWallet);

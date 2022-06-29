@@ -83,6 +83,13 @@ const SuccessModal = forwardRef((props, ref) => {
         }
     }));
 
+    const handleOnClose = (e, reason) => {
+        if (reason === 'backdropClick') {
+            return;
+        }
+        closeModal();
+    }
+
 	return (
         <Modal
             aria-labelledby="transition-modal-title"
@@ -90,7 +97,7 @@ const SuccessModal = forwardRef((props, ref) => {
             className={classes.modal}
             open={open}
             disableEscapeKeyDown
-            onClose={() => setOpen(false)}
+            onClose={handleOnClose}
             closeAfterTransition
             BackdropComponent={Backdrop}
             BackdropProps={{

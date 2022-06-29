@@ -1,8 +1,8 @@
-const formatId = (id) => {
-  const PREFIX = 'LID';
+const formatId = (id, prefix='LID', idLen=7) => {
+  const PREFIX = prefix;
   let lid = ''
   if (id && id.length > 25) {
-    lid = PREFIX + id.substring(1, 7).toUpperCase()
+    lid = PREFIX + id.substring(1, idLen).toUpperCase()
   } else {
     lid = id
   }

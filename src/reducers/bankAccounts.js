@@ -1,8 +1,9 @@
-import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_MSG } from '../actions/types';
+import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION } from '../actions/types';
 
 const initialState = {
     account: {},
     accounts: [],
+    accountValidation: {},
     msg: null
 };
 
@@ -52,6 +53,12 @@ const bankAccountsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 accounts
+            };
+
+        case SET_ACCOUNT_VALIDATION:
+            return {
+                ...state,
+                accountValidation: action.payload
             };
             
 

@@ -228,16 +228,16 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
             setTransactionSteps([
                 `You transfered ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
                 `${seller.userName} to confirm the NGN payment`, 
-                `${seller.userName} to transfer EUR to you`,
-                `You to confirm - Transaction Completed`
+                'EUR moved to your EUR wallet',
+                'Transaction Completed'
             ]);
         } else {
             setTransactionSteps([
                 `You accepted offer`, 
-                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} within 30 minutes`,
+                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
                 `You confirmed ${seller.currency ? seller.currency : ''} payment`,
-                `You transfered ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
-                `${seller.userName} confirmed the ${buyer.currency ? buyer.currency : ''} payment - Transaction Completed`,
+                `EUR moved to ${seller.userName}'s wallet`, 
+                'Transaction Completed',
             ]);
         }
     };
@@ -247,16 +247,16 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
             setTransactionSteps([
                 `${buyer.userName} to transfer NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
                 `You confirm NGN payment`, 
-                `You transfer the equivalent EUR to ${buyer.userName}`,
-                `${buyer.userName} confirmed the EUR - Transaction Completed`
+                `EUR moved to ${seller.userNames}'s EUR wallet`,
+                'Transaction Completed'
             ]);
         } else {
             setTransactionSteps([
                 `${buyer.userName} accepted offer`, 
-                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)} to ${buyer.userName} within 30 minutes`,
+                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
                 `${buyer.userName} confirmed the ${seller.currency ? seller.currency : ''} payment`,
-                `${buyer.userName} transferred the ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to you`,
-                `You confirm ${buyer.currency ? buyer.currency : ''} payment - Transaction Completed`, 
+                'EUR moved to your EUR wallet',
+                'Transaction Completed' 
             ]);
         }
     };
@@ -349,7 +349,7 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
             <Box component="section" className={classes.root}>
                 <Box component="header">
                     <Button 
-                        color="primary" 
+                        color="primary"
                         variant="outlined" 
                         onClick={() => navigate(-1)}
                         startIcon={<ArrowLeft />}

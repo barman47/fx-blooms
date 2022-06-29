@@ -13,6 +13,8 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_BIDS,
+    SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
@@ -28,37 +30,29 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
-// export const getAllListings = () => async (dispatch) => {
-//     try {
-//         console.log('getting all listings');
-//         await reIssueCustomerToken();
-//         const res = await axios.post(`${URL}/GetAllListings`, {
-//             pageNumber: 0,
-//             pageSize: 15,
-//             currencyNeeded: 'NGN',
-//             currencyAvailable: 'NGN',
-//             minimumExchangeAmount: 0,
-//             useCurrencyFilter: false
-//         });
-//         const { items, ...rest } = res.data.data;
-
-//         dispatch({
-//             type: SET_LISTINGS,
-//             payload: { listings: items, ...rest }
-//         });
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
+export const getBids = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${URL}/GetAllBidsbyListingId?listingId=${listingId}`, { pageNumber: 1, pageSize: 50 });
+        const bids = res.data.data.result.items;
+        return dispatch({
+            type: SET_BIDS,
+            payload: bids
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
+        const msg = listing.AmountAvailable.CurrencyType === 'EUR' ? 'Offer successfully created. The EUR amount is now temporarily unavailabe (escrowed)' : 'Offer successfully created. You will be notified once a buyer accepts your offer';
         return batch(() => {
             dispatch({
                 type: ADDED_LISTING,
-                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+                payload: { listing: res.data.data, msg }
             });
             dispatch({
                 type: SET_REQUIRED_CURRENCY,
@@ -67,6 +61,19 @@ export const addListing = (listing) => async (dispatch) => {
                     requiredCurrency: listing.AmountAvailable.CurrencyType  
                 }
             });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getListing = (id) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/GetListing/${id}`);
+        return dispatch({
+            type: SET_LISTING,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -147,8 +154,6 @@ export const deleteListing = (listingId) => async (dispatch) => {
     }
 };
 
-
-
 export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
@@ -198,6 +203,7 @@ export const getMoreListings = (query) => async (dispatch) => {
 
 export const acceptOffer = (data, listing) => async (dispatch) => {
     try {
+        console.log(listing);
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AcceptOffer`, data);
         batch(() => {
@@ -210,7 +216,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within 30 minutes`
             });
         });
     } catch (err) {
@@ -235,26 +241,35 @@ export const addBid = (bid, listing) => async (dispatch) => {
     }
 };
 
-export const madePayment = (data) => async (dispatch) => {
+export const madePayment = (data, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
-        return dispatch({
-            type: SET_AS_ACCEPTED,
-            payload: data.listingId
+        batch(() => {
+            dispatch({
+                type: SET_AS_ACCEPTED,
+                payload: data.listingId
+            });
+            dispatch({
+                type: SET_LISTING_MSG,
+                payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);
     }
 };
 
-export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
+export const madePaymentV2 = (data, notificationId, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
         dispatch({
             type: REMOVE_NOTIFICATION,
             payload: notificationId
         });
-
+        dispatch({
+            type: SET_LISTING_MSG,
+            payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
+        });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
         return handleError(err, dispatch);
@@ -289,9 +304,15 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
-        dispatch({
-            type: REMOVE_NOTIFICATION,
-            payload: notificationId
+        batch(() => {
+            dispatch({
+                type: SET_CUSTOMER_MSG,
+                payload: 'Payment confirmed successfully'
+            });
+            dispatch({
+                type: REMOVE_NOTIFICATION,
+                payload: notificationId
+            });
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {

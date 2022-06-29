@@ -162,7 +162,15 @@ const BankAccounts = ({ deleteAccount, handleSetTitle }) => {
                         <Typography variant="body1" component="p">Kindly provide your bank details below</Typography>
                         <hr className={classes.hr} />
                     </div>
-                    <Button variant="text" color="primary" onClick={toggleShowAddAccountDrawer} style={{ alignSelf: 'flex-start' }}>Add Account</Button>
+                    <Button 
+                        variant="contained" 
+                        color="primary" 
+                        size="large"
+                        onClick={toggleShowAddAccountDrawer} 
+                        style={{ alignSelf: 'flex-start' }}
+                    >
+                        Add Account
+                    </Button>
                 </div>
                 <div className={classes.bankAccounts}>
                     {accounts.length > 0 ? accounts.map(account => (

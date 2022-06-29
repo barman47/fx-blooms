@@ -81,16 +81,14 @@ const useStyles = makeStyles(theme => ({
     listingContent: {
         backgroundColor: COLORS.lightTeal,
         display: 'grid',
-        gridTemplateColumns: 'repeat(5, 1fr)',
+        gridTemplateColumns: 'repeat(4, 1fr)',
         gap: theme.spacing(1),
         padding: [[theme.spacing(2), theme.spacing(4), theme.spacing(2), theme.spacing(8)]],
         // padding: [[theme.spacing(4), theme.spacing(3)]],
 
         [theme.breakpoints.down('lg')]: {
-            gridTemplateColumns: 'repeat(5, 1fr)',
-            gap: theme.spacing(1),
-            // padding: [[theme.spacing(4), theme.spacing(4), theme.spacing(4), theme.spacing(8)]],
-            // padding: [[theme.spacing(3), theme.spacing(3)]]
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: theme.spacing(1)
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -129,20 +127,21 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditListing, listing, getSeller }) => {
+const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditListing, listing, getSeller, showError, toggleCreateWalletModal }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const theme = useTheme();
     const navigate = useNavigate();
 
     const userId = useSelector(state => state.customer.customerId);
+    const { wallet, wallets } = useSelector(state => state.wallets);
 
     const [expired] = useState(false);
     const [timerHours, setTimerHours] = useState('0');
     const [timerMinutes, setTimerMinutes] = useState('00');
     const [timerSeconds, setTimerSeconds] = useState('00');
 
-    const { id, amountAvailable, amountNeeded, bank, exchangeRate, listedBy, customerId, dateCreated } = listing;
+    const { id, amountAvailable, amountNeeded, exchangeRate, listedBy, customerId, dateCreated } = listing;
     const { finalized, negotiation, open } = LISTING_STATUS;
 
     const interval = useRef();
@@ -165,7 +164,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 172800000; // number of milliseconds in 2 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -205,10 +204,16 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     };
 
     const handleBuyButtonClick = (listing) => {
-        if (listing.amountAvailable.currencyType === 'EUR') {
-            return handleAddBid(listing);
+        if (wallets.length === 0) {
+            return toggleCreateWalletModal();
         }
-        return handleAcceptOffer(listing);
+        if (listing.amountAvailable.currencyType === 'NGN') {
+            if (wallet.balance.available < listing.amountNeeded.amount) {
+                return showError('Insufficient wallet balance');
+            }
+            return handleAcceptOffer(listing);
+        }
+        return handleAddBid(listing);
     };
     
     return (
@@ -257,14 +262,6 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`NGN${formatNumber(exchangeRate, 2)} to ${decode('&#8364;')}1`}
                     </Typography>
-                    <Typography variant="subtitle2" component="span">
-                        {amountAvailable?.currencyType === 'EUR' && 
-                            <>
-                                <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Paying From</span>
-                                {bank?.toUpperCase()}
-                            </>
-                        }
-                    </Typography>
                     {listing.status === finalized ?
                         <Button 
                             disabled
@@ -308,7 +305,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                             disableFocusRipple
                             fullWidth
                         >
-                            <Button 
+                            {/* <Button 
                                 className={classes.buttons}
                                 color="primary"
                                 size="large"
@@ -319,7 +316,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                                 disabled={listing.status !== open}
                             >
                                 Edit
-                            </Button>
+                            </Button> */}
                             <Button 
                                 className={classes.buttons}
                                 color="secondary"
@@ -362,7 +359,9 @@ Listing.propTypes = {
     getSeller: PropTypes.func.isRequired,
     handleEditListing: PropTypes.func.isRequired,
     listing: PropTypes.object.isRequired,
-    deleteListing: PropTypes.func.isRequired
+    deleteListing: PropTypes.func.isRequired,
+    showError: PropTypes.func.isRequired,
+    toggleCreateWalletModal: PropTypes.func.isRequired,
 };
 
 export default connect(undefined, { deleteListing, getSeller })(Listing);

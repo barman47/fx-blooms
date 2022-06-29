@@ -1,23 +1,24 @@
 import { useEffect } from 'react';
+import { connect, useSelector } from 'react-redux';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+
+import { getWallets } from '../../../actions/wallets';
 
 import { COLORS } from '../../../utils/constants';
 
 import Transactions from './Transactions';
-import Wallets from './Wallets';
+import WalletInfo from './WalletInfo';
 
 const useStyles = makeStyles(theme => ({
     root: {
         marginBottom: theme.spacing(8),
-        marginTop: theme.spacing(8),
         paddingLeft: theme.spacing(5),
         paddingRight: theme.spacing(5),
 
         [theme.breakpoints.down('md')]: {
-            marginBottom: theme.spacing(3),
-            // paddingLeft: theme.spacing(5),
-            // paddingRight: theme.spacing(5),
+            marginBottom: theme.spacing(3)
         },
 
         [theme.breakpoints.down('sm')]: {
@@ -28,8 +29,7 @@ const useStyles = makeStyles(theme => ({
 
     header: {
         color: COLORS.offBlack,
-        fontWeight: '600',
-        marginTop: theme.spacing(10)
+        fontWeight: '600'
     },
 
     container: {
@@ -43,10 +43,12 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Index = ({ handleSetTitle }) => {
+const Index = ({ getWallets, handleSetTitle }) => {
     const classes = useStyles();
+    const { customerId } = useSelector(state => state.customer);
     useEffect(() => {
-        handleSetTitle('Wallet');
+        getWallets(customerId);
+        handleSetTitle('Wallets');
         // eslint-disable-next-line
     }, []);
 
@@ -54,12 +56,15 @@ const Index = ({ handleSetTitle }) => {
         <section className={classes.root}>
             <Typography variant="h6" className={classes.header}>Wallet</Typography>
             <Typography variant="body2" component="p">Here are your wallets</Typography>
-            <div className={classes.container}>
-                <Wallets />
-                <Transactions />
-            </div>
+            <WalletInfo />
+            <Transactions />
         </section>
     );
 };
 
-export default Index;
+Index.propTypes = {
+    getWallets: PropTypes.func.isRequired,
+    handleSetTitle: PropTypes.func.isRequired
+};
+
+export default connect(undefined, { getWallets })(Index);
