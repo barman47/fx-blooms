@@ -80,6 +80,7 @@ const DepositAndWithdrawalTable = ({
     handleBatch,
     handleCheckError,
     fontsize = 13,
+    checkList,
 }) => {
     const classes = useStyles();
 
@@ -122,11 +123,6 @@ const DepositAndWithdrawalTable = ({
             handleCheckError();
             return;
         }
-        console.log(customer);
-        // setCheck((values) => ({
-        //   ...values,
-        //   [i]: checked,
-        // }));
 
         handleBatch(customer.id);
     };

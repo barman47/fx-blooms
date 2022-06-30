@@ -27,10 +27,11 @@ import moveToNextField from '../../../utils/moveToNextField';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
+import AlertModal from '../../../components/common/AlertModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import formatNumber from '../../../utils/formatNumber';
-import { DASHBOARD_HOME } from '../../../routes';
+import { DASHBOARD_HOME, PIN } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -80,7 +81,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
-    const { customerId, firstName, lastName, msg } = useSelector(state => state.customer);
+    const { customerId, hasSetPin, firstName, lastName, msg } = useSelector(state => state.customer);
     const { wallet } = useSelector(state => state.wallets);
 
     const [currency] = useState('EUR');
@@ -103,11 +104,13 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     const thirdField = useRef();
     const fourthField = useRef();
 
+    const alertModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Request Withdrawal');
+        handleSetPin();
         // eslint-disable-next-line
     }, []);
 
@@ -142,6 +145,13 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    const handleSetPin = () => {
+        if (!hasSetPin) {
+            alertModal.current.setModalText('Security PIN is required for all withdrawals. Kindly set up your PIN first.');
+            alertModal.current.openModal();   
+        }
+    };
 
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
@@ -189,6 +199,11 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
         navigate(DASHBOARD_HOME);
     };
 
+    const dismissAlertModal = () => {
+        alertModal.current.closeModal();
+        navigate(PIN);
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -203,6 +218,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
             {loading && <Spinner />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <AlertModal ref={alertModal} dismissAction={dismissAlertModal} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="h6" color="primary" className={classes.pageTitle}>Request Withdrawal</Typography>

@@ -29,6 +29,7 @@ import clsx from 'clsx';
 
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
+import AlertModal from '../../components/common/AlertModal';
 import Toast from '../../components/common/Toast';
 import AlertNotification from './notifications/AlertNotification';
 
@@ -90,7 +91,7 @@ import {
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
 import { checkPin } from '../../actions/pin';
-import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, HAS_SEEN_ESCROW_MESSAGE, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
@@ -428,6 +429,7 @@ const Dashboard = (props) => {
     const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
+    const alertModal = useRef();
     const customToast = useRef();
     const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
@@ -436,6 +438,7 @@ const Dashboard = (props) => {
     const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        showEscrowMessage();
         getNotificationCount(customerId);
         checkPin(customerId);
         if (matches) {
@@ -577,6 +580,15 @@ const Dashboard = (props) => {
                 break;
         }
     }, [connectionStatus]);
+
+    const showEscrowMessage = () => {
+        const hasSeenEscrowMessage = localStorage.getItem(HAS_SEEN_ESCROW_MESSAGE);
+        if (!hasSeenEscrowMessage) {
+            alertModal.current.setModalText('FXBLOOMS platform now supports escrow. Hence, users are required to fund their wallets in order to perform some activities.');
+            alertModal.current.openModal();
+            localStorage.setItem(HAS_SEEN_ESCROW_MESSAGE, 'true');
+        }
+    };
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -829,6 +841,7 @@ const Dashboard = (props) => {
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
+            <AlertModal ref={alertModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />

@@ -628,7 +628,7 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
 
         //     status: data.overallResult.status
         // };
-        console.log(res.data.data);
+        // console.log(res.data.data);
         dispatch({
             type: SET_ID_CHECK_DATA,
             payload: customerData,
