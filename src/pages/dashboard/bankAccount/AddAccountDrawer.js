@@ -158,8 +158,6 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
-    // eslint-disable-next-line
-    const [isIbanValid, setIsIbanValid] = useState(false);
 
     const successModal = useRef();
     const supportedBanks = useRef();
@@ -181,9 +179,13 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
             if (institutions.length === 0) {
                 getInstitutions();
             }
-            setReceivingAccountType();
         } else {
+            setErrors({});
             batch(() => {
+                dispatch({
+                    type: GET_ERRORS,
+                    payload: {}
+                });
                 dispatch({
                     type: SET_ACCOUNT_VALIDATION,
                     payload: {}
@@ -239,14 +241,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     useEffect(() => {
         setLoading(false);
         if (!isEmpty(accountValidation && accountValidation?.bank?.bank_name)) {
-            // setBankName(accountValidation.bank.bank_name);
             setBic(accountValidation.bank.bic);
-            setIsIbanValid(accountValidation.valid)
             setErrors({});
         } else {
             if (accountValidation.message) {
                 setErrors({ AccountNumber: accountValidation.message });
-                setIsIbanValid(false);
             }
         }
         
