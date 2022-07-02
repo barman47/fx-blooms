@@ -15251,124 +15251,124 @@ export const SUPPORTED_FUNDING_INSTITUTIONS = [
             "ACCOUNT_REQUEST_DETAILS"
         ]
     },
-    {
-        "id": "n26",
-        "name": "N26",
-        "fullName": "N26",
-        "countries": [
-            {
-                "displayName": "Iceland",
-                "countryCode2": "IS"
-            },
-            {
-                "displayName": "Ireland",
-                "countryCode2": "IE"
-            },
-            {
-                "displayName": "Austria",
-                "countryCode2": "AT"
-            },
-            {
-                "displayName": "Denmark",
-                "countryCode2": "DK"
-            },
-            {
-                "displayName": "Norway",
-                "countryCode2": "NO"
-            },
-            {
-                "displayName": "Belgium",
-                "countryCode2": "BE"
-            },
-            {
-                "displayName": "Italy",
-                "countryCode2": "IT"
-            },
-            {
-                "displayName": "United States",
-                "countryCode2": "US"
-            },
-            {
-                "displayName": "Netherlands",
-                "countryCode2": "NL"
-            },
-            {
-                "displayName": "Liechtenstein",
-                "countryCode2": "LI"
-            },
-            {
-                "displayName": "Poland",
-                "countryCode2": "PL"
-            },
-            {
-                "displayName": "Slovakia",
-                "countryCode2": "SK"
-            },
-            {
-                "displayName": "Germany",
-                "countryCode2": "DE"
-            },
-            {
-                "displayName": "Luxembourg",
-                "countryCode2": "LU"
-            },
-            {
-                "displayName": "Sweden",
-                "countryCode2": "SE"
-            },
-            {
-                "displayName": "France",
-                "countryCode2": "FR"
-            },
-            {
-                "displayName": "Switzerland",
-                "countryCode2": "CH"
-            },
-            {
-                "displayName": "Slovenia",
-                "countryCode2": "SI"
-            },
-            {
-                "displayName": "Finland",
-                "countryCode2": "FI"
-            },
-            {
-                "displayName": "Estonia",
-                "countryCode2": "EE"
-            },
-            {
-                "displayName": "Spain",
-                "countryCode2": "ES"
-            },
-            {
-                "displayName": "Greece",
-                "countryCode2": "GR"
-            }
-        ],
-        "environmentType": "LIVE",
-        "credentialsType": "OPEN_BANKING_NO_KEY",
-        "media": [
-            {
-                "source": "https://images.yapily.com/image/0ca5bc97-61cc-4fed-823a-541b4a905006?size=0",
-                "type": "icon"
-            },
-            {
-                "source": "https://images.yapily.com/image/3b6852da-3f47-4c8e-85bb-69ffec5decb9?size=0",
-                "type": "logo"
-            }
-        ],
-        "features": [
-            "ACCOUNT_TRANSACTIONS",
-            "CREATE_DOMESTIC_SINGLE_PAYMENT",
-            "EXISTING_PAYMENTS_DETAILS",
-            "INITIATE_ACCOUNT_REQUEST",
-            "ACCOUNTS",
-            "INITIATE_PRE_AUTHORISATION",
-            "ACCOUNT_TRANSACTIONS_WITH_MERCHANT",
-            "INITIATE_DOMESTIC_SINGLE_PAYMENT",
-            "ACCOUNT_REQUEST_DETAILS"
-        ]
-    },
+    // {
+    //     "id": "n26",
+    //     "name": "N26",
+    //     "fullName": "N26",
+    //     "countries": [
+    //         {
+    //             "displayName": "Iceland",
+    //             "countryCode2": "IS"
+    //         },
+    //         {
+    //             "displayName": "Ireland",
+    //             "countryCode2": "IE"
+    //         },
+    //         {
+    //             "displayName": "Austria",
+    //             "countryCode2": "AT"
+    //         },
+    //         {
+    //             "displayName": "Denmark",
+    //             "countryCode2": "DK"
+    //         },
+    //         {
+    //             "displayName": "Norway",
+    //             "countryCode2": "NO"
+    //         },
+    //         {
+    //             "displayName": "Belgium",
+    //             "countryCode2": "BE"
+    //         },
+    //         {
+    //             "displayName": "Italy",
+    //             "countryCode2": "IT"
+    //         },
+    //         {
+    //             "displayName": "United States",
+    //             "countryCode2": "US"
+    //         },
+    //         {
+    //             "displayName": "Netherlands",
+    //             "countryCode2": "NL"
+    //         },
+    //         {
+    //             "displayName": "Liechtenstein",
+    //             "countryCode2": "LI"
+    //         },
+    //         {
+    //             "displayName": "Poland",
+    //             "countryCode2": "PL"
+    //         },
+    //         {
+    //             "displayName": "Slovakia",
+    //             "countryCode2": "SK"
+    //         },
+    //         {
+    //             "displayName": "Germany",
+    //             "countryCode2": "DE"
+    //         },
+    //         {
+    //             "displayName": "Luxembourg",
+    //             "countryCode2": "LU"
+    //         },
+    //         {
+    //             "displayName": "Sweden",
+    //             "countryCode2": "SE"
+    //         },
+    //         {
+    //             "displayName": "France",
+    //             "countryCode2": "FR"
+    //         },
+    //         {
+    //             "displayName": "Switzerland",
+    //             "countryCode2": "CH"
+    //         },
+    //         {
+    //             "displayName": "Slovenia",
+    //             "countryCode2": "SI"
+    //         },
+    //         {
+    //             "displayName": "Finland",
+    //             "countryCode2": "FI"
+    //         },
+    //         {
+    //             "displayName": "Estonia",
+    //             "countryCode2": "EE"
+    //         },
+    //         {
+    //             "displayName": "Spain",
+    //             "countryCode2": "ES"
+    //         },
+    //         {
+    //             "displayName": "Greece",
+    //             "countryCode2": "GR"
+    //         }
+    //     ],
+    //     "environmentType": "LIVE",
+    //     "credentialsType": "OPEN_BANKING_NO_KEY",
+    //     "media": [
+    //         {
+    //             "source": "https://images.yapily.com/image/0ca5bc97-61cc-4fed-823a-541b4a905006?size=0",
+    //             "type": "icon"
+    //         },
+    //         {
+    //             "source": "https://images.yapily.com/image/3b6852da-3f47-4c8e-85bb-69ffec5decb9?size=0",
+    //             "type": "logo"
+    //         }
+    //     ],
+    //     "features": [
+    //         "ACCOUNT_TRANSACTIONS",
+    //         "CREATE_DOMESTIC_SINGLE_PAYMENT",
+    //         "EXISTING_PAYMENTS_DETAILS",
+    //         "INITIATE_ACCOUNT_REQUEST",
+    //         "ACCOUNTS",
+    //         "INITIATE_PRE_AUTHORISATION",
+    //         "ACCOUNT_TRANSACTIONS_WITH_MERCHANT",
+    //         "INITIATE_DOMESTIC_SINGLE_PAYMENT",
+    //         "ACCOUNT_REQUEST_DETAILS"
+    //     ]
+    // },
     {
         "id": "nassauische-sparkasse",
         "name": "Nassauische Sparkasse",

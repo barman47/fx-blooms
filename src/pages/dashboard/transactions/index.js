@@ -1,16 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Toaster } from 'react-hot-toast';
+// import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
 import { getTransactions } from '../../../actions/transactions';
-import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { CLEAR_TRANSACTIONS, GET_ERRORS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+
+import isEmpty from '../../../utils/isEmpty';
 
 import Transaction from './Transaction';
 import TransactionSkeleton from './TransactionSkeleton';
+import Toast from '../../../components/common/Toast';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -56,8 +59,12 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
     const { currencies, loading } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
     const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
+    const errorsState = useSelector(state => state.errors);
 
     const [currency, setCurrency] = useState('ALL');
+    const [errors, setErrors] = useState({});
+
+    const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Transactions');
@@ -76,6 +83,26 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            dispatch({
+                type: SET_LOADING,
+                payload: false
+            });
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     // Filter transactions
     useEffect(() => {
@@ -122,7 +149,16 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
 
     return (
         <>
-            <Toaster />
+            {/* <Toaster /> */}
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             <Box component="section" className={classes.root}>
                 <Typography variant="h6">Transaction History</Typography>
                 <Typography variant="body2" component="p">Here are your recent transactions</Typography>

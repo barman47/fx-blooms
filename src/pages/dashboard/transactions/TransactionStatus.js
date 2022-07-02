@@ -226,18 +226,16 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
     const getBuyerTransactionSteps = (buyer, seller) => {
         if (seller.currency === 'EUR') {
             setTransactionSteps([
-                `You transfered ${buyer.currency ? buyer.currency : ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
-                `${seller.userName} to confirm the NGN payment`, 
-                'EUR moved to your EUR wallet',
-                'Transaction Completed'
+                `You transfered ${buyer.currency ?? ''}${formatNumber(buyer.amountTransfered, 2)} to ${seller.userName}`, 
+                'EUR equivalent is moved to your EUR wallet (escrowed)',
+                'Your NGN payment confirmed, EUR now available'
             ]);
         } else {
             setTransactionSteps([
                 `You accepted offer`, 
-                `${seller.userName} to transfer ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
-                `You confirmed ${seller.currency ? seller.currency : ''} payment`,
-                `EUR moved to ${seller.userName}'s wallet`, 
-                'Transaction Completed',
+                `${seller.userName} to transferred ${seller.currency ?? ''}${formatNumber(seller.amountTransfered, 2)}`,
+                'The EUR equivalent debited from your wallet', 
+                `Transaction Completed - EUR now made available for ${seller.userName}`,
             ]);
         }
     };
@@ -245,18 +243,16 @@ const TransactionStatus = ({ getBid, handleSetTitle }) => {
     const getSellerTransactionSteps = (buyer, seller) => {
         if (seller.currency === 'EUR') {
             setTransactionSteps([
-                `${buyer.userName} to transfer NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
-                `You confirm NGN payment`, 
-                `EUR moved to ${seller.userNames}'s EUR wallet`,
-                'Transaction Completed'
+                `${buyer.userName} transferred NGN${formatNumber(buyer.amountTransfered, 2)} to you`, 
+                `EUR moved to ${buyer.userName}'s wallet (escrowed)`,
+                `Transaction Completed - EUR now made available for ${buyer.userName}`
             ]);
         } else {
             setTransactionSteps([
                 `${buyer.userName} accepted offer`, 
-                `You transfer the equivalent ${seller.currency ? seller.currency : ''}${formatNumber(seller.amountTransfered, 2)}`,
-                `${buyer.userName} confirmed the ${seller.currency ? seller.currency : ''} payment`,
-                'EUR moved to your EUR wallet',
-                'Transaction Completed' 
+                `You transfer ${seller.currency ?? ''}${formatNumber(seller.amountTransfered, 2)}`,
+                'The EUR equivalent credited to your wallet (Escrowed)',
+                'Transaction Completed - EUR now made available for use' 
             ]);
         }
     };
