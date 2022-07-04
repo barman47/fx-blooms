@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
     Button,
     Checkbox,
     CircularProgress,
-    Divider,
     FormControl,
     FormControlLabel,
     FormHelperText,
@@ -19,17 +18,15 @@ import {
     Typography
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { FormatListText } from 'mdi-material-ui';
 
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
-import PreviousListingItem from './PreviousListingItem';
 
 import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
-import { addListing } from '../../../actions/listings';
+import { addListing, getExchangeRate } from '../../../actions/listings';
 import { getWallets } from '../../../actions/wallets';
-import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG } from '../../../actions/types';
+import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG, SET_REQUIRED_CURRENCY } from '../../../actions/types';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -49,7 +46,7 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(0, 5),
 
         [theme.breakpoints.down('sm')]: {
-            padding: theme.spacing(0, 2)  
+            padding: 0
         },
         
         '& header': {
@@ -100,10 +97,19 @@ const useStyles = makeStyles(theme => ({
     container: {
         position: 'relative',
         top: theme.spacing(3),
+        paddingLeft: theme.spacing(25),
+        paddingRight: theme.spacing(25),
 
         [theme.breakpoints.down('md')]: {
-            height: '100%'
-        }
+            height: '100%',
+            paddingLeft: theme.spacing(10),
+            paddingRight: theme.spacing(10),
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            paddingLeft: theme.spacing(1),
+            paddingRight: theme.spacing(1)
+        },
     },
 
     listings: {
@@ -166,7 +172,6 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const location = useLocation();
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
@@ -175,17 +180,17 @@ const MakeListing = (props) => {
     const { currencies } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
     const errorsState = useSelector(state => state.errors);
-    const { addedListing, listings, msg, recommendedRate } = useSelector(state => state.listings);
+    const { addedListing, msg, recommendedRate, requiredCurrency } = useSelector(state => state.listings);
     const { wallet, wallets } = useSelector(state => state.wallets);
 
-    const { addListing, getAccounts, getCurrencies, getWallets, handleSetTitle } = props;
+    const { addListing, getAccounts, getCurrencies, getExchangeRate, getWallets } = props;
 
     const [checked, setChecked] = useState(false);
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
     const [showPendingIdModal, setShowPendingIdModal] = useState(false);
     const [showCreateWalletModal, setShowCreateWalletModal] = useState(false);
 
-    const [AvailableCurrency, setAvailableCurrency] = useState('');
+    const [AvailableCurrency, setAvailableCurrency] = useState(requiredCurrency);
     const [ExchangeAmount, setExchangeAmount] = useState('');
 
     const [RequiredCurrency, setRequiredCurrency] = useState('NGN');
@@ -200,8 +205,6 @@ const MakeListing = (props) => {
 
     const [reference, setReference] = useState('');
 
-    const [previousListings, setPreviousListings] = useState([]);
-
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -215,10 +218,7 @@ const MakeListing = (props) => {
     const { PENDING, REJECTED } = CUSTOMER_CATEGORY;
 
     useEffect(() => {
-        handleSetTitle('Add Listing');
         checkForWallets();
-        setPresetSelectedCurrency();
-
         if (idStatus !== APPROVED) {
             idVerificationModal.current.openModal();
         }
@@ -264,13 +264,6 @@ const MakeListing = (props) => {
             getCurrencies();
         }
     }, [currencies, getCurrencies]);
-    
-    useEffect(() => {
-        setLoading(false);
-        if (listings.length > 0) {
-            setPreviousListings(listings.filter(item => item.customerId === customerId)); 
-        }
-    }, [customerId, listings]);
 
     useEffect(() => {
         if (addedListing && msg) {
@@ -279,6 +272,17 @@ const MakeListing = (props) => {
             successModal.current.setModalText(msg);
         }
     }, [addedListing, dispatch, msg]);
+
+    useEffect(() => {
+        setAvailableCurrency(requiredCurrency);
+    }, [requiredCurrency]);
+
+    // Get exchange rate whenever available currency changes
+    useEffect(() => {
+        if (AvailableCurrency) {
+            getExchangeRate(AvailableCurrency);
+        }   
+    }, [AvailableCurrency, getExchangeRate]);
 
     // Set NGN as Required currency when EUR is the Available currency and vice versa
     // useEffect(() => {
@@ -369,15 +373,6 @@ const MakeListing = (props) => {
     const checkForWallets = () => {
         if (wallets.length === 0) {
             toggleShowCreateWalletModal();
-        }
-    };
-
-    const setPresetSelectedCurrency = () => {
-        if (location.state.eur) {
-            setAvailableCurrency('EUR');
-        }
-        if (location.state.ngn) {
-            setAvailableCurrency('NGN');
         }
     };
 
@@ -523,14 +518,12 @@ const MakeListing = (props) => {
                 <PendingIdModal open={showPendingIdModal} handleCloseModal={handleClosePendingIdModal} />
                 <header>
                     <div>
-                        <Typography variant="h6">Make a Listing - (Sell {AvailableCurrency})</Typography>
-                        <Typography variant="subtitle1" component="span">Complete the form below to post a listing</Typography>
+                        <Typography variant="h6">Sell {AvailableCurrency}</Typography>
                     </div>
-                    {/* <Typography variant="subtitle1" component="p" onClick={handleOpenAccountModalModal}>Seller Account Details Popup</Typography> */}
                 </header>
                 <Grid container direction="row" spacing={6} className={classes.container}>
-                    <Grid item xs={12} lg={4}>
-                        <form onSubmit={onSubmit} noValidate>
+                    <Grid item xs={12}>
+                        <form onSubmit={onSubmit} noValidate className={classes.form}>
                             <Grid container direction="row" spacing={1}>
                                 <Grid item xs={4}>
                                     <Typography variant="subtitle2" component="span" className={classes.helperText}>I Want to Exchange</Typography>
@@ -544,8 +537,27 @@ const MakeListing = (props) => {
                                         <Select
                                             labelId="AvailableCurrency"
                                             value={AvailableCurrency}
-                                            onChange={(e) => setAvailableCurrency(e.target.value)}
-                                        
+                                            onChange={(e) => {
+                                                setAvailableCurrency(e.target.value);
+                                                if (e.target.value === 'NGN') {
+                                                    setRequiredCurrency('EUR');
+                                                    dispatch({
+                                                        type: SET_REQUIRED_CURRENCY,
+                                                        payload: {
+                                                            availableCurrency: 'EUR',
+                                                            requiredCurrency: 'NGN'  
+                                                        }
+                                                    });
+                                                } else {
+                                                    dispatch({
+                                                        type: SET_REQUIRED_CURRENCY,
+                                                        payload: {
+                                                            availableCurrency: 'NGN',
+                                                            requiredCurrency: 'EUR'  
+                                                        }
+                                                    });
+                                                }
+                                            }}
                                         >
                                             <MenuItem value="" disabled>Select Currency</MenuItem>
                                             {currencies.length > 0 && currencies.map((currency, index) => (
@@ -667,31 +679,6 @@ const MakeListing = (props) => {
                                         <Button variant="text" color="primary" onClick={handleAddAccount} className={classes.addAccountButton}>Add New Account</Button>
                                     </Grid>
                                 }
-                                {/* {AvailableCurrency === 'EUR' && 
-                                    <Grid item xs={12}>
-                                        <Typography variant="subtitle2" component="span" className={classes.helperText}>Paying From</Typography>
-                                        <FormControl 
-                                            variant="outlined" 
-                                            error={errors.Bank ? true : false } 
-                                            fullWidth 
-                                            required
-                                            disabled={loading ? true : false}
-                                        >
-                                            <Select
-                                                labelId="Bank"
-                                                value={Bank}
-                                                onChange={(e) => setBank(e.target.value)}
-                                            
-                                            >
-                                                <MenuItem value="" disabled>Select Payment Method</MenuItem>
-                                                {PAYMENT_METHODS.map((method, index) => (
-                                                    <MenuItem key={index} value={method}>{method}</MenuItem>
-                                                ))}
-                                            </Select>
-                                            <FormHelperText>{errors.Bank}</FormHelperText>
-                                        </FormControl>
-                                    </Grid>
-                                } */}
                                 {AvailableCurrency === 'EUR' &&
                                     <Grid item xs={12}>
                                         <Typography variant="subtitle2" component="span">Payment Reference (OPTIONAL)</Typography>
@@ -726,7 +713,6 @@ const MakeListing = (props) => {
                                             error={errors.ReceiptAmount ? true : false}
                                         />
                                     </Tooltip>
-                                    {/* <FormHelperText>Listing Fee: EUR 0.00</FormHelperText> */}
                                 </Grid>
                                 {AvailableCurrency === 'NGN' && 
                                     <Grid item xs={12}>
@@ -759,25 +745,6 @@ const MakeListing = (props) => {
                             </Grid>
                         </form>
                     </Grid>
-                    <Grid item xs={12} md={12} lg={8} className={classes.listings}>
-                        {listings.length === 0 ?
-                            <section className={classes.noListing}>
-                                <Typography variant="h6">Previous Listings</Typography>
-                                <Divider />
-                                <div className={classes.noListingContent}>
-                                    <FormatListText className={classes.noListingIcon} />
-                                    <Typography className={classes.noListingText} variant="subtitle2" component="span">Your previous listings would appear here</Typography>
-                                </div>
-                            </section>
-                            : 
-                            <div>
-                                <Typography variant="h6">Previous Listings</Typography>
-                                <Divider />
-                                <br />
-                                {previousListings.map(item => (<PreviousListingItem key={item.id} listing={item} />))}
-                            </div>
-                        }
-                    </Grid>
                 </Grid>
             </section>
         </>
@@ -788,7 +755,8 @@ MakeListing.propTypes = {
     addListing: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
     getAccounts: PropTypes.func.isRequired,
+    getExchangeRate: PropTypes.func.isRequired,
     getWallets: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { addListing, getAccounts, getCurrencies, getWallets })(MakeListing);
+export default connect(undefined, { addListing, getAccounts, getExchangeRate, getCurrencies, getWallets })(MakeListing);

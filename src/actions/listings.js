@@ -319,3 +319,17 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
         return handleError(err, dispatch);
     }
 };
+
+export const getExchangeRate = (currency) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/ComputeExchangeRate?currency=${currency}`);
+        console.log('Set exchange rate', res);
+        // return dispatch({
+        //     type: SET_RECOMMENDED_RATE,
+        //     payload: res.data.data
+        // });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};

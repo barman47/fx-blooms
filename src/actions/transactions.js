@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
+import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS, SET_PENDING_TRANSACTION_COUNT } from './types';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
@@ -68,6 +68,19 @@ export const acceptChatPopupNotification = (chatId) => async (dispatch) => {
         return dispatch({
             type: SET_TRANSACTION_TERMS,
             payload: { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getPendingTransactionCount = () => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/GetPendingTransferCount`);
+        return dispatch({
+            type: SET_PENDING_TRANSACTION_COUNT,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);

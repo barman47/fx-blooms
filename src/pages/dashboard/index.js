@@ -392,6 +392,7 @@ const Dashboard = (props) => {
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { pendingTransactions } = useSelector(state => state.transactions);
     const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
@@ -414,7 +415,7 @@ const Dashboard = (props) => {
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
         { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url: WALLETS, text:'Wallets', icon: <Wallet /> },
-        { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
+        { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="rectangular" badgeContent={pendingTransactions} color="primary"><ArrowLeftRight /></Badge> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
