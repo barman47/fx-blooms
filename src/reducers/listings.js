@@ -23,13 +23,17 @@ import {
     MAKE_LISTING_OPEN,
     UPDATED_LISTING,
     CREDIT_LISTING,
-} from "../actions/types";
+    SET_BUY,
+    SET_SELL
+} from '../actions/types';
 
 import { BID_STATUS, LISTING_STATUS } from "../utils/constants";
 
 const initialState = {
-    availableCurrency: "NGN",
-    requiredCurrency: "EUR",
+    availableCurrency: 'NGN',
+    requiredCurrency: 'EUR',
+    buy: true,
+    sell: false,
     addedListing: false,
     editedListing: false,
     addedBid: false,
@@ -62,6 +66,20 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 availableCurrency: action.payload.availableCurrency,
                 requiredCurrency: action.payload.requiredCurrency,
+            };
+
+        case SET_BUY:
+            return {
+                ...state,
+                buy: true,
+                sell: false
+            };
+
+        case SET_SELL:
+            return {
+                ...state,
+                buy: false,
+                sell: true
             };
 
         case ADDED_BID:

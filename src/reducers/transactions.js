@@ -7,6 +7,7 @@ import {
     SET_EUR_TRANSACTIONS,
     SET_NGN_TRANSACTIONS,
     SET_TRANSACTION_TYPE,
+    SET_PENDING_TRANSACTION_COUNT
 } from '../actions/types';
 
 const initialState = {
@@ -18,7 +19,8 @@ const initialState = {
     connectionStatus: null,
     sent: true,
     received: false,
-    msg: null
+    msg: null,
+    pendingTransactions: 0
 };
 
 const transactionsReducer = (state = initialState, action) => {
@@ -96,6 +98,12 @@ const transactionsReducer = (state = initialState, action) => {
                 transactions: [],
                 eurTransactions: [],
                 ngnTransactions: [],
+            };
+
+        case SET_PENDING_TRANSACTION_COUNT:
+            return {
+                ...state,
+                pendingTransactions: action.payload
             };
 
         default:

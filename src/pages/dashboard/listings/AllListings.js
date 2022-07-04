@@ -1,28 +1,30 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import PropTypes from 'prop-types';
 import { 
 	Box,
 	Button,
-	ButtonGroup,
 	Checkbox,
-	Collapse,
+	Zoom,
 	FormControlLabel,
 	IconButton,
 	InputAdornment,
+	Paper,
 	TextField,
 	Typography,
 	useMediaQuery
 } from '@material-ui/core';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
-import { ChevronDown, ChevronRight, Magnify } from 'mdi-material-ui';
+import { ArrowTopRight, EyeOutline, EyeOffOutline, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
 
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
 // import { getCurrencies } from '../../../actions/currencies';
 import { getAccounts } from '../../../actions/bankAccounts';
+import { getPendingTransactionCount } from '../../../actions/transactions';
 import { getWallets } from '../../../actions/wallets';
 import { 
 	// ACTIVATE_EUR_WALLET,
@@ -30,44 +32,26 @@ import {
 	HIDE_NEGOTIATION_LISTINGS, 
 	SET_WALLET,
 	SET_LOADING,
-	SET_REQUIRED_CURRENCY 
+	SET_REQUIRED_CURRENCY ,
+	SET_BUY,
+	SET_SELL
 } from '../../../actions/types';
 import { getListingsOpenForBid, getMoreListings, removeExpiredListings } from '../../../actions/listings';
 import isEmpty from '../../../utils/isEmpty';
+import formatNumber from '../../../utils/formatNumber';
+import { COLORS } from '../../../utils/constants';
 // import validatePriceFilter from '../../../utils/validation/listing/priceFilter';
 
 import Listings from './Listings';
 import RiskNoticeModal from './RiskNoticeModal';
-// import Wallet from '../wallet/Wallet';
-import WalletInfo from '../wallet/WalletInfo';
 
 // import EUFlag from '../../../assets/img/EU-flag.svg';
 // import NGNFlag from '../../../assets/img/NGN-flag.svg';
 import ListingsSkeleton from './ListingsSkeleton';
+import MakeListing from './MakeListing';
+import { FUND_WALLET } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
-	header: {
-		display: 'grid',
-		gridTemplateColumns: '1fr 1fr',
-		marginBottom: theme.spacing(2),
-		// marginTop: theme.spacing(10),
-		padding: theme.spacing(0, 5),
-
-		[theme.breakpoints.down('md')]: {
-			display: 'grid',
-			gridTemplateColumns: '1fr',
-			paddingLeft: theme.spacing(2),
-			paddingRight: theme.spacing(2),
-			gap: theme.spacing(1)
-		},
-
-		[theme.breakpoints.down('sm')]: {
-			marginBottom: '0',
-			paddingLeft: theme.spacing(2),
-			paddingRight: theme.spacing(2)
-		}
-	},
-
 	root: {
 		maxWidth: '100vw',
 
@@ -78,26 +62,18 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	walletsContainer: {
-		display: 'grid',
-		gridTemplateColumns: '1fr',
-		// flexDirection: 'column',
-		// gap: theme.spacing(1),
-		paddingLeft: theme.spacing(5),
-		paddingRight: theme.spacing(5),
-		margin: '0 auto',
-		width: '70%',
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		margin: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
-			width: '90%'
+			margin: `${theme.spacing(2)} !important`
 		},
-
 		[theme.breakpoints.down('sm')]: {
-			gap: theme.spacing(2),
-			margin: '0',
-			paddingLeft: '0',
-			paddingRight: '0',
-			width: '100%'
-		}
+			margin: 0
+		},
 	},
 
 	wallets: {
@@ -116,29 +92,84 @@ const useStyles = makeStyles(theme => ({
 	walletToggleContainer: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'flex-end',
-		marginRight: theme.spacing(7),
 
 		[theme.breakpoints.down('md')]: {
 			marginRight: 0
+		},
+
+		'& section': {
+			display: 'flex',
+			flexDirection: 'column',
+			alignItems: 'center',
+			justifyContent: 'space-between',
+		},
+
+		'& section:first-child': {
+			marginRight: theme.spacing(2)
 		}
 	},
 
-	walletToggle: {
-		color: theme.palette.primary.main,
+	walletToggleText: {
+		fontWeight: 600
+	},
+
+	walletBalance: {
+		'& p': {
+			fontWeight: 300
+		},
+
+		'& h6': {
+			fontWeight: 600
+		},
+	},
+
+	topUpButton: {
+		backgroundColor: COLORS.lightTeal,
+		border: `1px solid ${theme.palette.primary.main}`,
 
 		'&:hover': {
-			backgroundColor: 'transparent'
+			backgroundColor: COLORS.lightTeal
+		}
+	},
+
+	topUpIcon: {
+		color: theme.palette.primary.main
+	},
+
+	toggleWalletButton: {
+		backgroundColor: 'rgba(246, 113, 113, 0.08)',
+		border: '1px solid rgb(246, 113, 113)',
+
+		'&:hover': {
+			backgroundColor: 'rgba(246, 113, 113, 0.08)'
+		}
+	},
+
+	toggleIcon: {
+		color: 'rgb(246, 113, 113)'
+	},
+
+	title: {
+		fontWeight: 300,
+		margin: theme.spacing(0, 5),
+
+		[theme.breakpoints.down('md')]: {
+			margin: theme.spacing(0, 2)
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			margin: 0
 		}
 	},
 
 	filterContainer: {
 		display: 'flex',
 		flexDirection: 'row',
-		justifyContent: 'space-evenly',
+		justifyContent: 'space-between',
 		alignItems: 'center',
-		marginBottom: theme.spacing(1),
-		marginTop: theme.spacing(1),
+		margin: theme.spacing(1, 5),
+		paddingBottom: theme.spacing(1),
+		paddingTop: theme.spacing(1),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
@@ -150,6 +181,7 @@ const useStyles = makeStyles(theme => ({
 			display: 'grid',
 			gridTemplateColumns: '1fr 1fr',
 			alignItems: 'center',
+			margin: theme.spacing(1, 0)
 		},
 
 		// Search field
@@ -171,8 +203,10 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	currencyButtons: {
+	buySellButtons: {
+		backgroundColor: COLORS.lightTeal,
 		height: theme.spacing(4.3),
+		padding: theme.spacing(0.8)
 	},
 
 	filterLabel: {
@@ -204,6 +238,19 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
+	sell: {
+		// border: '1px solid red',
+		margin: theme.spacing(0, 5),
+
+		[theme.breakpoints.down('md')]: {
+			margin: theme.spacing(0, 2)
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			margin: 0
+		}
+	},
+
 	listingContainer: {
 		marginTop: theme.spacing(1)
 	},
@@ -221,13 +268,14 @@ const AllListings = (props) => {
 	const dispatch = useDispatch();
 	const theme = useTheme();
 	const matches = useMediaQuery(theme.breakpoints.down('sm'));
+	const navigate = useNavigate();
 
-	const { customerId, firstName, userName, profile, isAuthenticated } = useSelector(state => state.customer);
-	const { listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
+	const { customerId, profile, isAuthenticated } = useSelector(state => state.customer);
+	const { buy, sell, listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
 	const { unreadNotifications } = useSelector(state => state.notifications);
-	const { wallets } = useSelector(state => state.wallets);
+	const { wallet, wallets } = useSelector(state => state.wallets);
 
 	const { 
 		getAccounts, 
@@ -238,11 +286,11 @@ const AllListings = (props) => {
 		getNotifications,
 		getWallets,
 		handleSetTitle,
-		removeExpiredListings 
+		removeExpiredListings,
+		getPendingTransactionCount
 	} = props;
 
 	const [Amount, setAmount] = useState('');
-	const [timeOfDay, setTimeOfDay] = useState('');
 	const [hideNegotiationListings, setHideNegotiationListings] = useState(false);
 	const [errors, setErrors] = useState({});
 
@@ -253,7 +301,7 @@ const AllListings = (props) => {
 
 	useEffect(() => {
 		removeExpiredListings();
-		greet();
+		getPendingTransactionCount();
 		loadedEvent.current = getListings;
 		window.addEventListener('DOMContentLoaded', loadedEvent.current);
 		getCustomerStats();
@@ -433,112 +481,94 @@ const AllListings = (props) => {
 		});
 	}
 
-	const greet = () => {
-        const time = new Date();
-        const hour = time.getHours();
-
-        if (hour < 12) {
-            setTimeOfDay('morning');
-        } else if (hour >= 12 && hour < 16) {
-            setTimeOfDay('afternoon');
-        } else {
-            setTimeOfDay('evening');
-        }
-    };
-
 	return (
 		<>
 			<RiskNoticeModal />
-			<section className={classes.header}>
-				<div>
-					<Typography variant="body1" component="p">Good {timeOfDay}, <strong>{firstName ? firstName : userName}</strong></Typography> 
-				</div>
-				{/* <div>
-					<NewNotification 
-						title="Set up  2FA"
-						message="Required to keep your account more secure. Click Setup 2FA to proceed."
-						buttonText="Setup 2FA"
-						buttonAction={() => {}}
-						icon={<Camera />}
-						iconBackgroundColor="#F79410"
-						iconColor="white"
-					/>
-				</div> */}
-				
-			</section>
 			<Box component="section" className={classes.root}>
-				<Box component="div" className={classes.walletToggleContainer}>
-					<Button
-						variant="text"
-						size="small"
-						startIcon={showWallets ? <ChevronDown /> : <ChevronRight />}
-						classes={{
-							root: classes.walletToggle
-						}}
-						onClick={() => setShowWallets(!showWallets)}
-						>
-						{showWallets ? 'Hide Wallets' : 'Show Wallets'}
-					</Button>
+				<Box component="section" className={classes.walletsContainer}>
+					<Zoom in={showWallets}>
+						<Box component="div" className={classes.walletBalance}>
+							<Typography variant="body2" component="p">Wallet Balance</Typography>
+							{!isEmpty(wallet) && <Typography variant="h6">{`${wallet.currency.value} ${formatNumber(wallet.balance.available, 2)}`}</Typography>}
+						</Box>
+					</Zoom>
+					<Box component="div" className={classes.walletToggleContainer}>
+						<Box component="section">
+							<IconButton 
+								disableFocusRipple
+								disableTouchRipple
+								disableRipple
+								className={classes.topUpButton}
+								onClick={() => navigate(FUND_WALLET)}
+								size={matches ? 'small' : 'medium'}
+							>
+								<ArrowTopRight className={classes.topUpIcon} />
+							</IconButton>
+							<Typography variant="body2" component="span" className={classes.walletToggleText}>Top Up</Typography>
+						</Box>
+						<Box component="section">
+							<IconButton 
+								disableFocusRipple
+								disableTouchRipple
+								disableRipple
+								className={classes.toggleWalletButton}
+								onClick={() => setShowWallets(!showWallets)}
+								size={matches ? 'small' : 'medium'}
+							>
+								{showWallets ? <EyeOffOutline className={classes.toggleIcon} /> : <EyeOutline className={classes.toggleIcon} />}
+							</IconButton>
+							<Typography variant="body2" component="span" className={classes.walletToggleText}>{showWallets ? 'Hide Wallet' : 'Show Wallet'}</Typography>
+						</Box>
+					</Box>
 				</Box>
-				<Collapse in={showWallets}>
-					<section className={classes.walletsContainer}>
-						{/* <section className={classes.wallets}>
-							<Wallet 
-								type="EUR"
-								flag={EUFlag}
-								active={eurActive}
-								handleOnclick={() => dispatch({ type: ACTIVATE_EUR_WALLET })}
-							/>
-						</section> */}
-						<WalletInfo />
-					</section>
-				</Collapse>
-				<section className={classes.listings} id="scrollableParent">
-					<InfiniteScroll 
-						className={classes.listingContainer}
-						dataLength={dataLength}
-						next={getMore}
-						hasMore={hasNext}
-						scrollThreshold={1}
-						loader={<h4 style={{ textAlign: 'center' }}>Fetching Listings . . .</h4>}
-						refreshFunction={getListings}
-						// pullDownToRefresh
-						// pullDownToRefreshThreshold={80}
-						// releaseToRefreshContent={
-						// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
-						// }
-						// pullDownToRefreshContent={
-						// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
-						// }
-						endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
-						scrollableTarget="scrollableParent"
-						// height={1000}
-					>
-						<Box component="div" className={classes.filterContainer}>
-							<ButtonGroup disableElevation className={classes.currencyButtons}>
-								<Button
-									color="primary"
-									size="small"
-									disableRipple
-									disableFocusRipple
-									onClick={() => setCurrency('NGN', 'EUR')}
-									variant={requiredCurrency === 'EUR' ? 'contained' : 'outlined'}
-									// disabled={requiredCurrency === 'NGN'}
-								>
-									BUY EUR
-								</Button>
-								<Button
-									color="primary"
-									size="small"
-									disableRipple
-									disableFocusRipple
-									onClick={() => setCurrency('EUR', 'NGN')}
-									variant={requiredCurrency === 'NGN' ? 'contained' : 'outlined'}
-									// disabled={requiredCurrency === 'EUR'}
-								>
-									BUY NGN
-								</Button>
-							</ButtonGroup>
+				<Typography variant="body2" component="p" className={classes.title}>Marketplace</Typography>
+				<Box component={Paper} className={classes.filterContainer}>
+					<Box component="div" className={classes.buySellButtons}>
+						<Button
+							color="primary"
+							size="small"
+							disableRipple
+							disableFocusRipple
+							onClick={() => dispatch({ type: SET_BUY })}
+							variant={buy ? 'contained' : 'text'}
+						>
+							BUY
+						</Button>
+						<Button
+							color="secondary"
+							size="small"
+							disableRipple
+							disableFocusRipple
+							onClick={() => dispatch({ type: SET_SELL })}
+							variant={sell ? 'contained' : 'text'}
+						>
+							SELL
+						</Button>
+					</Box>
+					<Box component="div" className={classes.currencyButtons}>
+						<Button
+							color="primary"
+							size="small"
+							disableRipple
+							disableFocusRipple
+							onClick={() => setCurrency('NGN', 'EUR')}
+							variant={requiredCurrency === 'EUR' ?  'contained' : 'text'}
+						>
+							EUR
+						</Button>
+						<Button
+							color="primary"
+							size="small"
+							disableRipple
+							disableFocusRipple
+							onClick={() => setCurrency('EUR', 'NGN')}
+							variant={requiredCurrency === 'NGN' ?  'contained' : 'text'}
+						>
+							NGN
+						</Button>
+					</Box>
+					{buy &&
+						<>
 							<form onSubmit={handleFilter}>
 								<TextField 
 									value={Amount}
@@ -594,16 +624,42 @@ const AllListings = (props) => {
 										color="primary"
 									/>
 								}
-								label="Hide Unavailable Listings"
+								label="Hide Unavailable Offers"
 							/>
-						</Box>
-						{loading === true ?
-							<ListingsSkeleton />
-							:
-							<Listings />
-						}
-					</InfiniteScroll>
-				</section>
+						</>
+					}
+				</Box>
+				{sell && <Box className={classes.sell}><MakeListing /></Box>}
+				{buy &&
+					<section className={classes.listings} id="scrollableParent">
+						<InfiniteScroll 
+							className={classes.listingContainer}
+							dataLength={dataLength}
+							next={getMore}
+							hasMore={hasNext}
+							scrollThreshold={1}
+							loader={<h4 style={{ textAlign: 'center' }}>Fetching Listings . . .</h4>}
+							refreshFunction={getListings}
+							// pullDownToRefresh
+							// pullDownToRefreshThreshold={80}
+							// releaseToRefreshContent={
+							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8593; Release to refresh</h3>
+							// }
+							// pullDownToRefreshContent={
+							// 	matches && <h3 style={{ textAlign: 'center' }}>&#8595; Pull down to refresh</h3>
+							// }
+							endMessage={<h4 style={{ textAlign: 'center' }}>No More Listings</h4>}
+							scrollableTarget="scrollableParent"
+							// height={1000}
+						>
+							{loading === true ?
+								<ListingsSkeleton />
+								:
+								<Listings />
+							}
+						</InfiniteScroll>
+					</section>
+				}
 			</Box>
 		</>
 	);
@@ -617,6 +673,7 @@ AllListings.propTypes = {
 	getMoreListings: PropTypes.func.isRequired,
 	getNotifications: PropTypes.func.isRequired,
 	getWallets: PropTypes.func.isRequired,
+	getPendingTransactionCount: PropTypes.func.isRequired,
 	handleSetTitle:PropTypes.func.isRequired
 };
 
@@ -628,5 +685,6 @@ export default connect(undefined, {
 	getMoreListings, 
 	getNotifications,
 	getWallets,
+	getPendingTransactionCount,
 	removeExpiredListings 
 })(AllListings);
