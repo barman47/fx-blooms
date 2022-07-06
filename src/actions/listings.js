@@ -22,7 +22,7 @@ import {
     SET_MORE_LISTINGS,
     SET_RECOMMENDED_RATE,
     SET_REQUIRED_CURRENCY,
-    UPDATED_LISTING 
+    UPDATED_LISTING
 } from './types';
 import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -203,7 +203,6 @@ export const getMoreListings = (query) => async (dispatch) => {
 
 export const acceptOffer = (data, listing) => async (dispatch) => {
     try {
-        console.log(listing);
         await reIssueCustomerToken()
         const res = await axios.post(`${URL}/AcceptOffer`, data);
         batch(() => {
@@ -216,7 +215,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within the hour`
             });
         });
     } catch (err) {

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -31,7 +31,7 @@ import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
 import getAccount from '../../../utils/getAccount';
-import { DASHBOARD_HOME, FUND_WALLET } from '../../../routes';
+import { FUND_WALLET } from '../../../routes';
 import validateAddListing from '../../../utils/validation/listing/add';
 
 import PendingIdModal from '../idVerification/PendingIdModal';
@@ -172,7 +172,6 @@ const useStyles = makeStyles(theme => ({
 
 const MakeListing = (props) => {
     const classes = useStyles();
-    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     const { idStatus } = useSelector(state => state.customer.stats);
@@ -424,7 +423,6 @@ const MakeListing = (props) => {
                 type: ADDED_LISTING
             });
             getWallets(customerId);
-            navigate(DASHBOARD_HOME);
         }
     };
 

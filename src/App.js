@@ -18,7 +18,6 @@ import {
     VERIFY_2FA,
     SIGNUP_SUCCESS,
     SIGNUP_FAILURE,
-    MAKE_LISTING,
     NOTIFICATIONS,
     DASHBOARD,
     DASHBOARD_HOME,
@@ -97,7 +96,6 @@ const Dashboard = lazy(() => import('./pages/dashboard'));
 
 const AllListings = lazy(() => import('./pages/dashboard/listings/AllListings'));
 const EditListing = lazy(() => import('./pages/dashboard/listings/EditListing'));
-const MakeListing = lazy(() => import('./pages/dashboard/listings/MakeListing'));
 const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails')); 
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
@@ -267,7 +265,6 @@ const App = ({ getCustomerInformation }) => {
                             <Route path={DASHBOARD} element={<PrivateRoute><Dashboard title={title} /></PrivateRoute>}>
                                 <Route index path={DASHBOARD_HOME} element={<AllListings handleSetTitle={handleSetTitle} />} />
                                 <Route path={EDIT_LISTING} element={<EditListing handleSetTitle={handleSetTitle} />} />
-                                <Route path={MAKE_LISTING} element={<MakeListing handleSetTitle={handleSetTitle} />}/>
                                 <Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle}/>}/>
                                 <Route path={PROFILE} element={<Profile handleSetTitle={handleSetTitle} />} />
                                 <Route path={ID_VERIFICATION} element={<IdVerification handleSetTitle={handleSetTitle} />} />

@@ -49,7 +49,6 @@ import {
     ChevronLeft, 
     ChevronRight, 
     ChevronDown, 
-    FormatListText, 
     HomeOutline, 
     LockOutline, 
     Logout, 
@@ -61,7 +60,6 @@ import {
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
-    MAKE_LISTING, 
     DASHBOARD_HOME, 
     NOTIFICATIONS, 
     SECURITY,
@@ -95,7 +93,6 @@ import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, HAS_SEEN_E
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
-import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
 // import CreateWalletModal from './wallet/CreateWalletModal';
@@ -407,15 +404,15 @@ const Dashboard = (props) => {
     
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
-        { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
+        { url: WALLETS, text:'Wallets', icon: <Wallet /> }
     ];
 
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
-        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url: WALLETS, text:'Wallets', icon: <Wallet /> },
-        { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="rectangular" badgeContent={pendingTransactions} color="primary"><ArrowLeftRight /></Badge> },
+        { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
+        // { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="rectangular" badgeContent={pendingTransactions} color="primary"><ArrowLeftRight /></Badge> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
         { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
@@ -432,7 +429,6 @@ const Dashboard = (props) => {
     const accountSetupModal = useRef();
     const alertModal = useRef();
     const customToast = useRef();
-    const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
     const transactionCompleteModal = useRef();
 
@@ -809,24 +805,13 @@ const Dashboard = (props) => {
     };
 
     const handleLinkClick = (link) => {
-        if (link === MAKE_LISTING && location.pathname.includes(MAKE_LISTING)) {
-            return;
-        }
-
         if (matches) {
             if (open) {
                 setTimeout(() => {
                     setOpen(false);
                 }, 500);
             }
-            if (link === MAKE_LISTING) {
-                return selectCurrencyListingDrawer?.current?.toggleDrawer();
-            }
             navigate(link); 
-        }
-
-        if (link === MAKE_LISTING) {
-            return selectCurrencyListingDrawer?.current?.toggleDrawer();
         }
         navigate(link); 
     };
@@ -844,7 +829,6 @@ const Dashboard = (props) => {
             <AccountSetupModal ref={accountSetupModal} />
             <AlertModal ref={alertModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
             {/* {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />} */}
             <SessionModal />
@@ -975,6 +959,36 @@ const Dashboard = (props) => {
                                             <Divider />
                                         </Fragment>
                                     );
+                                }
+                                if (link.url === TRANSACTIONS) {
+                                    return (
+                                        <Fragment key={index}>
+                                            <ListItem 
+                                                // className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                key={index} 
+                                                button 
+                                                disableRipple
+                                                onClick={() => handleLinkClick(link.url)}
+                                            >
+                                                <Badge overlap="rectangular" badgeContent={pendingTransactions} color="secondary">
+                                                    {open ? 
+                                                        <ListItemIcon className={classes.icon}>
+                                                            {link.icon}
+                                                        </ListItemIcon>
+                                                        :
+                                                        <Tooltip title={link.text} placement="right" arrow>
+                                                            <ListItemIcon className={classes.icon}>
+                                                                {link.icon}
+                                                            </ListItemIcon>
+                                                        </Tooltip>
+                                                    }
+                                                    {open && <ListItemText primary={link.text} />}
+                                                </Badge>
+                                            </ListItem>
+                                            <Divider />
+                                        </Fragment>
+                                    );    
                                 }
                                 return (
                                     <Fragment key={index}>

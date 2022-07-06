@@ -19,6 +19,7 @@ import {
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import { ArrowTopRight, EyeOutline, EyeOffOutline, Magnify } from 'mdi-material-ui';
 import _ from 'lodash';
+import clsx from 'clsx';
 
 import { getNotifications } from '../../../actions/notifications';
 import { getCustomerInformation, getCustomerStats } from '../../../actions/customer';
@@ -53,7 +54,13 @@ import { FUND_WALLET } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
+		marginTop: theme.spacing(-2.5),
 		maxWidth: '100vw',
+		overflowY: 'hidden',
+
+		[theme.breakpoints.down('md')]: {
+			margin: 0,
+		},
 
 		[theme.breakpoints.down('sm')]: {
 			paddingLeft: theme.spacing(1),
@@ -151,7 +158,7 @@ const useStyles = makeStyles(theme => ({
 
 	title: {
 		fontWeight: 300,
-		margin: theme.spacing(0, 5),
+		margin: theme.spacing(2, 5),
 
 		[theme.breakpoints.down('md')]: {
 			margin: theme.spacing(0, 2)
@@ -162,14 +169,28 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	filterContainer: {
+	listingHeader: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
+		alignContent: 'center',
+		margin: theme.spacing(2, 5),
+
+		[theme.breakpoints.down('md')]: {
+			display: 'flex',
+			flexDirection: 'column',
+			margin: theme.spacing(2),
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			margin: 0
+		}
+	},
+
+	buttonContainer: {
+		display: 'flex',
+		flexDirection: 'row',
 		alignItems: 'center',
-		margin: theme.spacing(1, 5),
-		paddingBottom: theme.spacing(1),
-		paddingTop: theme.spacing(1),
 
 		[theme.breakpoints.down('md')]: {
 			display: 'grid',
@@ -178,16 +199,44 @@ const useStyles = makeStyles(theme => ({
 		},
 
 		[theme.breakpoints.down('sm')]: {
-			display: 'grid',
-			gridTemplateColumns: '1fr 1fr',
+			display: 'flex',
+			flexDirection: 'row',
+			justifyContent: 'space-between',
 			alignItems: 'center',
 			margin: theme.spacing(1, 0)
-		},
+		}
+	},
 
+	buySellButtons: {
+		backgroundColor: COLORS.lightTeal,
+		borderBottomRightRadius: theme.shape.borderRadius,
+		borderTopRightRadius: theme.shape.borderRadius,
+		height: theme.spacing(4.3),
+		padding: theme.spacing(0.8),
+		marginRight: theme.spacing(2),
+
+		[theme.breakpoints.down('sm')]: {
+			marginRight: 0
+		}
+	},
+
+	currencyButton: {
+		borderRadius: 0,
+		
+		'&:hover': {
+			backgroundColor: 'transparent'
+		}
+	},
+
+	activeButton: {
+		borderBottom: `2px solid ${theme.palette.primary.main}`
+	},
+
+	form: {
 		// Search field
 		'& .MuiOutlinedInput-input': {
-			paddingBottom: theme.spacing(1),
-			paddingTop: theme.spacing(1)
+			paddingBottom: theme.spacing(0.9),
+			paddingTop: theme.spacing(0.9)
 		},
 
 		// Search button
@@ -201,12 +250,6 @@ const useStyles = makeStyles(theme => ({
 				margin: '0'
 			}
 		}
-	},
-
-	buySellButtons: {
-		backgroundColor: COLORS.lightTeal,
-		height: theme.spacing(4.3),
-		padding: theme.spacing(0.8)
 	},
 
 	filterLabel: {
@@ -239,7 +282,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	sell: {
-		// border: '1px solid red',
 		margin: theme.spacing(0, 5),
 
 		[theme.breakpoints.down('md')]: {
@@ -522,54 +564,58 @@ const AllListings = (props) => {
 					</Box>
 				</Box>
 				<Typography variant="body2" component="p" className={classes.title}>Marketplace</Typography>
-				<Box component={Paper} className={classes.filterContainer}>
-					<Box component="div" className={classes.buySellButtons}>
-						<Button
-							color="primary"
-							size="small"
-							disableRipple
-							disableFocusRipple
-							onClick={() => dispatch({ type: SET_BUY })}
-							variant={buy ? 'contained' : 'text'}
-						>
-							BUY
-						</Button>
-						<Button
-							color="secondary"
-							size="small"
-							disableRipple
-							disableFocusRipple
-							onClick={() => dispatch({ type: SET_SELL })}
-							variant={sell ? 'contained' : 'text'}
-						>
-							SELL
-						</Button>
-					</Box>
-					<Box component="div" className={classes.currencyButtons}>
-						<Button
-							color="primary"
-							size="small"
-							disableRipple
-							disableFocusRipple
-							onClick={() => setCurrency('NGN', 'EUR')}
-							variant={requiredCurrency === 'EUR' ?  'contained' : 'text'}
-						>
-							EUR
-						</Button>
-						<Button
-							color="primary"
-							size="small"
-							disableRipple
-							disableFocusRipple
-							onClick={() => setCurrency('EUR', 'NGN')}
-							variant={requiredCurrency === 'NGN' ?  'contained' : 'text'}
-						>
-							NGN
-						</Button>
+				<Box className={classes.listingHeader} component={Paper}>
+					<Box className={classes.buttonContainer}>
+						<Box component="div" className={classes.buySellButtons}>
+							<Button
+								color="primary"
+								size="small"
+								disableRipple
+								disableFocusRipple
+								onClick={() => dispatch({ type: SET_BUY })}
+								variant={buy ? 'contained' : 'text'}
+							>
+								BUY
+							</Button>
+							<Button
+								color="secondary"
+								size="small"
+								disableRipple
+								disableFocusRipple
+								onClick={() => dispatch({ type: SET_SELL })}
+								variant={sell ? 'contained' : 'text'}
+							>
+								SELL
+							</Button>
+						</Box>
+						<Box component="div">
+							<Button
+								color="primary"
+								size="small"
+								disableRipple
+								disableFocusRipple
+								onClick={() => setCurrency('NGN', 'EUR')}
+								variant="text"
+								className={clsx(classes.currencyButton, { [classes.activeButton]: requiredCurrency === 'EUR'})}
+							>
+								EUR
+							</Button>
+							<Button
+								color="primary"
+								size="small"
+								disableRipple
+								disableFocusRipple
+								onClick={() => setCurrency('EUR', 'NGN')}
+								variant="text"
+								className={clsx(classes.currencyButton, { [classes.activeButton]: requiredCurrency === 'NGN'})}
+							>
+								NGN
+							</Button>
+						</Box>
 					</Box>
 					{buy &&
 						<>
-							<form onSubmit={handleFilter}>
+							<form onSubmit={handleFilter} className={classes.form}>
 								<TextField 
 									value={Amount}
 									onChange={(e) => handleSetAmount(e.target.value)}
@@ -610,7 +656,7 @@ const AllListings = (props) => {
 												</Button>
 											}
 											
-										</InputAdornment>,
+										</InputAdornment>
 									}}
 								/>
 							</form>
