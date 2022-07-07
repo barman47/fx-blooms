@@ -76,7 +76,7 @@ const DepositAndWithdrawalTable = ({
     otherRows,
     displayChck = true,
     loading,
-    gridColumns = "1fr 1fr .7fr 1fr 1fr 1fr 0.5fr",
+    gridColumns = "1fr 1fr .7fr 1fr 1fr 0.5fr",
     handleBatch,
     handleCheckError,
     fontsize = 13,
@@ -231,7 +231,7 @@ const DepositAndWithdrawalTable = ({
                                 : ""}
                         </Typography>
 
-                        <Typography
+                        {/* <Typography
                             component="span"
                             className={clsx(
                                 classes.tableCell
@@ -246,7 +246,7 @@ const DepositAndWithdrawalTable = ({
                             {customer.paymentType
                                 ? handlePaymentStatus(customer.paymentType)
                                 : ""}
-                        </Typography>
+                        </Typography> */}
 
                         <Typography
                             component="span"
@@ -276,37 +276,6 @@ const DepositAndWithdrawalTable = ({
                                 <DotsHorizontal />
                             </IconButton>
                         </Typography>
-                        {/* <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.user ? customer.user : ''} lines={1} />
-                </Typography>
-                <Typography style={{ textTransform: 'capitalize' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.transactionId ? customer.transactionId : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer.amount ? customer.amount : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[fourthRow] ? customer[fourthRow] : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[fifthRow] ? customer[fifthRow] : ''} lines={1} />
-                </Typography>
-                <Typography component="span" className={classes.tableCell} variant="subtitle1">
-                    <TextClamp text={customer[sixthRow] ? customer[sixthRow] : ''} lines={1} />
-                </Typography>
-                <Typography style={{ textAlign: 'center' }} component="span" className={classes.tableCell} variant="subtitle1">
-                    <IconButton 
-                            variant="text" 
-                            size="small" 
-                            className={classes.button} 
-                            aria-controls="customer-menu" 
-                            aria-haspopup="true" 
-                            onClick={(e) => handleButtonClick(customer, e)}
-                            disableRipple
-                        >
-                            <DotsHorizontal />
-                        </IconButton>
-                </Typography> */}
                     </Box>
                 ))
             )}

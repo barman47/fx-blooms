@@ -46,16 +46,15 @@ import {
     CLEAR_ERROR_MSG,
     CLEAR_CUSTOMER,
     CLEAR_WALLET,
+    VIEW_LISTING,
 } from "../../../actions/types";
 import { exportRecords } from "../../../utils/exportRecords";
 import isEmpty from "../../../utils/isEmpty";
 import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
-// import Status from '../../../components/admin-dashboard/Status';
+
 import formatId from "../../../utils/formatId";
 import handleStatusStyle from "../../../utils/statusDisplay";
 import Toast from "../../../components/common/Toast";
-// import GenericPopUp from "../../../components/admin-dashboard/GenericPopUp";
-// import GenericTextField from "../../../components/admin-dashboard/GenericTextField";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -628,10 +627,9 @@ const Listings = () => {
     // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
 
-    const [workFlow, setWorkFlow] = useState("");
     const [sellerName, setSellerName] = useState("");
 
-    const [viewMoreData, setViewMoreData] = useState({});
+    // const [viewMoreData, setViewMoreData] = useState({});
     const [openViewMore, setOpenViewMore] = useState(false);
     const [openFilterBx, setOpenFilterBx] = useState(false);
     const [openXport, closeXport] = useState(false);
@@ -664,6 +662,7 @@ const Listings = () => {
         inProgressListings,
         deletedListings,
         credit,
+        listing,
     } = useSelector((state) => state.listings);
     const { msg } = useSelector((state) => state.errors);
     const { wallet } = useSelector((state) => state.wallets);
@@ -676,44 +675,11 @@ const Listings = () => {
         setValue(newValue);
     };
 
-    // const handlePageNUmberList = useCallback(() => {
-    //     const pageNumArr = [];
-    //     if (pageCount >= 1) {
-    //         for (let i = 1; i <= pageCount; i++) {
-    //             pageNumArr.push(i);
-    //         }
-    //     }
-    //     setPageNumberList(pageNumArr);
-    //     setLastPage(pageCount);
-    // }, [pageCount]);
-
-    // const onNextPage = () => {
-    //     setCurrentPage(currentPage + 1);
-    // };
-
-    // const onPrevPage = () => {
-    //     setCurrentPage(currentPage - 1);
-    // };
-
     useEffect(() => {
         if (tab) {
             setCurrentPage(1);
         }
     }, [tab]);
-
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_SIZE,
-    //         payload: rowsPerPage
-    //     });
-    // }, [dispatch, rowsPerPage]);
-
-    // useEffect(() => {
-    //     dispatch({
-    //         type: SET_PAGE_NUMBER,
-    //         payload: currentPage
-    //     });
-    // }, [dispatch, currentPage]);
 
     useEffect(() => {
         switch (tab) {
@@ -901,51 +867,21 @@ const Listings = () => {
         await exportAllUserRecords(admin);
     };
 
-    // useEffect(() => {
-    //     if (currentPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, currentPage]);
-
-    // useEffect(() => {
-    //     if (rowsPerPage > 0) {
-    //         fetchData();
-    //     }
-    // }, [fetchData, rowsPerPage]);
-
     const handleSetTab = (tab) => {
         setTab(tab);
         setRowsPerPage(pages[0]);
     };
 
     const viewTableRow = (listing) => {
-        // console.log(listing.bids[0]?.customerId);
+        console.log(listing);
         batch(() => {
+            dispatch({ type: VIEW_LISTING, payload: listing });
             dispatch(getCustomer(listing.customerId));
             dispatch(getOneWallet(listing.walletId));
         });
-        setViewMoreData(listing);
+        // setViewMoreData(listing);
         setOpenViewMore(true);
     };
-
-    useEffect(() => {
-        if (!isEmpty(viewMoreData)) {
-            switch (viewMoreData?.amountNeeded?.currencyType) {
-                case "EUR":
-                    setWorkFlow(
-                        "BUY " + viewMoreData?.amountNeeded?.currencyType
-                    );
-                    break;
-                case "NGN":
-                    setWorkFlow(
-                        "BUY " + viewMoreData?.amountNeeded?.currencyType
-                    );
-                    break;
-                default:
-                    return;
-            }
-        }
-    }, [viewMoreData]);
 
     useEffect(() => {
         if (!isEmpty(customer?.username)) {
@@ -955,10 +891,10 @@ const Listings = () => {
     }, [customer]);
 
     useEffect(() => {
-        if (!isEmpty(viewMoreData?.bids)) {
-            dispatch(getCustomer(viewMoreData.bids[0]?.customerId, "BUYER"));
+        if (!isEmpty(listing?.bids)) {
+            dispatch(getCustomer(listing.bids[0]?.customerId, "BUYER"));
         }
-    }, [viewMoreData, dispatch]);
+    }, [listing, dispatch]);
 
     useEffect(() => {
         // console.log("buyer", buyer);
@@ -1058,6 +994,7 @@ const Listings = () => {
     };
 
     const handleCredit = (listing) => {
+        console.log("hell", listing);
         dispatch(
             creditListing(listing.walletId, {
                 amount: listing.amountNeeded.amount,
@@ -1085,9 +1022,7 @@ const Listings = () => {
     }, [msg]);
 
     const closeViewMoreModal = () => {
-        setViewMoreData({});
         setOpenViewMore(false);
-        setWorkFlow("");
         setSellerName("");
         batch(() => {
             dispatch({
@@ -1632,47 +1567,6 @@ const Listings = () => {
                                 paddingBottom: 24,
                             }}
                         >
-                            {/* <Box
-                                component="div"
-                                sx={{ display: "flex", gap: "15px" }}
-                            >
-                                <GenericButton
-                                    clickAction={onPrevPage}
-                                    isDisabled={currentPage === 1}
-                                    buttonName="Previous"
-                                />
-                                <GenericButton
-                                    clickAction={onNextPage}
-                                    isDisabled={currentPage === lastPage}
-                                    buttonName="Next"
-                                />
-                            </Box> */}
-                            {/* <Box
-                                component="span"
-                                sx={{
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    gap: "10px",
-                                }}
-                            >
-                                {pageNumberList &&
-                                    pageNumberList.map((pageNUmber, i) => (
-                                        <Typography
-                                            className={clsx(
-                                                classes.pageList,
-                                                pageNUmber === currentPage &&
-                                                    classes.selected
-                                            )}
-                                            onClick={() =>
-                                                setCurrentPage(pageNUmber)
-                                            }
-                                            variant="subtitle2"
-                                            key={i}
-                                        >
-                                            {pageNUmber}
-                                        </Typography>
-                                    ))}
-                            </Box> */}
                             <Pagination
                                 count={pageCount}
                                 page={currentPage}
@@ -1711,7 +1605,7 @@ const Listings = () => {
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Listing ID:"}
-                                        amlNumber={formatId(viewMoreData.id)}
+                                        amlNumber={formatId(listing.id)}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1728,10 +1622,10 @@ const Listings = () => {
                                         amlTitle={"Current Amount:"}
                                         amlNumber={
                                             currentAmount(
-                                                viewMoreData.amountNeeded
+                                                listing.amountAvailable
                                             ).currencyType +
                                             currentAmount(
-                                                viewMoreData.amountNeeded
+                                                listing.amountAvailable
                                             ).amount
                                         }
                                     />
@@ -1748,32 +1642,31 @@ const Listings = () => {
                                         classes={classes}
                                         amlTitle={"Current Status"}
                                         otherStyles={handleStatusStyle(
-                                            viewMoreData.status,
+                                            listing.status,
                                             classes
                                         )}
-                                        amlNumber={viewMoreData.status}
+                                        amlNumber={listing.status}
                                     />
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Listed Time"}
                                         amlNumber={
-                                            handleDate(viewMoreData.dateCreated)
+                                            handleDate(listing.dateCreated)
                                                 .time +
-                                            handleDate(viewMoreData.dateCreated)
+                                            handleDate(listing.dateCreated)
                                                 .space +
-                                            handleDate(viewMoreData.dateCreated)
-                                                .date
+                                            handleDate(listing.dateCreated).date
                                         }
                                     />
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Work Flow"}
-                                        amlNumber={workFlow}
+                                        amlNumber={listing.workFlow}
                                     />
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Current Rate"}
-                                        amlNumber={viewMoreData.exchangeRate}
+                                        amlNumber={listing.exchangeRate}
                                     />
                                     <AmlBoard
                                         classes={classes}
@@ -1806,8 +1699,8 @@ const Listings = () => {
                                 component="div"
                                 className={classes.viewMoreBidsContainer}
                             >
-                                {viewMoreData &&
-                                    viewMoreData.bids.map((listing, index) => {
+                                {listing &&
+                                    listing.bids.map((listing, index) => {
                                         return (
                                             <Box
                                                 key={index}
@@ -1974,8 +1867,8 @@ const Listings = () => {
                                             </Box>
                                         );
                                     })}
-                                {isEmpty(viewMoreData.bids) ||
-                                viewMoreData?.bids[0]?.status === CANCELED ? (
+                                {isEmpty(listing.bids) ||
+                                listing?.bids[0]?.status === CANCELED ? (
                                     ""
                                 ) : (
                                     <Box

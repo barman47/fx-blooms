@@ -255,37 +255,25 @@ const PersonalDetails = ({
     const classes = useStyles();
     const location = useLocation();
 
-    const { customer, idCheckData, msg, profileCheckData } = useSelector(
-        (state) => state.customers
-    );
+    const { customer, idCheckData, msg, profileCheckData, isLoading } =
+        useSelector((state) => state.customers);
     const errorsState = useSelector((state) => state.errors);
 
     const [anchorEl, setAnchorEl] = useState(null);
 
-    const [firstName] = useState(customer.firstName);
-    const [middleName] = useState(customer.otherName);
-    const [lastName] = useState(customer.lastName);
-    const [userName] = useState(customer.userName);
     const [occupation, setOccupation] = useState(customer.occupation ?? "");
-    const [dateOfBirth] = useState(
-        idCheckData?.dateOfBirth || profileCheckData?.dateOfBirth
-    );
+
     const [address, setAddress] = useState(customer.address ?? "");
     const [postalCode] = useState(customer.postalCode);
-    const [city] = useState(customer.city);
-    const [country] = useState(customer.countryId);
-    const [nationality] = useState(customer.nationality);
     const [phoneNumber, setPhoneNumber] = useState(customer.phoneNo ?? "");
     const [riskProfile, setRiskProfile] = useState(customer.riskProfile);
     // const [riskProfile] = useState(customer.riskProfile);
     const [remarks, setRemarks] = useState(customer.remarks);
-    const [email] = useState(customer.email);
     const [status, setStatus] = useState(customer.customerStatus);
-    const [dateJoined] = useState(customer?.dateCreated ?? customer?.createdOn);
 
     const [errors, setErrors] = useState({});
     const [editable, setEditable] = useState(false);
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [saveLoader, setSaveLoader] = useState(false);
 
     const toast = useRef();
@@ -293,17 +281,17 @@ const PersonalDetails = ({
     const { CONFIRMED, SUSPENDED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
     // const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];
 
-    // useEffect(() => {
-    //     if (!idCheckData) {
-    //         getIdCardValidationResponse(customer.id);
-    //     }
+    useEffect(() => {
+        if (!idCheckData) {
+            getIdCardValidationResponse(customer.id);
+        }
 
-    //     if (!profileCheckData) {
-    //         getResidencePermitValidationResponse(customer.id);
-    //     }
+        if (!profileCheckData) {
+            getResidencePermitValidationResponse(customer.id);
+        }
 
-    //     // eslint-disable-next-line
-    // }, []);
+        // eslint-disable-next-line
+    }, []);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -323,33 +311,31 @@ const PersonalDetails = ({
 
     useEffect(() => {
         if (errorsState?.msg) {
-            setLoading(false);
             toast.current.handleClick();
         }
     }, [errorsState, errors]);
 
     useEffect(() => {
-        // setEditable(false);
-        // const { customerStatus } = customer;
-        // const { address, occupation, riskProfile, remark, status } = customer;
-        // console.log('cs', remarks)
-        // setStatus(customer.customerStatus);
         if (!editable) {
-            setAddress(address);
+            setAddress(customer.address);
             setStatus(customer.customerStatus);
-            setOccupation(occupation);
-            setRiskProfile(riskProfile);
-            setRemarks(remarks);
+            setOccupation(customer.occupation);
+            setRiskProfile(customer.riskProfile);
+            setRemarks(customer.remarks);
+            setPhoneNumber(customer.phoneNumber);
         }
-    }, [
-        customer.customerStatus,
-        editable,
-        address,
-        remarks,
-        riskProfile,
-        occupation,
-        status,
-    ]);
+    }, [customer, editable]);
+
+    useEffect(() => {
+        if (!!customer) {
+            setAddress(customer.address);
+            setStatus(customer.customerStatus);
+            setOccupation(customer.occupation);
+            setRiskProfile(customer.riskProfile);
+            setRemarks(customer.remarks);
+            setPhoneNumber(customer.phoneNumber);
+        }
+    }, [customer]);
 
     const editMode = useCallback(() => {
         if (editable) {
@@ -359,7 +345,7 @@ const PersonalDetails = ({
 
     const suspendCustomer = () => {
         handleClose();
-        setLoading(true);
+        // setLoading(true);
         if (
             customer.customerStatus !== SUSPENDED &&
             customer.customerStatus === CONFIRMED
@@ -381,7 +367,7 @@ const PersonalDetails = ({
     const confirmCustomer = () => {
         // setLoadingText('Confirming Customer...');
         handleClose();
-        setLoading(true);
+        // setLoading(true);
         if (
             customer.customerStatus !== CONFIRMED &&
             customer.customerStatus === SUSPENDED
@@ -443,7 +429,7 @@ const PersonalDetails = ({
     useEffect(() => {
         if (!!msg) {
             console.log("heloo p");
-            setLoading(false);
+            // setLoading(false);
             setEditable(false);
         }
     }, [msg]);
@@ -456,11 +442,11 @@ const PersonalDetails = ({
 
         const data = {
             customerId: customer.id,
-            firstName: firstName,
-            lastName: lastName,
-            otherName: middleName,
+            firstName: customer.firstName,
+            lastName: customer.lastName,
+            otherName: customer.otherName,
             phoneNumber: phoneNumber,
-            country: country,
+            country: customer.country,
             address: address,
             postalCode: postalCode,
             occupation: occupation,
@@ -476,42 +462,10 @@ const PersonalDetails = ({
         }
         // setLoadingText('Updating Customer . . .');
         console.log("data", data);
-        setEditable(false);
+        // setEditable(false);
         setErrors({});
         updateCustomerProfile(data);
     };
-
-    // useEffect(() => {
-    //     dispatch({
-    //         type: GET_ERRORS,
-    //         payload: {},
-    //     });
-    // }, [dispatch]);
-
-    // const saveRemark = (e) => {
-    //     e.preventDefault();
-    //     setErrors({});
-    //     setLoadingText('');
-
-    //     const data = {
-    //         customerId: customer.id,
-    //         firstName: firstName,
-    //         lastName: lastName,
-    //         otherName: middleName,
-    //         phoneNumber: '',
-    //         country: '',
-    //         address: '',
-    //         postalCode: '',
-    //         occupation: '',
-    //         risk: '',
-    //         remarks
-    //     };
-
-    //     setLoadingText('Saving Remark . . .');
-    //     setLoading(true);
-    //     setErrors({});
-    //     updateCustomerProfile(data);
-    // };
 
     return (
         <>
@@ -567,7 +521,7 @@ const PersonalDetails = ({
                             ) : (
                                 ""
                             )}
-                            {loading ? (
+                            {isLoading ? (
                                 <CircularProgressBar
                                     newWidth="20px"
                                     newHeight="20px"
@@ -619,27 +573,30 @@ const PersonalDetails = ({
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Username"}
-                        amlNumber={userName}
+                        amlNumber={customer.username ?? customer.userName}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"First Name"}
-                        amlNumber={firstName}
+                        amlNumber={customer.firstName}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Middle Name"}
-                        amlNumber={middleName}
+                        amlNumber={customer.otherName}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Last Name"}
-                        amlNumber={lastName}
+                        amlNumber={customer.lastName}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Date of Birth"}
-                        amlNumber={dateOfBirth}
+                        amlNumber={
+                            idCheckData?.dateOfBirth ??
+                            profileCheckData?.dateOfBirth
+                        }
                     />
                     <AmlBoard
                         editable={editable}
@@ -661,17 +618,19 @@ const PersonalDetails = ({
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Email"}
-                        amlNumber={email}
+                        amlNumber={customer.email}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Date joined"}
-                        amlNumber={formatDate(dateJoined)}
+                        amlNumber={formatDate(
+                            customer?.dateCreated ?? customer?.createdOn
+                        )}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Nationality"}
-                        amlNumber={nationality}
+                        amlNumber={customer.nationality}
                     />
 
                     <AmlBoard
@@ -722,12 +681,12 @@ const PersonalDetails = ({
                     <AmlBoard
                         classes={classes}
                         amlTitle={"City"}
-                        amlNumber={city}
+                        amlNumber={customer.city}
                     />
                     <AmlBoard
                         classes={classes}
                         amlTitle={"Country of Residence"}
-                        amlNumber={country}
+                        amlNumber={customer.country}
                     />
                 </form>
             </Box>

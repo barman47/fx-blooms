@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, batch } from "react-redux";
 import { Box, Typography, Grid, Switch } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 // import clsx from 'clsx';
@@ -8,6 +8,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
     CLEAR_CUSTOMER_STATUS_MSG,
     CLEAR_ERROR_MSG,
+    CLEAR_PROFILE_DATA,
+    CLEAR_IDCHECK_DATA,
 } from "../../../actions/types";
 // import { USER_DETAILS } from '../../../utils/constants';
 
@@ -90,8 +92,17 @@ const Customer = () => {
 
     useEffect(() => {
         return () => {
-            dispatch({
-                type: CLEAR_ERROR_MSG,
+            batch(() => {
+                console.log("unmonting");
+                dispatch({
+                    type: CLEAR_ERROR_MSG,
+                });
+                dispatch({
+                    type: CLEAR_IDCHECK_DATA,
+                });
+                dispatch({
+                    type: CLEAR_PROFILE_DATA,
+                });
             });
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps

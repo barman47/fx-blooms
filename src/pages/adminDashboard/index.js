@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector, batch } from "react-redux";
 import { Helmet } from "react-helmet";
 import { makeStyles } from "@material-ui/core/styles";
 import PropTypes from "prop-types";
@@ -54,7 +54,11 @@ import {
     searchForCustomer,
     searchForListings,
 } from "../../actions/admin";
-import { getCustomers } from "../../actions/customer";
+import {
+    getCustomers,
+    getResidencePermitValidationResponse,
+    getIdCardValidationResponse,
+} from "../../actions/customer";
 import {
     COLORS,
     DRAWER_WIDTH as drawerWidth,
@@ -360,9 +364,9 @@ const AdminDashboard = ({
     const { admin, customers } = useSelector((state) => state);
     const {
         pageSize,
-        customers: { items },
+        customersSearchResult: { items },
     } = useSelector((state) => state.customers);
-    const { listings } = useSelector((state) => state.listings);
+    const { listingSearchResult } = useSelector((state) => state.listings);
 
     const [searchText, setSearchText] = useState("");
     const [path, setPath] = useState("");
@@ -448,7 +452,11 @@ const AdminDashboard = ({
             searchForCustomer({ searchText, pageNumber: 0, pageSize });
             if (!isEmpty(items)) {
                 // items.map((customer) =>
-                searchForListings(items[0]?.id, { pageNumber: 0, pageSize });
+                console.log(items[0].id);
+                searchForListings(items[0]?.id, {
+                    pageNumber: 0,
+                    pageSize,
+                });
                 // );
             }
         },
@@ -458,10 +466,15 @@ const AdminDashboard = ({
     const viewCustomerProfile = (customer) => {
         console.log(location);
         // console.log(params);
-        dispatch({
-            type: SET_CUSTOMER,
-            payload: customer,
+        batch(() => {
+            dispatch(getResidencePermitValidationResponse(customer.id));
+            dispatch(getIdCardValidationResponse(customer.id));
+            dispatch({
+                type: SET_CUSTOMER,
+                payload: customer,
+            });
         });
+
         navigate(`${CUSTOMERS}/${customer.id}`, { replace: true });
         setSearchText("");
     };
@@ -701,7 +714,7 @@ const AdminDashboard = ({
                                 viewCustomerProfile={viewCustomerListing}
                                 accordionHeader="Listings"
                                 searchText={searchText}
-                                data={listings}
+                                data={listingSearchResult}
                                 loading={loading}
                             />
                         </Box>
