@@ -2,7 +2,6 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
-import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
     ADDED_BID, 
@@ -20,7 +19,6 @@ import {
     SET_LISTING_MSG,
     SET_LOADING, 
     SET_MORE_LISTINGS,
-    SET_RECOMMENDED_RATE,
     SET_REQUIRED_CURRENCY,
     UPDATED_LISTING
 } from './types';
@@ -168,12 +166,6 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
                 type: SET_LOADING,
                 payload: false
             });
-            if (setRecommendedRate && items.length > 0) {
-                dispatch({
-                    type: SET_RECOMMENDED_RATE,
-                    payload: getRecommendedRate(items)
-                });
-            }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -215,7 +207,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within the hour`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within the hour. N.B.: if no payment is made in 30minutes, you have the right to cancel.`
             });
         });
     } catch (err) {
@@ -306,7 +298,7 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Payment confirmed successfully'
+                payload: 'Transaction completed. The EUR is now made available for the @buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
             });
             dispatch({
                 type: REMOVE_NOTIFICATION,

@@ -55,6 +55,7 @@ import {
     ID_VERIFICATION,
     TWO_FACTOR,
     PIN,
+    HOW_IT_WORKS_DASHBOARD,
 } from './routes';
 
 import { getCustomerInformation } from './actions/customer';
@@ -107,6 +108,8 @@ const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 const Pin = lazy(() => import('./pages/dashboard/pin'));
 
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
+
+const HowItWorksDashboard = lazy(() => import('./pages/dashboard/howItWorks'));
 
 const TransactionStatus = lazy(() =>import('./pages/dashboard/transactions/TransactionStatus'));
 const Transactions = lazy(() => import('./pages/dashboard/transactions'));
@@ -271,6 +274,7 @@ const App = ({ getCustomerInformation }) => {
                                 <Route path={TWO_FACTOR} element={<TwoFactor handleSetTitle={handleSetTitle} />} />
                                 <Route path={BANK_ACCOUNTS} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
                                 <Route path={NOTIFICATIONS} element={<Notifications handleSetTitle={handleSetTitle} />} />
+                                <Route path={HOW_IT_WORKS_DASHBOARD} element={<HowItWorksDashboard handleSetTitle={handleSetTitle} />} />
                                 <Route path={TRANSACTIONS} element={<Transactions handleSetTitle={handleSetTitle} />} />
                                 <Route path={TRANSACTION_STATUS} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
                                 <Route path={WALLETS} element={<Wallet handleSetTitle={handleSetTitle} />} />

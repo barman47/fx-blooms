@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import './index.css';
+import 'animate.css';
 import App from './App';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';

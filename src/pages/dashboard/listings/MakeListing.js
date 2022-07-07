@@ -26,7 +26,7 @@ import { getAccounts } from '../../../actions/bankAccounts';
 import { getCurrencies } from '../../../actions/currencies';
 import { addListing, getExchangeRate } from '../../../actions/listings';
 import { getWallets } from '../../../actions/wallets';
-import { ADDED_LISTING, GET_ERRORS, SET_LISTING_MSG, SET_REQUIRED_CURRENCY } from '../../../actions/types';
+import { ADDED_LISTING, GET_ERRORS, SET_BUY, SET_LISTING_MSG, SET_REQUIRED_CURRENCY } from '../../../actions/types';
 import { COLORS, CUSTOMER_CATEGORY, ID_STATUS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
@@ -283,17 +283,6 @@ const MakeListing = (props) => {
         }   
     }, [AvailableCurrency, getExchangeRate]);
 
-    // Set NGN as Required currency when EUR is the Available currency and vice versa
-    // useEffect(() => {
-    //     if (AvailableCurrency === 'EUR') {
-    //         setRequiredCurrency('NGN');
-    //     }
-
-    //     if (AvailableCurrency === 'NGN') {
-    //         setRequiredCurrency('EUR');
-    //     }
-    // }, [AvailableCurrency]);
-
     // useEffect(() => {
     //     if (MinExchangeAmount && ExchangeAmount && Number(MinExchangeAmount) > Number(ExchangeAmount)) {
     //         setErrors({ MinExchangeAmount: 'Minimum exchange amount cannot be greater than available amount!' });
@@ -404,11 +393,8 @@ const MakeListing = (props) => {
     const resetForm = () => {
         setAvailableCurrency('');
         setExchangeAmount('');
-        setRequiredCurrency('');
         setExchangeRate('');
-        // setMinExchangeAmount('');
         setReceiptAmount('');
-        // setListingFee('');
         setLoading(false);
     };
 
@@ -422,6 +408,7 @@ const MakeListing = (props) => {
             dispatch({
                 type: ADDED_LISTING
             });
+            dispatch({ type: SET_BUY });
             getWallets(customerId);
         }
     };
@@ -634,7 +621,7 @@ const MakeListing = (props) => {
                                             }}
                                         />
                                     </Tooltip>
-                                    {recommendedRate && <FormHelperText color="primary">Recomended Rate: 1EUR to <span style={{ color: COLORS.red }}>{recommendedRate}NGN</span></FormHelperText>}
+                                    {recommendedRate && recommendedRate > 0 && <FormHelperText color="primary">Recomended Rate: 1EUR to <span style={{ color: COLORS.red }}>{recommendedRate}NGN</span></FormHelperText>}
                                 </Grid>
                                 {AvailableCurrency === 'EUR' && 
                                     <Grid item xs={12}>

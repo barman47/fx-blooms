@@ -56,12 +56,14 @@ import {
     Menu,
     Security,
     TwoFactorAuthentication,
+    ViewListOutline,
     Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
     DASHBOARD_HOME, 
     NOTIFICATIONS, 
+    HOW_IT_WORKS_DASHBOARD,
     SECURITY,
     ID_VERIFICATION, 
     PIN, 
@@ -415,7 +417,8 @@ const Dashboard = (props) => {
         // { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="rectangular" badgeContent={pendingTransactions} color="primary"><ArrowLeftRight /></Badge> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
+        { url: HOW_IT_WORKS_DASHBOARD, text:'How it works', icon: <ViewListOutline /> }
     ];
 
     const securityLinks = [
