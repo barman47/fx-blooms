@@ -39,6 +39,7 @@ export const DASHBOARD_HOME = `${DASHBOARD}/home`;
 export const EDIT_LISTING = `${DASHBOARD}/listings/edit`;
 export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
+export const HOW_IT_WORKS_DASHBOARD = `${DASHBOARD}/howItWorks`;
 export const WALLETS = `${DASHBOARD}/wallets`;
 export const WALLET_TRANSACTION_STATUS = `${WALLETS}/transactionStatus`;
 export const FUND_WALLET = `${WALLETS}/fundWallet`;

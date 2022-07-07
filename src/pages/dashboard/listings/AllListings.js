@@ -431,7 +431,7 @@ const AllListings = (props) => {
 			minimumExchangeAmount: 0,
 			useCurrencyFilter: true,
 			useRatingFilter: false
-		}, true);
+		});
 	};
 
 	const getMore = () => {

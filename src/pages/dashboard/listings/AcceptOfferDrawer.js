@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -25,6 +26,7 @@ import isEmpty from '../../../utils/isEmpty';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
+import { TRANSACTIONS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -102,6 +104,7 @@ const useStyles = makeStyles(theme => ({
 const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { accounts } = useSelector(state => state.bankAccounts);
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
@@ -191,7 +194,6 @@ const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
     }, [errorsState]);
 
     const dismissSuccessModal = () => {
-        // setButtonDisabled(true);
         successModal.current.closeModal();
         setLoading(false);
         toggleDrawer();
@@ -213,6 +215,7 @@ const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
                 payload: {}
             });
         });
+        navigate(TRANSACTIONS);
     };
 
     const getAccountId = (account) => {

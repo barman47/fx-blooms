@@ -36,9 +36,15 @@ const useStyles = makeStyles((theme) => ({
 
 const VERIFF_API = `${process.env.REACT_APP_VERIFF_API}`;
 
-function VeriffVerify() {
+function VeriffVerify({ handleSetTitle }) {
     const classes = useStyles();
     const { customerId } = useSelector((state) => state.customer);
+
+    useEffect(() => {
+        handleSetTitle('Verify ID');
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         // here we generate a verification session needless of a server;
