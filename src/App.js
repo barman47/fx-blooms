@@ -18,7 +18,6 @@ import {
     VERIFY_2FA,
     SIGNUP_SUCCESS,
     SIGNUP_FAILURE,
-    MAKE_LISTING,
     NOTIFICATIONS,
     DASHBOARD,
     DASHBOARD_HOME,
@@ -56,6 +55,7 @@ import {
     ID_VERIFICATION,
     TWO_FACTOR,
     PIN,
+    HOW_IT_WORKS_DASHBOARD,
 } from './routes';
 
 import { getCustomerInformation } from './actions/customer';
@@ -97,7 +97,6 @@ const Dashboard = lazy(() => import('./pages/dashboard'));
 
 const AllListings = lazy(() => import('./pages/dashboard/listings/AllListings'));
 const EditListing = lazy(() => import('./pages/dashboard/listings/EditListing'));
-const MakeListing = lazy(() => import('./pages/dashboard/listings/MakeListing'));
 const UserDetails = lazy(() => import('./pages/dashboard/listings/UserDetails')); 
 const Profile = lazy(() => import('./pages/dashboard/profile'));
 
@@ -109,6 +108,8 @@ const TwoFactor = lazy(() => import('./pages/dashboard/twoFactor'));
 const Pin = lazy(() => import('./pages/dashboard/pin'));
 
 const Notifications = lazy(() => import('./pages/dashboard/notifications'));
+
+const HowItWorksDashboard = lazy(() => import('./pages/dashboard/howItWorks'));
 
 const TransactionStatus = lazy(() =>import('./pages/dashboard/transactions/TransactionStatus'));
 const Transactions = lazy(() => import('./pages/dashboard/transactions'));
@@ -267,13 +268,13 @@ const App = ({ getCustomerInformation }) => {
                             <Route path={DASHBOARD} element={<PrivateRoute><Dashboard title={title} /></PrivateRoute>}>
                                 <Route index path={DASHBOARD_HOME} element={<AllListings handleSetTitle={handleSetTitle} />} />
                                 <Route path={EDIT_LISTING} element={<EditListing handleSetTitle={handleSetTitle} />} />
-                                <Route path={MAKE_LISTING} element={<MakeListing handleSetTitle={handleSetTitle} />}/>
                                 <Route path={`${USER_DETAILS}/:id`} element={<UserDetails handleSetTitle={handleSetTitle}/>}/>
                                 <Route path={PROFILE} element={<Profile handleSetTitle={handleSetTitle} />} />
                                 <Route path={ID_VERIFICATION} element={<IdVerification handleSetTitle={handleSetTitle} />} />
                                 <Route path={TWO_FACTOR} element={<TwoFactor handleSetTitle={handleSetTitle} />} />
                                 <Route path={BANK_ACCOUNTS} element={<BankAccounts handleSetTitle={handleSetTitle} />} />
                                 <Route path={NOTIFICATIONS} element={<Notifications handleSetTitle={handleSetTitle} />} />
+                                <Route path={HOW_IT_WORKS_DASHBOARD} element={<HowItWorksDashboard handleSetTitle={handleSetTitle} />} />
                                 <Route path={TRANSACTIONS} element={<Transactions handleSetTitle={handleSetTitle} />} />
                                 <Route path={TRANSACTION_STATUS} element={<TransactionStatus handleSetTitle={handleSetTitle} />} />
                                 <Route path={WALLETS} element={<Wallet handleSetTitle={handleSetTitle} />} />

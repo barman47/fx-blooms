@@ -3,8 +3,8 @@ import { createBrowserHistory } from 'history';
 
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
-import { AUTH_TOKEN } from './constants';
-import { RESET_CUSTOMER_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
+import { AUTH_TOKEN, NETWORK_ERROR } from './constants';
+import { GET_ERRORS, RESET_CUSTOMER_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
 import { LOGIN } from '../routes';
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
@@ -30,8 +30,13 @@ const reIssueCustomerToken = () => {
             });
             resolve('Reissued token');
         } catch (err) {
+            if (err?.message === NETWORK_ERROR) {
+                return store.dispatch({
+                    type: GET_ERRORS,
+                    payload: { msg: NETWORK_ERROR }
+                });     
+            }
             console.error(err);
-            // console.log(err.response)
             setAuthToken(null);
             store.dispatch({ type: RESET_STORE });
             createBrowserHistory().push(LOGIN, { msg: 'Your session has expired' });

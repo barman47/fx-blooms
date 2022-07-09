@@ -1,16 +1,29 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Toaster } from 'react-hot-toast';
+// import { Toaster } from 'react-hot-toast';
 import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';
-import { getTransactions } from '../../../actions/transactions';
-import { CLEAR_TRANSACTIONS, SET_ALL_TRANSACTIONS, SET_BID, SET_EUR_TRANSACTIONS, SET_LOADING, SET_NGN_TRANSACTIONS } from '../../../actions/types';
+import { cancelTransaction, getPendingTransactionCount, getTransactions } from '../../../actions/transactions';
+import { 
+    CLEAR_TRANSACTIONS,
+    GET_ERRORS,
+    SET_ALL_TRANSACTIONS,
+    SET_BID,
+    SET_EUR_TRANSACTIONS,
+    SET_LOADING,
+    SET_NGN_TRANSACTIONS,
+    SET_TRANSACTION_MSG
+} from '../../../actions/types';
+
+import isEmpty from '../../../utils/isEmpty';
 
 import Transaction from './Transaction';
 import TransactionSkeleton from './TransactionSkeleton';
+import Toast from '../../../components/common/Toast';
+import SuccessModal from '../../../components/common/SuccessModal';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -34,11 +47,6 @@ const useStyles = makeStyles(theme => ({
             gap: theme.spacing(3),
         }
     },
-
-    buttonGroup: {
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-    },
     
     transactions: {
         display: 'grid',
@@ -49,15 +57,21 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
+                        
+const Transactions = ({ cancelTransaction, getCurrencies, getPendingTransactionCount, getTransactions, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
     const { currencies, loading } = useSelector(state => state);
     const { customerId } = useSelector(state => state.customer);
-    const { eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
+    const { msg, eurTransactions, ngnTransactions, transactions } = useSelector(state => state.transactions);
+    const errorsState = useSelector(state => state.errors);
 
     const [currency, setCurrency] = useState('ALL');
+    const [errors, setErrors] = useState({});
+
+    const successModal = useRef();
+    const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Transactions');
@@ -69,13 +83,40 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
             dispatch({ type: CLEAR_TRANSACTIONS });
             dispatch({ type: SET_BID, payload: {} });
         });
-        getTransactions(true);
+        getTransactions(false);
         if (currencies.length === 0) {
             // setLoading(true);
             getCurrencies();
         }
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            dispatch({
+                type: SET_LOADING,
+                payload: false
+            });
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
+
+    useEffect(() => {
+        if (msg) {
+            successModal.current.setModalText(msg);
+            successModal.current.openModal();
+        }
+    }, [msg]);
 
     // Filter transactions
     useEffect(() => {
@@ -110,6 +151,18 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
         }
     }, [currency, customerId, dispatch]);
 
+    const handleCancelTransaction = (transactionId) => {
+        cancelTransaction(transactionId);
+    };
+
+    const dismissAction = () => {
+        getPendingTransactionCount();
+        dispatch({
+            type: SET_TRANSACTION_MSG,
+            payload: null
+        });
+    };
+
     // const setTransactionType = (sent, received) => {
 	// 	dispatch({
 	// 		type: SET_TRANSACTION_TYPE,
@@ -122,7 +175,17 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
 
     return (
         <>
-            <Toaster />
+            {/* <Toaster /> */}
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
+            <SuccessModal ref={successModal} dismissAction={dismissAction} />
             <Box component="section" className={classes.root}>
                 <Typography variant="h6">Transaction History</Typography>
                 <Typography variant="body2" component="p">Here are your recent transactions</Typography>
@@ -144,28 +207,6 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                                 {currencies && currencies.map((currency, index) => <MenuItem key={index} value={currency.value}>{currency.value}</MenuItem>)}
                             </Select>
                         </FormControl>
-                        {/* <ButtonGroup className={classes.buttonGroup} disableElevation size="large">
-                            <Button
-                                color="primary"
-                                disableRipple
-                                disableFocusRipple
-                                onClick={() => setTransactionType(false, true)}
-                                variant={received ? 'contained' : 'outlined'}
-                                fullWidth
-                            >
-                                Received
-                            </Button>
-                            <Button
-                                color="primary"
-                                disableRipple
-                                disableFocusRipple
-                                onClick={() => setTransactionType(true, false)}
-                                variant={sent ? 'contained' : 'outlined'}
-                                fullWidth
-                            >
-                                Sent
-                            </Button>
-                        </ButtonGroup> */}
                     </Box>
                 </Box>
                 <Box component="section" className={classes.transactions}>
@@ -183,7 +224,7 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
                         :
                         ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
-                        transactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
+                        transactions.map(transaction => <Transaction key={transaction.id} cancelTransaction={handleCancelTransaction} transaction={transaction} />)
                     }
                     {!loading && transactions.length === 0 && 
                         <Typography variant="h4" align="center" color="primary">You have no transactions</Typography>
@@ -195,9 +236,11 @@ const Transactions = ({ getCurrencies, getTransactions, handleSetTitle }) => {
 };
 
 Transactions.propTypes = {
+    cancelTransaction: PropTypes.func.isRequired,
     getCurrencies: PropTypes.func.isRequired,
     getTransactions: PropTypes.func.isRequired,
+    getPendingTransactionCount: PropTypes.func.isRequired,
     handleSetTitle: PropTypes.func.isRequired
 };
 
-export default connect(undefined, { getCurrencies, getTransactions })(Transactions);
+export default connect(undefined, { cancelTransaction, getCurrencies, getPendingTransactionCount, getTransactions })(Transactions);
