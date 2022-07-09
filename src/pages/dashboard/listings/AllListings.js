@@ -156,19 +156,6 @@ const useStyles = makeStyles(theme => ({
 		color: 'rgb(246, 113, 113)'
 	},
 
-	title: {
-		fontWeight: 300,
-		margin: theme.spacing(2, 5),
-
-		[theme.breakpoints.down('md')]: {
-			margin: theme.spacing(0, 2)
-		},
-
-		[theme.breakpoints.down('sm')]: {
-			margin: 0
-		}
-	},
-
 	listingHeader: {
 		display: 'flex',
 		flexDirection: 'row',
@@ -563,7 +550,6 @@ const AllListings = (props) => {
 						</Box>
 					</Box>
 				</Box>
-				<Typography variant="body2" component="p" className={classes.title}>Marketplace</Typography>
 				<Box className={classes.listingHeader} component={Paper}>
 					<Box className={classes.buttonContainer}>
 						<Box component="div" className={classes.buySellButtons}>

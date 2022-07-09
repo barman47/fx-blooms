@@ -521,7 +521,7 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
                         <img src={yapily} alt="Yapily Logo" />
                         <Box className={classes.noteContent}>
                             <Security className={classes.icon} />
-                            <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
+                            <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily (Safe Connect) UAB. Your information is used for payment processing only, and will be kept secure by Safe Connect UAB.</Typography>
                         </Box>
                     </Grid>
                 </form>
