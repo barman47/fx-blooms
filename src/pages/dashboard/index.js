@@ -120,7 +120,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
 
     alertContainerOpen: {
@@ -129,7 +134,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
     
     appBarContent: {
