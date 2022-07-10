@@ -73,14 +73,15 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		margin: theme.spacing(0, 5),
+		margin: theme.spacing(4, 5, 7, 5),
 
 		[theme.breakpoints.down('md')]: {
 			margin: `${theme.spacing(2)} !important`
 		},
+
 		[theme.breakpoints.down('sm')]: {
-			margin: 0
-		},
+			margin: theme.spacing(2, 0)
+		}
 	},
 
 	wallets: {
@@ -160,12 +161,12 @@ const useStyles = makeStyles(theme => ({
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignContent: 'center',
+		alignItems: 'center',
 		margin: theme.spacing(2, 5),
 
 		[theme.breakpoints.down('md')]: {
-			display: 'flex',
-			flexDirection: 'column',
+			display: 'grid',
+			gridTemplateColumns: '1fr',
 			margin: theme.spacing(2),
 		},
 
@@ -220,7 +221,6 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	form: {
-		justifySelf: 'center',
 		// Search field
 		'& .MuiOutlinedInput-input': {
 			paddingBottom: theme.spacing(0.9),
@@ -240,13 +240,13 @@ const useStyles = makeStyles(theme => ({
 		}
 	},
 
-	// filterLabel: {
-	// 	[theme.breakpoints.down('sm')]: {
-	// 		'& .MuiTypography-body1': {
-	// 			fontSize: theme.spacing(1.2)
-	// 		}
-	// 	}
-	// },
+	filterLabel: {
+		[theme.breakpoints.down('sm')]: {
+			'& .MuiTypography-body1': {
+				fontSize: theme.spacing(1.8)
+			}
+		}
+	},
 
 	searchButton: {
 		paddingBottom: theme.spacing(0.55),
@@ -284,7 +284,13 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingContainer: {
-		marginTop: theme.spacing(1)
+		marginTop: theme.spacing(1),
+		paddingLeft: theme.spacing(17),
+		paddingRight: theme.spacing(17),
+
+		[theme.breakpoints.down('md')]: {
+			padding: 0
+		}
 	},
 
 	buyerPopup: {

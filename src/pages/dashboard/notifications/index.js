@@ -23,7 +23,6 @@ import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
-import TimeElapsedModal from '../../../components/common/TimeElapsedModal';
 import Toast from '../../../components/common/Toast';
 import isEmpty from '../../../utils/isEmpty';
 
@@ -114,7 +113,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const [errors, setErrors] = useState({});
 
     const successModal = useRef();
-    const timeElapsedModal = useRef();
     const toast = useRef();
 
     const { APPROVED } = ID_STATUS;
@@ -157,10 +155,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
             successModal.current.setModalText(msg);
         }
     }, [msg]);
-
-    const handleOpenTimeElapsedModal = () => {
-        timeElapsedModal.current.openModal();
-    };
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
         setLoading(true);
@@ -291,13 +285,11 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
                 />
             }
             {loading && <Spinner />}
-            <TimeElapsedModal ref={timeElapsedModal} />
             {sellerSendNgnDrawerOpen && 
                 <SellerSendNgnDrawer 
                     drawerOpen={sellerSendNgnDrawerOpen} 
                     toggleDrawer={toggleSellerSendNgnDrawer} 
                     notificationId={notificationId}
-                    handleOpenTimeElapsedModal={handleOpenTimeElapsedModal}
                 />
             }
             {open && 
