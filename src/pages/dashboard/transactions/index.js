@@ -163,6 +163,13 @@ const Transactions = ({ cancelTransaction, getCurrencies, getPendingTransactionC
         });
     };
 
+    const isPending = (transaction) => {
+        if (!transaction.buyer.hasMadePayment && !transaction.buyer.hasReceivedPayment && !transaction.seller.hasMadePayment && !transaction.seller.hasReceivedPayment) {
+            return true;
+        }
+        return false;
+    };
+
     // const setTransactionType = (sent, received) => {
 	// 	dispatch({
 	// 		type: SET_TRANSACTION_TYPE,
@@ -224,7 +231,17 @@ const Transactions = ({ cancelTransaction, getCurrencies, getPendingTransactionC
                         :
                         ngnTransactions.length > 0 ? ngnTransactions.map(transaction => <Transaction key={transaction.id} transaction={transaction} />)
                         :
-                        transactions.map(transaction => <Transaction key={transaction.id} cancelTransaction={handleCancelTransaction} transaction={transaction} />)
+                        transactions.map(transaction => {
+                            if (isPending(transaction)) {
+                                if (transaction.buyer.customerId === customerId) {
+                                    return <Transaction key={transaction.id} cancelTransaction={handleCancelTransaction} transaction={transaction} />
+                                }
+                                return null;
+                            }
+                            return <Transaction key={transaction.id} cancelTransaction={handleCancelTransaction} transaction={transaction} />
+                            
+                            
+                        })
                     }
                     {!loading && transactions.length === 0 && 
                         <Typography variant="h4" align="center" color="primary">You have no transactions</Typography>
