@@ -1,16 +1,17 @@
 import {
     SET_REQUIRED_CURRENCY,
+    GET_LISTING,
     ADDED_BID,
     ADDED_LISTING,
     DELETED_LISTING,
     SET_BID,
+    SET_BIDS,
     SET_LISTINGS,
     SET_DELETED_LISTINGS,
     SET_FINALISED_LISTINGS,
     SET_INPROGRESS_LISTINGS,
     SET_ACTIVE_LISTINGS,
     SET_MORE_LISTINGS,
-    GET_LISTING,
     SET_LISTING,
     CANCELED_NEGOTIATION,
     SET_AS_ACCEPTED,
@@ -24,17 +25,22 @@ import {
     UPDATED_LISTING,
     CREDIT_LISTING,
     VIEW_LISTING,
-} from "../actions/types";
+    SET_BUY,
+    SET_SELL
+} from '../actions/types';
 
 import { BID_STATUS, LISTING_STATUS } from "../utils/constants";
 
 const initialState = {
-    availableCurrency: "NGN",
-    requiredCurrency: "EUR",
+    availableCurrency: 'NGN',
+    requiredCurrency: 'EUR',
+    buy: true,
+    sell: false,
     addedListing: false,
     editedListing: false,
     addedBid: false,
     bid: {},
+    bids: [],
     updatedListing: false,
     listing: {},
     listings: [],
@@ -65,6 +71,20 @@ const listingsReducer = (state = initialState, action) => {
                 requiredCurrency: action.payload.requiredCurrency,
             };
 
+        case SET_BUY:
+            return {
+                ...state,
+                buy: true,
+                sell: false
+            };
+
+        case SET_SELL:
+            return {
+                ...state,
+                buy: false,
+                sell: true
+            };
+
         case ADDED_BID:
             listingId = action.payload.listing.id;
             listingIndex = state.listings.findIndex(
@@ -89,6 +109,12 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 bid: action.payload,
+            };
+
+        case SET_BIDS:
+            return {
+                ...state,
+                bids: action.payload
             };
 
         case SET_AS_ACCEPTED:
@@ -210,7 +236,7 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 deletedListings: action.payload,
             };
-
+        
         case GET_LISTING:
             return {
                 ...state,

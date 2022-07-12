@@ -7,6 +7,9 @@ import {
     SET_EUR_TRANSACTIONS,
     SET_NGN_TRANSACTIONS,
     SET_TRANSACTION_TYPE,
+    SET_PENDING_TRANSACTION_COUNT,
+    REMOVE_TRANSACTION,
+    SET_TRANSACTION_MSG
 } from '../actions/types';
 
 const initialState = {
@@ -18,7 +21,8 @@ const initialState = {
     connectionStatus: null,
     sent: true,
     received: false,
-    msg: null
+    msg: null,
+    pendingTransactions: 0
 };
 
 const transactionsReducer = (state = initialState, action) => {
@@ -96,6 +100,24 @@ const transactionsReducer = (state = initialState, action) => {
                 transactions: [],
                 eurTransactions: [],
                 ngnTransactions: [],
+            };
+
+        case SET_PENDING_TRANSACTION_COUNT:
+            return {
+                ...state,
+                pendingTransactions: action.payload
+            };
+
+        case REMOVE_TRANSACTION:
+            return {
+                ...state,
+                transactions: state.transactions.filter(transacton => transacton.id !== action.payload)
+            };
+
+        case SET_TRANSACTION_MSG:
+            return {
+                ...state,
+                msg: action.payload
             };
 
         default:

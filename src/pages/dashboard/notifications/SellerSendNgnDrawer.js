@@ -12,14 +12,13 @@ import {
 import { makeStyles } from '@material-ui/core/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
-import { cancelBid, madePaymentV2 } from '../../../actions/listings';
+import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';
 import { markNotificationAsRead } from '../../../actions/notifications';
-import { GET_ERRORS, GET_LISTING, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_BIDS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -138,44 +137,32 @@ const useStyles = makeStyles(theme => ({
 
     button: {
         margin: theme.spacing(2, 0),
-    },
+    }
 }));
 
-const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
+const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, madePaymentV2, markNotificationAsRead, toggleDrawer, drawerOpen, notificationId }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
 
-    const { account } = useSelector(state => state.bankAccounts);
-    const { bid, listing, msg } = useSelector(state => state.listings);
+    const { bid, bids, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
-    const [timerMinutes, setTimerMinutes] = useState('00');
-    const [timerSeconds, setTimerSeconds] = useState('00');
-
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
     const errorToast = useRef();
 
     useEffect(() => {
-        startExpiryTimer();
-        dispatch({
-            type: GET_LISTING,
-            payload: bid.data.ListingId
-        });
-        if (isEmpty(account) && !isEmpty(listing)) {
-            getAccount(listing.sellersAccountId);
-        }
-
         return () => {
-            clearInterval(interval.current);
+            dispatch({
+                type: SET_BIDS,
+                payload: []
+            });
         };
         // eslint-disable-next-line
     }, []);
@@ -219,50 +206,22 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
         setErrors(errorsState);
     }, [errorsState]);
 
-    const getBidIds = (bids) => {
+    const getBidIds = useCallback(() => {
         const bidIds = [];
         bids.forEach(bid => bidIds.push(bid.id));
         return bidIds;
-    };
+    }, [bids]);
 
-    const expireListing = useCallback(() => {
-        clearInterval(interval.current);
-        dispatch({
-            type: REMOVE_NOTIFICATION,
-            payload: notificationId
-        });
-        
-        cancelBid(getBidIds(listing.bids));
-        markNotificationAsRead(notificationId);
-        toggleDrawer();
-    }, [cancelBid, dispatch, listing, markNotificationAsRead, notificationId, toggleDrawer]);
+    // Cancel bids once bids return from the endpoint
+    useEffect(() => {
+        if (bids.length > 0) {
+            cancelBid(getBidIds());
+            handleOpenTimeElapsedModal();
+            toggleDrawer();
+        }
+    }, [bids, cancelBid, getBidIds, handleOpenTimeElapsedModal, toggleDrawer]);
 
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
-
-    const startExpiryTimer = useCallback(() => {
-        // const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
-        // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        // const countDownTime = date + THIRTY_MINUTES;
-        const countDownTime = new Date((convertToLocalTime(bid.dateLogged))).getTime() + THIRTY_MINUTES;
-        interval.current = setInterval(() => {
-            const distance = countDownTime - getTime();
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-
-            if (minutes <= 0 && seconds <= 0) {
-                clearInterval(interval.current);
-                setTimerMinutes('00');
-                setTimerSeconds('00');
-                expireListing();
-                // setTimerValue(0);
-            } else {
-                setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
-                setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
-                // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
-            }
-        }, 1000);
-    }, [bid, expireListing]);
 
     useEffect(() => {
         setOpen(drawerOpen);
@@ -271,10 +230,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
             payload: {}
         });
         if (!drawerOpen) {
-            clearInterval(interval.current);
             setErrors({});
         }
-    }, [dispatch, drawerOpen, startExpiryTimer]);
+    }, [dispatch, drawerOpen]);
 
     useEffect(() => {
         if (msg) {
@@ -310,7 +268,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
         madePaymentV2({
             bidId: bid.data.BidId,
             listingId: bid.data.ListingId
-        }, notificationId);
+        }, notificationId, bid.data.Buyer.UserName);
     };
 
     return (
@@ -356,9 +314,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
                     </Grid>
                 </Grid>
                 <ol>
-                    <li><Typography variant="body2" component="p">Select/add the receiving account</Typography></li>
                     <li><Typography variant="body2" component="p">Transfer the {bid.data.Seller.Currency} to {`${bid.data.Buyer.UserName?.toLowerCase()}'s`} account below</Typography></li>
                     <li><Typography variant="body2" component="p">Click on <Typography variant="body2" component="span" color="primary" style={{ fontWeight: 600 }}>{bid.data.Seller.Currency}{formatNumber(bid.data.Seller.AmountTransfered, 2)} Payment Made</Typography></Typography></li>
+                    <li><Typography variant="body2" component="p">The EUR equivalent will be moved to your wallet immediately</Typography></li>
                 </ol>
                 <Grid item xs={12}>
                     <Typography variant="subtitle1" component="p" className={classes.accountDetails}>Buyer Account Details</Typography>
@@ -381,10 +339,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
                         </div>
                     </section>
                 </Grid>
-                <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid.data.Seller.Currency}{formatNumber((bid.data.Seller.AmountTransfered), 2)} within...</Typography>
-                    <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
-                </Grid>
                 <Grid item xs={12}>
                     <Button 
                         type="submit"
@@ -406,6 +360,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getAccount, madePaymentV2, markNotific
 
 SellerSendNgnDrawer.propTypes = {
     cancelBid: PropTypes.func.isRequired,
+    getBids: PropTypes.func.isRequired,
     getAccount: PropTypes.func.isRequired,
     toggleDrawer: PropTypes.func.isRequired,
     drawerOpen: PropTypes.bool.isRequired,
@@ -414,4 +369,4 @@ SellerSendNgnDrawer.propTypes = {
     notificationId: PropTypes.string.isRequired
 };
 
-export default connect(undefined, { cancelBid, getAccount, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);
+export default connect(undefined, { cancelBid, getAccount, getBids, madePaymentV2, markNotificationAsRead })(SellerSendNgnDrawer);

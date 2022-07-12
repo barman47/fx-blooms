@@ -13,7 +13,7 @@ import {
     Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import Alert from '@material-ui/lab/Alert';
+// import Alert from '@material-ui/lab/Alert';
 import PropTypes from 'prop-types';
 
 import { getWallets, requestWithdrawal } from '../../../actions/wallets';
@@ -27,10 +27,11 @@ import moveToNextField from '../../../utils/moveToNextField';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import Spinner from '../../../components/common/Spinner';
+import AlertModal from '../../../components/common/AlertModal';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
 import formatNumber from '../../../utils/formatNumber';
-import { DASHBOARD_HOME } from '../../../routes';
+import { DASHBOARD_HOME, PIN } from '../../../routes';
 
 
 const useStyles = makeStyles(theme => ({
@@ -80,7 +81,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
 
     const errorsState = useSelector(state => state.errors);
     const { accounts } = useSelector(state => state.bankAccounts);
-    const { customerId, firstName, lastName, msg } = useSelector(state => state.customer);
+    const { customerId, hasSetPin, firstName, lastName, msg } = useSelector(state => state.customer);
     const { wallet } = useSelector(state => state.wallets);
 
     const [currency] = useState('EUR');
@@ -88,6 +89,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     const [sourceAccount, setSourceAccount] = useState('');
     const [reference, setReference] = useState('');
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
+    // eslint-disable-next-line
     const [withdrawalFee, setWithdrawalFee] = useState(0);
     const [first, setFirst] = useState('');
     const [second, setSecond] = useState('');
@@ -102,20 +104,22 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
     const thirdField = useRef();
     const fourthField = useRef();
 
+    const alertModal = useRef();
     const successModal = useRef();
     const toast = useRef();
 
     useEffect(() => {
         handleSetTitle('Request Withdrawal');
+        handleSetPin();
         // eslint-disable-next-line
     }, []);
 
     // Set withdrawal fee when user enters amount
-    useEffect(() => {
-        if (amount) {
-            setWithdrawalFee(((1/100) * amount).toFixed(2));
-        }
-    }, [amount]);
+    // useEffect(() => {
+    //     if (amount) {
+    //         setWithdrawalFee(((1/100) * amount).toFixed(2));
+    //     }
+    // }, [amount]);
 
     useEffect(() => {
         if (msg) {
@@ -141,6 +145,13 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
             });
         }
     }, [dispatch, errorsState, errors]);
+
+    const handleSetPin = () => {
+        if (!hasSetPin) {
+            alertModal.current.setModalText('Security PIN is required for all withdrawals. Kindly set up your PIN first.');
+            alertModal.current.openModal();   
+        }
+    };
 
     const handleAddAccount = () => {
         setAddAccountDrawerOpen(true);
@@ -188,6 +199,11 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
         navigate(DASHBOARD_HOME);
     };
 
+    const dismissAlertModal = () => {
+        alertModal.current.closeModal();
+        navigate(PIN);
+    };
+
     return (
         <>
             {!isEmpty(errors) && 
@@ -202,11 +218,12 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
             {loading && <Spinner />}
             {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} ngn={currency === 'NGN' ? true : false} eur={currency === 'EUR' ? true : false} />}
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
+            <AlertModal ref={alertModal} dismissAction={dismissAlertModal} />
             <Box component="section" className={classes.root}>
                 <form onSubmit={handleFormSubmit} noValidate>
                     <Typography variant="h6" color="primary" className={classes.pageTitle}>Request Withdrawal</Typography>
                     <Typography variant="body2" component="p" className={classes.subTitle}>Input your PIN to authenticate a withdrawal request to your bank account.</Typography>
-                    <Alert className={classes.alert} severity="info">Please note that you will be chanrged 1% of the withdrawal fee.</Alert>
+                    {/* <Alert className={classes.alert} severity="info">Please note that you will be chanrged 1% of the withdrawal fee.</Alert> */}
                     <Grid container direction="row" spacing={2}>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span">Select Receiving Account</Typography>
@@ -264,7 +281,7 @@ const RequestWithdrawal = ({ getWallets, handleSetTitle, requestWithdrawal }) =>
                                 fullWidth 
                                 helperText={errors.amount}
                             />
-                            <FormHelperText>Withdrawal fee: EUR {formatNumber(withdrawalFee, 2)}</FormHelperText>
+                            {/* <FormHelperText>Withdrawal fee: EUR {formatNumber(withdrawalFee, 2)}</FormHelperText> */}
                         </Grid>
                         <Grid item xs={12}>
                             <Typography variant="subtitle2" component="span" className={classes.helperText}>Withdrawal Reference (OPTIONAL)</Typography>

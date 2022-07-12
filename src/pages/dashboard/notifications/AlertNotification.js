@@ -17,18 +17,33 @@ const useStyles = makeStyles(theme => ({
         padding: theme.spacing(0.5, 2),
 
         [theme.breakpoints.down('md')]: {
-            gridTemplateColumns: '1fr',
+            marginTop: theme.spacing(8),
+            gridTemplateColumns: '1fr'
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            marginTop: theme.spacing(7.5)
+
         },
 
         '& div:first-child': {
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+
+            [theme.breakpoints.down('sm')]: {
+                display: 'grid',
+                gridTemplateColumns: '1fr 0.5fr 0.2fr'
+            },
         },
 
         '& p': {
-            color: theme.palette.primary.main
+            color: theme.palette.primary.main,
+
+            [theme.breakpoints.down('sm')]: {
+                fontSize: theme.spacing(1.1)
+            }
         }
     },
 

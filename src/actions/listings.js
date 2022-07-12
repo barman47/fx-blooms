@@ -2,7 +2,6 @@ import axios from 'axios';
 import { batch } from 'react-redux';
 import { DASHBOARD_HOME, EDIT_LISTING } from '../routes';
 
-import getRecommendedRate from '../utils/getRecommendedRate';
 import handleError from '../utils/handleError';
 import { 
     ADDED_BID, 
@@ -13,15 +12,15 @@ import {
     REMOVE_NOTIFICATION,
     SET_AS_ACCEPTED,
     SET_BID,
+    SET_BIDS,
     SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
     SET_LOADING, 
     SET_MORE_LISTINGS,
-    SET_RECOMMENDED_RATE,
     SET_REQUIRED_CURRENCY,
-    UPDATED_LISTING 
+    UPDATED_LISTING
 } from './types';
 import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
@@ -29,37 +28,29 @@ import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 
-// export const getAllListings = () => async (dispatch) => {
-//     try {
-//         console.log('getting all listings');
-//         await reIssueCustomerToken();
-//         const res = await axios.post(`${URL}/GetAllListings`, {
-//             pageNumber: 0,
-//             pageSize: 15,
-//             currencyNeeded: 'NGN',
-//             currencyAvailable: 'NGN',
-//             minimumExchangeAmount: 0,
-//             useCurrencyFilter: false
-//         });
-//         const { items, ...rest } = res.data.data;
-
-//         dispatch({
-//             type: SET_LISTINGS,
-//             payload: { listings: items, ...rest }
-//         });
-//     } catch (err) {
-//         return handleError(err, dispatch);
-//     }
-// };
+export const getBids = (listingId) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.post(`${URL}/GetAllBidsbyListingId?listingId=${listingId}`, { pageNumber: 1, pageSize: 50 });
+        const bids = res.data.data.result.items;
+        return dispatch({
+            type: SET_BIDS,
+            payload: bids
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
 
 export const addListing = (listing) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/AddListing`, listing);
+        const msg = listing.AmountAvailable.CurrencyType === 'EUR' ? 'Offer successfully created. The EUR amount is now temporarily unavailabe (escrowed)' : 'Offer successfully created. You will be notified once a buyer accepts your offer';
         return batch(() => {
             dispatch({
                 type: ADDED_LISTING,
-                payload: { listing: res.data.data, msg: 'Your listing has been posted successfully' }
+                payload: { listing: res.data.data, msg }
             });
             dispatch({
                 type: SET_REQUIRED_CURRENCY,
@@ -68,6 +59,19 @@ export const addListing = (listing) => async (dispatch) => {
                     requiredCurrency: listing.AmountAvailable.CurrencyType  
                 }
             });
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getListing = (id) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/GetListing/${id}`);
+        return dispatch({
+            type: SET_LISTING,
+            payload: res.data.data
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -152,7 +156,6 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/GetListingsOpenForBid`, query);
-        console.log(res);
         const { items, ...rest } = res.data.data;
         batch(() => {
             dispatch({
@@ -163,12 +166,6 @@ export const getListingsOpenForBid = (query, setRecommendedRate) => async (dispa
                 type: SET_LOADING,
                 payload: false
             });
-            if (setRecommendedRate && items.length > 0) {
-                dispatch({
-                    type: SET_RECOMMENDED_RATE,
-                    payload: getRecommendedRate(items)
-                });
-            }
         });
     } catch (err) {
         return handleError(err, dispatch);
@@ -210,7 +207,7 @@ export const acceptOffer = (data, listing) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: `Offer placed successfully. ${listing.listedBy} will make the payment within 30 minutes`
+                payload: `Offer accepted! ${listing.listedBy} will transfer ${listing.amountAvailable.currencyType}${listing.amountAvailable.amount} within the hour. N.B.: if no payment is made in 30minutes, you have the right to cancel.`
             });
         });
     } catch (err) {
@@ -235,7 +232,7 @@ export const addBid = (bid, listing) => async (dispatch) => {
     }
 };
 
-export const madePayment = (data) => async (dispatch) => {
+export const madePayment = (data, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePayment`, data)]);
         batch(() => {
@@ -245,7 +242,7 @@ export const madePayment = (data) => async (dispatch) => {
             });
             dispatch({
                 type: SET_LISTING_MSG,
-                payload: 'Payment made successfully'
+                payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
             });
         });
     } catch (err) {
@@ -253,7 +250,7 @@ export const madePayment = (data) => async (dispatch) => {
     }
 };
 
-export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
+export const madePaymentV2 = (data, notificationId, seller) => async (dispatch) => {
     try {
         await Promise.all([reIssueCustomerToken(), axios.post(`${URL}/MadePaymentV2`, data)]);
         dispatch({
@@ -262,7 +259,7 @@ export const madePaymentV2 = (data, notificationId) => async (dispatch) => {
         });
         dispatch({
             type: SET_LISTING_MSG,
-            payload: 'Payment made successfully'
+            payload: `EUR moved to your wallet (escrowed), it will be made available once ${seller} confirms`
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
@@ -301,7 +298,7 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Payment confirmed successfully'
+                payload: 'Transaction completed. The EUR is now made available for the @buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
             });
             dispatch({
                 type: REMOVE_NOTIFICATION,
@@ -309,6 +306,20 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
             });
         });
         return dispatch(markNotificationAsRead(notificationId));
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getExchangeRate = (currency) => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${URL}/ComputeExchangeRate?currency=${currency}`);
+        console.log('Set exchange rate', res);
+        // return dispatch({
+        //     type: SET_RECOMMENDED_RATE,
+        //     payload: res.data.data
+        // });
     } catch (err) {
         return handleError(err, dispatch);
     }

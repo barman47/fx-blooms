@@ -1,7 +1,9 @@
 import { useState, forwardRef, useImperativeHandle } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { 
     Backdrop,
+    Box,
 	Button,
     Fade,
 	Grid,
@@ -9,9 +11,10 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CheckboxMarkedCircle } from 'mdi-material-ui';
+import { InformationOutline } from 'mdi-material-ui';
 
-import { COLORS, SHADOW } from '../../utils/constants';
+import { COLORS, SHADOW } from '../../../utils/constants';
+import { DASHBOARD_HOME, FUND_WALLET } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     modal: {
@@ -51,14 +54,20 @@ const useStyles = makeStyles(theme => ({
     icon: {
         color: theme.palette.primary.main,
         fontSize: theme.spacing(5)
+    },
+
+    buttonContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%'
     }
 }));
 
-const SuccessModal = forwardRef((props, ref) => {
+const ZeroBalanceModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
-    const [text, setText] = useState('');
 
     const { dismissAction } = props;
 
@@ -77,16 +86,15 @@ const SuccessModal = forwardRef((props, ref) => {
         closeModal: () => {
             setOpen(false);
         },
-
-        setModalText: (text) => {
-            setText(text);
-        }
     }));
 
     const handleOnClose = (e, reason) => {
         if (reason === 'backdropClick') {
             return;
         }
+        // if (reason === 'clickaway') {
+        //     return;
+        // }
         closeModal();
     }
 
@@ -107,11 +115,14 @@ const SuccessModal = forwardRef((props, ref) => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
+                        <InformationOutline className={classes.icon} />
                         <Typography variant="subtitle1">
-                            {text}
+                            To sell EUR, you need to fund your wallet
                         </Typography>
-                        <Button onClick={closeModal} color="primary">Okay</Button>
+                        <Box component="div" className={classes.buttonContainer}>
+                            <Button size="small" component={RouterLink} to={FUND_WALLET} color="primary" variant="contained">Fund Wallet</Button>
+                            <Button size="small" component={RouterLink} to={DASHBOARD_HOME} color="secondary" variant="contained">Cancel</Button>
+                        </Box>
                     </Grid>
                 </Grid>
             </Fade>
@@ -119,8 +130,8 @@ const SuccessModal = forwardRef((props, ref) => {
 	);
 });
 
-SuccessModal.propTypes = {
+ZeroBalanceModal.propTypes = {
     dismissAction: PropTypes.func
 };
 
-export default SuccessModal;
+export default ZeroBalanceModal;

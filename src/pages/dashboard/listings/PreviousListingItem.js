@@ -1,18 +1,14 @@
-import { useNavigate, useLocation } from 'react-router-dom';
-import { connect, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { Tooltip, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import clsx from  'clsx';
-import { DeleteForever, FileDocumentEdit } from 'mdi-material-ui';
-
-import { SET_LISTING } from '../../../actions/types';
+import { DeleteForever } from 'mdi-material-ui';
 
 import formatNumber from '../../../utils/formatNumber';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
 import { deleteListing } from '../../../actions/listings';
 import { COLORS, LISTING_STATUS, SHADOW } from '../../../utils/constants';
-import { EDIT_LISTING, MAKE_LISTING } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
 	root: {
@@ -64,28 +60,8 @@ const useStyles = makeStyles(theme => ({
 
 const PreviousListingItem = ({ deleteListing, listing }) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
-    const location = useLocation();
 
     const { open } = LISTING_STATUS;
-
-    const setListing = (listing) => {
-        if (listing.status !== open) {
-            return;
-        }
-        if (location.pathname.includes(MAKE_LISTING)) {
-            dispatch({
-                type: SET_LISTING,
-                payload: listing
-            });
-            return navigate(EDIT_LISTING);
-        }
-        return dispatch({
-            type: SET_LISTING,
-            payload: listing
-        });
-    };
 
     const handleDeleteListing = () => {
         if (listing.status !== open) {
@@ -121,14 +97,6 @@ const PreviousListingItem = ({ deleteListing, listing }) => {
                     {listing.bank.toUpperCase()}
                 </Typography>
                 <section>
-                    <Tooltip title="Edit Listing" aria-label="Edit Listing" arrow>
-                        <FileDocumentEdit 
-                            className={clsx(classes.editIcon, { [`${classes.disabled}`]: listing.status !== open })} 
-                            style={{ cursor: listing.status !== open ? 'not-allowed' : 'pointer' }}
-                            onClick={() => setListing(listing)} 
-                            disabled={listing.status !== open ? true : false}
-                        />
-                    </Tooltip>
                     <Tooltip title="Delete Listing" aria-label="Delete Listing" arrow style={{ marginLeft: '10px' }}>
                         <DeleteForever 
                             className={clsx(classes.deleteIcon, { [`${classes.disabled}`]: listing.status !== open })} 

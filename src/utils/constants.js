@@ -129,6 +129,8 @@ export const LISTING_STATUS = {
     finalized: "FINALIZED",
 };
 
+export const HAS_SEEN_ESCROW_MESSAGE = 'hasSeenEscrowMessage';
+
 export const PAYMENT_METHODS = [
     "N26",
     "TransferWise",

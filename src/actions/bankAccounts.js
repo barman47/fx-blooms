@@ -1,5 +1,5 @@
 import axios from 'axios';
-import $ from "jquery";
+import $ from 'jquery';
 
 import handleError from '../utils/handleError';
 import { ADDED_ACCOUNT, EDITED_ACCOUNT, DELETED_ACCOUNT, SET_ACCOUNT, SET_ACCOUNTS, SET_ACCOUNT_VALIDATION, GET_ERRORS } from './types';
@@ -10,9 +10,8 @@ const URL = `${API}/account-management`;
 
 export const addAccount = (account) => async (dispatch) => {
     try {
-        const { first, second, third, fourth, ...rest } = account;
         await reIssueCustomerToken();
-        const res = await axios.post(`${URL}/accounts/add`, { ...rest, pin: `${first}${second}${third}${fourth}`});
+        const res = await axios.post(`${URL}/accounts/add`, account);
         dispatch({
             type: ADDED_ACCOUNT,
             payload: {
@@ -29,7 +28,6 @@ export const editAccount = (account, accountId) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${URL}/accounts/${accountId}/edit`, account);
-        console.log(res);
         dispatch({
             type: EDITED_ACCOUNT,
             payload: {

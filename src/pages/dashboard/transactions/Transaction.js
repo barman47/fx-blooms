@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -14,7 +14,7 @@ import { SET_TRANSACTION } from '../../../actions/types';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import returnLastSixDigits from '../../../utils/returnLastThreeCharacters';
-import { convertToLocalTime } from '../../../utils/getTime';
+import getTime, { convertToLocalTime } from '../../../utils/getTime';
 import { TRANSACTION_STATUS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     text: {
-        color: COLORS.offBlack,
+        // color: COLORS.offBlack,
         fontWeight: 600,
         marginTop: theme.spacing(1)
     },
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const Transaction = ({ transaction }) => {
+const Transaction = ({ cancelTransaction, transaction }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -62,11 +62,25 @@ const Transaction = ({ transaction }) => {
 
     const [amount, setAmount] = useState(0);
     const [currency, setCurrency] = useState('');
-    // eslint-disable-next-line
-    const [reference, setReference] = useState('');
+    const [timerMinutes, setTimerMinutes] = useState('00');
+    const [timerSeconds, setTimerSeconds] = useState('00');
+    const [expired, setExpired] = useState(false);
+    const [isPending, setIsPending] = useState(false);
+
+    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
+
+    const interval = useRef();
 
     useEffect(() => {
         setTransactionDetails();
+        if (!transaction.buyer.hasMadePayment && !transaction.buyer.hasReceivedPayment && !transaction.seller.hasMadePayment && !transaction.seller.hasReceivedPayment) {
+            startExpiryTimer();
+            setIsPending(true);
+        }
+
+        return () => {
+            clearInterval(interval.current);
+        }
         // eslint-disable-next-line
     }, []);
 
@@ -94,11 +108,36 @@ const Transaction = ({ transaction }) => {
         // }
     };
 
+    const startExpiryTimer = () => {
+        // const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
+        // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
+        // const countDownTime = date + THIRTY_MINUTES;
+        const countDownTime = new Date((convertToLocalTime(transaction.dateCreated))).getTime() + THIRTY_MINUTES;
+        interval.current = setInterval(() => {
+            const distance = countDownTime - getTime();
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+
+            if (minutes <= 0 && seconds <= 0) {
+                clearInterval(interval.current);
+                setExpired(true);
+                setTimerMinutes('00');
+                setTimerSeconds('00');
+                // expireListing();
+                // setTimerValue(0);
+            } else {
+                setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
+                setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
+                // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
+            }
+        }, 1000);
+    };
+
     const setTransactionDetails = () => {
-        const { amount, currency, reference } = getTransactionDetails(transaction);
+        const { amount, currency } = getTransactionDetails(transaction);
         setAmount(amount);
         setCurrency(currency);
-        setReference(reference);
     };
 
     const getTransactionDetails = () => {
@@ -137,6 +176,12 @@ const Transaction = ({ transaction }) => {
         toast.success('Listing ID copied');
     };
 
+    const handleCancelTransaction = () => {
+        if (window.confirm('Are you sure you want to cancel this transaction?')) {
+            cancelTransaction(transaction.id, transaction.bidId)
+        }
+    };
+
     return (
         <Box component="section" className={classes.root}>
             <Box component="div">
@@ -144,8 +189,18 @@ const Transaction = ({ transaction }) => {
                 <Typography variant="body1" component="p" className={classes.text}>{convertToLocalTime(transaction.dateCreated).fromNow()}</Typography>
             </Box>
             <Box component="div">
-                <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>
-                <Typography variant="body1" component="p" className={classes.text}>P2P Exchange</Typography>
+                {isPending ? 
+                    <>
+                        <Typography variant="body2" component="span" className={classes.label}>Transaction Countdown</Typography>
+                        <Typography variant="body1" component="p" className={classes.text}>{`00: ${timerMinutes}:${timerSeconds}`}</Typography>
+                    </>
+                    :
+                    <>
+                        <Typography variant="body2" component="span" className={classes.label}>Transaction Type</Typography>
+                        <Typography variant="body1" component="p" className={classes.text}>P2P Exchange</Typography>
+                    </>
+                }
+                
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Amount Tendered</Typography>
@@ -164,24 +219,44 @@ const Transaction = ({ transaction }) => {
             </Box>
             <Box component="div">
                 <Typography variant="body2" component="span" className={classes.label}>Status</Typography>
-                <Typography variant="body1" component="p" className={clsx(classes.text, {[classes.inProgress]: !transaction.isClosed})}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
+                {isPending ? 
+                    <Typography variant="body1" component="p" color="error" className={clsx(classes.text)}>Pending</Typography> 
+                    : 
+                    <Typography variant="body1" component="p" className={clsx(classes.text, {[classes.inProgress]: !transaction.isClosed})}>{transaction?.isClosed ? 'Completed' : 'In Progress'}</Typography>
+                }
             </Box>
-            <Button 
-                variant="outlined" 
-                color="primary" 
-                disableRipple
-                disableFocusRipple
-                disableTouchRipple
-                onClick={gotoTransaction}
-            >
-                View More
-            </Button>
+            {isPending ? 
+                <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    disableRipple
+                    disableFocusRipple
+                    disableTouchRipple
+                    onClick={handleCancelTransaction}
+                    disabled={!expired}
+                >
+                    Cancel
+                </Button>
+                :
+                <Button 
+                    variant="outlined" 
+                    color="primary" 
+                    disableRipple
+                    disableFocusRipple
+                    disableTouchRipple
+                    onClick={gotoTransaction}
+                >
+                    View More
+                </Button>
+            }
+            
         </Box>
     );
 };
 
 Transaction.propTypes = {
-    transaction: PropTypes.object.isRequired
+    transaction: PropTypes.object.isRequired,
+    cancelTransaction: PropTypes.func
 };
 
 export default Transaction;

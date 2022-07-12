@@ -29,6 +29,7 @@ import clsx from 'clsx';
 
 import AccountSetupModal from './AccountSetupModal';
 import SessionModal from './SessionModal';
+import AlertModal from '../../components/common/AlertModal';
 import Toast from '../../components/common/Toast';
 import AlertNotification from './notifications/AlertNotification';
 
@@ -48,7 +49,6 @@ import {
     ChevronLeft, 
     ChevronRight, 
     ChevronDown, 
-    FormatListText, 
     HomeOutline, 
     LockOutline, 
     Logout, 
@@ -56,13 +56,14 @@ import {
     Menu,
     Security,
     TwoFactorAuthentication,
+    ViewListOutline,
     Wallet
 } from 'mdi-material-ui';
 import { 
     BANK_ACCOUNTS, 
-    MAKE_LISTING, 
     DASHBOARD_HOME, 
     NOTIFICATIONS, 
+    HOW_IT_WORKS_DASHBOARD,
     SECURITY,
     ID_VERIFICATION, 
     PIN, 
@@ -83,18 +84,17 @@ import {
     PAYMENT_NOTIFICATION_OFFER_MADE,
     // REMOVE_NOTIFICATION,
     SET_CUSTOMER_MSG,
-    SET_LISTING_MSG
+    // SET_LISTING_MSG
 } from '../../actions/types';
 
 
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
 import { checkPin } from '../../actions/pin';
-import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, HAS_SEEN_ESCROW_MESSAGE, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
-import SelectCurrencyListingDrawer from './listings/SelectCurrencyListingDrawer';
 import SuccessModal from '../../components/common/SuccessModal';
 import TransactionCompleteModal from './TransactionCompleteModal';
 // import CreateWalletModal from './wallet/CreateWalletModal';
@@ -120,7 +120,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
 
     alertContainerOpen: {
@@ -129,7 +134,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
     
     appBarContent: {
@@ -391,6 +401,7 @@ const Dashboard = (props) => {
     
     const { customerId, hasSetup2FA, isPhoneNumberVerified, stats, twoFactorEnabled, userName } = useSelector(state => state.customer);
     const { alertNotifications, connectionStatus, unreadNotifications } = useSelector(state => state.notifications);
+    const { pendingTransactions } = useSelector(state => state.transactions);
     const { authorized } = useSelector(state => state.twoFactor);
 
     const [value, setValue] = useState(0);
@@ -405,18 +416,19 @@ const Dashboard = (props) => {
     
     const mobileLinks = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
-        { url : MAKE_LISTING, text:'Add Listing', icon: <FormatListText /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
+        { url: WALLETS, text:'Wallets', icon: <Wallet /> }
     ];
 
     const protectedRoutes = [
         { url : DASHBOARD_HOME, text:'Dashboard', icon: <HomeOutline /> },
-        { url : MAKE_LISTING, text:'Make a Listing', icon: <FormatListText /> },
         { url: WALLETS, text:'Wallets', icon: <Wallet /> },
         { url: TRANSACTIONS, text:'Transactions', icon: <ArrowLeftRight /> },
+        // { url: TRANSACTIONS, text:'Transactions', icon: <Badge overlap="rectangular" badgeContent={pendingTransactions} color="primary"><ArrowLeftRight /></Badge> },
         { url: BANK_ACCOUNTS, text:'Bank Accounts', icon: <BagChecked /> },
         { url: SECURITY, text:'Security', icon: <LockOutline /> },
-        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> }
+        { url: NOTIFICATIONS, text:'Notifications', icon: <Badge overlap="circular" color="error" variant="dot" badgeContent={unreadNotifications}><MessageOutline /></Badge> },
+        { url: HOW_IT_WORKS_DASHBOARD, text:'How it works', icon: <ViewListOutline /> }
     ];
 
     const securityLinks = [
@@ -428,14 +440,15 @@ const Dashboard = (props) => {
     const { checkPin, getNotificationCount, logout, markNotificationAsRead, title } = props;
     
     const accountSetupModal = useRef();
+    const alertModal = useRef();
     const customToast = useRef();
-    const selectCurrencyListingDrawer = useRef();
     const successModal = useRef();
     const transactionCompleteModal = useRef();
 
     const { NOT_SUBMITTED } = ID_STATUS;
 
     useEffect(() => {
+        showEscrowMessage();
         getNotificationCount(customerId);
         checkPin(customerId);
         if (matches) {
@@ -578,6 +591,15 @@ const Dashboard = (props) => {
         }
     }, [connectionStatus]);
 
+    const showEscrowMessage = () => {
+        const hasSeenEscrowMessage = localStorage.getItem(HAS_SEEN_ESCROW_MESSAGE);
+        if (!hasSeenEscrowMessage) {
+            alertModal.current.setModalText('FXBLOOMS platform now supports escrow. Hence, users are required to fund their wallets in order to perform some activities.');
+            alertModal.current.openModal();
+            localStorage.setItem(HAS_SEEN_ESCROW_MESSAGE, 'true');
+        }
+    };
+
     const toggleDrawer = () => {
         setOpen(!open);
     };
@@ -667,19 +689,19 @@ const Dashboard = (props) => {
                         }
 
                         // Show message to buyer only
-                        if (customerId === buyer.CustomerId && seller.HasMadePayment === false) {
-                            dispatch({
-                                type: SET_LISTING_MSG,
-                                payload: `${seller.UserName} will confirm your payment and send the ${seller.Currency} equivalent to the account you provided.`
-                            });
-                        }
+                        // if (customerId === buyer.CustomerId && seller.HasMadePayment === false) {
+                        //     dispatch({
+                        //         type: SET_LISTING_MSG,
+                        //         payload: `${seller.UserName} will confirm your payment and send the ${seller.Currency} equivalent to the account you provided.`
+                        //     });
+                        // }
 
-                        if (customerId === buyer.CustomerId && seller.HasMadePayment) {
-                            dispatch({
-                                type: SET_LISTING_MSG,
-                                payload: `Payment successful, a notification was sent. Once ${seller.UserName} confirms, this transaction will be considered complete.`
-                            });
-                        }
+                        // if (customerId === buyer.CustomerId && seller.HasMadePayment) {
+                        //     dispatch({
+                        //         type: SET_LISTING_MSG,
+                        //         payload: `Payment successful, a notification was sent. Once ${seller.UserName} confirms, this transaction will be considered complete.`
+                        //     });
+                        // }
                         break;
 
                     case BUYER_CONFIRMED_PAYMENT:
@@ -712,19 +734,19 @@ const Dashboard = (props) => {
                                     payload: notification
                                 });
                                 // Show message to seller only
-                                if (customerId === seller.CustomerId && buyer.HasMadePayment) {
-                                    dispatch({
-                                        type: SET_CUSTOMER_MSG,
-                                        payload: `Payment successful, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
-                                    });
-                                }
+                                // if (customerId === seller.CustomerId && buyer.HasMadePayment) {
+                                //     dispatch({
+                                //         type: SET_CUSTOMER_MSG,
+                                //         payload: `Payment successful, a notification was sent. Once ${buyer.UserName} confirms, this transaction will be considered complete.`
+                                //     });
+                                // }
 
-                                if (customerId === seller.CustomerId && buyer.HasMadePayment === false) {
-                                    dispatch({
-                                        type: SET_CUSTOMER_MSG,
-                                        payload: `${buyer.UserName} will confirm your payment and send the ${buyer.Currency} equivalent to the account you provided.`
-                                    });
-                                }
+                                // if (customerId === seller.CustomerId && buyer.HasMadePayment === false) {
+                                //     dispatch({
+                                //         type: SET_CUSTOMER_MSG,
+                                //         payload: `${buyer.UserName} will confirm your payment and send the ${buyer.Currency} equivalent to the account you provided.`
+                                //     });
+                                // }
                             });
                         }
 
@@ -796,24 +818,13 @@ const Dashboard = (props) => {
     };
 
     const handleLinkClick = (link) => {
-        if (link === MAKE_LISTING && location.pathname.includes(MAKE_LISTING)) {
-            return;
-        }
-
         if (matches) {
             if (open) {
                 setTimeout(() => {
                     setOpen(false);
                 }, 500);
             }
-            if (link === MAKE_LISTING) {
-                return selectCurrencyListingDrawer?.current?.toggleDrawer();
-            }
             navigate(link); 
-        }
-
-        if (link === MAKE_LISTING) {
-            return selectCurrencyListingDrawer?.current?.toggleDrawer();
         }
         navigate(link); 
     };
@@ -829,8 +840,8 @@ const Dashboard = (props) => {
         <>
             <Helmet><title>{`${title} | FXBLOOMS.com`}</title></Helmet>
             <AccountSetupModal ref={accountSetupModal} />
+            <AlertModal ref={alertModal} />
             <SuccessModal ref={successModal} dismissAction={dismissAction} />
-            <SelectCurrencyListingDrawer ref={selectCurrencyListingDrawer} />
             <TransactionCompleteModal ref={transactionCompleteModal} />
             {/* {showCreateWalletModal && <CreateWalletModal open={showCreateWalletModal} toggleCreateWalletDrawer={toggleCreateWalletDrawer} />} */}
             <SessionModal />
@@ -961,6 +972,36 @@ const Dashboard = (props) => {
                                             <Divider />
                                         </Fragment>
                                     );
+                                }
+                                if (link.url === TRANSACTIONS) {
+                                    return (
+                                        <Fragment key={index}>
+                                            <ListItem 
+                                                // className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                className={clsx(classes.linkItem, { [classes.activeLink]: path.includes(`${link.url}`) })} 
+                                                key={index} 
+                                                button 
+                                                disableRipple
+                                                onClick={() => handleLinkClick(link.url)}
+                                            >
+                                                <Badge overlap="rectangular" badgeContent={pendingTransactions} color="secondary">
+                                                    {open ? 
+                                                        <ListItemIcon className={classes.icon}>
+                                                            {link.icon}
+                                                        </ListItemIcon>
+                                                        :
+                                                        <Tooltip title={link.text} placement="right" arrow>
+                                                            <ListItemIcon className={classes.icon}>
+                                                                {link.icon}
+                                                            </ListItemIcon>
+                                                        </Tooltip>
+                                                    }
+                                                    {open && <ListItemText primary={link.text} />}
+                                                </Badge>
+                                            </ListItem>
+                                            <Divider />
+                                        </Fragment>
+                                    );    
                                 }
                                 return (
                                     <Fragment key={index}>

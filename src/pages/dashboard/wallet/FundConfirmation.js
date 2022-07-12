@@ -16,19 +16,31 @@ import formatNumber from '../../../utils/formatNumber';
 
 const useStyles = makeStyles(theme => ({
     root: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
         padding: theme.spacing(0, 5, 2, 5),
-        width: '80%',
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(0, 1, 1, 1),
-            width: '90%',
-        },
+            width: '95%',
+        }
+    },
+
+    text: {
+        fontWeight: 300,
+        marginBottom: theme.spacing(2),
     },
 
     content: {
-        // border: '1px solid red',
-        width: '100%',
-        // justifyContent: 'center',
+        width: '60%',
+        [theme.breakpoints.down('md')]: {
+            width: '90%'
+        },
+
+        [theme.breakpoints.down('sm')]: {
+            width: '100%'
+        }
     },
 
     fundingRequest: {
@@ -38,12 +50,11 @@ const useStyles = makeStyles(theme => ({
         gridTemplateColumns: '1fr',
         rowGap: theme.spacing(1),
         padding: theme.spacing(2),
-        // margin: theme.spacing(2, ),
         margin: '10px  auto',
-        // width: '100%',
 
         [theme.breakpoints.down('sm')]: {
             margin: 0,
+            marginBottom: theme.spacing(2)
         },
 
         '& section': {
@@ -63,7 +74,6 @@ const FundConfirmation = ({ handleSetTitle }) => {
 
     const { wallets, fundingRequest } = useSelector(state => state.wallets);
 
-
     useEffect(() => {
         // Set token to localStorage from sessionStorage
         localStorage.setItem(AUTH_TOKEN, sessionStorage.getItem(AUTH_TOKEN));
@@ -82,8 +92,8 @@ const FundConfirmation = ({ handleSetTitle }) => {
 
     return (
         <Box component="section" className={classes.root}>
-            <Typography variant="h6" color="primary" className={classes.pageTitle}>Funding Details</Typography>
-            <Typography variant="body2" component="p" className={classes.pageTitle}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
+            <Typography variant="h6" color="primary">Funding Details</Typography>
+            <Typography variant="body2" component="p" className={classes.text}>Kindly confirm the details you provided below and proceed to Authorize Funding or go back if you need to make any changes.</Typography>
             <Box component="div" className={classes.content}>
                 <Box component="div" className={classes.fundingRequest}>
                     <Box component="section">

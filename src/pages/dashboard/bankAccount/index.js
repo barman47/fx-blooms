@@ -153,6 +153,7 @@ const BankAccounts = ({ deleteAccount, handleSetTitle }) => {
                     type="error"
                 />
             }
+            <AddAccountDrawer drawerOpen={showAddAccountDrawer} toggleDrawer={toggleShowAddAccountDrawer} eur={true} ngn={true} />
             {editAccount && <EditAccountDrawer toggleDrawer={toggleEditAccountDrawer} drawerOpen={editAccount} />}
             {msg && <SuccessModal ref={successModalRef} dismissAction={dismissAction} />}
             <section className={classes.root}>
@@ -194,7 +195,6 @@ const BankAccounts = ({ deleteAccount, handleSetTitle }) => {
                     }
                 </div>
             </section>
-            <AddAccountDrawer drawerOpen={showAddAccountDrawer} toggleDrawer={toggleShowAddAccountDrawer} eur={true} ngn={true} />
         </>
     );
 }
