@@ -157,7 +157,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     }, [msg]);
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
-        // setLoading(true);
+        setLoading(true);
         const data = {
             transactionSessionId: tranactionId,
             message: '',
