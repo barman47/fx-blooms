@@ -201,7 +201,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     const handleButtonAction = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
-        setLoading(true);
         if (customerId === Seller.CustomerId) {
             return handlePaymentReceived(notification.Id, notificationId);
         }

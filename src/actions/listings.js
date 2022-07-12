@@ -298,7 +298,7 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Transaction completed. The EUR is now made available for the @buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
+                payload: 'Transaction completed. The EUR is now made available for the buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
             });
             dispatch({
                 type: REMOVE_NOTIFICATION,
