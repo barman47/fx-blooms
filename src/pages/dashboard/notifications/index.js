@@ -157,7 +157,7 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     }, [msg]);
 
     const handlePaymentReceived = (tranactionId, notificationId) => {
-        setLoading(true);
+        // setLoading(true);
         const data = {
             transactionSessionId: tranactionId,
             message: '',
@@ -201,7 +201,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     const handleButtonAction = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
-        setLoading(true);
         if (customerId === Seller.CustomerId) {
             return handlePaymentReceived(notification.Id, notificationId);
         }

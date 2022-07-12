@@ -13,7 +13,7 @@ import {
     SET_AS_ACCEPTED,
     SET_BID,
     SET_BIDS,
-    SET_CUSTOMER_MSG,
+    // SET_CUSTOMER_MSG,
     SET_LISTING, 
     SET_LISTINGS, 
     SET_LISTING_MSG,
@@ -295,15 +295,20 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
             reIssueCustomerToken(),
             axios.post(`${URL}/CompleteTransaction`, data)
         ]);
-        batch(() => {
-            dispatch({
-                type: SET_CUSTOMER_MSG,
-                payload: 'Transaction completed. The EUR is now made available for the @buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
-            });
-            dispatch({
-                type: REMOVE_NOTIFICATION,
-                payload: notificationId
-            });
+        // batch(() => {
+        //     dispatch({
+        //         type: SET_CUSTOMER_MSG,
+        //         payload: 'Transaction completed. The EUR is now made available for the buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
+        //     });
+        //     dispatch({
+        //         type: REMOVE_NOTIFICATION,
+        //         payload: notificationId
+        //     });
+        // });
+        
+        dispatch({
+            type: REMOVE_NOTIFICATION,
+            payload: notificationId
         });
         return dispatch(markNotificationAsRead(notificationId));
     } catch (err) {
