@@ -26,6 +26,7 @@ import {
     CLEAR_WITHDRAWAL_REQUESTS,
     UPDATE_FUNDING_REQUEST,
     CLEAR_WALLET,
+    FETCH_WALLETS,
 } from "../actions/types";
 
 import { WALLET_FILTER } from "../utils/constants";
@@ -52,6 +53,7 @@ const initialState = {
     withdrawalSuccess: null,
     withdrawalTrigger: null,
     checkList: {},
+    isLoading: false,
 };
 
 const walletsReducer = (state = initialState, action) => {
@@ -69,6 +71,11 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 wallets: action.payload,
+            };
+        case FETCH_WALLETS:
+            return {
+                ...state,
+                isLoading: true,
             };
 
         case SET_ONE_WALLET:
@@ -151,6 +158,7 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 transactions: action.payload ? action.payload : [],
+                isLoading: false,
             };
 
         case SET_WALLET_FILTER:
@@ -163,6 +171,7 @@ const walletsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 fundingRequests: action.payload,
+                isLoading: false,
             };
         
         // case SET_BANK_ACCOUNTS:

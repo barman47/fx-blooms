@@ -1,16 +1,7 @@
-import { useState, useLayoutEffect, useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useSelector } from "react-redux";
-// import PropTypes from 'prop-types';
 import { Box, Typography, Divider } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-// import clsx from 'clsx';
-
-// import { COLORS } from '../../../utils/constants';
-import {
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
-    getCustomer,
-} from "../../../actions/customer";
 import GenericGridAuth from "../../../components/admin-dashboard/GenericGridAuth";
 
 const useStyles = makeStyles((theme) => ({
@@ -79,26 +70,7 @@ const useStyles = makeStyles((theme) => ({
 
 const AuthenticationDetails = () => {
     const classes = useStyles();
-    const { customer, idCheckData, profileCheckData } = useSelector(
-        (state) => state.customers
-    );
-    // const { customer } = useSelector(state => state.customers);
-    // const errorsState = useSelector(state => state.errors);
-
-    // const [loading, setLoading] = useState(false);
-
-    const [twoFactorEnabled] = useState(customer.twoFactorEnabled);
-    const [hasSetUpTwoFactor] = useState(customer.hasSetUpTwoFactor);
-
-    const [verifiedPhoneNumber] = useState(customer.isPhoneNumberVerified);
-    const [verifiedEmail] = useState(customer.isEmailVerified);
-    const [verifiedAddress] = useState(customer.residencePermitStatus);
-
-    // eslint-disable-next-line
-    // const [errors, setErrors] = useState({});
-
-    // const toast = useRef();
-    // console.log('auth', twoFactorEnabled)
+    const { customer } = useSelector((state) => state.customers);
 
     const isVerified = useCallback(
         (status) => {
@@ -115,7 +87,7 @@ const AuthenticationDetails = () => {
     const hasSetup2FASetup = useCallback(
         (status) => {
             if (!!status) {
-                if (!!twoFactorEnabled) {
+                if (!!customer.twoFactorEnabled) {
                     return classes.verified;
                 } else {
                     return classes.rejected;
@@ -124,12 +96,12 @@ const AuthenticationDetails = () => {
                 return classes.status;
             }
         },
-        [classes.rejected, classes.verified, classes.status, twoFactorEnabled]
+        [classes.rejected, classes.verified, classes.status, customer]
     );
 
     const handleDisplayStatus = useCallback(() => {
-        if (!!hasSetUpTwoFactor) {
-            if (!!twoFactorEnabled) {
+        if (!!customer.hasSetUpTwoFactor) {
+            if (!!customer.twoFactorEnabled) {
                 return "ACTIVE";
             } else {
                 return "INACTIVE";
@@ -137,7 +109,7 @@ const AuthenticationDetails = () => {
         } else {
             return "NOT SETUP";
         }
-    }, [twoFactorEnabled, hasSetUpTwoFactor]);
+    }, [customer]);
 
     const handleVerification = (status) => {
         switch (status) {
@@ -147,43 +119,6 @@ const AuthenticationDetails = () => {
                 return "UNVERIFIED";
         }
     };
-
-    useLayoutEffect(() => {
-        if (!idCheckData) {
-            getIdCardValidationResponse(customer.id);
-        }
-
-        if (!profileCheckData) {
-            getResidencePermitValidationResponse(customer.id);
-        }
-
-        // dispatch({
-        //     type: GET_ERRORS,
-        //     payload: {}
-        // });
-        // eslint-disable-next-line
-    }, []);
-
-    useEffect(() => {
-        if (!twoFactorEnabled) {
-            getCustomer(customer.id);
-        }
-    }, [twoFactorEnabled, customer]);
-
-    // useEffect(() => {
-    //     if (errorsState?.msg) {
-    //         setLoading(false);
-    //         // toast.current.handleClick();
-    //     }
-    // }, [errorsState, errors]);
-
-    // useEffect(() => {
-    //     if (msg) {
-    //         setLoading(false);
-    //         successModal.current.openModal();
-    //         successModal.current.setModalText(msg);
-    //     }
-    // }, [dispatch, msg]);
 
     return (
         <>
@@ -214,7 +149,7 @@ const AuthenticationDetails = () => {
                             twoFactorName="Google Authenticator"
                             statusName={handleDisplayStatus()}
                             conditionalStyles={hasSetup2FASetup(
-                                hasSetUpTwoFactor
+                                customer.hasSetUpTwoFactor
                             )}
                         />
 
@@ -223,7 +158,7 @@ const AuthenticationDetails = () => {
                             twoFactorName="SMS Authenticator"
                             statusName={handleDisplayStatus()}
                             conditionalStyles={hasSetup2FASetup(
-                                hasSetUpTwoFactor
+                                customer.hasSetUpTwoFactor
                             )}
                         />
 
@@ -232,7 +167,7 @@ const AuthenticationDetails = () => {
                             twoFactorName="Email Authenticator"
                             statusName={handleDisplayStatus()}
                             conditionalStyles={hasSetup2FASetup(
-                                hasSetUpTwoFactor
+                                customer.hasSetUpTwoFactor
                             )}
                         />
                     </Box>
@@ -251,42 +186,48 @@ const AuthenticationDetails = () => {
                             Verifications
                         </Typography>
                         <GenericGridAuth
-                            conditionalStyles={isVerified(verifiedPhoneNumber)}
+                            conditionalStyles={isVerified(
+                                customer.isPhoneNumberVerified
+                            )}
                             btnWidth="9vw"
                             gridColumns="1fr 1fr"
                             mb="15px"
                             twoFactorName="Phone Number"
-                            statusName={handleVerification(verifiedPhoneNumber)}
+                            statusName={handleVerification(
+                                customer.isPhoneNumberVerified
+                            )}
                         />
 
                         <GenericGridAuth
-                            conditionalStyles={isVerified(verifiedAddress)}
+                            conditionalStyles={isVerified(
+                                customer.residencePermitStatus
+                            )}
                             btnWidth="9vw"
                             gridColumns="1fr 1fr"
                             mb="15px"
                             twoFactorName="Address"
-                            statusName={handleVerification(verifiedAddress)}
+                            statusName={handleVerification(
+                                customer.residencePermitStatus
+                            )}
                         />
 
                         <GenericGridAuth
-                            conditionalStyles={isVerified(verifiedEmail)}
+                            conditionalStyles={isVerified(
+                                customer.isEmailVerified
+                            )}
                             btnWidth="9vw"
                             gridColumns="1fr 1fr"
                             mb="15px"
                             twoFactorName="Email"
-                            statusName={handleVerification(verifiedEmail)}
+                            statusName={handleVerification(
+                                customer.isEmailVerified
+                            )}
                         />
                     </Box>
                 </Box>
             </Box>
         </>
     );
-};
-
-AuthenticationDetails.propTypes = {
-    // getIdCardValidationResponse: PropTypes.func.isRequired,
-    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
-    // getCustomer: PropTypes.func.isRequired,
 };
 
 export default AuthenticationDetails;

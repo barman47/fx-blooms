@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Typography, Box, Paper } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
@@ -6,7 +6,7 @@ import { getWallets } from "../../../actions/wallets";
 import greenWallet from "../../../assets/img/greenWalletShape.svg";
 import blackWallet from "../../../assets/img/blackWalletShape.svg";
 import icon from "../../../assets/img/icon.png";
-import isEmpty from "../../../utils/isEmpty";
+
 import modifyAmount from "../../../utils/modifyAmount";
 
 const useStyles = makeStyles((theme) => ({
@@ -111,9 +111,6 @@ const WalletDetails = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
 
-    const [ngn, setNgn] = useState({});
-    const [eur, setEur] = useState({});
-
     const { customer } = useSelector((state) => state.customers);
     const { wallets } = useSelector((state) => state.wallets);
 
@@ -122,13 +119,6 @@ const WalletDetails = () => {
             dispatch(getWallets(customer.id, "ADMIN"));
         }
     }, [dispatch, customer?.id]);
-
-    useEffect(() => {
-        if (!isEmpty(wallets)) {
-            setEur(wallets[1]);
-            setNgn(wallets[0]);
-        }
-    }, [wallets]);
 
     return (
         <>
@@ -157,23 +147,27 @@ const WalletDetails = () => {
                                     alt="icon"
                                     src={icon}
                                 />
-                                {eur?.currency?.value ?? "EUR"} WALLET
+                                {wallets[1]?.currency?.value ?? "EUR"} WALLET
                             </Typography>
 
                             <Typography
                                 className={classes.walletAmount}
                                 variant="h6"
                             >
-                                {eur?.currency?.value !== undefined
-                                    ? eur?.currency?.value +
+                                {wallets[1]?.currency?.value !== undefined
+                                    ? wallets[1]?.currency?.value +
                                       " " +
-                                      modifyAmount(+eur?.balance?.available)
+                                      modifyAmount(
+                                          +wallets[1]?.balance?.available
+                                      )
                                     : "EUR 0"}
                                 <Typography className={classes.walletLien}>
                                     Lien Bal{" "}
-                                    {eur?.currency?.value !== undefined
-                                        ? eur?.currency?.value +
-                                          modifyAmount(+eur?.balance?.lien)
+                                    {wallets[1]?.currency?.value !== undefined
+                                        ? wallets[1]?.currency?.value +
+                                          modifyAmount(
+                                              +wallets[1]?.balance?.lien
+                                          )
                                         : "EUR0"}
                                 </Typography>
                             </Typography>
@@ -181,7 +175,7 @@ const WalletDetails = () => {
                                 <img
                                     className={classes.walletDesign}
                                     src={
-                                        eur?.currency?.value === "EUR"
+                                        wallets[1]?.currency?.value === "EUR"
                                             ? blackWallet
                                             : greenWallet
                                     }
@@ -189,7 +183,7 @@ const WalletDetails = () => {
                                 />
                             </Box>
                         </Paper>
-                        <Paper
+                        {/* <Paper
                             className={classes.paperWalletCard}
                             elevation={3}
                             variant="outlined"
@@ -204,24 +198,28 @@ const WalletDetails = () => {
                                     alt="icon"
                                     src={icon}
                                 />
-                                {ngn?.currency?.value ?? "NGN"} WALLET
+                                {wallets[0]?.currency?.value ?? "NGN"} WALLET
                             </Typography>
 
                             <Typography
                                 className={classes.walletAmount}
                                 variant="h6"
                             >
-                                {ngn?.currency?.value !== undefined
-                                    ? ngn?.currency?.value +
+                                {wallets[0]?.currency?.value !== undefined
+                                    ? wallets[0]?.currency?.value +
                                       " " +
-                                      modifyAmount(+ngn?.balance?.available)
+                                      modifyAmount(
+                                          +wallets[0]?.balance?.available
+                                      )
                                     : "NGN 0"}
 
                                 <Typography className={classes.walletLien}>
                                     Lien Bal{" "}
-                                    {ngn?.currency?.value !== undefined
-                                        ? ngn?.currency?.value +
-                                          modifyAmount(+ngn?.balance?.lien)
+                                    {wallets[0]?.currency?.value !== undefined
+                                        ? wallets[0]?.currency?.value +
+                                          modifyAmount(
+                                              +wallets[0]?.balance?.lien
+                                          )
                                         : "NGN0"}
                                 </Typography>
                             </Typography>
@@ -229,14 +227,14 @@ const WalletDetails = () => {
                                 <img
                                     className={classes.walletDesign}
                                     src={
-                                        ngn?.currency?.value === "EUR"
+                                        wallets[0]?.currency?.value === "EUR"
                                             ? blackWallet
                                             : greenWallet
                                     }
                                     alt="wallet design"
                                 />
                             </Box>
-                        </Paper>
+                        </Paper> */}
                     </Box>
                 </Box>
             </Box>

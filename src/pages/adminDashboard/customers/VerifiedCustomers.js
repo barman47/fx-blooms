@@ -1,116 +1,35 @@
-import { connect, useSelector } from 'react-redux';
-import PropTypes from 'prop-types';
-// import { 
-//     Checkbox,
-//     FormControlLabel,
-//     IconButton, 
-//     TableCell, 
-//     TableRow, 
-//     Typography 
-// } from '@material-ui/core';
-// import { makeStyles } from '@material-ui/core/styles';
-// import { DotsHorizontal } from 'mdi-material-ui';
-// import TextClamp from 'react-string-clamp';
+import { useSelector } from "react-redux";
+import PropTypes from "prop-types";
 
-import { getNewCustomers } from '../../../actions/customer';
-// import { SET_CUSTOMER } from '../../../actions/types';
-import { USER_COLUMNS } from '../../../utils/constants';
-import GenericTableBody from '../../../components/admin-dashboard/GenericTableBody'
+import { USER_COLUMNS } from "../../../utils/constants";
+import GenericTableBody from "../../../components/admin-dashboard/GenericTableBody";
 
-
-// const useStyles = makeStyles(theme => ({
-//     customer: {
-//         background: 'transparent',
-//         display: 'grid',
-//         gridTemplateColumns: '0.2fr 1fr 1fr 1.5fr 1fr 0.5fr 0.7fr 0.5fr',
-//         alignItems: 'center',
-
-//         '&:last-child': {
-//             borderBottom: 'none'
-//         }
-//     },
-
-//     text: {
-//         color: COLORS.offBlack,
-//         fontWeight: 400,
-//         padding: theme.spacing(1),
-
-//         [theme.breakpoints.down('md')]: {
-//             fontSize: theme.spacing(1.2)
-//         },
-
-//         [theme.breakpoints.down('md')]: {
-//             fontSize: theme.spacing(0.7)
-//         }
-//     },
-
-//     item: {
-//         border: 'none',
-//         marginBottom: 0
-//     },
-    
-//     button: {
-//         justifySelf: 'center'
-//     },
-
-//     customerLink: {
-//         color: `${theme.palette.primary.main}`,
-//         cursor: 'pointer'
-//     },
-// }));
-
-const VerifiedCustomers = ({ getNewCustomers, handleClick, viewCustomerProfile, loading }) => {
-
-    const verifiedCustomers = useSelector(state => state.customers?.confirmed?.items);
-
-    // useEffect(() => {
-    //     // handleSetTitle('Verified Customers');
-    //     // if (!verifiedCustomers) {
-    //         getNewCustomers({
-    //             pageNumber: 1,
-    //             pageSize: 25
-    //         });
-    //     // }
-    //     // eslint-disable-next-line
-    // }, []);
-
+const VerifiedCustomers = ({
+    getNewCustomers,
+    handleClick,
+    viewCustomerProfile,
+    loading,
+}) => {
+    const verifiedCustomers = useSelector(
+        (state) => state.customers?.confirmed?.items
+    );
     return (
         <>
-            <GenericTableBody loading={loading} data={verifiedCustomers} columnList={USER_COLUMNS} handleClick={handleClick} viewCustomerProfile={viewCustomerProfile}  />
-            {/* {verifiedCustomers && verifiedCustomers.map((customer) => (
-                <TableRow role="checkbox" tabIndex={-1} key={customer.id} className={classes.customer} hover>
-                    <TableCell className={classes.item}>
-                        <FormControlLabel control={<Checkbox name="checked" color="primary" disableFocusRipple disableTouchRipple disableRipple />} />    
-                    </TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)}><TextClamp text={customer.firstName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.lastName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.email} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item} style={{ cursor: 'pointer' }} onClick={() => viewCustomerProfile(customer)} ><TextClamp text={customer.userName} lines={1} className={classes.text} /></TableCell>
-                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer.customerStatus}</Typography></TableCell>
-                    <TableCell className={classes.item}><Typography variant="subtitle2" component="span">{customer?.riskProfile}</Typography></TableCell>
-                    <TableCell className={classes.item} style={{ justifySelf: 'stretch' }}>
-                        <IconButton 
-                            variant="text" 
-                            size="small" 
-                            className={classes.button} 
-                            aria-controls="customer-menu" 
-                            aria-haspopup="true" 
-                            onClick={(e) => handleButtonClick(customer, e)} 
-                            disableRipple
-                        >
-                            <DotsHorizontal />
-                        </IconButton>
-                    </TableCell>
-                </TableRow>
-            ))} */}
+            <GenericTableBody
+                loading={loading}
+                data={verifiedCustomers}
+                columnList={USER_COLUMNS}
+                handleClick={handleClick}
+                viewCustomerProfile={viewCustomerProfile}
+            />
         </>
     );
 };
 
 VerifiedCustomers.propTypes = {
-    getNewCustomers: PropTypes.func.isRequired,
+    loading: PropTypes.bool.isRequired,
     handleClick: PropTypes.func.isRequired,
-    viewCustomerProfile: PropTypes.func.isRequired
+    viewCustomerProfile: PropTypes.func.isRequired,
 };
 
-export default connect(undefined, { getNewCustomers })(VerifiedCustomers);
+export default VerifiedCustomers;

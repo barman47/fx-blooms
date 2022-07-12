@@ -3,17 +3,11 @@ import {
     CLEAR_CUSTOMER,
     SET_CUSTOMER,
     SET_CUSTOMERS,
-    SET_MORE_CUSTOMERS,
     SET_CUSTOMER_STATUS,
     SET_NEW_CUSTOMERS,
-    SET_MORE_NEW_CUSTOMERS,
     SET_CONFIRMED_CUSTOMERS,
-    SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
-    SET_MORE_REJECTED_CUSTOMERS,
     SET_SUSPENDED_CUSTOMERS,
-    SET_MORE_SUSPENDED_CUSTOMERS,
-    SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
     SET_CUSTOMERS_WITHOUT_PROFILE,
     SET_ALL_CUSTOMERS,
     CLEAR_ALL_CUSTOMERS,
@@ -23,9 +17,16 @@ import {
     ACCEPTED_CUSTOMER_RESIDENCE_PERMIT,
     SET_PAGE_NUMBER,
     SET_PAGE_SIZE,
+    CUSTOMER_SEARCH_RESULT,
     SET_BUYER,
     SET_CATEGORY,
     UPDATED_CUSTOMER,
+    FETCHING_STOP,
+    FETCHING_START,
+    FETCHING_ID_STOP,
+    FETCHING_ID_START,
+    CLEAR_PROFILE_DATA,
+    CLEAR_IDCHECK_DATA,
 } from "../actions/types";
 
 import { CUSTOMER_CATEGORY } from "../utils/constants";
@@ -48,6 +49,10 @@ const initialState = {
     suspended: {},
     buyer: {},
     msg: null,
+    customersSearchResult: {},
+    isLoading: false,
+    isLoadingIdData: false,
+    isLoadingApproveId: false,
 };
 
 const customersReducer = (state = initialState, action) => {
@@ -61,6 +66,28 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 customer: action.payload,
+            };
+        case FETCHING_START:
+            return {
+                ...state,
+                isLoading: true,
+            };
+
+        case FETCHING_STOP:
+            return {
+                ...state,
+                isLoading: false,
+            };
+        case FETCHING_ID_START:
+            return {
+                ...state,
+                isLoadingIdData: true,
+            };
+
+        case FETCHING_ID_STOP:
+            return {
+                ...state,
+                isLoadingIdData: false,
             };
 
         case SET_BUYER:
@@ -81,20 +108,7 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
-            };
-
-        case SET_MORE_NEW_CUSTOMERS:
-            return {
-                ...state,
-                pending: {
-                    items: [...state.pending.items, ...action.payload.items],
-                    totalItemCount: action.payload.totalItemCount,
-                    totalPageCount: action.payload.totalPageCount,
-                    currentPageSize: action.payload.currentPageSize,
-                    currentPageNumber: action.payload.currentPageNumber,
-                    hasNext: action.payload.hasNext,
-                    hasPrevious: action.payload.hasPrevious,
-                },
+                isLoading: false,
             };
 
         case SET_CONFIRMED_CUSTOMERS:
@@ -109,20 +123,7 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
-            };
-
-        case SET_MORE_CONFIRMED_CUSTOMERS:
-            return {
-                ...state,
-                confirmed: {
-                    items: [...state.confirmed.items, ...action.payload.items],
-                    totalItemCount: action.payload.totalItemCount,
-                    totalPageCount: action.payload.totalPageCount,
-                    currentPageSize: action.payload.currentPageSize,
-                    currentPageNumber: action.payload.currentPageNumber,
-                    hasNext: action.payload.hasNext,
-                    hasPrevious: action.payload.hasPrevious,
-                },
+                isLoading: false,
             };
 
         case SET_CUSTOMERS_WITHOUT_PROFILE:
@@ -137,20 +138,7 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
-            };
-
-        case SET_MORE_CUSTOMERS_WITHOUT_PROFILE:
-            return {
-                ...state,
-                noProfile: {
-                    items: [...state.noProfile.items, ...action.payload.items],
-                    totalItemCount: action.payload.totalItemCount,
-                    totalPageCount: action.payload.totalPageCount,
-                    currentPageSize: action.payload.currentPageSize,
-                    currentPageNumber: action.payload.currentPageNumber,
-                    hasNext: action.payload.hasNext,
-                    hasPrevious: action.payload.hasPrevious,
-                },
+                isLoading: false,
             };
 
         case SET_SUSPENDED_CUSTOMERS:
@@ -165,20 +153,7 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
-            };
-
-        case SET_MORE_SUSPENDED_CUSTOMERS:
-            return {
-                ...state,
-                suspended: {
-                    items: [...state.suspended.items, ...action.payload.items],
-                    totalItemCount: action.payload.totalItemCount,
-                    totalPageCount: action.payload.totalPageCount,
-                    currentPageSize: action.payload.currentPageSize,
-                    currentPageNumber: action.payload.currentPageNumber,
-                    hasNext: action.payload.hasNext,
-                    hasPrevious: action.payload.hasPrevious,
-                },
+                isLoading: false,
             };
 
         case SET_REJECTED_CUSTOMERS:
@@ -193,20 +168,7 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
-            };
-
-        case SET_MORE_REJECTED_CUSTOMERS:
-            return {
-                ...state,
-                rejected: {
-                    items: [...state.rejected.items, ...action.payload.items],
-                    totalItemCount: action.payload.totalItemCount,
-                    totalPageCount: action.payload.totalPageCount,
-                    currentPageSize: action.payload.currentPageSize,
-                    currentPageNumber: action.payload.currentPageNumber,
-                    hasNext: action.payload.hasNext,
-                    hasPrevious: action.payload.hasPrevious,
-                },
+                isLoading: false,
             };
 
         case SET_ALL_CUSTOMERS:
@@ -217,6 +179,7 @@ const customersReducer = (state = initialState, action) => {
                     ...state.confirmed.items,
                     ...state.rejected.items,
                 ],
+                isLoading: false,
             };
 
         case CLEAR_ALL_CUSTOMERS:
@@ -237,13 +200,14 @@ const customersReducer = (state = initialState, action) => {
                     hasNext: action.payload.hasNext,
                     hasPrevious: action.payload.hasPrevious,
                 },
+                isLoading: false,
             };
 
-        case SET_MORE_CUSTOMERS:
+        case CUSTOMER_SEARCH_RESULT:
             return {
                 ...state,
-                customers: {
-                    items: [...state.customers.items, ...action.payload.items],
+                customersSearchResult: {
+                    items: action.payload.items,
                     totalItemCount: action.payload.totalItemCount,
                     totalPageCount: action.payload.totalPageCount,
                     currentPageSize: action.payload.currentPageSize,
@@ -263,6 +227,16 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 profileCheckData: action.payload,
+            };
+        case CLEAR_PROFILE_DATA:
+            return {
+                ...state,
+                profileCheckData: null,
+            };
+        case CLEAR_IDCHECK_DATA:
+            return {
+                ...state,
+                idCheckData: null,
             };
 
         case SET_CUSTOMER_STATUS:
@@ -384,10 +358,10 @@ const customersReducer = (state = initialState, action) => {
                 default:
                     break;
             }
-
             break;
 
         case ACCEPTED_CUSTOMER_ID:
+            console.log(action.payload);
             return {
                 ...state,
                 msg: "Customer ID card has been verified",
