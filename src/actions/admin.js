@@ -9,8 +9,8 @@ import {
     SET_CURRENT_ADMIN,
     SET_CUSTOMER_COUNT,
     SET_LISTING_COUNT,
-    SET_CUSTOMERS,
-    SET_LISTINGS,
+    CUSTOMER_SEARCH_RESULT,
+    LISTING_SEARCH_RESULT,
     SET_TRANSACTION_VOLUME,
     SET_STATS,
     SET_TRANSACTIONS,
@@ -120,7 +120,7 @@ export const searchForCustomer =
                 `${api}/SearchForCustomer?KeyWord=${searchText}&PageNumber=${pageNumber}&PageSize=${pageSize}`
             );
             return dispatch({
-                type: SET_CUSTOMERS,
+                type: CUSTOMER_SEARCH_RESULT,
                 payload: res.data.data,
             });
         } catch (err) {
@@ -136,9 +136,9 @@ export const searchForListings = (customerId, query) => async (dispatch) => {
             query
         );
         const { items, ...rest } = res.data.data;
-        // console.log("items", items);
+        console.log("items", items);
         return dispatch({
-            type: SET_LISTINGS,
+            type: LISTING_SEARCH_RESULT,
             payload: { listings: items, ...rest },
         });
     } catch (err) {

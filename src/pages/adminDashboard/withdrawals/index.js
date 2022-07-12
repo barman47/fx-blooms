@@ -386,11 +386,11 @@ const columns = [
         label: "Payment Status",
         format: (value) => value.toLocaleString("en-US"),
     },
-    {
-        id: "paymenttype",
-        label: "Payment Type",
-        format: (value) => value.toLocaleString("en-US"),
-    },
+    // {
+    //     id: "paymenttype",
+    //     label: "Payment Type",
+    //     format: (value) => value.toLocaleString("en-US"),
+    // },
     {
         id: "date",
         label: "Date",
@@ -446,7 +446,7 @@ const withdrawalColumns = [
 const { WITHDRAWAL, FUND } = PAYMENT_TYPE;
 const { IN_PROGRESS, FAILED, COMPLETED, PENDING } = PAYMENT_STATUS;
 
-const gridColumns = ".3fr 1.5fr 1.2fr .7fr 1fr 1fr 1fr";
+const gridColumns = ".3fr 1.5fr 1.2fr .7fr 1fr 1fr";
 // const withdrawalGridCol = "1fr 1fr 1fr 1fr 1fr .5fr .5fr 1fr"
 const pages = [15, 50, 75, 100];
 
@@ -504,9 +504,10 @@ const Withdrawals = () => {
     const allInstitutions = useSelector((state) => state.institutions);
     const admin = useSelector((state) => state.admin);
     const { msg } = useSelector((state) => state.errors);
-    const { toastType, setToastType } = useState("error");
+    const [toastType, setToastType] = useState("error");
 
     const [isMan, setIsMan] = useState(false);
+    const [dispatchType, setDispatchType] = useState("");
 
     const { requestNumber, institutions } = requests;
     const ref = useRef();
@@ -569,10 +570,6 @@ const Withdrawals = () => {
     useEffect(() => {
         if (!!batchId && !isEmpty(withdrawalRequests)) {
             dispatch(getInstitutions("ADMIN"));
-            // dispatch({
-            //   type: SET_BATCH_ID,
-            //   payload: null
-            // })
         }
     }, [withdrawalRequests, dispatch, batchId]);
 
@@ -599,17 +596,6 @@ const Withdrawals = () => {
         }
     }, [allInstitutions, dispatch, institutions, batchId]);
 
-    // const handlePageNUmberList = useCallback(() => {
-    //     const pageNumArr = [];
-    //     if (pageCount >= 1) {
-    //         for (let i = 1; i <= pageCount; i++) {
-    //             pageNumArr.push(i);
-    //         }
-    //     }
-    //     setPageNumberList(pageNumArr);
-    //     setLastPage(pageCount);
-    // }, [pageCount]);
-
     useEffect(() => {
         if (isEmpty(account.result)) {
             dispatch(getAllFXBAccounts());
@@ -618,9 +604,7 @@ const Withdrawals = () => {
 
     useEffect(() => {
         if (!!items) {
-            console.log("hello", items);
             setLoading(false);
-            // handlePageNUmberList();
         }
     }, [items]);
 
@@ -635,14 +619,6 @@ const Withdrawals = () => {
 
         setPageCount(totalPageCount || 0);
     }, [rowsPerPage, currentPage, dispatch, totalPageCount]);
-
-    // const onNextPage = () => {
-    //     setCurrentPage(currentPage + 1);
-    // };
-
-    // const onPrevPage = () => {
-    //     setCurrentPage(currentPage - 1);
-    // };
 
     const downloadAll = async () => {
         // await exportAllUserRecords(admin)
@@ -693,7 +669,7 @@ const Withdrawals = () => {
     };
 
     const openManualScreen = () => {
-        console.log(batchList);
+        // console.log(batchList);
         if (isEmpty(batchList)) {
             setCheckBoxMsg("Add a request");
             ref.current.handleClick();
@@ -787,11 +763,12 @@ const Withdrawals = () => {
 
     useEffect(() => {
         if (!!withdrawalTrigger) {
+            setBatchList([]);
             setToastType("success");
-            setCheckBoxMsg("withdrawalTrigger");
-            dispatch({
-                type: CLEAR_WITHDRAWAL_REQUESTS,
-            });
+            setCheckBoxMsg(withdrawalTrigger);
+            setDispatchType(CLEAR_WITHDRAWAL_REQUESTS);
+            ref.current.handleClick();
+            return;
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dispatch, withdrawalTrigger]);
@@ -823,12 +800,17 @@ const Withdrawals = () => {
     };
 
     const triggerWithdrawal = () => {
-        console.log("bl", batchList);
         if (batchList.length > 1) {
             setCheckBoxMsg("One request at a time");
             ref.current.handleClick();
             return;
         }
+        if (batchList.length < 1) {
+            setCheckBoxMsg("Please select a request");
+            ref.current.handleClick();
+            return;
+        }
+
         dispatch(
             completeWithdrawalRequest({
                 id: batchList[0],
@@ -844,6 +826,7 @@ const Withdrawals = () => {
                 type={toastType}
                 msg={checkBoxMsg}
                 title="Withdrawal Batch"
+                dispatchType={dispatchType}
             />
             <section
                 className={clsx(
@@ -1596,29 +1579,6 @@ const Withdrawals = () => {
                                             </Button>
                                         </>
                                     )}
-
-                                    {/* <Box component="div" className={classes.withdrawalTable}>
-                      <GenericTableHeader columns={withdrawalColumns} gridColumns={withdrawalGridCol} headerPadding="11px 15px" />
-                      <Box component="div" className={classes.withdrawalTableBody}>
-                        <Typography component="span">Revolut</Typography>
-                        <Typography component="span">FXBLOOMS</Typography>
-                        <Typography component="span">1011011011</Typography>
-                        <Typography component="span">₤32000</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-
-                        <Typography component="span">Revolut</Typography>
-                        <Typography component="span">FXBLOOMS</Typography>
-                        <Typography component="span">1011011011</Typography>
-                        <Typography component="span">₤32000</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                        <Typography className={classes.icon} component="span">Test</Typography>
-                      </Box>
-                    </Box> */}
                                 </>
                             )}
                         </Box>

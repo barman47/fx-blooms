@@ -1,7 +1,16 @@
 import axios from 'axios';
 import { batch } from 'react-redux';
 
-import { REMOVE_NOTIFICATION, SET_LOADING, SET_TRANSACTION, SET_TRANSACTIONS, SET_TRANSACTION_TERMS } from './types';
+import { 
+    REMOVE_NOTIFICATION,
+    REMOVE_TRANSACTION,
+    SET_LOADING,
+    SET_TRANSACTION,
+    SET_TRANSACTIONS,
+    SET_TRANSACTION_TERMS,
+    SET_PENDING_TRANSACTION_COUNT,
+    SET_TRANSACTION_MSG
+} from './types';
 import handleError from '../utils/handleError';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
 
@@ -68,6 +77,40 @@ export const acceptChatPopupNotification = (chatId) => async (dispatch) => {
         return dispatch({
             type: SET_TRANSACTION_TERMS,
             payload: { buyerAcceptedTransactionTerms, sellerAcceptedTransactionTerms }
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getPendingTransactionCount = () => async (dispatch) => {
+    try {
+        await reIssueCustomerToken();
+        const res = await axios.get(`${api}/GetPendingTransferCount`);
+        return dispatch({
+            type: SET_PENDING_TRANSACTION_COUNT,
+            payload: res.data.data
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const cancelTransaction = (transactionId) => async (dispatch) => {
+    try {
+        await Promise.all([
+            reIssueCustomerToken(),
+            axios.post(`${api}/CancelOffer?transferId=${transactionId}`)
+        ]);
+        return batch(() => {
+            dispatch({
+                type: SET_TRANSACTION_MSG,
+                payload: 'Offer successfully cancelled. Your EUR is reverted to wallet. You may accept or create a new offer.'
+            });
+            dispatch({
+                type: REMOVE_TRANSACTION,
+                payload: transactionId
+            });
         });
     } catch (err) {
         return handleError(err, dispatch);

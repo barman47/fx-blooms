@@ -19,17 +19,23 @@ import {
     HIDE_NEGOTIATION_LISTINGS,
     TOGGLE_BID_STATUS,
     SET_RECOMMENDED_RATE,
+    LISTING_SEARCH_RESULT,
     REMOVE_EXPIRED_LISTING,
     MAKE_LISTING_OPEN,
     UPDATED_LISTING,
     CREDIT_LISTING,
-} from "../actions/types";
+    VIEW_LISTING,
+    SET_BUY,
+    SET_SELL
+} from '../actions/types';
 
 import { BID_STATUS, LISTING_STATUS } from "../utils/constants";
 
 const initialState = {
-    availableCurrency: "NGN",
-    requiredCurrency: "EUR",
+    availableCurrency: 'NGN',
+    requiredCurrency: 'EUR',
+    buy: true,
+    sell: false,
     addedListing: false,
     editedListing: false,
     addedBid: false,
@@ -47,6 +53,7 @@ const initialState = {
     msg: null,
     recommendedRate: null,
     credit: null,
+    listingSearchResult: [],
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -62,6 +69,20 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 availableCurrency: action.payload.availableCurrency,
                 requiredCurrency: action.payload.requiredCurrency,
+            };
+
+        case SET_BUY:
+            return {
+                ...state,
+                buy: true,
+                sell: false
+            };
+
+        case SET_SELL:
+            return {
+                ...state,
+                buy: false,
+                sell: true
             };
 
         case ADDED_BID:
@@ -156,6 +177,18 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 listings: [...listingsList],
             };
+        case VIEW_LISTING:
+            const WF = "BUY";
+            return {
+                ...state,
+                listing: {
+                    ...action.payload,
+                    workFlow:
+                        action.payload.amountAvailable.currencyType === "EUR"
+                            ? `${WF} ${action.payload.amountAvailable.currencyType}`
+                            : `${WF} ${action.payload.amountAvailable.currencyType}`,
+                },
+            };
 
         case SET_LISTING:
             return {
@@ -169,6 +202,15 @@ const listingsReducer = (state = initialState, action) => {
                 ...state,
                 listings,
                 ...rest,
+            };
+
+        case LISTING_SEARCH_RESULT:
+            // const { listings: searchListings } = action.payload;
+            console.log(action.payload);
+            return {
+                ...state,
+                listingSearchResult: action.payload.listings,
+                ...action.payload.rest,
             };
 
         case SET_ACTIVE_LISTINGS:

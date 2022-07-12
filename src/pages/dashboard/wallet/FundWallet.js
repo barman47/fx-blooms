@@ -38,7 +38,7 @@ import NoInsitutionModal from './NoInsitutionModal';
 import UnsupportedInstitutionModal from './UnsupportedInstitutionModal';
 import SupportedFundingInstitutionsModal from '../bankAccount/SupportedFundingInstitutionsModal';
 
-// import yapily from '../../../assets/img/yapily.png';
+import yapily from '../../../assets/img/yapily.png';
 // import bankTransfer from '../../../assets/img/bank-transfer.png';
 // import cardPayment from '../../../assets/img/card-logo.png';
 
@@ -116,12 +116,31 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: theme.spacing(3)
+        marginTop: theme.spacing(3),
+
+        [theme.breakpoints.down('sm')]: {
+            flexDirection: 'column'
+        },
+
+        '& img': {
+            width: theme.spacing(15),
+
+            [theme.breakpoints.down('sm')]: {
+                flexDirection: 'row',
+                width: theme.spacing(10)
+            },
+        }
+    },
+
+    noteContent: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center'
     },
 
     icon: {
         color: COLORS.grey,
-        marginRight: theme.spacing(2)
+        margin: theme.spacing(0, 2)
     }
 }));
 
@@ -499,8 +518,11 @@ const FundWallet = ({ getCurrencies, requestWalletFunding, handleSetTitle }) => 
                         </Grid>
                     </Grid>
                     <Grid item xs={12} className={classes.note}>
-                        <Security className={classes.icon} />
-                        <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily UAB. The information taken is used only for the payment processing and will be kept secure by Yapily UAB.</Typography>
+                        <img src={yapily} alt="Yapily Logo" />
+                        <Box className={classes.noteContent}>
+                            <Security className={classes.icon} />
+                            <Typography variant="subtitle2" component="span" className={classes.text}>This service is powered by Yapily (Safe Connect) UAB. Your information is used for payment processing only, and will be kept secure by Safe Connect UAB.</Typography>
+                        </Box>
                     </Grid>
                 </form>
             </Box>

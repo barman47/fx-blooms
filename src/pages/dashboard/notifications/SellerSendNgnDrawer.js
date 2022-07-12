@@ -14,12 +14,11 @@ import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';
 import { markNotificationAsRead } from '../../../actions/notifications';
-import { GET_ERRORS, REMOVE_NOTIFICATION, SET_ACCOUNT, SET_BID, SET_BIDS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_ACCOUNT, SET_BID, SET_BIDS, SET_LISTING, SET_LISTING_MSG } from '../../../actions/types';
 import { getAccount } from '../../../actions/bankAccounts';
 import { COLORS } from '../../../utils/constants';
 import formatNumber from '../../../utils/formatNumber';
 import isEmpty from '../../../utils/isEmpty';
-import getTime, { convertToLocalTime } from '../../../utils/getTime';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -150,27 +149,20 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
 
     const [addAccountDrawerOpen, setAddAccountDrawerOpen] = useState(false);
 
-    const [timerMinutes, setTimerMinutes] = useState('00');
-    const [timerSeconds, setTimerSeconds] = useState('00');
-
     const [errors, setErrors] = useState({});
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-
-    const THIRTY_MINUTES = 1800000; // 30 minutes in milliseconds
 
     const interval = useRef();
     const successModal = useRef();
     const errorToast = useRef();
 
     useEffect(() => {
-        startExpiryTimer();
         return () => {
             dispatch({
                 type: SET_BIDS,
                 payload: []
             });
-            clearInterval(interval.current);
         };
         // eslint-disable-next-line
     }, []);
@@ -229,43 +221,7 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
         }
     }, [bids, cancelBid, getBidIds, handleOpenTimeElapsedModal, toggleDrawer]);
 
-    const expireListing = useCallback(() => {
-        getBids(bid.data.ListingId);
-        clearInterval(interval.current);
-        dispatch({
-            type: REMOVE_NOTIFICATION,
-            payload: notificationId
-        });
-        
-        markNotificationAsRead(notificationId);
-    }, [bid.data.ListingId, dispatch, getBids, markNotificationAsRead, notificationId]);
-
     const toggleAddAccountDrawer = () => setAddAccountDrawerOpen(!addAccountDrawerOpen);
-
-    const startExpiryTimer = useCallback(() => {
-        // const date = bid.dateLogged.endsWith('Z') ? new Date(bid.dateLogged).getTime() : new Date(bid.dateLogged + 'Z').getTime();
-        // let countDownTime = new Date(bid.dateLogged); // Remove 22 Seconds from the timer. I don't know wjy but when it starts there's an additional 22 seconds
-        // const countDownTime = date + THIRTY_MINUTES;
-        const countDownTime = new Date((convertToLocalTime(bid.dateLogged))).getTime() + THIRTY_MINUTES;
-        interval.current = setInterval(() => {
-            const distance = countDownTime - getTime();
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-
-            if (minutes <= 0 && seconds <= 0) {
-                clearInterval(interval.current);
-                setTimerMinutes('00');
-                setTimerSeconds('00');
-                expireListing();
-                // setTimerValue(0);
-            } else {
-                setTimerMinutes(minutes < 10 ? `0${minutes}` : minutes);
-                setTimerSeconds(seconds < 10 ? `0${seconds}` : seconds);
-                // setTimerValue(Math.floor(distance / THIRTY_MINUTES * 100));
-            }
-        }, 1000);
-    }, [bid, expireListing]);
 
     useEffect(() => {
         setOpen(drawerOpen);
@@ -274,10 +230,9 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
             payload: {}
         });
         if (!drawerOpen) {
-            clearInterval(interval.current);
             setErrors({});
         }
-    }, [dispatch, drawerOpen, startExpiryTimer]);
+    }, [dispatch, drawerOpen]);
 
     useEffect(() => {
         if (msg) {
@@ -383,10 +338,6 @@ const SellerSendNgnDrawer = ({ cancelBid, getBids, handleOpenTimeElapsedModal, m
                             <Typography variant="subtitle2" component="span" className={classes.accountDetailsText}>{bid.data.Buyer.TransferReference}</Typography>
                         </div>
                     </section>
-                </Grid>
-                <Grid item xs={12} className={classes.timerContainer}>
-                    <Typography variant="subtitle2" component="span" color="textSecondary">Kindly send {bid.data.Seller.Currency}{formatNumber((bid.data.Seller.AmountTransfered), 2)} within...</Typography>
-                    <Typography variant="h4" color="error">{timerMinutes}:{timerSeconds}</Typography>
                 </Grid>
                 <Grid item xs={12}>
                     <Button 

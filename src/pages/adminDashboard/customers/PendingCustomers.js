@@ -3,16 +3,16 @@ import PropTypes from "prop-types";
 import { USER_COLUMNS } from "../../../utils/constants";
 import GenericTableBody from "../../../components/admin-dashboard/GenericTableBody";
 
-const NoProfileCustomers = ({ handleClick, viewCustomerProfile, loading }) => {
-    const noProfileCustomers = useSelector(
-        (state) => state.customers?.noProfile?.items
+const PendingCustomers = ({ handleClick, viewCustomerProfile, loading }) => {
+    const pendingCustomers = useSelector(
+        (state) => state.customers?.pending?.items
     );
 
     return (
         <>
             <GenericTableBody
                 loading={loading}
-                data={noProfileCustomers}
+                data={pendingCustomers}
                 columnList={USER_COLUMNS}
                 handleClick={handleClick}
                 viewCustomerProfile={viewCustomerProfile}
@@ -21,10 +21,10 @@ const NoProfileCustomers = ({ handleClick, viewCustomerProfile, loading }) => {
     );
 };
 
-NoProfileCustomers.propTypes = {
+PendingCustomers.propTypes = {
     loading: PropTypes.bool.isRequired,
     handleClick: PropTypes.func.isRequired,
     viewCustomerProfile: PropTypes.func.isRequired,
 };
 
-export default NoProfileCustomers;
+export default PendingCustomers;

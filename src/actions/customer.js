@@ -27,28 +27,30 @@ import {
     SET_CURRENT_CUSTOMER,
     SET_CUSTOMER_PROFILE,
     SET_CONFIRMED_CUSTOMERS,
-    SET_MORE_CONFIRMED_CUSTOMERS,
     SET_REJECTED_CUSTOMERS,
-    SET_MORE_REJECTED_CUSTOMERS,
     SET_SUSPENDED_CUSTOMERS,
-    SET_MORE_SUSPENDED_CUSTOMERS,
     SET_CUSTOMERS_WITHOUT_PROFILE,
-    SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
     SET_CUSTOMER_STATUS,
     SET_CUSTOMER_STATS,
     SET_CUSTOMER,
     SET_BUYER,
     SET_CUSTOMERS,
-    SET_MORE_CUSTOMERS,
     SET_CUSTOMER_MSG,
     HIDE_PHONE_NUMBER,
     SHOW_PHONE_NUMBER,
+    // APPROVE_ID_START,
+    // APPROVE_ID_STOP,
+    FETCHING_ID_START,
+    FETCHING_ID_STOP,
     SET_NEW_CUSTOMERS,
-    SET_MORE_NEW_CUSTOMERS,
     SET_CUSTOMER_LISTING_COUNT,
     SET_CUSTOMER_VOLUME_COUNT,
+    FETCHING_START,
+    FETCHING_STOP,
     SET_EMAIL,
     GET_ERRORS,
+    CLEAR_IDCHECK_DATA,
+    CLEAR_PROFILE_DATA,
 } from "./types";
 import extractIdDetails from "../utils/extractIdDetails";
 
@@ -263,27 +265,18 @@ export const getCustomerStats = () => async (dispatch) => {
     }
 };
 
+export const fetchStart = () => ({
+    type: FETCHING_START,
+});
+
 export const getCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_CUSTOMERS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getMoreCustomers = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetAllCustomers`, query);
-        dispatch({
-            type: SET_MORE_CUSTOMERS,
             payload: res.data.data,
         });
     } catch (err) {
@@ -325,6 +318,7 @@ export const getNewCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(
             `${api}/GetCustomersAwaitingConfirmation/`,
             query
@@ -338,44 +332,14 @@ export const getNewCustomers = (query) => async (dispatch) => {
     }
 };
 
-export const getMoreNewCustomers = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(
-            `${api}/GetCustomersAwaitingConfirmation/`,
-            query
-        );
-        return dispatch({
-            type: SET_MORE_NEW_CUSTOMERS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
 export const getRejectedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
         return dispatch({
             type: SET_REJECTED_CUSTOMERS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getMoreRejectedCustomers = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
-        return dispatch({
-            type: SET_MORE_REJECTED_CUSTOMERS,
             payload: res.data.data,
         });
     } catch (err) {
@@ -387,23 +351,10 @@ export const getVerifiedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
         return dispatch({
             type: SET_CONFIRMED_CUSTOMERS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getMoreVerifiedCustomers = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
-        return dispatch({
-            type: SET_MORE_CONFIRMED_CUSTOMERS,
             payload: res.data.data,
         });
     } catch (err) {
@@ -415,23 +366,10 @@ export const getCustomersWithoutProfile = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
         return dispatch({
             type: SET_CUSTOMERS_WITHOUT_PROFILE,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getMoreCustomersWithoutProfile = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
-        return dispatch({
-            type: SET_MORE_CUSTOMERS_WITHOUT_PROFILE,
             payload: res.data.data,
         });
     } catch (err) {
@@ -443,23 +381,10 @@ export const getSuspendedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${api}/GetSuspendedCustomers`, query);
         return dispatch({
             type: SET_SUSPENDED_CUSTOMERS,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
-
-export const getMoreSuspendedCustomers = (query) => async (dispatch) => {
-    try {
-        // Issue admin token
-        await reIssueAdminToken();
-        const res = await axios.post(`${api}/GetSuspendedCustomers`, query);
-        return dispatch({
-            type: SET_MORE_SUSPENDED_CUSTOMERS,
             payload: res.data.data,
         });
     } catch (err) {
@@ -499,20 +424,26 @@ export const setCustomerStatus =
         try {
             // Issue admin token
             await reIssueAdminToken();
+            dispatch(fetchStart());
             const res = await axios.post(
                 `${api}/CustomerStatus?customerID=${customerID}&status=${newStatus}`
             );
-            console.log("res", res);
+            // console.log("res", res);
             const msg = res.data.data;
-            dispatch({
-                type: SET_CUSTOMER_STATUS,
-                payload: {
-                    customerID,
-                    newStatus,
-                    currentStatus,
-                    msg,
-                    isPersonal,
-                },
+            batch(() => {
+                dispatch({
+                    type: SET_CUSTOMER_STATUS,
+                    payload: {
+                        customerID,
+                        newStatus,
+                        currentStatus,
+                        msg,
+                        isPersonal,
+                    },
+                });
+                dispatch({
+                    type: FETCHING_STOP,
+                });
             });
             return await axios.get(`${API}/admin/GetAppStatistics`);
         } catch (err) {
@@ -593,9 +524,22 @@ export const sendMail = (data) => async (dispatch) => {
     }
 };
 
+export const fetchIdsStart = () => ({
+    type: FETCHING_ID_START,
+});
+
+// export const approveIdStart = () => ({
+//     type: APPROVE_ID_START
+// })
+
+export const fetchIdsStop = () => ({
+    type: FETCHING_ID_STOP,
+});
+
 export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
     try {
         await reIssueAdminToken();
+        dispatch(fetchIdsStart());
         const res = await axios.get(
             `${api}/GetIDCardValidationResponse/id/${customerId}`
         );
@@ -629,11 +573,19 @@ export const getIdCardValidationResponse = (customerId) => async (dispatch) => {
         //     status: data.overallResult.status
         // };
         // console.log(res.data.data);
-        dispatch({
-            type: SET_ID_CHECK_DATA,
-            payload: customerData,
+        batch(() => {
+            dispatch({
+                type: SET_ID_CHECK_DATA,
+                payload: customerData,
+            });
+            dispatch({
+                type: FETCHING_ID_STOP,
+            });
         });
     } catch (err) {
+        dispatch({
+            type: CLEAR_IDCHECK_DATA,
+        });
         return handleError(err, dispatch);
     }
 };
@@ -642,6 +594,7 @@ export const getResidencePermitValidationResponse =
     (customerId) => async (dispatch) => {
         try {
             await reIssueAdminToken();
+            dispatch(fetchIdsStart());
             const res = await axios.get(
                 `${api}/GetResidencePermitValidationResponse/id/${customerId}`
             );
@@ -672,11 +625,20 @@ export const getResidencePermitValidationResponse =
 
             //     status: data.overallResult.status
             // };
-            dispatch({
-                type: SET_PROFILE_CHECK_DATA,
-                payload: customerData,
+            console.log(customerData);
+            batch(() => {
+                dispatch({
+                    type: SET_PROFILE_CHECK_DATA,
+                    payload: customerData,
+                });
+                dispatch({
+                    type: FETCHING_ID_STOP,
+                });
             });
         } catch (err) {
+            dispatch({
+                type: CLEAR_PROFILE_DATA,
+            });
             return handleError(err, dispatch);
         }
     };
@@ -748,25 +710,17 @@ export const subscribeToNewsletter = (email) => async (dispatch) => {
 
 export const getCustomerListingCounts = (customerId) => async (dispatch) => {
     try {
-        await reIssueAdminToken();
-        const deletedListingCount = await axios.get(
-            `${admin}/GetUserDeletedListingCount?customerId=${customerId}`
-        );
-
-        const completedListingCount = await axios.get(
-            `${admin}/GetUserCompletedListingCount?customerId=${customerId}`
-        );
-
-        const totalListingCount = await axios.get(
-            `${admin}/GetUserTotalListingCount?customerId=${customerId}`
-        );
-        const activeListingCount = await axios.get(
-            `${admin}/GetUserActiveListingCount?customerId=${customerId}`
-        );
-        const inProgressListingCount = await axios.get(
-            `${admin}/GetUserListingInProgressCount?customerId=${customerId}`
-        );
-
+        const promises = [
+            reIssueAdminToken(),
+            axios.get(`${admin}/GetUserDeletedListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserCompletedListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserTotalListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserActiveListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserListingInProgressCount?customerId=${customerId}`)
+        ];
+        
+        // eslint-disable-next-line no-unused-vars
+        const [_, deletedListingCount, completedListingCount, totalListingCount, activeListingCount, inProgressListingCount] = await Promise.all(promises);
         dispatch({
             type: SET_CUSTOMER_LISTING_COUNT,
             payload: {

@@ -314,14 +314,14 @@ const TransactionDetails = () => {
                                         Deleted
                                     </Typography>
                                     <Typography variant="h6">
-                                        {deletedListingCount ?? 0}
+                                        {+deletedListingCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
 
                                 <div className={classes.detailsRow}>
                                     <Typography variant="h6">Active</Typography>
                                     <Typography variant="h6">
-                                        {activeListingCount ?? 0}
+                                        {+activeListingCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
 
@@ -330,14 +330,15 @@ const TransactionDetails = () => {
                                         In Progress
                                     </Typography>
                                     <Typography variant="h6">
-                                        {inProgressListingCount ?? 0}
+                                        {+inProgressListingCount?.toFixed(2) ??
+                                            0}
                                     </Typography>
                                 </div>
 
                                 <div className={classes.detailsRow}>
                                     <Typography variant="h6">Total</Typography>
                                     <Typography variant="h6">
-                                        {totalListingCount ?? 0}
+                                        {+totalListingCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
                             </div>
@@ -401,14 +402,14 @@ const TransactionDetails = () => {
                                 <div className={classes.detailsRow}>
                                     <Typography variant="h6">Buys</Typography>
                                     <Typography variant="h6">
-                                        {buyCount ?? 0}
+                                        {+buyCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
 
                                 <div className={classes.detailsRow}>
                                     <Typography variant="h6">Sells</Typography>
                                     <Typography variant="h6">
-                                        {sellCount ?? 0}
+                                        {+sellCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
 
@@ -417,7 +418,7 @@ const TransactionDetails = () => {
                                         Average Buys
                                     </Typography>
                                     <Typography variant="h6">
-                                        {buyAvgCount ?? 0}
+                                        {+buyAvgCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
 
@@ -426,7 +427,7 @@ const TransactionDetails = () => {
                                         Averyage Sells
                                     </Typography>
                                     <Typography variant="h6">
-                                        {sellAvgCount ?? 0}
+                                        {+sellAvgCount?.toFixed(2) ?? 0}
                                     </Typography>
                                 </div>
                             </div>

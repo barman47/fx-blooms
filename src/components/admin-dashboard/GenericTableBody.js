@@ -17,6 +17,8 @@ import formatId from "../../utils/formatId";
 import formatDate from "../../utils/formatDate";
 import CircularProgressBar from "./CircularProgressBar";
 import clsx from "clsx";
+import buyEUR from "../../assets/img/eur-logo.svg";
+import buyNGN from "../../assets/img/ngn-logo.svg";
 
 const useStyles = makeStyles((theme) => ({
     tableBodyRow: {
@@ -167,7 +169,7 @@ const GenericTableBody = ({
 
     return (
         <>
-            {loading ? (
+            {!!loading ? (
                 <CircularProgressBar
                     newWidth="40px"
                     newHeight="40px"
@@ -196,18 +198,27 @@ const GenericTableBody = ({
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        name="checked"
-                                        className={classes.tableCell}
-                                        color="primary"
-                                        disableFocusRipple
-                                        disableTouchRipple
-                                        disableRipple
-                                    />
-                                }
-                            />
+                            {viewMore ? (
+                                customer.amountAvailable.currencyType ===
+                                "EUR" ? (
+                                    <img src={buyEUR} alt="buy eur" />
+                                ) : (
+                                    <img src={buyNGN} alt="buy ngn" />
+                                )
+                            ) : (
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="checked"
+                                            className={classes.tableCell}
+                                            color="primary"
+                                            disableFocusRipple
+                                            disableTouchRipple
+                                            disableRipple
+                                        />
+                                    }
+                                />
+                            )}
                         </Typography>
                         <Typography
                             style={{ textTransform: "capitalize" }}
@@ -244,11 +255,13 @@ const GenericTableBody = ({
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            {handleDisplayRow(
-                                customer[columnList[3]].amount
-                                    ? customer[columnList[3]].amount
-                                    : customer[columnList[3]] ?? ""
-                            )}
+                            {customer[columnList[3]].amount
+                                ? `${customer[columnList[3]].currencyType} ${
+                                      customer[columnList[3]].amount
+                                  }`
+                                : handleDisplayRow(
+                                      customer[columnList[3]] ?? ""
+                                  )}
                         </Typography>
                         <Typography
                             component="span"

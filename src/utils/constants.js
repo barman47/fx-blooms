@@ -246,6 +246,7 @@ export const LISTING_COLUMNS = {
     4: "exchangeRate",
     5: "status",
     6: "dateCreated",
+    8: "amountAvailable",
 };
 
 export const TRANSACTION_COLUMNS = {

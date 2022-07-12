@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -22,6 +22,7 @@ import { addAccount, validateIban } from '../../../actions/bankAccounts';
 import { GET_ERRORS, SET_ACCOUNT, SET_ACCOUNT_MSG, SET_ACCOUNT_VALIDATION, SET_INSTITUTIONS } from '../../../actions/types';
 import { getInstitutions } from '../../../actions/institutions';
 import { COLORS } from '../../../utils/constants';
+import { SUPPORTED_FUNDING_INSTITUTIONS } from '../../../utils/institutions';
 import validateAddBankAccount from '../../../utils/validation/bankAccount/add';
 
 import SuccessModal from '../../../components/common/SuccessModal';
@@ -144,7 +145,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const matches = theme.breakpoints.down('md');
 
     const { customerId, firstName, lastName } = useSelector(state => state.customer);
-    const { institutions } = useSelector(state => state);
+    // const { institutions } = useSelector(state => state);
     const errorsState = useSelector(state => state.errors);
     const { accountValidation, msg } = useSelector(state => state.bankAccounts);
 
@@ -158,32 +159,30 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     const [loading, setLoading] = useState(false);
     const [open, setOpen] = useState(false);
     const [value, setValue] = useState(0);
-    // eslint-disable-next-line
-    const [isIbanValid, setIsIbanValid] = useState(false);
 
     const successModal = useRef();
     const supportedBanks = useRef();
     const toast = useRef();
 
-    const setReceivingAccountType = useCallback(() => {
-        if (eur && ngn) {
-            setValue(0);
-        } else if (eur) {
-            setValue(0);
-        } else if (ngn) {
-            setValue(0);
-        }
-    }, [eur, ngn]);
+    // const setReceivingAccountType = useCallback(() => {
+    //     if (eur && ngn) {
+    //         setValue(0);
+    //     } else if (eur) {
+    //         setValue(0);
+    //     } else if (ngn) {
+    //         setValue(0);
+    //     }
+    // }, [eur, ngn]);
 
     useEffect(() => {
         setOpen(drawerOpen);
-        if (drawerOpen) {
-            if (institutions.length === 0) {
-                getInstitutions();
-            }
-            setReceivingAccountType();
-        } else {
+        if (!drawerOpen) {
+            setErrors({});
             batch(() => {
+                dispatch({
+                    type: GET_ERRORS,
+                    payload: {}
+                });
                 dispatch({
                     type: SET_ACCOUNT_VALIDATION,
                     payload: {}
@@ -194,7 +193,31 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                 });
             });
         }
-    }, [dispatch, drawerOpen, getInstitutions, institutions.length, setReceivingAccountType]);
+    }, [dispatch, drawerOpen]);
+    // useEffect(() => {
+    //     setOpen(drawerOpen);
+    //     if (drawerOpen) {
+    //         if (institutions.length === 0) {
+    //             getInstitutions();
+    //         }
+    //     } else {
+    //         setErrors({});
+    //         batch(() => {
+    //             dispatch({
+    //                 type: GET_ERRORS,
+    //                 payload: {}
+    //             });
+    //             dispatch({
+    //                 type: SET_ACCOUNT_VALIDATION,
+    //                 payload: {}
+    //             });
+    //             dispatch({
+    //                 type: SET_INSTITUTIONS,
+    //                 payload: []
+    //             });
+    //         });
+    //     }
+    // }, [dispatch, drawerOpen, getInstitutions, institutions.length, setReceivingAccountType]);
 
     useEffect(() => {
         if (!isEmpty(errorsState)) {
@@ -239,14 +262,11 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
     useEffect(() => {
         setLoading(false);
         if (!isEmpty(accountValidation && accountValidation?.bank?.bank_name)) {
-            // setBankName(accountValidation.bank.bank_name);
             setBic(accountValidation.bank.bic);
-            setIsIbanValid(accountValidation.valid)
             setErrors({});
         } else {
             if (accountValidation.message) {
                 setErrors({ AccountNumber: accountValidation.message });
-                setIsIbanValid(false);
             }
         }
         
@@ -471,7 +491,7 @@ const AddAccountDrawer = ({ addAccount, toggleDrawer, drawerOpen, eur, ngn, vali
                             <Grid item xs={12}>
                                 <Typography variant="subtitle2" component="span">Bank Name</Typography>
                                 <Autocomplete
-                                    options={institutions}
+                                    options={SUPPORTED_FUNDING_INSTITUTIONS}
                                     autoHighlight
                                     disableClearable
                                     getOptionLabel={(option) => {
