@@ -90,7 +90,7 @@ const AboutUs = () => {
                     <Typography variant="subtitle2" className={classes.text}>We are fully committed to making currency exchange more accessible, secure and seamless.</Typography>
                     <Button component={Link} to={ABOUT_US} color="primary" variant="contained" className={classes.button}>ABOUT US</Button>
                 </div>    
-                <YouTube className={classes.video} videoId="205kTyH11Ds" opts={opts} onReady={onReady} />
+                <YouTube className={classes.video} videoId="E6r6ooKguLM" opts={opts} onReady={onReady} />
             </div>
         </section>
     );
