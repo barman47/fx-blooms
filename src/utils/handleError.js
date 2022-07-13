@@ -1,4 +1,9 @@
-import { GET_ERRORS, FETCHING_STOP, FETCHING_ID_STOP } from "../actions/types";
+import {
+    GET_ERRORS,
+    FETCHING_STOP,
+    FETCHING_ID_STOP,
+    FETCHING_LISTING_STOP,
+} from "../actions/types";
 import { NETWORK_ERROR } from "./constants";
 
 const handleError = (err, dispatch) => {
@@ -13,6 +18,9 @@ const handleError = (err, dispatch) => {
         });
         dispatch({
             type: FETCHING_ID_STOP,
+        });
+        dispatch({
+            type: FETCHING_LISTING_STOP,
         });
     }
 

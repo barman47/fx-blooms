@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import {
     Box,
@@ -79,11 +79,42 @@ const useStyles = makeStyles((theme) => ({
     },
 
     viewBtn: {
-        fontSize: theme.spacing(1.95),
+        fontSize: theme.spacing(1.7),
         outline: "none",
         border: "none",
-        backgroundColor: "#FFFFFF",
+        position: "relative",
+        backgroundColor: "#4CAF50",
         cursor: "pointer",
+        borderRadius: "5px",
+        color: "white",
+        padding: 6,
+        transitionDuration: "0.4s",
+        textDecoration: "none",
+        overflow: "hidden",
+
+        "&:after": {
+            content: "",
+            background: "#f1f1f1",
+            display: "block",
+            position: "absolute",
+            paddingTop: "300%",
+            paddingLeft: "350%",
+            marginLeft: "-20px !important",
+            marginTop: "-120%",
+            opacity: 0,
+            transition: "all 0.8s",
+        },
+
+        "&:active:after": {
+            padding: 0,
+            margin: 0,
+            opacity: 1,
+            transition: "0s",
+        },
+
+        "&:hover": {
+            backgroundColor: "#1e6262e6",
+        },
     },
 }));
 
@@ -95,6 +126,7 @@ const GenericTableBody = ({
     addColumn,
     columnList,
     loading,
+    profileNavigate,
     viewMore,
     animate,
 }) => {
@@ -102,8 +134,6 @@ const GenericTableBody = ({
 
     const dispatch = useDispatch();
     const { CONFIRMED } = CUSTOMER_CATEGORY;
-    // const [ isDisabled ] = useState(true)
-    // const [check, setCheck] = useState(false)
 
     const handleButtonClick = (customer, e) => {
         if (!viewMore) {
@@ -118,12 +148,6 @@ const GenericTableBody = ({
         }
     };
 
-    // const handleStatus = useCallback((status) => {
-    //   // console.log('status', status)
-
-    //   const statusUi = handleStatusStyle(status, classes, CONFIRMED, REJECTED, SUSPENDED, PENDING)
-    // }, [CONFIRMED, PENDING, REJECTED, SUSPENDED, handleStatusStyle, classes])
-
     const handleDisplayStatus = useCallback(
         (status) => {
             switch (status) {
@@ -136,25 +160,10 @@ const GenericTableBody = ({
         [CONFIRMED]
     );
 
-    const handleGridColumns = useMemo(() => {
-        if (!gridColumns) {
-            return "minmax(0, 0.15fr) repeat(2, minmax(0, 1fr)) repeat(2, minmax(0, 1.2fr)) .8fr 1fr 0.3fr";
-        }
-        return gridColumns;
-    }, [gridColumns]);
-
     const handleCheckBox = (e, customer) => {
         e.preventDefault();
         e.stopPropagation();
-        // setCheck(!check)
-        // console.log(e.target.checked)
-        // console.log(customer)
     };
-
-    // const handleCheck = (e) => {
-    //   // setCheck(!check)
-    //   console.log(e)
-    // }
 
     const handleDisplayRow = (value) => {
         if (typeof value === "string") {
@@ -162,10 +171,6 @@ const GenericTableBody = ({
         }
         return value;
     };
-
-    // const handleTimeStamp = useCallback((value) => {
-    //   console.log('value', value)
-    // }, [])
 
     return (
         <>
@@ -181,7 +186,9 @@ const GenericTableBody = ({
                     <Box
                         component="div"
                         sx={{
-                            gridTemplateColumns: handleGridColumns,
+                            gridTemplateColumns: !viewMore
+                                ? "minmax(0, 0.15fr) repeat(2, minmax(0, 1fr)) repeat(2, minmax(0, 1.2fr)) .8fr 1fr 0.3fr"
+                                : gridColumns,
                             padding: "1px 0px",
                         }}
                         className={clsx(
@@ -190,7 +197,12 @@ const GenericTableBody = ({
                                 "animate__animated animate__lightSpeedInRight"
                         )}
                         key={i}
-                        onClick={() => viewCustomerProfile(customer)}
+                        onClick={() => {
+                            if (viewMore) {
+                                return;
+                            }
+                            return viewCustomerProfile(customer);
+                        }}
                     >
                         <Typography
                             onClick={(e) => handleCheckBox(e)}
@@ -236,10 +248,21 @@ const GenericTableBody = ({
                             />
                         </Typography>
                         <Typography
-                            style={{ textTransform: "capitalize" }}
+                            style={{
+                                textTransform: "capitalize",
+                                "&:active": {
+                                    color: "blue",
+                                },
+                            }}
                             component="span"
                             className={classes.tableCell}
                             variant="subtitle1"
+                            onClick={(e) => {
+                                if (viewMore) {
+                                    profileNavigate(e, customer.customerId);
+                                }
+                                return;
+                            }}
                         >
                             <TextClamp
                                 text={
@@ -255,10 +278,8 @@ const GenericTableBody = ({
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            {customer[columnList[3]].amount
-                                ? `${customer[columnList[3]].currencyType} ${
-                                      customer[columnList[3]].amount
-                                  }`
+                            {viewMore
+                                ? `${customer.amountAvailable.currencyType} ${customer.amountAvailable.amount}`
                                 : handleDisplayRow(
                                       customer[columnList[3]] ?? ""
                                   )}
@@ -317,12 +338,14 @@ const GenericTableBody = ({
                         <Typography
                             style={{ textAlign: viewMore ? "left" : "center" }}
                             component="span"
-                            className={classes.tableCell}
+                            className={`${classes.tableCell} ${classes.viewMore}`}
                             variant="subtitle1"
                         >
                             {viewMore && viewMore ? (
                                 <button
-                                    onClick={() => handleButtonClick()}
+                                    onClick={() =>
+                                        viewCustomerProfile(customer)
+                                    }
                                     className={classes.viewBtn}
                                 >
                                     view more
@@ -346,31 +369,12 @@ const GenericTableBody = ({
                     </Box>
                 ))
             )}
-
-            {/* {
-        loading ? '' :
-        <Box component="div" sx={{ display: 'flex',justifyContent: 'space-between', alignItems: 'center', marginTop: '60px', width: "100%" }}>
-            <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                <Typography component="span">{data?.length ?? 0} results</Typography>
-            </Box>
-
-            <Box component="div" sx={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                    <GenericButton isDisabled={isDisabled} buttonName="Previous" />
-                    <GenericButton isDisabled={!isDisabled} buttonName="Next" />
-                </Box> 
-                <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
-                    {
-                        pageNumberList.map(n => (
-                            <Typography variant="subtitle2">{n}</Typography>
-                        ))
-                    }
-                </Box>
-            </Box>                    
-        </Box>
-    } */}
         </>
     );
+};
+
+GenericTableBody.defaultProps = {
+    gridColumns: ".3fr 1.1fr 1.2fr .8fr .5fr .7fr .5fr .5fr",
 };
 
 export default GenericTableBody;

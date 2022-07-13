@@ -63,9 +63,9 @@ const AccordionSearch = ({
                     >
                         <Typography style={{ cursor: "pointer" }}>
                             {accordionHeader === "Customers"
-                                ? custmer.firstName
-                                    ? custmer.firstName
-                                    : custmer.email
+                                ? custmer.userName
+                                    ? custmer.userName
+                                    : custmer.username
                                 : formatId(custmer.id)}
                         </Typography>
                     </AccordionDetails>

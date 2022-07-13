@@ -6,19 +6,19 @@ import { LISTING_COLUMNS } from "../../../utils/constants";
 import GenericTableBody from "../../../components/admin-dashboard/GenericTableBody";
 import PropTypes from "prop-types";
 
-const gridColumns = ".3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr";
+// const gridColumns = ".3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr";
 
-const AllListings = ({ loadingListings, viewRow }) => {
-    const { listings } = useSelector((state) => state.listings);
+const AllListings = ({ loadingListings, viewRow, navigateToProfile }) => {
+    const { items } = useSelector((state) => state.listings.listings);
 
     return (
         <>
             <GenericTableBody
                 viewCustomerProfile={viewRow}
                 loading={loadingListings}
-                gridColumns={gridColumns}
+                profileNavigate={navigateToProfile}
                 addColumn={true}
-                data={listings}
+                data={items}
                 viewMore={true}
                 columnList={LISTING_COLUMNS}
             />

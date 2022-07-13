@@ -20,8 +20,8 @@ import { makeStyles } from "@material-ui/core/styles";
 // import moment from 'moment';
 import clsx from "clsx";
 import {
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
+    // getIdCardValidationResponse,
+    // getResidencePermitValidationResponse,
     setCustomerStatus,
 } from "../../../actions/customer";
 import { updateCustomerProfile } from "../../../actions/admin";
@@ -247,8 +247,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const PersonalDetails = ({
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
+    // getIdCardValidationResponse,
+    // getResidencePermitValidationResponse,
     setCustomerStatus,
     updateCustomerProfile,
 }) => {
@@ -280,18 +280,6 @@ const PersonalDetails = ({
 
     const { CONFIRMED, SUSPENDED, PENDING, REJECTED } = CUSTOMER_CATEGORY;
     // const RISK_PROFILES= ['Risk Profile 1', 'Risk Profile 2', 'Risk Profile 3'];
-
-    useEffect(() => {
-        if (!idCheckData) {
-            getIdCardValidationResponse(customer.id);
-        }
-
-        if (!profileCheckData) {
-            getResidencePermitValidationResponse(customer.id);
-        }
-
-        // eslint-disable-next-line
-    }, []);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -461,7 +449,7 @@ const PersonalDetails = ({
             return setErrors({ msg: "Invalid customer data", ...updateErrors });
         }
         // setLoadingText('Updating Customer . . .');
-        console.log("data", data);
+        // console.log("data", data);
         // setEditable(false);
         setErrors({});
         updateCustomerProfile(data);
@@ -733,15 +721,15 @@ const PersonalDetails = ({
 };
 
 PersonalDetails.propTypes = {
-    getIdCardValidationResponse: PropTypes.func.isRequired,
-    getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    // getIdCardValidationResponse: PropTypes.func.isRequired,
+    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
     setCustomerStatus: PropTypes.func.isRequired,
     updateCustomerProfile: PropTypes.func.isRequired,
 };
 
 export default connect(undefined, {
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
+    // getIdCardValidationResponse,
+    // getResidencePermitValidationResponse,
     setCustomerStatus,
     updateCustomerProfile,
 })(PersonalDetails);

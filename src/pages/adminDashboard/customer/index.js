@@ -12,7 +12,10 @@ import {
     CLEAR_IDCHECK_DATA,
 } from "../../../actions/types";
 // import { USER_DETAILS } from '../../../utils/constants';
-
+import {
+    getIdCardValidationResponse,
+    getResidencePermitValidationResponse,
+} from "../../../actions/customer";
 import Spinner from "../../../components/common/Spinner";
 import SuccessModal from "../../../components/common/SuccessModal";
 import PersonalDetails from "./PersonalDetails";
@@ -91,9 +94,16 @@ const Customer = () => {
     const successModal = useRef();
 
     useEffect(() => {
+        dispatch(getIdCardValidationResponse(customer.id));
+
+        dispatch(getResidencePermitValidationResponse(customer.id));
+
+        // eslint-disable-next-line
+    }, []);
+
+    useEffect(() => {
         return () => {
             batch(() => {
-                console.log("unmonting");
                 dispatch({
                     type: CLEAR_ERROR_MSG,
                 });

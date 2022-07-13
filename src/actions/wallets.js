@@ -212,8 +212,8 @@ export const fetchStart = () => ({
 
 export const getAllDeposits = (query) => async (dispatch) => {
     try {
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllDeposits`, query);
         // console.log(res)
         dispatch({
@@ -245,8 +245,8 @@ export const viewAllWalletRequests = (query) => async (dispatch) => {
 export const getAllWithdrawalReqs = (query) => async (dispatch) => {
     try {
         // console.log('res')
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${PAYMENT_REQ}/GetAllWithdrawals`, query);
 
         dispatch({
@@ -417,22 +417,22 @@ export const completeWithdrawalRequest =
     (query, currPage, rowsPerPage) => async (dispatch) => {
         try {
             await reIssueAdminToken();
-            // console.log(query, token);
+            const pageQuery = {
+                pageSize: rowsPerPage,
+                pageNumber: currPage,
+            };
             const res = await axios.post(
                 `${PAYMENT_REQ}/CompleteWithdrawalRequest`,
                 query
             );
-            batch(() => {
-                dispatch({
-                    type: COMPLETE_WITHDRAWAL_REQ,
-                    payload: res.data.data,
-                });
-                dispatch(
-                    getAllWithdrawalReqs({
-                        pageSize: rowsPerPage,
-                        pageNumber: currPage,
-                    })
-                );
+            const withd = await axios.post(
+                `${PAYMENT_REQ}/GetAllWithdrawals`,
+                pageQuery
+            );
+
+            dispatch({
+                type: COMPLETE_WITHDRAWAL_REQ,
+                payload: { trans: withd.data, msgTrigger: res.data.data },
             });
         } catch (err) {
             return handleError(err, dispatch);

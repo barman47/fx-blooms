@@ -446,12 +446,9 @@ const AdminDashboard = ({
                 // return setErrors({ searchText: 'Please enter a search term' });
                 // return
             }
-            // setLoading(true);
-            // setLoadingText('Searching . . .');
-            // const test = searchForCustomer({ searchText, pageNumber: 0, pageSize });
+
             searchForCustomer({ searchText, pageNumber: 0, pageSize });
             if (!isEmpty(items)) {
-                // items.map((customer) =>
                 console.log(items[0].id);
                 searchForListings(items[0]?.id, {
                     pageNumber: 0,
@@ -464,8 +461,6 @@ const AdminDashboard = ({
     );
 
     const viewCustomerProfile = (customer) => {
-        console.log(location);
-        // console.log(params);
         batch(() => {
             dispatch(getResidencePermitValidationResponse(customer.id));
             dispatch(getIdCardValidationResponse(customer.id));

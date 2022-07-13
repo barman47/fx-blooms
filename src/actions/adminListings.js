@@ -1,5 +1,6 @@
 import axios from "axios";
 import handleError from "../utils/handleError";
+import { batch } from "react-redux";
 import {
     SET_LISTINGS,
     SET_DELETED_LISTINGS,
@@ -7,6 +8,9 @@ import {
     SET_INPROGRESS_LISTINGS,
     SET_ACTIVE_LISTINGS,
     DELETE_OPEN_LISTING,
+    FETCHING_LISTING_START,
+    FETCHING_LISTING_STOP,
+    VIEW_LISTING,
 } from "./types";
 import reIssueAdminToken from "../utils/reIssueAdminToken";
 
@@ -14,10 +18,18 @@ const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
 const api = `${API}/Admin`;
 
+export const fetchListingsStart = () => ({
+    type: FETCHING_LISTING_START,
+});
+export const fetchListingsStop = () => ({
+    type: FETCHING_LISTING_STOP,
+});
+
 export const getAllListings =
     (query, start = null, end = null) =>
     async (dispatch) => {
         try {
+            dispatch(fetchListingsStart());
             await reIssueAdminToken();
             let res;
             if (!!start && !!end) {
@@ -28,12 +40,14 @@ export const getAllListings =
             } else {
                 res = await axios.post(`${URL}/GetAllListings`, query);
             }
-            const { items, ...rest } = res.data.data;
-            // console.log(items)
+            // const { items, ...rest } = res.data.data;
 
-            dispatch({
-                type: SET_LISTINGS,
-                payload: { listings: items, ...rest },
+            batch(() => {
+                dispatch({
+                    type: SET_LISTINGS,
+                    payload: res.data.data,
+                });
+                dispatch(fetchListingsStop());
             });
         } catch (err) {
             return handleError(err, dispatch);
@@ -57,6 +71,7 @@ export const getActiveListings =
     (query, start = null, end = null) =>
     async (dispatch) => {
         try {
+            dispatch(fetchListingsStart());
             await reIssueAdminToken();
             let res;
             if (!!start && !!end) {
@@ -80,6 +95,7 @@ export const getListingsInProgress =
     (query, start = null, end = null) =>
     async (dispatch) => {
         try {
+            dispatch(fetchListingsStart());
             await reIssueAdminToken();
             let res;
             if (!!start && !!end) {
@@ -103,6 +119,7 @@ export const getFinalisedListings =
     (query, start = null, end = null) =>
     async (dispatch) => {
         try {
+            dispatch(fetchListingsStart());
             await reIssueAdminToken();
             let res;
             if (!!start && !!end) {
@@ -126,6 +143,7 @@ export const getDeletedListings =
     (query, start = null, end = null) =>
     async (dispatch) => {
         try {
+            dispatch(fetchListingsStart());
             await reIssueAdminToken();
             let res;
             if (!!start && !!end) {
@@ -153,6 +171,21 @@ export const deleteLisings = () => async (dispatch) => {
 
         return dispatch({
             type: DELETE_OPEN_LISTING,
+        });
+    } catch (err) {
+        return handleError(err, dispatch);
+    }
+};
+
+export const getAListing = (listingId) => async (dispatch) => {
+    try {
+        await reIssueAdminToken();
+        const res = await axios.get(`${URL}/GetListing/${listingId}`);
+        // console.log(res.data.data);
+
+        dispatch({
+            type: VIEW_LISTING,
+            payload: res.data.data,
         });
     } catch (err) {
         return handleError(err, dispatch);

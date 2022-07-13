@@ -24,6 +24,8 @@ import {
     UPDATED_LISTING,
     CREDIT_LISTING,
     VIEW_LISTING,
+    FETCHING_LISTING_START,
+    FETCHING_LISTING_STOP,
 } from "../actions/types";
 
 import { BID_STATUS, LISTING_STATUS } from "../utils/constants";
@@ -37,6 +39,7 @@ const initialState = {
     bid: {},
     updatedListing: false,
     listing: {},
+    buyer: {},
     listings: [],
     activeListings: [],
     finalisedListings: [],
@@ -48,6 +51,7 @@ const initialState = {
     recommendedRate: null,
     credit: null,
     listingSearchResult: [],
+    isLoading: false,
 };
 
 const listingsReducer = (state = initialState, action) => {
@@ -58,6 +62,17 @@ const listingsReducer = (state = initialState, action) => {
     let updatedListing = {};
 
     switch (action.type) {
+        case FETCHING_LISTING_START:
+            return {
+                ...state,
+                isLoading: true,
+            };
+
+        case FETCHING_LISTING_STOP:
+            return {
+                ...state,
+                isLoading: false,
+            };
         case SET_REQUIRED_CURRENCY:
             return {
                 ...state,
@@ -171,16 +186,15 @@ const listingsReducer = (state = initialState, action) => {
             };
 
         case SET_LISTINGS:
-            const { listings, ...rest } = action.payload;
+            // const { listings, ...rest } = action.payload;
             return {
                 ...state,
-                listings,
-                ...rest,
+                listings: action.payload,
             };
 
         case LISTING_SEARCH_RESULT:
             // const { listings: searchListings } = action.payload;
-            console.log(action.payload);
+
             return {
                 ...state,
                 listingSearchResult: action.payload.listings,
@@ -191,24 +205,28 @@ const listingsReducer = (state = initialState, action) => {
             return {
                 ...state,
                 activeListings: action.payload,
+                isLoading: false,
             };
 
         case SET_INPROGRESS_LISTINGS:
             return {
                 ...state,
                 inProgressListings: action.payload,
+                isLoading: false,
             };
 
         case SET_FINALISED_LISTINGS:
             return {
                 ...state,
                 finalisedListings: action.payload,
+                isLoading: false,
             };
 
         case SET_DELETED_LISTINGS:
             return {
                 ...state,
                 deletedListings: action.payload,
+                isLoading: false,
             };
 
         case GET_LISTING:
