@@ -338,6 +338,7 @@ const AllListings = (props) => {
 	let loadedEvent = useRef();
 
 	useEffect(() => {
+		getWallets(customerId);
 		removeExpiredListings();
 		getPendingTransactionCount();
 		loadedEvent.current = getListings;
@@ -351,8 +352,6 @@ const AllListings = (props) => {
 			});
 			getListings();
 		}
-
-		getWallets(customerId);
 
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
@@ -371,11 +370,6 @@ const AllListings = (props) => {
 		};
 		// eslint-disable-next-line
 	}, []);
-
-	// Refetch Wallets to update balance when listings change due to deletion
-    useEffect(() => {
-		getWallets(customerId);
-	}, [customerId, getWallets, listings]);
 
 	// Only allow numbers on search
 	const handleSetAmount = (value) => {
