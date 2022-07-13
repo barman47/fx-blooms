@@ -16,6 +16,7 @@ import {
     // PROCEED_TO_DASHBOARD,
     ID_STATUS,
     FILL_FORM1,
+    SESSION_TIME,
 } from "../utils/constants";
 import handleError from "../utils/handleError";
 import reIssueCustomerToken from "../utils/reIssueCustomerToken";
@@ -690,6 +691,7 @@ export const approveResidencePermit =
 export const logout = (navigate, msg) => (dispatch) => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
+    sessionStorage.removeItem(SESSION_TIME);
     return navigate(LOGIN, { state: { msg } });
 };
 
