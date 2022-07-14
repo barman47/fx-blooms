@@ -1571,11 +1571,7 @@ const Listings = () => {
                 )}
 
                 {!!openViewMore ? (
-                    <Box
-                        component="div"
-                        className={classes.viewMoreContainer}
-                        onClick={() => closeViewMoreModal()}
-                    >
+                    <Box component="div" className={classes.viewMoreContainer}>
                         <Box
                             component="div"
                             className={clsx(
