@@ -236,7 +236,7 @@ const IDVerification = () => {
                                         Verify
                                     </Button>
                                 </>
-                            ) : (
+                             : (
                                 <Typography
                                     variant="body2"
                                     component="p"
