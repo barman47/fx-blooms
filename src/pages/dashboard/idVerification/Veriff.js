@@ -1,5 +1,3 @@
-//
-
 // Serverless Veriff JS SDK and Incontext SDK integration example using React.JS
 
 import { useEffect } from "react";
@@ -36,6 +34,35 @@ const useStyles = makeStyles((theme) => ({
 
 const VERIFF_API = `${process.env.REACT_APP_VERIFF_API}`;
 
+const popupBlockerChecker = {
+    check: function (popup_window) {
+        const scope = this;
+        if (popup_window) {
+            if (/chrome/.test(navigator.userAgent.toLowerCase())) {
+                setTimeout(function () {
+                    scope.is_popup_blocked(scope, popup_window);
+                }, 200);
+            } else {
+                popup_window.onload = function () {
+                    scope.is_popup_blocked(scope, popup_window);
+                };
+            }
+        } else {
+            scope.displayError();
+        }
+    },
+    is_popup_blocked: function (scope, popup_window) {
+        if ((popup_window.innerHeight > 0) === false) {
+            scope.displayError();
+        }
+    },
+    displayError: function () {
+        alert(
+            "Popup Blocker is enabled! Please add this site to your exception list or disable your popup block."
+        );
+    },
+};
+
 function VeriffVerify({ handleSetTitle }) {
     const classes = useStyles();
     const { customerId } = useSelector((state) => state.customer);
@@ -60,7 +87,8 @@ function VeriffVerify({ handleSetTitle }) {
                         // debugger
                         // JS SDK implementation--> redirects user to the verification url
                         // window.location.replace(response.verification.url);
-                        window.open(response.verification.url, "_blank");
+                        const url = window.open(response.verification.url, "_blank");
+                        popupBlockerChecker.check(url)
                         break;
                     case "INCONTEXT_SDK":
                         // Incontext SDK implementation-->  user stays in the webpage

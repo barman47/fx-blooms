@@ -235,9 +235,11 @@ const walletsReducer = (state = initialState, action) => {
             };
 
         case COMPLETE_WITHDRAWAL_REQ:
+            const { trans, msgTrigger } = action.payload;
             return {
                 ...state,
-                withdrawalTrigger: action.payload,
+                withdrawalTrigger: msgTrigger,
+                transactions: trans,
             };
         case SET_CHECKLIST:
             return {

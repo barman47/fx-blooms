@@ -254,12 +254,10 @@ export const LISTING_COLUMNS = {
 
 export const TRANSACTION_COLUMNS = {
     0: "buyer",
-    1: "buyer",
-    2: "buyer",
-    3: "seller",
-    4: "id",
-    5: "isClosed",
-    6: "dateCreated",
+    1: "seller",
+    2: "id",
+    3: "isClosed",
+    4: "dateCreated",
 };
 
 export const VERIFF_HOST = "https://stationapi.veriff.com";

@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { connect, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import {
@@ -17,8 +17,8 @@ import { ID_STATUS_CATEGORY } from "../../../utils/constants";
 import {
     approveIdCard,
     approveResidencePermit,
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
+    // getIdCardValidationResponse,
+    // getResidencePermitValidationResponse,
 } from "../../../actions/customer";
 // import isEmpty from '../../../utils/isEmpty';
 
@@ -176,17 +176,6 @@ const IdentityDetails = ({
     );
 
     // const { APPROVED } = ID_STATUS;
-
-    useEffect(() => {
-        if (!idCheckData) {
-            getIdCardValidationResponse(customer.id);
-        }
-
-        if (!profileCheckData) {
-            getResidencePermitValidationResponse(customer.id);
-        }
-        // eslint-disable-next-line
-    }, []);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -361,13 +350,13 @@ const IdentityDetails = ({
 IdentityDetails.propTypes = {
     approveIdCard: PropTypes.func.isRequired,
     approveResidencePermit: PropTypes.func.isRequired,
-    getIdCardValidationResponse: PropTypes.func.isRequired,
-    getResidencePermitValidationResponse: PropTypes.func.isRequired,
+    // getIdCardValidationResponse: PropTypes.func.isRequired,
+    // getResidencePermitValidationResponse: PropTypes.func.isRequired,
 };
 
 export default connect(undefined, {
     approveIdCard,
     approveResidencePermit,
-    getIdCardValidationResponse,
-    getResidencePermitValidationResponse,
+    // getIdCardValidationResponse,
+    // getResidencePermitValidationResponse,
 })(IdentityDetails);

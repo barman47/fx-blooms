@@ -273,8 +273,8 @@ export const fetchStart = () => ({
 export const getCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetAllCustomers`, query);
         dispatch({
             type: SET_CUSTOMERS,
@@ -318,8 +318,8 @@ export const getCustomerStatus = (customerId) => async (dispatch) => {
 export const getNewCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(
             `${api}/GetCustomersAwaitingConfirmation/`,
             query
@@ -336,8 +336,8 @@ export const getNewCustomers = (query) => async (dispatch) => {
 export const getRejectedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetRejectedCustomers/`, query);
         return dispatch({
             type: SET_REJECTED_CUSTOMERS,
@@ -351,8 +351,8 @@ export const getRejectedCustomers = (query) => async (dispatch) => {
 export const getVerifiedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetConfirmedCustomers/`, query);
         return dispatch({
             type: SET_CONFIRMED_CUSTOMERS,
@@ -366,8 +366,8 @@ export const getVerifiedCustomers = (query) => async (dispatch) => {
 export const getCustomersWithoutProfile = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetCustomersWithNoProfile`, query);
         return dispatch({
             type: SET_CUSTOMERS_WITHOUT_PROFILE,
@@ -381,8 +381,8 @@ export const getCustomersWithoutProfile = (query) => async (dispatch) => {
 export const getSuspendedCustomers = (query) => async (dispatch) => {
     try {
         // Issue admin token
-        await reIssueAdminToken();
         dispatch(fetchStart());
+        await reIssueAdminToken();
         const res = await axios.post(`${api}/GetSuspendedCustomers`, query);
         return dispatch({
             type: SET_SUSPENDED_CUSTOMERS,
@@ -425,7 +425,8 @@ export const setCustomerStatus =
         try {
             // Issue admin token
             await reIssueAdminToken();
-            dispatch(fetchStart());
+            // dispatch(fetchStart());
+            // console.log("hello", customerID, newStatus, currentStatus);
             const res = await axios.post(
                 `${api}/CustomerStatus?customerID=${customerID}&status=${newStatus}`
             );
@@ -626,7 +627,7 @@ export const getResidencePermitValidationResponse =
 
             //     status: data.overallResult.status
             // };
-            console.log(customerData);
+            // console.log(customerData);
             batch(() => {
                 dispatch({
                     type: SET_PROFILE_CHECK_DATA,

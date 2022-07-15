@@ -23,6 +23,7 @@ import {
     UPDATED_CUSTOMER,
     FETCHING_STOP,
     FETCHING_START,
+    CLEAR_BUYER,
     FETCHING_ID_STOP,
     FETCHING_ID_START,
     CLEAR_PROFILE_DATA,
@@ -94,6 +95,12 @@ const customersReducer = (state = initialState, action) => {
             return {
                 ...state,
                 buyer: action.payload,
+            };
+
+        case CLEAR_BUYER:
+            return {
+                ...state,
+                buyer: {},
             };
 
         case SET_NEW_CUSTOMERS:

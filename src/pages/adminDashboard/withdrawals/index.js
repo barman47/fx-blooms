@@ -812,10 +812,14 @@ const Withdrawals = () => {
         }
 
         dispatch(
-            completeWithdrawalRequest({
-                id: batchList[0],
-                paymentStatus: 2,
-            })
+            completeWithdrawalRequest(
+                {
+                    id: batchList[0],
+                    paymentStatus: 2,
+                },
+                currentPage,
+                rowsPerPage
+            )
         );
     };
 

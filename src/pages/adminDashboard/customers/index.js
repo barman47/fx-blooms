@@ -22,7 +22,7 @@ import {
     getSuspendedCustomers,
     getVerifiedCustomers,
     getCustomersWithoutProfile,
-    fetchStart,
+    // fetchStart,
     setCustomerStatus,
 } from "../../../actions/customer";
 import { getStats, exportAllUserRecords } from "../../../actions/admin";
@@ -348,10 +348,10 @@ const Customers = (props) => {
     //     setCurrentPage(currentPage - 1);
     // };
 
-    useEffect(() => {
-        dispatch(fetchStart());
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [filter]);
+    // useEffect(() => {
+    //     dispatch(fetchStart());
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [filter]);
 
     useEffect(() => {
         handleSetTitle("Customers");
@@ -363,13 +363,6 @@ const Customers = (props) => {
         }
         // eslint-disable-next-line
     }, []);
-
-    // Reset page number when filter changes
-    useEffect(() => {
-        if (filter) {
-            setCurrentPage(1);
-        }
-    }, [filter]);
 
     useEffect(() => {
         if (!customerStatus || anchorEl) {
@@ -448,26 +441,32 @@ const Customers = (props) => {
     const getCount = useCallback(() => {
         switch (filter) {
             case CONFIRMED:
+                setCurrentPage(confirmed.currentPageNumber);
                 setCustomerCount(confirmed.totalPageCount || 0);
                 break;
 
             case PENDING:
+                setCurrentPage(pending.currentPageNumber);
                 setCustomerCount(pending.totalPageCount || 0);
                 break;
 
             case REJECTED:
+                setCurrentPage(rejected.currentPageNumber);
                 setCustomerCount(rejected.totalPageCount || 0);
                 break;
 
             case SUSPENDED:
+                setCurrentPage(suspended.currentPageNumber);
                 setCustomerCount(suspended.totalPageCount || 0);
                 break;
 
             case NO_PROFILE:
+                setCurrentPage(noProfile.currentPageNumber);
                 setCustomerCount(noProfile.totalPageCount || 0);
                 break;
 
             case ALL_CUSTOMERS:
+                setCurrentPage(customers.currentPageNumber);
                 setCustomerCount(customers.totalPageCount || 0);
                 break;
 
@@ -483,12 +482,12 @@ const Customers = (props) => {
         REJECTED,
         SUSPENDED,
         NO_PROFILE,
-        customers.totalPageCount,
-        confirmed.totalPageCount,
-        pending.totalPageCount,
-        rejected.totalPageCount,
-        suspended.totalPageCount,
-        noProfile.totalPageCount,
+        customers,
+        confirmed,
+        pending,
+        rejected,
+        suspended,
+        noProfile,
     ]);
 
     // const getMore = useCallback(() => {
@@ -974,8 +973,8 @@ const Customers = (props) => {
                             }}
                         >
                             <Pagination
-                                count={customerCount}
-                                page={currentPage}
+                                count={customerCount ?? 0}
+                                page={currentPage ?? 0}
                                 onChange={(event, value) =>
                                     setCurrentPage(value)
                                 }

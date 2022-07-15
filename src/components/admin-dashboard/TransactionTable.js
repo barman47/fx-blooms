@@ -1,13 +1,15 @@
-import { useDispatch } from "react-redux";
+// import { useDispatch } from "react-redux";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import TextClamp from "react-string-clamp";
-import { SET_CUSTOMER } from "../../actions/types";
+// import { SET_CUSTOMER } from "../../actions/types";
 import handleStatusStyle from "../../utils/statusDisplay";
 import formatId from "../../utils/formatId";
 import CircularProgressBar from "./CircularProgressBar";
 import clsx from "clsx";
-import { BankOutline } from "mdi-material-ui";
+import buyEUR from "../../assets/img/eur-logo.svg";
+import buyNGN from "../../assets/img/ngn-logo.svg";
+import formatDate from "../../utils/formatDate";
 
 const useStyles = makeStyles((theme) => ({
     tableBodyRow: {
@@ -77,76 +79,80 @@ const useStyles = makeStyles((theme) => ({
     },
 
     viewBtn: {
-        fontSize: theme.spacing(1.95),
+        fontSize: theme.spacing(1.7),
         outline: "none",
         border: "none",
-        backgroundColor: "#FFFFFF",
+        position: "relative",
+        backgroundColor: "#4CAF50",
         cursor: "pointer",
+        borderRadius: "5px",
+        color: "white",
+        padding: 6,
+        transitionDuration: "0.4s",
+        textDecoration: "none",
+        overflow: "hidden",
+
+        "&:after": {
+            content: "",
+            background: "#f1f1f1",
+            display: "block",
+            position: "absolute",
+            paddingTop: "300%",
+            paddingLeft: "350%",
+            marginLeft: "-20px !important",
+            marginTop: "-120%",
+            opacity: 0,
+            transition: "all 0.8s",
+        },
+
+        "&:active:after": {
+            padding: 0,
+            margin: 0,
+            opacity: 1,
+            transition: "0s",
+        },
+
+        "&:hover": {
+            backgroundColor: "#1e6262e6",
+        },
     },
 }));
 
 const TransactionTable = ({
     data,
     handleClick,
-    viewCustomerProfile,
+    viewData,
     gridColumns,
     columnList,
     loading,
     viewMore,
+    profileNavigate,
 }) => {
     const classes = useStyles();
 
-    const dispatch = useDispatch();
-    // const { CONFIRMED } = CUSTOMER_CATEGORY;
-    // const [ isDisabled ] = useState(true)
+    // const dispatch = useDispatch();
 
-    const handleButtonClick = (customer, e) => {
-        if (!viewMore) {
-            e.preventDefault();
-            e.stopPropagation();
+    // const handleButtonClick = (customer, e) => {
+    //     if (!viewMore) {
+    //         e.preventDefault();
+    //         e.stopPropagation();
 
-            dispatch({
-                type: SET_CUSTOMER,
-                payload: customer,
-            });
-            handleClick(e);
-        }
-    };
-
-    const formatDate = (date) => {
-        const newDate = new Date(date);
-        const hours = newDate.getHours();
-        const mins = newDate.getMinutes();
-
-        const transTime = hours + ":" + mins;
-        const transDate =
-            newDate.getDate() +
-            " " +
-            new Intl.DateTimeFormat("en", { month: "short" }).format(newDate) +
-            " " +
-            newDate.getFullYear().toString().substr(-2);
-        return transTime + " | " + transDate;
-    };
+    //         dispatch({
+    //             type: SET_CUSTOMER,
+    //             payload: customer,
+    //         });
+    //         handleClick(e);
+    //     }
+    // };
 
     const handleDisplayStatus = (status) => {
         switch (status) {
             case true:
-                return "SUCCESSFUL";
+                return "CONFIRMED";
             default:
-                return "ONHOLD";
+                return "AWAITING";
         }
     };
-
-    // const handleDisplayRow = (value) => {
-    //   if (typeof value === 'string') {
-    //     return value.substring(0, 25)
-    //   }
-    //   return value
-    // }
-
-    // const handleTimeStamp = useCallback((value) => {
-    //   console.log('value', value)
-    // }, [])
 
     return (
         <>
@@ -171,19 +177,29 @@ const TransactionTable = ({
                                 "animate__animated animate__lightSpeedInRight"
                         )}
                         key={i}
-                        onClick={() => viewCustomerProfile(customer)}
+                        onClick={() => viewData(customer)}
                     >
                         <Typography
                             component="span"
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            <BankOutline
-                                className={classes.recentIcon}
-                                color="primary"
-                                style={{ color: "purple", fontSize: 15 }}
+                            <img
+                                src={
+                                    customer.seller.currency === "NGN"
+                                        ? buyNGN
+                                        : buyEUR
+                                }
+                                alt="Workflow"
                             />
-                            Direct Transfer
+                        </Typography>
+
+                        <Typography
+                            component="span"
+                            className={classes.tableCell}
+                            variant="subtitle1"
+                        >
+                            {formatId(customer[columnList[2]], "TID", 10)}
                         </Typography>
 
                         <Typography
@@ -191,12 +207,18 @@ const TransactionTable = ({
                             component="span"
                             className={classes.tableCell}
                             variant="subtitle1"
+                            onClick={(e) => {
+                                if (viewMore) {
+                                    profileNavigate(e, customer.customerId);
+                                }
+                                return;
+                            }}
                         >
                             <TextClamp
                                 text={
-                                    customer[columnList[1]].accountName.split(
-                                        " "
-                                    )[0]
+                                    customer.seller.currency === "NGN"
+                                        ? customer[columnList[1]].accountName
+                                        : customer[columnList[0]].accountName
                                 }
                                 lines={1}
                             />
@@ -210,10 +232,15 @@ const TransactionTable = ({
                         >
                             <TextClamp
                                 text={
-                                    customer[columnList[2]].currency +
-                                    customer[
-                                        columnList[2]
-                                    ].amountTransfered.toLocaleString()
+                                    customer.seller.currency === "NGN"
+                                        ? customer[columnList[1]].currency +
+                                          customer[
+                                              columnList[1]
+                                          ].amountTransfered.toLocaleString()
+                                        : customer[columnList[0]].currency +
+                                          customer[
+                                              columnList[0]
+                                          ].amountTransfered.toLocaleString()
                                 }
                                 lines={1}
                             />
@@ -224,15 +251,9 @@ const TransactionTable = ({
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            {customer[columnList[3]].accountName.split(" ")[0]}
-                        </Typography>
-
-                        <Typography
-                            component="span"
-                            className={classes.tableCell}
-                            variant="subtitle1"
-                        >
-                            {formatId(customer[columnList[4]], "TID", 10)}
+                            {customer.seller.currency === "NGN"
+                                ? customer[columnList[0]].accountName
+                                : customer[columnList[1]].accountName}
                         </Typography>
 
                         <Typography
@@ -241,13 +262,13 @@ const TransactionTable = ({
                                 classes.tableCell,
                                 classes.status,
                                 handleStatusStyle(
-                                    customer[columnList[5]],
+                                    customer[columnList[3]],
                                     classes
                                 )
                             )}
                             variant="subtitle1"
                         >
-                            {handleDisplayStatus(customer[columnList[5]])}
+                            {handleDisplayStatus(customer[columnList[3]])}
                         </Typography>
 
                         <Typography
@@ -255,8 +276,7 @@ const TransactionTable = ({
                             className={classes.tableCell}
                             variant="subtitle1"
                         >
-                            {/* <TextClamp text={customer[columnList[6]] ? customer[columnList[6]] : ''} lines={1} /> */}
-                            {formatDate(customer[columnList[6]])}
+                            {formatDate(customer[columnList[4]])}
                         </Typography>
 
                         <Typography
@@ -266,7 +286,7 @@ const TransactionTable = ({
                             variant="subtitle1"
                         >
                             <button
-                                onClick={() => handleButtonClick()}
+                                onClick={() => viewData(customer)}
                                 className={classes.viewBtn}
                             >
                                 view more

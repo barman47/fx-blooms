@@ -4,9 +4,9 @@ import PropTypes from "prop-types";
 import GenericTableBody from "../../../components/admin-dashboard/GenericTableBody";
 import { LISTING_COLUMNS } from "../../../utils/constants";
 
-const gridColumns = ".3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr";
+// const gridColumns = ".3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr";
 
-const CompletedListings = ({ loadingListings, viewRow }) => {
+const CompletedListings = ({ loadingListings, viewRow, navigateToProfile }) => {
     const listings = useSelector(
         (state) => state.listings?.finalisedListings?.items
     );
@@ -17,7 +17,8 @@ const CompletedListings = ({ loadingListings, viewRow }) => {
                 <GenericTableBody
                     viewCustomerProfile={viewRow}
                     loading={loadingListings}
-                    gridColumns={gridColumns}
+                    profileNavigate={navigateToProfile}
+                    // gridColumns={gridColumns}
                     addColumn={true}
                     data={listings}
                     viewMore={true}
@@ -25,7 +26,7 @@ const CompletedListings = ({ loadingListings, viewRow }) => {
                 />
             </>
         ),
-        [viewRow, loadingListings, listings]
+        [viewRow, loadingListings, listings, navigateToProfile]
     );
 
     return completedListingsMemo;

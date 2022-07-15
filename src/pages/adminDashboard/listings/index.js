@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useDispatch, useSelector, batch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { getCustomer } from "../../../actions/customer";
 // import { getListingByStatus } from '../../../actions/adminListings';
 import clsx from "clsx";
@@ -40,6 +41,7 @@ import {
     getListingsInProgress,
     getFinalisedListings,
     getDeletedListings,
+    // fetchListingsStart,
 } from "../../../actions/adminListings";
 import {
     CREDIT_LISTING,
@@ -47,6 +49,7 @@ import {
     CLEAR_CUSTOMER,
     CLEAR_WALLET,
     VIEW_LISTING,
+    CLEAR_BUYER,
 } from "../../../actions/types";
 import { exportRecords } from "../../../utils/exportRecords";
 import isEmpty from "../../../utils/isEmpty";
@@ -55,6 +58,7 @@ import AmlBoard from "../../../components/admin-dashboard/AmlBoard";
 import formatId from "../../../utils/formatId";
 import handleStatusStyle from "../../../utils/statusDisplay";
 import Toast from "../../../components/common/Toast";
+import navigateToProfile from "../../../utils/navigateToProfile";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -396,7 +400,7 @@ const useStyles = makeStyles((theme) => ({
 
     viewMoreBids: {
         display: "grid",
-        gridTemplateColumns: "repeat(4, max-content)",
+        gridTemplateColumns: ".1fr .5fr repeat(2, max-content)",
         padding: ".5rem .5rem .5rem 2rem",
         marginTop: "2rem",
         columnGap: "1rem",
@@ -600,13 +604,14 @@ const columns = [
     },
 ];
 
-const gridColumns = ".3fr .8fr 1fr .8fr .5fr .7fr 1fr .5fr";
+const gridColumns = ".3fr 1.1fr 1.2fr .8fr .5fr .7fr .5fr .5fr";
 
 const pages = [15, 25, 50, 100];
 
 const Listings = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
     const { admin } = useSelector((state) => state);
     const { customer, buyer } = useSelector((state) => state.customers);
@@ -620,14 +625,12 @@ const Listings = () => {
         ALL_OPEN,
     } = LISTING_DETAILS;
     const [tab, setTab] = useState(ALL_LISTINGS);
-    const [loading, setLoading] = useState(true);
+    // const [loading, setLoading] = useState(true);
     // const [pageNumberList, setPageNumberList] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [pageCount, setPageCount] = useState(0);
     // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
-
-    const [sellerName, setSellerName] = useState("");
 
     // const [viewMoreData, setViewMoreData] = useState({});
     const [openViewMore, setOpenViewMore] = useState(false);
@@ -635,13 +638,8 @@ const Listings = () => {
     const [openXport, closeXport] = useState(false);
 
     //PC is PageCount
-    const [totalActivePC, setTotalActivePC] = useState(0);
-    const [totalFinalisedPC, setTotalFinalisedPC] = useState(0);
-    const [totalRemovedPC, setTotalRemovedPC] = useState(0);
-    const [totalInProgressPC, setTotalInProgressPC] = useState(0);
     const [anchorEl, setAnchorEl] = useState(null);
     // const [openReverseMenu, closeReverseMenu] = useState(false);
-    const [buyerName, setBuyerName] = useState("");
     const [dateFilter, setDateFilter] = useState({ start: "", end: "" });
     const ref = useRef();
 
@@ -654,8 +652,8 @@ const Listings = () => {
         totalListingsInProgress,
         totalFinalisedListings,
     } = useSelector((state) => state.stats);
+
     const {
-        totalPageCount,
         listings,
         activeListings,
         finalisedListings,
@@ -663,9 +661,12 @@ const Listings = () => {
         deletedListings,
         credit,
         listing,
+        isLoading,
     } = useSelector((state) => state.listings);
+
     const { msg } = useSelector((state) => state.errors);
     const { wallet } = useSelector((state) => state.wallets);
+    const [isNavigate, setIsNavigate] = useState(false);
 
     const [value, setValue] = useState([1, 70]);
     const [toastMsg, setToastMsg] = useState("");
@@ -676,44 +677,39 @@ const Listings = () => {
     };
 
     useEffect(() => {
-        if (tab) {
-            setCurrentPage(1);
-        }
-    }, [tab]);
-
-    useEffect(() => {
         switch (tab) {
             case ALL_LISTINGS:
                 if (!!listings) {
-                    setLoading(false);
+                    setCurrentPage(listings.currentPageNumber);
+                    setPageCount(listings.totalPageCount);
                 }
                 break;
 
             case ALL_OPEN:
                 if (!!activeListings.items) {
-                    setTotalActivePC(activeListings.totalPageCount);
-                    setLoading(false);
+                    setCurrentPage(activeListings.currentPageNumber);
+                    setPageCount(activeListings.totalPageCount);
                 }
                 break;
 
             case ALL_COMPLETED:
                 if (!!finalisedListings) {
-                    setTotalFinalisedPC(finalisedListings.totalPageCount);
-                    setLoading(false);
+                    setCurrentPage(finalisedListings.currentPageNumber);
+                    setPageCount(finalisedListings.totalPageCount);
                 }
                 break;
 
             case ALL_NEGOTIATIONS:
                 if (!!inProgressListings) {
-                    setTotalInProgressPC(inProgressListings.totalPageCount);
-                    setLoading(false);
+                    setCurrentPage(inProgressListings.currentPageNumber);
+                    setPageCount(inProgressListings.totalPageCount);
                 }
                 break;
 
             case ALL_DELETED:
                 if (!!deletedListings) {
-                    setTotalRemovedPC(deletedListings.totalPageCount);
-                    setLoading(false);
+                    setCurrentPage(deletedListings.currentPageNumber);
+                    setPageCount(deletedListings.totalPageCount);
                 }
                 break;
 
@@ -737,7 +733,7 @@ const Listings = () => {
     useEffect(() => {
         closeXport(false);
         setOpenFilterBx(false);
-        setLoading(true);
+
         switch (tab) {
             case ALL_LISTINGS:
                 dispatch(
@@ -750,7 +746,6 @@ const Listings = () => {
                         dateFilter.end
                     )
                 );
-                setPageCount(totalPageCount || 0);
                 break;
 
             case ALL_OPEN:
@@ -764,7 +759,6 @@ const Listings = () => {
                         dateFilter.end
                     )
                 );
-                setPageCount(totalActivePC || 0);
                 break;
 
             case ALL_COMPLETED:
@@ -778,7 +772,6 @@ const Listings = () => {
                         dateFilter.end
                     )
                 );
-                setPageCount(totalFinalisedPC || 0);
                 break;
 
             case ALL_NEGOTIATIONS:
@@ -792,7 +785,6 @@ const Listings = () => {
                         dateFilter.end
                     )
                 );
-                setPageCount(totalInProgressPC || 0);
                 break;
 
             case ALL_DELETED:
@@ -806,7 +798,6 @@ const Listings = () => {
                         dateFilter.end
                     )
                 );
-                setPageCount(totalRemovedPC || 0);
                 break;
 
             default:
@@ -822,13 +813,6 @@ const Listings = () => {
         ALL_DELETED,
         tab,
         currentPage,
-        rowsPerPage,
-        dispatch,
-        totalPageCount,
-        totalInProgressPC,
-        totalActivePC,
-        totalRemovedPC,
-        totalFinalisedPC,
     ]);
 
     const downloadRecords = () => {
@@ -873,35 +857,19 @@ const Listings = () => {
     };
 
     const viewTableRow = (listing) => {
-        console.log(listing);
         batch(() => {
             dispatch({ type: VIEW_LISTING, payload: listing });
             dispatch(getCustomer(listing.customerId));
             dispatch(getOneWallet(listing.walletId));
         });
-        // setViewMoreData(listing);
         setOpenViewMore(true);
     };
-
-    useEffect(() => {
-        if (!isEmpty(customer?.username)) {
-            // console.log("cus", customer);
-            setSellerName(customer?.username);
-        }
-    }, [customer]);
 
     useEffect(() => {
         if (!isEmpty(listing?.bids)) {
             dispatch(getCustomer(listing.bids[0]?.customerId, "BUYER"));
         }
     }, [listing, dispatch]);
-
-    useEffect(() => {
-        // console.log("buyer", buyer);
-        if (!isEmpty(buyer)) {
-            setBuyerName(buyer?.username);
-        }
-    }, [buyer]);
 
     const currentAmount = (amount) => {
         // console.log("amount", amount);
@@ -915,24 +883,24 @@ const Listings = () => {
         (bids) => {
             // console.log(sellerName);
             const confirmed =
-                sellerName +
+                (customer?.username ?? customer?.userName) +
                 " confirms " +
-                currentAmount(bids.bidAmount)?.currencyType +
-                currentAmount(bids.bidAmount).amount +
+                currentAmount(listing.amountNeeded)?.currencyType +
+                currentAmount(listing.amountNeeded).amount +
                 ", " +
                 currentAmount(bids.bidAmount).currencyType +
                 currentAmount(bids.bidAmount).amount +
-                ` moved to ${buyerName}'s wallet`;
+                ` moved to ${buyer?.username ?? buyer?.userName}'s wallet`;
 
             const cancelled =
-                sellerName +
+                (customer?.username ?? customer?.userName) +
                 " cancels " +
                 currentAmount(bids.bidAmount).currencyType +
                 currentAmount(bids.bidAmount).amount +
                 " listing.";
 
             const inProgress =
-                buyerName +
+                (buyer?.username ?? buyer?.userName) +
                 " has bid for " +
                 currentAmount(bids.bidAmount).currencyType +
                 currentAmount(bids.bidAmount).amount +
@@ -944,7 +912,7 @@ const Listings = () => {
                 inProgress,
             };
         },
-        [sellerName, buyerName]
+        [customer, buyer, listing]
     );
 
     const bidsStatusDetails = useCallback(
@@ -994,7 +962,7 @@ const Listings = () => {
     };
 
     const handleCredit = (listing) => {
-        console.log("hell", listing);
+        // console.log("hell", listing);
         dispatch(
             creditListing(listing.walletId, {
                 amount: listing.amountNeeded.amount,
@@ -1023,7 +991,6 @@ const Listings = () => {
 
     const closeViewMoreModal = () => {
         setOpenViewMore(false);
-        setSellerName("");
         batch(() => {
             dispatch({
                 type: CREDIT_LISTING,
@@ -1039,10 +1006,18 @@ const Listings = () => {
             dispatch({
                 type: CLEAR_WALLET,
             });
+            dispatch({
+                type: CLEAR_BUYER,
+            });
         });
     };
 
     useEffect(() => {
+        if (!openViewMore && !isEmpty(buyer)) {
+            dispatch({
+                type: CLEAR_BUYER,
+            });
+        }
         return () => {
             dispatch({
                 type: CLEAR_ERROR_MSG,
@@ -1110,7 +1085,6 @@ const Listings = () => {
                 }
                 break;
             case ALL_DELETED:
-                console.log("helo");
                 if (!!dateFilter.start && !!dateFilter.end) {
                     dispatch(
                         getDeletedListings(
@@ -1139,6 +1113,19 @@ const Listings = () => {
         filterDate();
         setOpenFilterBx(false);
     };
+
+    const navigateToCustomerProf = (e, customerId) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsNavigate(true);
+        dispatch(getCustomer(customerId));
+    };
+
+    useEffect(() => {
+        if (!openViewMore && isNavigate && !isEmpty(customer)) {
+            navigateToProfile(navigate, customer.id);
+        }
+    }, [navigate, customer, openViewMore, isNavigate]);
 
     return (
         <>
@@ -1512,36 +1499,41 @@ const Listings = () => {
                     {tab === ALL_LISTINGS && (
                         <AllListings
                             viewRow={viewTableRow}
-                            loadingListings={loading}
+                            navigateToProfile={navigateToCustomerProf}
+                            loadingListings={isLoading}
                         />
                     )}
                     {tab === ALL_OPEN && (
                         <ActiveListings
                             viewRow={viewTableRow}
-                            loadingListings={loading}
+                            navigateToProfile={navigateToCustomerProf}
+                            loadingListings={isLoading}
                         />
                     )}
                     {tab === ALL_NEGOTIATIONS && (
                         <InProgressListings
                             viewRow={viewTableRow}
-                            loadingListings={loading}
+                            navigateToProfile={navigateToCustomerProf}
+                            loadingListings={isLoading}
                         />
                     )}
                     {tab === ALL_DELETED && (
                         <RemovedListings
                             viewRow={viewTableRow}
-                            loadingListings={loading}
+                            navigateToProfile={navigateToCustomerProf}
+                            loadingListings={isLoading}
                         />
                     )}
                     {tab === ALL_COMPLETED && (
                         <CompletedListings
                             viewRow={viewTableRow}
-                            loadingListings={loading}
+                            navigateToProfile={navigateToCustomerProf}
+                            loadingListings={isLoading}
                         />
                     )}
                 </Box>
 
-                {loading ? (
+                {isLoading ? (
                     ""
                 ) : (
                     <Box
@@ -1568,8 +1560,8 @@ const Listings = () => {
                             }}
                         >
                             <Pagination
-                                count={pageCount}
-                                page={currentPage}
+                                count={pageCount ?? 0}
+                                page={currentPage ?? 0}
                                 onChange={(event, value) =>
                                     setCurrentPage(value)
                                 }
@@ -1610,16 +1602,19 @@ const Listings = () => {
                                     <AmlBoard
                                         classes={classes}
                                         amlTitle={"Seller:"}
-                                        amlNumber={sellerName}
+                                        amlNumber={
+                                            customer?.username ??
+                                            customer?.userName
+                                        }
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Buyer:"}
-                                        amlNumber={buyerName}
+                                        amlTitle={"Work Flow"}
+                                        amlNumber={listing.workFlow}
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Current Amount:"}
+                                        amlTitle={"Amount (Available):"}
                                         amlNumber={
                                             currentAmount(
                                                 listing.amountAvailable
@@ -1631,9 +1626,9 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Lien Balance:"}
+                                        amlTitle={"Available Balance:"}
                                         amlNumber={
-                                            wallet && wallet?.balance?.lien
+                                            wallet && wallet?.balance?.available
                                         }
                                     />
                                 </Box>
@@ -1649,30 +1644,32 @@ const Listings = () => {
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Listed Time"}
+                                        amlTitle={"Buyer"}
                                         amlNumber={
-                                            handleDate(listing.dateCreated)
-                                                .time +
-                                            handleDate(listing.dateCreated)
-                                                .space +
-                                            handleDate(listing.dateCreated).date
+                                            buyer?.username ?? buyer?.userName
                                         }
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Work Flow"}
-                                        amlNumber={listing.workFlow}
-                                    />
-                                    <AmlBoard
-                                        classes={classes}
-                                        amlTitle={"Current Rate"}
+                                        amlTitle={"Rate:"}
                                         amlNumber={listing.exchangeRate}
                                     />
                                     <AmlBoard
                                         classes={classes}
-                                        amlTitle={"Available Balance"}
+                                        amlTitle={"Amount (Needed):"}
                                         amlNumber={
-                                            wallet && wallet?.balance?.available
+                                            currentAmount(listing.amountNeeded)
+                                                .currencyType +
+                                            currentAmount(listing.amountNeeded)
+                                                .amount
+                                        }
+                                    />
+
+                                    <AmlBoard
+                                        classes={classes}
+                                        amlTitle={"Lien Balance:"}
+                                        amlNumber={
+                                            wallet && wallet?.balance?.lien
                                         }
                                     />
                                 </Box>
@@ -1700,175 +1697,329 @@ const Listings = () => {
                                 className={classes.viewMoreBidsContainer}
                             >
                                 {listing &&
-                                    listing.bids.map((listing, index) => {
+                                    listing.bids.map((bid, index) => {
                                         return (
-                                            <Box
-                                                key={index}
-                                                component="div"
-                                                className={classes.viewMoreBids}
-                                            >
+                                            <>
                                                 <Box
+                                                    key={index}
                                                     component="div"
                                                     className={
-                                                        classes.circleDesign
-                                                    }
-                                                >
-                                                    <Box
-                                                        component="div"
-                                                        className={clsx(
-                                                            classes.circle,
-                                                            classes.status,
-                                                            handleStatus(
-                                                                listing.status
-                                                            )
-                                                        )}
-                                                    ></Box>
-                                                    <Box
-                                                        component="div"
-                                                        className={classes.line}
-                                                    ></Box>
-                                                </Box>
-                                                <Box
-                                                    component="div"
-                                                    className={
-                                                        classes.statusContainer
-                                                    }
-                                                >
-                                                    <Typography
-                                                        variant="h6"
-                                                        className={clsx(
-                                                            classes.userStatusTitle,
-                                                            classes.status,
-                                                            handleStatus(
-                                                                listing.status
-                                                            )
-                                                        )}
-                                                    >
-                                                        {listing.status}
-                                                    </Typography>
-                                                    <Box
-                                                        component="span"
-                                                        className={
-                                                            classes.subStatus
-                                                        }
-                                                    >
-                                                        <Typography component="span">
-                                                            Test:{" "}
-                                                        </Typography>
-                                                        <Typography component="span">
-                                                            Another test:{" "}
-                                                        </Typography>
-                                                    </Box>
-                                                </Box>
-                                                <Box
-                                                    component="div"
-                                                    className={
-                                                        classes.dateTimeContainer
+                                                        classes.viewMoreBids
                                                     }
                                                 >
                                                     <Box
                                                         component="div"
                                                         className={
-                                                            classes.dateTime
+                                                            classes.circleDesign
                                                         }
                                                     >
-                                                        <Typography variant="body1">
-                                                            {
-                                                                handleDate(
-                                                                    listing.datePlaced
-                                                                ).time
-                                                            }
-                                                        </Typography>
-                                                        <Typography variant="body1">
-                                                            {
-                                                                handleDate(
-                                                                    listing.datePlaced
-                                                                ).date
-                                                            }
-                                                        </Typography>
-                                                    </Box>
-                                                    <Box
-                                                        component="span"
-                                                        className={
-                                                            classes.subDateTime
-                                                        }
-                                                    >
-                                                        <Typography component="span">
-                                                            {bidsStatusDetails(
-                                                                listing
-                                                            )}
-                                                        </Typography>
-                                                        {/* <Typography component='span'>Another test: </Typography> */}
-                                                    </Box>
-                                                </Box>
-                                                <Box
-                                                    component="div"
-                                                    id="basic-button"
-                                                    aria-controls={
-                                                        Boolean(anchorEl)
-                                                            ? "basic-menu"
-                                                            : undefined
-                                                    }
-                                                    // className={clsx(
-                                                    //     listing.status !==
-                                                    //         "OPEN" &&
-                                                    //         classes.hideCredBtn
-                                                    // )}
-                                                >
-                                                    <Menu
-                                                        className={
-                                                            classes.creditOptions
-                                                        }
-                                                        id="basic-menu"
-                                                        anchorEl={anchorEl}
-                                                        keepMounted
-                                                        open={Boolean(anchorEl)}
-                                                        onClose={handleClose}
-                                                        // classes={{
-                                                        //     paper: classes.menu,
-                                                        // }}
-                                                        aria-haspopup="true"
-                                                        aria-expanded={
-                                                            Boolean(anchorEl)
-                                                                ? "true"
-                                                                : undefined
-                                                        }
-                                                        MenuListProps={{
-                                                            "aria-labelledby":
-                                                                "basic-button",
-                                                        }}
-                                                        disableScrollLock={true}
-                                                    >
-                                                        <MenuItem
-                                                            onClick={() =>
-                                                                handleCredit(
-                                                                    listing
+                                                        <Box
+                                                            component="div"
+                                                            className={clsx(
+                                                                classes.circle,
+                                                                classes.status,
+                                                                handleStatus(
+                                                                    bid.status
                                                                 )
+                                                            )}
+                                                        ></Box>
+                                                        <Box
+                                                            component="div"
+                                                            className={
+                                                                classes.line
+                                                            }
+                                                        ></Box>
+                                                    </Box>
+                                                    <Box
+                                                        component="div"
+                                                        className={
+                                                            classes.statusContainer
+                                                        }
+                                                    >
+                                                        <Typography
+                                                            variant="h6"
+                                                            className={clsx(
+                                                                classes.userStatusTitle,
+                                                                classes.status,
+                                                                handleStatus(
+                                                                    bid.status
+                                                                )
+                                                            )}
+                                                        >
+                                                            {bid.status}
+                                                        </Typography>
+                                                        <Box
+                                                            component="span"
+                                                            className={
+                                                                classes.subStatus
                                                             }
                                                         >
-                                                            Transfer
-                                                        </MenuItem>
-                                                        <MenuItem
-                                                            onClick={
-                                                                handleClose
+                                                            <Typography component="span">
+                                                                Activity:
+                                                            </Typography>
+                                                        </Box>
+                                                    </Box>
+                                                    <Box
+                                                        component="div"
+                                                        className={
+                                                            classes.dateTimeContainer
+                                                        }
+                                                    >
+                                                        <Box
+                                                            component="div"
+                                                            className={
+                                                                classes.dateTime
                                                             }
                                                         >
-                                                            TEst
-                                                        </MenuItem>
-                                                        <MenuItem
-                                                            onClick={
-                                                                handleClose
+                                                            <Typography variant="body1">
+                                                                {
+                                                                    handleDate(
+                                                                        bid.datePlaced
+                                                                    ).time
+                                                                }
+                                                            </Typography>
+                                                            <Typography variant="body1">
+                                                                {
+                                                                    handleDate(
+                                                                        bid.datePlaced
+                                                                    ).date
+                                                                }
+                                                            </Typography>
+                                                        </Box>
+                                                        <Box
+                                                            component="span"
+                                                            className={
+                                                                classes.subDateTime
                                                             }
                                                         >
-                                                            Delete
-                                                        </MenuItem>
-                                                    </Menu>
+                                                            <Typography component="span">
+                                                                {bidsStatusDetails(
+                                                                    bid
+                                                                )}
+                                                            </Typography>
+                                                            {/* <Typography component='span'>Another test: </Typography> */}
+                                                        </Box>
+                                                    </Box>
+                                                    {listing &&
+                                                    !listing.bids.length ? (
+                                                        <Box
+                                                            component="div"
+                                                            id="basic-button"
+                                                            aria-controls={
+                                                                Boolean(
+                                                                    anchorEl
+                                                                )
+                                                                    ? "basic-menu"
+                                                                    : undefined
+                                                            }
+                                                            // className={clsx(
+                                                            //     listing.status !==
+                                                            //         "OPEN" &&
+                                                            //         classes.hideCredBtn
+                                                            // )}
+                                                        >
+                                                            <Menu
+                                                                className={
+                                                                    classes.creditOptions
+                                                                }
+                                                                id="basic-menu"
+                                                                anchorEl={
+                                                                    anchorEl
+                                                                }
+                                                                keepMounted
+                                                                open={Boolean(
+                                                                    anchorEl
+                                                                )}
+                                                                onClose={
+                                                                    handleClose
+                                                                }
+                                                                // classes={{
+                                                                //     paper: classes.menu,
+                                                                // }}
+                                                                aria-haspopup="true"
+                                                                aria-expanded={
+                                                                    Boolean(
+                                                                        anchorEl
+                                                                    )
+                                                                        ? "true"
+                                                                        : undefined
+                                                                }
+                                                                MenuListProps={{
+                                                                    "aria-labelledby":
+                                                                        "basic-button",
+                                                                }}
+                                                                disableScrollLock={
+                                                                    true
+                                                                }
+                                                            >
+                                                                <MenuItem
+                                                                    onClick={() =>
+                                                                        handleCredit(
+                                                                            bid
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    Release
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                    onClick={
+                                                                        handleClose
+                                                                    }
+                                                                >
+                                                                    Reverse
+                                                                    Release
+                                                                </MenuItem>
+                                                                <MenuItem
+                                                                    onClick={
+                                                                        handleClose
+                                                                    }
+                                                                >
+                                                                    Delete
+                                                                </MenuItem>
+                                                            </Menu>
+                                                        </Box>
+                                                    ) : (
+                                                        ""
+                                                    )}
                                                 </Box>
-                                            </Box>
+                                            </>
                                         );
                                     })}
-                                {isEmpty(listing.bids) ||
-                                listing?.bids[0]?.status === CANCELED ? (
+                                <Box
+                                    // key={bid.id}
+                                    component="div"
+                                    className={classes.viewMoreBids}
+                                >
+                                    <Box
+                                        component="div"
+                                        className={classes.circleDesign}
+                                    >
+                                        <Box
+                                            component="div"
+                                            className={clsx(
+                                                classes.circle,
+                                                classes.status,
+                                                handleStatus(listing.status)
+                                            )}
+                                        ></Box>
+
+                                        <Box
+                                            component="div"
+                                            // style={
+                                            //     listing && !!listing.bids.length
+                                            //         ? { display: "none" }
+                                            //         : {}
+                                            // }
+                                            className={classes.line}
+                                        ></Box>
+                                    </Box>
+                                    <Box
+                                        component="div"
+                                        className={classes.statusContainer}
+                                    >
+                                        <Typography
+                                            variant="h6"
+                                            className={clsx(
+                                                classes.userStatusTitle,
+                                                classes.status,
+                                                handleStatus(listing.status)
+                                            )}
+                                        >
+                                            {listing.status}
+                                        </Typography>
+                                        <Box
+                                            component="span"
+                                            className={classes.subStatus}
+                                        >
+                                            <Typography component="span">
+                                                Activity:
+                                            </Typography>
+                                        </Box>
+                                    </Box>
+                                    <Box
+                                        component="div"
+                                        className={classes.dateTimeContainer}
+                                    >
+                                        <Box
+                                            component="div"
+                                            className={classes.dateTime}
+                                        >
+                                            <Typography variant="body1">
+                                                {
+                                                    handleDate(
+                                                        listing.dateCreated
+                                                    ).time
+                                                }
+                                            </Typography>
+                                            <Typography variant="body1">
+                                                {
+                                                    handleDate(
+                                                        listing.dateCreated
+                                                    ).date
+                                                }
+                                            </Typography>
+                                        </Box>
+                                        <Box
+                                            component="span"
+                                            className={classes.subDateTime}
+                                        >
+                                            <Typography component="span">
+                                                {bidsStatusDetails(listing)}
+                                            </Typography>
+                                            {/* <Typography component='span'>Another test: </Typography> */}
+                                        </Box>
+                                    </Box>
+                                    <Box
+                                        component="div"
+                                        id="basic-button"
+                                        aria-controls={
+                                            Boolean(anchorEl)
+                                                ? "basic-menu"
+                                                : undefined
+                                        }
+                                        // className={clsx(
+                                        //     listing.status !==
+                                        //         "OPEN" &&
+                                        //         classes.hideCredBtn
+                                        // )}
+                                    >
+                                        <Menu
+                                            className={classes.creditOptions}
+                                            id="basic-menu"
+                                            anchorEl={anchorEl}
+                                            keepMounted
+                                            open={Boolean(anchorEl)}
+                                            onClose={handleClose}
+                                            // classes={{
+                                            //     paper: classes.menu,
+                                            // }}
+                                            aria-haspopup="true"
+                                            aria-expanded={
+                                                Boolean(anchorEl)
+                                                    ? "true"
+                                                    : undefined
+                                            }
+                                            MenuListProps={{
+                                                "aria-labelledby":
+                                                    "basic-button",
+                                            }}
+                                            disableScrollLock={true}
+                                        >
+                                            <MenuItem
+                                                onClick={() =>
+                                                    handleCredit(listing)
+                                                }
+                                            >
+                                                Release
+                                            </MenuItem>
+                                            <MenuItem onClick={handleClose}>
+                                                Reverse Release
+                                            </MenuItem>
+                                        </Menu>
+                                    </Box>
+                                </Box>
+                                {isEmpty(listing) ||
+                                listing[0]?.status === CANCELED ? (
                                     ""
                                 ) : (
                                     <Box

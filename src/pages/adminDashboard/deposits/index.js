@@ -116,16 +116,11 @@ const Deposits = () => {
 
     const dispatch = useDispatch();
     const [anchorEl, setAnchorEl] = useState(null);
-    // const [ depositFilter, setDepositFilter ] = useState('')
-    // const [ loadingDeposit ] = useState(false)
-    // const [rowsPerPage, setRowsPerPage] = useState(pages[0]);
     const [rowsPerPage] = useState(pages[0]);
     const [currentPage, setCurrentPage] = useState(1);
-    // const [pageNumberList, setPageNumberList] = useState([]);
-    // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [pageCount, setPageCount] = useState(0);
 
-    const { fundingRequests, totalPageCount, isLoading } = useSelector(
+    const { fundingRequests, isLoading } = useSelector(
         (state) => state.wallets
     );
 
@@ -147,15 +142,21 @@ const Deposits = () => {
     }, []);
 
     useEffect(() => {
+        if (!!fundingRequests.items) {
+            setCurrentPage(fundingRequests.currentPageNumber);
+            setPageCount(fundingRequests.totalPageCount);
+            return;
+        }
+    }, [fundingRequests]);
+
+    useEffect(() => {
         dispatch(
             getAllDeposits({
                 pageSize: rowsPerPage,
                 pageNumber: currentPage,
             })
         );
-
-        setPageCount(totalPageCount || 0);
-    }, [currentPage, dispatch, rowsPerPage, totalPageCount]);
+    }, [currentPage, dispatch, rowsPerPage]);
 
     return (
         <>
@@ -195,17 +196,21 @@ const Deposits = () => {
                             width: "100%",
                         }}
                     >
+                        <Box component="div" sx={{ alignSelf: "flex-start" }}>
+                            {/* <Typography component="span">{'20'} results</Typography> */}
+                        </Box>
                         <Box
                             component="div"
                             sx={{
                                 display: "flex",
                                 flexDirection: "column",
                                 gap: "15px",
+                                paddingBottom: 24,
                             }}
                         >
                             <Pagination
-                                count={pageCount}
-                                page={currentPage}
+                                count={pageCount ?? 0}
+                                page={currentPage ?? 0}
                                 onChange={(event, value) =>
                                     setCurrentPage(value)
                                 }
