@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { 
@@ -25,6 +26,7 @@ import isEmpty from '../../../utils/isEmpty';
 
 import AddAccountDrawer from '../bankAccount/AddAccountDrawer';
 import SuccessModal from '../../../components/common/SuccessModal';
+import { TRANSACTIONS } from '../../../routes';
 
 const useStyles = makeStyles(theme => ({
     drawer: {
@@ -99,11 +101,12 @@ const useStyles = makeStyles(theme => ({
     },
 }));
 
-const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }) => {
+const AcceptOfferDrawer = ({ acceptOffer, toggleDrawer, drawerOpen }) => {
 	const classes = useStyles();
     const dispatch = useDispatch();
+    const navigate = useNavigate();
 
-    const { account, accounts } = useSelector(state => state.bankAccounts);
+    const { accounts } = useSelector(state => state.bankAccounts);
     const bankAccountMsg = useSelector(state => state.bankAccounts.msg);
     const { listing, msg } = useSelector(state => state.listings);
     const errorsState = useSelector(state => state.errors);
@@ -121,9 +124,9 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     const successModal = useRef();
 
     useEffect(() => {
-        if (isEmpty(account) && !isEmpty(listing)) {
-            getAccount(listing.sellersAccountId);
-        }
+        // if (isEmpty(account) && !isEmpty(listing)) {
+        //     getAccount(listing.sellersAccountId);
+        // }
         // eslint-disable-next-line
     }, []);
 
@@ -191,7 +194,6 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     }, [errorsState]);
 
     const dismissSuccessModal = () => {
-        // setButtonDisabled(true);
         successModal.current.closeModal();
         setLoading(false);
         toggleDrawer();
@@ -213,6 +215,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
                 payload: {}
             });
         });
+        navigate(TRANSACTIONS);
     };
 
     const getAccountId = (account) => {
@@ -236,7 +239,7 @@ const AcceptOfferDrawer = ({ acceptOffer, getAccount, toggleDrawer, drawerOpen }
     return (
         <>
             <SuccessModal ref={successModal} dismissAction={dismissSuccessModal} />
-            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={true} />}
+            {addAccountDrawerOpen && <AddAccountDrawer toggleDrawer={toggleAddAccountDrawer} drawerOpen={addAccountDrawerOpen} eur={false} ngn={true} />}
             <Drawer 
                 ModalProps={{ 
                     // disableBackdropClick: true,

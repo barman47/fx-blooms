@@ -116,6 +116,9 @@ export const EIGHT_CHARACTERS = new RegExp(/.{8,}/);
 export const UPLOAD_LIMIT = 1000000; // 1 Megabyte
 export const ATTACHMENT_LIMIT = 3000000; // 3 Megabytes
 
+export const SESSION_LIFE = 270000; // 4.5minutes in milliseconds
+export const SESSION_TIME = 'sessionTime'
+
 export const BID_STATUS = {
     IN_PROGRES: "IN_PROGRESS",
     CANCELED: "CANCELED",
@@ -128,6 +131,8 @@ export const LISTING_STATUS = {
     negotiation: "NEGOTIATION",
     finalized: "FINALIZED",
 };
+
+export const HAS_SEEN_ESCROW_MESSAGE = 'hasSeenEscrowMessage';
 
 export const PAYMENT_METHODS = [
     "N26",

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
+import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
@@ -12,17 +12,19 @@ import formatNumber from '../../../utils/formatNumber';
 import { completeTransaction } from '../../../actions/listings';
 import { getTransaction } from '../../../actions/transactions';
 import { getNotifications, generateOtp } from '../../../actions/notifications';
-import { GET_ERRORS, SET_BID, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
+import { GET_ERRORS, SET_BID, SET_BIDS, SET_CUSTOMER_MSG, SET_LISTING_MSG } from '../../../actions/types';
 
 import extractCountryCode from '../../../utils/extractCountryCode';
 import getCurrencySymbol from '../../../utils/getCurrencySymbol';
-import { PROFILE, PIN, TWO_FACTOR } from '../../../routes';
+import { PROFILE, PIN, TWO_FACTOR, VERIFF } from '../../../routes';
 
 import Notification from './Notification';
 import SellerSendNgnDrawer from './SellerSendNgnDrawer';
 import VerifyPhoneNumberModal from '../profile/VerifyPhoneNumberModal';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
+import Toast from '../../../components/common/Toast';
+import isEmpty from '../../../utils/isEmpty';
 
 const useStyles = makeStyles(theme => ({
     root: {
@@ -98,7 +100,8 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const classes = useStyles();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const { customerId, hasSetup2FA, isPhoneNumberVerified, idVerificationLink, phoneNo, residencePermitUrl, stats, msg } = useSelector(state => state.customer);
+    const { customerId, hasSetPin, hasSetup2FA, isPhoneNumberVerified, phoneNo, stats, msg } = useSelector(state => state.customer);
+    const errorsState = useSelector(state => state.errors);
     const { notifications } = useSelector(state => state.notifications);
 
     const [sellerSendNgnDrawerOpen, setSellerSendNgnDrawerOpen] = useState(false);
@@ -107,8 +110,10 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const [loading, setLoading] = useState(false);
     const [countryCode, setCountryCode] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [errors, setErrors] = useState({});
 
     const successModal = useRef();
+    const toast = useRef();
 
     const { APPROVED } = ID_STATUS;
     const { BUYER_MADE_PAYMENT, SELLER_MADE_PAYMENT, OFFER_MADE } = NOTIFICATION_TYPES;
@@ -125,6 +130,23 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
         };
         // eslint-disable-next-line
     }, []);
+
+    useEffect(() => {
+        if (!isEmpty(errors)) {
+            toast.current.handleClick();
+        }
+    }, [errors]);
+
+    useEffect(() => {
+        if (errorsState?.msg) {
+            setErrors({ ...errorsState });
+            setLoading(false);
+            dispatch({
+                type: GET_ERRORS,
+                payload: {}
+            });
+        }
+    }, [dispatch, errorsState, errors]);
 
     useEffect(() => {
         if (msg) {
@@ -179,7 +201,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     const handleButtonAction = (notification, notificationId) => {
         const { Buyer, Seller } = notification;
-        setLoading(true);
         if (customerId === Seller.CustomerId) {
             return handlePaymentReceived(notification.Id, notificationId);
         }
@@ -187,14 +208,6 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
         if (customerId === Buyer.CustomerId) {
             return handlePaymentReceived(notification.Id, notificationId);
         }
-    };
-
-    const verifyEuId = () => {
-        window.open(residencePermitUrl);
-    };
-
-    const verifyOtherId = () => {
-        window.open(idVerificationLink);
     };
 
     const verifyPhone = () => {
@@ -219,9 +232,17 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
     const handleBuyerPayment = (bid) => {
         const { notificationId, data } = bid;
         setNotificationId(notificationId);
-        dispatch({
-            type: SET_BID,
-            payload: bid
+        batch(() => {
+            dispatch({
+                type: SET_BID,
+                payload: bid
+            });
+
+            // Clear bids before opening the drawer so as not to make the call to cancel bids when the drawer opens
+            dispatch({
+                type: SET_BIDS,
+                payload: []
+            });
         });
 
         // if (data.Buyer.HasReceivedPayment && !data.Buyer.HasMadePayment) {
@@ -253,6 +274,15 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 
     return (
         <>
+            {!isEmpty(errors) && 
+                <Toast 
+                    ref={toast}
+                    title="ERROR"
+                    duration={5000}
+                    msg={errors.msg || ''}
+                    type="error"
+                />
+            }
             {loading && <Spinner />}
             {sellerSendNgnDrawerOpen && 
                 <SellerSendNgnDrawer 
@@ -346,27 +376,16 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
                             // }
                             return null;
                         })}
-                        {stats.residencePermitStatus !== APPROVED &&
+                        {stats.idStatus !== APPROVED &&
                             <Notification 
-                                title="Verify your EU Government Issued ID"
-                                message="Required to BUY and SELL. Click Verify ID to proceed."
+                                title="Verify  your Identity"
+                                message="Required to BUY only. Click Verify ID to proceed."
                                 buttonText="Verify ID"
-                                buttonAction={verifyEuId}
+                                buttonAction={() => navigate(VERIFF)}
                                 icon={<Passport />}
 						        iconBackgroundColor="#000100"
                             />
                         }
-                        {/* eslint-disable-next-line no-mixed-operators */}
-                        {((stats.idStatus !== APPROVED) && (stats.residencePermitStatus !== APPROVED)) && (
-                            <Notification 
-                                title="Verify Other Government Issued ID"
-                                message="Required to BUY only. Click Verify ID to proceed."
-                                buttonText="Verify ID"
-                                buttonAction={verifyOtherId}
-                                icon={<Passport />}
-						        iconBackgroundColor="#000100"
-                            />
-                        )}
                         {!hasSetup2FA &&
                             <Notification 
                                 title="Set up 2FA"
@@ -387,12 +406,14 @@ const Index = ({ completeTransaction, getTransaction, getNotifications, generate
 						        iconBackgroundColor="#2893EB"
                             />
                         }
-                        <Notification 
-                            title="Set PIN"
-                            message="Required for wallet withdrawals.. Click Set PIN to proceed."
-                            buttonText="Set PIN"
-                            buttonAction={() => navigate(PIN)}
-                        />
+                        {!hasSetPin && 
+                            <Notification 
+                                title="Set PIN"
+                                message="Required for wallet withdrawals. Click Set PIN to proceed."
+                                buttonText="Set PIN"
+                                buttonAction={() => navigate(PIN)}
+                            />
+                        }
                     </section>
                     <aside>
                         <Typography variant="h6">Attention</Typography>

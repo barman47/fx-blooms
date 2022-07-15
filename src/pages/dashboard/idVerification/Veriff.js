@@ -1,5 +1,3 @@
-//
-
 // Serverless Veriff JS SDK and Incontext SDK integration example using React.JS
 
 import { useEffect } from "react";
@@ -65,9 +63,15 @@ const popupBlockerChecker = {
     },
 };
 
-function VeriffVerify() {
+function VeriffVerify({ handleSetTitle }) {
     const classes = useStyles();
     const { customerId } = useSelector((state) => state.customer);
+
+    useEffect(() => {
+        handleSetTitle('Verify ID');
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         // here we generate a verification session needless of a server;

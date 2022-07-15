@@ -163,7 +163,7 @@ const IDVerification = () => {
         idStatus,
         residencePermitStatus,
     ]);
-
+    
     const verifyID = () => {
         // window.open(residencePermitUrl);
         // window.open('/dashboard/veriff')
@@ -212,7 +212,7 @@ const IDVerification = () => {
                             For KYC, kindly verify your government-issued ID.
                         </Typography>
                         <div>
-                            {residencePermitStatus !== APPROVED ? (
+                            {idStatus !== APPROVED ? 
                                 <>
                                     <Typography
                                         variant="body2"

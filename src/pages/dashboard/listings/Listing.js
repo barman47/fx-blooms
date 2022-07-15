@@ -83,8 +83,7 @@ const useStyles = makeStyles(theme => ({
         display: 'grid',
         gridTemplateColumns: 'repeat(4, 1fr)',
         gap: theme.spacing(1),
-        padding: [[theme.spacing(2), theme.spacing(4), theme.spacing(2), theme.spacing(8)]],
-        // padding: [[theme.spacing(4), theme.spacing(3)]],
+        padding: [[theme.spacing(2), theme.spacing(3), theme.spacing(2), theme.spacing(8)]],
 
         [theme.breakpoints.down('lg')]: {
             gridTemplateColumns: 'repeat(4, 1fr)',
@@ -93,8 +92,7 @@ const useStyles = makeStyles(theme => ({
 
         [theme.breakpoints.down('sm')]: {
             padding: theme.spacing(1),
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
+            gridTemplateColumns: 'repeat(3, 1fr)',
             rowGap: theme.spacing(2)
         },
 
@@ -112,7 +110,7 @@ const useStyles = makeStyles(theme => ({
         color: COLORS.offWhite,
 
         [theme.breakpoints.down('sm')]: {
-            gridColumn: '1 / span 2'
+            gridColumn: '1 / span 3'
         }
     },
 
@@ -164,7 +162,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     }, [dispatch, expired, listing.id]);
 
     const startExpiryTimer = () => {
-        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 259200000; // number of milliseconds in 3 days
+        const countDownDate = new Date((convertToLocalTime(dateCreated))).getTime() + 172800000; // number of milliseconds in 2 days
         interval.current = setInterval(() => {
             const now = new Date().getTime();
             const distance = countDownDate - now;
@@ -305,7 +303,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                             disableFocusRipple
                             fullWidth
                         >
-                            <Button 
+                            {/* <Button 
                                 className={classes.buttons}
                                 color="primary"
                                 size="large"
@@ -316,7 +314,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                                 disabled={listing.status !== open}
                             >
                                 Edit
-                            </Button>
+                            </Button> */}
                             <Button 
                                 className={classes.buttons}
                                 color="secondary"

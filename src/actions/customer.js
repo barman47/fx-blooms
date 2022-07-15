@@ -16,6 +16,7 @@ import {
     // PROCEED_TO_DASHBOARD,
     ID_STATUS,
     FILL_FORM1,
+    SESSION_TIME,
 } from "../utils/constants";
 import handleError from "../utils/handleError";
 import reIssueCustomerToken from "../utils/reIssueCustomerToken";
@@ -231,10 +232,7 @@ export const externalLogin = (data, navigate) => async (dispatch) => {
             type: SET_CURRENT_CUSTOMER,
             payload: authResponse,
         });
-
-        return isLinkedToProfile
-            ? navigate(DASHBOARD_HOME)
-            : navigate(ADD_USERNAME, { addUsername: true });
+        return isLinkedToProfile ? navigate(DASHBOARD_HOME) : navigate(ADD_USERNAME, { addUsername: true });
     } catch (err) {
         return handleError(err, dispatch);
     }
@@ -694,6 +692,7 @@ export const approveResidencePermit =
 export const logout = (navigate, msg) => (dispatch) => {
     setAuthToken(null);
     dispatch({ type: RESET_STORE });
+    sessionStorage.removeItem(SESSION_TIME);
     return navigate(LOGIN, { state: { msg } });
 };
 
@@ -714,25 +713,17 @@ export const subscribeToNewsletter = (email) => async (dispatch) => {
 
 export const getCustomerListingCounts = (customerId) => async (dispatch) => {
     try {
-        await reIssueAdminToken();
-        const deletedListingCount = await axios.get(
-            `${admin}/GetUserDeletedListingCount?customerId=${customerId}`
-        );
-
-        const completedListingCount = await axios.get(
-            `${admin}/GetUserCompletedListingCount?customerId=${customerId}`
-        );
-
-        const totalListingCount = await axios.get(
-            `${admin}/GetUserTotalListingCount?customerId=${customerId}`
-        );
-        const activeListingCount = await axios.get(
-            `${admin}/GetUserActiveListingCount?customerId=${customerId}`
-        );
-        const inProgressListingCount = await axios.get(
-            `${admin}/GetUserListingInProgressCount?customerId=${customerId}`
-        );
-
+        const promises = [
+            reIssueAdminToken(),
+            axios.get(`${admin}/GetUserDeletedListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserCompletedListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserTotalListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserActiveListingCount?customerId=${customerId}`),
+            axios.get(`${admin}/GetUserListingInProgressCount?customerId=${customerId}`)
+        ];
+        
+        // eslint-disable-next-line no-unused-vars
+        const [_, deletedListingCount, completedListingCount, totalListingCount, activeListingCount, inProgressListingCount] = await Promise.all(promises);
         dispatch({
             type: SET_CUSTOMER_LISTING_COUNT,
             payload: {

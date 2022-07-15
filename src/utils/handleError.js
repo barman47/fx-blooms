@@ -28,7 +28,6 @@ const handleError = (err, dispatch) => {
     console.log(err.message);
 
     if (err?.message === NETWORK_ERROR) {
-        console.log("network error");
         return dispatch({
             type: GET_ERRORS,
             payload: { msg: NETWORK_ERROR },

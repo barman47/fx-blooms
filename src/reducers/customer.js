@@ -16,7 +16,7 @@ import {
     RESET_CUSTOMER_SESSION,
     SET_CUSTOMER_LISTING_COUNT,
     SET_CUSTOMER_VOLUME_COUNT,
-    SETUP_PIN,
+    SETUP_PIN
 } from "../actions/types";
 
 const initialState = {
@@ -27,6 +27,7 @@ const initialState = {
     resetSession: false,
     customerListingCounts: {},
     customerVolumeCounts: {},
+    sessionTime: 0
 };
 
 const customerReducer = (state = initialState, action) => {

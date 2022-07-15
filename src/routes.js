@@ -36,15 +36,16 @@ export const RISK_PROFILE = `${ADMIN_DASHBOARD}/riskProfile`;
 
 export const DASHBOARD = '/dashboard';
 export const DASHBOARD_HOME = `${DASHBOARD}/home`;
-export const MAKE_LISTING = `${DASHBOARD}/listings/create`;
 export const EDIT_LISTING = `${DASHBOARD}/listings/edit`;
 export const USER_DETAILS = `${DASHBOARD}/listings/sellerDetails`;
 export const NOTIFICATIONS = `${DASHBOARD}/notifications`;
+export const HOW_IT_WORKS_DASHBOARD = `${DASHBOARD}/howItWorks`;
 export const WALLETS = `${DASHBOARD}/wallets`;
 export const WALLET_TRANSACTION_STATUS = `${WALLETS}/transactionStatus`;
 export const FUND_WALLET = `${WALLETS}/fundWallet`;
 export const FUND_CONFIRMATION = `${WALLETS}/fundingRequest`;
 export const FUND_AUTHORIZATION_SUCCESS = `${WALLETS}/fundingAuthorizationSuccess`;
+export const FUNDING_FAILURE = `${WALLETS}/fundingFailure`;
 export const FUNDING_REQUEST_STATUS = `${WALLETS}/funding/Status`;
 export const REQUEST_WITHDRAWAL = `${WALLETS}/withdrawalRequest`;
 export const WITHDRAWAL_REQUEST_STATUS = `${WALLETS}/withdrawal/status`;

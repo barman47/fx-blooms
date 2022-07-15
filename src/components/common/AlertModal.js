@@ -9,7 +9,7 @@ import {
 	Typography 
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
-import { CheckboxMarkedCircle } from 'mdi-material-ui';
+import { Information } from 'mdi-material-ui';
 
 import { COLORS, SHADOW } from '../../utils/constants';
 
@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const SuccessModal = forwardRef((props, ref) => {
+const AlertModal = forwardRef((props, ref) => {
 	const classes = useStyles();
 
     const [open, setOpen] = useState(false);
@@ -107,7 +107,7 @@ const SuccessModal = forwardRef((props, ref) => {
             <Fade in={open}>
                 <Grid container className={classes.container}>
                     <Grid item xs={12} className={classes.item}>
-                        <CheckboxMarkedCircle className={classes.icon} />
+                        <Information className={classes.icon} />
                         <Typography variant="subtitle1">
                             {text}
                         </Typography>
@@ -119,8 +119,8 @@ const SuccessModal = forwardRef((props, ref) => {
 	);
 });
 
-SuccessModal.propTypes = {
+AlertModal.propTypes = {
     dismissAction: PropTypes.func
 };
 
-export default SuccessModal;
+export default AlertModal;
