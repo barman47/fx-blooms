@@ -1,11 +1,10 @@
 import axios from 'axios';
-import { createBrowserHistory } from 'history';
+// import { createBrowserHistory } from 'history';
 
 import { store } from '../store';
 import setAuthToken from './setAuthToken';
 import { AUTH_TOKEN, NETWORK_ERROR } from './constants';
-import { GET_ERRORS, RESET_CUSTOMER_SESSION, RESET_STORE, SET_AUTH_TOKEN } from '../actions/types';
-import { LOGIN } from '../routes';
+import { RESET_CUSTOMER_SESSION, SET_AUTH_TOKEN } from '../actions/types';
 import { SESSION_LIFE, SESSION_TIME } from './constants';
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
@@ -13,7 +12,6 @@ const API = `${process.env.REACT_APP_BACKEND_API}`;
 const reIssueCustomerToken = () => {
     return new Promise(async(resolve, reject) => {
         try {
-            // Redirect to login page
             const sessionTime = sessionStorage.getItem(SESSION_TIME);
             if (new Date().getTime() >= sessionTime) {
                 console.log('reissuing token');
@@ -39,15 +37,21 @@ const reIssueCustomerToken = () => {
             
         } catch (err) {
             if (err?.message === NETWORK_ERROR) {
-                return store.dispatch({
-                    type: GET_ERRORS,
-                    payload: { msg: NETWORK_ERROR }
-                });     
+                return reject('Network error');
+                // return store.dispatch({
+                //     type: GET_ERRORS,
+                //     payload: { msg: NETWORK_ERROR }
+                // });   
             }
-            console.error(err);
-            setAuthToken(null);
-            store.dispatch({ type: RESET_STORE });
-            createBrowserHistory().push(LOGIN, { msg: 'Your session has expired' });
+            return reject('Something went wrong');
+            // return store.dispatch({
+            //     type: GET_ERRORS,
+            //     payload: { msg: 'Something went wrong' }
+            // });
+            // console.error(err);
+            // setAuthToken(null);
+            // store.dispatch({ type: RESET_STORE });
+            // createBrowserHistory().push(LOGIN, { msg: 'Your session has expired' });
         }
     }); 
 };

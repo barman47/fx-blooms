@@ -35,6 +35,7 @@ import VerifyPhoneNumberModal from './VerifyPhoneNumberModal';
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';
 import Toast from '../../../components/common/Toast';
+import { VERIFF } from '../../../routes';
 
 export const a11yProps = (index) => {
     return {
@@ -165,7 +166,7 @@ const useStyles = makeStyles(theme =>({
     }
 }));
 
-const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile, verifyIdentity, handleSetTitle }) => {
+const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updateProfile, handleSetTitle }) => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const { isPhoneNumberVerified, msg, profile, stats } = useSelector(state => state.customer); 
@@ -346,21 +347,21 @@ const Profile = ({ generateOtp, setHidePhoneNumber, setShowPhoneNumber, updatePr
         });
     };
 
-    if (stats.residencePermitStatus === NOT_SUBMITTED && stats.idStatus === NOT_SUBMITTED) {
-        return (
-            <div className={classes.noProfile}>
-                <Typography variant="h5" color="primary">No Profile</Typography>
-                <Typography variant="body2" component="p">Kindly verify your identity to create a profile and buy and sell.</Typography>
-                <Button className={classes.button} color="primary" variant="contained" onClick={() => verifyIdentity()}>Verify Identity</Button>
-            </div>
-        );
-    } 
-
     const togglePhoneNumber = () => {
         profile.showPhoneNumber ? setHidePhoneNumber() : setShowPhoneNumber();
         setLoading(true);
         setSpinnerText('One Moment . . .');
     };
+
+    if (stats.residencePermitStatus === NOT_SUBMITTED && stats.idStatus === NOT_SUBMITTED) {
+        return (
+            <div className={classes.noProfile}>
+                <Typography variant="h5" color="primary">No Profile</Typography>
+                <Typography variant="body2" component="p">Kindly verify your identity to create a profile and buy and sell.</Typography>
+                <Button component={RouterLink} to={VERIFF} className={classes.button} color="primary" variant="contained">Verify Identity</Button>
+            </div>
+        );
+    }
 
     return (
         <>
