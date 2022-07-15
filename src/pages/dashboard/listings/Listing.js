@@ -115,12 +115,16 @@ const useStyles = makeStyles(theme => ({
     },
 
     buttons: {
-        alignSelf: 'center'
+        alignSelf: 'center',
+
+        [theme.breakpoints.down('sm')]: {
+            gridColumn: '1 / span 3'
+        }
     },
 
     buttonGroup: {
         [theme.breakpoints.down('sm')]: {
-            gridColumn: '1 / span 2'
+            gridColumn: '1 / span 3'
         }
     }
 }));
@@ -316,7 +320,6 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                                 Edit
                             </Button> */}
                             <Button 
-                                className={classes.buttons}
                                 color="secondary"
                                 size="large"
                                 disableElevation
@@ -324,6 +327,10 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                                 disableRipple
                                 onClick={handleDeleteListing}
                                 disabled={listing.status !== open}
+                                classes={{ 
+                                    contained: classes.button,
+                                    root: classes.button
+                                }}
                             >
                                 Delete
                             </Button>
