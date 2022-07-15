@@ -156,7 +156,6 @@ const useStyles = makeStyles((theme) => ({
 
     root: {
         [theme.breakpoints.down('md')]: {
-            marginTop: theme.spacing(10),
             paddingLeft: theme.spacing(5),
             paddingRight: theme.spacing(5),
         },

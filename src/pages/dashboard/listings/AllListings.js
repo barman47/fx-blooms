@@ -76,11 +76,27 @@ const useStyles = makeStyles(theme => ({
 		margin: theme.spacing(4, 5, 7, 5),
 
 		[theme.breakpoints.down('md')]: {
-			margin: `${theme.spacing(2)} !important`
+			margin: `${theme.spacing(5, 2)} !important`
 		},
 
 		[theme.breakpoints.down('sm')]: {
 			margin: theme.spacing(2, 0)
+		}
+	},
+
+	walletsContainerSpaced: {
+		display: 'flex',
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		margin: theme.spacing(4, 5, 7, 5),
+
+		[theme.breakpoints.down('md')]: {
+			margin: `${theme.spacing(0, 2, 2, 2)} !important`
+		},
+
+		[theme.breakpoints.down('sm')]: {
+			margin: `${theme.spacing(0)} !important`
 		}
 	},
 
@@ -312,7 +328,7 @@ const AllListings = (props) => {
 	const { buy, sell, listings, currentPageNumber, hasNext, availableCurrency, requiredCurrency } = useSelector(state => state.listings);
 	const { loading } = useSelector(state => state);
 	const { accounts } = useSelector(state => state.bankAccounts);
-	const { unreadNotifications } = useSelector(state => state.notifications);
+	const { alertNotifications, unreadNotifications } = useSelector(state => state.notifications);
 	const { wallet, wallets } = useSelector(state => state.wallets);
 
 	const { 
@@ -517,7 +533,8 @@ const AllListings = (props) => {
 		<>
 			<RiskNoticeModal />
 			<Box component="section" className={classes.root}>
-				<Box component="section" className={classes.walletsContainer}>
+				<Box component="section" className={alertNotifications.length > 0 ? classes.walletsContainerSpaced : classes.walletsContainer}>
+				{/* <Box component="section" className={clsx(classes.walletsContainer, {[alertNotifications.length > 0]: classes.walletsContainerSpaced})}> */}
 					<Zoom in={showWallets}>
 						<Box component="div" className={classes.walletBalance}>
 							<Typography variant="body2" component="p">Wallet Balance</Typography>
