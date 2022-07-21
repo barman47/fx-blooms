@@ -26,8 +26,7 @@ const initialState = {
     profile: {},
     resetSession: false,
     customerListingCounts: {},
-    customerVolumeCounts: {},
-    sessionTime: 0
+    customerVolumeCounts: {}
 };
 
 const customerReducer = (state = initialState, action) => {
