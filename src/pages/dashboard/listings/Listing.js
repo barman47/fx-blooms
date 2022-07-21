@@ -144,7 +144,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
     const [timerSeconds, setTimerSeconds] = useState('00');
 
     const { id, amountAvailable, amountNeeded, exchangeRate, listedBy, customerId, dateCreated } = listing;
-    const { finalized, negotiation, open } = LISTING_STATUS;
+    const { finalizedActive, negotiation, open } = LISTING_STATUS;
 
     const interval = useRef();
 
@@ -264,7 +264,7 @@ const Listing = ({ handleAddBid, handleAcceptOffer, deleteListing, handleEditLis
                         <span style={{ display: 'block', fontWeight: 300, marginBottom: '10px' }}>Exchange rate</span>
                         {`NGN${formatNumber(exchangeRate, 2)} to ${decode('&#8364;')}1`}
                     </Typography>
-                    {listing.status === finalized ?
+                    {listing.status === finalizedActive ?
                         <Button 
                             disabled
                             to="#!"

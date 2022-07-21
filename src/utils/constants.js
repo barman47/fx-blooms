@@ -126,21 +126,15 @@ export const BID_STATUS = {
 };
 
 export const LISTING_STATUS = {
-    open: "OPEN",
-    removed: "REMOVED",
-    negotiation: "NEGOTIATION",
-    finalized: "FINALIZED",
+    open: 'OPEN',
+    expired: 'EXPIRED',
+    negotiation: 'NEGOTIATION',
+    finalizedActive: 'FINALIZED_ACTIVE',
+    deleted: 'Deleted',
+    finalizedInactive: 'FINALIZED_INACTIVE',
 };
 
 export const HAS_SEEN_ESCROW_MESSAGE = 'hasSeenEscrowMessage';
-
-export const PAYMENT_METHODS = [
-    "N26",
-    "TransferWise",
-    "Revolut",
-    "Other Banks (with instant)",
-    "Other Banks (without instant)",
-];
 
 export const olimpicMedals = [
     {

@@ -5,9 +5,9 @@ import { AUTH_TOKEN } from '../utils/constants';
 const setAuthToken =  async (token) => {
     if (token) {
         // Apply to every request
-        axios.defaults.headers.common['Authorization'] = 'Bearer';
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         axios.defaults.headers.common['Accept'] = 'application/json';
-        axios.defaults.headers.common['token'] = token;
+        // axios.defaults.headers.common['token'] = token;
         sessionStorage.setItem(AUTH_TOKEN, token);
     } else {
         // Delete auth header

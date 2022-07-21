@@ -505,6 +505,7 @@ export const updateProfile = (data) => async (dispatch) => {
     try {
         await reIssueCustomerToken();
         const res = await axios.post(`${api}/UpdateProfile`, data);
+        console.log(res);
         return dispatch({
             type: PROFILE_UPDATED,
             payload: res.data.data,
