@@ -1899,7 +1899,7 @@ const Listings = () => {
                                             className={clsx(
                                                 classes.circle,
                                                 classes.status,
-                                                handleStatus(listing.status)
+                                                handleStatus('OPEN')
                                             )}
                                         ></Box>
 
@@ -1922,10 +1922,10 @@ const Listings = () => {
                                             className={clsx(
                                                 classes.userStatusTitle,
                                                 classes.status,
-                                                handleStatus(listing.status)
+                                                handleStatus('OPEN')
                                             )}
                                         >
-                                            {listing.status}
+                                            {'OPEN'}
                                         </Typography>
                                         <Box
                                             component="span"

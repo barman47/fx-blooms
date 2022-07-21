@@ -7,6 +7,7 @@ import { createVeriffFrame } from "@veriff/incontext-sdk";
 import { Box, Typography } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { VERIFF_HOST, CALLBACK } from "../../../utils/constants";
+import VeriffLogo from '../../../assets/img/veriff-logo.jpg'
 
 // In this example both Web SDKs are covered. You can use either of implementations
 
@@ -20,15 +21,17 @@ const useStyles = makeStyles((theme) => ({
         alignItems: "center",
         justifyContent: "center",
         height: "90vh",
+        position: "relative",
 
         [theme.breakpoints.down("sm")]: {
-            justifyContent: "flex-start",
+            justifyContent: "center",
         },
     },
 
     text: {
         fontWeight: 300,
         marginBottom: theme.spacing(2),
+        textAlign: 'center'
     },
 }));
 
@@ -121,6 +124,12 @@ function VeriffVerify({ handleSetTitle }) {
 
     return (
         <div className={classes.app}>
+            <Box component="div" sx={{
+                position: "absolute",
+                top: '15%'
+            }}>
+                <img src={VeriffLogo} alt="Veriff Logo" width="120px" />
+            </Box>
             <Box component="div">
                 <Typography
                     variant="body2"
