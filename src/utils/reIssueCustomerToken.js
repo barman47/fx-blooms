@@ -17,10 +17,15 @@ const reIssueCustomerToken = () => {
                 console.log('reissuing token');
                 const res = await axios.get(`${API}/Customer/ReIssueToken`, {
                     headers: {
-                        'Authorization': 'Bearer',
-                        token: sessionStorage.getItem(AUTH_TOKEN)
+                        'Authorization': `Bearer ${sessionStorage.getItem(AUTH_TOKEN)}`
                     } 
                 });
+                // const res = await axios.get(`${API}/Customer/ReIssueToken`, {
+                //     headers: {
+                //         'Authorization': 'Bearer',
+                //         token: sessionStorage.getItem(AUTH_TOKEN)
+                //     } 
+                // });
                 setAuthToken(res.data.data);
                 store.dispatch({
                     type: SET_AUTH_TOKEN,

@@ -15,8 +15,7 @@ const reIssueAdminToken = () => {
             if (new Date().getTime() >= sessionTime) {
                 const res = await axios.get(`${API}/Admin/ReIssueToken`, {
                     headers: {
-                        'Authorization': 'Bearer',
-                        token: sessionStorage.getItem(AUTH_TOKEN)
+                        'Authorization': `Bearer ${sessionStorage.getItem(AUTH_TOKEN)}`
                     } 
                 });
                 setAuthToken(res.data.data);
