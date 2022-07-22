@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
-import { Button, Box, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Button, Box, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 
 import { COLORS } from '../utils/constants';

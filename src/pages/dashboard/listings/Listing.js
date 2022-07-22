@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Box, Button, ButtonGroup, Typography } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Box, Button, ButtonGroup, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 import { decode } from 'html-entities';
 

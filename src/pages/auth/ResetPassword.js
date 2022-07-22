@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Button, Grid, IconButton, InputAdornment, TextField, Tooltip, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 

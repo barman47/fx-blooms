@@ -1,7 +1,7 @@
 import {
   Box,
   Typography
-} from '@material-ui/core';
+} from '@mui/material';
 
 const RecentTransactions = ({ classes, recentName, children, recentDate, recentAmount}) => {
 

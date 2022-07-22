@@ -1,7 +1,7 @@
 import Status from '../../components/admin-dashboard/Status'
-import { Box, Typography } from '@material-ui/core';
+import { Box, Typography } from '@mui/material';
 import { DotsHorizontal } from 'mdi-material-ui';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
 
 const useStyles = makeStyles(theme =>({

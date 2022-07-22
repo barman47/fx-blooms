@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button, Grid, TextField, Typography, makeStyles, useMediaQuery, useTheme } from '@material-ui/core';
+import { Box, Button, Grid, TextField, Typography, makeStyles, useMediaQuery, useTheme } from '@mui/material';
 
 import { generatePinOtp } from '../../../actions/notifications';
 import { createPin, resetPin } from '../../../actions/pin';

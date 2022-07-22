@@ -8,8 +8,8 @@ import {
     InputLabel,
     Select,
     MenuItem,
-} from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+} from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
 import GenericPopUp from "../../../components/admin-dashboard/GenericPopUp";

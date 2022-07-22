@@ -4,8 +4,8 @@ import {
     Container, 
     Link,
     Typography 
-    } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+    } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 
 import { COLORS } from '../../utils/constants';
 import { SIGN_UP } from '../../routes';

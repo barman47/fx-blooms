@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { Veriff } from "@veriff/js-sdk";
 import { createVeriffFrame } from "@veriff/incontext-sdk";
-import { Box, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import { VERIFF_HOST, CALLBACK } from "../../../utils/constants";
 import VeriffLogo from '../../../assets/img/veriff-logo.jpg'
 

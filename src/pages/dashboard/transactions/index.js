@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { Toaster } from 'react-hot-toast';
-import { Box, FormControl, MenuItem, Select, Typography } from '@material-ui/core';
+import { Box, FormControl, MenuItem, Select, Typography } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 
 import { getCurrencies } from '../../../actions/currencies';

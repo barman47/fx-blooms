@@ -6,12 +6,12 @@ import {
     Button, 
     IconButton, 
     Toolbar
-} from '@material-ui/core';
+} from '@mui/material';
 import clsx from 'clsx';
 
 import { Link as AnimatedLink } from 'react-scroll';
 import { Menu as MenuIcon } from 'mdi-material-ui';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 
 import MobileNav from './MobileNav';
 
@@ -19,7 +19,6 @@ import logo from '../../assets/img/logo.svg';
 import logoWhite from '../../assets/img/logo-white.svg';
 import { COLORS, SHADOW } from '../../utils/constants';
 import { ABOUT_US, CONTACT_US, HOW_IT_WORKS, SIGN_UP, LOGIN, FAQS, DASHBOARD_HOME } from '../../routes';
-import { useTheme } from '@material-ui/styles';
 
 import HideOnScroll from './HideOnScroll';
 

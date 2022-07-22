@@ -1,10 +1,10 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import { useDispatch } from "react-redux";
 import PropTypes from "prop-types";
-import Snackbar from "@material-ui/core/Snackbar";
+import Snackbar from "@mui/material/Snackbar";
 import AlertTitle from "@material-ui/lab/AlertTitle";
 import MuiAlert from "@material-ui/lab/Alert";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 
 function Alert(props) {
     return <MuiAlert elevation={6} variant="filled" {...props} />;

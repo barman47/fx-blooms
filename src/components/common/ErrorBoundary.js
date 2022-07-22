@@ -1,6 +1,7 @@
 import { Component } from 'react';
 import { Helmet } from 'react-helmet';
-import { Box, Button, Grid, Typography, makeStyles, } from '@material-ui/core';
+import { Box, Button, Grid, Typography, } from '@mui/material';
+import { makeStyles, } from '@mui/styles';
 
 import logo from '../../assets/img/logo.svg';
 

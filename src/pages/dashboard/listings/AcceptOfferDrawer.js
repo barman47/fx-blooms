@@ -14,8 +14,8 @@ import {
     MenuItem,
     TextField,
 	Typography 
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { acceptOffer } from '../../../actions/listings';

@@ -3,7 +3,8 @@ import { useDispatch } from 'react-redux';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { createTheme, ThemeProvider } from '@material-ui/core';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { CssBaseline } from '@mui/material';
 
 import {
     ABOUT_US,
@@ -240,6 +241,7 @@ const App = ({ getCustomerInformation }) => {
 
     return (
         <ThemeProvider theme={theme}>
+            <CssBaseline />
             <Router>
                 <Suspense fallback={<FallBack />}>
                     <ScrollToTop>

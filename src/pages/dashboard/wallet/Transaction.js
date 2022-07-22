@@ -1,5 +1,5 @@
-import { Box, IconButton, Tooltip, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, IconButton, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ContentCopy, ArrowBottomLeftThick, ArrowTopRightThick } from 'mdi-material-ui';
 import moment from 'moment';
 import copy from 'copy-to-clipboard';

@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Button, CircularProgress, Grid, TextField, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import Validator from 'validator';
 
 import { sendMail, subscribeToNewsletter } from '../../actions/customer';

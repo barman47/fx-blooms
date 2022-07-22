@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import {
   Typography,
   Box
-} from '@material-ui/core';
+} from '@mui/material';
 import clsx from 'clsx'
 
 

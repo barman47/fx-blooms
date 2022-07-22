@@ -1,4 +1,4 @@
-import { Slide, useScrollTrigger } from '@material-ui/core';
+import { Slide, useScrollTrigger } from '@mui/material';
 
 import PropTypes from 'prop-types';
 

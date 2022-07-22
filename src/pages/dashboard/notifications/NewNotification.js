@@ -1,4 +1,4 @@
-import { Box, Button, IconButton, Paper, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Paper, Typography } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { Close } from 'mdi-material-ui';
 import PropTypes from 'prop-types';

@@ -11,8 +11,8 @@ import {
     StepLabel,
     Tooltip,
 	Typography
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ArrowLeft, ContentCopy } from 'mdi-material-ui';
 import copy from 'copy-to-clipboard';
 import toast, { Toaster } from 'react-hot-toast';

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { Tooltip, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import clsx from  'clsx';
 import { DeleteForever } from 'mdi-material-ui';

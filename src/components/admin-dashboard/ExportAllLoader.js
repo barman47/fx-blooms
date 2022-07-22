@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import CircularProgressBar from './CircularProgressBar'
-import { Box } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 
 const useStyles = makeStyles(() => ({

@@ -2,10 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Collapse, Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@material-ui/core';
+import { Collapse, Button, Grid, Link, TextField, Typography, InputAdornment, IconButton, Tooltip } from '@mui/material';
 import Alert from '@material-ui/lab/Alert';
 import { Close, Eye, EyeOff } from 'mdi-material-ui';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 
 import Spinner from '../../components/common/Spinner';

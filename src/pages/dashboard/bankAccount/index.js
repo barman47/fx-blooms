@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Button, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import AddAccountDrawer from './AddAccountDrawer';
 import EditAccountDrawer from './EditAccountDrawer';

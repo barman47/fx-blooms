@@ -1,6 +1,6 @@
 // import { useDispatch } from "react-redux";
-import { Box, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import TextClamp from "react-string-clamp";
 // import { SET_CUSTOMER } from "../../actions/types";
 import handleStatusStyle from "../../utils/statusDisplay";

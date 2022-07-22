@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Box, Button, Divider, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Button, Divider, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ArrowBottomLeftThinCircleOutline, ArrowTopRightThinCircleOutline } from 'mdi-material-ui';
 
 import { COLORS } from '../../../utils/constants';

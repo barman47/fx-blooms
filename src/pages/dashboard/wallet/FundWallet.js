@@ -11,8 +11,8 @@ import {
     Select,
     TextField,
     Typography 
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Security } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 

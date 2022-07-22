@@ -13,9 +13,9 @@ import {
     Slider,
     Menu,
     MenuItem,
-} from "@material-ui/core";
+} from "@mui/material";
 import Pagination from "@material-ui/lab/Pagination";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 // import { COLORS, LISTING_DETAILS, CUSTOMER_CATEGORY } from '../../../utils/constants';
 import { COLORS, LISTING_DETAILS, BID_STATUS } from "../../../utils/constants";
 import AllListings from "./AllListings";

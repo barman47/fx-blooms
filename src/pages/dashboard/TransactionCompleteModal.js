@@ -10,8 +10,8 @@ import {
 	Tooltip,
 	Typography,
     useMediaQuery 
-} from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { CheckboxMarkedCircle, ShareVariant } from 'mdi-material-ui';
 import {
     FacebookShareButton,

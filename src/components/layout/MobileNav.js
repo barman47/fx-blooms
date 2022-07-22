@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import { Link as AnimatedLink } from 'react-scroll';
 import {
     Drawer,
@@ -9,7 +9,7 @@ import {
     ListItemText,
     ListItemIcon,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { AccountOutline, Home, FormatListText, InformationVariant, Phone, Login, Help, TelevisionGuide } from 'mdi-material-ui';
 
 import logo from '../../assets/img/logo.svg';

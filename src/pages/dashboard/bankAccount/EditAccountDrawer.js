@@ -10,8 +10,8 @@ import {
     Drawer,
     TextField,
 	Typography 
-} from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Close } from 'mdi-material-ui';
 
 import { editAccount } from '../../../actions/bankAccounts';

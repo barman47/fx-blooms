@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Typography, Box, Paper } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Typography, Box, Paper } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import { getWallets } from "../../../actions/wallets";
 import greenWallet from "../../../assets/img/greenWalletShape.svg";
 import blackWallet from "../../../assets/img/blackWalletShape.svg";

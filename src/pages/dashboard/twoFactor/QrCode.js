@@ -8,8 +8,8 @@ import {
     TextField,
     Tooltip,
     Typography 
-    } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+    } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import Spinner from '../../../components/common/Spinner';
 import SuccessModal from '../../../components/common/SuccessModal';

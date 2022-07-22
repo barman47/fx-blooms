@@ -3,9 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
 import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
-import { Button, CircularProgress, Divider, Grid, TextField, Typography, useMediaQuery } from '@material-ui/core';
+import { Button, CircularProgress, Divider, Grid, TextField, Typography, useMediaQuery } from '@mui/material';
 import Rating from '@material-ui/lab/Rating';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 
 import { getSeller, reportSeller } from '../../../actions/customer';
 import { COLORS } from '../../../utils/constants';

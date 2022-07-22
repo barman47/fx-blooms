@@ -13,9 +13,9 @@ import {
     Tabs,
     TextField,
 	Typography 
-} from '@material-ui/core';
+} from '@mui/material';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Close } from 'mdi-material-ui';
 
 import { addAccount, validateIban } from '../../../actions/bankAccounts';

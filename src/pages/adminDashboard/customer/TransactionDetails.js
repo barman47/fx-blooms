@@ -9,9 +9,9 @@ import {
     // FormControl,
     Paper,
     // Divider,
-} from "@material-ui/core";
+} from "@mui/material";
 import { COLORS } from "../../../utils/constants";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 import {
     getCustomerListingCounts,
     getCustomerVolumeCounts,

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import {
     Box,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress'
 
 const UserActivitiesRow = ({ classname, category, number, progressNumber }) => {

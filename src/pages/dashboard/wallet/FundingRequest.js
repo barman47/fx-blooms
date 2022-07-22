@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import { Box, Button, Tooltip, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Button, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Refresh } from 'mdi-material-ui';
 import moment from 'moment';
 import PropTypes from 'prop-types';

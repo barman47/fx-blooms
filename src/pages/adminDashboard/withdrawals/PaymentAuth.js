@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Box, TextField, Typography } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, TextField, Typography } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import GenericButton from "../../../components/admin-dashboard/GenericButton";
 import clsx from "clsx";
 import { makeWithdrawalPayment } from "../../../actions/wallets";

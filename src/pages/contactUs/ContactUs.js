@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Box, Button, CircularProgress, Grid, TextField, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { EmailOpen, Help, Telegram } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 

@@ -6,8 +6,8 @@ import {
     Box, 
     Link,
     Typography 
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ChevronUp } from 'mdi-material-ui';
 
 import Layout from '../../components/layout';

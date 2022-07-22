@@ -9,9 +9,9 @@ import {
     IconButton,
     TextField, 
     Typography 
-} from '@material-ui/core';
+} from '@mui/material';
 import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import { CheckCircleOutline, Close } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { Box, makeStyles } from '@material-ui/core';
+import { Box, makeStyles } from '@mui/material';
 
 import VerifyPhoneModal from './VerifyPhoneModal';
 import SetPin from './SetPin';

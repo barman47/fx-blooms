@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useDispatch, useSelector, batch } from "react-redux";
-import { Box, Typography, Grid, Switch } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography, Grid, Switch } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 // import clsx from 'clsx';
 
 import {

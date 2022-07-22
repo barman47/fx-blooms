@@ -1,6 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Accordion, AccordionDetails, AccordionSummary, Button, Link, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Accordion, AccordionDetails, AccordionSummary, Button, Link, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { ChevronUp } from 'mdi-material-ui';
 
 import { COLORS } from '../../utils/constants';

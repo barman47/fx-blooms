@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
-import { Box, Typography, Divider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography, Divider } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import GenericGridAuth from "../../../components/admin-dashboard/GenericGridAuth";
 
 const useStyles = makeStyles((theme) => ({

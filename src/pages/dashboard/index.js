@@ -20,8 +20,8 @@ import {
     Typography,
     useMediaQuery,
     useTheme
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import toast, { Toaster } from 'react-hot-toast';
 import _ from 'lodash';
@@ -39,7 +39,7 @@ import {
     Button,
     BottomNavigation,
     BottomNavigationAction
-} from '@material-ui/core';
+} from '@mui/material';
 
 import { 
     AccountOutline, 

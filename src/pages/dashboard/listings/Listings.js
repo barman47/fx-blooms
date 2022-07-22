@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { batch, connect, useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { FormatListText } from 'mdi-material-ui';
 
 import { BID_STATUS, COLORS, ID_STATUS, LISTING_STATUS } from '../../../utils/constants';

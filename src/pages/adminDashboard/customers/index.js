@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { batch, connect, useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
 import PropTypes from "prop-types";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 import Alert from "@material-ui/lab/Alert";
 import {
     Box,
@@ -12,7 +12,7 @@ import {
     Menu,
     MenuItem,
     Typography,
-} from "@material-ui/core";
+} from "@mui/material";
 import Pagination from "@material-ui/lab/Pagination";
 
 import {

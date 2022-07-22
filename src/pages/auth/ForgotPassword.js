@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { connect, useDispatch, useSelector } from 'react-redux';
-import { Button, Grid, TextField, Typography } from '@material-ui/core';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { Button, Grid, TextField, Typography } from '@mui/material';
+import { makeStyles, useTheme } from '@mui/styles';
 import PropTypes from 'prop-types';
 import Validator from 'validator';
 

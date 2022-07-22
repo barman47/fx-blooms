@@ -13,9 +13,9 @@ import {
     Tab,
     TextField, 
     Typography 
-} from '@material-ui/core';
+} from '@mui/material';
 import Autocomplete from '@material-ui/lab/Autocomplete';
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 import { ChevronRight } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import Validator from 'validator';

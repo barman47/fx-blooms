@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { IconButton, Tooltip, Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { IconButton, Tooltip, Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { DeleteForever, FileEdit } from 'mdi-material-ui';
 import clsx from 'clsx';
 

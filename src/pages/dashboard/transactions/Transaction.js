@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Box, Button, IconButton, Tooltip, Typography } from '@material-ui/core';
+import { Box, Button, IconButton, Tooltip, Typography } from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { ContentCopy } from 'mdi-material-ui';
 import clsx from 'clsx';

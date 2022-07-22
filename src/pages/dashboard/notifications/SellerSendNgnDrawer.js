@@ -8,8 +8,8 @@ import {
     Grid,
     IconButton,
 	Typography 
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { AlertOutline, Close } from 'mdi-material-ui';
 
 import { cancelBid, getBids, madePaymentV2 } from '../../../actions/listings';

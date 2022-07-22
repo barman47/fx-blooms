@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { connect, useSelector } from 'react-redux';
-import { Typography } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Typography } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 
 import { getWallets } from '../../../actions/wallets';

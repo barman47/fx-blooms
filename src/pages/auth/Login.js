@@ -13,9 +13,9 @@ import {
     TextField, 
     Tooltip,
     Typography 
-} from '@material-ui/core';
+} from '@mui/material';
 import Alert from '@material-ui/lab/Alert';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles, useTheme } from '@mui/styles';
 import { Close, EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import toast, { Toaster } from 'react-hot-toast';
 import { GoogleLogin } from 'react-google-login';

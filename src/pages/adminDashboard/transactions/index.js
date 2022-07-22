@@ -7,8 +7,8 @@ import {
 } from "../../../actions/admin";
 import { getAListing } from "../../../actions/adminListings";
 import clsx from "clsx";
-import { Box, Typography, Grid, Menu, MenuItem } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography, Grid, Menu, MenuItem } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import {
     COLORS,
     TRANSACTION_DETAILS,

@@ -6,8 +6,8 @@ import {
     Tooltip,
     Typography,
     Zoom 
-} from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+} from '@mui/material';
+import { makeStyles } from '@mui/styles';
 import { Instagram, Linkedin, Twitter, Telegram } from 'mdi-material-ui';
 import { animateScroll as scroll } from 'react-scroll';
 import clsx from 'clsx';

@@ -6,7 +6,7 @@ import {
     Button,
     Divider,
     Typography
-} from '@material-ui/core';
+} from '@mui/material';
 import { makeStyles } from '@material-ui/styles';
 import { Refresh } from 'mdi-material-ui';
 import moment from 'moment';

@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { connect, useDispatch, useSelector, batch } from "react-redux";
 import { Helmet } from "react-helmet";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@mui/styles";
 import PropTypes from "prop-types";
 import clsx from "clsx";
 
@@ -25,7 +25,7 @@ import {
     // Accordion,
     // AccordionSummary,
     // AccordionDetails
-} from "@material-ui/core";
+} from "@mui/material";
 
 import {
     AccountMultiple,

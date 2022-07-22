@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Box, Typography, Menu, MenuItem, Divider } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
+import { Box, Typography, Menu, MenuItem, Divider } from "@mui/material";
+import { makeStyles } from "@mui/styles";
 import Pagination from "@material-ui/lab/Pagination";
 // import { CLEAR_ALL_CUSTOMERS, SET_CUSTOMER } from '../../../actions/types';
 import GenericTableHeader from "../../../components/admin-dashboard/GenericTableHeader";

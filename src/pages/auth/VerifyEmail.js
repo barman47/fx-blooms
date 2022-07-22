@@ -5,8 +5,8 @@ import { Helmet } from 'react-helmet';
 import PropTypes from 'prop-types';
 import { 
     Container,
-    } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+    } from '@mui/material';
+import { makeStyles } from '@mui/styles';
 
 import { verifyEmail } from '../../actions/customer';
 
