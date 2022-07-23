@@ -1,5 +1,5 @@
 import { Box, Button, Typography } from '@mui/material';
-import { makeStyles } from '@material-ui/styles';
+import { makeStyles } from '@mui/styles';
 import PropTypes from 'prop-types';
 import { ClockOutline } from 'mdi-material-ui';
 
