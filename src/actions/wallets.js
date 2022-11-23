@@ -24,7 +24,8 @@ import {
     AUTHORIZE_WITHDRAWAL,
     SET_WITHDRAWAL_REQUEST,
     CREDIT_LISTING,
-    GET_ERRORS,
+    FETCH_WALLETS,
+    GET_ERRORS
 } from "./types";
 const API = `${process.env.REACT_APP_WALLET_API}`;
 const WALLETS_API = `${API}/wallet-management`;
@@ -216,9 +217,14 @@ export const getFundingDetails = (paymentId, paymentRequestId) => async (dispatc
     }
 };
 
+export const fetchStart = () => ({
+    type: FETCH_WALLETS,
+});
+
 export const getAllDeposits = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${PAYMENT_REQ}/GetAllDeposits`, query);
         dispatch({
             type: SET_FUNDING_REQUESTS,
@@ -246,6 +252,7 @@ export const viewAllWalletRequests = (query) => async (dispatch) => {
 export const getAllWithdrawalReqs = (query) => async (dispatch) => {
     try {
         await reIssueAdminToken();
+        dispatch(fetchStart());
         const res = await axios.post(`${PAYMENT_REQ}/GetAllWithdrawals`, query);
         dispatch({
             type: SET_WALLET_TRANSACTIONS,
@@ -382,8 +389,6 @@ export const makeWithdrawalPayment =
 
 export const creditListing = (walletId, query) => async (dispatch) => {
     try {
-        // console.log(walletId);
-        // console.log(query);
         await Promise.all([
             reIssueAdminToken(),
             axios.post(`${WALLETS_API}/wallets/${walletId}/credit`, query),
@@ -413,20 +418,28 @@ export const getOneWallet = (walletId) => async (dispatch) => {
     }
 };
 
-export const completeWithdrawalRequest = (query, token) => async (dispatch) => {
-    try {
-        await reIssueAdminToken();
-        console.log(query, token);
-        const res = await axios.post(
-            `${PAYMENT_REQ}/CompleteWithdrawalRequest`,
-            query
-        );
-
-        dispatch({
-            type: COMPLETE_WITHDRAWAL_REQ,
-            payload: res.data.data,
-        });
-    } catch (err) {
-        return handleError(err, dispatch);
-    }
-};
+export const completeWithdrawalRequest =
+    (query, currPage, rowsPerPage) => async (dispatch) => {
+        try {
+            await reIssueAdminToken();
+            // console.log(query, token);
+            const res = await axios.post(
+                `${PAYMENT_REQ}/CompleteWithdrawalRequest`,
+                query
+            );
+            batch(() => {
+                dispatch({
+                    type: COMPLETE_WITHDRAWAL_REQ,
+                    payload: res.data.data,
+                });
+                dispatch(
+                    getAllWithdrawalReqs({
+                        pageSize: rowsPerPage,
+                        pageNumber: currPage,
+                    })
+                );
+            });
+        } catch (err) {
+            return handleError(err, dispatch);
+        }
+    };

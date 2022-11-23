@@ -3,7 +3,7 @@ const formatDate = (date) => {
     const hours = newDate.getHours();
     const mins = newDate.getMinutes();
 
-    const transTime = hours + ":" + mins;
+    const transTime = hours + ":" + (+mins < 10 ? "0" + mins : mins);
     const transDate =
         newDate.getDate() +
         " " +

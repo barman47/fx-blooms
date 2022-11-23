@@ -91,7 +91,7 @@ import {
 import { logout } from '../../actions/customer';
 import { getNotificationCount, markNotificationAsRead } from '../../actions/notifications';
 import { checkPin } from '../../actions/pin';
-import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, HAS_SEEN_ESCROW_MESSAGE, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, TRANSITION } from '../../utils/constants';
+import { CHAT_CONNECTION_STATUS, COLORS, DRAWER_WIDTH as drawerWidth, HAS_SEEN_ESCROW_MESSAGE, LOGOUT, NOTIFICATION_TYPES, ID_STATUS, SESSION_TIME, TRANSITION, SESSION_LIFE } from '../../utils/constants';
 import SignalRService from '../../utils/SignalRController';
 
 import HideOnScroll from '../../components/layout/HideOnScroll';
@@ -120,7 +120,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
 
     alertContainerOpen: {
@@ -129,7 +134,12 @@ const useStyles = makeStyles((theme) => ({
         transition: theme.transitions.create('width', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.enteringScreen,
-        })
+        }),
+
+        [theme.breakpoints.down('md')]: {
+            marginLeft: 0,
+            width: '100%'
+        }
     },
     
     appBarContent: {
@@ -453,6 +463,7 @@ const Dashboard = (props) => {
     }, [location.pathname]);
 
     useEffect(() => {
+        setSessionTime();
         checkTwoFactorStatus();
         checkSession();
         onReconnected();
@@ -489,6 +500,10 @@ const Dashboard = (props) => {
         }
         // eslint-disable-next-line
     }, []);
+
+    const setSessionTime = () => {
+        sessionStorage.setItem(SESSION_TIME, new Date().getTime() + SESSION_LIFE);
+    };
         
     const verifyId = useCallback(() => {
         navigate(VERIFF);

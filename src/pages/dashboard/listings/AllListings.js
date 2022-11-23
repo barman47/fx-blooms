@@ -73,14 +73,15 @@ const useStyles = makeStyles(theme => ({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
-		margin: theme.spacing(0, 5),
+		margin: theme.spacing(4, 5, 7, 5),
 
 		[theme.breakpoints.down('md')]: {
 			margin: `${theme.spacing(2)} !important`
 		},
+
 		[theme.breakpoints.down('sm')]: {
-			margin: 0
-		},
+			margin: theme.spacing(2, 0)
+		}
 	},
 
 	wallets: {
@@ -156,34 +157,21 @@ const useStyles = makeStyles(theme => ({
 		color: 'rgb(246, 113, 113)'
 	},
 
-	title: {
-		fontWeight: 300,
-		margin: theme.spacing(2, 5),
-
-		[theme.breakpoints.down('md')]: {
-			margin: theme.spacing(0, 2)
-		},
-
-		[theme.breakpoints.down('sm')]: {
-			margin: 0
-		}
-	},
-
 	listingHeader: {
 		display: 'flex',
 		flexDirection: 'row',
 		justifyContent: 'space-between',
-		alignContent: 'center',
+		alignItems: 'center',
 		margin: theme.spacing(2, 5),
 
 		[theme.breakpoints.down('md')]: {
-			display: 'flex',
-			flexDirection: 'column',
+			display: 'grid',
+			gridTemplateColumns: '1fr',
 			margin: theme.spacing(2),
 		},
 
 		[theme.breakpoints.down('sm')]: {
-			margin: 0
+			margin: theme.spacing(1, 0)
 		}
 	},
 
@@ -254,7 +242,9 @@ const useStyles = makeStyles(theme => ({
 
 	filterLabel: {
 		[theme.breakpoints.down('sm')]: {
-			gridColumn: '1 / span 2'
+			'& .MuiTypography-body1': {
+				fontSize: theme.spacing(1.8)
+			}
 		}
 	},
 
@@ -294,7 +284,13 @@ const useStyles = makeStyles(theme => ({
 	},
 
 	listingContainer: {
-		marginTop: theme.spacing(1)
+		marginTop: theme.spacing(1),
+		paddingLeft: theme.spacing(17),
+		paddingRight: theme.spacing(17),
+
+		[theme.breakpoints.down('md')]: {
+			padding: 0
+		}
 	},
 
 	buyerPopup: {
@@ -342,6 +338,7 @@ const AllListings = (props) => {
 	let loadedEvent = useRef();
 
 	useEffect(() => {
+		getWallets(customerId);
 		removeExpiredListings();
 		getPendingTransactionCount();
 		loadedEvent.current = getListings;
@@ -355,8 +352,6 @@ const AllListings = (props) => {
 			});
 			getListings();
 		}
-
-		getWallets(customerId);
 
 		if (_.isEmpty(profile)) {
 			getCustomerInformation();
@@ -375,11 +370,6 @@ const AllListings = (props) => {
 		};
 		// eslint-disable-next-line
 	}, []);
-
-	// Refetch Wallets to update balance when listings change due to deletion
-    useEffect(() => {
-		getWallets(customerId);
-	}, [customerId, getWallets, listings]);
 
 	// Only allow numbers on search
 	const handleSetAmount = (value) => {
@@ -563,7 +553,6 @@ const AllListings = (props) => {
 						</Box>
 					</Box>
 				</Box>
-				<Typography variant="body2" component="p" className={classes.title}>Marketplace</Typography>
 				<Box className={classes.listingHeader} component={Paper}>
 					<Box className={classes.buttonContainer}>
 						<Box component="div" className={classes.buySellButtons}>
@@ -621,7 +610,7 @@ const AllListings = (props) => {
 									onChange={(e) => handleSetAmount(e.target.value)}
 									type="text"
 									variant="outlined" 
-									placeholder={matches ? `${requiredCurrency} Amount` : 'Enter Amount'}
+									placeholder={matches ? 'Amount' : 'Enter Amount'}
 									helperText={errors.Amount}
 									fullWidth
 									required

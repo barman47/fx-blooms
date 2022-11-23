@@ -89,11 +89,11 @@ const columns = [
         label: "Payment Status",
         format: (value) => value.toLocaleString("en-US"),
     },
-    {
-        id: "paymenttype",
-        label: "Payment Type",
-        format: (value) => value.toLocaleString("en-US"),
-    },
+    // {
+    //     id: "paymenttype",
+    //     label: "Payment Type",
+    //     format: (value) => value.toLocaleString("en-US"),
+    // },
     {
         id: "date",
         label: "Date",
@@ -108,7 +108,7 @@ const columns = [
 
 // const pages = [10, 25, 50, 100]
 
-const gridColumns = "1fr 1fr .7fr 1fr 1fr 1fr 0.5fr";
+const gridColumns = "1fr 1fr .7fr 1fr 1fr 0.5fr";
 const pages = [15, 50, 75, 100];
 
 const Deposits = () => {
@@ -125,8 +125,7 @@ const Deposits = () => {
     // const [lastPage, setLastPage] = useState(pageNumberList?.length);
     const [pageCount, setPageCount] = useState(0);
 
-    const [loading, setLoading] = useState(true);
-    const { fundingRequests, totalPageCount } = useSelector(
+    const { fundingRequests, totalPageCount, isLoading } = useSelector(
         (state) => state.wallets
     );
 
@@ -138,24 +137,6 @@ const Deposits = () => {
         setAnchorEl(null);
     };
 
-    // const handlePageNUmberList = useCallback(() => {
-    //     const pageNumArr = [];
-    //     if (pageCount >= 1) {
-    //         for (let i = 1; i <= pageCount; i++) {
-    //             pageNumArr.push(i);
-    //         }
-    //     }
-    //     setPageNumberList(pageNumArr);
-    //     setLastPage(pageCount);
-    // }, [pageCount]);
-
-    useEffect(() => {
-        if (!!fundingRequests.items) {
-            setLoading(false);
-            // handlePageNUmberList();
-        }
-    }, [fundingRequests.items]);
-
     useEffect(() => {
         return () => {
             dispatch({
@@ -166,7 +147,6 @@ const Deposits = () => {
     }, []);
 
     useEffect(() => {
-        setLoading(true);
         dispatch(
             getAllDeposits({
                 pageSize: rowsPerPage,
@@ -176,14 +156,6 @@ const Deposits = () => {
 
         setPageCount(totalPageCount || 0);
     }, [currentPage, dispatch, rowsPerPage, totalPageCount]);
-
-    // const onNextPage = () => {
-    //     setCurrentPage(currentPage + 1);
-    // };
-
-    // const onPrevPage = () => {
-    //     setCurrentPage(currentPage - 1);
-    // };
 
     return (
         <>
@@ -203,14 +175,14 @@ const Deposits = () => {
                         headerPadding="11px 15px"
                     />
                     <DepositAndWithdrawalTable
-                        loading={loading}
+                        loading={isLoading}
                         displayChck={false}
                         data={fundingRequests.items}
                         handleClick={handleClick}
                         fontsize={11}
                     />
                 </Box>
-                {loading ? (
+                {isLoading ? (
                     ""
                 ) : (
                     <Box

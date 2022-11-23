@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { connect, useDispatch, useSelector } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import PropTypes from "prop-types";
 import {
     Box,
@@ -139,21 +139,18 @@ const IdentityDetails = ({
     getResidencePermitValidationResponse,
 }) => {
     const classes = useStyles();
-    const dispatch = useDispatch();
-    const { customer, msg, idCheckData, profileCheckData } = useSelector(
-        (state) => state.customers
-    );
+    // const dispatch = useDispatch();
+    const {
+        customer,
+        idCheckData,
+        profileCheckData,
+        isLoadingIdData,
+        isLoadingApproveId,
+    } = useSelector((state) => state.customers);
     // const errorsState = useSelector(state => state.errors);
     const { DECLINED, ACCEPTED } = ID_STATUS_CATEGORY;
-    const [loading, setLoading] = useState(false);
+    // const [loading, setLoading] = useState(false);
     const [anchorEl, setAnchorEl] = useState(null);
-
-    const [docType, setDocType] = useState(idCheckData?.documentType);
-    const [docNumber, setDocNumber] = useState(idCheckData?.documentNumber);
-    const [issueCountry, setIssueCountry] = useState(idCheckData?.issueCountry);
-    const [docStatus, setDocStatus] = useState(idCheckData?.status);
-    const [dateOfIssue, setDateOfIssue] = useState(idCheckData?.dateOfIssue);
-    const [dateOfExpiry, setExpiryDate] = useState(idCheckData?.expiryDate);
 
     // eslint-disable-next-line
     // const [errors, setErrors] = useState({});
@@ -188,22 +185,8 @@ const IdentityDetails = ({
         if (!profileCheckData) {
             getResidencePermitValidationResponse(customer.id);
         }
-
-        if (!docType && idCheckData) {
-            setExpiryDate(idCheckData.expiryDate);
-            setDateOfIssue(idCheckData.dateOfIssue);
-            setDocStatus(idCheckData.status);
-            setIssueCountry(idCheckData.issueCountry);
-            setDocNumber(idCheckData.documentNumber);
-            setDocType(idCheckData.documentType);
-        }
-
-        // dispatch({
-        //     type: GET_ERRORS,
-        //     payload: {}
-        // });
         // eslint-disable-next-line
-    }, [idCheckData]);
+    }, []);
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -213,42 +196,17 @@ const IdentityDetails = ({
         setAnchorEl(e.currentTarget);
     };
 
-    // useEffect(() => {
-    //     if (errorsState?.msg) {
-    //         setLoading(false);
-    //         // toast.current.handleClick();
-    //     }
-    // }, [errorsState, errors]);
-
-    useEffect(() => {
-        if (msg) {
-            setLoading(false);
-        }
-    }, [dispatch, msg]);
-
-    // const handleCloseModal = () => {
-    //     setModalImage('');
-    //     setAlt('');
-    //     setOpen(false);
-    // };
-
-    // const handleModalOpen = (img, alt) => {
-    //     setModalImage(img);
-    //     setAlt(alt);
-    //     setOpen(true);
-    // };
-
     const handleApproveId = () => {
-        setLoading(true);
+        // setLoading(true);
         handleClose();
         approveIdCard(customer.id);
     };
 
-    const handleApproveResidencePermit = () => {
-        setLoading(true);
-        handleClose();
-        approveResidencePermit(customer.id);
-    };
+    // const handleApproveResidencePermit = () => {
+    //     // setLoading(true);
+    //     handleClose();
+    //     approveResidencePermit(customer.id);
+    // };
 
     // const onSubmit = (e) => {
     //     e.preventDefault();
@@ -273,24 +231,31 @@ const IdentityDetails = ({
                     </Typography>
 
                     <Typography component="div" className={classes.approveId}>
-                        <GenericButton
-                            className={classes.approveId}
-                            clickAction={handleMenu}
-                            fontsize="1vw"
-                            buttonName={
-                                loading ? (
-                                    <CircularProgressBar
-                                        newWidth="20px"
-                                        newHeight="20px"
-                                    />
-                                ) : (
-                                    "APPROVE ID"
-                                )
-                            }
-                            fontColor="white"
-                            bgColor="#1E6262"
-                            textColor="white"
-                        />
+                        {!isLoadingIdData &&
+                        _.isEmpty(idCheckData ?? profileCheckData) ? (
+                            ""
+                        ) : (
+                            <GenericButton
+                                className={classes.approveId}
+                                clickAction={handleMenu}
+                                fontsize="1vw"
+                                buttonName={
+                                    isLoadingApproveId ? (
+                                        <CircularProgressBar
+                                            newWidth="20px"
+                                            newHeight="20px"
+                                        />
+                                    ) : (
+                                        "APPROVE ID"
+                                    )
+                                }
+                                fontColor="white"
+                                bgColor="#1E6262"
+                                textColor="white"
+                                btnWidth={107.14}
+                                btnHeight={32.48}
+                            />
+                        )}
                     </Typography>
 
                     <Menu
@@ -302,19 +267,32 @@ const IdentityDetails = ({
                         classes={{ paper: classes.menu }}
                         disableScrollLock={true}
                     >
-                        <MenuItem onClick={handleApproveResidencePermit}>
-                            Buy and Sell
+                        <MenuItem onClick={handleApproveId}>Approve</MenuItem>
+                        <MenuItem disabled={true} onClick={handleApproveId}>
+                            Need Review
                         </MenuItem>
-                        <MenuItem onClick={handleApproveId}>Buy only</MenuItem>
+                        <MenuItem disabled={true} onClick={handleApproveId}>
+                            Reject
+                        </MenuItem>
                     </Menu>
                 </Box>
 
-                {_.isEmpty(idCheckData) ? (
+                {isLoadingIdData ? (
                     <CircularProgressBar
                         topMargin="15px"
                         newWidth="25px"
                         newHeight="25px"
                     />
+                ) : !isLoadingIdData &&
+                  _.isEmpty(profileCheckData) &&
+                  _.isEmpty(idCheckData) ? (
+                    <Typography
+                        className="animate__animated animate__shakeX"
+                        style={{ textAlign: "center " }}
+                        variant="h6"
+                    >
+                        NO DATA FOUND
+                    </Typography>
                 ) : (
                     <Box component="div" className={classes.idDetails}>
                         <AmlBoard
@@ -322,35 +300,56 @@ const IdentityDetails = ({
                             amlTitle={"Status"}
                             amlNumber={
                                 <Status
-                                    extraStyles={handleStatus(docStatus)}
-                                    statusName={docStatus?.toUpperCase()}
+                                    extraStyles={handleStatus(
+                                        idCheckData?.status ??
+                                            profileCheckData?.status
+                                    )}
+                                    statusName={
+                                        idCheckData?.status.toUpperCase() ??
+                                        profileCheckData?.status?.toUpperCase()
+                                    }
                                 />
                             }
                         />
                         <AmlBoard
                             classes={classes}
                             amlTitle={"Document Type"}
-                            amlNumber={docType}
+                            amlNumber={
+                                idCheckData?.documentType ??
+                                profileCheckData?.documentType
+                            }
                         />
                         <AmlBoard
                             classes={classes}
                             amlTitle={"Document Number"}
-                            amlNumber={docNumber}
+                            amlNumber={
+                                idCheckData?.documentNumber ??
+                                profileCheckData?.documentNumber
+                            }
                         />
                         <AmlBoard
                             classes={classes}
                             amlTitle={"Issue Country"}
-                            amlNumber={issueCountry}
+                            amlNumber={
+                                idCheckData?.issueCountry ??
+                                profileCheckData?.issueCountry
+                            }
                         />
                         <AmlBoard
                             classes={classes}
                             amlTitle={"Date of Issue"}
-                            amlNumber={dateOfIssue}
+                            amlNumber={
+                                idCheckData?.dateOfIssue ??
+                                profileCheckData?.dateOfIssue
+                            }
                         />
                         <AmlBoard
                             classes={classes}
                             amlTitle={"Date of Expiry"}
-                            amlNumber={dateOfExpiry}
+                            amlNumber={
+                                idCheckData?.expiryDate ??
+                                profileCheckData?.expiryDate
+                            }
                         />
                     </Box>
                 )}

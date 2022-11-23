@@ -19,7 +19,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { EyeOutline, EyeOffOutline } from 'mdi-material-ui';
 import PropTypes from 'prop-types';
 import customToast, { Toaster } from 'react-hot-toast';
-import clsx from 'clsx';
+// import clsx from 'clsx';
 import Alert from '@material-ui/lab/Alert';
 import { GoogleLogin } from 'react-google-login';
 
@@ -618,7 +618,8 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                         color="primary"
                                         type="submit"
                                         fullWidth
-                                        disabled={checked ? false : true}
+                                        // disabled={checked ? false : true}
+                                        disabled
                                     >
                                         Create an Account
                                     </Button>
@@ -632,7 +633,8 @@ const CreateAccount = ({ externalLogin, registerCustomer }) => {
                                     <GoogleLogin
                                         onClick={() => alert('clicked!')}
                                         clientId={process.env.REACT_APP_GOOGLE_APP_ID}
-                                        className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
+                                        className={classes.disabledButton}
+                                        // className={clsx(classes.googleButton, { [classes.disabledButton]: !checked })}
                                         buttonText="Sign up with Google"
                                         onSuccess={handleGoogleLoginSuccess}
                                         onFailure={handleSocialLoginFailure}

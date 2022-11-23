@@ -24,6 +24,7 @@ import {
 } from './types';
 import { markNotificationAsRead } from './notifications';
 import reIssueCustomerToken from '../utils/reIssueCustomerToken';
+import { getWallets } from './wallets';
 
 const API = `${process.env.REACT_APP_BACKEND_API}`;
 const URL = `${API}/Listing`;
@@ -136,13 +137,14 @@ export const removeExpiredListings = () => async (dispatch) => {
     }
 };
 
-export const deleteListing = (listingId) => async (dispatch) => {
+export const deleteListing = (listingId) => async (dispatch, getState) => {
     try {
         await Promise.all([
             reIssueCustomerToken(),
             axios.post(`${URL}/DeleteListing/${listingId}`)
         ]);
 
+        dispatch(getWallets(getState().customer.customerId));
         return dispatch({
             type: DELETED_LISTING,
             payload: { id: listingId }
@@ -298,7 +300,7 @@ export const completeTransaction = (data, notificationId) => async (dispatch) =>
         batch(() => {
             dispatch({
                 type: SET_CUSTOMER_MSG,
-                payload: 'Transaction completed. The EUR is now made available for the @buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
+                payload: 'Transaction completed. The EUR is now made available for the buyer. Thanks for using FXBLOOMS. Please tell others about our service.'
             });
             dispatch({
                 type: REMOVE_NOTIFICATION,

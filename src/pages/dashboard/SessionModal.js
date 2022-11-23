@@ -85,6 +85,8 @@ const SessionModal = ({ logout }) => {
         clearInterval(logoutTimer.current);
         logoutTimer.current = undefined;
         startSessionTimer();
+
+        // eslint-disable-next-line
     }, []);
 
     useEffect(() => {
@@ -148,6 +150,10 @@ const SessionModal = ({ logout }) => {
         if (!sessionTimer.current) {
             sessionTimer.current = setInterval(() => {
                 setInActiveTime(inactiveTime => inactiveTime + 1);
+                // dispatch({
+                //     type: SET_SESSION_TIME,
+                //     payload: { clear: false }
+                // });
             },1000);
         }
     };

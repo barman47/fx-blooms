@@ -22,6 +22,7 @@ import {
     getSuspendedCustomers,
     getVerifiedCustomers,
     getCustomersWithoutProfile,
+    fetchStart,
     setCustomerStatus,
 } from "../../../actions/customer";
 import { getStats, exportAllUserRecords } from "../../../actions/admin";
@@ -267,6 +268,7 @@ const Customers = (props) => {
         pending,
         rejected,
         suspended,
+        isLoading,
     } = useSelector((state) => state.customers);
     const {
         // totalCustomersAwaitingApproval,
@@ -294,7 +296,6 @@ const Customers = (props) => {
     const [customerCount, setCustomerCount] = useState(0);
     const [error, setError] = useState("");
     // eslint-disable-next-line
-    const [loading, setLoading] = useState(false);
     const [filter, setFilter] = useState(ALL_CUSTOMERS);
     const [anchorEl, setAnchorEl] = useState(null);
     // const [pageNumberList, setPageNumberList] = useState([]);
@@ -348,6 +349,11 @@ const Customers = (props) => {
     // };
 
     useEffect(() => {
+        dispatch(fetchStart());
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [filter]);
+
+    useEffect(() => {
         handleSetTitle("Customers");
         if (isEmpty(noProfile)) {
             getCustomersWithoutProfile({
@@ -384,27 +390,22 @@ const Customers = (props) => {
         getStats();
 
         if (filter === CONFIRMED && confirmed.items?.length > 0) {
-            setLoading(false);
             return;
         }
 
         if (filter === ALL_CUSTOMERS && customers.items?.length > 0) {
-            setLoading(false);
             return;
         }
 
         if (filter === REJECTED && rejected.items?.length > 0) {
-            setLoading(false);
             return;
         }
 
         if (filter === SUSPENDED && suspended.items?.length > 0) {
-            setLoading(false);
             return;
         }
 
         if (filter === NO_PROFILE && noProfile.items?.length > 0) {
-            setLoading(false);
             return;
         }
     }, [
@@ -425,7 +426,6 @@ const Customers = (props) => {
 
     useEffect(() => {
         if (msg && customer) {
-            setLoading(false);
             successModal.current.openModal();
             successModal.current.setModalText(msg);
         }
@@ -551,7 +551,6 @@ const Customers = (props) => {
     // }, [ALL_CUSTOMERS, CONFIRMED, NO_PROFILE, PENDING, REJECTED, SUSPENDED, confirmed.currentPageNumber, confirmed.hasNext, customers.currentPageNumber, customers.hasNext, filter, getCustomers, getCustomersWithoutProfile, getNewCustomers, getRejectedCustomers, getSuspendedCustomers, getVerifiedCustomers, noProfile.currentPageNumber, pending.currentPageNumber, pending.hasNext, rejected.currentPageNumber, rejected.hasNext, rowsPerPage, suspended.currentPageNumber]);
 
     useEffect(() => {
-        setLoading(true);
         switch (filter) {
             case CONFIRMED:
                 getVerifiedCustomers({
@@ -619,20 +618,13 @@ const Customers = (props) => {
     // Get customers when page number changes
     // useEffect(() => {
     //     if (currentPage > 0) {
-    //         fetchCustomers();
+    //         fetchStart();
     //     }
-    // }, [fetchCustomers, currentPage]);
+    // }, [fetchStart, currentPage]);
 
     useEffect(() => {
         getCount();
     }, [filter, getCount]);
-
-    // Get customers whenever rows per page changes
-    // useEffect(() => {
-    //     if (rowsPerPage > 0) {
-    //         fetchCustomers();
-    //     }
-    // }, [fetchCustomers, rowsPerPage]);
 
     const handleSetFilter = (filter) => {
         setFilter(filter);
@@ -713,9 +705,7 @@ const Customers = (props) => {
     };
 
     const confirmCustomer = () => {
-        // setLoadingText('Confirming Customer...');
         handleClose();
-        setLoading(true);
         if (customerStatus !== CONFIRMED && customerStatus === SUSPENDED) {
             setCustomerStatus({
                 customerID: customer.id,
@@ -890,7 +880,7 @@ const Customers = (props) => {
                         <NoProfileCustomers
                             handleClick={handleClick}
                             handleSetTitle={handleSetTitle}
-                            loading={loading}
+                            loading={isLoading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     )}
@@ -898,7 +888,7 @@ const Customers = (props) => {
                         <SuspendedCustomers
                             handleClick={handleClick}
                             handleSetTitle={handleSetTitle}
-                            loading={loading}
+                            loading={isLoading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     )}
@@ -906,7 +896,7 @@ const Customers = (props) => {
                         <VerifiedCustomers
                             handleClick={handleClick}
                             handleSetTitle={handleSetTitle}
-                            loading={loading}
+                            loading={isLoading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     )}
@@ -914,7 +904,7 @@ const Customers = (props) => {
                         <RejectedCustomers
                             handleClick={handleClick}
                             handleSetTitle={handleSetTitle}
-                            loading={loading}
+                            loading={isLoading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     )}
@@ -922,7 +912,7 @@ const Customers = (props) => {
                         <AllCustomers
                             handleClick={handleClick}
                             handleSetTitle={handleSetTitle}
-                            loading={loading}
+                            loading={isLoading}
                             viewCustomerProfile={viewCustomerProfile}
                         />
                     )}
@@ -951,7 +941,7 @@ const Customers = (props) => {
                         }
                         disabled={
                             customerStatus === REJECTED ||
-                            customerStatus === "NO_PTOFILE"
+                            customerStatus === "NO_PROFILE"
                         }
                     >
                         {customerStatus === SUSPENDED ? "UnSuspend" : "Suspend"}
@@ -962,23 +952,19 @@ const Customers = (props) => {
                     </MenuItem>
                 </Menu>
 
-                {loading ? (
+                {!!isLoading ? (
                     ""
                 ) : (
                     <Box
                         component="div"
                         sx={{
                             display: "flex",
-                            justifyContent: "space-between",
+                            justifyContent: "flex-end",
                             alignItems: "center",
                             marginTop: "60px",
                             width: "100%",
                         }}
                     >
-                        <Box component="div" sx={{ alignSelf: "flex-start" }}>
-                            {/* <Typography component="span">{'20'} results</Typography> */}
-                        </Box>
-
                         <Box
                             component="div"
                             sx={{
@@ -987,18 +973,6 @@ const Customers = (props) => {
                                 gap: "15px",
                             }}
                         >
-                            {/* <Box component="div" sx={{ display: 'flex', gap: '15px' }}>
-                                <GenericButton clickAction={onPrevPage} isDisabled={currentPage === 1} buttonName="Previous" />
-                                <GenericButton clickAction={onNextPage} isDisabled={currentPage === lastPage} buttonName="Next" />
-                            </Box> */}
-                            {/* <Box component="span"  sx={{ display: 'flex', justifyContent:'center', gap: '10px' }}>
-                                {
-                                    pageNumberList && pageNumberList.map((pageNUmber, i) => (
-                                        <Typography className={clsx(classes.pageList, pageNUmber === currentPage && classes.selected)} onClick={() => setCurrentPage(pageNUmber)} variant="subtitle2" key={i}>{pageNUmber}</Typography>
-                                    ))
-                                }
-                            </Box> */}
-
                             <Pagination
                                 count={customerCount}
                                 page={currentPage}
