@@ -152,7 +152,8 @@ const Footer = () => {
                 <div>
                     <img src={logo} className={classes.logo} alt="FX Blooms Logo" onClick={() => scroll.scrollToTop} />
                     <Typography variant="subtitle2" component="span">
-                        FXBLOOMS O&#220; (registry code: 16262446) offers its products and services in partnership with Safe Connect UAB, a Yapily Ltd subsidiary regulated by the Bank of Lithuania as an Authorised Payment Institution (Company Code: 305602679, Licence No. 53).
+                        {/* FXBLOOMS O&#220; (registry code: 16262446) offers its products and services in partnership with Safe Connect UAB, a Yapily Ltd subsidiary regulated by the Bank of Lithuania as an Authorised Payment Institution (Company Code: 305602679, Licence No. 53). */}
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quibusdam quidem dolores vero laudantium amet expedita eum doloremque? Ad doloribus quod provident minima molestiae hic ducimus molestias recusandae nihil debitis totam animi, accusamus enim quidem aperiam earum laborum dolore quo expedita unde quibusdam qui, temporibus maiores! Reiciendis exercitationem tempora perferendis facilis!
                     </Typography>
                 </div>
                 <div>
