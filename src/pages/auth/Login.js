@@ -305,6 +305,7 @@ const Login = ({ externalLogin, login }) => {
                                     color="primary"
                                     type="submit"
                                     fullWidth
+                                    disabled
                                 >
                                     Sign In
                                 </Button>
